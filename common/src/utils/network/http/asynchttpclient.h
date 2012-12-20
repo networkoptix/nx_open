@@ -65,7 +65,7 @@ namespace nx_http
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
         */
-        const HttpResponse* response() const;
+        const Response* response() const;
         StringType contentType() const;
         //!Start receiving message body
         /*!
@@ -108,7 +108,7 @@ namespace nx_http
 
     private:
         State m_state;
-        HttpRequest m_request;
+        Request m_request;
         QSharedPointer<TCPSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;

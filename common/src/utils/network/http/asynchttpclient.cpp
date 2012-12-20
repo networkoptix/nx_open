@@ -255,15 +255,15 @@ namespace nx_http
     /*!
         Response is valid only after signal \a responseReceived() has been emitted
     */
-    const HttpResponse* AsyncHttpClient::response() const
+    const Response* AsyncHttpClient::response() const
     {
-        const HttpMessage& httpMsg = m_httpStreamReader.message();
+        const Message& httpMsg = m_httpStreamReader.message();
         return httpMsg.type == MessageType::response ? httpMsg.response : NULL;
     }
 
     StringType AsyncHttpClient::contentType() const
     {
-        const HttpMessage& httpMsg = m_httpStreamReader.message();
+        const Message& httpMsg = m_httpStreamReader.message();
         if( httpMsg.type == MessageType::none )
             return StringType();
         HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
@@ -379,16 +379,18 @@ namespace nx_http
         m_request.requestLine.url = m_url.path();
         m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
         if( !m_userAgent.isEmpty() )
-            m_request.headers["User-Agent"] = m_userAgent.toLatin1();
+            m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
         {
-            m_request.headers["Accept"] = "*/*";
-            m_request.headers["Accept-Encoding"] = "identity";
-            m_request.headers["Host"] = m_url.host().toLatin1();
+            m_request.headers.insert( std::make_pair("Accept", "*/*" ) );
+            m_request.headers.insert( std::make_pair("Accept-Encoding", "identity" ) );
+            m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1() ) );
         }
         //adding user credentials
         if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
-            m_request.headers[Header::Authorization::NAME] = Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString();
+            m_request.headers.insert( std::make_pair(
+                Header::Authorization::NAME,
+                Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
         //TODO/IMPL add custom headers
     }
 

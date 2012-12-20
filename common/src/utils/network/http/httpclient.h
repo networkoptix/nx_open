@@ -32,7 +32,7 @@ namespace nx_http
             Returns on receiving response
         */
         bool doGet( const QUrl& url );
-        const HttpResponse* response() const;
+        const Response* response() const;
         //!
         bool eof() const;
         //!

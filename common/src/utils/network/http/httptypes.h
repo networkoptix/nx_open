@@ -9,6 +9,7 @@
 #include <map>
 
 #include <QByteArray>
+#include <QUrl>
 
 #include "qnbytearrayref.h"
 
@@ -32,21 +33,26 @@ namespace nx_http
             - implicit sharing
             - ability to hold reference to part of the source string (to perform substr with no allocation)
             - concatenate without relocation (hold list of buffers inside). This is suitable since socket write operation can accept array of buffers
+            - pop_front operation with no relocation (just be moving internal offset)
 
-        Using QByteArray or any STL container results in many memory copy/relocation which makes implementation not effective
+        Using QByteArray or any STL container results in many memory copy/relocation operations which make implementation not effecient
     */
     typedef QByteArray BufferType;
     typedef QnByteArrayConstRef ConstBufferRefType;
     typedef QByteArray StringType;
 
-    typedef std::map<StringType, StringType> HttpHeaders;
+    typedef std::multimap<StringType, StringType> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
 
     static const size_t BufferNpos = size_t(-1);
 
 
-    //following algorithms differ from stl analogue in following: they limit number of characters checked during search 
-        //(last argument is the number of characters to check (str) but not length of searchable characters string (toSearch))
+    /*!
+        Searches first occurence of any element of \0-terminated string \a toSearch in \a count elements of \a str, starting with element \a offset
+        \param toSearch \0-terminated string
+        \param count number of characters of \a str to check, NOT a length of searchable characters string (\a toSearch)
+        \note following algorithms differ from stl analogue in following: they limit number of characters checked during search 
+    */
     template<class Str>
         size_t find_first_of(
             const Str& str,
@@ -110,6 +116,26 @@ namespace nx_http
         return BufferNpos;
     }
 
+    template<class Str, class StrValueType>
+        size_t find_last_of(
+            const Str& str,
+            const StrValueType toSearch,
+            size_t offset = 0,
+            size_t count = BufferNpos )
+    {
+        const StrValueType* strEnd = str.data() + (count == BufferNpos ? str.size() : (offset + count));
+        for( const StrValueType*
+            curPos = strEnd-1;
+            curPos >= str.data();
+            --curPos )
+        {
+            if( toSearch == *curPos )
+                return curPos-str.data();
+        }
+
+        return BufferNpos;
+    }
+
 
     bool parseHeader(
         StringType* const headerName,
@@ -125,10 +151,13 @@ namespace nx_http
             ok = 200,
             multipleChoices = 300,
             badRequest = 400,
-            internalServerError = 500
+            notFound = 404,
+            internalServerError = 500,
+            notImplemented = 501
         };
 
         StringType toString( Value );
+        StringType toString( int );
     };
 
     namespace Method
@@ -151,6 +180,7 @@ namespace nx_http
         StringType version;
 
         bool parse( const ConstBufferRefType& data );
+        //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
     };
 
@@ -163,25 +193,30 @@ namespace nx_http
 
         StatusLine();
         bool parse( const ConstBufferRefType& data );
+        //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
     };
 
-    class HttpRequest
+    class Request
     {
     public:
         RequestLine requestLine;
         HttpHeaders headers;
         BufferType messageBody;
 
+        //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
     };
 
-    class HttpResponse
+    class Response
     {
     public:
         StatusLine statusLine;
         HttpHeaders headers;
         BufferType messageBody;
+
+        //!Appends serialized data to \a dstBuffer
+        void serialize( BufferType* const dstBuffer ) const;
     };
 
     namespace MessageType
@@ -192,23 +227,25 @@ namespace nx_http
             request,
             response
         };
+
+        QLatin1String toString( Value val );
     }
 
-    class HttpMessage
+    class Message
     {
     public:
         MessageType::Value type;
         union
         {
-            HttpRequest* request;
-            HttpResponse* response;
+            Request* request;
+            Response* response;
         };
 
-        HttpMessage( MessageType::Value _type = MessageType::none );
-        HttpMessage( const HttpMessage& right );
-        ~HttpMessage();
+        Message( MessageType::Value _type = MessageType::none );
+        Message( const Message& right );
+        ~Message();
 
-        HttpMessage& operator=( const HttpMessage& right );
+        Message& operator=( const Message& right );
 
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };

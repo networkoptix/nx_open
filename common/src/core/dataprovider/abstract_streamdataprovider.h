@@ -9,7 +9,7 @@
 
 class QnAbstractStreamDataProvider;
 class QnResource;
-class QnAbstractDataConsumer;
+class QnAbstractDataReceptor;
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10)
@@ -28,27 +28,13 @@ public:
 
     virtual bool dataCanBeAccepted() const;
 
-    void addDataProcessor(QnAbstractDataConsumer* dp);
-    void removeDataProcessor(QnAbstractDataConsumer* dp);
+    void addDataProcessor(QnAbstractDataReceptor* dp);
+    void removeDataProcessor(QnAbstractDataReceptor* dp);
 
     virtual void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE) { Q_UNUSED(value); Q_UNUSED(currentTimeHint); }
     virtual bool isReverseMode() const { return false;}
 
     bool isConnectedToTheResource() const;
-
-    void pauseDataProcessors()
-    {
-        foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) {
-            dataProcessor->pause();
-        }
-    }
-
-    void resumeDataProcessors()
-    {
-        foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) {
-            dataProcessor->resume();
-        }
-    }
 
     void setNeedSleep(bool sleep);
 
@@ -65,7 +51,7 @@ protected:
     void beforeDisconnectFromResource();
 
 protected:
-    QList<QnAbstractDataConsumer*> m_dataprocessors;
+    QList<QnAbstractDataReceptor*> m_dataprocessors;
     mutable QMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
 };

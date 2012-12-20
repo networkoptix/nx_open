@@ -165,10 +165,11 @@ void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
     sendData(sendBuffer.data(), sendBuffer.size());
 }
 
-void QnTCPConnectionProcessor::sendData(const char* data, int size)
+int QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     QMutexLocker lock(&d->sockMutex);
+    int bytesSent = 0;
     while (!m_needStop && size > 0 && d->socket->isConnected())
     {
         int sended;
@@ -176,14 +177,18 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
             sended = SSL_write(d->ssl, data, size);
         else
             sended = d->socket->send(data, size);
-        if (sended > 0) {
+        if( sended <= 0 )
+            break;
+
 #ifdef DEBUG_RTSP
-            dumpRtspData(data, sended);
+        dumpRtspData(data, sended);
 #endif
-            data += sended;
-            size -= sended;
-        }
+        data += sended;
+        size -= sended;
+        bytesSent += sended;
     }
+
+    return bytesSent > 0 ? bytesSent : -1;
 }
 
 
@@ -290,6 +295,24 @@ int QnTCPConnectionProcessor::getSocketTimeout()
     return d->socketTimeout;
 }
 
+int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    if (d->owner->getOpenSSLContext() && !d->ssl)
+    {
+        d->ssl = SSL_new((SSL_CTX*) d->owner->getOpenSSLContext());  // get new SSL state with context 
+        if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
+            return false;
+        if (SSL_accept(d->ssl) != 1) 
+            return false; // ssl error
+    }
+
+    return d->ssl
+        ? SSL_read(d->ssl, buffer, bufSize )
+        : d->socket->recv( buffer, bufSize );
+}
+
 bool QnTCPConnectionProcessor::readRequest()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -362,4 +385,10 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
     mutex.unlock();
     run();
     mutex.lock();
+}
+
+QString QnTCPConnectionProcessor::remoteHostAddress() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->socket ? d->socket->getPeerAddress() : QString();
 }

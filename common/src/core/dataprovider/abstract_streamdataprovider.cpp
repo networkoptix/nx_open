@@ -19,7 +19,7 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
     QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
         if (!dp->canAcceptData())
             return false;
     }
@@ -27,7 +27,7 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 }
 
 
-void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
+void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {
     QMutexLocker mutex(&m_mutex);
 
@@ -39,7 +39,7 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
     }
 }
 
-void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
+void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataReceptor* dp)
 {
     QMutexLocker mutex(&m_mutex);
     m_dataprocessors.removeOne(dp);
@@ -53,7 +53,7 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
     QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
         dp->putData(data);
     }
 }

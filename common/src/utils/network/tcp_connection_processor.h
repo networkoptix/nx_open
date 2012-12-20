@@ -29,12 +29,19 @@ public:
 
     void execute(QMutex& mutex);
     virtual void pleaseStop();
+
+    QString remoteHostAddress() const;
+
 protected:
     virtual void parseRequest();
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
-    void sendData(const char* data, int size);
-    inline void sendData(const QByteArray& data) { sendData(data.constData(), data.size()); }
+    /*!
+        \return Number of bytes actually sent, -1 in case of error
+        \note If managed to send something and then error occured, then number of actually sent bytes is returned
+    */
+    int sendData(const char* data, int size);
+    inline int sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
 
     //QnByteArray& getSendBuffer();
     //void bufferData(const char* data, int size);
@@ -46,6 +53,10 @@ protected:
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
+    /*!
+        \return Number of bytes read. 0 if connection has been closed. -1 in case of error
+    */
+    int readSocket( quint8* buffer, int bufSize );
     bool readRequest();
     QUrl getDecodedUrl() const;
 

@@ -149,11 +149,20 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case badRequest:
                     return StringType("Bad Request");
+                case notFound:
+                    return StringType("Not Found");
                 case internalServerError:
                     return StringType("Internal Server Error");
+                case notImplemented:
+                    return StringType("Not Implemented");
                 default:
                     return QString::fromLatin1( "Unknown_%1" ).arg(val).toLatin1();
             }
+        }
+
+        StringType toString( int val )
+        {
+            return toString( (Value)val );
         }
     }
 
@@ -206,6 +215,16 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     //// class StatusLine
     ////////////////////////////////////////////////////////////
+    static size_t estimateSerializedDataSize( const StatusLine& sl )
+    {
+        return sl.version.size()
+            + 1     //space
+            + 3     //http status codes have 3 digits
+            + 1     //space
+            + sl.reasonPhrase.size()
+            + 2;   //\r\n
+    }
+
     StatusLine::StatusLine()
     :
         statusCode( StatusCode::undefined )
@@ -257,13 +276,12 @@ namespace nx_http
 
 
     ////////////////////////////////////////////////////////////
-    //// class HttpRequest
+    //// class Request
     ////////////////////////////////////////////////////////////
-    void HttpRequest::serialize( BufferType* const dstBuffer ) const
+    void Request::serialize( BufferType* const dstBuffer ) const
     {
         //estimating required buffer size
-        dstBuffer->clear();
-        dstBuffer->reserve( estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+        dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
 
         //serializing
         requestLine.serialize( dstBuffer );
@@ -274,47 +292,88 @@ namespace nx_http
 
 
     ////////////////////////////////////////////////////////////
-    //// class HttpMessage
+    //// class Response
     ////////////////////////////////////////////////////////////
-    HttpMessage::HttpMessage( MessageType::Value _type )
+    void Response::serialize( BufferType* const dstBuffer ) const
+    {
+        //estimating required buffer size
+        dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+
+        statusLine.serialize( dstBuffer );
+        serializeHeaders( headers, dstBuffer );
+        dstBuffer->append( (const BufferType::value_type*)"\r\n" );
+        dstBuffer->append( messageBody );
+    }
+
+
+    namespace MessageType
+    {
+        QLatin1String toString( Value val )
+        {
+            switch( val )
+            {
+                case request:
+                {
+                    static QLatin1String requestStr("request");
+                    return requestStr;
+                }
+                case response:
+                {
+                    static QLatin1String responseStr("response");
+                    return responseStr;
+                }
+                default:
+                {
+                    static QLatin1String unknownStr("unknown");
+                    return unknownStr;
+                }
+            }
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////
+    //// class Message
+    ////////////////////////////////////////////////////////////
+    Message::Message( MessageType::Value _type )
     :
         type( _type )
     {
         if( type == MessageType::request )
-            request = new HttpRequest();
+            request = new Request();
         else if( type == MessageType::response )
-            response = new HttpResponse();
+            response = new Response();
     }
 
-    HttpMessage::HttpMessage( const HttpMessage& right )
+    Message::Message( const Message& right )
     :
         type( right.type )
     {
         if( type == MessageType::request )
-            request = new HttpRequest( *right.request );
+            request = new Request( *right.request );
         else if( type == MessageType::response )
-            response = new HttpResponse( *right.response );
+            response = new Response( *right.response );
         else
             request = NULL;
     }
 
-    HttpMessage::~HttpMessage()
+    Message::~Message()
     {
         clear();
     }
 
-    HttpMessage& HttpMessage::operator=( const HttpMessage& right )
+    Message& Message::operator=( const Message& right )
     {
         clear();
         type = right.type;
         if( type == MessageType::request )
-            request = new HttpRequest( *right.request );
+            request = new Request( *right.request );
         else if( type == MessageType::response )
-            response = new HttpResponse( *right.response );
+            response = new Response( *right.response );
         return *this;
     }
 
-    void HttpMessage::clear()
+    void Message::clear()
     {
         if( type == MessageType::request )
             delete request;

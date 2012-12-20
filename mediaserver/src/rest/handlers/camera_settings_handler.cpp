@@ -38,7 +38,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
         ctSetParam,
         ctGetParam
     } cmdType;
-    //LTRACE( 6, http, "QnCameraSettingsHandler. Received request "<<path );
+    NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Received request %1").arg(path), cl_logDEBUG1 );
 
     //TODO it would be nice to fill reasonPhrase too
     if( params.empty() )
@@ -54,14 +54,14 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
     }
     if( camIDIter == params.end() )
     {
-        //LTRACE( 4, http, "QnCameraSettingsHandler. No res_id params in request "<<path<<". Ignoring..." );
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No res_id params in request %1. Ignoring...").arg(path), cl_logWARNING );
         return HttpStatusCode::badRequest;
     }
     const QString& camID = camIDIter->second;
 
     if( params.size() == 1 )
     {
-        //LTRACE( 4, http, "QnCameraSettingsHandler. No param names in request "<<path );
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No param names in request %1").arg(path), cl_logWARNING );
         return HttpStatusCode::badRequest;
     }
 
@@ -85,7 +85,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
     }
     else
     {
-        //LTRACE( 4, http, "QnCameraSettingsHandler. Unknown command "<<cmdName<<" in request "<<path<<". Ignoring..." );
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Unknown command %1 in request %2. Ignoring...").arg(cmdName).arg(path), cl_logWARNING );
         return HttpStatusCode::notFound;
     }
 
@@ -93,7 +93,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
     const QnResourcePtr& res = QnResourcePool::instance()->getNetResourceByPhysicalId( camID );
     if( !res.data() )
     {
-        //LTRACE( 4, http, "QnCameraSettingsHandler. Unknown camera "<<camID<<" in request "<<path<<". Ignoring..." );
+        NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Unknown camera %1 in request %2. Ignoring...").arg(camID).arg(path), cl_logWARNING );
         return HttpStatusCode::notFound;
     }
 
@@ -166,21 +166,20 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
             this,
             SLOT(asyncParamSetComplete(const QString&, const QVariant&, bool)) );
 
+    //serializing answer
+    for( std::map<QString, std::pair<QVariant, bool> >::const_iterator
+        it = awaitedParams.paramValues.begin();
+        it != awaitedParams.paramValues.end();
+        ++it )
     {
-        //serializing answer
-        for( std::map<QString, std::pair<QVariant, bool> >::const_iterator
-            it = awaitedParams.paramValues.begin();
-            it != awaitedParams.paramValues.end();
-            ++it )
-        {
-            if( cmdType == ctGetParam )
-                responseMessageBody += it->first + "=" + it->second.first.toString() + "\n";
-            else if( cmdType == ctSetParam )
-                responseMessageBody += (it->second.second ? "ok:" : "failure:") + it->first + "\n";
-        }
+        if( cmdType == ctGetParam )
+            responseMessageBody += it->first + "=" + it->second.first.toString() + "\n";
+        else if( cmdType == ctSetParam )
+            responseMessageBody += (it->second.second ? "ok:" : "failure:") + it->first + "\n";
     }
+    contentType = "text/plain";
 
-    //LTRACE( 6, http, "QnCameraSettingsHandler. request "<<path<<" processed successfully" );
+    NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. request %1 processed successfully").arg(path), cl_logDEBUG1 );
 
     return HttpStatusCode::ok;
 }
@@ -221,7 +220,7 @@ void QnCameraSettingsHandler::asyncParamGetComplete( const QString& paramName, c
 {
     QMutexLocker lk( &m_mutex );
 
-    //LTRACE( 6, http, "QnCameraSettingsHandler::asyncParamGetComplete. paramName "<<paramName<<", paramValue "<<paramValue );
+    NX_LOG( QString::fromLatin1("QnCameraSettingsHandler::asyncParamGetComplete. paramName %1, paramValue %2").arg(paramName).arg(paramValue.toString()), cl_logDEBUG1 );
 
     for( std::set<AwaitedParameters*>::const_iterator
         it = m_awaitedParamsSets.begin();
