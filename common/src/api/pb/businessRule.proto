@@ -25,10 +25,10 @@ enum BusinessActionType
 
 enum ToggleStateType
 {
-    Off        = 0;
-    On         = 1;
-    Any        = 2;
-    NotDefined = 3;
+    State_Off        = 0;
+    State_On         = 1;
+    State_Any        = 2;
+    State_NotDefined = 3;
 }
 
 message BusinessRule {
