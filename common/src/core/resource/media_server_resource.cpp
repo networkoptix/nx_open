@@ -141,7 +141,8 @@ public:
     {
         QnHTTPRawResponse response;
         QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestHeaderList(), QnRequestParamList(), response);
-        if (response.data.contains("Requested method is absent"))
+        QByteArray guid = m_owner->getGuid().toUtf8();
+        if (response.data.contains("Requested method is absent") || response.data.contains(guid))
         {
             // server OK
             m_owner->setPrimaryIF(m_url.host());

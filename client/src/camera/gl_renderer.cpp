@@ -87,6 +87,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_contrast( 0 ),
     m_hue( 0 ),
     m_saturation( 0 ),
+    m_lastDisplayedTime( AV_NOPTS_VALUE ),
     m_lastDisplayedFlags( 0 ),
     m_prevFrameSequence( 0 )
 {

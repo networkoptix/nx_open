@@ -2,9 +2,10 @@
 #define __ABSTRACT_BUSINESS_ACTION_H_
 
 #include <QSharedPointer>
+
 #include "business_logic_common.h"
-#include "core/resource/resource_fwd.h"
-#include "utils/common/qnid.h"
+#include <core/resource/resource_fwd.h>
+#include <utils/common/qnid.h>
 
 namespace BusinessActionType
 {
@@ -29,17 +30,18 @@ namespace BusinessActionType
         BA_Alert,
         BA_ShowPopup,
         // media server based actions
-        BA_NotDefined
+        BA_NotDefined,
+
+        BA_FirstType = BA_CameraOutput,
+        BA_LastType = BA_ShowPopup
     };
 
     QString toString( Value val );
-}
 
-namespace BusinessActionParamName
-{
-    static QLatin1String relayOutputID( "relayOutputID" );
-    static QLatin1String relayAutoResetTimeout( "relayAutoResetTimeout" );
-    static QLatin1String emailAddress( "emailAddress" );
+
+    bool isResourceRequired(Value val);
+
+    bool hasToggleState(Value val);
 }
 
 class QnAbstractBusinessAction;
@@ -51,47 +53,43 @@ typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 
 class QnAbstractBusinessAction
 {
+protected:
+    explicit QnAbstractBusinessAction(BusinessActionType::Value actionType);
+
 public:
-    QnAbstractBusinessAction();
     virtual ~QnAbstractBusinessAction() {}
     BusinessActionType::Value actionType() const { return m_actionType; }
 
     QByteArray serialize();
-    static QnAbstractBusinessActionPtr fromByteArray2(const QByteArray&);
+    static QnAbstractBusinessActionPtr fromByteArray(const QByteArray&);
 
     /*
     * Resource depend of action type.
     * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
-    * For actions: BA_SendMail, BA_Alert resource is not used
+    * For actions: BA_SendMail, BA_Alert, BA_ShowPopup resource is not used
     */
-    void setResource(QnResourcePtr resource)   { m_resource = resource; }
+    void setResource(QnResourcePtr resource);
 
-    const QnResourcePtr& getResource()                { return m_resource;     }
+    const QnResourcePtr& getResource();
 
-    void setParams(const QnBusinessParams& params) {m_params = params; }
-    const QnBusinessParams& getParams() const             { return m_params; }
+    void setParams(const QnBusinessParams& params);
+    const QnBusinessParams& getParams() const;
 
-    void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
-    QnId getBusinessRuleId() const             { return m_businessRuleId; }
+    void setBusinessRuleId(const QnId& value);
+    QnId getBusinessRuleId() const;
 
-    void setToggleState(ToggleState::Value value) { m_toggleState = value; }
-    ToggleState::Value getToggleState() const { return m_toggleState; }
+    void setToggleState(ToggleState::Value value);
+    ToggleState::Value getToggleState() const;
 
-    void setReceivedFromRemoteHost(bool value) { m_receivedFromRemoteHost = value; }
-    bool isReceivedFromRemoteHost() const { return m_receivedFromRemoteHost; }
-
-    bool isToggledAction() const;
-protected:
-    void setActionType(BusinessActionType::Value value) { m_actionType = value; }
-
+    void setReceivedFromRemoteHost(bool value);
+    bool isReceivedFromRemoteHost() const;
+private:
     BusinessActionType::Value m_actionType;
+    ToggleState::Value m_toggleState;
+    bool m_receivedFromRemoteHost;
     QnResourcePtr m_resource;
     QnBusinessParams m_params;
     QnId m_businessRuleId; // business rule, that generated this action
-
-private:
-    ToggleState::Value m_toggleState;
-    bool m_receivedFromRemoteHost;
 };
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)

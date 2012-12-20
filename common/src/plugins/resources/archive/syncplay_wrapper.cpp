@@ -202,6 +202,22 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
     d->timer.restart();
 }
 
+void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    setJumpTime(skipTime);
+    foreach(const ReaderInfo& info, d->readers)
+    {
+        if (info.enabled)
+        {
+            info.reader->setNavDelegate(0);
+            info.reader->setSkipFramesToTime(skipTime);
+            info.reader->setNavDelegate(this);
+        }
+    }
+}
+
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
@@ -255,9 +271,11 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     QMutexLocker lock(&d->timeMutex);
     foreach(const ReaderInfo& info, d->readers)
     {
-        info.reader->setNavDelegate(0);
-        info.reader->previousFrame(mksec);
-        info.reader->setNavDelegate(this);
+        if (info.enabled) {
+            info.reader->setNavDelegate(0);
+            info.reader->previousFrame(mksec);
+            info.reader->setNavDelegate(this);
+        }
     }
 }
 
@@ -562,6 +580,7 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
             return;
     }
 
+    /*
     // no more buffering
     qint64 bt = d->bufferingTime;
     d->bufferingTime = AV_NOPTS_VALUE;
@@ -576,8 +595,10 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     else {
         reinitTime(displayTime);
     }
-
-    //reinitTime(getDisplayedTime());
+    */
+    // reinit time to real position. If reinit time to requested position (it differs if rought jump), redAss can switch item to LQ
+    d->bufferingTime = AV_NOPTS_VALUE;
+    reinitTime(getDisplayedTime());
 }
 
 void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
@@ -672,25 +693,8 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
 
     qint64 expectTime = expectedTime();
     qint64 nextTime = getNextTime();
-    if (d->speed >= 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime > expectTime + MAX_FRAME_DURATION*1000)
+    if (nextTime != qint64(AV_NOPTS_VALUE) && qAbs(nextTime - expectTime) > MAX_FRAME_DURATION*1000)
     {
-        QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
-        
-        /*
-        qDebug() << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
-               "expected time=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
-        */
-
-        nonConstThis->reinitTime(nextTime);
-        expectTime = expectedTime();
-    }
-    else if (d->speed < 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime < expectTime - MAX_FRAME_DURATION*1000)
-    {
-        /*
-        qDebug() << "nextTime=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
-            "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz")
-            << "currentTime=" << QDateTime::fromMSecsSinceEpoch(getDisplayedTimeInternal()/1000).toString("hh:mm:ss.zzz");
-        */
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
         expectTime = expectedTime();
@@ -745,6 +749,10 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                     if (d->enabled)
                         d->readers[i].reader->setNavDelegate(this);
                     d->readers[i].paused = true;
+                    if (d->readers[i].buffering) {
+                        d->readers[i].buffering = false;
+                        d->bufferingCnt--;
+                    }
                 }
             }
             d->readers[i].enabled = !value;
@@ -780,18 +788,21 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
     bool isPaused = false;
     foreach(const ReaderInfo& info, d->readers) 
     {
-        isPaused |= info.reader->isMediaPaused();
+        if (info.enabled)
+        {
+            isPaused |= info.reader->isMediaPaused();
 
-        if (currentTime != qint64(AV_NOPTS_VALUE)) {
-            setJumpTime(currentTime);
-            info.reader->jumpToPreviousFrame(currentTime);
-            info.reader->setSpeed(currentSpeed, currentTime);
-        }
-        else {
-            info.reader->setSpeed(currentSpeed);
-        }
+            if (currentTime != qint64(AV_NOPTS_VALUE)) {
+                setJumpTime(currentTime);
+                info.reader->jumpToPreviousFrame(currentTime);
+                info.reader->setSpeed(currentSpeed, currentTime);
+            }
+            else {
+                info.reader->setSpeed(currentSpeed);
+            }
 
-        info.reader->setNavDelegate(this);
+            info.reader->setNavDelegate(this);
+        }
     }
     if (isPaused)
         pauseMedia();

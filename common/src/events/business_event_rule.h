@@ -4,57 +4,52 @@
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
 #include "business_logic_common.h"
+
 #include "core/resource/resource.h"
 
-/*
+/**
 * This class define relation between business event and action
 */
-
 class QnBusinessEventRule: public QnResource
 {
+    Q_OBJECT
+
 public:
     QnBusinessEventRule();
 
     virtual QString getUniqueId() const override;
 
-    QnAbstractBusinessActionPtr getAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined);
-    QnBusinessParams getEventCondition() const { return m_eventCondition; }
-    /*!
-        \param name This should be a constant from \a BusinessEventParameters namespace
-    */
-    void addEventCondition( const QString& name, const QVariant& value ) { m_eventCondition[name] = value; }
+    // TODO: move to some factory
+    QnAbstractBusinessActionPtr instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined) const;
 
-    QnResourcePtr getSrcResource() const { return m_source; }
-    void setSrcResource(QnResourcePtr value) { m_source = value; }
 
-    BusinessEventType::Value getEventType() const { return m_eventType; }
-    void setEventType(BusinessEventType::Value value) { m_eventType = value; }
+    BusinessEventType::Value eventType() const;
+    void setEventType(BusinessEventType::Value value);
 
-    BusinessActionType::Value getActionType() const { return m_actionType; }
-    void setActionType(BusinessActionType::Value value) { m_actionType = value; }
+    QnResourcePtr eventResource() const;
+    void setEventResource(QnResourcePtr value);
 
-    QnResourcePtr getDstResource() const { return m_destination; }
-    void setDstResource(QnResourcePtr value) { m_destination = value; }
+    QnBusinessParams eventParams() const;
+    void setEventParams(const QnBusinessParams& params);
 
-    QnBusinessParams getBusinessParams() const;
-    void setBusinessParams(const QnBusinessParams& params);
+    BusinessActionType::Value actionType() const;
+    void setActionType(BusinessActionType::Value value);
 
-    /*
-    * Return true if last returned action is toggledAction and action has On
-    */
-    bool isActionInProgress() const;
+    QnResourcePtr actionResource() const;
+    void setActionResource(QnResourcePtr value);
+
+    QnBusinessParams actionParams() const;
+    void setActionParams(const QnBusinessParams& params);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
     BusinessEventType::Value m_eventType;
-    QnResourcePtr m_source;
-    QnBusinessParams m_eventCondition;
+    QnResourcePtr m_eventResource;
+    QnBusinessParams m_eventParams;
 
     BusinessActionType::Value m_actionType;
-    QnResourcePtr m_destination;
+    QnResourcePtr m_actionResource;
     QnBusinessParams m_actionParams;
-
-    bool m_actionInProgress;
 };
 
 typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;

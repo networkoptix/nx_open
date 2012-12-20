@@ -11,6 +11,7 @@ m_quality(QnQualityNormal),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_role(QnResource::Role_LiveVideo),
+m_softMotionRole(QnResource::Role_Default),
 m_softMotionLastChannel(0)
 {
     m_timeSinceLastMetaData.restart();
@@ -92,9 +93,20 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
     return m_quality;
 }
 
+QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
+{
+    if (m_softMotionRole == QnResource::Role_Default) {
+        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && m_cameraRes->checkCameraCapability(QnPhysicalCameraResource::primaryStreamSoftMotion))
+            m_softMotionRole = QnResource::Role_LiveVideo;
+        else
+            m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+    }
+    return m_softMotionRole;
+}
+
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    if (getRole() == QnResource::Role_SecondaryLiveVideo && m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
@@ -159,14 +171,16 @@ bool QnLiveStreamProvider::needMetaData()
 {
     // I assume this function is called once per video frame 
 
-    if (getRole() == QnResource::Role_SecondaryLiveVideo && m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == MT_SoftwareGrid)
     {
-        for (int i = 0; i < m_layout->numberOfChannels(); ++i)
-        {
-            bool rez = m_motionEstimation[i].existsMetadata();
-            if (rez) {
-                m_softMotionLastChannel = i;
-                return rez;
+        if (getRole() == roleForMotionEstimation()) {
+            for (int i = 0; i < m_layout->numberOfChannels(); ++i)
+            {
+                bool rez = m_motionEstimation[i].existsMetadata();
+                if (rez) {
+                    m_softMotionLastChannel = i;
+                    return rez;
+                }
             }
         }
         return false;
@@ -189,7 +203,7 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
 {
     m_framesSinceLastMetaData++;
 
-    if (m_role == QnResource::Role_SecondaryLiveVideo && m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == MT_SoftwareGrid)
         m_motionEstimation[videoData->channelNumber].analizeFrame(videoData);
 }
 

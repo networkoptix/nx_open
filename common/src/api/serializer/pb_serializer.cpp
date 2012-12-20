@@ -539,16 +539,15 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRulePtr& businessRulePtr)
 {
     pb_businessRule.set_id(businessRulePtr->getId().toInt());
-    pb_businessRule.set_eventtype((pb::BusinessEventType)businessRulePtr->getEventType());
-    if (businessRulePtr->getSrcResource())
-        pb_businessRule.set_eventresource(businessRulePtr->getSrcResource()->getId().toInt());
-    // TODO vasilenko
-    // pb_businessRule.set_eventcondition(businessRuleIn.getEventCondition());
+    pb_businessRule.set_eventtype((pb::BusinessEventType)businessRulePtr->eventType());
+    if (businessRulePtr->eventResource())
+        pb_businessRule.set_eventresource(businessRulePtr->eventResource()->getId().toInt());
+    pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventParams()));
 
-    pb_businessRule.set_actiontype((pb::BusinessActionType)businessRulePtr->getActionType());
-    if (businessRulePtr->getDstResource())
-        pb_businessRule.set_actionresource(businessRulePtr->getDstResource()->getId().toInt());
-    pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->getBusinessParams()));
+    pb_businessRule.set_actiontype((pb::BusinessActionType)businessRulePtr->actionType());
+    if (businessRulePtr->actionResource())
+        pb_businessRule.set_actionresource(businessRulePtr->actionResource()->getId().toInt());
+    pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
@@ -739,16 +738,14 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessR
         QnBusinessEventRulePtr businessRule(new QnBusinessEventRule());
 
         businessRule->setId(ci->id());
+
         businessRule->setEventType((BusinessEventType::Value)ci->eventtype());
-        businessRule->setSrcResource(qnResPool->getResourceById(ci->eventresource()));
-        // businessRule->setEventCondition();
+        businessRule->setEventResource(qnResPool->getResourceById(ci->eventresource()));
+        businessRule->setEventParams(deserializeBusinessParams(ci->eventcondition().c_str()));
 
         businessRule->setActionType((BusinessActionType::Value)ci->actiontype());
-        businessRule->setDstResource(qnResPool->getResourceById(ci->actionresource(), QnResourcePool::rfAllResources)); //destination resource can belong to another server
-        businessRule->setBusinessParams(deserializeBusinessParams(ci->actionparams().c_str()));
-        const QnBusinessParams& eventConditions = deserializeBusinessParams(ci->eventcondition().c_str());
-        for( QnBusinessParams::const_iterator it = eventConditions.begin(); it != eventConditions.end(); ++it )
-            businessRule->addEventCondition( it.key(), it.value() );
+        businessRule->setActionResource(qnResPool->getResourceById(ci->actionresource(), QnResourcePool::rfAllResources)); //destination resource can belong to another server
+        businessRule->setActionParams(deserializeBusinessParams(ci->actionparams().c_str()));
 
         businessRules.append(businessRule);
     }

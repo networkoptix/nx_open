@@ -11,6 +11,7 @@ class QnAbstractNavigator
 public:
     virtual void directJumpToNonKeyFrame(qint64 mksec) = 0;
     virtual bool jumpTo(qint64 mksec,  qint64 skipTime) = 0;
+    virtual void setSkipFramesToTime(qint64 skipTime) = 0;
     virtual void previousFrame(qint64 mksec) = 0;
     virtual void nextFrame() = 0;
     virtual void pauseMedia() = 0;
@@ -59,6 +60,7 @@ public:
     quint64 lengthUsec() const;
 
     virtual void directJumpToNonKeyFrame(qint64 usec) = 0;
+    virtual void setSkipFramesToTime(qint64 skipTime) = 0;
     void jumpToPreviousFrame(qint64 usec);
 
 
@@ -110,7 +112,7 @@ signals:
     void streamResumed();
     void nextFrameOccured();
     void prevFrameOccured();
-
+    void skipFramesTo(qint64 mksec);
 protected:
     bool m_cycleMode;
     qint64 m_needToSleep;

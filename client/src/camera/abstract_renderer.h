@@ -85,7 +85,7 @@ public:
     /**
      * Returns last displayed time
      */
-    virtual qint64 lastDisplayedTime() const { return AV_NOPTS_VALUE; }
+    virtual qint64 lastDisplayedTime(int /*channelNumber*/) const { return AV_NOPTS_VALUE; }
 
 
 protected:

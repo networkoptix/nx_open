@@ -39,11 +39,29 @@ namespace BusinessEventType
     bool isResourceRequired(Value val);
 
     bool hasToggleState(Value val);
+
+    bool requiresCameraResource(Value val);
+
+    bool requiresServerResource(Value val);
 }
 
-namespace BusinessEventParameters
-{
-    static QLatin1String toggleState( "toggleState" );
+namespace BusinessEventParameters {
+    ToggleState::Value getToggleState(const QnBusinessParams &params);
+    void setToggleState(QnBusinessParams* params, ToggleState::Value value);
+}
+
+namespace QnBusinessEventRuntime {
+    BusinessEventType::Value getEventType(const QnBusinessParams &params);
+    void setEventType(QnBusinessParams* params, BusinessEventType::Value value);
+
+    QString getEventResourceName(const QnBusinessParams &params);
+    void setEventResourceName(QnBusinessParams* params, QString value);
+
+    QString getEventResourceUrl(const QnBusinessParams &params);
+    void setEventResourceUrl(QnBusinessParams* params, QString value);
+
+    QString getEventDescription(const QnBusinessParams &params);
+    void setEventDescription(QnBusinessParams* params, QString value);
 }
 
 /**
@@ -71,7 +89,7 @@ public:
     virtual ~QnAbstractBusinessEvent() {}
 
     /**
-     * @brief toString          Convert event to human-readable string in debug purposes.
+     * @brief toString          Convert event to human-readable string in debug purposes and as sendMail text.
      * @return                  Printable string with all event data in human-readable form.
      */
     virtual QString toString() const;
@@ -102,15 +120,7 @@ public:
      */
     virtual bool checkCondition(const QnBusinessParams& params) const;
 
-protected:
-    /**
-     * @brief getParameter      Utility function for retrieving event parameters.
-     * @param params            Parameters of an event that are selected in rule.
-     * @param paramName         Name of the parameter that is looked up.
-     * @return                  Value of the parameter or an invalid variant if params are not contain
-     *                          parameter with target name.
-     */
-    static QVariant getParameter(const QnBusinessParams& params, const QString &paramName);
+    virtual QnBusinessParams getRuntimeParams() const;
 private:
     /**
      * @brief m_eventType       Type of event. See BusinessEventType::Value.

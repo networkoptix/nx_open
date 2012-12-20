@@ -50,7 +50,7 @@
             </column>
             <column>
              <property name="text">
-              <string>Serial</string>
+              <string>License key</string>
              </property>
             </column>
            </widget>

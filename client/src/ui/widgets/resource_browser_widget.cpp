@@ -70,7 +70,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
-//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #gdm ask #Elrik whether try to enable this =)
+//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #gdm ask #Elric whether try to enable this =)
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
     ui->searchTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);

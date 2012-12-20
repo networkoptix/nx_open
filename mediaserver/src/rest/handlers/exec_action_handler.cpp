@@ -17,7 +17,7 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
 
 int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
-    QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray2(body);
+    QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray(body);
     if (action) {
         action->setReceivedFromRemoteHost(true);
         qnBusinessMessageBus->at_actionReceived(action);

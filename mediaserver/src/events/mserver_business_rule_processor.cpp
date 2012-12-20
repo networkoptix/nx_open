@@ -4,6 +4,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
+#include "api/app_server_connection.h"
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
@@ -19,18 +20,28 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     case BusinessActionType::BA_CameraRecording:
         return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>());
     case BusinessActionType::BA_PanicRecording:
-        break;
-
+        return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
     default:
         break;
     }
     return false;
-};
+}
+
+bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
+{
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    if (action->getToggleState() == ToggleState::On)
+        conn->setPanicMode(true);
+    else
+        conn->setPanicMode(false);
+    return true;
+}
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessActionPtr action)
 {
+    Q_ASSERT(action);
     QnSecurityCamResourcePtr camera = action->getResource().dynamicCast<QnSecurityCamResource>();
-    Q_ASSERT(camera);
+    //Q_ASSERT(camera);
     if (!camera)
         return false;
 

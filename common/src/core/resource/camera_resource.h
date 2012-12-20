@@ -13,10 +13,6 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT
 
 public:
-    // TODO: move to QnSecurityCamResource
-    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
-
 
     QnVirtualCameraResource();
 
@@ -41,10 +37,6 @@ public:
     void setDTSFactory(QnAbstractDTSFactory* factory);
     void lockDTSFactory();
     void unLockDTSFactory();
-
-    // TODO: move to QnSecurityCamResource
-    CameraCapabilities getCameraCapabilities();
-    void addCameraCapabilities(CameraCapabilities value);
 
     // TODO: move to QnSecurityCamResource
     QString getModel() const;

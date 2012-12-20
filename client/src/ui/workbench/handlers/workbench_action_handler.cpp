@@ -1437,7 +1437,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = 16; // TODO: take it from config?
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(widget(), tr("Could not perform thumbnails search"), tr("Selected time period is too short to perform thumbnails search. Please select a longer period."), QMessageBox::Ok);
+        QMessageBox::warning(widget(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1519,7 +1519,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
+    layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     if(context()->user())
         layout->setParentId(context()->user()->getId());
@@ -1816,7 +1816,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             if(snapshotManager()->isLocal(layout))
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
 
-        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
+        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
 }
 
@@ -1913,9 +1913,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QString timeString;
     qint64 time = display->camDisplay()->getCurrentTime() / 1000;
     if(widget->resource()->flags() & QnResource::utc) {
-        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
+        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
     } else {
-        timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
+        timeString = QTime().addMSecs(time).toString(lit("hh.mm.ss"));
     }
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
@@ -2570,8 +2570,7 @@ Do you want to continue?"),
         previousDir = qnSettings->mediaFolder();
     }
 
-    QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+    QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;
@@ -2827,14 +2826,13 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
     }
 }
 
-void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {
     Q_UNUSED(handle);
-    Q_UNUSED(data);
 
-    if(status == 0)   
+    if(response.status == 0)
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
+    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {

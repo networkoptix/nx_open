@@ -7,33 +7,20 @@
 
 namespace ToggleState
 {
-    const char* toString( Value val )
+    QString toString( Value val )
     {
         switch( val )
         {
             case Off:
-                return "off";
+                return QObject::tr("Stops");
             case On:
-                return "on";
+                return QObject::tr("Starts");
             case Any:
-                return "any";
+                return QObject::tr("Starts/stops");
             case NotDefined:
-                return "not defined";
-            default:
-                return "Unknown";
+                return QObject::tr("Occurs");
         }
-    }
-
-    Value fromString( const char* str )
-    {
-        if( strcmp( str, "off" ) == 0 )
-            return Off;
-        else if( strcmp( str, "on" ) == 0 )
-            return On;
-        else if( strcmp( str, "any" ) == 0 )
-            return Any;
-        else
-            return NotDefined;
+        return QLatin1String("---");
     }
 }
 

@@ -77,7 +77,7 @@ p, li { white-space: pre-wrap; }
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Serial Key:</string>
+        <string>License Key:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

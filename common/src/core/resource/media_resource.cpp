@@ -3,6 +3,26 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 
+QString QnStreamQualityToString(QnStreamQuality value) {
+    switch(value) {
+        case QnQualityLowest:
+            return QObject::tr("Lowest");
+        case QnQualityLow:
+            return QObject::tr("Low");
+        case QnQualityNormal:
+            return QObject::tr("Normal");
+        case QnQualityHigh:
+            return QObject::tr("High");
+        case QnQualityHighest:
+            return QObject::tr("Highest");
+        case QnQualityPreSet:
+            return QObject::tr("Preset");
+    default:
+        break;
+    }
+    return QObject::tr("Undefined");
+}
+
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
 QnMediaResource::QnMediaResource():

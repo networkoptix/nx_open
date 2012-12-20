@@ -4,10 +4,12 @@
 QnMotionBusinessEvent::QnMotionBusinessEvent(
         QnResourcePtr resource,
         ToggleState::Value toggleState,
-        qint64 timeStamp):
+        qint64 timeStamp,
+        QnMetaDataV1Ptr metadata):
     QnAbstractBusinessEvent(BusinessEventType::BE_Camera_Motion,
                             resource,
                             toggleState,
-                            timeStamp)
+                            timeStamp),
+    m_metadata(metadata)
 {
 }

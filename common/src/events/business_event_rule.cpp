@@ -1,87 +1,95 @@
-
 #include "business_event_rule.h"
+
 #include "recording_business_action.h"
 #include "sendmail_business_action.h"
 #include "common_business_action.h"
+#include "camera_output_business_action.h"
+
+#include <events/business_action_factory.h>
+
+#include <core/resource/resource.h>
 
 
 QnBusinessEventRule::QnBusinessEventRule()
 :
     m_eventType( BusinessEventType::BE_NotDefined ),
-    m_actionType( BusinessActionType::BA_NotDefined ),
-    m_actionInProgress( false )
+    m_actionType( BusinessActionType::BA_NotDefined )
 {
     //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
-    m_eventCondition[BusinessEventParameters::toggleState] = QLatin1String(ToggleState::toString(ToggleState::On));
+    BusinessEventParameters::setToggleState(&m_eventParams, ToggleState::On);
 }
 
-QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState)
-{
-    QnAbstractBusinessActionPtr result;
-    switch (m_actionType)
-    {
-        case BusinessActionType::BA_CameraOutput:
-        case BusinessActionType::BA_Bookmark:
-        case BusinessActionType::BA_PanicRecording:
-            result = QnAbstractBusinessActionPtr(new CommonBusinessAction(m_actionType));
-            break;
-        case BusinessActionType::BA_CameraRecording:
-            result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
-            break;
-        case BusinessActionType::BA_SendMail:
-            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(bEvent));
-            break;
-        case BusinessActionType::BA_Alert:
-        case BusinessActionType::BA_ShowPopup:
-        default:
-            return QnAbstractBusinessActionPtr(); // not implemented
-    }
+QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
+    if (BusinessActionType::isResourceRequired(m_actionType) && !m_actionResource)
+        return QnAbstractBusinessActionPtr(); //resource is not exists anymore
+
+    QnBusinessParams runtimeParams = bEvent->getRuntimeParams();
+
+    QnAbstractBusinessActionPtr result = QnBusinessActionFactory::createAction(m_actionType, runtimeParams);
 
     if (!m_actionParams.isEmpty())
         result->setParams(m_actionParams);
-    result->setResource(m_destination);
+    result->setResource(m_actionResource);
 
-    if (bEvent->getToggleState() != ToggleState::NotDefined)
-    {
-        if (result->isToggledAction()) {
-            ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
-            result->setToggleState(value);
-        }
+    if (BusinessEventType::hasToggleState(bEvent->getEventType()) && BusinessActionType::hasToggleState(m_actionType)) {
+        ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
+        result->setToggleState(value);
     }
-    else if (result->getToggleState() != ToggleState::NotDefined)
-    {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Toggle action MUST used with toggle events only!!!");
-    }
-
-    m_actionInProgress = result && result->getToggleState() == ToggleState::On;
     result->setBusinessRuleId(getId());
 
     return result;
 }
 
-QnBusinessParams QnBusinessEventRule::getBusinessParams() const
+BusinessEventType::Value QnBusinessEventRule::eventType() const {
+    return m_eventType;
+}
+
+void QnBusinessEventRule::setEventType(BusinessEventType::Value value) {
+    m_eventType = value;
+}
+
+
+QnResourcePtr QnBusinessEventRule::eventResource() const {
+    return m_eventResource;
+}
+
+void QnBusinessEventRule::setEventResource(QnResourcePtr value) {
+    m_eventResource = value;
+}
+
+QnBusinessParams QnBusinessEventRule::eventParams() const {
+    return m_eventParams;
+}
+
+void QnBusinessEventRule::setEventParams(const QnBusinessParams &params)
+{
+    m_eventParams = params;
+}
+
+BusinessActionType::Value QnBusinessEventRule::actionType() const {
+    return m_actionType;
+}
+
+void QnBusinessEventRule::setActionType(BusinessActionType::Value value) {
+    m_actionType = value;
+}
+
+QnResourcePtr QnBusinessEventRule::actionResource() const {
+    return m_actionResource;
+}
+
+void QnBusinessEventRule::setActionResource(QnResourcePtr value) {
+    m_actionResource = value;
+}
+
+QnBusinessParams QnBusinessEventRule::actionParams() const
 {
     return m_actionParams;
 }
 
-void QnBusinessEventRule::setBusinessParams(const QnBusinessParams &params)
+void QnBusinessEventRule::setActionParams(const QnBusinessParams &params)
 {
     m_actionParams = params;
-}
-
-//ToggleState::Value QnBusinessEventRule::getToggleStateFilter() const
-//{
-//    return m_toggleStateFilter;
-//}
-//
-//void QnBusinessEventRule::setToggleStateFilter( ToggleState::Value _filter )
-//{
-//    m_toggleStateFilter = _filter;
-//}
-
-bool QnBusinessEventRule::isActionInProgress() const
-{
-    return m_actionInProgress;
 }
 
 QString QnBusinessEventRule::getUniqueId() const

@@ -3,6 +3,7 @@
 #include "camera_input_business_event.h"
 #include "core/resource/resource.h"
 #include "business_rule_processor.h"
+#include "camera_disconnected_business_event.h"
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 
@@ -12,13 +13,23 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
 }
 
 
-void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp)
+void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp, QnMetaDataV1Ptr metadata)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(
-                                             resource->toSharedPointer(),
+                                             resource,
                                              value ? ToggleState::On : ToggleState::Off,
-                                             timeStamp));
+                                             timeStamp,
+                                             metadata));
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
+}
+
+void QnBusinessEventConnector::at_cameraDisconnected(QnResourcePtr cameraResource, qint64 timeStamp)
+{
+    QnCameraDisconnectedBusinessEventPtr cameraEvent(new QnCameraDisconnectedBusinessEvent(
+        cameraResource->getParentResource(),
+        cameraResource,
+        timeStamp));
+    qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
 }
 
 void QnBusinessEventConnector::at_cameraInput(

@@ -74,6 +74,9 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resou
 }
 
 void QnWorkbenchServerTimeWatcher::updateServerTime(const QnMediaServerResourcePtr &server) {
+    if(server->getStatus() == QnResource::Offline)
+        return;
+
     int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
     m_resourceByHandle[handle] = server;
 }
@@ -97,6 +100,7 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
         return;
 
     connect(server.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_server_serverIFFound()));
+    connect(server.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_server_statusChanged()));
     updateServerTime(server);
 }
 
@@ -110,6 +114,10 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
 }
 
 void QnWorkbenchServerTimeWatcher::at_server_serverIFFound() {
+    updateServerTime(toSharedPointer(checked_cast<QnMediaServerResource *>(sender())));
+}
+
+void QnWorkbenchServerTimeWatcher::at_server_statusChanged() {
     updateServerTime(toSharedPointer(checked_cast<QnMediaServerResource *>(sender())));
 }
 

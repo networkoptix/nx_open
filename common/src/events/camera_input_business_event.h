@@ -10,7 +10,8 @@
 
 namespace BusinessEventParameters
 {
-    static QLatin1String inputPortId( "inputPortId" );
+    QString getInputPortId(const QnBusinessParams &params);
+    void setInputPortId(QnBusinessParams* params, const QString &value);
 }
 
 
@@ -28,7 +29,6 @@ public:
     virtual QString toString() const;
 
     const QString& inputPortID() const;
-
 
     virtual bool checkCondition(const QnBusinessParams &params) const override;
 

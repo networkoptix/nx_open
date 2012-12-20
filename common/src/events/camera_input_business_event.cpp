@@ -4,7 +4,22 @@
 ***********************************************************/
 
 #include "camera_input_business_event.h"
-#include "core/resource/resource.h"
+#include "core/resource/resource_fwd.h"
+
+namespace BusinessEventParameters {
+
+    static QLatin1String inputPortId( "inputPortId" );
+
+    QString getInputPortId(const QnBusinessParams &params) {
+        return params.value(inputPortId, QString()).toString();
+    }
+
+    void setInputPortId(QnBusinessParams *params, const QString &value) {
+        (*params)[inputPortId] = value;
+    }
+
+}
+
 
 QnCameraInputEvent::QnCameraInputEvent(
     QnResourcePtr resource,
@@ -24,7 +39,7 @@ QnCameraInputEvent::QnCameraInputEvent(
 QString QnCameraInputEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
-    text += QString::fromLatin1("  input port %1, state %2\n").arg(m_inputPortID).arg(QLatin1String(ToggleState::toString(getToggleState())));
+    text += QString::fromLatin1("  input port %1, state %2\n").arg(m_inputPortID).arg(ToggleState::toString(getToggleState()));
     return text;
 }
 
@@ -38,10 +53,6 @@ bool QnCameraInputEvent::checkCondition(const QnBusinessParams &params) const {
     if (!result)
         return false;
 
-    QVariant inputPort = getParameter(params, BusinessEventParameters::inputPortId);
-    if (!inputPort.isValid())
-        return true; // no condition on input port => work on any
-
-    QString requiredPort = inputPort.toString();
-    return requiredPort.isEmpty() || requiredPort == m_inputPortID;
+    QString inputPort = BusinessEventParameters::getInputPortId(params);
+    return inputPort.isEmpty() || inputPort == m_inputPortID;
 }

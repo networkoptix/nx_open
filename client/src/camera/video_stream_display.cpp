@@ -16,11 +16,12 @@ static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
 
 
-QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale) :
+QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber) :
     m_prevFrameToDelete(NULL),
     m_frameQueueIndex(0),
     m_decodeMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
+    m_channelNumber(channelNumber),
     m_prevFactor(QnFrameScaler::factor_1),
     m_scaleFactor(QnFrameScaler::factor_1),
     m_previousOnScreenSize(0, 0),
@@ -141,8 +142,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(int ch
         newWidth /= 2;
         newHeight /= 2;
     }
-    //return rez;
-    return (QnFrameScaler::DownscaleFactor)(rez * 2);
+    return rez;
 }
 
 void QnVideoStreamDisplay::reorderPrevFrames()
@@ -639,8 +639,11 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
                         dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
                 }
             }
-            else
-                m_drawer->draw(outFrame);
+            else {
+                if (qAbs(m_speed) < 1.0 + FPS_EPS)
+                    m_drawer->waitForFrameDisplayed(outFrame->channel); // wait old frame
+                m_drawer->draw(outFrame); // send new one
+            }
             m_lastDisplayedFrame = outFrame;
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
@@ -659,13 +662,18 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
         }
         if (reverseMode)
             m_prevFrameToDelete = outFrame;
-        return !m_bufferedFrameDisplayer;
+        return true; //!m_bufferedFrameDisplayer;
     }
     else
     {
 //        delete outFrame;
         return false;
     }
+}
+
+bool QnVideoStreamDisplay::selfSyncUsed() const
+{
+    return m_bufferedFrameDisplayer;
 }
 
 bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
@@ -737,10 +745,13 @@ void QnVideoStreamDisplay::setSpeed(float value)
 qint64 QnVideoStreamDisplay::getLastDisplayedTime() const 
 { 
     QMutexLocker lock(&m_timeMutex);
-    if (m_bufferedFrameDisplayer && m_timeChangeEnabled)
-        return m_bufferedFrameDisplayer->getLastDisplayedTime();
+
+    if( m_timeChangeEnabled )
+        return m_lastDisplayedTime;
+    else if( m_drawer )
+        return m_drawer->lastDisplayedTime(m_channelNumber);
     else
-        return m_lastDisplayedTime; 
+        return AV_NOPTS_VALUE;
 }
 
 void QnVideoStreamDisplay::setLastDisplayedTime(qint64 value) 

@@ -26,9 +26,6 @@ public:
     QByteArray toString() const;
     static QnLicense fromString(const QByteArray &licenseString);
 
-public:
-    static const QByteArray FREE_LICENSE_KEY; // TODO: add isFree accessor instead 
-
 private:
     QString m_name;
     QByteArray m_key;

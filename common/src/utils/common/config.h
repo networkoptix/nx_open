@@ -79,10 +79,21 @@ namespace Qn {
     template<class T>
     const T &_id(const T &value) { return value; }
 }
-#endif
+#endif // __cplusplus
 
-// TODO: move to client_globals?
+// TODO: move to client_globals
 #define InvalidUtcOffset _id(INT64_MAX)
+
+// TODO: move out
+#ifdef __cplusplus
+#include <QtCore/QString>
+
+/** Helper function to mark strings that are not to be translated. */
+inline QString lit(const char *s) {
+    return QLatin1String(s);
+}
+#endif // __cplusplus
+
 
 
 #endif // QN_COMMON_CONFIG_H

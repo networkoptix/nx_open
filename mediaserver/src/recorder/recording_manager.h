@@ -40,6 +40,8 @@ public:
 
     bool startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int maxDuration);
     bool stopForcedRecording(QnSecurityCamResourcePtr camRes);
+signals:
+    void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);

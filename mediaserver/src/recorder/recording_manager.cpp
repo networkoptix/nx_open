@@ -18,6 +18,7 @@
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
+#include "events/business_event_connector.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -33,6 +34,8 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(QnResourcePtr, qint64)));
+
     m_scheduleWatchingTimer.start(1000);
 
     QThread::start();
@@ -129,10 +132,9 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
-    QByteArray errStr;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem, errStr) != 0) {
-        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << errStr;
+    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem) != 0) {
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << appServerConnection->getLastError();
         return false;
     }
     return true;
@@ -191,8 +193,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline &&
-        recorderHiRes->currentScheduleTask().getRecordingType() != Qn::RecordingType_Never)
+    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline)
     {
         if (providerHi)
         {
@@ -347,12 +348,15 @@ void QnRecordingManager::at_cameraUpdated()
 
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
+    if (!camera)
+        return;
+
     if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
-    {
-        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
-        if (camera)
-            updateCamera(camera);
-    }
+        updateCamera(camera);
+
+    if ((oldStatus == QnResource::Online || oldStatus == QnResource::Recording) && newStatus == QnResource::Offline)
+        emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
 }
 
 void QnRecordingManager::onNewResource(QnResourcePtr res)
@@ -415,23 +419,6 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 
 void QnRecordingManager::onTimer()
 {
-    // for test purpose only
-    static int gggTest = 0;
-    if (gggTest == 0) {
-        gggTest = 1;
-        QnResourcePtr srcCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
-        QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
-        if (srcCamera && dstCamera) {
-            QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
-            bRule->setEventType(BusinessEventType::BE_Camera_Motion);
-            bRule->setSrcResource(srcCamera);
-            bRule->setActionType(BusinessActionType::BA_CameraRecording);
-            bRule->setDstResource(dstCamera);
-            qnBusinessRuleProcessor->addBusinessRule(bRule);
-        }
-    }
-    // =======================================================
-
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
     {
@@ -450,14 +437,14 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance);
+Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
 QnRecordingManager* QnRecordingManager::instance()
 {
     return qn_recordingManager_instance();
 }
 
 // --------------------- QnServerDataProviderFactory -------------------
-Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance);
+Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance)
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {

@@ -208,6 +208,10 @@ void QnRedAssController::onTimer()
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
+
+        if (display->isFullScreen())
+            reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
+
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
         {
             gotoLowQuality(display, Reason_Small);
@@ -299,6 +303,7 @@ void QnRedAssController::addHQTry()
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
 
+/*
 bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
 {
     if (currentDisplay->isFullScreen() || !currentDisplay->isSyncAllowed())
@@ -315,3 +320,4 @@ bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
     }
     return true;
 }
+*/

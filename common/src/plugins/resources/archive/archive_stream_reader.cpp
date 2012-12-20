@@ -206,22 +206,27 @@ bool QnArchiveStreamReader::init()
 
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
+	MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
     if (requiredJumpTime != qint64(AV_NOPTS_VALUE) && m_reverseMode == m_prevReverseMode) 
     {
         // It is optimization: open and jump at same time
         while (1)
         {
+			m_delegate->setQuality(quality, true);
             bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
             Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
+				m_oldQuality = quality;
+				m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
                 emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
+			quality = m_quality;
             m_jumpMtx.unlock();
         }
     }
@@ -957,6 +962,21 @@ void QnArchiveStreamReader::setMarker(int marker)
     m_newDataMarker = marker;
     if (useMutex)
         m_jumpMtx.unlock();
+}
+
+void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
+{
+    if (m_navDelegate) {
+        return m_navDelegate->setSkipFramesToTime(skipTime);
+    }
+
+    qDebug() << "setSkipFramesToTime(" << QDateTime::fromMSecsSinceEpoch(skipTime / 1000).toString(QLatin1String("hh:mm:ss.zzz"));
+
+    setSkipFramesToTime(skipTime, true);
+    emit skipFramesTo(skipTime);
+
+    if (isSingleShotMode())
+        QnLongRunnable::resume();
 }
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)

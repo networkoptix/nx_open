@@ -126,6 +126,8 @@ private slots:
     void onFindAppServerButtonClicked();
     void onAppServerUrlHistoryComboBoxCurrentChanged( int index );
     void onRadioButtonPublicIpChanged();
+
+    void at_appServerPassword_textChanged(const QString &text);
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);

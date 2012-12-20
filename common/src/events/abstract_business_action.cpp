@@ -5,39 +5,85 @@
 
 #include "api/serializer/serializer.h"
 #include "abstract_business_action.h"
+#include "business_action_factory.h"
+#include <core/resource/resource.h>
 
+namespace BusinessActionType {
 
-namespace BusinessActionType
-{
-    QString toString( Value val )
-    {
-        switch( val )
-        {
-            case BA_NotDefined:
-                return QLatin1String("Not defined");
-            case BA_CameraOutput:
-                return QLatin1String("Camera output");
-            case BA_Bookmark:
-                return QLatin1String("Bookmark");
-            case BA_CameraRecording:
-                return QLatin1String("Camera recording");
-            case BA_PanicRecording:
-                return QLatin1String("Panic recording");
-            case BA_SendMail:
-                return QLatin1String("Send mail");
-            case BA_Alert:
-                return QLatin1String("Alert");
-            case BA_ShowPopup:
-                return QLatin1String("Show popup");
-            default:
-                return QString::fromLatin1("unknown (%1)").arg((int)val);
+    //do not use 'default' keyword: warning should be raised on unknown enumeration values
+
+    QString toString(Value val) {
+        switch(val) {
+            case BA_NotDefined:         return QObject::tr("---");
+            case BA_CameraOutput:       return QObject::tr("Camera output");
+            case BA_Bookmark:           return QObject::tr("Bookmark");
+            case BA_CameraRecording:    return QObject::tr("Camera recording");
+            case BA_PanicRecording:     return QObject::tr("Panic recording");
+            case BA_SendMail:           return QObject::tr("Send mail");
+            case BA_Alert:              return QObject::tr("Alert");
+            case BA_ShowPopup:          return QObject::tr("Show popup");
         }
+        return QObject::tr("Unknown (%1)").arg((int)val);
+    }
+
+    bool isResourceRequired(Value val) {
+        switch(val) {
+            case BA_NotDefined:         return false;
+            case BA_CameraOutput:       return true;
+            case BA_Bookmark:           return true;
+            case BA_CameraRecording:    return true;
+            case BA_PanicRecording:     return false;
+            case BA_SendMail:           return false;
+            case BA_Alert:              return false;
+            case BA_ShowPopup:          return false;
+        }
+        return false;
+    }
+
+    bool hasToggleState(Value val) {
+        switch(val) {
+            case BA_NotDefined:         return false;
+            case BA_CameraOutput:       return true;
+            case BA_Bookmark:           return false;
+            case BA_CameraRecording:    return true;
+            case BA_PanicRecording:     return true;
+            case BA_SendMail:           return false;
+            case BA_Alert:              return false;
+            case BA_ShowPopup:          return false;
+        }
+        return false;
+    }
+
+    pb::BusinessActionType toProtobuf(Value val) {
+        switch(val) {
+            case BA_NotDefined:         return pb::Alert;
+            case BA_CameraOutput:       return pb::CameraOutput;
+            case BA_Bookmark:           return pb::Bookmark;
+            case BA_CameraRecording:    return pb::CameraRecording;
+            case BA_PanicRecording:     return pb::PanicRecording;
+            case BA_SendMail:           return pb::SendMail;
+            case BA_Alert:              return pb::Alert;
+            case BA_ShowPopup:          return pb::ShowPopup;
+        }
+        return pb::Alert;        //TODO: think about adding undefined action to protobuf
+    }
+
+    Value fromProtobuf(pb::BusinessActionType actionType) {
+        switch (actionType) {
+            case pb::CameraOutput:      return BA_CameraOutput;
+            case pb::Bookmark:          return BA_Bookmark;
+            case pb::CameraRecording:   return BA_CameraRecording;
+            case pb::PanicRecording:    return BA_PanicRecording;
+            case pb::SendMail:          return BA_SendMail;
+            case pb::Alert:             return BA_Alert;
+            case pb::ShowPopup:         return BA_ShowPopup;
+        }
+        return BA_NotDefined;
     }
 }
 
-
-QnAbstractBusinessAction::QnAbstractBusinessAction(): 
-    m_actionType(BusinessActionType::BA_NotDefined),
+QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value actionType):
+    m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false)
 {
@@ -48,7 +94,7 @@ QByteArray QnAbstractBusinessAction::serialize()
 {
     pb::BusinessAction pb_businessAction;
 
-    pb_businessAction.set_actiontype((pb::BusinessActionType)actionType());
+    pb_businessAction.set_actiontype(BusinessActionType::toProtobuf(m_actionType));
     if( getResource() )
         pb_businessAction.set_actionresource(getResource()->getId());
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
@@ -59,7 +105,7 @@ QByteArray QnAbstractBusinessAction::serialize()
     return QByteArray(str.data(), str.length());
 }
 
-QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByteArray& data)
+QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
 {
     pb::BusinessAction pb_businessAction;
 
@@ -70,21 +116,13 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByte
         throw QnSerializeException(errorString);
     }
 
-    QnAbstractBusinessActionPtr businessAction;
+    QnBusinessParams runtimeParams;
+    if (pb_businessAction.has_runtimeparams())
+        runtimeParams = deserializeBusinessParams(pb_businessAction.runtimeparams().c_str());
+    QnAbstractBusinessActionPtr businessAction = QnBusinessActionFactory::createAction(
+                BusinessActionType::fromProtobuf(pb_businessAction.actiontype()),
+                runtimeParams);
 
-    switch(pb_businessAction.actiontype())
-    {
-        case pb::CameraOutput:
-        case pb::Bookmark:
-        case pb::CameraRecording:
-        case pb::PanicRecording:
-        case pb::SendMail:
-        case pb::Alert:
-        case pb::ShowPopup:
-            businessAction = QnAbstractBusinessActionPtr(new QnAbstractBusinessAction());
-    }
-
-    businessAction->setActionType((BusinessActionType::Value)pb_businessAction.actiontype());
     businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
     businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
@@ -92,15 +130,42 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByte
     return businessAction;
 }
 
-bool QnAbstractBusinessAction::isToggledAction() const
-{
-    switch(m_actionType)
-    {
-        case BusinessActionType::BA_CameraOutput:
-        case BusinessActionType::BA_CameraRecording:
-        case BusinessActionType::BA_PanicRecording:
-            return true;
-        default:
-            return false;
-    }
+void QnAbstractBusinessAction::setResource(QnResourcePtr resource) {
+    m_resource = resource;
+}
+
+const QnResourcePtr& QnAbstractBusinessAction::getResource() {
+    return m_resource;
+}
+
+void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
+    m_params = params;
+}
+
+const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
+    return m_params;
+}
+
+void QnAbstractBusinessAction::setBusinessRuleId(const QnId& value) {
+    m_businessRuleId = value;
+}
+
+QnId QnAbstractBusinessAction::getBusinessRuleId() const {
+    return m_businessRuleId;
+}
+
+void QnAbstractBusinessAction::setToggleState(ToggleState::Value value) {
+    m_toggleState = value;
+}
+
+ToggleState::Value QnAbstractBusinessAction::getToggleState() const {
+    return m_toggleState;
+}
+
+void QnAbstractBusinessAction::setReceivedFromRemoteHost(bool value) {
+    m_receivedFromRemoteHost = value;
+}
+
+bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
+    return m_receivedFromRemoteHost;
 }
