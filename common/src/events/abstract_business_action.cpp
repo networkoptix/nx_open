@@ -99,6 +99,7 @@ QByteArray QnAbstractBusinessAction::serialize()
         pb_businessAction.set_actionresource(getResource()->getId());
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
     pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
+    pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
 
     std::string str;
     pb_businessAction.SerializeToString(&str);
@@ -126,6 +127,7 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
     businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
     businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
+    businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
 
     return businessAction;
 }
