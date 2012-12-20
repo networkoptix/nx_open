@@ -47,8 +47,8 @@ message BusinessAction {
     optional int32 actionResource          = 2;
     optional string actionParams           = 3;
     optional int32 businessRuleId          = 4;
-	optional string runtimeParams          = 5;
-	optional ToggleStateType toggleState   = 6;	
+    optional string runtimeParams          = 5;
+    optional ToggleStateType toggleState   = 6;	
 }
 
 message BusinessRules {
