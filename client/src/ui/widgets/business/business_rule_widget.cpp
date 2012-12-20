@@ -155,6 +155,8 @@ void QnBusinessRuleWidget::initEventResources(BusinessEventType::Value eventType
 void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
     m_eventStatesModel->clear();
 
+    //TODO: leave only "start/stops, starts, stops" for long actions, only "occurs" on istant
+
     QList<ToggleState::Value> values;
     values << ToggleState::NotDefined;
     if (BusinessEventType::hasToggleState(eventType))
@@ -305,7 +307,7 @@ void QnBusinessRuleWidget::updateSummary() {
     if (!m_rule)
         return;
 
-    QLatin1String formatString("<html><head/><body><p>%1: %2</p></body></html>");
+    QLatin1String formatString("<html><head/><body><p>%1 -> %2</p></body></html>");
 
     QLatin1String eventString("%1 %2 %3");
     QLatin1String actionString("%1 %2");

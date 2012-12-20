@@ -6,8 +6,8 @@
 
 QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(BusinessEventType::Value eventType, QWidget *parent) {
     switch (eventType) {
-    case BusinessEventType::BE_Camera_Motion:
-        return new QnMotionBusinessEventWidget(parent);
+ /*   case BusinessEventType::BE_Camera_Motion:
+        return new QnMotionBusinessEventWidget(parent);*/
     case BusinessEventType::BE_Camera_Input:
         return new QnCameraInputBusinessEventWidget(parent);
     default:
