@@ -23,6 +23,13 @@ enum BusinessActionType
     ShowPopup        = 6;
 }
 
+enum ToggleStateType
+{
+    Off        = 0;
+    On         = 1;
+    Any        = 2;
+    NotDefined = 3;
+}
 
 message BusinessRule {
     optional int32 id                      = 1;
@@ -41,6 +48,7 @@ message BusinessAction {
     optional string actionParams           = 3;
     optional int32 businessRuleId          = 4;
 	optional string runtimeParams          = 5;
+	optional ToggleStateType toggleState   = 6;	
 }
 
 message BusinessRules {
