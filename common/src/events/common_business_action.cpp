@@ -4,8 +4,7 @@
 
 #include "common_business_action.h"
 
-
-CommonBusinessAction::CommonBusinessAction( BusinessActionType::Value actionType ):
+QnCommonBusinessAction::QnCommonBusinessAction( BusinessActionType::Value actionType ):
     base_type(actionType)
 {
 }

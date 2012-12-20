@@ -38,6 +38,7 @@ namespace BusinessActionType
 
     QString toString( Value val );
 
+
     bool isResourceRequired(Value val);
 
     bool hasToggleState(Value val);

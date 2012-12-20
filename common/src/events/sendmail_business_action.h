@@ -20,7 +20,7 @@ class QnSendMailBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnSendMailBusinessAction( BusinessEventType::Value eventType, QnResourcePtr resource, QString eventDescription );
+    QnSendMailBusinessAction(QnBusinessParams runtimeParams);
 
     QString getSubject() const;
 
@@ -28,7 +28,8 @@ public:
     QString getMessageBody() const;
 private:
     BusinessEventType::Value m_eventType;
-    QnResourcePtr m_eventResource;
+    QString m_eventResourceName;
+    QString m_eventResourceUrl;
     QString m_eventDescription;
 };
 

@@ -43,7 +43,7 @@ namespace BusinessEventType
             case BE_Camera_Input:
                 return true;
             case BE_Camera_Disconnect:
-                return true;
+                return false;
             case BE_Storage_Failure:
                 return true;
             case BE_UserDefined:
@@ -125,7 +125,7 @@ namespace BusinessEventType
 
 namespace BusinessEventParameters {
 
-    static QLatin1String toggleState( "toggleState" );
+    static QLatin1String toggleState("toggleState");
 
     ToggleState::Value getToggleState(const QnBusinessParams &params) {
         return (ToggleState::Value) params.value(toggleState, ToggleState::NotDefined).toInt();
@@ -137,6 +137,45 @@ namespace BusinessEventParameters {
 
 }
 
+namespace QnBusinessEventRuntime {
+
+    static QLatin1String typeStr("eventType");
+    static QLatin1String nameStr("eventResourceName");
+    static QLatin1String urlStr("eventResourceUrl");
+    static QLatin1String descriptionStr("eventDescription");
+
+    BusinessEventType::Value getEventType(const QnBusinessParams &params) {
+        return (BusinessEventType::Value) params.value(typeStr, BusinessEventType::BE_NotDefined).toInt();
+    }
+
+    void setEventType(QnBusinessParams* params, BusinessEventType::Value value) {
+        (*params)[typeStr] = (int)value;
+    }
+
+    QString getEventResourceName(const QnBusinessParams &params) {
+        return params.value(nameStr, QString()).toString();
+    }
+
+    void setEventResourceName(QnBusinessParams* params, QString value) {
+        (*params)[nameStr] = value;
+    }
+
+    QString getEventResourceUrl(const QnBusinessParams &params) {
+        return params.value(urlStr, QString()).toString();
+    }
+
+    void setEventResourceUrl(QnBusinessParams* params, QString value) {
+        (*params)[urlStr] = value;
+    }
+
+    QString getEventDescription(const QnBusinessParams &params) {
+        return params.value(descriptionStr, QString()).toString();
+    }
+
+    void setEventDescription(QnBusinessParams* params, QString value) {
+        (*params)[descriptionStr] = value;
+    }
+}
 
 QnAbstractBusinessEvent::QnAbstractBusinessEvent(
         BusinessEventType::Value eventType,
@@ -159,5 +198,16 @@ QString QnAbstractBusinessEvent::toString() const
 
 bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const {
     ToggleState::Value toggleState = BusinessEventParameters::getToggleState(params);
-    return toggleState == ToggleState::Any || toggleState == m_toggleState;
+    return toggleState == ToggleState::NotDefined
+            ||  ToggleState::Any || toggleState == m_toggleState;
+}
+
+QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
+    QnBusinessParams params;
+    QnBusinessEventRuntime::setEventType(&params, m_eventType);
+    QnBusinessEventRuntime::setEventDescription(&params, toString());
+    QnBusinessEventRuntime::setEventResourceName(&params, m_resource ? m_resource->getName() : QString());
+    QnBusinessEventRuntime::setEventResourceUrl(&params, m_resource ? m_resource->getUrl() : QString());
+
+    return params;
 }
