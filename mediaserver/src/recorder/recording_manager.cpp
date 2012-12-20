@@ -18,6 +18,7 @@
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
+#include "events/business_event_connector.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -33,6 +34,8 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(QnResourcePtr, qint64)));
+
     m_scheduleWatchingTimer.start(1000);
 
     QThread::start();
@@ -345,12 +348,15 @@ void QnRecordingManager::at_cameraUpdated()
 
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
+    if (!camera)
+        return;
+
     if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
-    {
-        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
-        if (camera)
-            updateCamera(camera);
-    }
+        updateCamera(camera);
+
+    if ((oldStatus == QnResource::Online || oldStatus == QnResource::Recording) && newStatus == QnResource::Offline)
+        emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
 }
 
 void QnRecordingManager::onNewResource(QnResourcePtr res)

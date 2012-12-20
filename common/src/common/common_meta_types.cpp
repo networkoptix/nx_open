@@ -77,6 +77,7 @@ void QnCommonMetaTypes::initilize() {
     //events/actions
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
+    qRegisterMetaType<QnMetaDataV1Ptr>();
 
     qn_commonMetaTypes_initialized = true;
 }
