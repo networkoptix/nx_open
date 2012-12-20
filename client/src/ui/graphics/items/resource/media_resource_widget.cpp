@@ -392,44 +392,6 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
-
-    if(options() & DisplayCrosshair) {
-        QVector<QPointF> crosshairLines; // TODO: cache these?
-
-        QPointF center = rect.center();
-        qreal d0 = qMin(rect.width(), rect.height()) / 4.0;
-        qreal d1 = d0 / 8.0;
-
-        qreal dx = d1 * 3.0;
-        while(dx < rect.width() / 2.0) {
-            crosshairLines 
-                << center + QPointF( dx, d1 / 2.0) << center + QPointF( dx, -d1 / 2.0)
-                << center + QPointF(-dx, d1 / 2.0) << center + QPointF(-dx, -d1 / 2.0);
-            dx += d1;
-        }
-
-        qreal dy = d1 * 3.0;
-        while(dy < rect.height() / 2.0) {
-            crosshairLines 
-                << center + QPointF(d1 / 2.0,  dy) << center + QPointF(-d1 / 2.0,  dy)
-                << center + QPointF(d1 / 2.0, -dy) << center + QPointF(-d1 / 2.0, -dy);
-            dy += d1;
-        }
-
-        /*for(int i = 0; i < 4; i++) {
-            qreal a = M_PI * (0.25 + 0.5 * i);
-            qreal sin = std::sin(a);
-            qreal cos = std::cos(a);
-            QPointF v0(cos, sin), v1(-sin, cos);
-
-            crosshairLines
-                << center + v0 * d1 << center + v0 * d0
-                << center + v0 * d0 + v1 * d1 / 2.0 << center + v0 * d0 - v1 * d1 / 2.0;
-        }*/
-
-        QnScopedPainterPenRollback penRollback(painter, QPen(toTransparent(qnGlobals->ptzColor(), 0.75)));
-        painter->drawLines(crosshairLines);
-    }
 }
 
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion) {

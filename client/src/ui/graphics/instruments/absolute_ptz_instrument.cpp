@@ -303,8 +303,43 @@ public:
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */) {
-        painter->setPen(Qt::green);
-        painter->drawRect(rect());
+        QRectF rect = this->rect();
+
+        QVector<QPointF> crosshairLines; // TODO: cache these?
+
+        QPointF center = rect.center();
+        qreal d0 = qMin(rect.width(), rect.height()) / 4.0;
+        qreal d1 = d0 / 8.0;
+
+        qreal dx = d1 * 3.0;
+        while(dx < rect.width() / 2.0) {
+            crosshairLines 
+                << center + QPointF( dx, d1 / 2.0) << center + QPointF( dx, -d1 / 2.0)
+                << center + QPointF(-dx, d1 / 2.0) << center + QPointF(-dx, -d1 / 2.0);
+            dx += d1;
+        }
+
+        qreal dy = d1 * 3.0;
+        while(dy < rect.height() / 2.0) {
+            crosshairLines 
+                << center + QPointF(d1 / 2.0,  dy) << center + QPointF(-d1 / 2.0,  dy)
+                << center + QPointF(d1 / 2.0, -dy) << center + QPointF(-d1 / 2.0, -dy);
+            dy += d1;
+        }
+
+        /*for(int i = 0; i < 4; i++) {
+            qreal a = M_PI * (0.25 + 0.5 * i);
+            qreal sin = std::sin(a);
+            qreal cos = std::cos(a);
+            QPointF v0(cos, sin), v1(-sin, cos);
+
+            crosshairLines
+                << center + v0 * d1 << center + v0 * d0
+                << center + v0 * d0 + v1 * d1 / 2.0 << center + v0 * d0 - v1 * d1 / 2.0;
+        }*/
+
+        QnScopedPainterPenRollback penRollback(painter, QPen(ptzBorderColor));
+        painter->drawLines(crosshairLines);
     }
 
 private:
@@ -374,6 +409,7 @@ void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
         return;
 
     overlay = new PtzOverlayWidget();
+    overlay->setOpacity(0.0);
     m_overlayByWidget[widget] = overlay;
 
     widget->addOverlayWidget(overlay, false, false);
@@ -398,8 +434,13 @@ void AbsolutePtzInstrument::updateOverlayWidget() {
 }
 
 void AbsolutePtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
-    if(widget->options() & QnResourceWidget::DisplayCrosshair)
+    bool hasCrosshair = widget->options() & QnResourceWidget::DisplayCrosshair;
+
+    if(hasCrosshair)
         ensureOverlayWidget(widget);
+
+    if(PtzOverlayWidget *overlay = overlayWidget(widget))
+        opacityAnimator(overlay, 0.5)->animateTo(hasCrosshair ? 1.0 : 0.0);
 }
 
 void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
@@ -498,13 +539,7 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
         connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
         updateOverlayWidget(widget);
-
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if(m_ptzController->mapper(camera)) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     } else {
         return false;
     }
