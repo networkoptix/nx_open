@@ -80,8 +80,8 @@ public:
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
 
-    virtual QStringList QnSecurityCamResource::getRelayOutputList() const;
-    virtual QStringList QnSecurityCamResource::getInputPortList() const;
+    virtual QStringList getRelayOutputList() const;
+    virtual QStringList getInputPortList() const;
 
 
     CameraCapabilities getCameraCapabilities() const;
