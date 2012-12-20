@@ -10,3 +10,10 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
                             timeStamp)
 {
 }
+
+QString QnStorageFailureBusinessEvent::toString() const
+{
+    QString text = QnAbstractBusinessEvent::toString();
+    //text += tr("  storage %1\n").arg(m_cameraResource->getUniqueId());
+    return text;
+}
