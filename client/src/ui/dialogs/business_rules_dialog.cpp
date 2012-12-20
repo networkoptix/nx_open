@@ -15,11 +15,12 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     ui->setupUi(this);
 
     QnBusinessEventRules rules;
-    QByteArray errString;
     connection->getBusinessRules(rules); // synchronous call
     foreach (QnBusinessEventRulePtr rule, rules) {
         addRuleToList(rule);
     }
+
+    //TODO: show description label if no rules are loaded
 
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     connect(ui->newRuleButton, SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));

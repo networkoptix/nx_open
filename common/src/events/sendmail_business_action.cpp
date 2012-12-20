@@ -3,7 +3,6 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "abstract_business_event.h"
 #include "sendmail_business_action.h"
 #include "core/resource/resource.h"
 
@@ -20,21 +19,22 @@ namespace BusinessActionParameters {
 
 }
 
-QnSendMailBusinessAction::QnSendMailBusinessAction( BusinessEventType::Value eventType, QnResourcePtr resource, QString eventDescription ) :
-    base_type(BusinessActionType::BA_SendMail),
-    m_eventType(eventType),
-    m_eventResource(resource),
-    m_eventDescription(eventDescription)
+QnSendMailBusinessAction::QnSendMailBusinessAction(QnBusinessParams runtimeParams):
+    base_type(BusinessActionType::BA_SendMail)
 {
+    m_eventType =           QnBusinessEventRuntime::getEventType(runtimeParams);
+    m_eventResourceName =   QnBusinessEventRuntime::getEventResourceName(runtimeParams);
+    m_eventResourceUrl =    QnBusinessEventRuntime::getEventResourceUrl(runtimeParams);
+    m_eventDescription =    QnBusinessEventRuntime::getEventDescription(runtimeParams);
 }
 
 QString QnSendMailBusinessAction::getSubject() const {
-    return m_eventResource
+    return !m_eventResourceName.isEmpty()
         ? QObject::tr("%1 Event received from resource %2 (%3)").
             arg(BusinessEventType::toString(m_eventType)).
-            arg(m_eventResource->getName()).
-            arg(m_eventResource->getUrl())
-        : QObject::tr("%1 Event received from an unknown resource").
+            arg(m_eventResourceName).
+            arg(m_eventResourceUrl)
+        : QObject::tr("%1 Event received").
           arg(BusinessEventType::toString(m_eventType));
 }
 
@@ -49,11 +49,12 @@ QString QnSendMailBusinessAction::getMessageBody() const {
             ...
     */
 
+    //TODO: modify to allow events without resources
     QString text;
     text += QObject::tr("Event %1 caught from %2 (address %3):\n").
         arg(BusinessEventType::toString(m_eventType)).
-        arg(m_eventResource ? m_eventResource->getName() : QObject::tr("UNKNOWN")).
-        arg(m_eventResource ? m_eventResource->getUrl() : QObject::tr("UNKNOWN"));
+        arg(!m_eventResourceName.isEmpty() ? m_eventResourceName : QObject::tr("UNKNOWN")).
+        arg(!m_eventResourceUrl.isEmpty() ? m_eventResourceUrl : QObject::tr("UNKNOWN"));
     text += m_eventDescription;
 
     text += QObject::tr("Action parameters:\n");

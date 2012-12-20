@@ -11,16 +11,11 @@
 
 #include <core/resource/resource_fwd.h>
 
-namespace BusinessActionParameters {
-    QString getEmailAddress(const QnBusinessParams &params);
-    void setEmailAddress(QnBusinessParams* params, const QString &value);
-}
-
 class QnPanicBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnPanicBusinessAction( BusinessEventType::Value eventType, QnResourcePtr resource, QString eventDescription );
+    QnPanicBusinessAction();
 
 private:
 };

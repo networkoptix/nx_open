@@ -5,6 +5,8 @@
 #include "common_business_action.h"
 #include "camera_output_business_action.h"
 
+#include <events/business_action_factory.h>
+
 #include <core/resource/resource.h>
 
 
@@ -18,29 +20,12 @@ QnBusinessEventRule::QnBusinessEventRule()
 }
 
 QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
-    QnAbstractBusinessActionPtr result;
-    switch (m_actionType)
-    {
-        case BusinessActionType::BA_CameraOutput:
-            result = QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction);
-            break;
-        case BusinessActionType::BA_Bookmark:
-        case BusinessActionType::BA_PanicRecording:
-            result = QnAbstractBusinessActionPtr(new CommonBusinessAction(m_actionType));
-            break;
-        case BusinessActionType::BA_CameraRecording:
-            result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
-            break;
-        case BusinessActionType::BA_SendMail:
-            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(bEvent->getEventType(),
-                                                                              bEvent->getResource(),
-                                                                              bEvent->toString()));
-            break;
-        case BusinessActionType::BA_Alert:
-        case BusinessActionType::BA_ShowPopup:
-        default:
-            return QnAbstractBusinessActionPtr(); // not implemented
-    }
+    if (BusinessActionType::isResourceRequired(m_actionType) && !m_actionResource)
+        return QnAbstractBusinessActionPtr(); //resource is not exists anymore
+
+    QnBusinessParams runtimeParams = bEvent->getRuntimeParams();
+
+    QnAbstractBusinessActionPtr result = QnBusinessActionFactory::createAction(m_actionType, runtimeParams);
 
     if (!m_actionParams.isEmpty())
         result->setParams(m_actionParams);

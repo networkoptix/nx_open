@@ -45,10 +45,23 @@ namespace BusinessEventType
     bool requiresServerResource(Value val);
 }
 
-namespace BusinessEventParameters
-{
+namespace BusinessEventParameters {
     ToggleState::Value getToggleState(const QnBusinessParams &params);
     void setToggleState(QnBusinessParams* params, ToggleState::Value value);
+}
+
+namespace QnBusinessEventRuntime {
+    BusinessEventType::Value getEventType(const QnBusinessParams &params);
+    void setEventType(QnBusinessParams* params, BusinessEventType::Value value);
+
+    QString getEventResourceName(const QnBusinessParams &params);
+    void setEventResourceName(QnBusinessParams* params, QString value);
+
+    QString getEventResourceUrl(const QnBusinessParams &params);
+    void setEventResourceUrl(QnBusinessParams* params, QString value);
+
+    QString getEventDescription(const QnBusinessParams &params);
+    void setEventDescription(QnBusinessParams* params, QString value);
 }
 
 /**
@@ -106,6 +119,8 @@ public:
      * @return                  True if event should be handled, false otherwise.
      */
     virtual bool checkCondition(const QnBusinessParams& params) const;
+
+    virtual QnBusinessParams getRuntimeParams() const;
 private:
     /**
      * @brief m_eventType       Type of event. See BusinessEventType::Value.

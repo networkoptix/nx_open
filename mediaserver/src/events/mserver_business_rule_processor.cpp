@@ -25,7 +25,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
         break;
     }
     return false;
-};
+}
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
 {
@@ -39,8 +39,9 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessActionPtr action)
 {
+    Q_ASSERT(action);
     QnSecurityCamResourcePtr camera = action->getResource().dynamicCast<QnSecurityCamResource>();
-    Q_ASSERT(camera);
+    //Q_ASSERT(camera);
     if (!camera)
         return false;
 
