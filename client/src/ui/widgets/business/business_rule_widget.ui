@@ -110,7 +110,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="eventTypeComboBox"/>
+            <widget class="QComboBox" name="eventTypeComboBox">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="eventAtLabel">
@@ -121,21 +125,18 @@
            </item>
            <item>
             <widget class="QComboBox" name="eventResourceComboBox">
-             <item>
-              <property name="text">
-               <string>DW1031ax</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../../../../x86/build/client-custom.qrc">
-                <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
-              </property>
-             </item>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
             </widget>
            </item>
            <item>
             <widget class="QComboBox" name="eventStatesComboBox">
              <property name="currentIndex">
               <number>-1</number>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
              </property>
             </widget>
            </item>
@@ -183,11 +184,8 @@
            </item>
            <item>
             <widget class="QComboBox" name="actionTypeComboBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
              </property>
             </widget>
            </item>
@@ -200,21 +198,9 @@
            </item>
            <item>
             <widget class="QComboBox" name="actionResourceComboBox">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
              </property>
-             <item>
-              <property name="text">
-               <string>DW1031ax</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../../../../x86/build/client-custom.qrc">
-                <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
-              </property>
-             </item>
             </widget>
            </item>
            <item>
