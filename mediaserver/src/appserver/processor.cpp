@@ -39,7 +39,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // but now (new version) camera NOT in resource pool!
         resource->setStatus(QnResource::Online, true); // set status in silence mode. Do not send any signals e.t.c
 
-        QByteArray errorString;
         QnVirtualCameraResourceList cameras;
         QString password = cameraResource->getAuth().password();
 
@@ -47,9 +46,9 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance().containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
 
-        if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
+        if (m_appServer->addCamera(cameraResource, cameras) != 0)
         {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
             continue;
         }
 

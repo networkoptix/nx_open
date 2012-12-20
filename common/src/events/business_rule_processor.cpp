@@ -189,11 +189,10 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     if( appServerConnection->sendEmail(
             emailAddress,
             action->getSubject(),
-            action->getMessageBody(),
-            emailSendErrorText ) )
+            action->getMessageBody()))
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
-            arg(emailAddress).arg(QLatin1String(emailSendErrorText)), cl_logWARNING );
+            arg(emailAddress).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
         return false;
     }
     return true;

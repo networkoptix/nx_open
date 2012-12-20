@@ -34,12 +34,11 @@ bool QnAbstractPtzController::calibrate(QnVirtualCameraResourcePtr res, qreal xV
     res->setParam(QLatin1String("yVelocityCoeff"), yVelocityCoeff, QnDomainDatabase);
     res->setParam(QLatin1String("zoomVelocityCoeff"), zoomVelocityCoeff, QnDomainDatabase);
 
-    QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(res, errorStr) != 0) 
+    if (conn->saveSync(res) != 0) 
     {
         qCritical() << "QnPlOnvifResource::init: can't save resource PTZ params to Enterprise Controller. Resource physicalId: "
-            << res->getPhysicalId() << ". Error: " << errorStr;
+            << res->getPhysicalId() << ". Error: " << conn->getLastError();
         return false;
     }
     return true;

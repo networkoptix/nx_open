@@ -274,11 +274,10 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
 
     while (servers.isEmpty())
     {
-        QByteArray errorString;
-        if (appServerConnection->getServers(servers, errorString) == 0)
+        if (appServerConnection->getServers(servers) == 0)
             break;
 
-        qDebug() << "findServer(): Call to registerServer failed. Reason: " << errorString;
+        qDebug() << "findServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(1000);
     }
 
@@ -294,13 +293,12 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
 QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResourcePtr serverPtr)
 {
     QnMediaServerResourceList servers;
-    QByteArray errorString;
     serverPtr->setStatus(QnResource::Online);
 
     QByteArray authKey;
-    if (appServerConnection->registerServer(serverPtr, servers, authKey, errorString) != 0)
+    if (appServerConnection->registerServer(serverPtr, servers, authKey) != 0)
     {
-        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
+        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
 
         return QnMediaServerResourcePtr();
     }
@@ -540,14 +538,11 @@ void QnMain::loadResourcesFromECS()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    QByteArray errorString;
-
-    //reading local cameras
     QnVirtualCameraResourceList cameras;
-    while (appServerConnection->getCameras(cameras, m_mediaServer->getId(), errorString) != 0)
+    while (appServerConnection->getCameras(cameras, m_mediaServer->getId()) != 0)
     {
-        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
-        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << appServerConnection->getLastError();
+        QnSleep::msleep(10000);
     }
 
     QnManualCamerasMap manualCameras;
@@ -570,9 +565,9 @@ void QnMain::loadResourcesFromECS()
 
     //reading media servers list
     QnMediaServerResourceList mediaServerList;
-    while( appServerConnection->getServers( mediaServerList, errorString ) != 0 )
+    while( appServerConnection->getServers( mediaServerList) != 0 )
     {
-        NX_LOG( QString::fromLatin1("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(errorString)), cl_logERROR );
+        NX_LOG( QString::fromLatin1("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -585,10 +580,10 @@ void QnMain::loadResourcesFromECS()
         qnResPool->addResource( mediaServer );
         //requesting remote server cameras
         QnVirtualCameraResourceList cameras;
-        while( appServerConnection->getCameras(cameras, mediaServer->getId(), errorString) != 0 )
+        while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
         {
             NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
-                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String(errorString)), cl_logERROR );
+                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
         }
         foreach( const QnVirtualCameraResourcePtr &camera, cameras )
@@ -601,10 +596,10 @@ void QnMain::loadResourcesFromECS()
     }
 
     QnCameraHistoryList cameraHistoryList;
-    while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+    while (appServerConnection->getCameraHistoryList(cameraHistoryList) != 0)
     {
-        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
-        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << appServerConnection->getLastError();
+        QnSleep::msleep(1000);
     }
 
     foreach(QnCameraHistoryPtr history, cameraHistoryList)
@@ -614,9 +609,9 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnBusinessEventRules rules;
-    while( appServerConnection->getBusinessRules( rules, errorString ) != 0 )
+    while( appServerConnection->getBusinessRules(rules) != 0 )
     {
-        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << errorString;
+        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -742,17 +737,16 @@ void QnMain::run()
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    QByteArray errorString;
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
         if (checkIfAppServerIsOld())
             return;
 
-        if (appServerConnection->connect(connectInfo, errorString) == 0)
+        if (appServerConnection->connect(connectInfo) == 0)
             break;
 
-        cl_log.log("Can't connect to Enterprise Controller: ", errorString.data(), cl_logWARNING);
+        cl_log.log("Can't connect to Enterprise Controller: ", appServerConnection->getLastError(), cl_logWARNING);
 
         QnSleep::msleep(1000);
     }
@@ -842,7 +836,7 @@ void QnMain::run()
     int status;
     do
     {
-        status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online, errorString);
+        status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online);
     } while (status != 0);
 
     initAppServerEventConnection(qSettings, m_mediaServer);
