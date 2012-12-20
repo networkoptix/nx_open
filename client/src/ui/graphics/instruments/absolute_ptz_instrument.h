@@ -106,6 +106,7 @@ private:
     QWeakPointer<PtzManipulatorWidget> m_manipulator;
     QHash<QObject *, PtzOverlayWidget *> m_overlayByWidget;
     QHash<QObject *, PtzSpeed> m_speedByWidget;
+    QBasicTimer m_movementTimer;
 
     bool m_isClick;
     bool m_isDoubleClick;

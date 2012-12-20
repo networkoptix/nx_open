@@ -45,6 +45,8 @@ namespace {
     const QColor ptzBaseColor = toTransparent(ptzColor.lighter(120), 0.25);
 
     const qreal instantSpeedUpdateThreshold = 0.1;
+    const qreal speedUpdateThreshold = 0.001;
+    const int speedUpdateIntervalMSec = 500;
 }
 
 
@@ -442,20 +444,25 @@ void AbsolutePtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
 
 void AbsolutePtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed) {
     PtzSpeed &ptzSpeed = m_speedByWidget[widget];
-
     ptzSpeed.requested = speed;
 
-    bool send = 
-        (qFuzzyIsNull(ptzSpeed.current) ^ qFuzzyIsNull(ptzSpeed.requested)) || 
-        (ptzSpeed.current - ptzSpeed.requested).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
-
-    if(!send) 
+    if((ptzSpeed.current - ptzSpeed.requested).lengthSquared() < speedUpdateThreshold * speedUpdateThreshold)
         return;
 
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    bool instant =
+        (qFuzzyIsNull(ptzSpeed.current) ^ qFuzzyIsNull(ptzSpeed.requested)) || 
+        (ptzSpeed.current - ptzSpeed.requested).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
+    if(instant) {
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
 
-    m_ptzController->setMovement(camera, ptzSpeed.requested);
-    ptzSpeed.current = ptzSpeed.requested;
+        m_ptzController->setMovement(camera, ptzSpeed.requested);
+        ptzSpeed.current = ptzSpeed.requested;
+
+        m_movementTimer.stop();
+    } else {
+        if(!m_movementTimer.isActive())
+            m_movementTimer.start(speedUpdateIntervalMSec, this);
+    }
 }
 
 
@@ -471,6 +478,7 @@ void AbsolutePtzInstrument::installedNotify() {
 
 void AbsolutePtzInstrument::aboutToBeDisabledNotify() {
     m_clickTimer.stop();
+    m_movementTimer.stop();
 
     base_type::aboutToBeDisabledNotify();
 }
@@ -522,6 +530,17 @@ void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
         m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
         ptzMoveTo(target(), m_clickPos);
+    } else if(event->timerId() == m_movementTimer.timerId()) { 
+        if(!target())
+            return;
+
+        QnVirtualCameraResourcePtr camera = target()->resource().dynamicCast<QnVirtualCameraResource>();
+        PtzSpeed &ptzSpeed = m_speedByWidget[target()];
+
+        m_ptzController->setMovement(camera, ptzSpeed.requested);
+        ptzSpeed.current = ptzSpeed.requested;
+
+        m_movementTimer.stop();
     } else {
         base_type::timerEvent(event);
     }
