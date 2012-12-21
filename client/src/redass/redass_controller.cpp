@@ -12,6 +12,7 @@ static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ 
 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
+static const double FPS_EPS = 0.0001;
 
 QnRedAssController* QnRedAssController::instance()
 {
@@ -41,7 +42,7 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
 bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
 {
     QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
-    return cam && cam->hasDualStreaming() && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
+    return cam && cam->hasDualStreaming(); // && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
 }
 
 QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond, int* displaySize)
@@ -136,6 +137,8 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
         reader->setQuality(MEDIA_Quality_High, true);
         return;
     }
+    else if (isFFSpeed(display))
+        return; // do not return to HQ in FF mode because of retry counter is not increased for FF
 
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
         return; // Some item stuck after HQ switching. Do not switch to HQ any more
@@ -174,6 +177,12 @@ bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
     return !isSmallItem(display);
 }
 
+bool QnRedAssController::isFFSpeed(QnCamDisplay* display) const
+{
+    double speed = display->getSpeed();
+    return speed > 1 + FPS_EPS || speed < 0;
+}
+
 void QnRedAssController::onTimer()
 {
     QMutexLocker lock(&m_mutex);
@@ -209,7 +218,7 @@ void QnRedAssController::onTimer()
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
 
-        if (display->isFullScreen())
+        if (display->isFullScreen() && !isFFSpeed(display))
             reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
 
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
