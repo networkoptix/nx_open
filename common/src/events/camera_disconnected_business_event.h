@@ -1,19 +1,20 @@
 #ifndef __CAMERA_DISCONNECTED_BUSINESS_EVENT_H__
 #define __CAMERA_DISCONNECTED_BUSINESS_EVENT_H__
 
-#include "abstract_business_event.h"
-#include "core/datapacket/media_data_packet.h"
+#include "instant_business_event.h"
+#include "core/resource/resource_fwd.h"
 
-class QnCameraDisconnectedBusinessEvent: public QnAbstractBusinessEvent
+class QnCameraDisconnectedBusinessEvent: public QnInstantBusinessEvent
 {
+    typedef QnInstantBusinessEvent base_type;
 public:
-    QnCameraDisconnectedBusinessEvent(QnResourcePtr mediaServerResource, QnResourcePtr cameraResource, qint64 timeStamp);
+    QnCameraDisconnectedBusinessEvent(const QnResourcePtr& mediaServerResource, const QnResourcePtr& cameraResource, qint64 timeStamp);
 
     /**
      * @brief checkCondition
      * @params params 'camera' - optional camera unique ID
      */
-    bool checkCondition(const QnBusinessParams& params) const;
+    bool checkCondition(const QnBusinessParams& params) const override;
 
     virtual QString toString() const override;
 private:

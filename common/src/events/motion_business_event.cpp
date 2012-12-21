@@ -2,11 +2,11 @@
 #include "core/resource/resource.h"
 
 QnMotionBusinessEvent::QnMotionBusinessEvent(
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         ToggleState::Value toggleState,
         qint64 timeStamp,
         QnMetaDataV1Ptr metadata):
-    QnAbstractBusinessEvent(BusinessEventType::BE_Camera_Motion,
+    base_type(BusinessEventType::BE_Camera_Motion,
                             resource,
                             toggleState,
                             timeStamp),

@@ -11,7 +11,7 @@ class QnAbstractBusinessParamsWidget : public QWidget
 
 public:
     explicit QnAbstractBusinessParamsWidget(QWidget *parent = 0):QWidget(parent) {}
-    ~QnAbstractBusinessParamsWidget() {}
+    virtual ~QnAbstractBusinessParamsWidget() {}
 
     virtual void loadParameters(const QnBusinessParams &params) = 0;
     virtual QnBusinessParams parameters() const = 0;

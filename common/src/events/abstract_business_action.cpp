@@ -132,7 +132,7 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
     return businessAction;
 }
 
-void QnAbstractBusinessAction::setResource(QnResourcePtr resource) {
+void QnAbstractBusinessAction::setResource(const QnResourcePtr& resource) {
     m_resource = resource;
 }
 

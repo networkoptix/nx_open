@@ -2,11 +2,10 @@
 #include "core/resource/resource.h"
 
 QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         qint64 timeStamp):
-    QnAbstractBusinessEvent(BusinessEventType::BE_Storage_Failure,
+    base_type(BusinessEventType::BE_Storage_Failure,
                             resource,
-                            ToggleState::NotDefined,
                             timeStamp)
 {
 }

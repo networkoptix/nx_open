@@ -68,6 +68,8 @@ namespace QnBusinessEventRuntime {
  * @brief The QnAbstractBusinessEvent class
  *                              Base class for business events. Contains parameters of the
  *                              occured event and methods for checking it against the rules.
+ *                              No classes should directly inherit QnAbstractBusinessEvent
+ *                              except the QnInstantBusinessEvent and QnProlongedBusinessEvent.
  */
 class QnAbstractBusinessEvent
 {
@@ -82,7 +84,7 @@ protected:
      */
     explicit QnAbstractBusinessEvent (
             BusinessEventType::Value eventType,
-            QnResourcePtr resource,
+            const QnResourcePtr& resource,
             ToggleState::Value toggleState,
             qint64 timeStamp);
 public:
@@ -98,7 +100,7 @@ public:
      * @brief getResource       Get resource that provided this event.
      * @return                  Shared pointer on the resource.
      */
-    QnResourcePtr getResource()             const { return m_resource; }
+    const QnResourcePtr& getResource() const { return m_resource; }
 
     /**
      * @brief getEventType      Get type of event. See BusinessEventType::Value.
@@ -118,7 +120,7 @@ public:
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(const QnBusinessParams& params) const;
+    virtual bool checkCondition(const QnBusinessParams& params) const = 0;
 
     virtual QnBusinessParams getRuntimeParams() const;
 private:

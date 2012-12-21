@@ -2,29 +2,26 @@
 <ui version="4.0">
  <class>QnMotionBusinessEventWidget</class>
  <widget class="QWidget" name="QnMotionBusinessEventWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>820</width>
-    <height>45</height>
-   </rect>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QPushButton" name="selectRegionButton">
-     <property name="text">
-      <string>Select region...</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QLabel" name="summaryLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Selected region: Anywhere</string>
+      <string>Event occurs when motion is detected anywhere on the screen</string>
      </property>
     </widget>
    </item>

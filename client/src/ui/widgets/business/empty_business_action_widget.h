@@ -18,7 +18,7 @@ public:
     explicit QnEmptyBusinessActionWidget(QWidget *parent = 0);
     ~QnEmptyBusinessActionWidget();
 
-    virtual void loadParameters(const QnBusinessParams &params) override {}
+    virtual void loadParameters(const QnBusinessParams &params) override { Q_UNUSED(params) }
     virtual QnBusinessParams parameters() const override {return QnBusinessParams(); }
     virtual QString description() const override;
 private:

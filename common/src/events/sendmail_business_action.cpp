@@ -4,7 +4,6 @@
 ***********************************************************/
 
 #include "sendmail_business_action.h"
-#include "core/resource/resource.h"
 
 namespace BusinessActionParameters {
     static QLatin1String emailAddress("emailAddress");

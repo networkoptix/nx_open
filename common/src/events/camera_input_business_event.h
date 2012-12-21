@@ -6,7 +6,7 @@
 #ifndef CAMERA_INPUT_BUSINESS_EVENT_H
 #define CAMERA_INPUT_BUSINESS_EVENT_H
 
-#include "abstract_business_event.h"
+#include "prolonged_business_event.h"
 
 namespace BusinessEventParameters
 {
@@ -14,14 +14,12 @@ namespace BusinessEventParameters
     void setInputPortId(QnBusinessParams* params, const QString &value);
 }
 
-
-
-class QnCameraInputEvent: public QnAbstractBusinessEvent
+class QnCameraInputEvent: public QnProlongedBusinessEvent
 {
-    typedef QnAbstractBusinessEvent base_type;
+    typedef QnProlongedBusinessEvent base_type;
 public:
     QnCameraInputEvent(
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         ToggleState::Value toggleState,
         qint64 timeStamp,
         const QString& inputPortID);

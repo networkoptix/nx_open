@@ -22,7 +22,7 @@ namespace BusinessEventParameters {
 
 
 QnCameraInputEvent::QnCameraInputEvent(
-    QnResourcePtr resource,
+    const QnResourcePtr& resource,
     ToggleState::Value toggleState,
     qint64 timeStamp,
     const QString& inputPortID)
@@ -39,7 +39,10 @@ QnCameraInputEvent::QnCameraInputEvent(
 QString QnCameraInputEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
-    text += QString::fromLatin1("  input port %1, state %2\n").arg(m_inputPortID).arg(ToggleState::toString(getToggleState()));
+    text += QString::fromLatin1("  input port %1, state %2\n").arg(m_inputPortID)
+            .arg(getToggleState() == ToggleState::On
+                 ? QLatin1String("On")
+                 : QLatin1String("Off"));
     return text;
 }
 
@@ -49,8 +52,7 @@ const QString& QnCameraInputEvent::inputPortID() const
 }
 
 bool QnCameraInputEvent::checkCondition(const QnBusinessParams &params) const {
-    bool result = base_type::checkCondition(params);
-    if (!result)
+    if (!base_type::checkCondition(params))
         return false;
 
     QString inputPort = BusinessEventParameters::getInputPortId(params);

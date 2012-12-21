@@ -79,6 +79,7 @@ private slots:
     void updateDisplay();
     void resetFromRule();
     void updateSummary();
+    void updateResources();
 
 private:
     BusinessEventType::Value getCurrentEventType() const;

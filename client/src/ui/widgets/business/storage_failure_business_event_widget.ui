@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnCameraInputBusinessEventWidget</class>
- <widget class="QWidget" name="QnCameraInputBusinessEventWidget">
+ <class>QnStorageFailureBusinessEventWidget</class>
+ <widget class="QWidget" name="QnStorageFailureBusinessEventWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>45</height>
+    <width>799</width>
+    <height>41</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,12 +17,9 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Input ID:</string>
+      <string>Event will be raised if any storage on the selected server will go offline</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="inputIdLineEdit"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">
@@ -31,7 +28,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>302</width>
        <height>20</height>
       </size>
      </property>

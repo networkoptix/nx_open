@@ -9,8 +9,6 @@
 #include "abstract_business_action.h"
 #include "abstract_business_event.h"
 
-#include <core/resource/resource_fwd.h>
-
 namespace BusinessActionParameters {
     QString getEmailAddress(const QnBusinessParams &params);
     void setEmailAddress(QnBusinessParams* params, const QString &value);
@@ -21,6 +19,7 @@ class QnSendMailBusinessAction: public QnAbstractBusinessAction
     typedef QnAbstractBusinessAction base_type;
 public:
     QnSendMailBusinessAction(QnBusinessParams runtimeParams);
+    ~QnSendMailBusinessAction() {}
 
     QString getSubject() const;
 

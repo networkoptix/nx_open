@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnCameraInputBusinessEventWidget</class>
- <widget class="QWidget" name="QnCameraInputBusinessEventWidget">
+ <class>QnCameraDisconnectedBusinessEventWidget</class>
+ <widget class="QWidget" name="QnCameraDisconnectedBusinessEventWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>45</height>
+    <width>771</width>
+    <height>41</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -16,13 +22,16 @@
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Input ID:</string>
+      <string>Event will be raised when any camera goes offline</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="inputIdLineEdit"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">
@@ -31,7 +40,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>412</width>
        <height>20</height>
       </size>
      </property>

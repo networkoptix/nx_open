@@ -179,7 +179,7 @@ namespace QnBusinessEventRuntime {
 
 QnAbstractBusinessEvent::QnAbstractBusinessEvent(
         BusinessEventType::Value eventType,
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         ToggleState::Value toggleState,
         qint64 timeStamp):
     m_eventType(eventType),
@@ -194,12 +194,6 @@ QString QnAbstractBusinessEvent::toString() const
     QString text = QObject::tr("event type: %1\n").arg(BusinessEventType::toString(m_eventType));
     text += QObject::tr("timestamp: %1\n").arg(QDateTime::fromMSecsSinceEpoch(m_timeStamp/1000).toString());
     return text;
-}
-
-bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const {
-    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(params);
-    return toggleState == ToggleState::NotDefined
-            ||  ToggleState::Any || toggleState == m_toggleState;
 }
 
 QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
