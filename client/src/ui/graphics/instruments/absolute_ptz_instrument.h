@@ -60,6 +60,8 @@ protected:
 private slots:
     void at_splashItem_destroyed();
 
+    void at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera);
+
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
 
@@ -87,12 +89,17 @@ private:
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
     void ptzUnzoom(QnMediaResourceWidget *widget);
 
-    void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed);
+    void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant = false);
 
 private:
-    struct PtzSpeed {
-        QVector3D current;
-        QVector3D requested;
+    struct PtzData {
+        PtzData(): hasAbsoluteMove(false), overlayWidget(NULL) {}
+
+        bool hasAbsoluteMove;
+        QVector3D currentSpeed;
+        QVector3D requestedSpeed;
+        QRectF pendingAbsoluteMove;
+        PtzOverlayWidget *overlayWidget;
     };
 
     QnWorkbenchPtzController *m_ptzController;
@@ -104,9 +111,7 @@ private:
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
     QWeakPointer<PtzManipulatorWidget> m_manipulator;
-    QSet<QObject *> m_absoluteWidgets;
-    QHash<QObject *, PtzOverlayWidget *> m_overlayByWidget;
-    QHash<QObject *, PtzSpeed> m_speedByWidget;
+    QHash<QObject *, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
 
     bool m_isClick;

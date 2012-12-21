@@ -456,7 +456,9 @@ AbsolutePtzInstrument::AbsolutePtzInstrument(QObject *parent):
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
-{}
+{
+    connect(m_ptzController, SIGNAL(positionChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &)));
+}
 
 AbsolutePtzInstrument::~AbsolutePtzInstrument() {
     ensureUninstalled();
@@ -479,18 +481,18 @@ PtzSplashItem *AbsolutePtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
 }
 
 PtzOverlayWidget *AbsolutePtzInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
-    return m_overlayByWidget.value(widget);
+    return m_dataByWidget[widget].overlayWidget;
 }
 
 void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
-    PtzOverlayWidget *overlay = m_overlayByWidget.value(widget);
+    PtzOverlayWidget *overlay = m_dataByWidget[widget].overlayWidget;
     if(overlay)
         return;
 
     overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
-    m_overlayByWidget[widget] = overlay;
+    m_dataByWidget[widget].overlayWidget = overlay;
 
     widget->addOverlayWidget(overlay, false, false);
 }
@@ -535,7 +537,11 @@ void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRect
     QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(camera);
     if(qIsNaN(oldPhysicalPosition)) {
         m_ptzController->setMovement(camera, QVector3D());
-        return; // TODO
+
+        PtzData &data = m_dataByWidget[widget];
+        data.pendingAbsoluteMove = rect;
+
+        return; 
     }
 
     qreal sideSize = 36.0 / oldPhysicalPosition.z();
@@ -565,21 +571,23 @@ void AbsolutePtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
 }
 
-void AbsolutePtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed) {
-    PtzSpeed &ptzSpeed = m_speedByWidget[widget];
-    ptzSpeed.requested = speed;
+void AbsolutePtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant) {
+    PtzData &data = m_dataByWidget[widget];
+    data.requestedSpeed = speed;
 
-    if((ptzSpeed.current - ptzSpeed.requested).lengthSquared() < speedUpdateThreshold * speedUpdateThreshold)
+    if(!instant && (data.currentSpeed - data.requestedSpeed).lengthSquared() < speedUpdateThreshold * speedUpdateThreshold)
         return;
 
-    bool instant =
-        (qFuzzyIsNull(ptzSpeed.current) ^ qFuzzyIsNull(ptzSpeed.requested)) || 
-        (ptzSpeed.current - ptzSpeed.requested).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
+    instant = instant ||
+        (qFuzzyIsNull(data.currentSpeed) ^ qFuzzyIsNull(data.requestedSpeed)) || 
+        (data.currentSpeed - data.requestedSpeed).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
+
     if(instant) {
         QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
 
-        m_ptzController->setMovement(camera, ptzSpeed.requested);
-        ptzSpeed.current = ptzSpeed.requested;
+        m_ptzController->setMovement(camera, data.requestedSpeed);
+        data.currentSpeed = data.requestedSpeed;
+        data.pendingAbsoluteMove = QRectF();
 
         m_movementTimer.stop();
     } else {
@@ -623,11 +631,10 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
             updateOverlayWidget(widget);
 
+            PtzData &data = m_dataByWidget[widget];
             if(m_ptzController->mapper(camera))
-                m_absoluteWidgets.insert(widget);
-
-            PtzSpeed &ptzSpeed = m_speedByWidget[widget];
-            ptzSpeed.current = ptzSpeed.requested = m_ptzController->movement(camera);
+                data.hasAbsoluteMove = true;
+            data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
 
             return true;
         }
@@ -641,9 +648,7 @@ void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
 
-    m_overlayByWidget.remove(object);
-    m_speedByWidget.remove(object);
-    m_absoluteWidgets.remove(object);
+    m_dataByWidget.remove(object);
 }
 
 void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
@@ -661,12 +666,7 @@ void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
         if(!target())
             return;
 
-        QnVirtualCameraResourcePtr camera = target()->resource().dynamicCast<QnVirtualCameraResource>();
-        PtzSpeed &ptzSpeed = m_speedByWidget[target()];
-
-        m_ptzController->setMovement(camera, ptzSpeed.requested);
-        ptzSpeed.current = ptzSpeed.requested;
-
+        ptzMove(target(), m_dataByWidget[target()].requestedSpeed);
         m_movementTimer.stop();
     } else {
         base_type::timerEvent(event);
@@ -742,7 +742,7 @@ bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneM
             manipulator = NULL;
     }
 
-    if(!manipulator && !m_absoluteWidgets.contains(target))
+    if(!manipulator && !m_dataByWidget[target].hasAbsoluteMove)
         return false;
 
     m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
@@ -885,3 +885,15 @@ void AbsolutePtzInstrument::at_splashItem_destroyed() {
     m_activeAnimations.removeAll(item);
 }
 
+void AbsolutePtzInstrument::at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera) {
+    if(!target() || target()->resource() != camera)
+        return;
+
+    PtzData &data = m_dataByWidget[target()];
+    QRectF rect = data.pendingAbsoluteMove;
+    if(rect.isNull())
+        return;
+
+    data.pendingAbsoluteMove = QRectF();
+    ptzMoveTo(target(), rect);
+}

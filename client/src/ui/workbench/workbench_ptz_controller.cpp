@@ -221,6 +221,13 @@ const QnPtzSpaceMapper *QnWorkbenchPtzController::mapper(const QnVirtualCameraRe
     return m_mapperByModel.value(camera->getModel());
 }
 
+void QnWorkbenchPtzController::emitChanged(const QnVirtualCameraResourcePtr &camera, bool position, bool movement) {
+    if(position)
+        emit positionChanged(camera);
+    if(movement)
+        emit movementChanged(camera);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -257,12 +264,17 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
     
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
+        bool positionChanged = false;
         if(qFuzzyIsNull(data.movement)) {
-            data.position = QVector3D(xPos, yPox, zoomPos);
+            QVector3D position(xPos, yPox, zoomPos);
+            positionChanged = !qFuzzyCompare(position, data.position);
+            data.position = position;
             if(const QnPtzSpaceMapper *mapper = this->mapper(camera))
                 data.physicalPosition = mapper->fromCamera.logicalToPhysical(data.position);
         }
         data.attemptCount[GetPositionRequest] = 0;
+
+        emitChanged(camera, positionChanged, false);
     } else {
         if(data.attemptCount[GetPositionRequest] > maxAttempts) {
             qnWarning("Could not get PTZ position from '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
@@ -283,11 +295,16 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
 
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
+        bool positionChanged = !qFuzzyCompare(data.position, position);
         data.position = position;
         if(const QnPtzSpaceMapper *mapper = this->mapper(camera))
             data.physicalPosition = mapper->toCamera.logicalToPhysical(data.position);
+
+        bool movementChanged = qFuzzyCompare(data.movement, QVector3D());
         data.movement = QVector3D();
         data.attemptCount[SetPositionRequest] = 0;
+
+        emitChanged(camera, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetPositionRequest] > maxAttempts) {
             qnWarning("Could not set PTZ position for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
@@ -308,14 +325,20 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
 
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
+        bool positionChanged = false;
         if(!qFuzzyIsNull(movement)) {
+            positionChanged = !qIsNaN(data.position);
             data.position = qQNaN<QVector3D>();
             data.physicalPosition = qQNaN<QVector3D>();
         } else if(qIsNaN(data.position)) {
             sendGetPosition(camera);
         }
+        
+        bool movementChanged = !qFuzzyCompare(data.movement, movement);
         data.movement = movement;
         data.attemptCount[SetMovementRequest] = 0;
+
+        emitChanged(camera, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetMovementRequest] > maxAttempts) {
             qnWarning("Could not set PTZ movement for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);

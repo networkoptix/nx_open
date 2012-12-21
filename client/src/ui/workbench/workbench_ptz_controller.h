@@ -62,6 +62,10 @@ public:
      */
     void setMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement);
 
+signals:
+    void movementChanged(const QnVirtualCameraResourcePtr &camera);
+    void positionChanged(const QnVirtualCameraResourcePtr &camera);
+
 private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
@@ -79,6 +83,8 @@ private:
     void sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement);
 
     void tryInitialize(const QnVirtualCameraResourcePtr &camera);
+
+    void emitChanged(const QnVirtualCameraResourcePtr &camera, bool position, bool movement);
 
 private:
     enum PtzRequestType {
