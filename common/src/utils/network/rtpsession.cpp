@@ -24,9 +24,10 @@ static const int TCP_CONNECT_TIMEOUT = 1000*2;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
-static const int TIME_RESYNC_THRESHOLD = 15;
-static const int TIME_FUTURE_THRESHOLD = 4;
-
+//static const int TIME_RESYNC_THRESHOLD = 15;
+//static const int TIME_FUTURE_THRESHOLD = 4;
+static const double TIME_RESYNC_THRESHOLD = 1.1;
+static const double TIME_RESYNC_THRESHOLD2 = 30;
 //#define DEBUG_RTSP
 
 static QString getValueFromString(const QString& line)
@@ -152,8 +153,9 @@ QMap<QString, QnRtspTimeHelper::CamSyncInfo*> QnRtspTimeHelper::m_camClock;
 
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     m_lastTime(AV_NOPTS_VALUE),
-    m_lastResultInSec(0),
-    m_localStartTime(0)
+    m_resId(resId)
+    //m_lastResultInSec(0),
+    //m_localStartTime(0)
 {
     {
         QMutexLocker lock(&m_camClockMutex);
@@ -163,8 +165,8 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
         m_cameraClockToLocalDiff = itr.value();
     }
     
-    m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
-    m_timer.restart();
+    //m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
+    //m_timer.restart();
 }
 
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
@@ -181,12 +183,14 @@ void QnRtspTimeHelper::reset()
     QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
     
     m_cameraClockToLocalDiff->value = INT_MAX;
-    m_lastTime = AV_NOPTS_VALUE;
-    m_lastResultInSec = 0;
-    m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
-    m_timer.restart();
+    //m_lastTime = AV_NOPTS_VALUE;
+
+    //m_lastResultInSec = 0;
+    //m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
+    //m_timer.restart();
 }
 
+/*
 bool QnRtspTimeHelper::isLocalTimeChanged()
 {
     int elapsed;
@@ -203,6 +207,7 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
     }
     return timeChanged;
 }
+*/
 
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
 {
@@ -217,16 +222,22 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
         //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
-        bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
-        bool gotInvalidTime = resultInSecs - localTimeInSecs > TIME_FUTURE_THRESHOLD;
-        if ((cameraTimeChanged || isLocalTimeChanged() || gotInvalidTime) && recursiveAllowed)
+        //bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
+        //bool gotInvalidTime = resultInSecs - localTimeInSecs > TIME_FUTURE_THRESHOLD;
+        //if ((cameraTimeChanged || isLocalTimeChanged() || gotInvalidTime) && recursiveAllowed)
+
+        if (localTimeInSecs - resultInSecs > TIME_RESYNC_THRESHOLD2)
+            m_lastTime = 0; // time goes to the past
+
+        //qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs;
+        if (qAbs(localTimeInSecs - resultInSecs) > TIME_RESYNC_THRESHOLD && recursiveAllowed) 
         {
-            //qDebug() << "reset time";
+            qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "resync time for camera" << m_resId;
             reset();
             return getUsecTime(rtpTime, statistics, frequency, false);
         }
         else {
-            m_lastResultInSec = resultInSecs;
+            //m_lastResultInSec = resultInSecs;
             qint64 rez = resultInSecs * 1000000ll;
             // check for negative time if camera timings is inaccurate
             if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)

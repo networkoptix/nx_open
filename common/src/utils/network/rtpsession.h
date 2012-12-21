@@ -38,13 +38,13 @@ public:
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
 private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
-    bool isLocalTimeChanged();
+    //bool isLocalTimeChanged();
     void reset();
 private:
     qint64 m_lastTime;
-    double m_lastResultInSec;
-    QElapsedTimer m_timer;
-    qint64 m_localStartTime;
+    //double m_lastResultInSec;
+    //QElapsedTimer m_timer;
+    //qint64 m_localStartTime;
 
     struct CamSyncInfo {
         CamSyncInfo(): value(INT_MAX) {}
@@ -53,6 +53,7 @@ private:
     };
 
     CamSyncInfo* m_cameraClockToLocalDiff;
+    QString m_resId;
 
     static QMutex m_camClockMutex;
     static QMap<QString, CamSyncInfo*> m_camClock;
