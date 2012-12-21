@@ -22,8 +22,10 @@
 #include <ui/common/coordinate_transformations.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
 #include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
@@ -41,8 +43,11 @@
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
 
-    const QColor ptzBorderColor = toTransparent(ptzColor, 0.75);
-    const QColor ptzBaseColor = toTransparent(ptzColor.lighter(120), 0.25);
+    const QColor ptzArrowBorderColor = toTransparent(ptzColor, 0.75);
+    const QColor ptzArrowBaseColor = toTransparent(ptzColor.lighter(120), 0.75);
+
+    const QColor ptzItemBorderColor = toTransparent(ptzColor, 0.75);
+    const QColor ptzItemBaseColor = toTransparent(ptzColor.lighter(120), 0.25);
 
     const qreal instantSpeedUpdateThreshold = 0.1;
     const qreal speedUpdateThreshold = 0.001;
@@ -60,7 +65,10 @@ public:
     PtzSelectionItem(QGraphicsItem *parent = NULL): 
         base_type(parent),
         m_elementSize(0.0)
-    {}
+    {
+        setPen(ptzItemBorderColor);
+        setBrush(ptzItemBaseColor);
+    }
 
     virtual QRectF boundingRect() const override {
         return QnGeometry::dilated(base_type::boundingRect(), m_elementSize / 2.0);
@@ -239,10 +247,62 @@ class PtzArrowItem: public GraphicsPathItem {
     typedef GraphicsPathItem base_type;
 
 public:
-    PtzArrowItem(QGraphicsItem *parent = NULL): base_type(parent) {}
+    PtzArrowItem(QGraphicsItem *parent = NULL): 
+        base_type(parent),
+        m_size(QSizeF(32, 32)),
+        m_pathValid(false)
+    {
+        setPen(ptzArrowBorderColor);
+        setBrush(ptzArrowBaseColor);
+    }
+
+    const QSizeF &size() const {
+        return m_size;
+    }
+
+    void setSize(const QSizeF &size) {
+        if(qFuzzyCompare(size, m_size))
+            return;
+
+        m_size = size;
+
+        invalidatePath();
+    }
+
+    void moveTo(const QPointF &origin, const QPointF &target) {
+        setPos(target);
+        setRotation(QnGeometry::atan2(origin - target) / M_PI * 180);
+    }
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
+        ensurePath();
+
+        base_type::paint(painter, option, widget);
+    }
+
+protected:
+    void invalidatePath() {
+        m_pathValid = false;
+    }
+
+    void ensurePath() {
+        if(m_pathValid)
+            return;
+
+        QPainterPath path;
+        path.moveTo(0, 0);
+        path.lineTo(m_size.height(), m_size.width() / 2);
+        path.lineTo(m_size.height(), -m_size.width() / 2);
+        path.closeSubpath();
+
+        setPath(path);
+    }
 
 private:
+    /** Arrow size. Height determines arrow length. */
+    QSizeF m_size;
 
+    bool m_pathValid;
 };
 
 
@@ -266,8 +326,8 @@ public:
         QPointF center = rect.center();
         QPointF centralStep = QPointF(penWidth, penWidth);
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(ptzBorderColor, penWidth));
-        QnScopedPainterBrushRollback brushRollback(painter, ptzBaseColor);
+        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor, penWidth));
+        QnScopedPainterBrushRollback brushRollback(painter, ptzItemBaseColor);
 
         painter->drawEllipse(rect);
         painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
@@ -284,13 +344,23 @@ class PtzOverlayWidget: public QGraphicsWidget {
 public:
     PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags),
-        m_manipulatorWidget(new PtzManipulatorWidget(this))
+        m_manipulatorWidget(new PtzManipulatorWidget(this)),
+        m_arrowItem(new PtzArrowItem(this))/*,
+        m_zoomInButton(new QnImageButtonWidget(this)),
+        m_zoomOutButton(new QnImageButtonWidget(this))*/
     {
+        //m_zoomInButton->setIcon(qnSkin->icon("ptz_zoom"));
+        //m_zoomOutButton->setIcon(qnSkin->icon("ptz_unzoom"));
+
         updateLayout();
     }
 
     PtzManipulatorWidget *manipulatorWidget() const {
         return m_manipulatorWidget;
+    }
+
+    PtzArrowItem *arrowItem() const {
+        return m_arrowItem;
     }
 
     virtual void setGeometry(const QRectF &rect) override {
@@ -327,7 +397,8 @@ public:
             dy += d1;
         }
 
-        /*for(int i = 0; i < 4; i++) {
+#if 0
+        for(int i = 0; i < 4; i++) {
             qreal a = M_PI * (0.25 + 0.5 * i);
             qreal sin = std::sin(a);
             qreal cos = std::cos(a);
@@ -336,9 +407,10 @@ public:
             crosshairLines
                 << center + v0 * d1 << center + v0 * d0
                 << center + v0 * d0 + v1 * d1 / 2.0 << center + v0 * d0 - v1 * d1 / 2.0;
-        }*/
+        }
+#endif
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(ptzBorderColor));
+        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor));
         painter->drawLines(crosshairLines);
     }
 
@@ -353,10 +425,16 @@ private:
         QPointF centralStep(centralWidth, centralWidth);
 
         m_manipulatorWidget->setGeometry(QRectF(center - centralStep, center + centralStep));
+
+        m_arrowItem->setSize(QSizeF(centralWidth, centralWidth));
+        m_arrowItem->moveTo(center, center + centralStep * 3);
     }
 
 private:
     PtzManipulatorWidget *m_manipulatorWidget;
+    PtzArrowItem *m_arrowItem;
+    QnImageButtonWidget *m_zoomInButton;
+    QnImageButtonWidget *m_zoomOutButton;
 };
 
 Q_DECLARE_METATYPE(PtzOverlayWidget *);
@@ -421,8 +499,6 @@ void AbsolutePtzInstrument::ensureSelectionItem() {
 
     m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(ptzBorderColor);
-    selectionItem()->setBrush(ptzBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
     if(scene() != NULL)
@@ -692,6 +768,9 @@ void AbsolutePtzInstrument::startDrag(DragInfo *) {
         opacityAnimator(selectionItem())->stop();
         selectionItem()->setOpacity(1.0);
         /* Everything else will be initialized in the first call to drag(). */
+    } else {
+        opacityAnimator(overlayWidget(target())->arrowItem(), 0.5)->animateTo(1.0);
+        /* Everything else will be initialized in the first call to drag(). */
     }
 
     emit ptzStarted(target());
@@ -726,11 +805,15 @@ void AbsolutePtzInstrument::dragMove(DragInfo *info) {
         selectionItem()->setSidePoints(sidePoints);
     } else {
         QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
-
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
+        QVector3D speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0), 0.0);
 
-        ptzMove(target(), QVector3D(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0), 0.0));
+        PtzArrowItem *arrowItem = overlayWidget(target())->arrowItem();
+        arrowItem->moveTo(target()->rect().center(), info->mouseItemPos());
+        arrowItem->setSize(QSize());
+
+        ptzMove(target(), speed);
     }
 }
 
@@ -749,6 +832,8 @@ void AbsolutePtzInstrument::finishDrag(DragInfo *) {
             m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
             ptzMoveTo(target(), selectionRect);
+        } else {
+            opacityAnimator(overlayWidget(target())->arrowItem())->animateTo(0.0);
         }
     }
 
