@@ -106,10 +106,13 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
     if (display->isFullScreen())
         return; // do not go to LQ for full screen items (except of FF/REW play)
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return; // do not go to LQ if recently switch occurred
     if (reader->getQuality() == MEDIA_Quality_Low)
         return; // reader already at LQ
+
+    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL) {
+        m_redAssInfo[display].awaitingLQTime = qnSyncTime->currentMSecsSinceEpoch();
+        return; // do not go to LQ if recently switch occurred
+    }
 
     // switch to LQ min item
     display = findDisplay(Find_Least, MEDIA_Quality_High);
@@ -130,6 +133,8 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     QnCamDisplay* display = getDisplayByReader(reader);
     if (!isSupportedDisplay(display))
         return;
+
+    m_redAssInfo[display].awaitingLQTime = 0;
 
     if (qAbs(display->getSpeed()) < m_redAssInfo[display].toLQSpeed || (m_redAssInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
     {
@@ -221,6 +226,9 @@ void QnRedAssController::onTimer()
         if (display->isFullScreen() && !isFFSpeed(display))
             reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
 
+        if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
+            gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
+
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
         {
             gotoLowQuality(display, Reason_Small);
@@ -297,6 +305,7 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
     m_redAssInfo[display].lqReason = reason;
     m_redAssInfo[display].toLQSpeed = display->getSpeed();
+    m_redAssInfo[display].awaitingLQTime = 0;
 }
 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
