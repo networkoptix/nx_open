@@ -37,6 +37,7 @@ private:
     /** try LQ->HQ once more */
     void addHQTry(); 
     bool isFFSpeed(QnCamDisplay* display) const;
+    bool existstBufferingDisplay() const;
 private:
     enum FindMethod {Find_Biggest, Find_Least};
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};

@@ -123,6 +123,17 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
     }
 }
 
+bool QnRedAssController::existstBufferingDisplay() const
+{
+    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    {
+        QnCamDisplay* display = itr.key();
+        if (display->isBuffering())
+            return true;
+    }
+    return false;
+}
+
 void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
@@ -163,6 +174,9 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
         return; // recently LQ->HQ or HQ->LQ
     if (m_lastLqTime + QUALITY_SWITCH_INTERVAL > qnSyncTime->currentMSecsSinceEpoch())
         return; // recently slow report received (not all reports affect m_lastSwitchTimer)
+
+    if (existstBufferingDisplay())
+        return; // do not go to HQ if some display perform opening...
 
     display = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem);
     if (display) {
