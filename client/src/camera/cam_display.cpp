@@ -217,8 +217,9 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 
 	if (isVideoCamera)
 	{
-        bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-		if (m_speed < 1.0 || m_singleShotMode || isLive)
+        //bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+        //bool isPrebuffer = media->flags & QnAbstractMediaData::MediaFlags_FCZ;
+		if (m_speed < 1.0 || m_singleShotMode)
 			return;
         if ((quint64)m_firstAfterJumpTime == AV_NOPTS_VALUE) {
 			m_firstAfterJumpTime = media->timestamp;
