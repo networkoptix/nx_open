@@ -104,6 +104,7 @@ private:
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
     QWeakPointer<PtzManipulatorWidget> m_manipulator;
+    QSet<QObject *> m_absoluteWidgets;
     QHash<QObject *, PtzOverlayWidget *> m_overlayByWidget;
     QHash<QObject *, PtzSpeed> m_speedByWidget;
     QBasicTimer m_movementTimer;

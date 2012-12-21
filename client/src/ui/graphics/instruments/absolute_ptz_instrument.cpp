@@ -537,9 +537,15 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
         return false;
 
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
-        connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
-        updateOverlayWidget(widget);
-        return true;
+        if(QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
+            connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
+            updateOverlayWidget(widget);
+
+            if(m_ptzController->mapper(camera))
+                m_absoluteWidgets.insert(widget);
+
+            return true;
+        }
     } else {
         return false;
     }
@@ -552,6 +558,7 @@ void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {
 
     m_overlayByWidget.remove(object);
     m_speedByWidget.remove(object);
+    m_absoluteWidgets.remove(object);
 }
 
 void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
@@ -649,6 +656,9 @@ bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneM
         if(!manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
             manipulator = NULL;
     }
+
+    if(!manipulator && !m_absoluteWidgets.contains(target))
+        return false;
 
     m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
     m_target = target;
@@ -748,7 +758,7 @@ void AbsolutePtzInstrument::finishDrag(DragInfo *) {
 
 void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
     if(target()) {
-        if(m_isClick && m_isDoubleClick) {
+        if(!manipulator() && m_isClick && m_isDoubleClick) {
             PtzSplashItem *splashItem = newSplashItem(target());
             splashItem->setSplashType(PtzSplashItem::Rectangular);
             splashItem->setPos(target()->rect().center());
