@@ -533,6 +533,10 @@ void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRect
         return;
 
     QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(camera);
+    if(qIsNaN(oldPhysicalPosition)) {
+        m_ptzController->setMovement(camera, QVector3D());
+        return; // TODO
+    }
 
     qreal sideSize = 36.0 / oldPhysicalPosition.z();
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
@@ -621,6 +625,9 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
 
             if(m_ptzController->mapper(camera))
                 m_absoluteWidgets.insert(widget);
+
+            PtzSpeed &ptzSpeed = m_speedByWidget[widget];
+            ptzSpeed.current = ptzSpeed.requested = m_ptzController->movement(camera);
 
             return true;
         }
