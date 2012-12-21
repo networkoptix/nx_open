@@ -2,6 +2,8 @@
 #define QN_BUSINESS_RULES_DIALOG_H
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QModelIndex>
+
 #include <QtGui/QDialog>
 
 #include <api/api_fwd.h>
@@ -29,6 +31,8 @@ private slots:
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
+    void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+
     void newRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
     void saveRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
     void deleteRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
@@ -36,6 +40,9 @@ private:
     void addRuleToList(QnBusinessEventRulePtr rule);
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
+
+    QStandardItemModel* m_listModel;
+    QnBusinessEventRules m_rules;
 
     QnAppServerConnectionPtr m_connection;
     QMap<int, QnBusinessRuleWidget*> m_savingWidgets;

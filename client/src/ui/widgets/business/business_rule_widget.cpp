@@ -322,8 +322,8 @@ QString QnBusinessRuleWidget::getResourceName(const QnResourcePtr& resource) con
 // Handlers
 
 void QnBusinessRuleWidget::updateDisplay() {
-    ui->summaryFrame->setVisible(m_rule);
-    ui->deleteButton->setVisible(m_rule);
+    ui->summaryFrame->setVisible(false);
+    ui->resetButton->setVisible(m_rule);
     if (m_rule)
         updateSummary();
 }
@@ -466,7 +466,7 @@ void QnBusinessRuleWidget::at_applyButton_clicked() {
 
     emit apply(this, rule);
     updateSummary();
-    setExpanded(false);
+ //   setExpanded(false);
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
