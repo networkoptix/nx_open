@@ -3,6 +3,9 @@ package pb;
 import "businessCommon.proto";
 import "businessAction.proto";
 
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "BusinessRuleProtos";
+
 enum BusinessEventType {
     NotDefinedEvent    = 0;
     Camera_Motion      = 1;

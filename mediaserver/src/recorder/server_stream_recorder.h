@@ -36,7 +36,7 @@ public:
     void stopForcedRecording();
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
-    void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnMetaDataV1Ptr motion);
+    void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnAbstractDataPacketPtr motion);
 
     void storageFailure(QnResourcePtr resource, qint64 timestamp, const QString& errMessage);
 protected:

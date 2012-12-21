@@ -34,6 +34,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->installEventFilter(this);
 
+    connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+            this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
 
@@ -52,6 +54,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
             this, SLOT(at_message_ruleDeleted(QnId)));
+
 
 //    connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -191,6 +194,12 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
     updateControlButtons();
 }
 
+void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
+    Q_UNUSED(bottomRight)
+    if (topLeft.column() <= QnBusiness::ModifiedColumn)
+        updateControlButtons();
+}
+
 void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
     if (m_processing.values().contains(ruleModel))
         return;
@@ -221,7 +230,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
-    //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && m_rulesViewModel->hasModifiedItems());
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && m_rulesViewModel->hasModifiedItems());
 
     ui->deleteRuleButton->setEnabled(hasRights && m_currentDetailsWidget);
     ui->addRuleButton->setEnabled(hasRights);

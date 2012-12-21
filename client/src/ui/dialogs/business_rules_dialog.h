@@ -54,6 +54,7 @@ private slots:
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+    void at_model_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
 
