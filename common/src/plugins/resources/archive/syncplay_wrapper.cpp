@@ -754,10 +754,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                     if (d->enabled)
                         d->readers[i].reader->setNavDelegate(this);
                     d->readers[i].paused = true;
-                    if (d->readers[i].buffering) {
-                        d->readers[i].buffering = false;
-                        d->bufferingCnt--;
-                    }
+                    if (d->readers[i].buffering)
+                        onBufferingFinished(d->readers[i].cam);
                 }
             }
             d->readers[i].enabled = !value;
