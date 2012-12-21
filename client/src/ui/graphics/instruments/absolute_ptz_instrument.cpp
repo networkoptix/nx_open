@@ -296,6 +296,10 @@ protected:
         path.closeSubpath();
 
         setPath(path);
+        
+        QPen pen = this->pen();
+        pen.setWidthF(qMax(m_size.width(), m_size.height()) / 16.0);
+        setPen(pen);
     }
 
 private:
@@ -316,9 +320,7 @@ class PtzManipulatorWidget: public Instrumented<QGraphicsWidget> {
 public:
     PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags) 
-    {
-        setCursor(Qt::SizeAllCursor);
-    }
+    {}
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
         QRectF rect = this->rect();
@@ -351,6 +353,8 @@ public:
     {
         //m_zoomInButton->setIcon(qnSkin->icon("ptz_zoom"));
         //m_zoomOutButton->setIcon(qnSkin->icon("ptz_unzoom"));
+
+        m_arrowItem->setOpacity(0.0);
 
         updateLayout();
     }
@@ -425,9 +429,6 @@ private:
         QPointF centralStep(centralWidth, centralWidth);
 
         m_manipulatorWidget->setGeometry(QRectF(center - centralStep, center + centralStep));
-
-        m_arrowItem->setSize(QSizeF(centralWidth, centralWidth));
-        m_arrowItem->moveTo(center, center + centralStep * 3);
     }
 
 private:
@@ -488,6 +489,7 @@ void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
 
     overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
+    overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     m_overlayByWidget[widget] = overlay;
 
     widget->addOverlayWidget(overlay, false, false);
@@ -769,6 +771,8 @@ void AbsolutePtzInstrument::startDrag(DragInfo *) {
         selectionItem()->setOpacity(1.0);
         /* Everything else will be initialized in the first call to drag(). */
     } else {
+        manipulator()->setCursor(Qt::BlankCursor);
+        target()->setCursor(Qt::BlankCursor);
         opacityAnimator(overlayWidget(target())->arrowItem(), 0.5)->animateTo(1.0);
         /* Everything else will be initialized in the first call to drag(). */
     }
@@ -808,10 +812,12 @@ void AbsolutePtzInstrument::dragMove(DragInfo *info) {
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
         QVector3D speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0), 0.0);
+        qreal speedMagnitude = (qAbs(speed.x()) + qAbs(speed.y())) / 2.0;
+        qreal arrowSize = scale / 16.0 * (0.4 + 2.6 * speedMagnitude);
 
         PtzArrowItem *arrowItem = overlayWidget(target())->arrowItem();
         arrowItem->moveTo(target()->rect().center(), info->mouseItemPos());
-        arrowItem->setSize(QSize());
+        arrowItem->setSize(QSize(arrowSize, arrowSize));
 
         ptzMove(target(), speed);
     }
@@ -833,6 +839,8 @@ void AbsolutePtzInstrument::finishDrag(DragInfo *) {
 
             ptzMoveTo(target(), selectionRect);
         } else {
+            manipulator()->setCursor(Qt::SizeAllCursor);
+            target()->unsetCursor();
             opacityAnimator(overlayWidget(target())->arrowItem())->animateTo(0.0);
         }
     }
