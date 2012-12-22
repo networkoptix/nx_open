@@ -341,7 +341,7 @@ void QnRtspClientArchiveDelegate::reopen()
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result = getNextDataInternal();
-    if (!result)
+    if (!result && !m_blockReopening)
         result = getNextDataInternal(); // try again in case of RTSP reconnect
 
     if (m_serverTimePeriod.isNull() || !m_isMultiserverAllowed)

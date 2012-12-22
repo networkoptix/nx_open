@@ -326,15 +326,15 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
         return;
 
     qint64 displayedTime = getDisplayedTimeInternal();
-    qint64 archiveEndTime = AV_NOPTS_VALUE;
+
     qDebug() << "Speed changed. CurrentTime" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString();
+    
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled) {
             info.reader->setNavDelegate(0);
             info.reader->setSpeed(value, d->lastJumpTime == DATETIME_NOW ? DATETIME_NOW : displayedTime);
             info.reader->setNavDelegate(this);
-            archiveEndTime = qMax(archiveEndTime, info.reader->endTime());
         }
     }
 
@@ -343,7 +343,7 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
     if ((d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW) && value < 0)
     {
         // REW from live
-        reinitTime(archiveEndTime);
+        reinitTime(qnSyncTime->currentUSecsSinceEpoch());
     }
     else {
         qint64 et = expectedTime();
@@ -621,7 +621,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
         {
             if (i->enabled)
-                allReady &= (i->isEOF || i->reader->isRealTimeSource());
+                allReady &= i->isEOF; //(i->isEOF || i->reader->isRealTimeSource());
         }
 
         if (d->enabled) {
