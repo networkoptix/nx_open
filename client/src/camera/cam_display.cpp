@@ -1510,6 +1510,16 @@ int QnCamDisplay::getAvarageFps() const
     return m_fpsStat.getFps();
 }
 
+bool QnCamDisplay::isBuffering() const
+{
+    if (m_buffering == 0)
+        return false;
+    // for offline resource at LIVE position no any data. Check it
+    if (!isRealTimeSource())
+        return true; // if archive position then buffering mark should be resetted event for offline resource
+    return m_resource->getStatus() == QnResource::Online || m_resource->getStatus() == QnResource::Recording;
+}
+
 // -------------------------------- QnFpsStatistics -----------------------
 
 void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)

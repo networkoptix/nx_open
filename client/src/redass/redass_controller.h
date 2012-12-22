@@ -19,7 +19,6 @@ public:
     void unregisterConsumer(QnCamDisplay* display);
     int counsumerCount() const;
 
-    //bool isPrecSeekAllowed(QnCamDisplay* currentDisplay);
 public slots:
     /* Inform controller that not enough data or CPU for stream */
     void onSlowStream(QnArchiveStreamReader* reader);
@@ -37,6 +36,7 @@ private:
     /** try LQ->HQ once more */
     void addHQTry(); 
     bool isFFSpeed(QnCamDisplay* display) const;
+    bool isFFSpeed(double speed) const;
     bool existstBufferingDisplay() const;
 private:
     enum FindMethod {Find_Biggest, Find_Least};
@@ -63,7 +63,7 @@ private:
     qint64 m_lastLqTime; // latest HQ->LQ switch time
 private:
     QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
-    void gotoLowQuality(QnCamDisplay* display, LQReason reason);
+    void gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed = INT_MAX);
     void optimizeItemsQualityBySize();
 };
 

@@ -96,10 +96,12 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         return;
     m_lastLqTime = m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
     
-    if (display->getSpeed() > 1.0 || display->getSpeed() < 0)
+    
+    double speed = display->getSpeed();
+    if (isFFSpeed(speed))
     {
         // for high speed mode change same item to LQ (do not try to find least item)
-        gotoLowQuality(display, Reson_FF);
+        gotoLowQuality(display, Reson_FF, speed);
         return;
     }
     
@@ -198,7 +200,11 @@ bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 
 bool QnRedAssController::isFFSpeed(QnCamDisplay* display) const
 {
-    double speed = display->getSpeed();
+    return isFFSpeed(display->getSpeed());
+}
+
+bool QnRedAssController::isFFSpeed(double speed) const
+{
     return speed > 1 + FPS_EPS || speed < 0;
 }
 
@@ -301,16 +307,21 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
     QMutexLocker lock(&m_mutex);
     if (display->getArchiveReader()) 
     {
-        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
-        {
-            if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
-                gotoLowQuality(display, itr.value().lqReason);
+        if (m_redAssInfo.size() >= 16) {
+            gotoLowQuality(display, Reason_Network);
+        }
+        else {
+            for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+            {
+                if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+                    gotoLowQuality(display, itr.value().lqReason);
+            }
         }
         m_redAssInfo.insert(display, RedAssInfo());
     }
 }
 
-void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
+void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed)
 {
     LQReason oldReason = m_redAssInfo[display].lqReason;
     if ((oldReason == Reason_Network || oldReason == Reason_CPU) && (reason == Reason_Network || reason == Reason_CPU))
@@ -318,7 +329,7 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
 
     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
     m_redAssInfo[display].lqReason = reason;
-    m_redAssInfo[display].toLQSpeed = display->getSpeed();
+    m_redAssInfo[display].toLQSpeed = speed != INT_MAX ? speed : display->getSpeed(); // get speed for FF reason as external varialbe to prevent race condition
     m_redAssInfo[display].awaitingLQTime = 0;
 }
 
@@ -334,22 +345,3 @@ void QnRedAssController::addHQTry()
     m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, HIGH_QUALITY_RETRY_COUNTER);
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
-
-/*
-bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
-{
-    if (currentDisplay->isFullScreen() || !currentDisplay->isSyncAllowed())
-        return true;
-
-    QMutexLocker lock(&m_mutex);
-    if (m_redAssInfo.size() <= 1)
-        return true;
-    for (ConsumersMap::const_iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
-    {
-        QnCamDisplay* display = itr.key();
-        if (display->getArchiveReader()->getQuality() == MEDIA_Quality_Low)
-            return false;
-    }
-    return true;
-}
-*/

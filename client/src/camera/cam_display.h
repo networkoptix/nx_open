@@ -89,6 +89,7 @@ public:
     bool isFullScreen() const;
     void setFullScreen(bool fullScreen);
     int getAvarageFps() const;
+    virtual bool isBuffering() const override;
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
