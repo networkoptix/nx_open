@@ -32,6 +32,7 @@ private:
             return;
         }
         
+        QProcess *process = this->process.data();
         if(process->state() == QProcess::NotRunning)
             return; /* Cannot initialize yet. */
 
@@ -52,7 +53,7 @@ private:
             return IDLE_PRIORITY_CLASS;
         case QnPlatformProcess::LowestPriority:
         case QnPlatformProcess::LowPriority:
-            return BELOW_NORMAL_PRIORITY_CLASS
+            return BELOW_NORMAL_PRIORITY_CLASS;
         case QnPlatformProcess::NormalPriority:
             return NORMAL_PRIORITY_CLASS;
         case QnPlatformProcess::HighPriority:
@@ -71,7 +72,7 @@ private:
         case IDLE_PRIORITY_CLASS:
             return QnPlatformProcess::IdlePriority;
         case BELOW_NORMAL_PRIORITY_CLASS:
-            return QnPlatformProcess::LowPriority
+            return QnPlatformProcess::LowPriority;
         case NORMAL_PRIORITY_CLASS:
             return QnPlatformProcess::NormalPriority;
         case ABOVE_NORMAL_PRIORITY_CLASS:
@@ -123,7 +124,7 @@ qint64 QnWindowsProcess::pid() const {
 }
 
 QnPlatformProcess::Priority QnWindowsProcess::priority() const {
-    Q_D(QnPlatformProcess);
+    Q_D(const QnWindowsProcess);
     if(!d->valid)
         return InvalidPriority;
 
@@ -132,7 +133,7 @@ QnPlatformProcess::Priority QnWindowsProcess::priority() const {
 }
 
 void QnWindowsProcess::setPriority(Priority priority) {
-    Q_D(QnPlatformProcess);
+    Q_D(QnWindowsProcess);
     if(!d->valid) {
         qnWarning("Process is not valid, could not set priority.");
         return;
