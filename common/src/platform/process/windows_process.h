@@ -1,6 +1,9 @@
 #ifndef QN_WINDOWS_PROCESS_H
 #define QN_WINDOWS_PROCESS_H
 
+#include <QtCore/QtGlobal>
+
+#ifdef Q_OS_WIN
 #include "platform_process.h"
 
 class QnWindowsProcessPrivate;
@@ -23,5 +26,7 @@ private:
 
     QScopedPointer<QnWindowsProcessPrivate> d_ptr;
 };
+
+#endif // Q_OS_WIN
 
 #endif // QN_WINDOWS_PROCESS_H

@@ -23,8 +23,21 @@ public:
     QnPlatformProcess(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformProcess() {}
 
+    /**
+     * \returns                         PID of this process, or -1 if this 
+     *                                  process is not valid (e.g. not yet started).
+     */
     virtual qint64 pid() const = 0;
+
+    /**
+     * \returns                         Priority of this process, or <tt>InvalidPriority</tt> in case
+     *                                  of an error.
+     */
     virtual Priority priority() const = 0;
+
+    /**
+     * \param priority                  New priority for this process.
+     */
     virtual void setPriority(Priority priority) = 0;
 };
 

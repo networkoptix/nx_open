@@ -1,5 +1,7 @@
 #include "windows_process.h"
 
+#ifdef Q_OS_WIN
+
 #include <utils/common/warnings.h>
 
 #include <Windows.h>
@@ -151,3 +153,5 @@ void QnWindowsProcess::setPriority(Priority priority) {
 void QnWindowsProcess::at_process_stateChanged() {
     d_func()->tryInitialize();
 }
+
+#endif // Q_OS_WIN
