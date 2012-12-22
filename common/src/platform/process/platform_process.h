@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QThread>
+#include <QtCore/QMetaType>
 
 class QProcess;
 
@@ -23,6 +24,8 @@ public:
     QnPlatformProcess(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformProcess() {}
 
+    static QnPlatformProcess *newInstance(QProcess *process, QObject *parent = NULL);
+
     /**
      * \returns                         PID of this process, or -1 if this 
      *                                  process is not valid (e.g. not yet started).
@@ -41,6 +44,7 @@ public:
     virtual void setPriority(Priority priority) = 0;
 };
 
+Q_DECLARE_METATYPE(QnPlatformProcess *)
 
 #endif // QN_PLATFORM_PROCESS_H
 

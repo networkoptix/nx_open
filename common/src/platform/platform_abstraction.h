@@ -5,6 +5,7 @@
 
 #include "monitoring/global_monitor.h"
 #include "notification/platform_notifier.h"
+#include "process/platform_process.h"
 
 class QnPlatformAbstraction: public QObject {
     Q_OBJECT;
@@ -28,10 +29,13 @@ public:
         return m_notifier;
     }
 
+    QnPlatformProcess *process(QProcess *source = NULL) const;
+
 private:
     static QnPlatformAbstraction *s_instance;
     QnGlobalMonitor *m_monitor;
     QnPlatformNotifier *m_notifier;
+    QnPlatformProcess *m_process;
 };
 
 #define qnPlatform (QnPlatformAbstraction::instance())
