@@ -208,21 +208,24 @@ bool QnArchiveStreamReader::init()
     qint64 requiredJumpTime = m_requiredJumpTime;
 	MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) && m_reverseMode == m_prevReverseMode) 
+    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode)
     {
         // It is optimization: open and jump at same time
         while (1)
         {
 			m_delegate->setQuality(quality, true);
-            bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
+            qint64 jumpTime = requiredJumpTime != AV_NOPTS_VALUE ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
+            bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
             Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
-                m_requiredJumpTime = AV_NOPTS_VALUE;
+                if (requiredJumpTime != AV_NOPTS_VALUE)
+                    m_requiredJumpTime = AV_NOPTS_VALUE;
 				m_oldQuality = quality;
 				m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
-                emit jumpOccured(requiredJumpTime);
+                if (requiredJumpTime != AV_NOPTS_VALUE)
+                    emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again

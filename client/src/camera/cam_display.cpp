@@ -874,7 +874,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
         m_timeMutex.lock();
         if (mediaIsLive != m_isRealTimeSource && !m_buffering)
-            onRealTimeStreamHint(mediaIsLive && !m_singleShotMode);
+            onRealTimeStreamHint(mediaIsLive && !m_singleShotMode && m_speed > 0);
         m_timeMutex.unlock();
     }
 
@@ -1455,7 +1455,7 @@ void QnCamDisplay::setExternalTimeSource(QnlTimeSource* value)
 
 bool QnCamDisplay::isRealTimeSource() const 
 { 
-    return m_isRealTimeSource; 
+    return m_isRealTimeSource;
 }
 
 bool QnCamDisplay::isStillImage() const
