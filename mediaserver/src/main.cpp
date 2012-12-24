@@ -386,7 +386,7 @@ int serverMain(int argc, char *argv[])
 #endif
 #ifdef Q_OS_LINUX
     errno = 0;
-    int newNiceVal = nice( -10 );
+    int newNiceVal = nice( -20 );
     if( newNiceVal == -1 && errno != 0 )
         qWarning() << "Error increasing process priority. " << strerror(errno);
     else
