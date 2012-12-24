@@ -18,18 +18,70 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="newRuleButton">
+       <property name="text">
+        <string>New</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveAllButton">
+       <property name="text">
+        <string>Save All</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="refreshButton">
+       <property name="text">
+        <string>Refresh</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="rulesGroupBox">
      <property name="title">
-      <string>GroupBox</string>
+      <string>List of rules</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QTableView" name="tableView">
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAsNeeded</enum>
-        </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="showDropIndicator" stdset="0">
+         <bool>false</bool>
         </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
@@ -42,9 +94,6 @@
         </property>
         <property name="showGrid">
          <bool>false</bool>
-        </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -61,16 +110,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QnBusinessRuleWidget" name="newRuleWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <widget class="QGroupBox" name="detailsGroupBox">
+     <property name="title">
+      <string>Details</string>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QnBusinessRuleWidget" name="newRuleWidget" native="true"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

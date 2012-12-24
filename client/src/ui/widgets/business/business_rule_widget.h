@@ -37,6 +37,8 @@ signals:
     void deleteConfirmed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 
     void apply(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
+
+    void changed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -78,7 +80,6 @@ private slots:
 private slots:
     void updateDisplay();
     void resetFromRule();
-    void updateSummary();
     void updateResources();
 
 private:

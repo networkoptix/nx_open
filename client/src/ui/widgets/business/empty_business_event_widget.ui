@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>690</width>
-    <height>45</height>
+    <width>663</width>
+    <height>26</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>45</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -25,12 +19,6 @@
    </property>
    <item>
     <widget class="QLabel" name="label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="text">
       <string>This event type has no additional parameters</string>
      </property>
