@@ -67,8 +67,7 @@ namespace {
         return QnBusinessEventRulePtr();
     }
 
-    static int IdRole       = Qt::UserRole + 1;
-    static int WidgetRole   = Qt::UserRole + 2;
+    static int WidgetRole   = Qt::UserRole + 1;
 }
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent):
@@ -88,8 +87,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     m_listModel->setHeaderData(4, Qt::Horizontal, tr("Action"));
     m_listModel->setHeaderData(5, Qt::Horizontal, tr("Target"));
 
-    connection->getBusinessRules(m_rules); // TODO: replace synchronous call
-    foreach (QnBusinessEventRulePtr rule, m_rules) {
+
+    QnBusinessEventRules rules;
+    connection->getBusinessRules(rules); // TODO: replace synchronous call
+    foreach (QnBusinessEventRulePtr rule, rules) {
         addRuleToList(rule);
     }
 
@@ -117,10 +118,8 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog()
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-    QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule);
-    m_rules.append(rule);
-    addRuleToList(rule);
-    ui->tableView->selectRow(m_listModel->rowCount());
+    m_listModel->appendRow(itemFromRule(QnBusinessEventRulePtr()));
+    ui->tableView->selectRow(m_listModel->rowCount() - 1);
 }
 
 void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
@@ -137,7 +136,7 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
         if (!rule)
             continue;
 
-        QnBusinessEventRulePtr old = ruleById(m_rules, rule->getUniqueId());
+  /*      QnBusinessEventRulePtr old = ruleById(m_rules, rule->getUniqueId());
         if (old) {
             m_rules.replace(m_rules.indexOf(old), rule);
 
@@ -152,7 +151,7 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
             m_rules.append(rule);
             addRuleToList(rule);
             ui->tableView->selectRow(m_listModel->rowCount() - 1);
-        }
+        }*/
     }
 
  }
@@ -177,69 +176,51 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
 }
 
 void QnBusinessRulesDialog::at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value) {
-    updateItemData(source, 0, value ? QLatin1String("*") : QString());
+    QStandardItem *item = tableItem(source, 0);
+    item->setText(value ? QLatin1String("*") : QString());
 }
 
 void QnBusinessRulesDialog::at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value) {
-    updateItemData(source, 1, BusinessEventType::toString(value));
+    QStandardItem *item = tableItem(source, 1);
+    item->setText(BusinessEventType::toString(value));
 }
 
 void QnBusinessRulesDialog::at_ruleEventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource) {
-    updateItemData(source, 2, getResourceName(resource));
+    QStandardItem *item = tableItem(source, 2);
+    if (resource) {
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setText(getResourceName(resource));
+    } else {
+        item->setIcon(QIcon());
+        item->setText(QString());
+    }
 }
 
 void QnBusinessRulesDialog::at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value) {
-//    updateItemData(source, 0, value ? QLatin1String("*") : QString());
+    //QStandardItem *item = tableItem(source, 1);
+    //item->setText(eventTypeString(source->rule()));
 }
 
 void QnBusinessRulesDialog::at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value) {
-    updateItemData(source, 4, BusinessActionType::toString(value));
+    QStandardItem *item = tableItem(source, 4);
+    item->setText(BusinessActionType::toString(value));
 }
 
 void QnBusinessRulesDialog::at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource) {
-    updateItemData(source, 5, getResourceName(resource));
+    QStandardItem *item = tableItem(source, 5);
+    if (resource) {
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setText(getResourceName(resource));
+    } else {
+        item->setIcon(QIcon());
+        item->setText(QString());
+    }
 }
-/*
-
-void QnBusinessRulesDialog::at_ruleChanged(QnBusinessRuleWidget *widget, QnBusinessEventRulePtr rule) {
-
-
-
-
-    QStandardItem *eventTypeItem = m_listModel->item(rowNum, 1);
-    eventTypeItem->setText(eventTypeString(rule));
-
-    QStandardItem *eventResourceItem = m_listModel->item(rowNum, 2);
-    if (BusinessEventType::isResourceRequired(rule->eventType())) {
-        QnResourcePtr resource = rule->eventResource();
-        eventResourceItem->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        eventResourceItem->setText(getResourceName(resource));
-    } else {
-        eventResourceItem->setIcon(QIcon());
-        eventResourceItem->setText(QString());
-    }
-
-    QStandardItem *actionTypeItem = m_listModel->item(rowNum, 4);
-    actionTypeItem->setText(BusinessActionType::toString(rule->actionType()));
-
-    QStandardItem *actionResourceItem = m_listModel->item(rowNum, 5);
-    if (BusinessActionType::isResourceRequired(rule->actionType())) {
-        QnResourcePtr resource = rule->actionResource();
-        actionResourceItem->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        actionResourceItem->setText(getResourceName(resource));
-    } else {
-        actionResourceItem->setIcon(QIcon());
-        actionResourceItem->setText(QString());
-    }
-
-}*/
 
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
     QStandardItem* item = m_listModel->itemFromIndex(current.sibling(current.row(), 0));
-
-    QString id = item->data(IdRole).toString();
 
     if (m_currentDetailsWidget) {
         ui->detailsLayout->removeWidget(m_currentDetailsWidget);
@@ -247,13 +228,13 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
         m_currentDetailsWidget = NULL;
     }
 
-    QnBusinessEventRulePtr rule = ruleById(m_rules, id);
-    if (!rule)
-        return;
-
     m_currentDetailsWidget = (QnBusinessRuleWidget *)item->data(WidgetRole).value<QWidget *>();
 
     if (!m_currentDetailsWidget) {
+        QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule);
+        rule->setEventType(BusinessEventType::BE_Camera_Disconnect);
+        rule->setActionType(BusinessActionType::BA_Alert);
+
         m_currentDetailsWidget = new QnBusinessRuleWidget(rule, this);
         item->setData(QVariant::fromValue<QWidget* >(m_currentDetailsWidget), WidgetRole);
         connect(m_currentDetailsWidget, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
@@ -275,20 +256,25 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
 
 QList<QStandardItem *> QnBusinessRulesDialog::itemFromRule(QnBusinessEventRulePtr rule) {
     QStandardItem *numberItem = new QStandardItem();
-    numberItem->setData(rule->getUniqueId(), IdRole);
 
-    QStandardItem *eventTypeItem = new QStandardItem(eventTypeString(rule));
+    if (rule) {
+        QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this);
+        w->setVisible(false);
+        numberItem->setData(QVariant::fromValue<QWidget* >(w), WidgetRole);
+    }
+
+    QStandardItem *eventTypeItem = new QStandardItem(rule ? eventTypeString(rule) : tr("<New Rule...>"));
     QStandardItem *eventResourceItem = new QStandardItem(QString());
-    if (BusinessEventType::isResourceRequired(rule->eventType())) {
+    if (rule && BusinessEventType::isResourceRequired(rule->eventType())) {
         QnResourcePtr resource = rule->eventResource();
         eventResourceItem->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         eventResourceItem->setText(getResourceName(resource));
     }
-    QStandardItem *spacerItem = new QStandardItem(tr("->"));
+    QStandardItem *spacerItem = new QStandardItem(rule ? tr("->") : QString());
 
-    QStandardItem *actionTypeItem = new QStandardItem(BusinessActionType::toString(rule->actionType()));
+    QStandardItem *actionTypeItem = new QStandardItem(rule ? BusinessActionType::toString(rule->actionType()) : QString());
     QStandardItem *actionResourceItem = new QStandardItem(QString());
-    if (BusinessActionType::isResourceRequired(rule->actionType())) {
+    if (rule && BusinessActionType::isResourceRequired(rule->actionType())) {
         QnResourcePtr resource = rule->actionResource();
         actionResourceItem->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         actionResourceItem->setText(getResourceName(resource));
@@ -317,20 +303,12 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleWidget* widget, QnBusinessE
     //TODO: rule caption should be modified with "Removing..."
 }
 
-int QnBusinessRulesDialog::rowNumByWidget(QnBusinessRuleWidget *widget) const {
+QStandardItem* QnBusinessRulesDialog::tableItem(QnBusinessRuleWidget *widget, int column) const {
     QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole,
                                                  QVariant::fromValue<QWidget *>(widget),
                                                  1, Qt::MatchExactly);
     if (ruleIdx.isEmpty())
-        return -1;
-    return ruleIdx.first().row();
-}
-
-void QnBusinessRulesDialog::updateItemData(QnBusinessRuleWidget *widget, int column, QString value) {
-    int row = rowNumByWidget(widget);
-    if (row < 0)
-        return;
-
-    QStandardItem *item = m_listModel->item(row, column);
-    item->setText(value);
+        return NULL;
+    int row = ruleIdx.first().row();
+    return m_listModel->item(row, column);
 }

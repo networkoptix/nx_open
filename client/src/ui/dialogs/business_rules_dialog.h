@@ -53,13 +53,12 @@ private:
     void saveRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
     void deleteRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
 
-    int rowNumByWidget(QnBusinessRuleWidget* widget) const;
-    void updateItemData(QnBusinessRuleWidget* widget, int column, QString value);
+    QStandardItem *tableItem(QnBusinessRuleWidget* widget, int column) const;
+
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QStandardItemModel* m_listModel;
-    QnBusinessEventRules m_rules;
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     //QHash<QString, QnBusinessRuleWidget*> m_ruleWidgets;
