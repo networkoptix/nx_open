@@ -35,7 +35,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_audioLayout(0),
     m_playNowModeAllowed(true),
-    m_reader(reader)
+    m_reader(reader),
+    m_frameCnt(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -293,6 +294,7 @@ void QnRtspClientArchiveDelegate::close()
     m_opened = false;
     delete m_audioLayout;
     m_audioLayout = 0;
+    m_frameCnt = 0;
 }
 
 qint64 QnRtspClientArchiveDelegate::startTime()
@@ -390,6 +392,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     // sometime function may return zero packet if no data arrived
     QnAbstractMediaDataPtr result;
     int errCnt = 0;
+    QTime receiveTimer;
+    receiveTimer.restart();
     while(!result)
     {
         if (!m_rtpData){
@@ -445,6 +449,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         }
         else if (format == QLatin1String("ffmpeg")) {
             result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2));
+            if (!result && m_frameCnt == 0 && receiveTimer.elapsed() > 4000)
+                emit dataDropped(m_reader); // if client can't receive first frame too long inform that stream is slow
         }
         else if (format == QLatin1String("ffmpeg-metadata")) {
             processMetadata(data, blockSize);
@@ -479,8 +485,10 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     }
     if (!result)
         reopen();
-    if (result)
+    if (result) {
         m_lastPacketFlags = result->flags;
+        m_frameCnt++;
+    }
 
 
     /*
