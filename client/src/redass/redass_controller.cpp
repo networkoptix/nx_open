@@ -127,9 +127,9 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 
 bool QnRedAssController::existstBufferingDisplay() const
 {
-    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    for (ConsumersMap::const_iterator itr = m_redAssInfo.constBegin(); itr != m_redAssInfo.constEnd(); ++itr)
     {
-        QnCamDisplay* display = itr.key();
+        const QnCamDisplay* display = itr.key();
         if (display->isBuffering())
             return true;
     }
