@@ -5,6 +5,7 @@
 
 #include <events/business_event_rule.h>
 #include <events/business_logic_common.h>
+#include <events/abstract_business_event.h>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
@@ -20,15 +21,10 @@ class QnBusinessRuleWidget : public QWidget
     Q_OBJECT
     
 public:
-    explicit QnBusinessRuleWidget(QWidget *parent = 0);
+    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0);
     ~QnBusinessRuleWidget();
 
-    void setRule(QnBusinessEventRulePtr rule);
-    QnBusinessEventRulePtr getRule() const;
-
-    void setExpanded(bool expanded = true);
-    bool expanded() const;
-
+    QnBusinessEventRulePtr rule() const;
 signals:
     /**
      * @brief deleteConfirmed       Signal is emitted when "Delete" button was clicked and user has confirmed deletion.
@@ -38,7 +34,12 @@ signals:
 
     void apply(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 
-    void changed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
+    void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
+    void eventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
+    void eventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void eventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
+    void actionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
+    void actionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -73,12 +74,14 @@ private slots:
     void at_expandButton_clicked();
     void at_deleteButton_clicked();
     void at_applyButton_clicked();
+
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
+    void at_eventResourceComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
+    void at_actionResourceComboBox_currentIndexChanged(int index);
 
 private slots:
-    void updateDisplay();
     void resetFromRule();
     void updateResources();
 
@@ -91,12 +94,13 @@ private:
     QnResourcePtr getCurrentActionResource() const;
 
     QString getResourceName(const QnResourcePtr& resource) const;
+
+    void setHasChanges(bool hasChanges);
 private:
     Ui::QnBusinessRuleWidget *ui;
 
-    bool m_expanded;
-
     QnBusinessEventRulePtr m_rule;
+    bool m_hasChanges;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;

@@ -14,8 +14,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <events/abstract_business_event.h>
-
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -52,11 +50,11 @@ namespace {
 
 } // namespace
 
-QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
+QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnBusinessRuleWidget),
-    m_expanded(false),
-    m_rule(0),
+    m_rule(rule),
+    m_hasChanges(false),
     m_eventParameters(NULL),
     m_actionParameters(NULL),
     m_eventTypesModel(new QStandardItemModel(this)),
@@ -73,28 +71,31 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
     ui->actionResourceComboBox->setModel(m_actionResourcesModel);
 
-    QPalette pal = ui->editFrame->palette();
+    QPalette pal = this->palette();
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
-    ui->editFrame->setPalette(pal);
-    ui->editFrame->setVisible(m_expanded);
+    this->setPalette(pal);
 
     connect(ui->eventTypeComboBox,      SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
     connect(ui->eventStatesComboBox,    SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
+    connect(ui->eventResourceComboBox,  SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventResourceComboBox_currentIndexChanged(int)));
     connect(ui->actionTypeComboBox,     SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
+    connect(ui->actionResourceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionResourceComboBox_currentIndexChanged(int)));
+
+    //TODO: connect notifyChaged on subitems
     //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
 
-    connect(ui->resetButton,  SIGNAL(clicked()), this, SLOT(resetFromRule()));
+/*    connect(ui->resetButton,  SIGNAL(clicked()), this, SLOT(resetFromRule()));
 
     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
     connect(ui->applyButton,  SIGNAL(clicked()), this, SLOT(at_applyButton_clicked()));
-    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));
+    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));*/
 
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(updateResources()));
     connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateResources()));
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(updateResources()));
 
     initEventTypes();
-    updateDisplay();
+    resetFromRule();
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
@@ -102,27 +103,8 @@ QnBusinessRuleWidget::~QnBusinessRuleWidget()
     delete ui;
 }
 
-void QnBusinessRuleWidget::setRule(QnBusinessEventRulePtr rule) {
-    m_rule = rule;
-    resetFromRule();
-    updateDisplay();
-}
-
-QnBusinessEventRulePtr QnBusinessRuleWidget::getRule() const {
+QnBusinessEventRulePtr QnBusinessRuleWidget::rule() const {
     return m_rule;
-}
-
-void QnBusinessRuleWidget::setExpanded(bool expanded) {
-    if (m_expanded == expanded)
-        return;
-    m_expanded = expanded;
-    ui->editFrame->setVisible(expanded);
-    if (expanded)
-        resetFromRule();
-}
-
-bool QnBusinessRuleWidget::expanded() const {
-    return m_expanded;
 }
 
 void QnBusinessRuleWidget::initEventTypes() {
@@ -311,24 +293,20 @@ QString QnBusinessRuleWidget::getResourceName(const QnResourcePtr& resource) con
     return resource->getName();
 }
 
-// Handlers
-
-void QnBusinessRuleWidget::updateDisplay() {
-    ui->resetButton->setVisible(m_rule);
-    ui->deleteButton->setVisible(m_rule);
+void QnBusinessRuleWidget::setHasChanges(bool hasChanges) {
+    if (hasChanges == m_hasChanges)
+        return;
+    m_hasChanges = hasChanges;
+    emit hasChangesChanged(this, m_hasChanges);
 }
 
+// Handlers
+
 void QnBusinessRuleWidget::resetFromRule() {
-    //TODO: create default rule dummy
+    QModelIndexList eventTypeIdx = m_eventTypesModel->match(m_eventTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->eventType());
+    ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-    if (m_rule) {
-        QModelIndexList eventTypeIdx = m_eventTypesModel->match(m_eventTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->eventType());
-        ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
-    } else {
-        ui->eventTypeComboBox->setCurrentIndex(0);
-    }
-
-    if (m_rule && m_rule->eventResource()) {
+    if (m_rule->eventResource()) {
         QModelIndexList eventResourceIdx = m_eventResourcesModel->match(m_eventResourcesModel->index(0, 0), Qt::UserRole + 1,
                                                                         m_rule->eventResource()->getUniqueId());
         ui->eventResourceComboBox->setCurrentIndex(eventResourceIdx.isEmpty() ? 0 : eventResourceIdx.first().row());
@@ -336,22 +314,14 @@ void QnBusinessRuleWidget::resetFromRule() {
         ui->eventResourceComboBox->setCurrentIndex(0);
     }
 
-    if (m_rule) {
-        ToggleState::Value toggleState = BusinessEventParameters::getToggleState(m_rule->eventParams());
-        QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)toggleState);
-        ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
-    } else {
-        ui->eventStatesComboBox->setCurrentIndex(0);
-    }
+    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(m_rule->eventParams());
+    QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)toggleState);
+    ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
 
-    if (m_rule) {
-        QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->actionType());
-        ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
-    } else {
-        ui->actionTypeComboBox->setCurrentIndex(0);
-    }
+    QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->actionType());
+    ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
-    if (m_rule && m_rule->actionResource()) {
+    if (m_rule->actionResource()) {
         QModelIndexList actionResourceIdx = m_actionResourcesModel->match(m_actionResourcesModel->index(0, 0), Qt::UserRole + 1,
                                                                           m_rule->actionResource()->getUniqueId());
         ui->actionResourceComboBox->setCurrentIndex(actionResourceIdx.isEmpty() ? 0 : actionResourceIdx.first().row());
@@ -360,13 +330,15 @@ void QnBusinessRuleWidget::resetFromRule() {
     }
 
 
-    if (m_rule && m_eventParameters)
+    if (m_eventParameters)
         m_eventParameters->loadParameters(m_rule->eventParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
-    if (m_rule && m_actionParameters)
+    if (m_actionParameters)
         m_actionParameters->loadParameters(m_rule->actionParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
+
+    setHasChanges(false);
 }
 
 void QnBusinessRuleWidget::updateResources() {
@@ -380,8 +352,7 @@ void QnBusinessRuleWidget::updateResources() {
 }
 
 void QnBusinessRuleWidget::at_expandButton_clicked() {
-    setExpanded(!m_expanded);
-}
+    }
 
 void QnBusinessRuleWidget::at_deleteButton_clicked() {
     if (QMessageBox::question(this,
@@ -438,6 +409,9 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
         initEventResources(val);
     initEventStates(val);
     initEventParameters(val);
+
+    setHasChanges(true);
+    emit eventTypeChanged(this, val);
 }
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
@@ -445,6 +419,16 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     ToggleState::Value val = (ToggleState::Value)typeIdx;
 
     initActionTypes(val);
+
+    setHasChanges(true);
+    emit eventStateChanged(this, val);
+}
+
+void QnBusinessRuleWidget::at_eventResourceComboBox_currentIndexChanged(int index) {
+    setHasChanges(true);
+
+    QString uniqueId = m_eventResourcesModel->item(index)->data().toString();
+    emit eventResourceChanged(this, qnResPool->getResourceByUniqId(uniqueId));
 }
 
 void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) {
@@ -458,4 +442,14 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
         initActionResources(val);
 
     initActionParameters(val);
+
+    setHasChanges(true);
+    emit actionTypeChanged(this, val);
+}
+
+void QnBusinessRuleWidget::at_actionResourceComboBox_currentIndexChanged(int index) {
+    setHasChanges(true);
+
+    QString uniqueId = m_actionResourcesModel->item(index)->data().toString();
+    emit actionResourceChanged(this, qnResPool->getResourceByUniqId(uniqueId));
 }

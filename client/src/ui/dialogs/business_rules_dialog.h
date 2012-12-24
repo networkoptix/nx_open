@@ -30,24 +30,39 @@ public:
 
 private slots:
     void at_newRuleButton_clicked();
+
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
+    /* Widget changes handlers */
+    void at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value);
+    void at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
+    void at_ruleEventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
+    void at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
+    void at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+
+
+
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
 
-    void saveRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
-    void deleteRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
 private:
-    QList<QStandardItem *> itemFromRule(QnBusinessEventRulePtr rule, int row = -1);
+    QList<QStandardItem *> itemFromRule(QnBusinessEventRulePtr rule);
 
     void addRuleToList(QnBusinessEventRulePtr rule);
+    void saveRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
+    void deleteRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
+
+    int rowNumByWidget(QnBusinessRuleWidget* widget) const;
+    void updateItemData(QnBusinessRuleWidget* widget, int column, QString value);
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QStandardItemModel* m_listModel;
-    QStandardItem* m_newRuleItem;
-    QnBusinessEventRulePtr m_deletingRule;
     QnBusinessEventRules m_rules;
+    QnBusinessRuleWidget* m_currentDetailsWidget;
+
+    //QHash<QString, QnBusinessRuleWidget*> m_ruleWidgets;
 
     QnAppServerConnectionPtr m_connection;
 };
