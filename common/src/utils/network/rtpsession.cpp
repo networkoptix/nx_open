@@ -26,7 +26,7 @@ static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
 //static const int TIME_RESYNC_THRESHOLD = 15;
 //static const int TIME_FUTURE_THRESHOLD = 4;
-static const double TIME_RESYNC_THRESHOLD = 1.1;
+static const double TIME_RESYNC_THRESHOLD = 2.0;
 static const double TIME_RESYNC_THRESHOLD2 = 30;
 //#define DEBUG_RTSP
 
