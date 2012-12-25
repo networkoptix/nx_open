@@ -163,7 +163,6 @@ protected:
     int m_iFrames;
     qint64 m_lastVideoPacketTime;
     qint64 m_lastDecodedTime;
-    qint64 m_ignoreTime;
     qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
     qint64 m_lastSleepInterval;

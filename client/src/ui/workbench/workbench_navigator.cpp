@@ -563,7 +563,7 @@ void QnWorkbenchNavigator::stepBackward() {
 
     m_pausedOverride = false;
 
-    if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime()) {
+    if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering()) {
         quint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
         if (reader->isSingleShotMode())
