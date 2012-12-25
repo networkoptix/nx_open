@@ -68,6 +68,7 @@ namespace {
     }
 
     static int WidgetRole   = Qt::UserRole + 1;
+    static int ModifiedRole = Qt::UserRole + 2;
 }
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent):
@@ -79,19 +80,24 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
 {
     ui->setupUi(this);
 
-    m_listModel->setColumnCount(6);
+    QStringList header;
+    header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
+    m_listModel->setHorizontalHeaderLabels(header);
+    /*m_listModel->setColumnCount(6);
     m_listModel->setHeaderData(0, Qt::Horizontal, tr("#"));
     m_listModel->setHeaderData(1, Qt::Horizontal, tr("Event"));
     m_listModel->setHeaderData(2, Qt::Horizontal, tr("Source"));
     m_listModel->setHeaderData(3, Qt::Horizontal, QString());
     m_listModel->setHeaderData(4, Qt::Horizontal, tr("Action"));
-    m_listModel->setHeaderData(5, Qt::Horizontal, tr("Target"));
+    m_listModel->setHeaderData(5, Qt::Horizontal, tr("Target"));*/
 
 
     QnBusinessEventRules rules;
     connection->getBusinessRules(rules); // TODO: replace synchronous call
     foreach (QnBusinessEventRulePtr rule, rules) {
-        addRuleToList(rule);
+        QnBusinessRuleWidget* w = createWidget(rule);
+        m_listModel->appendRow(createRow(w));
+        w->resetFromRule(); //here row data will be updated
     }
 
     ui->tableView->setModel(m_listModel);
@@ -105,12 +111,15 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     ui->tableView->clearSelection();
 
     //TODO: show description label if no rules are loaded
-   // ui->newRuleWidget->setExpanded(true);
 
-    connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(ui->newRuleButton, SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
-//    connect(ui->newRuleWidget, SIGNAL(apply(QnBusinessRuleWidget*, QnBusinessEventRulePtr)), this, SLOT(saveRule(QnBusinessRuleWidget*, QnBusinessEventRulePtr)));
-//    connect(ui->newRuleWidget, SIGNAL(deleteConfirmed(QnBusinessRuleWidget*,QnBusinessEventRulePtr)), this, SLOT(deleteRule(QnBusinessRuleWidget*,QnBusinessEventRulePtr)));
+    connect(ui->newRuleButton,  SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
+    connect(ui->saveButton,     SIGNAL(clicked()), this, SLOT(at_saveButton_clicked()));
+    connect(ui->saveAllButton,  SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
+    connect(ui->deleteButton,   SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
+    connect(ui->undoButton,     SIGNAL(clicked()), this, SLOT(at_undoButton_clicked()));
+    connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
+
+    updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -118,53 +127,102 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog()
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-    m_listModel->appendRow(itemFromRule(QnBusinessEventRulePtr()));
+    QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule());
+    //TODO: master?
+    rule->setEventType(BusinessEventType::BE_Camera_Disconnect);
+    rule->setActionType(BusinessActionType::BA_Alert);
+
+    QnBusinessRuleWidget* w = createWidget(rule);
+    m_listModel->appendRow(createRow(w));
+    w->resetFromRule(); //here row data will be updated
+    w->setHasChanges(true);
+
     ui->tableView->selectRow(m_listModel->rowCount() - 1);
+}
+
+void QnBusinessRulesDialog::at_saveButton_clicked() {
+    if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
+        return;
+    saveRule(m_currentDetailsWidget);
+}
+
+void QnBusinessRulesDialog::at_saveAllButton_clicked() {
+    for (int i = 0; i < m_listModel->rowCount(); i++) {
+        QStandardItem* item = m_listModel->item(i);
+        QnBusinessRuleWidget* w = (QnBusinessRuleWidget *)item->data(WidgetRole).value<QWidget *>();
+        if (!w || !w->hasChanges())
+            continue;
+        saveRule(w);
+    }
+}
+
+void QnBusinessRulesDialog::at_deleteButton_clicked() {
+    if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
+        return;
+
+    if (QMessageBox::question(this,
+                              tr("Confirm rule deletion"),
+                              tr("Are you sure you want to delete this rule?"),
+                              QMessageBox::Ok,
+                              QMessageBox::Cancel) == QMessageBox::Cancel)
+        return;
+
+    deleteRule(m_currentDetailsWidget);
+}
+
+void QnBusinessRulesDialog::at_undoButton_clicked() {
+    if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
+        return;
+    m_currentDetailsWidget->resetFromRule();
 }
 
 void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
 
-    ui->tableView->setEnabled(true);
+    if (!m_processingWidgets.contains(handle))
+        return;
 
-    if(status != 0) {
+    QnBusinessRuleWidget* w = m_processingWidgets[handle];
+    w->setEnabled(true);
+    m_processingWidgets.remove(handle);
+
+    bool success = (status == 0 && resources.size() == 1);
+    if(!success) {
         QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
         return;
     }
+    w->setHasChanges(false);
 
-    foreach (const QnResourcePtr& res, resources) {
+    updateControlButtons();
+
+    //TODO: load changes from resource
+
+    /*if (success) {
+        QnResourcePtr res = resources.first();
         QnBusinessEventRulePtr rule = res.dynamicCast<QnBusinessEventRule>();
         if (!rule)
-            continue;
+            success = false;
+        else
+            w->rule()->update(rule);
+    }*/
 
-  /*      QnBusinessEventRulePtr old = ruleById(m_rules, rule->getUniqueId());
-        if (old) {
-            m_rules.replace(m_rules.indexOf(old), rule);
 
-            QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), IdRole, rule->getUniqueId());
-            if (!ruleIdx.isEmpty()) {
-                int rowNum = ruleIdx.first().row();
-                m_listModel->removeRow(rowNum);
-                m_listModel->insertRow(rowNum, itemFromRule(rule));
-                ui->tableView->selectRow(rowNum);
-            }
-        } else {
-            m_rules.append(rule);
-            addRuleToList(rule);
-            ui->tableView->selectRow(m_listModel->rowCount() - 1);
-        }*/
-    }
-
- }
+}
 
 void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
 
-    ui->tableView->setEnabled(true);
+    if (!m_processingWidgets.contains(handle))
+        return;
+    QnBusinessRuleWidget* w = m_processingWidgets[handle];
+    w->setEnabled(true);
+    m_processingWidgets.remove(handle);
 
     if(response.status != 0) {
         qDebug() << response.errorString;
         QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
         return;
     }
+
+    updateControlButtons();
 /*
     QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), Qt::UserRole + 1, m_deletingRule->getUniqueId());
     if (!ruleIdx.isEmpty()) {
@@ -178,6 +236,9 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
 void QnBusinessRulesDialog::at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value) {
     QStandardItem *item = tableItem(source, 0);
     item->setText(value ? QLatin1String("*") : QString());
+    item->setData(value, ModifiedRole);
+
+    updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value) {
@@ -220,86 +281,81 @@ void QnBusinessRulesDialog::at_ruleActionResourceChanged(QnBusinessRuleWidget* s
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
-    QStandardItem* item = m_listModel->itemFromIndex(current.sibling(current.row(), 0));
-
     if (m_currentDetailsWidget) {
         ui->detailsLayout->removeWidget(m_currentDetailsWidget);
         m_currentDetailsWidget->setVisible(false);
         m_currentDetailsWidget = NULL;
     }
 
+    QStandardItem* item = m_listModel->itemFromIndex(current.sibling(current.row(), 0));
     m_currentDetailsWidget = (QnBusinessRuleWidget *)item->data(WidgetRole).value<QWidget *>();
 
-    if (!m_currentDetailsWidget) {
-        QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule);
-        rule->setEventType(BusinessEventType::BE_Camera_Disconnect);
-        rule->setActionType(BusinessActionType::BA_Alert);
-
-        m_currentDetailsWidget = new QnBusinessRuleWidget(rule, this);
-        item->setData(QVariant::fromValue<QWidget* >(m_currentDetailsWidget), WidgetRole);
-        connect(m_currentDetailsWidget, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
-                this, SLOT(at_ruleHasChangesChanged(QnBusinessRuleWidget*,bool)));
-        connect(m_currentDetailsWidget, SIGNAL(eventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)),
-                this, SLOT(at_ruleEventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)));
-        connect(m_currentDetailsWidget, SIGNAL(eventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)),
-                this, SLOT(at_ruleEventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)));
-        connect(m_currentDetailsWidget, SIGNAL(eventResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)),
-                this, SLOT(at_ruleEventResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)));
-        connect(m_currentDetailsWidget, SIGNAL(actionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)),
-                this, SLOT(at_ruleActionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)));
-        connect(m_currentDetailsWidget, SIGNAL(actionResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)),
-                this, SLOT(at_ruleActionResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)));
+    if (m_currentDetailsWidget) {
+        ui->detailsLayout->addWidget(m_currentDetailsWidget);
+        m_currentDetailsWidget->setVisible(true);
     }
-    ui->detailsLayout->addWidget(m_currentDetailsWidget);
-    m_currentDetailsWidget->setVisible(true);
+
+    updateControlButtons();
 }
 
-QList<QStandardItem *> QnBusinessRulesDialog::itemFromRule(QnBusinessEventRulePtr rule) {
-    QStandardItem *numberItem = new QStandardItem();
+QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr rule) {
+    QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this);
+    connect(w, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
+            this, SLOT(at_ruleHasChangesChanged(QnBusinessRuleWidget*,bool)));
+    connect(w, SIGNAL(eventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)),
+            this, SLOT(at_ruleEventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)));
+    connect(w, SIGNAL(eventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)),
+            this, SLOT(at_ruleEventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)));
+    connect(w, SIGNAL(eventResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)),
+            this, SLOT(at_ruleEventResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)));
+    connect(w, SIGNAL(actionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)),
+            this, SLOT(at_ruleActionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)));
+    connect(w, SIGNAL(actionResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)),
+            this, SLOT(at_ruleActionResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)));
+    w->setVisible(false);
+    return w;
+}
 
-    if (rule) {
-        QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this);
-        w->setVisible(false);
-        numberItem->setData(QVariant::fromValue<QWidget* >(w), WidgetRole);
-    }
+QList<QStandardItem *> QnBusinessRulesDialog::createRow(QnBusinessRuleWidget* widget) {
 
-    QStandardItem *eventTypeItem = new QStandardItem(rule ? eventTypeString(rule) : tr("<New Rule...>"));
-    QStandardItem *eventResourceItem = new QStandardItem(QString());
-    if (rule && BusinessEventType::isResourceRequired(rule->eventType())) {
-        QnResourcePtr resource = rule->eventResource();
-        eventResourceItem->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        eventResourceItem->setText(getResourceName(resource));
-    }
-    QStandardItem *spacerItem = new QStandardItem(rule ? tr("->") : QString());
-
-    QStandardItem *actionTypeItem = new QStandardItem(rule ? BusinessActionType::toString(rule->actionType()) : QString());
-    QStandardItem *actionResourceItem = new QStandardItem(QString());
-    if (rule && BusinessActionType::isResourceRequired(rule->actionType())) {
-        QnResourcePtr resource = rule->actionResource();
-        actionResourceItem->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        actionResourceItem->setText(getResourceName(resource));
-    }
-
+    //TODO: source -> event-> target -> action (source = system if none)
+    QStandardItem *statusItem = new QStandardItem();
+    statusItem->setData(QVariant::fromValue<QWidget* >(widget), WidgetRole);
+    QStandardItem *eventTypeItem = new QStandardItem();
+    QStandardItem *eventResourceItem = new QStandardItem();
+    QStandardItem *spacerItem = new QStandardItem();
+    QStandardItem *actionTypeItem = new QStandardItem();
+    QStandardItem *actionResourceItem = new QStandardItem();
     QList<QStandardItem *> result;
 
-    result << numberItem << eventTypeItem << eventResourceItem << spacerItem << actionTypeItem << actionResourceItem;
+    result << statusItem << eventTypeItem << eventResourceItem << spacerItem << actionTypeItem << actionResourceItem;
     return result;
 }
 
-void QnBusinessRulesDialog::addRuleToList(QnBusinessEventRulePtr rule) {
-    m_listModel->appendRow(itemFromRule(rule));
-}
+void QnBusinessRulesDialog::saveRule(QnBusinessRuleWidget* widget) {
+    if (m_processingWidgets.values().contains(widget))
+        return;
 
-void QnBusinessRulesDialog::saveRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule) {
+    //save changes to the rule field
+    widget->apply();
+
+    QnBusinessEventRulePtr rule = widget->rule();
     int handle = m_connection->saveAsync(rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
-    ui->tableView->setEnabled(false);
+    widget->setEnabled(false);
+    m_processingWidgets[handle] = widget;
     //TODO: update row
     //TODO: rule caption should be modified with "Saving..."
 }
 
-void QnBusinessRulesDialog::deleteRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule) {
+void QnBusinessRulesDialog::deleteRule(QnBusinessRuleWidget* widget) {
+    if (m_processingWidgets.values().contains(widget))
+        return;
+
+    QnBusinessEventRulePtr rule = widget->rule();
     int handle = m_connection->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
-    ui->tableView->setEnabled(false);
+    widget->setEnabled(false);
+    m_processingWidgets[handle] = widget;
+
     //TODO: rule caption should be modified with "Removing..."
 }
 
@@ -311,4 +367,11 @@ QStandardItem* QnBusinessRulesDialog::tableItem(QnBusinessRuleWidget *widget, in
         return NULL;
     int row = ruleIdx.first().row();
     return m_listModel->item(row, column);
+}
+
+void QnBusinessRulesDialog::updateControlButtons() {
+    ui->saveButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
+    ui->saveAllButton->setEnabled(!m_listModel->match(m_listModel->index(0, 0), ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
+    ui->deleteButton->setEnabled(m_currentDetailsWidget);
+    ui->undoButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
 }

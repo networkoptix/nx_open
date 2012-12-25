@@ -30,6 +30,10 @@ public:
 
 private slots:
     void at_newRuleButton_clicked();
+    void at_saveButton_clicked();
+    void at_saveAllButton_clicked();
+    void at_deleteButton_clicked();
+    void at_undoButton_clicked();
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
@@ -42,27 +46,24 @@ private slots:
     void at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
     void at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
 
-
-
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
-
 private:
-    QList<QStandardItem *> itemFromRule(QnBusinessEventRulePtr rule);
+    QList<QStandardItem *> createRow(QnBusinessRuleWidget* widget);
+    QnBusinessRuleWidget* createWidget(QnBusinessEventRulePtr rule);
 
-    void addRuleToList(QnBusinessEventRulePtr rule);
-    void saveRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
-    void deleteRule(QnBusinessRuleWidget* widget, QnBusinessEventRulePtr rule);
+    void saveRule(QnBusinessRuleWidget* widget);
+    void deleteRule(QnBusinessRuleWidget* widget);
 
     QStandardItem *tableItem(QnBusinessRuleWidget* widget, int column) const;
 
+    void updateControlButtons();
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QStandardItemModel* m_listModel;
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
-    //QHash<QString, QnBusinessRuleWidget*> m_ruleWidgets;
-
+    QMap<int, QnBusinessRuleWidget*> m_processingWidgets;
     QnAppServerConnectionPtr m_connection;
 };
 

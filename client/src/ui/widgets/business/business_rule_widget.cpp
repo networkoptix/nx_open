@@ -107,6 +107,10 @@ QnBusinessEventRulePtr QnBusinessRuleWidget::rule() const {
     return m_rule;
 }
 
+bool QnBusinessRuleWidget::hasChanges() const {
+    return m_hasChanges;
+}
+
 void QnBusinessRuleWidget::initEventTypes() {
     m_eventTypesModel->clear();
     for (int i = BusinessEventType::BE_FirstType; i <= BusinessEventType::BE_LastType; i++) {
@@ -338,6 +342,12 @@ void QnBusinessRuleWidget::resetFromRule() {
         m_actionParameters->loadParameters(m_rule->actionParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
+    emit eventTypeChanged(this, m_rule->eventType());
+    emit eventResourceChanged(this, m_rule->eventResource());
+    emit eventStateChanged(this, toggleState);
+    emit actionTypeChanged(this, m_rule->actionType());
+    emit actionResourceChanged(this, m_rule->actionResource());
+
     setHasChanges(false);
 }
 
@@ -351,51 +361,33 @@ void QnBusinessRuleWidget::updateResources() {
         initActionResources(actionType);
 }
 
-void QnBusinessRuleWidget::at_expandButton_clicked() {
-    }
-
-void QnBusinessRuleWidget::at_deleteButton_clicked() {
-    if (QMessageBox::question(this,
-                              tr("Confirm rule deletion"),
-                              tr("Are you sure you want to delete this rule?"),
-                              QMessageBox::Ok,
-                              QMessageBox::Cancel) == QMessageBox::Cancel)
-        return;
-    emit deleteConfirmed(this, m_rule);
-}
-
-void QnBusinessRuleWidget::at_applyButton_clicked() {
+void QnBusinessRuleWidget::apply() {
     //TODO: validate params!
 
-    QnBusinessEventRulePtr rule = m_rule ? m_rule : QnBusinessEventRulePtr(new QnBusinessEventRule);
+    m_rule->setEventType(getCurrentEventType());
 
-    rule->setEventType(getCurrentEventType());
-
-    if (BusinessEventType::isResourceRequired(rule->eventType())) {
-        rule->setEventResource(getCurrentEventResource());
+    if (BusinessEventType::isResourceRequired(m_rule->eventType())) {
+        m_rule->setEventResource(getCurrentEventResource());
     } else {
-        rule->setEventResource(QnResourcePtr());
+        m_rule->setEventResource(QnResourcePtr());
     }
 
     QnBusinessParams eventParams;
     if (m_eventParameters)
         eventParams = m_eventParameters->parameters();
     BusinessEventParameters::setToggleState(&eventParams, getCurrentEventToggleState());
-    rule->setEventParams(eventParams);
+    m_rule->setEventParams(eventParams);
 
-    rule->setActionType(getCurrentActionType());
+    m_rule->setActionType(getCurrentActionType());
 
-    if (BusinessActionType::isResourceRequired(rule->actionType())) {
-        rule->setActionResource(getCurrentActionResource());
+    if (BusinessActionType::isResourceRequired(m_rule->actionType())) {
+        m_rule->setActionResource(getCurrentActionResource());
     } else {
-        rule->setActionResource(QnResourcePtr());
+        m_rule->setActionResource(QnResourcePtr());
     }
 
     if (m_actionParameters)
-        rule->setActionParams(m_actionParameters->parameters());
-
-    emit apply(this, rule);
- //   setExpanded(false);
+        m_rule->setActionParams(m_actionParameters->parameters());
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
@@ -407,6 +399,8 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
     ui->eventResourceComboBox->setVisible(isResourceRequired);
     if (isResourceRequired)
         initEventResources(val);
+    else
+        emit eventResourceChanged(this, QnResourcePtr());
     initEventStates(val);
     initEventParameters(val);
 
@@ -440,6 +434,8 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     ui->actionResourceComboBox->setVisible(isResourceRequired);
     if (isResourceRequired)
         initActionResources(val);
+    else
+        emit actionResourceChanged(this, QnResourcePtr());
 
     initActionParameters(val);
 

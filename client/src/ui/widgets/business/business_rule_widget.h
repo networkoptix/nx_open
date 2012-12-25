@@ -25,15 +25,13 @@ public:
     ~QnBusinessRuleWidget();
 
     QnBusinessEventRulePtr rule() const;
+
+    bool hasChanges() const;
+    void setHasChanges(bool hasChanges);
+
+    void apply();
+    void resetFromRule();
 signals:
-    /**
-     * @brief deleteConfirmed       Signal is emitted when "Delete" button was clicked and user has confirmed deletion.
-     * @param rule                  Rule to delete. Should be replaced by ID if it is convinient.
-     */
-    void deleteConfirmed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
-
-    void apply(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
-
     void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
     void eventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
     void eventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
@@ -71,10 +69,6 @@ protected:
     void initActionParameters(BusinessActionType::Value actionType);
 
 private slots:
-    void at_expandButton_clicked();
-    void at_deleteButton_clicked();
-    void at_applyButton_clicked();
-
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_eventResourceComboBox_currentIndexChanged(int index);
@@ -82,7 +76,6 @@ private slots:
     void at_actionResourceComboBox_currentIndexChanged(int index);
 
 private slots:
-    void resetFromRule();
     void updateResources();
 
 private:
@@ -94,8 +87,6 @@ private:
     QnResourcePtr getCurrentActionResource() const;
 
     QString getResourceName(const QnResourcePtr& resource) const;
-
-    void setHasChanges(bool hasChanges);
 private:
     Ui::QnBusinessRuleWidget *ui;
 
