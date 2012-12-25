@@ -65,14 +65,11 @@ public:
      */
     struct PartitionSpace {
         PartitionSpace() {}
-        PartitionSpace(const Hdd &hdd, const QString &partition, quint64 freeBytes, quint64 sizeBytes):
-            hdd(hdd), partition(partition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
-
-        /** Description of an HDD that is owning this partition. */
-        Hdd hdd;
+        PartitionSpace(const QString &partition, quint64 freeBytes, quint64 sizeBytes):
+            partition(partition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
         /** Platform-specific string describing this logical partition,
-         * suitable to be shown to the user. */
+         *  suitable to be shown to the user. */
         QString partition;
 
         /** Free space of this partition in bytes */
