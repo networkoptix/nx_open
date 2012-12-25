@@ -60,6 +60,28 @@ public:
         qreal load;
     };
 
+    /**
+     * Partition space entry.
+     */
+    struct PartitionSpace {
+        PartitionSpace() {}
+        PartitionSpace(const Hdd &hdd, const QString &partition, quint64 freeBytes, quint64 sizeBytes):
+            hdd(hdd), partition(partition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
+
+        /** Description of an HDD that is owning this partition. */
+        Hdd hdd;
+
+        /** Platform-specific string describing this logical partition,
+         * suitable to be shown to the user. */
+        QString partition;
+
+        /** Free space of this partition in bytes */
+        quint64 freeBytes;
+
+        /** Total size of this partition in bytes */
+        quint64 sizeBytes;
+    };
+
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
 
@@ -88,6 +110,21 @@ public:
      */
     virtual QList<HddLoad> totalHddLoad() { return QList<HddLoad>(); }
 
+
+    /**
+     * @returns                         A list of partition space entries for all partitions on
+     *                                  all HDDs on this PC.
+     */
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() { return QList<PartitionSpace>(); }
+
+    /**
+     * @brief partitionByPath           Get partition name by path to some folder located on this partition.
+     *                                  Used to get partition by path to the storage.
+     * @param path                      Platform-specific path to target folder.
+     * @returns                         Platform-specific string describing this logical partition,
+     *                                  suitable to be shown to the user.
+     */
+    virtual QString partitionByPath(QString path) { return QString(); }
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)
 };
