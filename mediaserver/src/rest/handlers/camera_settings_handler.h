@@ -12,6 +12,8 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include <core/resource/resource_fwd.h>
+
 #include "rest/server/request_handler.h"
 
 
@@ -59,6 +61,8 @@ public:
 private:
     struct AwaitedParameters
     {
+        QnResourcePtr resource;
+
         //!Parameters which values we are waiting for
         std::set<QString> paramsToWaitFor;
         //!New parameter values are stored here
@@ -70,8 +74,8 @@ private:
     std::set<AwaitedParameters*> m_awaitedParamsSets;
 
 private slots:
-    void asyncParamGetComplete( const QString& paramName, const QVariant& paramValue, bool result );
-    void asyncParamSetComplete( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
+    void asyncParamSetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 };
 
 //!Handles getCameraParam request
