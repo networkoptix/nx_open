@@ -2,22 +2,21 @@
 
 #include <QtCore/QFileInfo>
 
-#include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
-#include "core/resource_managment/resource_pool.h"
-#include "utils/common/util.h"
-#include "api/serializer/serializer.h"
-#include "recorder/storage_manager.h"
+#include <api/serializer/serializer.h>
+#include <core/resource_managment/resource_pool.h>
+#include <platform/platform_abstraction.h>
+#include <recorder/storage_manager.h>
+#include <rest/server/rest_server.h>
+#include <utils/common/util.h>
+#include <utils/network/tcp_connection_priv.h>
 
-QnFileSystemHandler::QnFileSystemHandler(bool detectAvailableOnly):
-    m_detectAvailableOnly(detectAvailableOnly)
-{
-
+QnFileSystemHandler::QnFileSystemHandler() {
+    m_monitor = qnPlatform->monitor();
 }
 
-int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
-{
+int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) {
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
     QString pathStr;
     QString errStr;
 
@@ -29,6 +28,15 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
             break;
         }
     }
+
+
+    result.append("<storages>\n");
+    foreach(const QnPlatformMonitor::HddLoad &hddLoad, m_monitor->totalHddLoad()) {
+        result.append("<storage>\n");
+        result.append(QString("<url>%1</url>\n").arg(hddLoad.hdd.partitions));
+        result.append("</storage>\n");
+    }
+    result.append("</storages>\n");
 
     if (pathStr.isEmpty())
         errStr += "Parameter path is absent or empty. \n";
@@ -61,22 +69,15 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
     storage->setUrl(pathStr);
     QString rezStr;
     if (storage->isStorageAvailableForWriting()) {
-        if (m_detectAvailableOnly)
-            rezStr = "OK";
-        else {
-            rezStr.append("<freeSpace>\n");
-            rezStr.append(QByteArray::number(storage->getFreeSpace()));
-            rezStr.append("</freeSpace>\n");
-            rezStr.append("<usedSpace>\n");
-            rezStr.append(QByteArray::number(storage->getWritedSpace()));
-            rezStr.append("</usedSpace>\n");
-        }
+        rezStr.append("<freeSpace>\n");
+        rezStr.append(QByteArray::number(storage->getFreeSpace()));
+        rezStr.append("</freeSpace>\n");
+        rezStr.append("<usedSpace>\n");
+        rezStr.append(QByteArray::number(storage->getWritedSpace()));
+        rezStr.append("</usedSpace>\n");
     }
     else {
-        if (m_detectAvailableOnly)
-            rezStr = "FAIL";
-        else
-            rezStr = "-1";
+        rezStr = "-1";
     }
 
     result.append("<root>\n");
@@ -96,17 +97,8 @@ QString QnFileSystemHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
     QString rez;
-    if (m_detectAvailableOnly) 
-    {
-        rez += "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n";
-        rez += "<BR>Param <b>path</b> - Folder.";
-        rez += "<BR><b>Return</b> XML - with 'OK' or 'FAIL' message";
-    }
-    else 
-    {
-        rez += "Returns storage free space and current usage in bytes. if specified folder can not be used for writing or not available returns -1.\n";
-        rez += "<BR>Param <b>path</b> - Folder.";
-        rez += "<BR><b>Return</b> XML - free space in bytes or -1";
-    }
+    rez += "Returns storage free space and current usage in bytes. if specified folder can not be used for writing or not available returns -1.\n";
+    rez += "<BR>Param <b>path</b> - Folder.";
+    rez += "<BR><b>Return</b> XML - free space in bytes or -1";
     return rez;
 }

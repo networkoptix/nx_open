@@ -143,7 +143,7 @@ public:
     */
     virtual bool isCatalogAccessible() = 0;
 
-    virtual bool isRealFiles() const{return true;};
+    virtual bool isRealFiles() const{return true;}
 
     qint64 getWritedSpace() const;
     void addWritedSpace(qint64 value);
