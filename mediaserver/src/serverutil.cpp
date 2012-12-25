@@ -63,7 +63,8 @@ QString serverGuid()
 QString getDataDirectory()
 {
 #ifdef Q_OS_LINUX
-    QString varDirName = QString("/opt/%1/mediaserver/var").arg(VER_LINUX_ORGANIZATION_NAME);
+    QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(VER_LINUX_ORGANIZATION_NAME);
+    QString varDirName = qSettings.value("varDir", defVarDirName).toString();
     return varDirName;
 #else
     return QDesktopServices::storageLocation(QDesktopServices::DataLocation);

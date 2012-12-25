@@ -27,6 +27,12 @@
 /* Define override specifier for MSVC. */
 #ifdef _MSC_VER
 #  define override override
+#elif defined(__GNUC__)
+#  if (GCC_VERSION >= 40700)
+// does not require to redefine override
+#  else
+#    define override
+#  endif
 #else
 #  define override
 #endif
