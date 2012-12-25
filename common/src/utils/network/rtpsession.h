@@ -7,6 +7,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
+#include "../common/threadqueue.h"
 
 class RTPSession;
 
@@ -38,19 +39,24 @@ public:
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
 private:
-    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
-    //bool isLocalTimeChanged();
+    double cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime); // time in seconds since 1.1.1970
+    bool isLocalTimeChanged();
+    bool isCameraTimeChanged(const RtspStatistic& statistics);
     void reset();
 private:
     qint64 m_lastTime;
     //double m_lastResultInSec;
-    //QElapsedTimer m_timer;
-    //qint64 m_localStartTime;
+    QElapsedTimer m_timer;
+    qint64 m_localStartTime;
+    qint64 m_cameraTimeDrift;
+    double m_rtcpReportTimeDiff;
 
     struct CamSyncInfo {
-        CamSyncInfo(): value(INT_MAX) {}
+        CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
         QMutex mutex;
-        double value;
+        double timeDiff;
+        QnUnsafeQueue<qint64> driftStats;
+        qint64 driftSum;
     };
 
     CamSyncInfo* m_cameraClockToLocalDiff;

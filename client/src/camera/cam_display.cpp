@@ -134,7 +134,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
-    m_ignoreTime = AV_NOPTS_VALUE;
     qnRedAssController->registerConsumer(this);
 }
 
@@ -711,7 +710,6 @@ void QnCamDisplay::onReaderResumed()
 
 void QnCamDisplay::onPrevFrameOccured()
 {
-    m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
     m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->clearDeviceBuffer();
@@ -1128,13 +1126,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
-
-
-            // Skip one frame in forensic mode. If forward direction changed to backward direction. This condition got true only once.
-            bool needSkipFrame = vd->timestamp == m_ignoreTime;
-            m_ignoreTime = AV_NOPTS_VALUE;
-            if (needSkipFrame)
-                return true;
 
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
                 return false; // keep frame
