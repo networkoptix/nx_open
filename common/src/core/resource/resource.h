@@ -221,14 +221,14 @@ signals:
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
-    void asyncParamGetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully set, false otherwises
     */
-    void asyncParamSetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
     void resourceChanged();
     void initAsyncFinished(QnResourcePtr resource, bool initialized);
