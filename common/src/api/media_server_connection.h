@@ -149,6 +149,12 @@ namespace detail {
 
 } // namespace detail
 
+typedef QList<QPair<QString, bool> > QnStringBoolPairList;
+typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
+
+Q_DECLARE_METATYPE(QnStringBoolPairList);
+Q_DECLARE_METATYPE(QnStringVariantPairList);
+
 
 class QN_EXPORT QnMediaServerConnection: public QObject
 {
