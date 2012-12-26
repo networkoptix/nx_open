@@ -1172,11 +1172,11 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
     if(m_lastPlaying) 
         setPlayingTemporary(true);
 
-    if(isPlaying())
+    if(isPlaying()) {
         m_pausedOverride = false;
-
-    /* Handler must be re-run for precise seeking. */
-    at_timeSlider_valueChanged(m_timeSlider->value());
+        /* Handler must be re-run for precise seeking. */
+        at_timeSlider_valueChanged(m_timeSlider->value());
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_selectionPressed() {
