@@ -436,6 +436,8 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
+        if (jumpTime != AV_NOPTS_VALUE)
+            currentTimeHint = jumpTime;
         m_outOfPlaybackMask = false;
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
