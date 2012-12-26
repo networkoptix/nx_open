@@ -244,7 +244,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     if (packetLostDetected) {
         if (m_timeHelper)
-            qWarning() << "RTP Packet lost detected for camera " << m_timeHelper->getResID();
+            qWarning() << "RTP Packet lost detected for camera " << m_timeHelper->getResID() << ".old seq=" << m_prevSequenceNum << "new seq=" << sequenceNum;
         else
             qWarning() << "RTP Packet lost detected!!!!";
         clearInternalBuffer();
