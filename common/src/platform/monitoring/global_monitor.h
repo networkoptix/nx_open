@@ -46,6 +46,7 @@ public:
     virtual qreal totalCpuUsage() override;
     virtual qreal totalRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
 protected:
     virtual void timerEvent(QTimerEvent *event) override;

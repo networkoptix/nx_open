@@ -94,25 +94,25 @@ public:
      *                                  by all running processes since the last call to this function,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.
      */
-    virtual qreal totalCpuUsage() { return 0.0; }
+    virtual qreal totalCpuUsage() = 0;
 
     /**
      * \returns                         Percent of RAM currently consumed by all running processes,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.
      */
-    virtual qreal totalRamUsage() { return 0.0; }
+    virtual qreal totalRamUsage() = 0;
 
     /**
      * \returns                         A list of HDD load entries for all HDDs on this PC.
      */
-    virtual QList<HddLoad> totalHddLoad() { return QList<HddLoad>(); }
+    virtual QList<HddLoad> totalHddLoad() = 0;
 
 
     /**
      * @returns                         A list of partition space entries for all partitions on
      *                                  all HDDs on this PC.
      */
-    virtual QList<PartitionSpace> totalPartitionSpaceInfo() { return QList<PartitionSpace>(); }
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() = 0;
 
     /**
      * @brief partitionByPath           Get partition name by path to some folder located on this partition.
@@ -121,7 +121,7 @@ public:
      * @returns                         Platform-specific string describing this logical partition,
      *                                  suitable to be shown to the user.
      */
-    virtual QString partitionByPath(QString path) { return QString(); }
+    virtual QString partitionByPath(const QString &path) { return QString(); }
 
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)

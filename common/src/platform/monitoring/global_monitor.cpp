@@ -7,6 +7,20 @@
 
 #include <utils/common/warnings.h>
 
+// -------------------------------------------------------------------------- //
+// QnStubMonitor
+// -------------------------------------------------------------------------- //
+class QnStubMonitor: public QnPlatformMonitor {
+public:
+    QnStubMonitor(QObject *parent = NULL): QnPlatformMonitor(parent) {}
+
+    virtual qreal totalCpuUsage() override { return 0.0; }
+    virtual qreal totalRamUsage() override { return 0.0; }
+    virtual QList<HddLoad> totalHddLoad() override { return QList<HddLoad>(); }
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return QList<PartitionSpace>(); }
+    virtual QString partitionByPath(const QString &path) override { return QString(); }
+};
+
 
 // -------------------------------------------------------------------------- //
 // QnGlobalMonitorPrivate
@@ -69,12 +83,12 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 
     if(!base) {
         qnNullWarning(base);
-        base = new QnPlatformMonitor();
+        base = new QnStubMonitor();
     }
 
     if(base->thread() != thread()) {
         qnWarning("Cannot use a base monitor that lives in another thread.");
-        base = new QnPlatformMonitor();
+        base = new QnStubMonitor();
     }
 
     base->setParent(this); /* Claim ownership. */
@@ -133,6 +147,10 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     d->requestCount++;
     d->stopped = false;
     return d->totalHddLoad;
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo() {
+    return d_func()->base->totalPartitionSpaceInfo();
 }
 
 void QnGlobalMonitor::timerEvent(QTimerEvent *event) {

@@ -80,8 +80,9 @@ public:
         if(INVOKE(sigar_file_system_usage_get(sigar, dir.toLatin1().constData(), &usage)) != SIGAR_OK)
             return result;
 
-        result.freeBytes = usage.free;
-        result.sizeBytes = usage.total;
+        result.partition = dir; // TODO
+        result.freeBytes = usage.free * 1024;
+        result.sizeBytes = usage.total * 1024;
 
         return result;
     }
