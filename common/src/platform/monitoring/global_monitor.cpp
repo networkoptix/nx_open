@@ -150,6 +150,9 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
 }
 
 QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo() {
+    Q_D(QnGlobalMonitor);
+    QMutexLocker locker(&d->mutex);
+
     return d_func()->base->totalPartitionSpaceInfo();
 }
 
