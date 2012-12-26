@@ -124,6 +124,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QnStorageSpaceWidget" name="horizontalSlider">
+     <property name="value">
+      <number>50</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="detailsGroupBox">
      <property name="title">
       <string>Details</string>
@@ -133,6 +143,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnStorageSpaceWidget</class>
+   <extends>QSlider</extends>
+   <header>ui/widgets/storage_space_widget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
