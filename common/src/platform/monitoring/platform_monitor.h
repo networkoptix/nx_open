@@ -64,7 +64,7 @@ public:
      * Partition space entry.
      */
     struct PartitionSpace {
-        PartitionSpace() {}
+        PartitionSpace(): freeBytes(0), sizeBytes(0) {}
         PartitionSpace(const QString &partition, quint64 freeBytes, quint64 sizeBytes):
             partition(partition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
@@ -122,6 +122,7 @@ public:
      *                                  suitable to be shown to the user.
      */
     virtual QString partitionByPath(QString path) { return QString(); }
+
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)
 };

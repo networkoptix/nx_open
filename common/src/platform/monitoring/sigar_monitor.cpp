@@ -70,6 +70,22 @@ public:
         return result;
     }
 
+    QnPlatformMonitor::PartitionSpace partitionUsage(const QString &dir) {
+        QnPlatformMonitor::PartitionSpace result;
+
+        if(!sigar)
+            return result;
+
+        sigar_file_system_usage_t usage;
+        if(INVOKE(sigar_file_system_usage_get(sigar, dir.toLatin1().constData(), &usage)) != SIGAR_OK)
+            return result;
+
+        result.freeBytes = usage.free;
+        result.sizeBytes = usage.total;
+
+        return result;
+    }
+
 private:
     const QnSigarMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
 
@@ -169,3 +185,24 @@ QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
     return result;
 }
 
+QList<QnPlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo() {
+    Q_D(QnSigarMonitor);
+
+    QList<PartitionSpace> result;
+
+    sigar_file_system_list_t fileSystems;
+
+    if(INVOKE(sigar_file_system_list_get(d->sigar, &fileSystems)) != SIGAR_OK)
+        return result;
+
+    for(uint i = 0; i < fileSystems.number; i++) {
+        const sigar_file_system_t &fileSystem = fileSystems.data[i];
+        if(fileSystem.type != SIGAR_FSTYPE_LOCAL_DISK)
+            continue; /* Skip non-hdds. */
+
+        result.push_back(d->partitionUsage(QLatin1String(fileSystem.dir_name)));
+    }
+
+    INVOKE(sigar_file_system_list_destroy(d->sigar, &fileSystems));
+    return result;
+}
