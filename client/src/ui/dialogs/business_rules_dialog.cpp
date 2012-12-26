@@ -120,6 +120,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
 
     updateControlButtons();
+
+    ui->horizontalSlider->setMaximum(1024);
+    ui->horizontalSlider->setLockedValue(512);
+    ui->horizontalSlider->setRecordedValue(600);
+    ui->horizontalSlider->setValue(712);
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
