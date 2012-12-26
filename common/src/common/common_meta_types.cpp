@@ -10,6 +10,7 @@
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
 #include <api/media_server_statistics_data.h>
+#include <api/media_server_connection.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -51,7 +52,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnLayoutItemData>();
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
-    qRegisterMetaType<QnScheduleTaskList>();
+    qRegisterMetaType<QnScheduleTaskList>("QnScheduleTaskList");
 
     qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
     qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
@@ -60,16 +61,21 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnCamerasFoundInfoList>();
-    qRegisterMetaType<QnStatisticsDataList>();
+    qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
+    qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
-    qRegisterMetaType<QnUpdateInfoItemList>();
+    qRegisterMetaType<QnUpdateInfoItemList>("QnUpdateInfoItemList");
 
     qRegisterMetaType<TypeSpecificParamMap>("TypeSpecificParamMap");
+
+    qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
+    qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
+    qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
+    qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
 
     qn_commonMetaTypes_initialized = true;
 }

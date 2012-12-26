@@ -42,7 +42,7 @@ struct QnHTTPRawResponse
     QByteArray errorString;
 };
 
-Q_DECLARE_METATYPE(QnRequestParamList);
+Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */
 Q_DECLARE_METATYPE(QnReplyHeaderList);
 Q_DECLARE_METATYPE(QnHTTPRawResponse);
 
