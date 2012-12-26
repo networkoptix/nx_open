@@ -45,10 +45,11 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
                 for(QnStorageManager::StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
                 {
                     QString root = itr.value()->getUrl();
-                    if (root.startsWith(space.partition)) {
+                    if (m_monitor->partitionByPath(root) == space.partition) {
+                    //if (root.startsWith(space.partition)) {
                         xml.beginSection("storage");
                         xml.writeValue("url", root);
-                        xml.writeValue("used", itr.value()->getWritedSpace);
+                        xml.writeValue("used", itr.value()->getWritedSpace());
                         xml.endSection();
                     }
                 }
