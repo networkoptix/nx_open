@@ -41,12 +41,13 @@ namespace {
         else if (key == QLatin1String("RAM"))
             id = 8;
         else
-        if (key.endsWith(QLatin1Char(':'))) {
-            QString key2(key);
-            key2.chop(1);
+        if (key.contains(QLatin1Char(':'))) {
+            // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
+            QString key2 = key.at(0);
             id = qHash(salt + key2);
         }
         else
+            // linux hdd keys
             id = qHash(salt + key);
         QnColorVector colors = qnGlobals->systemHealthColors();
         return colors[id % colors.size()];
