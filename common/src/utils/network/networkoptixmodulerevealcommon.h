@@ -57,6 +57,8 @@ public:
 
 typedef QMap<QString, QString> TypeSpecificParamMap;
 
+Q_DECLARE_METATYPE(TypeSpecificParamMap);
+
 //!Sent in response to RevealRequest by module which reveals itself
 class RevealResponse
 {

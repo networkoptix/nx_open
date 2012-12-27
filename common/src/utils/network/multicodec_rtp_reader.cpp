@@ -175,7 +175,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         return result;
     }
     if (m_RtpSession.isOpened() && !m_pleaseStop)
-        qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
+        qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
     return result;
 }
 
@@ -277,7 +277,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         return result;
     }
 
-    qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
+    qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
     return result;
 }
 

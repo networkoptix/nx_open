@@ -134,7 +134,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
-    m_ignoreTime = AV_NOPTS_VALUE;
     qnRedAssController->registerConsumer(this);
 }
 
@@ -217,8 +216,9 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 
 	if (isVideoCamera)
 	{
-        bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-		if (m_speed < 1.0 || m_singleShotMode || isLive)
+        //bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+        //bool isPrebuffer = media->flags & QnAbstractMediaData::MediaFlags_FCZ;
+		if (m_speed < 1.0 || m_singleShotMode)
 			return;
         if ((quint64)m_firstAfterJumpTime == AV_NOPTS_VALUE) {
 			m_firstAfterJumpTime = media->timestamp;
@@ -710,7 +710,6 @@ void QnCamDisplay::onReaderResumed()
 
 void QnCamDisplay::onPrevFrameOccured()
 {
-    m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
     m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->clearDeviceBuffer();
@@ -873,7 +872,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
         m_timeMutex.lock();
         if (mediaIsLive != m_isRealTimeSource && !m_buffering)
-            onRealTimeStreamHint(mediaIsLive && !m_singleShotMode);
+            onRealTimeStreamHint(mediaIsLive && !m_singleShotMode && m_speed > 0);
         m_timeMutex.unlock();
     }
 
@@ -1127,13 +1126,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
-
-
-            // Skip one frame in forensic mode. If forward direction changed to backward direction. This condition got true only once.
-            bool needSkipFrame = vd->timestamp == m_ignoreTime;
-            m_ignoreTime = AV_NOPTS_VALUE;
-            if (needSkipFrame)
-                return true;
 
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
                 return false; // keep frame
@@ -1454,7 +1446,7 @@ void QnCamDisplay::setExternalTimeSource(QnlTimeSource* value)
 
 bool QnCamDisplay::isRealTimeSource() const 
 { 
-    return m_isRealTimeSource; 
+    return m_isRealTimeSource;
 }
 
 bool QnCamDisplay::isStillImage() const
@@ -1507,6 +1499,16 @@ void QnCamDisplay::setFullScreen(bool fullScreen)
 int QnCamDisplay::getAvarageFps() const
 {
     return m_fpsStat.getFps();
+}
+
+bool QnCamDisplay::isBuffering() const
+{
+    if (m_buffering == 0)
+        return false;
+    // for offline resource at LIVE position no any data. Check it
+    if (!isRealTimeSource())
+        return true; // if archive position then buffering mark should be resetted event for offline resource
+    return m_resource->getStatus() == QnResource::Online || m_resource->getStatus() == QnResource::Recording;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------
