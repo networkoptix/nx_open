@@ -174,7 +174,7 @@ void QnResource::setName(const QString& name)
         m_name = name;
     }
 
-    emit nameChanged();
+    emit nameChanged(toSharedPointer(this));
 }
 
 QnResource::Flags QnResource::flags() const

@@ -99,7 +99,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_layout,           SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
     connect(m_layout,           SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_layout_aboutToBeDestroyed()));
     connect(m_resource.data(),  SIGNAL(resourceChanged()),                      this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource.data(),  SIGNAL(nameChanged()),                          this, SLOT(at_resource_nameChanged()));
+    connect(m_resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),     this, SLOT(at_resource_nameChanged()));
     connect(m_resource.data(),  SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_resource_cellAspectRatioChanged()));
     connect(m_resource.data(),  SIGNAL(cellSpacingChanged()),                   this, SLOT(at_resource_cellSpacingChanged()));
     connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutItemData &)));

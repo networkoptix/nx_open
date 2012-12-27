@@ -225,7 +225,7 @@ signals:
     //void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void disabledChanged();
     //void disabledChanged(bool oldValue, bool newValue);
-    void nameChanged();
+    void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
     void flagsChanged();

@@ -49,7 +49,7 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &
         return;
 
     m_users.push_back(user);
-    connect(user.data(), SIGNAL(nameChanged()), this, SLOT(at_userResource_nameChanged()));
+    connect(user.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(at_userResource_nameChanged(const QnResourcePtr &)));
 
     at_userResource_nameChanged(user);
 }
@@ -59,7 +59,7 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
     if(!user)
         return;
 
-    disconnect(user.data(), SIGNAL(nameChanged()), this, SLOT(at_userResource_nameChanged()));
+    disconnect(user.data(), NULL, this, NULL);
     m_users.removeOne(user);
 
     if(user == m_user)
@@ -72,9 +72,5 @@ void QnWorkbenchUserWatcher::at_userResource_nameChanged(const QnUserResourcePtr
     } else if(user == m_user) {
         setCurrentUser(QnUserResourcePtr());
     }
-}
-
-void QnWorkbenchUserWatcher::at_userResource_nameChanged() {
-    at_userResource_nameChanged(toSharedPointer(checked_cast<QnUserResource *>(sender())));
 }
 

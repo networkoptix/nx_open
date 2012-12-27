@@ -277,7 +277,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
-    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(updateTitleText()));
+    connect(m_resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
     setChannelLayout(qn_resourceWidget_defaultContentLayout());
 
 

@@ -176,7 +176,7 @@ void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &reso
     connect(resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),      this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(nameChanged()),                            this,   SLOT(at_layout_changed()));
+    connect(resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),       this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(cellAspectRatioChanged()),                 this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(cellSpacingChanged()),                     this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(storeRequested()),                         this,   SLOT(at_layout_storeRequested()));

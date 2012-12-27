@@ -5,6 +5,11 @@
 
 #include <utils/common/synctime.h>
 
+// TODO: #GDM 
+// 
+// warning C4005: 'NO_DATA' : macro redefinition
+// C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\include\winsock2.h(756) : see previous definition of 'NO_DATA'
+
 /** Here can be any value below the zero */
 #define NO_DATA -1
 

@@ -39,7 +39,6 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_userResource_nameChanged(const QnUserResourcePtr &user);
-    void at_userResource_nameChanged();
 
 private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
