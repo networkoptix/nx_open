@@ -162,9 +162,8 @@ int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& par
     return executeGet(path, params, result, contentType);
 }
 
-QString QnPtzHandler::description(TCPSocket* tcpSocket) const
+QString QnPtzHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "There is several ptz command: <BR>";
     rez += "<b>api/ptz/move</b> - start camera moving <BR>";

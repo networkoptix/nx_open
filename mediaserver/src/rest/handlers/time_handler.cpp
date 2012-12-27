@@ -26,9 +26,8 @@ int QnTimeHandler::executePost(const QString& path, const QnRequestParamList& pa
     return executeGet(path, params, result, contentType);
 }
 
-QString QnTimeHandler::description(TCPSocket* tcpSocket) const
+QString QnTimeHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Returns server UTC time and time zone";
     return rez;

@@ -150,9 +150,8 @@ int QnRecordedChunksHandler::executePost(const QString& path, const QnRequestPar
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
+QString QnRecordedChunksHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Return recorded chunk info by specified cameras\n";
     rez += "<BR>Param <b>physicalId</b> - camera physicalId. Param can be repeated several times for many cameras.";

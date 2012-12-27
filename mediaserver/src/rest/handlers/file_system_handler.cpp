@@ -61,9 +61,8 @@ int QnFileSystemHandler::executePost(const QString& path, const QnRequestParamLi
     return executeGet(path, params, result, contentType);
 }
 
-QString QnFileSystemHandler::description(TCPSocket* tcpSocket) const
+QString QnFileSystemHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Returns storage free space and current usage in bytes. if specified folder can not be used for writing or not available returns -1.\n";
     rez += "<BR>Param <b>path</b> - Folder.";
