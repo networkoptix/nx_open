@@ -636,7 +636,7 @@ void QnResource::setUrl(const QString &url)
 
     mutexLocker.unlock();
 
-    emit urlChanged();
+    emit urlChanged(toSharedPointer(this));
 }
 
 void QnResource::addTag(const QString& tag)
