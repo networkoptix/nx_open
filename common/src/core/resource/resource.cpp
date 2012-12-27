@@ -153,7 +153,7 @@ void QnResource::setParentId(QnId parent)
         m_parentId = parent;
     }
     
-    emit parentIdChanged();
+    emit parentIdChanged(toSharedPointer(this));
 }
 
 
@@ -616,10 +616,6 @@ void QnResource::setId(QnId id) {
 
     QnId oldId = m_id;
     m_id = id;
-
-    mutexLocker.unlock();
-
-    emit idChanged(oldId, id);
 }
 
 QString QnResource::getUrl() const

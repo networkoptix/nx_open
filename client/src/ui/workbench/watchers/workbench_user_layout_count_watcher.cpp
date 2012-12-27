@@ -51,9 +51,8 @@ void QnWorkbenchUserLayoutCountWatcher::at_resourcePool_resourceAdded(const QnRe
     if(!layout)
         return;
 
-    connect(layout.data(), SIGNAL(parentIdChanged()), this, SLOT(at_layoutResource_parentIdChanged()));
-
-    at_layoutResource_parentIdChanged(layout, update);
+    connect(layout.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
+    at_resource_parentIdChanged(layout, update);
 }
 
 void QnWorkbenchUserLayoutCountWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource, bool update) {
@@ -68,17 +67,14 @@ void QnWorkbenchUserLayoutCountWatcher::at_resourcePool_resourceRemoved(const Qn
         updateLayoutCount();
 }
 
-void QnWorkbenchUserLayoutCountWatcher::at_layoutResource_parentIdChanged(const QnLayoutResourcePtr &layout, bool update) {
-    if(layout->getParentId() == m_currentUserId) {
-        m_layouts.insert(layout);
+void QnWorkbenchUserLayoutCountWatcher::at_resource_parentIdChanged(const QnResourcePtr &resource, bool update) {
+    if(resource->getParentId() == m_currentUserId) {
+        m_layouts.insert(resource);
     } else {
-        m_layouts.remove(layout);
+        m_layouts.remove(resource);
     }
         
     if(update)
         updateLayoutCount();
 }
 
-void QnWorkbenchUserLayoutCountWatcher::at_layoutResource_parentIdChanged() {
-    at_layoutResource_parentIdChanged(toSharedPointer(checked_cast<QnLayoutResource *>(sender())), true);
-}

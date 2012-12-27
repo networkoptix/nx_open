@@ -26,14 +26,13 @@ private slots:
     void at_context_userChanged();
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource, bool update = true);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource, bool update = true);
-    void at_layoutResource_parentIdChanged(const QnLayoutResourcePtr &layout, bool update = true);
-    void at_layoutResource_parentIdChanged();
+    void at_resource_parentIdChanged(const QnResourcePtr &resource, bool update = true);
 
     void updateLayoutCount();
 
 private:
     QnId m_currentUserId;
-    QSet<QnLayoutResourcePtr> m_layouts;
+    QSet<QnResourcePtr> m_layouts;
     int m_layoutCount;
 };
 

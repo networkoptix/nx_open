@@ -226,8 +226,7 @@ signals:
     void disabledChanged();
     //void disabledChanged(bool oldValue, bool newValue);
     void nameChanged(const QnResourcePtr &resource);
-    void parentIdChanged();
-    void idChanged(const QnId &oldId, const QnId &newId);
+    void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged();
     void urlChanged();
 

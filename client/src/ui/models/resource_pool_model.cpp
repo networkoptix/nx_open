@@ -878,7 +878,7 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     assert(resource && resource->getId().isValid());
 
-    connect(resource.data(), SIGNAL(parentIdChanged()),                                     this, SLOT(at_resource_parentIdChanged()));
+    connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),                    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged()),                                       this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(disabledChanged()),                                     this, SLOT(at_resource_resourceChanged()));
@@ -932,14 +932,6 @@ void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resou
     Node *node = this->node(resource);
 
     node->setParent(expectedParent(node));
-}
-
-void QnResourcePoolModel::at_resource_parentIdChanged() {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    at_resource_parentIdChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
