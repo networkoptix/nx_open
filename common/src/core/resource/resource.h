@@ -227,6 +227,7 @@ signals:
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
+    void resourceChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -242,8 +243,7 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void resourceChanged();
-    void initAsyncFinished(QnResourcePtr resource, bool initialized);
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
 public:
     // this is thread to process commands like setparam

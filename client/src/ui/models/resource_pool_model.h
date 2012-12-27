@@ -70,7 +70,6 @@ private slots:
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_resourceChanged(const QnResourcePtr &resource);
-    void at_resource_resourceChanged();
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_resource_itemAdded(const QnLayoutItemData &item);
     void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);

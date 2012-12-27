@@ -95,7 +95,7 @@ void QnResource::update(QnResourcePtr other)
     }
     setStatus(other->m_status);
     setDisabled(other->m_disabled);
-    emit resourceChanged();
+    emit resourceChanged(toSharedPointer(this));
 
     QnParamList paramList = other->getResourceParamList();
     foreach(QnParam param, paramList.list())

@@ -45,13 +45,13 @@ signals:
     void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
 
 private slots:
-    void onNewResource(QnResourcePtr res);
-    void onRemoveResource(QnResourcePtr res);
+    void onNewResource(const QnResourcePtr &resource);
+    void onRemoveResource(const QnResourcePtr &resource);
     void onTimer();
-    void at_updateStorage();
-    void at_camera_statusChanged(const QnResourcePtr &);
-    void at_cameraUpdated();
-    void at_initAsyncFinished(QnResourcePtr res, bool state);
+    void at_server_resourceChanged(const QnResourcePtr &resource);
+    void at_camera_statusChanged(const QnResourcePtr &resource);
+    void at_camera_resourceChanged(const QnResourcePtr &resource);
+    void at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state);
 
 private:
     void updateCamera(QnSecurityCamResourcePtr camera);

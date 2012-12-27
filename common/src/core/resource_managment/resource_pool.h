@@ -95,10 +95,6 @@ signals:
 
     void aboutToBeDestroyed();
 
-private slots:
-    void handleStatusChange();
-    void handleResourceChange();
-
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;

@@ -857,7 +857,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
-                connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged()), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
+                connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
                 d->liveDpHi->start();
             }
         }

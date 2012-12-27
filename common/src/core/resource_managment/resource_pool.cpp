@@ -144,10 +144,10 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values())
     {
+        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),       Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(resourceChanged()),                         this, SLOT(handleResourceChange()),                     Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
 
         if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
             resource->init();
@@ -234,26 +234,6 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         emit resourceRemoved(resource);
     }
-}
-
-void QnResourcePool::handleStatusChange()
-{
-    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
-
-    if (!resource)
-        return;
-
-    emit statusChanged(resource);
-}
-
-void QnResourcePool::handleResourceChange()
-{
-    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
-
-    if (!resource)
-        return;
-
-    emit resourceChanged(resource);
 }
 
 QnResourceList QnResourcePool::getResources() const
