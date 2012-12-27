@@ -192,7 +192,7 @@ void QnResource::setFlags(Flags flags)
 
     m_flags = flags;
 
-    emit flagsChanged();
+    emit flagsChanged(toSharedPointer(this));
 }
 
 void QnResource::addFlags(Flags flags)

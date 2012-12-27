@@ -227,7 +227,7 @@ signals:
     //void disabledChanged(bool oldValue, bool newValue);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
-    void flagsChanged();
+    void flagsChanged(const QnResourcePtr &resource);
     void urlChanged();
 
     //!Emitted on completion of every async get started with getParamAsync

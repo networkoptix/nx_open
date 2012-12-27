@@ -1225,7 +1225,7 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
         }
 
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
-    connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
+    connect(widget->resource().data(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -1267,13 +1267,6 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
         if(widget == m_currentWidget)
             updateCurrentPeriods(Qn::MotionRole);
     }
-}
-
-void QnWorkbenchNavigator::at_resource_flagsChanged() {
-    if(!sender())
-        return;
-
-    at_resource_flagsChanged(checked_cast<QnResource *>(sender())->toSharedPointer());
 }
 
 void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resource) {
