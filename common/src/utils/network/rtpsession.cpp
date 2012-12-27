@@ -269,9 +269,16 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         //if (qAbs(localTimeInSecs - resultInSecs) > TIME_RESYNC_THRESHOLD && recursiveAllowed) 
 
         bool gotInvalidTime = qAbs(resultInSecs - localTimeInSecs) > TIME_RESYNC_THRESHOLD;
-        if ((isCameraTimeChanged(statistics) || isLocalTimeChanged() || gotInvalidTime) && recursiveAllowed)
+        bool camTimeChanged = isCameraTimeChanged(statistics);
+        bool localTimeChanged = isLocalTimeChanged();
+        if ((camTimeChanged || localTimeChanged || gotInvalidTime) && recursiveAllowed)
         {
-            qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "resync time for camera" << m_resId;
+            if (camTimeChanged)
+                qWarning() << "No data from camera during" << TIME_RESYNC_THRESHOLD << "seconds. Resync time for camera" << m_resId;
+            else if (localTimeChanged)
+                qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
+            else
+                qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "seconds. Resync time for camera" << m_resId;
             reset();
             return getUsecTime(rtpTime, statistics, frequency, false);
         }
