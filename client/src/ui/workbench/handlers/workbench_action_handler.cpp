@@ -188,6 +188,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
+    connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
@@ -843,9 +844,6 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-
-    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(connection(), widget()));
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -1240,6 +1238,12 @@ void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
 
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
+    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(connection(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
