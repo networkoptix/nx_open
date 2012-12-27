@@ -107,6 +107,9 @@ signals:
      */
     virtual void scheduleTasksChanged();
 
+private slots:
+    void at_disabledChanged();
+
 protected:
     void updateInner(QnResourcePtr other) override;
 
@@ -128,9 +131,6 @@ private:
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
-
-private slots:
-    void onDisabledChanged( bool oldValue, bool newValue );
 };
 
 #endif //sequrity_cam_resource_h_1239

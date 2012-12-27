@@ -778,7 +778,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     if(widgets(widget->resource()).size() == 1)
-        connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
+        connect(widget->resource().data(),  SIGNAL(disabledChanged()),  this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 

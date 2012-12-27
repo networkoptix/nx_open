@@ -64,13 +64,16 @@ public:
     //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
     int getTracksCount() const;
+
 protected:
     virtual void run();
     void addResponseRangeHeader();
     QString getRangeStr();
+
 private slots:
-    void at_cameraDisabledChanged(bool oldValue, bool newValue);
+    void at_cameraDisabledChanged();
     void at_cameraUpdated();
+
 private:
     void checkQuality();
     void processRequest();
@@ -101,6 +104,7 @@ private:
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks();
+
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

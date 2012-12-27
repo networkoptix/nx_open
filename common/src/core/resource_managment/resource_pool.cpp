@@ -146,7 +146,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         connect(resource.data(), SIGNAL(statusChanged()), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(disabledChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 
         if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())

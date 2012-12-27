@@ -17,7 +17,7 @@ QnSecurityCamResource::QnSecurityCamResource()
 
     addFlags(live_cam);
 
-    connect( this, SIGNAL(disabledChanged(bool, bool)), this, SLOT(onDisabledChanged(bool, bool)), Qt::DirectConnection );
+    connect(this, SIGNAL(disabledChanged()), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()
@@ -392,15 +392,15 @@ void QnSecurityCamResource::setMotionType(MotionType value)
     m_motionType = value;
 }
 
-void QnSecurityCamResource::onDisabledChanged( bool oldValue, bool newValue )
+void QnSecurityCamResource::at_disabledChanged()
 {
-    if( oldValue == newValue )
-        return;
+    /*if( oldValue == newValue )
+        return;*/
 
-    if( hasFlags(QnResource::foreigner) )
+    if(hasFlags(QnResource::foreigner))
         return;     //we do not own camera
 
-    if( newValue )
+    if(isDisabled())
         stopInputPortMonitoring();
     else
         startInputPortMonitoring();

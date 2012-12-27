@@ -157,6 +157,13 @@ public:
 
 
     QnResourcePtr toSharedPointer() const;
+    
+    template<class Resource>
+    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
+        using ::toSharedPointer; /* Let ADL kick in. */
+        return toSharedPointer(resource);
+    }
+
     QnResourcePtr getParentResource() const;
 
     // ==================================================
@@ -216,7 +223,8 @@ signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged();
     //void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-    void disabledChanged(bool oldValue, bool newValue);
+    void disabledChanged();
+    //void disabledChanged(bool oldValue, bool newValue);
     void nameChanged();
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
