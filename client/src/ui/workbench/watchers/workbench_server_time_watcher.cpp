@@ -100,7 +100,7 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
         return;
 
     connect(server.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_server_serverIFFound()));
-    connect(server.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_server_statusChanged()));
+    connect(server.data(), SIGNAL(statusChanged()), this, SLOT(at_server_statusChanged()));
     updateServerTime(server);
 }
 

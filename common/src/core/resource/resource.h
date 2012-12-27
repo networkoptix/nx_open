@@ -214,7 +214,8 @@ public:
 
 signals:
     void parameterValueChanged(const QnParam &param);
-    void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+    void statusChanged();
+    //void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void disabledChanged(bool oldValue, bool newValue);
     void nameChanged();
     void parentIdChanged();

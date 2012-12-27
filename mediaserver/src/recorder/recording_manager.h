@@ -40,16 +40,19 @@ public:
 
     bool startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int maxDuration);
     bool stopForcedRecording(QnSecurityCamResourcePtr camRes);
+
 signals:
     void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
+
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
     void onTimer();
     void at_updateStorage();
-    void at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+    void at_cameraStatusChanged();
     void at_cameraUpdated();
     void at_initAsyncFinished(QnResourcePtr res, bool state);
+
 private:
     void updateCamera(QnSecurityCamResourcePtr camera);
 
@@ -62,6 +65,7 @@ private:
     bool updateCameraHistory(QnResourcePtr res);
 private:
     mutable QMutex m_mutex;
+    QSet<QnResourcePtr> m_onlineCameras;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
 };

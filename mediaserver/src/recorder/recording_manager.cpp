@@ -346,24 +346,33 @@ void QnRecordingManager::at_cameraUpdated()
     }
 }
 
-void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+void QnRecordingManager::at_cameraStatusChanged()
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
     if (!camera)
         return;
 
-    if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
+    QnResource::Status status = camera->getStatus();
+    if((status == QnResource::Online || status == QnResource::Recording) && !m_onlineCameras.contains(camera)) {
         updateCamera(camera);
+        m_onlineCameras.insert(camera);
+    }
 
-    if ((oldStatus == QnResource::Online || oldStatus == QnResource::Recording) && newStatus == QnResource::Offline)
+    if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) {
         emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
+        m_onlineCameras.remove(camera);
+    }
 }
 
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camera) {
-        connect(camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_cameraStatusChanged(QnResource::Status, QnResource::Status)));
+        QnResource::Status status = camera->getStatus();
+        if(status == QnResource::Online || status == QnResource::Recording)
+            m_onlineCameras.insert(camera); // TODO: merge into at_cameraStatusChanged
+
+        connect(camera.data(), SIGNAL(statusChanged()), this, SLOT(at_cameraStatusChanged()));
         connect(camera.data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()));
         connect(camera.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)),                this, SLOT(at_initAsyncFinished(QnResourcePtr, bool)));
         updateCamera(camera);
@@ -409,6 +418,8 @@ void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 
     beforeDeleteRecorder(recorders);
     deleteRecorder(recorders);
+
+    m_onlineCameras.remove(res);
 }
 
 bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)

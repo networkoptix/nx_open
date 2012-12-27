@@ -144,8 +144,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values())
     {
-        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(statusChanged()), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(statusChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 

@@ -578,7 +578,8 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
-    emit statusChanged(oldStatus, m_status);
+    //emit statusChanged(oldStatus, m_status);
+    emit statusChanged();
 
     QMutexLocker mutexLocker(&m_mutex);
     m_lastStatusUpdateTime = qnSyncTime->currentDateTime();

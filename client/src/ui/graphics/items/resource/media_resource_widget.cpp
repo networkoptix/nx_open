@@ -144,7 +144,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         
         connect(timer, SIGNAL(timeout()), this, SLOT(updateIconButton()));
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()), this, SLOT(updateIconButton()));
-        connect(m_camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(statusChanged()), this, SLOT(updateIconButton()));
         connect(m_camera.data(), SIGNAL(scheduleTasksChanged()), this, SLOT(updateIconButton()));
         connect(m_camera.data(), SIGNAL(parentIdChanged()), this, SLOT(updateServerResource()));
 
