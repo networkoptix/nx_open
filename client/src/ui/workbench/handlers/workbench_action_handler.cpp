@@ -2297,7 +2297,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
-        (*itr).uuid = QUuid();
+        //(*itr).uuid = QUuid();
         QnResourcePtr resource = qnResPool->getResourceById((*itr).resource.id);
         if (resource == 0)
             resource = qnResPool->getResourceByUniqId((*itr).resource.path);
@@ -2307,6 +2307,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
             if (mediaRes) {
                 (*itr).resource.id = 0;
+                (*itr).resource.path = mediaRes->getUniqueId();
                 if (!uniqIdList.contains(mediaRes->getUniqueId())) {
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
@@ -2336,7 +2337,12 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     QnApiPbSerializer serializer;
     QByteArray layoutData;
-    serializer.serializeLayout(layout, layoutData);
+    QnLayoutResourcePtr localLayout(new QnLayoutResource());
+    localLayout->setId(layout->getId());
+    localLayout->setGuid(layout->getGuid());
+    localLayout->update(layout);
+    localLayout->setItems(items);
+    serializer.serializeLayout(localLayout, layoutData);
     device->write(layoutData);
     delete device;
 

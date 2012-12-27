@@ -380,7 +380,7 @@ int serverMain(int argc, char *argv[])
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
 #ifdef Q_OS_WIN
-    int priority = ABOVE_NORMAL_PRIORITY_CLASS;
+    int priority = REALTIME_PRIORITY_CLASS;
     int hrez = SetPriorityClass(GetCurrentProcess(), priority);
     if (hrez == 0)
         qWarning() << "Error increasing process priority. " << strerror(errno);
@@ -389,7 +389,7 @@ int serverMain(int argc, char *argv[])
 #endif
 #ifdef Q_OS_LINUX
     errno = 0;
-    int newNiceVal = nice( -10 );
+    int newNiceVal = nice( -20 );
     if( newNiceVal == -1 && errno != 0 )
         qWarning() << "Error increasing process priority. " << strerror(errno);
     else

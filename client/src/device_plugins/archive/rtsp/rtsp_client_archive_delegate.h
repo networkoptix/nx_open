@@ -106,6 +106,7 @@ private:
     QnResourceCustomAudioLayout* m_audioLayout;
     bool m_playNowModeAllowed; // fast open mode without DESCRIBE
     QnArchiveStreamReader* m_reader;
+    int m_frameCnt;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
