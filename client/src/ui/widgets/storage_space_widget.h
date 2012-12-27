@@ -19,10 +19,9 @@ public:
     void setRecordedValue(int value) { m_recordedValue = value; }
     int recordedValue() const { return m_recordedValue; }
 
-public slots:
-    void setValue(int value);
-
 protected:
+    void sliderChange(SliderChange change) override;
+
     /** ReImp */
     void paintEvent(QPaintEvent *ev);
 
