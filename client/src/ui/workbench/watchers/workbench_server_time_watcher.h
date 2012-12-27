@@ -41,7 +41,7 @@ private:
 
 private slots:
     void at_server_serverIFFound();
-    void at_server_statusChanged();
+    void at_resource_statusChanged(const QnResourcePtr &resource);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);

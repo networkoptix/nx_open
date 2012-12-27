@@ -346,9 +346,9 @@ void QnRecordingManager::at_cameraUpdated()
     }
 }
 
-void QnRecordingManager::at_cameraStatusChanged()
+void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 {
-    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
 
@@ -370,9 +370,9 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     if (camera) {
         QnResource::Status status = camera->getStatus();
         if(status == QnResource::Online || status == QnResource::Recording)
-            m_onlineCameras.insert(camera); // TODO: merge into at_cameraStatusChanged
+            m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
 
-        connect(camera.data(), SIGNAL(statusChanged()), this, SLOT(at_cameraStatusChanged()));
+        connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_camera_statusChanged(const QnResourcePtr &)));
         connect(camera.data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()));
         connect(camera.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)),                this, SLOT(at_initAsyncFinished(QnResourcePtr, bool)));
         updateCamera(camera);

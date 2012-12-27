@@ -886,7 +886,7 @@ void QnMain::run()
 
     //
 
-    connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
+    connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), m_processor, SLOT(at_resource_statusChanged(const QnResourcePtr &))); // TODO: #VASILENKO this belongs to resource processor!
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
