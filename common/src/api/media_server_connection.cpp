@@ -1,18 +1,18 @@
+#include "media_server_connection.h"
+#include "media_server_connection_p.h"
+#include "session_manager.h"
+
 #include <QDebug>
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QSharedPointer>
 
-#include "utils/common/util.h"
-#include "utils/common/request_param.h"
-#include "common/common_meta_types.h"
-
-#include "media_server_connection.h"
-#include "media_server_connection_p.h"
-#include "session_manager.h"
-
 #include <api/serializer/serializer.h>
 #include <api/media_server_statistics_data.h>
+#include <common/common_meta_types.h>
+#include <qjson/parser.h>
+#include <utils/common/util.h>
+#include <utils/common/request_param.h>
 
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
@@ -469,6 +469,15 @@ QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int
 
 void detail::QnMediaServerFreeSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle)
 {
+    QJson::Parser json;
+    bool ok;
+    json.parse(response.data, &ok);
+    if (!ok) {
+        qDebug() << json.errorLine() << ":" << json.errorString();
+        emit finished(-1, -1, -1, handle);
+        return;
+    }
+
     qint64 freeSpace = -1;
     qint64 usedSpace = -1;
 

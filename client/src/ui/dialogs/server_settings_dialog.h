@@ -26,7 +26,7 @@ namespace detail {
 
     class CheckFreeSpaceReplyProcessor: public QObject 
     {
-        Q_OBJECT;
+        Q_OBJECT
     public:
 
         CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
