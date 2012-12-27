@@ -821,7 +821,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
     }
 }
 
-void QnRtspConnectionProcessor::at_cameraUpdated()
+void QnRtspConnectionProcessor::at_camera_resourceChanged()
 {
     Q_D(QnRtspConnectionProcessor);
     QMutexLocker lock(&d->mutex);
@@ -835,7 +835,7 @@ void QnRtspConnectionProcessor::at_cameraUpdated()
     }
 }
 
-void QnRtspConnectionProcessor::at_cameraDisabledChanged()
+void QnRtspConnectionProcessor::at_camera_disabledChanged()
 {
     Q_D(QnRtspConnectionProcessor);
 
@@ -856,8 +856,8 @@ void QnRtspConnectionProcessor::createDataProvider()
         if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
-                connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged()), this, SLOT(at_cameraDisabledChanged()), Qt::DirectConnection);
-                connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()), Qt::DirectConnection);
+                connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
+                connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged()), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
                 d->liveDpHi->start();
             }
         }

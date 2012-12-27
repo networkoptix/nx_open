@@ -17,7 +17,7 @@ QnSecurityCamResource::QnSecurityCamResource()
 
     addFlags(live_cam);
 
-    connect(this, SIGNAL(disabledChanged()), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+    connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()

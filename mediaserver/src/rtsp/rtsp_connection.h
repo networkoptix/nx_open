@@ -71,8 +71,8 @@ protected:
     QString getRangeStr();
 
 private slots:
-    void at_cameraDisabledChanged();
-    void at_cameraUpdated();
+    void at_camera_disabledChanged();
+    void at_camera_resourceChanged();
 
 private:
     void checkQuality();

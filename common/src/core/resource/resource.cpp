@@ -782,10 +782,8 @@ void QnResource::setDisabled(bool disabled)
         m_initialized = false;
     }
 
-    if (oldDisabled != disabled) {
-        //emit disabledChanged(oldDisabled, disabled);
-        emit disabledChanged();
-    }
+    if (oldDisabled != disabled)
+        emit disabledChanged(toSharedPointer(this));
 }
 
 void QnResource::init()

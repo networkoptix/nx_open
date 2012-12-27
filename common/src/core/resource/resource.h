@@ -220,12 +220,11 @@ public:
     virtual QnAbstractPtzController* getPtzController();
 
 signals:
-    //void disabledChanged(bool oldValue, bool newValue);
     //void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
     void parameterValueChanged(const QnParam &param);
     void statusChanged();
-    void disabledChanged();
+    void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);

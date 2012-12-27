@@ -224,7 +224,7 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged()),                           this, SLOT(updateSenderPermissions()));
-    connect(resource.data(), SIGNAL(disabledChanged()),                         this, SLOT(updateSenderPermissions()));
+    connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
     
     updatePermissions(resource);
 }
