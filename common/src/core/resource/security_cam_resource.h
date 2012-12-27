@@ -95,10 +95,7 @@ public:
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
     */
-    virtual bool setRelayOutputState(
-        const QString& ouputID,
-        bool activate,
-        unsigned int autoResetTimeoutMS = 0 );
+    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
 signals:
     /** 

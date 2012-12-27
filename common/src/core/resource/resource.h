@@ -159,10 +159,7 @@ public:
     QnResourcePtr toSharedPointer() const;
     
     template<class Resource>
-    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
-        using ::toSharedPointer; /* Let ADL kick in. */
-        return toSharedPointer(resource);
-    }
+    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
 
     QnResourcePtr getParentResource() const;
 
@@ -361,6 +358,11 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     }
 }
 
+template<class Resource>
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource) {
+    using ::toSharedPointer; /* Let ADL kick in. */
+    return toSharedPointer(resource);
+}
 
 
 class QnResourceFactory
