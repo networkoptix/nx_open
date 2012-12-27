@@ -274,7 +274,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         if ((camTimeChanged || localTimeChanged || gotInvalidTime) && recursiveAllowed)
         {
             if (camTimeChanged)
-                qWarning() << "No data from camera during" << TIME_RESYNC_THRESHOLD << "seconds. Resync time for camera" << m_resId;
+                qWarning() << "Camera time has been changed. Resync time for camera" << m_resId;
             else if (localTimeChanged)
                 qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
             else
