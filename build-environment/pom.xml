@@ -29,11 +29,11 @@
 			<classifier>${customization}</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org</groupId>
+			<groupId>net.sourceforge</groupId>
 			<artifactId>qjson</artifactId>
-			<version>0.7.1</version>
+			<version>0.7.1-SNAPSHOT</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.openssl</groupId>
