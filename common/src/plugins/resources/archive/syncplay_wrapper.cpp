@@ -326,15 +326,15 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
         return;
 
     qint64 displayedTime = getDisplayedTimeInternal();
-    qint64 archiveEndTime = AV_NOPTS_VALUE;
+
     qDebug() << "Speed changed. CurrentTime" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString();
+    
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled) {
             info.reader->setNavDelegate(0);
             info.reader->setSpeed(value, d->lastJumpTime == DATETIME_NOW ? DATETIME_NOW : displayedTime);
             info.reader->setNavDelegate(this);
-            archiveEndTime = qMax(archiveEndTime, info.reader->endTime());
         }
     }
 
@@ -343,7 +343,7 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
     if ((d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW) && value < 0)
     {
         // REW from live
-        reinitTime(archiveEndTime);
+        reinitTime(qnSyncTime->currentUSecsSinceEpoch());
     }
     else {
         qint64 et = expectedTime();
@@ -621,7 +621,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
         {
             if (i->enabled)
-                allReady &= (i->isEOF || i->reader->isRealTimeSource());
+                allReady &= i->isEOF; //(i->isEOF || i->reader->isRealTimeSource());
         }
 
         if (d->enabled) {
@@ -679,6 +679,8 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 }
 
 
+double sign(double value) { return value >= 0 ? 1 : -1; }
+
 qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
@@ -696,7 +698,10 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     if (nextTime != qint64(AV_NOPTS_VALUE) && qAbs(nextTime - expectTime) > MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
-        nonConstThis->reinitTime(nextTime);
+        if (nextTime > expectTime && d->speed >= 0 || nextTime < expectTime && d->speed < 0)
+            nonConstThis->reinitTime(nextTime); // data hole
+        else
+            nonConstThis->reinitTime(nextTime + MAX_FRAME_DURATION/2*1000ll * sign(d->speed)); // stream is playing slower than need. do not release expected time too far away
         expectTime = expectedTime();
     }
 
@@ -749,10 +754,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                     if (d->enabled)
                         d->readers[i].reader->setNavDelegate(this);
                     d->readers[i].paused = true;
-                    if (d->readers[i].buffering) {
-                        d->readers[i].buffering = false;
-                        d->bufferingCnt--;
-                    }
+                    if (d->readers[i].buffering)
+                        onBufferingFinished(d->readers[i].cam);
                 }
             }
             d->readers[i].enabled = !value;

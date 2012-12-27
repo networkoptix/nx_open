@@ -32,6 +32,22 @@ namespace {
     /** Get corresponding color from config */
     QColor getColorByKey(const QString &key) {
         int id;
+        // TODO: #gdm
+        // It seems that qHash is not needed here and actually harmful here.
+        // Why don't we just use plain numbering?
+        // CPU -> 0
+        // RAM -> 1
+        // C: -> 2
+        // D: -> 3
+        // E: -> 4
+        // ...
+        // 
+        // And for linux:
+        // hda -> 2
+        // hdb -> 3
+        // ...
+        // 
+        // This way we won't have collisions for sure.
 
         // some hacks to align hashes for keys like 'C:' and 'sda'
         // strongly depends on size of systemHealthColors

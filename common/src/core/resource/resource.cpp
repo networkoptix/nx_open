@@ -351,7 +351,10 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        emit asyncParamGetDone( name, QVariant(), false );
+        if (!name.contains(QLatin1String("VideoLayout")))
+            qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
+
+        emit asyncParamGetDone(toSharedPointer(), name, QVariant(), false);
         return false;
     }
 
@@ -366,7 +369,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
     if (domain == QnDomainMemory)
     {
-        emit asyncParamGetDone( name, val, true );
+        emit asyncParamGetDone(toSharedPointer(), name, val, true);
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -381,7 +384,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 m_mutex.unlock();
                 QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
             }
-            emit asyncParamGetDone( name, newValue, true );
+            emit asyncParamGetDone(toSharedPointer(), name, newValue, true);
             return true;
         }
     }
@@ -389,12 +392,12 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     {
         if (param.isPhysical())
         {
-            emit asyncParamGetDone( name, val, true );
+            emit asyncParamGetDone(toSharedPointer(), name, val, true);
             return true;
         }
     }
 
-    emit asyncParamGetDone( name, QVariant(), false );
+    emit asyncParamGetDone(toSharedPointer(), name, QVariant(), false);
     return false;
 }
 
@@ -402,7 +405,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
 {
     if (setSpecialParam(name, val, domain))
     {
-        emit asyncParamSetDone( name, val, true );
+        emit asyncParamSetDone(toSharedPointer(), name, val, true);
         return true;
     }
 
@@ -410,7 +413,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (!m_resourceParamList.contains(name))
     {
         qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
-        emit asyncParamSetDone( name, val, false );
+        emit asyncParamSetDone(toSharedPointer(), name, val, false);
         return false;
     }
 
@@ -420,7 +423,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
-        emit asyncParamSetDone( name, val, false );
+        emit asyncParamSetDone(toSharedPointer(), name, val, false);
         return false;
     }
     param.setDomain(domain);
@@ -432,7 +435,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     {
         if (!param.isPhysical() || !setParamPhysical(param, val))
         {
-            emit asyncParamSetDone( name, val, false );
+            emit asyncParamSetDone(toSharedPointer(), name, val, false);
             return false;
         }
     }
@@ -444,17 +447,15 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         if (!m_resourceParamList[name].setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
-            emit asyncParamSetDone( name, val, false );
+            emit asyncParamSetDone(toSharedPointer(), name, val, false);
             return false;
-
         }
-
     }
 
     if (oldValue != val)
         QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
 
-    emit asyncParamSetDone( name, val, true );
+    emit asyncParamSetDone(toSharedPointer(), name, val, true);
     return true;
 }
 
