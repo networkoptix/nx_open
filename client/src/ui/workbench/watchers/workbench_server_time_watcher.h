@@ -40,7 +40,7 @@ private:
     void updateServerTime(const QnMediaServerResourcePtr &server);
 
 private slots:
-    void at_server_serverIFFound();
+    void at_server_serverIFFound(const QnMediaServerResourcePtr &resource);
     void at_resource_statusChanged(const QnResourcePtr &resource);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);

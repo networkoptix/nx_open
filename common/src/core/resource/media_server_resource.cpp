@@ -169,7 +169,7 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     setUrl(url.toString());
 
     m_primaryIf = primaryIF;
-    emit serverIFFound(primaryIF);
+    emit serverIFFound(::toSharedPointer(this), primaryIF);
 }
 
 QString QnMediaServerResource::getPrimaryIF() const 

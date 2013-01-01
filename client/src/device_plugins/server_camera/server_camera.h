@@ -11,7 +11,7 @@ public:
 private:
     void determineOptimalIF(QnMediaServerResource* mediaServer);
 private slots:
-    void at_serverIfFound(const QString &);
+    void at_serverIfFound(const QnMediaServerResource &resource, const QString &);
 };
 
 class QnServerCamera: public QnVirtualCameraResource

@@ -5,11 +5,9 @@
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
 
-void QnServerCameraProcessor::at_serverIfFound(const QString &)
+void QnServerCameraProcessor::at_serverIfFound(const QnMediaServerResource &resource, const QString &)
 {
-    QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(sender());
-    if (server)
-        server->apiConnection()->setProxyAddr(QString(), 0);
+    resource->apiConnection()->setProxyAddr(QString(), 0);
 }
 
 void QnServerCameraProcessor::processResources(const QnResourceList &resources)
@@ -32,8 +30,8 @@ void QnServerCameraProcessor::determineOptimalIF(QnMediaServerResource* mediaSer
         url = QLatin1String("127.0.0.1");
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
     mediaServer->apiConnection()->setProxyAddr(url, port);
-    mediaServer->disconnect(this, SLOT(at_serverIfFound(const QString &)));
-    connect(mediaServer, SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
+    disconnect(mediaServer, NULL, this, NULL);
+    connect(mediaServer, SIGNAL(serverIFFound(const QnMediaServerResource &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResource &, const QString &)));
     mediaServer->determineOptimalNetIF();
 }
 
