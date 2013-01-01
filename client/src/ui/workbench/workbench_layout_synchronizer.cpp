@@ -92,19 +92,19 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     qn_synchronizerByLayoutResource()->insert(m_resource.data(), this);
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
 
-    connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-    connect(m_layout,           SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-    connect(m_layout,           SIGNAL(nameChanged()),                          this, SLOT(at_layout_nameChanged()));
-    connect(m_layout,           SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
-    connect(m_layout,           SIGNAL(cellSpacingChanged()),                   this, SLOT(at_layout_cellSpacingChanged()));
-    connect(m_layout,           SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_layout_aboutToBeDestroyed()));
-    connect(m_resource.data(),  SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),     this, SLOT(at_resource_nameChanged()));
-    connect(m_resource.data(),  SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_resource_cellAspectRatioChanged()));
-    connect(m_resource.data(),  SIGNAL(cellSpacingChanged()),                   this, SLOT(at_resource_cellSpacingChanged()));
-    connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutItemData &)));
-    connect(m_resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutItemData &)));
-    connect(m_resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),  this, SLOT(at_resource_itemChanged(const QnLayoutItemData &)));
+    connect(m_layout,           SIGNAL(itemAdded(QnWorkbenchItem *)),                                       this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(m_layout,           SIGNAL(itemRemoved(QnWorkbenchItem *)),                                     this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
+    connect(m_layout,           SIGNAL(nameChanged()),                                                      this, SLOT(at_layout_nameChanged()));
+    connect(m_layout,           SIGNAL(cellAspectRatioChanged()),                                           this, SLOT(at_layout_cellAspectRatioChanged()));
+    connect(m_layout,           SIGNAL(cellSpacingChanged()),                                               this, SLOT(at_layout_cellSpacingChanged()));
+    connect(m_layout,           SIGNAL(aboutToBeDestroyed()),                                               this, SLOT(at_layout_aboutToBeDestroyed()));
+    connect(m_resource.data(),  SIGNAL(resourceChanged(const QnResourcePtr &)),                             this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),                                 this, SLOT(at_resource_nameChanged()));
+    connect(m_resource.data(),  SIGNAL(cellAspectRatioChanged(const QnLayoutResourcePtr &)),                this, SLOT(at_resource_cellAspectRatioChanged()));
+    connect(m_resource.data(),  SIGNAL(cellSpacingChanged(const QnLayoutResourcePtr &)),                    this, SLOT(at_resource_cellSpacingChanged()));
+    connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)),   this, SLOT(at_resource_itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
+    connect(m_resource.data(),  SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)), this, SLOT(at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
+    connect(m_resource.data(),  SIGNAL(itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &)), this, SLOT(at_resource_itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
 
     m_update = m_submit = true;
 }
@@ -209,7 +209,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {
     m_layout->setName(m_resource->getName());
 }
 
-void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData &itemData) {
+void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &itemData) {
     if(!m_update)
         return;
 
@@ -221,7 +221,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
 
 }
 
-void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemData &itemData) {
+void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &itemData) {
     if(!m_update)
         return;
 
@@ -244,7 +244,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemDa
     qnDeleteLater(item);
 }
 
-void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemData &itemData) {
+void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &itemData) {
     if(!m_update)
         return;
 

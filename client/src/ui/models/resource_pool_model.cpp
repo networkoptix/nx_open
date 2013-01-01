@@ -887,8 +887,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(layout) {
-        connect(layout.data(), SIGNAL(itemAdded(const QnLayoutItemData &)),                 this, SLOT(at_resource_itemAdded(const QnLayoutItemData &)));
-        connect(layout.data(), SIGNAL(itemRemoved(const QnLayoutItemData &)),               this, SLOT(at_resource_itemRemoved(const QnLayoutItemData &)));
+        connect(layout.data(), SIGNAL(itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
+        connect(layout.data(), SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
     }
 
     Node *node = this->node(resource);
@@ -956,24 +956,8 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layou
     node->setParent(parentNode);
 }
 
-void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutItemData &item) {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    at_resource_itemAdded(toSharedPointer(checked_cast<QnLayoutResource *>(sender)), item);
-}
-
 void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
     deleteNode(node(item.uuid));
-}
-
-void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutItemData &item) {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    at_resource_itemRemoved(toSharedPointer(checked_cast<QnLayoutResource *>(sender)), item);
 }
 
 

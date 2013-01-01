@@ -79,9 +79,9 @@ protected slots:
 
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
-    void at_resource_itemAdded(const QnLayoutItemData &itemData);
-    void at_resource_itemRemoved(const QnLayoutItemData &itemData);
-    void at_resource_itemChanged(const QnLayoutItemData &itemData);
+    void at_resource_itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
+    void at_resource_itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
+    void at_resource_itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &itemData);
     void at_resource_cellAspectRatioChanged();
     void at_resource_cellSpacingChanged();
 
