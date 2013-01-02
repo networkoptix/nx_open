@@ -52,6 +52,10 @@
 #endif
 
 
+/* Define foreach */
+//#define foreach BOOST_FOREACH
+
+
 /* Some windows-specific defines. */
 #ifdef _WIN32
 #   undef NOMINMAX
