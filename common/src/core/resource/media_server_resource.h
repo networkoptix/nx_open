@@ -67,7 +67,7 @@ public:
     void setVersion(const QString& version);
 
 signals:
-    void serverIFFound(const QnMediaServerResourcePtr &resource, const QString &);
+    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
     void panicModeChanged(const QnMediaServerResourcePtr &resource);
 
 private:

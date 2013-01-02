@@ -24,8 +24,8 @@ QnPlAxisResource::QnPlAxisResource()
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
     connect(
-        this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
+        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
+        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnPlAxisResource::~QnPlAxisResource()

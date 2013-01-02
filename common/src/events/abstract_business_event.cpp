@@ -1,7 +1,6 @@
-
 #include "abstract_business_event.h"
-#include "utils/common/synctime.h"
 
+#include "utils/common/synctime.h"
 #include "core/resource/resource.h"
 
 
@@ -177,15 +176,15 @@ namespace QnBusinessEventRuntime {
     }
 }
 
-QnAbstractBusinessEvent::QnAbstractBusinessEvent(
-        BusinessEventType::Value eventType,
-        const QnResourcePtr& resource,
-        ToggleState::Value toggleState,
-        qint64 timeStamp):
+QnAbstractBusinessEvent::QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, ToggleState::Value toggleState, qint64 timeStamp):
     m_eventType(eventType),
     m_timeStamp(timeStamp),
     m_resource(resource),
     m_toggleState(toggleState)
+{
+}
+
+QnAbstractBusinessEvent::~QnAbstractBusinessEvent()
 {
 }
 

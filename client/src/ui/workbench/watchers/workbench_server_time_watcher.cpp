@@ -99,7 +99,7 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
     if(!server)
         return;
 
-    connect(server.data(), SIGNAL(serverIFFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIFFound(const QnMediaServerResourcePtr &)));
+    connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
     connect(server.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
     updateServerTime(server);
 }
@@ -113,7 +113,7 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
     disconnect(server.data(), NULL, this, NULL);
 }
 
-void QnWorkbenchServerTimeWatcher::at_server_serverIFFound(const QnMediaServerResourcePtr &resource) {
+void QnWorkbenchServerTimeWatcher::at_server_serverIfFound(const QnMediaServerResourcePtr &resource) {
     updateServerTime(resource);
 }
 

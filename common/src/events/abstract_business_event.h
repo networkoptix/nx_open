@@ -76,19 +76,16 @@ class QnAbstractBusinessEvent
 protected:
     /**
      * @brief QnAbstractBusinessEvent
-     *                          Explicit constructor that MUST be overriden in descendants.
+     *                          Explicit constructor that MUST be overridden in descendants.
      * @param eventType         Type of the event.
      * @param resource          Resources that provided the event.
      * @param toggleState       On/off state of the event if it is toggleable.
      * @param timeStamp         Event date and time in usec from UTC.
      */
-    explicit QnAbstractBusinessEvent (
-            BusinessEventType::Value eventType,
-            const QnResourcePtr& resource,
-            ToggleState::Value toggleState,
-            qint64 timeStamp);
+    QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, ToggleState::Value toggleState, qint64 timeStamp);
+
 public:
-    virtual ~QnAbstractBusinessEvent() {}
+    virtual ~QnAbstractBusinessEvent();
 
     /**
      * @brief toString          Convert event to human-readable string in debug purposes and as sendMail text.
@@ -123,6 +120,7 @@ public:
     virtual bool checkCondition(const QnBusinessParams& params) const = 0;
 
     virtual QnBusinessParams getRuntimeParams() const;
+
 private:
     /**
      * @brief m_eventType       Type of event. See BusinessEventType::Value.

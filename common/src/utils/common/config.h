@@ -15,7 +15,7 @@
 // -------------------------------------------------------------------------- //
 /* Get GCC version in human-readable format. */
 #ifdef __GNUC__
-#  define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#   define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 
 
@@ -26,29 +26,29 @@
 
 /* Define override specifier for MSVC. */
 #ifdef _MSC_VER
-#  define override override
+#   define override override
 #elif defined(__GNUC__)
-#  if (GCC_VERSION >= 40700)
-// does not require to redefine override
-#  else
-#    define override
-#  endif
+#   if (GCC_VERSION >= 40700)
+#       define override override
+#   else
+#       define override
+#   endif
 #else
-#  define override
+#   define override
 #endif
 
 
 /* Define noexcept. */
 #if defined(_MSC_VER)
-#  define noexcept throw()
+#   define noexcept throw()
 #elif defined(__GNUC__)
-#  if (GCC_VERSION >= 40600)
-#    define noexcept noexcept
-#  else
-#    define noexcept throw()
-#  endif
+#   if (GCC_VERSION >= 40600)
+#       define noexcept noexcept
+#   else
+#       define noexcept throw()
+#   endif
 #else
-#  define noexcept
+#   define noexcept
 #endif
 
 
@@ -63,6 +63,17 @@
 #ifdef _MSC_VER
 #   undef __STDC_CONSTANT_MACROS
 #   define __STDC_CONSTANT_MACROS
+#endif
+
+
+/* I'm really tired of fixing warnings introduced by Vasilenko, so from now on
+ * he'll have to fix them himself. Mwahahahaha!!! 
+ * 
+ * Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
+#ifdef _MSC_VER
+#   pragma warning(error: 4150) /* deletion of pointer to incomplete type 'X'; no destructor called */
+#   pragma warning(error: 4715) /* not all control paths return a value */
+#   pragma warning(error: 4005) /* macro redefinition */
 #endif
 
 

@@ -9,9 +9,9 @@ class QnServerCameraProcessor : public QObject, public QnResourceProcessor
 public:
     void processResources(const QnResourceList &resources);
 private:
-    void determineOptimalIF(QnMediaServerResource* mediaServer);
+    void determineOptimalIF(QnMediaServerResource* mediaServer); // TODO: #VASILENKO please don't use plain pointers with resources. Only shared ones.
 private slots:
-    void at_serverIfFound(const QnMediaServerResource &resource, const QString &);
+    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
 };
 
 class QnServerCamera: public QnVirtualCameraResource

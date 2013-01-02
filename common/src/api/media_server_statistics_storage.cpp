@@ -5,13 +5,8 @@
 
 #include <utils/common/synctime.h>
 
-// TODO: #GDM 
-// 
-// warning C4005: 'NO_DATA' : macro redefinition
-// C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\include\winsock2.h(756) : see previous definition of 'NO_DATA'
-
 /** Here can be any value below the zero */
-#define NO_DATA -1
+#define NoData -1
 
 QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int storageLimit, QObject *parent):
     QObject(parent),
@@ -50,7 +45,7 @@ void QnMediaServerStatisticsStorage::update() {
 
         for (QnStatisticsHistory::iterator iter = m_history.begin(); iter != m_history.end(); iter++) {
             QnStatisticsData &stats = iter.value();
-            stats.values.append(NO_DATA);
+            stats.values.append(NoData);
             if (stats.values.size() > m_storageLimit)
                 stats.values.removeFirst();
         }
@@ -79,7 +74,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDat
         stats.deviceType = nextData.deviceType;
         stats.description = nextData.description;
         while (stats.values.count() < m_storageLimit)
-            stats.values.append(NO_DATA);
+            stats.values.append(NoData);
         stats.values.append(nextData.value);
         if (stats.values.size() > m_storageLimit)
             stats.values.removeFirst();
@@ -88,10 +83,10 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDat
 
     foreach(QString id, not_updated) {
         QnStatisticsData &stats = m_history[id];
-        stats.values.append(NO_DATA);
+        stats.values.append(NoData);
         if (stats.values.size() > m_storageLimit)
             stats.values.removeFirst();
-        if (stats.values.count(NO_DATA) == stats.values.count())
+        if (stats.values.count(NoData) == stats.values.count())
             m_history.remove(id);
     }
 
