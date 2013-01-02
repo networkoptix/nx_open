@@ -228,6 +228,10 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_storageLimit = m_manager->storageLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
+    /* Note that this slot is already connected to nameChanged signal in 
+     * base class's constructor.*/
+    connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
+
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
@@ -449,7 +453,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 // Handlers
 // -------------------------------------------------------------------------- //
 QString QnServerResourceWidget::calculateTitleText() const {
-    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host()); // TODO: connect to change signal
+    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
