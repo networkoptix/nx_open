@@ -130,4 +130,7 @@ private:
     MotionType m_motionType;
 };
 
+Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
+Q_DECLARE_METATYPE(QnSecurityCamResourceList)
+
 #endif //sequrity_cam_resource_h_1239

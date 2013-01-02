@@ -435,7 +435,7 @@ void QnPlColdStoreStorage::checkIfRangeNeedsToBeUpdated()
         m_lastRangeUpdate.restart();
         qint64 t0 = getOldestFileTime();
         qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-        emit archiveRangeChanged(t0, t1);
+        emit archiveRangeChanged(::toSharedPointer(this), t0, t1);
     }
 }
 

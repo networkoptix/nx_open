@@ -84,6 +84,7 @@ public:
 #endif
 };
 
-Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr)
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+Q_DECLARE_METATYPE(QnVirtualCameraResourceList);
 
 #endif // QN_CAMERA_RESOURCE_H

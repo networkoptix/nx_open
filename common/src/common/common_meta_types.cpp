@@ -21,6 +21,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/media_server_resource.h>
+
 #include <core/misc/schedule_task.h>
 #include <events/abstract_business_action.h>
 #include <events/abstract_business_event.h>
@@ -48,8 +51,12 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
-    qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnUserResourcePtr>();
+    qRegisterMetaType<QnLayoutResourcePtr>();
+    qRegisterMetaType<QnMediaServerResourcePtr>();
+    qRegisterMetaType<QnVirtualCameraResourcePtr>();
+    qRegisterMetaType<QnSecurityCamResourcePtr>();
+    qRegisterMetaType<QnAbstractStorageResourcePtr>();
 
 
     qRegisterMetaType<QnLayoutItemData>();
