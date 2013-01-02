@@ -216,12 +216,10 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-    // TODO: #gdm why 'Get'? This is not a get request. To #Elric: really that's an http GET request.
-    int asyncGetManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+    int asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
                                    QObject *target, const char *slotSuccess, const char *slotError);
 
-    // TODO: #gdm why 'Get'? This is not a get request. To #Elric: really that's an http GET request.
-    int asyncGetManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+    int asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
                                 QObject *target, const char *slot);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
