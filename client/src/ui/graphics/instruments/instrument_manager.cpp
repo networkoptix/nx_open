@@ -12,12 +12,12 @@
 
 namespace {
     /** Name of the property to store a list of scene's instrument managers. */
-    const char *managersPropertyName = "_qn_instrumentManagers";
+    const char *managerPropertyName = "_qn_instrumentManager";
 
     const char *viewportWatcherName = "_qn_viewportWatcher";
 }
 
-Q_DECLARE_METATYPE(QList<InstrumentManager *>);
+Q_DECLARE_METATYPE(InstrumentManager *);
 
 InstrumentManagerPrivate::InstrumentManagerPrivate():
     q_ptr(NULL),
@@ -140,8 +140,6 @@ void InstrumentManagerPrivate::uninstallInstrumentInternal(Instrument *instrumen
 void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
     assert(scene == NULL && newScene != NULL);
 
-    Q_Q(InstrumentManager);
-
     /* Update scene and filter item. */
     scene = newScene;
     filterItem = new SceneEventFilterItem();
@@ -153,10 +151,8 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
     foreach (Instrument *instrument, instruments)
         installInstrumentInternal(instrument, InstallationMode::InstallFirst, NULL);
 
-    /* Store self in scene's list of instrument managers. */
-    QList<InstrumentManager *> managers = q->managersOf(scene);
-    managers.push_back(q);
-    scene->setProperty(managersPropertyName, QVariant::fromValue(managers));
+    /* Store self as scene's instrument manager. */
+    scene->setProperty(managerPropertyName, QVariant::fromValue<InstrumentManager *>(q_func()));
 
     /* Register scene with the scene event dispatcher. */
     sceneDispatcher->registerTarget(newScene);
@@ -168,18 +164,14 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
 void InstrumentManagerPrivate::unregisterSceneInternal() {
     assert(scene != NULL);
 
-    Q_Q(InstrumentManager);
-
     /* First remove event filter. */
     scene->removeEventFilter(sceneDispatcher);
 
     /* Unregister scene with the scene event dispatcher. */
     sceneDispatcher->unregisterTarget(scene);
 
-    /* Remove self from scene's list of instrument managers. */
-    QList<InstrumentManager *> managers = q->managersOf(scene);
-    managers.removeOne(q);
-    scene->setProperty(managersPropertyName, QVariant::fromValue(managers));
+    /* Remove self as scene's instrument manager. */
+    scene->setProperty(managerPropertyName, QVariant());
 
     /* Unregister view and items. */
     while(!views.empty())
@@ -411,6 +403,11 @@ void InstrumentManager::registerScene(QGraphicsScene *scene) {
         return;
     }
 
+    if(instance(scene) != NULL) {
+        qnWarning("Given scene is already assigned an instrument manager.");
+        return;
+    }
+
     d->registerSceneInternal(scene);
 }
 
@@ -548,8 +545,11 @@ void InstrumentManager::at_delayedItemRegistrationRequested() {
     d->pendingDelayedItemProcessing = false;
 }
 
-QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) {
-    return scene->property(managersPropertyName).value<QList<InstrumentManager *> >();
+InstrumentManager *InstrumentManager::instance(QGraphicsScene *scene) {
+    if(!scene)
+        return NULL;
+
+    return scene->property(managerPropertyName).value<InstrumentManager *>();
 }
 
 AnimationTimer *InstrumentManager::animationTimer() const {
@@ -561,13 +561,12 @@ AnimationTimer *InstrumentManager::animationTimer() const {
     }
 }
 
-AnimationTimer *InstrumentManager::animationTimerOf(QGraphicsScene *scene) {
-    if(scene == NULL)
+AnimationTimer *InstrumentManager::animationTimer(QGraphicsScene *scene) {
+    if(!scene)
         return NULL;
     
-    foreach(const InstrumentManager *manager, InstrumentManager::managersOf(scene)) 
-        if(AnimationTimer *result = manager->animationTimer())
-            return result;
+    if(InstrumentManager *manager = instance(scene))
+        return manager->animationTimer();
 
     return NULL;
 }

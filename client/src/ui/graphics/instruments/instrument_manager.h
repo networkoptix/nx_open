@@ -152,15 +152,14 @@ public:
 
     AnimationTimer *animationTimer() const;
 
-    // TODO: #Elric ONE manager per scene
     /**
      * \param scene                    Scene.
      * \returns                        List of all instrument managers managing
      *                                 the given scene.
      */
-    static QList<InstrumentManager *> managersOf(QGraphicsScene *scene);
+    static InstrumentManager *instance(QGraphicsScene *scene);
 
-    static AnimationTimer *animationTimerOf(QGraphicsScene *scene);
+    static AnimationTimer *animationTimer(QGraphicsScene *scene);
 
 private slots:
     void at_view_destroyed(QObject *view);
