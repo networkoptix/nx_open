@@ -102,7 +102,7 @@ signals:
      * This signal is virtual to work around a problem with inheritance from
      * two <tt>QObject</tt>s. 
      */
-    virtual void scheduleTasksChanged();
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
 
 private slots:
     void at_disabledChanged();

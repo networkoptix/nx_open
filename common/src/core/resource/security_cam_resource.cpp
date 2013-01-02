@@ -209,7 +209,7 @@ void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleT
 
     m_scheduleTasks = scheduleTasks;
 
-    emit scheduleTasksChanged();
+    emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
 const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
