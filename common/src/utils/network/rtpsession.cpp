@@ -168,6 +168,7 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     
     m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
     m_timer.restart();
+    m_lastWarnTime = 0;
 }
 
 double QnRtspTimeHelper::cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime)
@@ -273,12 +274,17 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         bool localTimeChanged = isLocalTimeChanged();
         if ((camTimeChanged || localTimeChanged || gotInvalidTime) && recursiveAllowed)
         {
-            if (camTimeChanged)
-                qWarning() << "Camera time has been changed. Resync time for camera" << m_resId;
-            else if (localTimeChanged)
-                qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
-            else
-                qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "seconds. Resync time for camera" << m_resId;
+            qint64 currentUsecTime = getUsecTimer();
+            if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
+            {
+                if (camTimeChanged)
+                    qWarning() << "Camera time has been changed or receiving latency > 10 seconds. Resync time for camera" << m_resId;
+                else if (localTimeChanged)
+                    qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
+                else
+                    qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "seconds. Resync time for camera" << m_resId;
+                m_lastWarnTime = currentUsecTime;
+            }
             reset();
             return getUsecTime(rtpTime, statistics, frequency, false);
         }

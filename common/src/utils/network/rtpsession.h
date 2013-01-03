@@ -64,6 +64,7 @@ private:
 
     static QMutex m_camClockMutex;
     static QMap<QString, CamSyncInfo*> m_camClock;
+    qint64 m_lastWarnTime;
 };
 
 class RTPIODevice
