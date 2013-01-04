@@ -2485,7 +2485,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
         }
     }
 
-    return false; // TODO: #AK is this the right value to return?
+    return false; //there is no output with id outputID
 }
 
 bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo )

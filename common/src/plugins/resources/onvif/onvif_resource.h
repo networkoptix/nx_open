@@ -190,14 +190,6 @@ public:
     int getChannel() const;
     int getMaxChannels() const;
 
-signals:
-    // TODO: #AK why this signal is not in the base class?
-    void cameraInput(
-        QnResourcePtr resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp);
-
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);

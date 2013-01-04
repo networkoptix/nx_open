@@ -62,14 +62,6 @@ public slots:
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient );
     void onMonitorConnectionClosed( nx_http::AsyncHttpClient* httpClient );
 
-signals:
-    // TODO: #AK why this signal is not in the base class?
-    void cameraInput(
-        QnResourcePtr resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp);
-
 protected:
     bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
