@@ -17,7 +17,6 @@ static const double FPS_EPS = 1e-6;
 
 
 QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber) :
-    m_prevFrameToDelete(NULL),
     m_frameQueueIndex(0),
     m_decodeMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
@@ -652,16 +651,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             m_drawer->draw(outFrame);
             m_drawer->waitForFrameDisplayed(outFrame->channel);
         }
-
-        if (m_prevFrameToDelete)
-        {
-            Q_ASSERT(outFrame != m_prevFrameToDelete);
-            Q_ASSERT(!m_prevFrameToDelete->isExternalData());
-            QMutexLocker lock(&m_mtx);
-            m_prevFrameToDelete.clear();
-        }
-        if (reverseMode)
-            m_prevFrameToDelete = outFrame;
         return true; //!m_bufferedFrameDisplayer;
     }
     else
