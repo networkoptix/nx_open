@@ -306,6 +306,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     if(cameraSettingsDialog())
         delete cameraSettingsDialog();
 
+    if (businessRulesDialog())
+        delete businessRulesDialog();
+
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
 }
@@ -1243,9 +1246,43 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
-    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(connection(), widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+//    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    bool newlyCreated = false;
+    if(!businessRulesDialog()) {
+        m_businessRulesDialog = new QnBusinessRulesDialog(connection(), widget());
+        newlyCreated = true;
+/*
+        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
+        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
+        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
+        */
+    }
+/*
+    if(cameraSettingsDialog()->widget()->resources() != resources) {
+        if(cameraSettingsDialog()->isVisible() && (
+           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
+        {
+            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(cameraSettingsDialog()->widget()->resources()),
+                tr("Camera(s) not Saved"),
+                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No
+            );
+            if(button == QDialogButtonBox::Yes)
+                saveCameraSettingsFromDialog();
+        }
+    }*/
+//    cameraSettingsDialog()->widget()->setResources(resources);
+//    updateCameraSettingsEditibility();
+
+    QRect oldGeometry = businessRulesDialog()->geometry();
+    businessRulesDialog()->show();
+    if(!newlyCreated)
+        businessRulesDialog()->setGeometry(oldGeometry);
+
+
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
@@ -1379,6 +1416,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
         return;
 
     // TODO: Factor out common code from reconnect/disconnect/login actions.
+
+    menu()->trigger(Qn::ClearCameraSettingsAction);
 
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
@@ -1591,7 +1630,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->show();
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
-
 }
 
 void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {

@@ -20,6 +20,7 @@ class QnBusinessRuleWidget : public QWidget
 {
     Q_OBJECT
     
+    typedef QWidget base_type;
 public:
     explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0);
     ~QnBusinessRuleWidget();
@@ -68,6 +69,8 @@ protected:
 
     void initActionParameters(BusinessActionType::Value actionType);
 
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 private slots:
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
@@ -104,6 +107,10 @@ private:
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
     QStandardItemModel *m_actionResourcesModel;
+
+    QnResourceList m_dropResources;
+    QnResourceList m_eventResources;
+    QnResourceList m_actionResources;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

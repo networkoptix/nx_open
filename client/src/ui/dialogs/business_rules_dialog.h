@@ -12,6 +12,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <events/business_event_rule.h>
+#include <ui/dialogs/button_box_dialog.h>
 #include <ui/widgets/business/business_rule_widget.h>
 #include <utils/common/request_param.h>
 
@@ -21,19 +22,23 @@ namespace Ui {
     class BusinessRulesDialog;
 }
 
-class QnBusinessRulesDialog : public QDialog {
+class QnBusinessRulesDialog : public QnButtonBoxDialog {
     Q_OBJECT
+
+    typedef QnButtonBoxDialog base_type;
 
 public:
     explicit QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent = 0);
     virtual ~QnBusinessRulesDialog();
+
+protected:
+    virtual bool eventFilter(QObject *o, QEvent *e) override;
 
 private slots:
     void at_newRuleButton_clicked();
     void at_saveButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
-    void at_undoButton_clicked();
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);

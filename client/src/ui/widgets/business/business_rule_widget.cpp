@@ -17,6 +17,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
+#include <ui/workbench/workbench_resource.h>
 
 #include <utils/settings.h>
 
@@ -51,7 +52,7 @@ namespace {
 } // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnBusinessRuleWidget),
     m_rule(rule),
     m_hasChanges(false),
@@ -70,6 +71,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     ui->eventStatesComboBox->setModel(m_eventStatesModel);
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
     ui->actionResourceComboBox->setModel(m_actionResourcesModel);
+
+    ui->eventResourcePlaceholder->installEventFilter(this);
 
     QPalette pal = this->palette();
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
@@ -168,6 +171,7 @@ void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
         row << item;
         m_eventStatesModel->appendRow(row);
     }
+    ui->eventStatesComboBox->setEnabled(prolonged);
 }
 
 void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
@@ -255,6 +259,29 @@ void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value action
         m_actionParameters->setVisible(true);
     }
 }
+
+bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
+    if (object == ui->eventResourcePlaceholder) {
+        if (event->type() == QEvent::DragEnter) {
+            QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
+            m_dropResources = QnWorkbenchResource::deserializeResources(de->mimeData());
+            if (!m_dropResources.empty())
+                de->acceptProposedAction();
+            return true;
+        } else if (event->type() == QEvent::Drop) {
+            QDropEvent* de = static_cast<QDropEvent*>(event);
+            if (!m_dropResources.empty())
+                de->acceptProposedAction();
+            return true;
+        } else if (event->type() == QEvent::DragLeave) {
+            m_dropResources = QnResourceList();
+            return true;
+        }
+    }
+
+    return base_type::eventFilter(object, event);
+}
+
 
 BusinessEventType::Value QnBusinessRuleWidget::getCurrentEventType() const {
     int typeIdx = m_eventTypesModel->item(ui->eventTypeComboBox->currentIndex())->data().toInt();

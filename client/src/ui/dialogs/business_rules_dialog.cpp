@@ -72,13 +72,14 @@ namespace {
 }
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent):
-    QDialog(parent, Qt::MSWindowsFixedSizeDialogHint),
+    base_type(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_listModel(new QStandardItemModel(this)),
     m_currentDetailsWidget(NULL),
     m_connection(connection)
 {
     ui->setupUi(this);
+    setButtonBox(ui->buttonBox);
 
     QStringList header;
     header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
@@ -103,6 +104,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     ui->tableView->setModel(m_listModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->installEventFilter(this);
 
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
@@ -110,22 +112,30 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     //ui->tableView->resizeColumnsToContents();
     ui->tableView->clearSelection();
 
-    ui->refreshButton->setVisible(false);
-
     //TODO: show description label if no rules are loaded
 
-    connect(ui->newRuleButton,  SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
-    connect(ui->saveButton,     SIGNAL(clicked()), this, SLOT(at_saveButton_clicked()));
-    connect(ui->saveAllButton,  SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
-    connect(ui->deleteButton,   SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->undoButton,     SIGNAL(clicked()), this, SLOT(at_undoButton_clicked()));
-    connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
+    connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
+    connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
+
+//    connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
 
     updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
 {
+}
+
+bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
+        if (pKeyEvent->key() == Qt::Key_Delete) {
+            at_deleteButton_clicked();
+            return true;
+        }
+    }
+    return base_type::eventFilter(object, event);
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
@@ -163,7 +173,8 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
         return;
 
-    if (QMessageBox::question(this,
+    if (m_currentDetailsWidget->rule()->getId() &&
+            QMessageBox::question(this,
                               tr("Confirm rule deletion"),
                               tr("Are you sure you want to delete this rule?"),
                               QMessageBox::Ok,
@@ -171,12 +182,6 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
         return;
 
     deleteRule(m_currentDetailsWidget);
-}
-
-void QnBusinessRulesDialog::at_undoButton_clicked() {
-    if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
-        return;
-    m_currentDetailsWidget->resetFromRule();
 }
 
 void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
@@ -199,14 +204,14 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
 
     //TODO: load changes from resource
 
-    /*if (success) {
+    if (success) {
         QnResourcePtr res = resources.first();
         QnBusinessEventRulePtr rule = res.dynamicCast<QnBusinessEventRule>();
         if (!rule)
             success = false;
         else
-            w->rule()->update(rule);
-    }*/
+            w->rule()->setId(rule->getId());
+    }
 
 
 }
@@ -227,7 +232,7 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
 
     updateControlButtons();
 /*
-    QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), Qt::UserRole + 1, m_deletingRule->getUniqueId());
+    QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole, m_deletingRule->getUniqueId());
     if (!ruleIdx.isEmpty()) {
         int rowNum = ruleIdx.first().row();
         m_listModel->removeRow(rowNum);
@@ -359,6 +364,18 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleWidget* widget) {
         return;
 
     QnBusinessEventRulePtr rule = widget->rule();
+    if (!rule->getId()) {
+        QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole,
+                                                     QVariant::fromValue<QWidget *>(widget),
+                                                     1, Qt::MatchExactly);
+        if (!ruleIdx.isEmpty()) {
+            int rowNum = ruleIdx.first().row();
+            m_listModel->removeRow(rowNum);
+            ui->tableView->clearSelection();
+        }
+        return;
+    }
+
     int handle = m_connection->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
     widget->setEnabled(false);
     m_processingWidgets[handle] = widget;
@@ -377,8 +394,7 @@ QStandardItem* QnBusinessRulesDialog::tableItem(QnBusinessRuleWidget *widget, in
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
-    ui->saveButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
-    ui->saveAllButton->setEnabled(!m_listModel->match(m_listModel->index(0, 0), ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
-    ui->deleteButton->setEnabled(m_currentDetailsWidget);
-    ui->undoButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
+//    ui->saveButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(!m_listModel->match(m_listModel->index(0, 0), ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
+    ui->deleteRuleButton->setEnabled(m_currentDetailsWidget);
 }

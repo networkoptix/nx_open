@@ -67,6 +67,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="eventResourcePlaceholder">
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <property name="text">
+        <string>&lt;Drop resource here&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="eventSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
