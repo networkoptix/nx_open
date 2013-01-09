@@ -9,6 +9,7 @@
 #include <core/resource/resource.h>
 
 #include <ui/style/resource_icon_cache.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/settings.h>
 
@@ -71,8 +72,9 @@ namespace {
     static int ModifiedRole = Qt::UserRole + 2;
 }
 
-QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent):
+QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::BusinessRulesDialog()),
     m_listModel(new QStandardItemModel(this)),
     m_currentDetailsWidget(NULL),
@@ -311,7 +313,7 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
 }
 
 QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr rule) {
-    QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this);
+    QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this, context());
     connect(w, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
             this, SLOT(at_ruleHasChangesChanged(QnBusinessRuleWidget*,bool)));
     connect(w, SIGNAL(eventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)),

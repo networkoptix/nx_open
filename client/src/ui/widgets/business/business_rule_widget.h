@@ -8,6 +8,7 @@
 #include <events/abstract_business_event.h>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class QnBusinessRuleWidget;
@@ -16,13 +17,13 @@ namespace Ui {
 class QStateMachine;
 class QStandardItemModel;
 
-class QnBusinessRuleWidget : public QWidget
+class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     
     typedef QWidget base_type;
 public:
-    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0);
+    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnBusinessRuleWidget();
 
     QnBusinessEventRulePtr rule() const;
@@ -77,6 +78,8 @@ private slots:
     void at_eventResourceComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
     void at_actionResourceComboBox_currentIndexChanged(int index);
+
+    void at_eventResourcesButton_clicked();
 
 private slots:
     void updateResources();

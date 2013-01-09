@@ -80,6 +80,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="eventResourcesButton">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="eventSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
