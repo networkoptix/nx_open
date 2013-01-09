@@ -245,6 +245,31 @@ bool QnRtspTimeHelper::isCameraTimeChanged(const RtspStatistic& statistics)
     return rez;
 }
 
+#ifdef DEBUG_TIMINGS
+void QnRtspTimeHelper::printTime(double jitter)
+{
+    if (m_statsTimer.elapsed() < 1000)
+    {
+        m_minJitter = qMin(m_minJitter, jitter);
+        m_maxJitter = qMax(m_maxJitter, jitter);
+        m_jitterSum += jitter;
+        m_jitPackets++;
+    }
+    else {
+        if (m_jitPackets > 0) {
+            QString message(QLatin1String("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms"));
+            message = message.arg(m_resId).arg(int(m_minJitter*1000+0.5)).arg(int(m_maxJitter*1000+0.5)).arg(int(m_jitterSum/m_jitPackets*1000+0.5));
+            cl_log.log(message, cl_logINFO);
+        }
+        m_statsTimer.restart();
+        m_minJitter = INT_MAX;
+        m_maxJitter = 0;
+        m_jitterSum = 0;
+        m_jitPackets = 0;
+    }
+}
+#endif
+
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
 {
     if (statistics.isEmpty())
@@ -269,9 +294,15 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         //qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs;
         //if (qAbs(localTimeInSecs - resultInSecs) > TIME_RESYNC_THRESHOLD && recursiveAllowed) 
 
-        bool gotInvalidTime = qAbs(resultInSecs - localTimeInSecs) > TIME_RESYNC_THRESHOLD;
+        double jitter = qAbs(resultInSecs - localTimeInSecs);
+        bool gotInvalidTime = jitter > TIME_RESYNC_THRESHOLD;
         bool camTimeChanged = isCameraTimeChanged(statistics);
         bool localTimeChanged = isLocalTimeChanged();
+
+#ifdef DEBUG_TIMINGS
+        printTime(jitter);
+#endif
+
         if ((camTimeChanged || localTimeChanged || gotInvalidTime) && recursiveAllowed)
         {
             qint64 currentUsecTime = getUsecTimer();
