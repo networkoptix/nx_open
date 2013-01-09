@@ -9,6 +9,8 @@
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
 
+//#define DEBUG_TIMINGS
+
 class RTPSession;
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
@@ -64,6 +66,16 @@ private:
 
     static QMutex m_camClockMutex;
     static QMap<QString, CamSyncInfo*> m_camClock;
+    qint64 m_lastWarnTime;
+
+#ifdef DEBUG_TIMINGS
+    void printTime(double jitter);
+    QTime m_statsTimer;
+    double m_minJitter;
+    double m_maxJitter;
+    double m_jitterSum;
+    int m_jitPackets;
+#endif
 };
 
 class RTPIODevice
