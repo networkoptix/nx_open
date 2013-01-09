@@ -1249,7 +1249,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 //    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(connection(), widget());
+        m_businessRulesDialog = new QnBusinessRulesDialog(connection(), widget(), context());
         newlyCreated = true;
 /*
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));

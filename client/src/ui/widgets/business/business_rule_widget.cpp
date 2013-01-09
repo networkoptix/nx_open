@@ -14,9 +14,11 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
 #include <utils/settings.h>
@@ -51,8 +53,9 @@ namespace {
 
 } // namespace
 
-QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent) :
+QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnBusinessRuleWidget),
     m_rule(rule),
     m_hasChanges(false),
@@ -81,6 +84,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     connect(ui->eventTypeComboBox,      SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
     connect(ui->eventStatesComboBox,    SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
     connect(ui->eventResourceComboBox,  SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventResourceComboBox_currentIndexChanged(int)));
+    connect(ui->eventResourcesButton,   SIGNAL(clicked()),                this, SLOT(at_eventResourcesButton_clicked()));
+
     connect(ui->actionTypeComboBox,     SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
     connect(ui->actionResourceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionResourceComboBox_currentIndexChanged(int)));
 
@@ -270,8 +275,11 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
             return true;
         } else if (event->type() == QEvent::Drop) {
             QDropEvent* de = static_cast<QDropEvent*>(event);
-            if (!m_dropResources.empty())
+            if (!m_dropResources.empty()) {
                 de->acceptProposedAction();
+                m_eventResources.append(m_dropResources);
+                m_dropResources = QnResourceList();
+            }
             return true;
         } else if (event->type() == QEvent::DragLeave) {
             m_dropResources = QnResourceList();
@@ -475,4 +483,9 @@ void QnBusinessRuleWidget::at_actionResourceComboBox_currentIndexChanged(int ind
 
     QString uniqueId = m_actionResourcesModel->item(index)->data().toString();
     emit actionResourceChanged(this, qnResPool->getResourceByUniqId(uniqueId));
+}
+
+void QnBusinessRuleWidget::at_eventResourcesButton_clicked() {
+    QnSelectCamerasDialog dialog(this, context());
+    dialog.exec();
 }

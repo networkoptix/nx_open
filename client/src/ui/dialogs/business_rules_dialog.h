@@ -11,24 +11,27 @@
 #include <api/api_fwd.h>
 
 #include <core/resource/resource_fwd.h>
+
 #include <events/business_event_rule.h>
+
 #include <ui/dialogs/button_box_dialog.h>
 #include <ui/widgets/business/business_rule_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
+
 #include <utils/common/request_param.h>
-
-
 
 namespace Ui {
     class BusinessRulesDialog;
 }
 
-class QnBusinessRulesDialog : public QnButtonBoxDialog {
+class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent = 0);
+    explicit QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     virtual ~QnBusinessRulesDialog();
 
 protected:

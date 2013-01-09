@@ -37,7 +37,6 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
 }
 
 QnExportCameraSettingsDialog::~QnExportCameraSettingsDialog() {
-
 }
 
 QnVirtualCameraResourceList QnExportCameraSettingsDialog::getSelectedCameras() const {
