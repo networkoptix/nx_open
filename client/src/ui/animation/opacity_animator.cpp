@@ -48,7 +48,7 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
             return staticVariantAnimator();
         }
             
-        animationTimer = InstrumentManager::animationTimerOf(item->scene());
+        animationTimer = InstrumentManager::animationTimer(item->scene());
         if(!animationTimer) {
             qnWarning("Cannot create opacity animator for an item on a scene that has no associated animation instrument.");
             return staticVariantAnimator();

@@ -1,10 +1,11 @@
 #include "dwm.h"
 
+#include <boost/type_traits/remove_pointer.hpp>
+
 #include <QtCore/QLibrary>
 #include <QtGui/QWidget>
 
 #include <utils/common/warnings.h>
-#include <utils/common/mpl.h>
 
 #include <utils/common/invocation_event.h>
 
@@ -61,7 +62,7 @@ typedef enum _DWMNCRENDERINGPOLICY {
     DWMNCRP_LAST 
 } DWMNCRENDERINGPOLICY;
 
-typedef remove_pointer<LRESULT>::type RESULT;
+typedef boost::remove_pointer<LRESULT>::type RESULT;
 
 typedef HRESULT (WINAPI *PtrDwmIsCompositionEnabled)(BOOL* pfEnabled);
 typedef HRESULT (WINAPI *PtrDwmExtendFrameIntoClientArea)(HWND hWnd, const _MARGINS *pMarInset);

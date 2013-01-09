@@ -57,7 +57,7 @@ protected:
     explicit QnAbstractBusinessAction(BusinessActionType::Value actionType);
 
 public:
-    virtual ~QnAbstractBusinessAction() {}
+    virtual ~QnAbstractBusinessAction();
     BusinessActionType::Value actionType() const { return m_actionType; }
 
     QByteArray serialize();
@@ -83,6 +83,7 @@ public:
 
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
+
 private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;

@@ -87,7 +87,10 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value act
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false)
 {
+}
 
+QnAbstractBusinessAction::~QnAbstractBusinessAction()
+{
 }
 
 QByteArray QnAbstractBusinessAction::serialize()

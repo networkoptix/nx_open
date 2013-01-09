@@ -61,8 +61,9 @@ bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
     return res1 > res2? true: (res1 == res2 && s1.width() > s2.width()? true: false);
 }
 
-struct VideoOptionsLocal
+class VideoOptionsLocal
 {
+public:
     VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1) {}
     VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp)
     {
@@ -182,7 +183,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_channelNumer(0)
 {
     connect(
-        this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
+        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
         QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
 }
 
@@ -2484,6 +2485,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
         }
     }
 
+    return false; //there is no output with id outputID
 }
 
 bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo )

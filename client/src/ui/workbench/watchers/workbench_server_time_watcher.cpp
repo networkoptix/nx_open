@@ -99,8 +99,8 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
     if(!server)
         return;
 
-    connect(server.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_server_serverIFFound()));
-    connect(server.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_server_statusChanged()));
+    connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
+    connect(server.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
     updateServerTime(server);
 }
 
@@ -113,12 +113,13 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
     disconnect(server.data(), NULL, this, NULL);
 }
 
-void QnWorkbenchServerTimeWatcher::at_server_serverIFFound() {
-    updateServerTime(toSharedPointer(checked_cast<QnMediaServerResource *>(sender())));
+void QnWorkbenchServerTimeWatcher::at_server_serverIfFound(const QnMediaServerResourcePtr &resource) {
+    updateServerTime(resource);
 }
 
-void QnWorkbenchServerTimeWatcher::at_server_statusChanged() {
-    updateServerTime(toSharedPointer(checked_cast<QnMediaServerResource *>(sender())));
+void QnWorkbenchServerTimeWatcher::at_resource_statusChanged(const QnResourcePtr &resource) {
+    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        updateServerTime(server);
 }
 
 void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle) {

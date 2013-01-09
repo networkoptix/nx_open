@@ -72,7 +72,6 @@ private:
       */
 
     QSharedPointer<CLVideoDecoderOutput> m_frameQueue[MAX_FRAME_QUEUE_SIZE];
-    QSharedPointer<CLVideoDecoderOutput> m_prevFrameToDelete;
     int m_frameQueueIndex;
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;

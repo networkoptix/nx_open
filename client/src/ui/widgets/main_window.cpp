@@ -186,6 +186,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
+    addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));

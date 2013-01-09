@@ -189,14 +189,6 @@ void QnWorkbenchAccessController::updatePermissions(const QnResourceList &resour
         updatePermissions(resource);
 }
 
-void QnWorkbenchAccessController::updateSenderPermissions() {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    updatePermissions(toSharedPointer(checked_cast<QnResource *>(sender)));
-}
-
 void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions) {
     if(permissions == this->permissions(resource))
         return;
@@ -222,9 +214,9 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    connect(resource.data(), SIGNAL(parentIdChanged()), this, SLOT(updateSenderPermissions()));
-    connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateSenderPermissions()));
-    connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(updateSenderPermissions()));
+    connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SLOT(updatePermissions(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
     
     updatePermissions(resource);
 }

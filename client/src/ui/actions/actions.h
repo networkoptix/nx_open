@@ -213,6 +213,11 @@ namespace Qn {
         SystemSettingsAction,
 
         /**
+         * Opens business events editing dialog.
+         */
+        BusinessEventsAction,
+
+        /**
          * Opens about dialog.
          */
         AboutAction,

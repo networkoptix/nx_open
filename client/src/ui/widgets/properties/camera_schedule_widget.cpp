@@ -53,14 +53,14 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->noRecordButton->setColor(qnGlobals->noRecordColor());
     ui->noRecordButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
 
-    connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),              this,   SLOT(updateMaxFpsValue(bool)));
-    connect(ui->noRecordButton,          SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->qualityComboBox,         SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateGridParams()));
-    connect(ui->fpsSpinBox,              SIGNAL(valueChanged(double)),       this,   SLOT(updateGridParams()));
-    connect(this,                        SIGNAL(scheduleTasksChanged()),     this,   SLOT(updateRecordSpinboxes()));
+    connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
+    connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
+    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
+    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),             this,   SLOT(updateMaxFpsValue(bool)));
+    connect(ui->noRecordButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
+    connect(ui->qualityComboBox,         SIGNAL(currentIndexChanged(int)),  this,   SLOT(updateGridParams()));
+    connect(ui->fpsSpinBox,              SIGNAL(valueChanged(double)),      this,   SLOT(updateGridParams()));
+    connect(this,                        SIGNAL(scheduleTasksChanged()),    this, SLOT(updateRecordSpinboxes()));
 
     connect(ui->recordBeforeSpinBox,    SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
     connect(ui->recordAfterSpinBox,     SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
@@ -76,7 +76,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
-    connect(ui->exportScheduleButton,   SIGNAL(clicked()),                   this,   SLOT(at_exportScheduleButton_clicked()));
+    connect(ui->exportScheduleButton,   SIGNAL(clicked()),                  this,   SLOT(at_exportScheduleButton_clicked()));
     ui->exportWarningLabel->setVisible(false);
     
     QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);

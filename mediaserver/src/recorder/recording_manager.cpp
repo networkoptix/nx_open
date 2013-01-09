@@ -318,14 +318,14 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
     }
 }
 
-void QnRecordingManager::at_initAsyncFinished(QnResourcePtr res, bool state)
+void QnRecordingManager::at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state)
 {
-    QnVirtualCameraResourcePtr camera = res.dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera && state)
         updateCamera(camera);
 }
 
-void QnRecordingManager::at_cameraUpdated()
+void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
@@ -346,41 +346,52 @@ void QnRecordingManager::at_cameraUpdated()
     }
 }
 
-void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 {
-    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
 
-    if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
+    QnResource::Status status = camera->getStatus();
+    if((status == QnResource::Online || status == QnResource::Recording) && !m_onlineCameras.contains(camera)) {
         updateCamera(camera);
+        m_onlineCameras.insert(camera);
+    }
 
-    if ((oldStatus == QnResource::Online || oldStatus == QnResource::Recording) && newStatus == QnResource::Offline)
+    if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) {
         emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
+        m_onlineCameras.remove(camera);
+    }
 }
 
-void QnRecordingManager::onNewResource(QnResourcePtr res)
+void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
-    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
     if (camera) {
-        connect(camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_cameraStatusChanged(QnResource::Status, QnResource::Status)));
-        connect(camera.data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()));
-        connect(camera.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)),                this, SLOT(at_initAsyncFinished(QnResourcePtr, bool)));
+        QnResource::Status status = camera->getStatus();
+        if(status == QnResource::Online || status == QnResource::Recording)
+            m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
+
+        connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)),            this, SLOT(at_camera_statusChanged(const QnResourcePtr &)));
+        connect(camera.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),          this, SLOT(at_camera_resourceChanged(const QnResourcePtr &)));
+        connect(camera.data(), SIGNAL(initAsyncFinished(const QnResourcePtr &, bool)),  this, SLOT(at_camera_initAsyncFinished(const QnResourcePtr &, bool)));
         updateCamera(camera);
         return;
     }
 
-    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(res);
-    if (mediaServer) {
-        connect(mediaServer.data(), SIGNAL(resourceChanged()), this, SLOT(at_updateStorage()), Qt::QueuedConnection);
-    }
+    QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
+    if (server)
+        connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged()), Qt::QueuedConnection);
 }
 
-void QnRecordingManager::at_updateStorage()
+void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource)
 {
-    QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (sender());
-    qnStorageMan->removeAbsentStorages(mediaServer->getStorages());
-    foreach(QnAbstractStorageResourcePtr storage, mediaServer->getStorages())
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if(!server)
+        return;
+
+    qnStorageMan->removeAbsentStorages(server->getStorages());
+    foreach(QnAbstractStorageResourcePtr storage, server->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
         if (physicalStorage)
@@ -388,9 +399,9 @@ void QnRecordingManager::at_updateStorage()
     }
 }
 
-void QnRecordingManager::onRemoveResource(QnResourcePtr res)
+void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 {
-    QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(res);
+    QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (physicalStorage) {
         qnStorageMan->removeStorage(physicalStorage);
         return;
@@ -399,16 +410,18 @@ void QnRecordingManager::onRemoveResource(QnResourcePtr res)
     Recorders recorders;
     {
         QMutexLocker lock(&m_mutex);
-        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(res);
+        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(resource);
         if (itr == m_recordMap.constEnd())
             return;
         recorders = itr.value();
-        m_recordMap.remove(res);
+        m_recordMap.remove(resource);
     }
-    qnCameraPool->removeVideoCamera(res);
+    qnCameraPool->removeVideoCamera(resource);
 
     beforeDeleteRecorder(recorders);
     deleteRecorder(recorders);
+
+    m_onlineCameras.remove(resource);
 }
 
 bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)

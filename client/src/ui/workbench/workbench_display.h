@@ -355,7 +355,6 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_resource_disabledChanged();
     void at_resource_disabledChanged(const QnResourcePtr &resource);
 
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);

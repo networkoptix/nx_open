@@ -22,7 +22,7 @@ private:
     void updateResourceStatusAsync(const QnResourcePtr &resource);
     bool isSetStatusInProgress(const QnResourcePtr &resource);
 private slots:
-    void onResourceStatusChanged(const QnResourcePtr& resource);
+    void at_resource_statusChanged(const QnResourcePtr& resource);
     void requestFinished(const QnHTTPRawResponse& response, int handle);
 };
 

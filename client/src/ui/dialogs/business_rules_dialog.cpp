@@ -102,13 +102,15 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
 
     ui->tableView->setModel(m_listModel);
     ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
 
-    ui->tableView->resizeColumnsToContents();
+    //ui->tableView->resizeColumnsToContents();
     ui->tableView->clearSelection();
+
+    ui->refreshButton->setVisible(false);
 
     //TODO: show description label if no rules are loaded
 
@@ -133,7 +135,7 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog()
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule());
-    //TODO: master?
+    //TODO: wizard dialog?
     rule->setEventType(BusinessEventType::BE_Camera_Disconnect);
     rule->setActionType(BusinessActionType::BA_Alert);
 
@@ -142,6 +144,7 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     w->resetFromRule(); //here row data will be updated
     w->setHasChanges(true);
 
+    //ui->tableView->resizeColumnsToContents();
     ui->tableView->selectRow(m_listModel->rowCount() - 1);
 }
 
@@ -249,6 +252,7 @@ void QnBusinessRulesDialog::at_ruleHasChangesChanged(QnBusinessRuleWidget* sourc
 void QnBusinessRulesDialog::at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value) {
     QStandardItem *item = tableItem(source, 1);
     item->setText(BusinessEventType::toString(value));
+    //ui->tableView->resizeColumnsToContents();
 }
 
 void QnBusinessRulesDialog::at_ruleEventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource) {
@@ -260,6 +264,7 @@ void QnBusinessRulesDialog::at_ruleEventResourceChanged(QnBusinessRuleWidget* so
         item->setIcon(QIcon());
         item->setText(QString());
     }
+    //ui->tableView->resizeColumnsToContents();
 }
 
 void QnBusinessRulesDialog::at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value) {
@@ -270,6 +275,7 @@ void QnBusinessRulesDialog::at_ruleEventStateChanged(QnBusinessRuleWidget* sourc
 void QnBusinessRulesDialog::at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value) {
     QStandardItem *item = tableItem(source, 4);
     item->setText(BusinessActionType::toString(value));
+    //ui->tableView->resizeColumnsToContents();
 }
 
 void QnBusinessRulesDialog::at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource) {
@@ -281,6 +287,7 @@ void QnBusinessRulesDialog::at_ruleActionResourceChanged(QnBusinessRuleWidget* s
         item->setIcon(QIcon());
         item->setText(QString());
     }
+    //ui->tableView->resizeColumnsToContents();
 }
 
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -328,7 +335,7 @@ QList<QStandardItem *> QnBusinessRulesDialog::createRow(QnBusinessRuleWidget* wi
     statusItem->setData(QVariant::fromValue<QWidget* >(widget), WidgetRole);
     QStandardItem *eventTypeItem = new QStandardItem();
     QStandardItem *eventResourceItem = new QStandardItem();
-    QStandardItem *spacerItem = new QStandardItem();
+    QStandardItem *spacerItem = new QStandardItem(QLatin1String("->"));
     QStandardItem *actionTypeItem = new QStandardItem();
     QStandardItem *actionResourceItem = new QStandardItem();
     QList<QStandardItem *> result;

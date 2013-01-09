@@ -574,6 +574,12 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Business Events...")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main).
         separator();

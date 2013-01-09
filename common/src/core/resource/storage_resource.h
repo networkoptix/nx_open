@@ -52,9 +52,7 @@ signals:
      * @param newStartTime - new archive start time point
      * @param newEndTime - Not used now, reserved for future use
      */
-    void archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
-
-protected:
+    void archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 
 private:
     qint64 m_spaceLimit;
@@ -63,6 +61,9 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
 };
+
+Q_DECLARE_METATYPE(QnAbstractStorageResourcePtr);
+Q_DECLARE_METATYPE(QnAbstractStorageResourceList);
 
 
 class QnStorageResource : public QnAbstractStorageResource
