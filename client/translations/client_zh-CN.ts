@@ -2034,7 +2034,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished">移动侦测录像被禁止或所选摄像机不支持。请到摄像机移动侦测配置界面确认是否支持该功能并激活。</translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection is not available for this camera.</source>
+        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
         <translation type="unfinished">这个摄像机不支持双码流和移动侦测</translation>
     </message>
     <message>
