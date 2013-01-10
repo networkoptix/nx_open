@@ -1255,8 +1255,9 @@ int  QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptio
 
 bool QnPlOnvifResource::isH264Allowed() const
 {
-    bool blockH264 = getName().contains(QLatin1String("SEYEON TECH")) && getModel().contains(QLatin1String("FW3471"));
-    return !blockH264;
+    return true;
+    //bool blockH264 = getName().contains(QLatin1String("SEYEON TECH")) && getModel().contains(QLatin1String("FW3471"));
+    //return !blockH264;
 }
 
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
