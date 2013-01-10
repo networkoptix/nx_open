@@ -1676,7 +1676,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection is not available for this camera.</source>
+        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
