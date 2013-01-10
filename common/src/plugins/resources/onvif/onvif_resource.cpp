@@ -65,7 +65,7 @@ class VideoOptionsLocal
 {
 public:
     VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1) {}
-    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp)
+    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed)
     {
         id = _id;
 
@@ -78,7 +78,7 @@ public:
             for (int i = 0; i < srcVector->size(); ++i)
                 resolutions << QSize(srcVector->at(i)->Width, srcVector->at(i)->Height);
         }
-        isH264 = resp.Options->H264;
+        isH264 = resp.Options->H264 && isH264Allowed;
         if (isH264) {
             for (int i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
                 h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
@@ -1253,6 +1253,12 @@ int  QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptio
         return (int) videoOptionsLocal.h264Profiles[0];
 }
 
+bool QnPlOnvifResource::isH264Allowed() const
+{
+    bool blockH264 = getName().contains(QLatin1String("SEYEON TECH")) && getModel().contains(QLatin1String("FW3471"));
+    return !blockH264;
+}
+
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
@@ -1311,7 +1317,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         }
 
             if (optResp.Options->H264 || optResp.Options->JPEG)
-                optionsList << VideoOptionsLocal(QString::fromStdString(configuration->token), optResp);
+                optionsList << VideoOptionsLocal(QString::fromStdString(configuration->token), optResp, isH264Allowed());
             else
                 qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken->c_str()
                     << "' contains no data for H264/JPEG (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";
@@ -1643,6 +1649,27 @@ bool QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
         return false;
     }
 
+    return true;
+}
+
+bool QnPlOnvifResource::detectVideoSourceCount()
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
+
+    _onvifMedia__GetVideoSources request;
+    _onvifMedia__GetVideoSourcesResponse response;
+    int soapRes = soapWrapper.getVideoSources(request, response);
+
+    if (soapRes != SOAP_OK) {
+
+        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: can't receive data from camera (or data is empty) (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return false;
+    }
+    m_maxChannels = response.VideoSources.size();
     return true;
 }
 
@@ -2534,4 +2561,12 @@ void QnPlOnvifResource::setUrl(const QString &url)
 int QnPlOnvifResource::getMaxChannels() const
 {
     return m_maxChannels;
+}
+
+void QnPlOnvifResource::updateToChannel(int value)
+{
+    QString suffix = QString(QLatin1String("?channel=%1")).arg(value+1);
+    setUrl(getUrl() + suffix);
+    setPhysicalId(getPhysicalId() + suffix.replace(QLatin1String("?"), QLatin1String("_")));
+    setName(getName() + QString(QLatin1String("-channel %1")).arg(value+1));
 }

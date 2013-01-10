@@ -23,19 +23,21 @@ namespace {
 
 QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
 {
+    QString urlStr = url.toString();
     this->url = url;
     this->auth = auth;
     this->resType = qnResTypePool->getResourceTypeByName(resType);
     this->searcher = 0;
 }
 
-QnResourcePtr QnManualCameraInfo::checkHostAddr() const
+QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
 {
     QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(searcher);
+    QString urlStr = url.toString();
     if (ns)
-        return ns->checkHostAddr(url, auth);
+        return ns->checkHostAddr(url, auth, false);
     else
-        return QnResourcePtr();
+        return QList<QnResourcePtr>();
 }
 
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
@@ -229,12 +231,12 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
 
     for (QnManualCamerasMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
-        QnResourcePtr resource = itr.value().checkHostAddr();
-        if (resource) {
-            QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
+        QList<QnResourcePtr> foundResources = itr.value().checkHostAddr();
+        for (int i = 0; i < foundResources.size(); ++i) {
+            QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(foundResources.at(i));
             if (camera)
                 camera->setManuallyAdded(true);
-            resources << resource;
+            resources << camera;
         }
     }
 }
@@ -623,7 +625,7 @@ struct ManualSearcherHelper
 
     QUrl url;
     QnResourceDiscoveryManager::ResourceSearcherList* plugins;
-    QnResourcePtr result;
+    QList<QnResourcePtr> resList;
     QAuthenticator auth;
 
     void f()
@@ -631,10 +633,9 @@ struct ManualSearcherHelper
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            result = ns->checkHostAddr(url, auth);
-            if (result) {
+            resList = ns->checkHostAddr(url, auth, true);
+            if (!resList.isEmpty())
                 break;
-            }
         }
     }
 };
@@ -709,21 +710,18 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
     foreach(const ManualSearcherHelper& h, testList)
     {
-        if (!h.result)
-            continue;
+        for (int i = 0; i < h.resList.size(); ++i)
+        {
+            if (qnResPool->hasSuchResource(h.resList[i]->getUniqueId())) // already in resource pool 
+                continue;
 
-        if (qnResPool->hasSuchResource(h.result->getUniqueId())) // already in resource pool 
-            continue;
+            // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
+            QnResourcePtr existRes = qnResPool->getResourceByUrl(h.url.host());
+            if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
+                continue;
 
-        // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
-        QnResourcePtr existRes = qnResPool->getResourceByUrl(h.url.host());
-        if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
-            continue;
-
-        result.push_back(h.result);
-
-        //qnResPool->
-
+            result.push_back(h.resList[i]);
+        }
     }
 
     cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);

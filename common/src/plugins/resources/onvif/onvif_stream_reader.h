@@ -13,6 +13,7 @@ class onvifXsd__Profile;
 class onvifXsd__VideoEncoderConfiguration;
 class onvifXsd__AudioEncoderConfiguration;
 class onvifXsd__AudioSourceConfiguration;
+class onvifXsd__H264Configuration;
 
 typedef onvifXsd__Profile Profile;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
@@ -89,6 +90,7 @@ private:
     QByteArray NETOPTIX_SECONDARY_NAME;
     QByteArray NETOPTIX_PRIMARY_TOKEN;
     QByteArray NETOPTIX_SECONDARY_TOKEN;
+    onvifXsd__H264Configuration* m_tmpH264Conf;
 };
 
 #endif // onvif_stream_reader_h

@@ -190,6 +190,9 @@ public:
     int getChannel() const;
     int getMaxChannels() const;
 
+    void updateToChannel(int value);
+
+    bool detectVideoSourceCount();
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -258,6 +261,8 @@ private:
     bool sendVideoSourceToCamera(VideoSource* source) const;
 
     QRect getVideoSourceMaxSize(const QString& configToken);
+
+    bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;

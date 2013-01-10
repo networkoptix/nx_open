@@ -49,7 +49,7 @@ QString QnPlAxisResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     QString host = url.host();
     int port = url.port();
@@ -66,7 +66,7 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
     QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
 
     if (response.length()==0)
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QStringList lines = response.split(QLatin1String("\n"), QString::SkipEmptyParts);
 
@@ -92,13 +92,13 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
     name = name.left(name.indexOf(QLatin1Char('-')));
 
     if (mac.isEmpty() || name.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
-        return QnResourcePtr(0);;
+        return QList<QnResourcePtr>();
 
     QnNetworkResourcePtr resource ( new QnPlAxisResource() );
 
@@ -110,8 +110,9 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
-
-    return resource;
+    QList<QnResourcePtr> result;
+    result << resource;
+    return result;
 }
 
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)

@@ -194,7 +194,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 }
 
 
-QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
 
     QString host = url.host();
@@ -212,7 +212,7 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     QString model = QString(QLatin1String(downloadFile(status, QLatin1String("get?model"), host, port, timeout, auth)));
 
     if (model.length()==0)
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QString modelRelease = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=releasename"), host, port, timeout, auth)));
 
@@ -233,11 +233,11 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     model = getValueFromString(model);
 
     if (model.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), model);
     if (!rt.isValid())
-        return QnResourcePtr(0);;
+        return QList<QnResourcePtr>();
 
 
 
@@ -245,7 +245,7 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     mac = getValueFromString(mac);
 
     if (mac.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QnPlAreconVisionResourcePtr res(0);
 
@@ -261,5 +261,7 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     res->setHostAddress(host, QnDomainMemory);
     res->setAuth(auth);
 
-    return res;
+    QList<QnResourcePtr> resList;
+    resList << res;
+    return resList;
 }
