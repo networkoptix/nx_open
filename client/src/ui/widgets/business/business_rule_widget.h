@@ -36,17 +36,15 @@ public:
 signals:
     void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
     void eventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
-    void eventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void eventResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resource);
     void eventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
     void actionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
-    void actionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void actionResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resource);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
      */
     void initEventTypes();
-
-    void initEventResources(BusinessEventType::Value eventType);
 
     /**
      * @brief initEventStates       Fill combobox with event states allowed to current event type.
@@ -66,7 +64,6 @@ protected:
      */
     void initActionTypes(ToggleState::Value eventState);
 
-    void initActionResources(BusinessActionType::Value actionType);
 
     void initActionParameters(BusinessActionType::Value actionType);
 
@@ -75,22 +72,17 @@ protected:
 private slots:
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
-    void at_eventResourceComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
-    void at_actionResourceComboBox_currentIndexChanged(int index);
 
     void at_eventResourcesButton_clicked();
 
-private slots:
-    void updateResources();
-
 private:
     BusinessEventType::Value getCurrentEventType() const;
-    QnResourcePtr getCurrentEventResource() const;
+    QnResourceList& getCurrentEventResources() const;
     ToggleState::Value getCurrentEventToggleState() const;
 
     BusinessActionType::Value getCurrentActionType() const;
-    QnResourcePtr getCurrentActionResource() const;
+    QnResourceList& getCurrentActionResources() const;
 
     QString getResourceName(const QnResourcePtr& resource) const;
 private:
@@ -106,12 +98,11 @@ private:
     QMap<BusinessActionType::Value, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
     QStandardItemModel *m_eventTypesModel;
-    QStandardItemModel *m_eventResourcesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
-    QStandardItemModel *m_actionResourcesModel;
 
     QnResourceList m_dropResources;
+
     QnResourceList m_eventResources;
     QnResourceList m_actionResources;
 };

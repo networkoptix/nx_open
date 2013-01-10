@@ -540,13 +540,14 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
 {
     pb_businessRule.set_id(businessRulePtr->getId().toInt());
     pb_businessRule.set_eventtype((pb::BusinessEventType)businessRulePtr->eventType());
-    if (businessRulePtr->eventResource())
-        pb_businessRule.set_eventresource(businessRulePtr->eventResource()->getId().toInt());
+    //TODO: #GDM resource list
+//    if (businessRulePtr->eventResource())
+//        pb_businessRule.set_eventresource(businessRulePtr->eventResource()->getId().toInt());
     pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventParams()));
 
     pb_businessRule.set_actiontype((pb::BusinessActionType)businessRulePtr->actionType());
-    if (businessRulePtr->actionResource())
-        pb_businessRule.set_actionresource(businessRulePtr->actionResource()->getId().toInt());
+//    if (businessRulePtr->actionResource())
+//        pb_businessRule.set_actionresource(businessRulePtr->actionResource()->getId().toInt());
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 }
 
@@ -740,11 +741,12 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessR
         businessRule->setId(ci->id());
 
         businessRule->setEventType((BusinessEventType::Value)ci->eventtype());
-        businessRule->setEventResource(qnResPool->getResourceById(ci->eventresource()));
+        //TODO: #GDM resources list
+        //businessRule->setEventResource(qnResPool->getResourceById(ci->eventresource()));
         businessRule->setEventParams(deserializeBusinessParams(ci->eventcondition().c_str()));
 
         businessRule->setActionType((BusinessActionType::Value)ci->actiontype());
-        businessRule->setActionResource(qnResPool->getResourceById(ci->actionresource(), QnResourcePool::rfAllResources)); //destination resource can belong to another server
+        //businessRule->setActionResource(qnResPool->getResourceById(ci->actionresource(), QnResourcePool::rfAllResources)); //destination resource can belong to another server
         businessRule->setActionParams(deserializeBusinessParams(ci->actionparams().c_str()));
 
         businessRules.append(businessRule);

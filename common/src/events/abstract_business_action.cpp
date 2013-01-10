@@ -98,8 +98,9 @@ QByteArray QnAbstractBusinessAction::serialize()
     pb::BusinessAction pb_businessAction;
 
     pb_businessAction.set_actiontype(BusinessActionType::toProtobuf(m_actionType));
-    if( getResource() )
-        pb_businessAction.set_actionresource(getResource()->getId());
+    //TODO: #GDM resources list
+//    if( getResource() )
+//        pb_businessAction.set_actionresource(getResource()->getId());
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
     pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
     pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
@@ -127,7 +128,8 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
                 BusinessActionType::fromProtobuf(pb_businessAction.actiontype()),
                 runtimeParams);
 
-    businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
+    //TODO: GDM resources list
+    //businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
     businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
     businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
@@ -135,12 +137,12 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
     return businessAction;
 }
 
-void QnAbstractBusinessAction::setResource(const QnResourcePtr& resource) {
-    m_resource = resource;
+void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {
+    m_resources = resources;
 }
 
-const QnResourcePtr& QnAbstractBusinessAction::getResource() {
-    return m_resource;
+const QnResourceList& QnAbstractBusinessAction::getResources() {
+    return m_resources;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {

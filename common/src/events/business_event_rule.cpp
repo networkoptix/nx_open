@@ -20,7 +20,7 @@ QnBusinessEventRule::QnBusinessEventRule()
 }
 
 QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
-    if (BusinessActionType::isResourceRequired(m_actionType) && !m_actionResource)
+    if (BusinessActionType::isResourceRequired(m_actionType) && m_actionResources.isEmpty())
         return QnAbstractBusinessActionPtr(); //resource is not exists anymore
 
     QnBusinessParams runtimeParams = bEvent->getRuntimeParams();
@@ -29,7 +29,7 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
 
     if (!m_actionParams.isEmpty())
         result->setParams(m_actionParams);
-    result->setResource(m_actionResource);
+    result->setResources(m_actionResources);
 
     if (BusinessEventType::hasToggleState(bEvent->getEventType()) && BusinessActionType::hasToggleState(m_actionType)) {
         ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
@@ -44,17 +44,17 @@ BusinessEventType::Value QnBusinessEventRule::eventType() const {
     return m_eventType;
 }
 
-void QnBusinessEventRule::setEventType(BusinessEventType::Value value) {
+void QnBusinessEventRule::setEventType(const BusinessEventType::Value value) {
     m_eventType = value;
 }
 
 
-QnResourcePtr QnBusinessEventRule::eventResource() const {
-    return m_eventResource;
+QnResourceList QnBusinessEventRule::eventResources() const {
+    return m_eventResources;
 }
 
-void QnBusinessEventRule::setEventResource(QnResourcePtr value) {
-    m_eventResource = value;
+void QnBusinessEventRule::setEventResources(const QnResourceList &value) {
+    m_eventResources = value;
 }
 
 QnBusinessParams QnBusinessEventRule::eventParams() const {
@@ -70,16 +70,16 @@ BusinessActionType::Value QnBusinessEventRule::actionType() const {
     return m_actionType;
 }
 
-void QnBusinessEventRule::setActionType(BusinessActionType::Value value) {
+void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
     m_actionType = value;
 }
 
-QnResourcePtr QnBusinessEventRule::actionResource() const {
-    return m_actionResource;
+QnResourceList QnBusinessEventRule::actionResources() const {
+    return m_actionResources;
 }
 
-void QnBusinessEventRule::setActionResource(QnResourcePtr value) {
-    m_actionResource = value;
+void QnBusinessEventRule::setActionResources(const QnResourceList &value) {
+    m_actionResources = value;
 }
 
 QnBusinessParams QnBusinessEventRule::actionParams() const

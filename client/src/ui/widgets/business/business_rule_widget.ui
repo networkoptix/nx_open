@@ -60,13 +60,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="eventResourceComboBox">
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QLabel" name="eventResourcePlaceholder">
        <property name="acceptDrops">
         <bool>true</bool>
@@ -162,13 +155,6 @@
       <widget class="QLabel" name="actionAtLabel">
        <property name="text">
         <string>at</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="actionResourceComboBox">
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
        </property>
       </widget>
      </item>

@@ -30,26 +30,7 @@ namespace BusinessEventType
     }
 
     bool isResourceRequired(Value val) {
-        if (val > BE_UserDefined)
-            return false;
-
-        switch( val )
-        {
-            case BE_NotDefined:
-                return false;
-            case BE_Camera_Motion:
-                return true;
-            case BE_Camera_Input:
-                return true;
-            case BE_Camera_Disconnect:
-                return false;
-            case BE_Storage_Failure:
-                return true;
-            case BE_UserDefined:
-                return false;
-            //warning should be raised on unknown enumeration values
-        }
-        return false;
+        return requiresCameraResource(val) || requiresServerResource(val);
     }
 
     bool hasToggleState(Value val) {

@@ -68,9 +68,9 @@ public:
     * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
     * For actions: BA_SendMail, BA_Alert, BA_ShowPopup resource is not used
     */
-    void setResource(const QnResourcePtr& resource);
+    void setResources(const QnResourceList& resources);
 
-    const QnResourcePtr& getResource();
+    const QnResourceList& getResources();
 
     void setParams(const QnBusinessParams& params);
     const QnBusinessParams& getParams() const;
@@ -88,7 +88,7 @@ private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;
     bool m_receivedFromRemoteHost;
-    QnResourcePtr m_resource;
+    QnResourceList m_resources;
     QnBusinessParams m_params;
     QnId m_businessRuleId; // business rule, that generated this action
 };

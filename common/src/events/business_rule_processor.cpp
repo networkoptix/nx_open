@@ -27,9 +27,10 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 {
     if (action->actionType() == BusinessActionType::BA_SendMail || action->actionType() == BusinessActionType::BA_Alert)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
-    if (!action->getResource())
+    //TODO: #vasilenko resources list
+//    if (!action->getResources())
         return QnMediaServerResourcePtr(); // can not find routeTo resource
-    return action->getResource()->getParentResource().dynamicCast<QnMediaServerResource>();
+//    return action->getResource()->getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
@@ -98,7 +99,9 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         bool typeOK = rule->eventType() == bEvent->getEventType();
-        bool resOK = !rule->eventResource() || !bEvent->getResource() || rule->eventResource()->getId() == bEvent->getResource()->getId();
+        bool resOK = true;
+        //TODO: #vasilenko resources list
+//                !rule->eventResource() || !bEvent->getResource() || rule->eventResource()->getId() == bEvent->getResource()->getId();
         if (typeOK && resOK)
         {
             bool condOK = bEvent->checkCondition(rule->eventParams());
@@ -143,7 +146,10 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
 //TODO: move to mserver_business_rule_processor
 bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action )
 {
-    const QnResourcePtr& resource = action->getResource();
+
+    //TODO: #vasilenko resources list
+//    const QnResourcePtr& resource = action->getResource();
+    QnResourcePtr resource;
 
     if( !resource )
     {
