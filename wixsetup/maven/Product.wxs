@@ -980,6 +980,7 @@
 			<ComponentRef Id="ServerQTLibraries" />
 			<ComponentRef Id="ServerOpenSSL"/>
 			<ComponentRef Id="ServerSigar"/>
+			<ComponentRef Id="ServerQjson"/>
 			<ComponentRef Id="sysfomediaservercomponent"/>
 		</Feature>
 
