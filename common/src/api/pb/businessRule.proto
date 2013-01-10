@@ -27,8 +27,7 @@ enum ToggleStateType
 {
     State_Off        = 0;
     State_On         = 1;
-    State_Any        = 2;
-    State_NotDefined = 3;
+    State_NotDefined = 2;
 }
 
 message BusinessRule {

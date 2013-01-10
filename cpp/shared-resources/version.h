@@ -19,7 +19,8 @@
 #define QN_SIGAR_VERSION            "${sigar.version}"
 #define QN_BOOST_VERSION            "${boost.version}"
 #define QN_CUSTOMIZATION_NAME       "${installer.customization}"
-#define QN_CUSTOMIZED_FILENAME      "${product.name}.exe"
+#define QN_MEDIA_FOLDER_NAME        "${client.mediafolder.name}"
+#define QN_CLIENT_EXECUTABLE_NAME   "${product.name}.exe"
 #define QN_LICENSING_MAIL_ADDRESS   "${company.license.address}"
 #define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
 #define QN_FREE_LICENSE_COUNT       ${freeLicenseCount}
@@ -45,6 +46,6 @@
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
-/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. */
+/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
 
 #endif // ${artifactId}_VERSION_H

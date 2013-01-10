@@ -13,7 +13,6 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT
 
 public:
-
     QnVirtualCameraResource();
 
     virtual void updateInner(QnResourcePtr other) override;
@@ -48,7 +47,7 @@ public:
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
-    virtual void scheduleTasksChanged() override;
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
 
 private:
     bool m_scheduleDisabled;
@@ -85,6 +84,7 @@ public:
 #endif
 };
 
-Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr)
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+Q_DECLARE_METATYPE(QnVirtualCameraResourceList);
 
 #endif // QN_CAMERA_RESOURCE_H

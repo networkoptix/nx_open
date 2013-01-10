@@ -31,7 +31,6 @@ public:
 
 private slots:
     void at_resource_resourceChanged(const QnResourcePtr &resource);
-    void at_resource_resourceChanged();
 
 private:
     bool m_readOnly;

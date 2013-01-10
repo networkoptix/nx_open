@@ -44,6 +44,9 @@ extern "C" {
 #include <algorithm>
 #include <functional>
 
+/* Boost headers. */
+#include <boost/foreach.hpp>
+
 // QT headers
 #include <QAction>
 

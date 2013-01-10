@@ -32,6 +32,22 @@ namespace {
     /** Get corresponding color from config */
     QColor getColorByKey(const QString &key) {
         int id;
+        // TODO: #gdm
+        // It seems that qHash is not needed here and actually harmful here.
+        // Why don't we just use plain numbering?
+        // CPU -> 0
+        // RAM -> 1
+        // C: -> 2
+        // D: -> 3
+        // E: -> 4
+        // ...
+        // 
+        // And for linux:
+        // hda -> 2
+        // hdb -> 3
+        // ...
+        // 
+        // This way we won't have collisions for sure.
 
         // some hacks to align hashes for keys like 'C:' and 'sda'
         // strongly depends on size of systemHealthColors
@@ -41,12 +57,13 @@ namespace {
         else if (key == QLatin1String("RAM"))
             id = 8;
         else
-        if (key.endsWith(QLatin1Char(':'))) {
-            QString key2(key);
-            key2.chop(1);
+        if (key.contains(QLatin1Char(':'))) {
+            // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
+            QString key2 = key.at(0);
             id = qHash(salt + key2);
         }
         else
+            // linux hdd keys
             id = qHash(salt + key);
         QnColorVector colors = qnGlobals->systemHealthColors();
         return colors[id % colors.size()];
@@ -210,6 +227,10 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 
     m_storageLimit = m_manager->storageLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
+
+    /* Note that this slot is already connected to nameChanged signal in 
+     * base class's constructor.*/
+    connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
 
     /* Run handlers. */
     updateButtonsVisibility();
@@ -432,7 +453,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 // Handlers
 // -------------------------------------------------------------------------- //
 QString QnServerResourceWidget::calculateTitleText() const {
-    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host()); // TODO: connect to change signal
+    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {

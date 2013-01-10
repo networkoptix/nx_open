@@ -95,17 +95,17 @@ public:
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
     */
-    virtual bool setRelayOutputState(
-        const QString& ouputID,
-        bool activate,
-        unsigned int autoResetTimeoutMS = 0 );
+    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
 signals:
     /** 
      * This signal is virtual to work around a problem with inheritance from
      * two <tt>QObject</tt>s. 
      */
-    virtual void scheduleTasksChanged();
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+
+private slots:
+    void at_disabledChanged();
 
 protected:
     void updateInner(QnResourcePtr other) override;
@@ -128,9 +128,9 @@ private:
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
-
-private slots:
-    void onDisabledChanged( bool oldValue, bool newValue );
 };
+
+Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
+Q_DECLARE_METATYPE(QnSecurityCamResourceList)
 
 #endif //sequrity_cam_resource_h_1239

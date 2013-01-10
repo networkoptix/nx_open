@@ -60,7 +60,7 @@ public:
     const StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
     void clearSpace();
 public slots:
-    void at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
+    void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);

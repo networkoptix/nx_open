@@ -1,1 +1,1 @@
-mvn compile  -Darch=x64 -Dcustomization=digitalwatchdog
+mvn compile  -Darch=x64 -Dcustomization=digitalwatchdog -P!installer

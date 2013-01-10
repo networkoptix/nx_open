@@ -188,6 +188,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
+    connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
@@ -304,6 +305,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if(cameraSettingsDialog())
         delete cameraSettingsDialog();
+
+    if (businessRulesDialog())
+        delete businessRulesDialog();
 
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
@@ -843,9 +847,6 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-
-    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(connection(), widget()));
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -1244,6 +1245,46 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     dialog->exec();
 }
 
+void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
+//    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    bool newlyCreated = false;
+    if(!businessRulesDialog()) {
+        m_businessRulesDialog = new QnBusinessRulesDialog(connection(), widget(), context());
+        newlyCreated = true;
+/*
+        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
+        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
+        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
+        */
+    }
+/*
+    if(cameraSettingsDialog()->widget()->resources() != resources) {
+        if(cameraSettingsDialog()->isVisible() && (
+           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
+        {
+            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(cameraSettingsDialog()->widget()->resources()),
+                tr("Camera(s) not Saved"),
+                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No
+            );
+            if(button == QDialogButtonBox::Yes)
+                saveCameraSettingsFromDialog();
+        }
+    }*/
+//    cameraSettingsDialog()->widget()->setResources(resources);
+//    updateCameraSettingsEditibility();
+
+    QRect oldGeometry = businessRulesDialog()->geometry();
+    businessRulesDialog()->show();
+    if(!newlyCreated)
+        businessRulesDialog()->setGeometry(oldGeometry);
+
+
+}
+
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
@@ -1375,6 +1416,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
         return;
 
     // TODO: Factor out common code from reconnect/disconnect/login actions.
+
+    menu()->trigger(Qn::ClearCameraSettingsAction);
 
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
@@ -1587,7 +1630,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->show();
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
-
 }
 
 void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
@@ -2293,7 +2335,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
-        (*itr).uuid = QUuid();
+        //(*itr).uuid = QUuid();
         QnResourcePtr resource = qnResPool->getResourceById((*itr).resource.id);
         if (resource == 0)
             resource = qnResPool->getResourceByUniqId((*itr).resource.path);
@@ -2303,6 +2345,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
             if (mediaRes) {
                 (*itr).resource.id = 0;
+                (*itr).resource.path = mediaRes->getUniqueId();
                 if (!uniqIdList.contains(mediaRes->getUniqueId())) {
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
@@ -2332,7 +2375,12 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     QnApiPbSerializer serializer;
     QByteArray layoutData;
-    serializer.serializeLayout(layout, layoutData);
+    QnLayoutResourcePtr localLayout(new QnLayoutResource());
+    localLayout->setId(layout->getId());
+    localLayout->setGuid(layout->getGuid());
+    localLayout->update(layout);
+    localLayout->setItems(items);
+    serializer.serializeLayout(localLayout, layoutData);
     device->write(layoutData);
     delete device;
 

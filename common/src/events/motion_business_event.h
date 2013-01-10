@@ -1,13 +1,14 @@
 #ifndef __MOTION_BUSINESS_EVENT_H__
 #define __MOTION_BUSINESS_EVENT_H__
 
-#include "abstract_business_event.h"
+#include "prolonged_business_event.h"
 #include "core/datapacket/media_data_packet.h"
 
-class QnMotionBusinessEvent: public QnAbstractBusinessEvent
+class QnMotionBusinessEvent: public QnProlongedBusinessEvent
 {
+    typedef QnProlongedBusinessEvent base_type;
 public:
-    QnMotionBusinessEvent(QnResourcePtr resource,
+    QnMotionBusinessEvent(const QnResourcePtr& resource,
                           ToggleState::Value toggleState,
                           qint64 timeStamp,
                           QnMetaDataV1Ptr metadata);

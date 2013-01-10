@@ -15,7 +15,7 @@ class QnMotionBusinessEventWidget : public QnAbstractBusinessParamsWidget
     
 public:
     explicit QnMotionBusinessEventWidget(QWidget *parent = 0);
-    ~QnMotionBusinessEventWidget();
+    virtual ~QnMotionBusinessEventWidget();
     
     virtual void loadParameters(const QnBusinessParams &params) override;
     virtual QnBusinessParams parameters() const override;

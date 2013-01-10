@@ -1,9 +1,15 @@
 #include "resource.h"
 
+#include <climits>
+
+#include <typeinfo>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
+#include <QtCore/QRunnable>
 
+#include "common/common_meta_types.h"
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
@@ -13,10 +19,7 @@
 #include "resource_consumer.h"
 #include "resource_property.h"
 
-#include <typeinfo>
-#include <limits.h>
 #include "utils/common/synctime.h"
-#include "common/common_meta_types.h"
 
 QnResource::QnResource(): 
     QObject(),
@@ -92,7 +95,7 @@ void QnResource::update(QnResourcePtr other)
     }
     setStatus(other->m_status);
     setDisabled(other->m_disabled);
-    emit resourceChanged();
+    emit resourceChanged(toSharedPointer(this));
 
     QnParamList paramList = other->getResourceParamList();
     foreach(QnParam param, paramList.list())
@@ -150,7 +153,7 @@ void QnResource::setParentId(QnId parent)
         m_parentId = parent;
     }
     
-    emit parentIdChanged();
+    emit parentIdChanged(toSharedPointer(this));
 }
 
 
@@ -171,7 +174,7 @@ void QnResource::setName(const QString& name)
         m_name = name;
     }
 
-    emit nameChanged();
+    emit nameChanged(toSharedPointer(this));
 }
 
 QnResource::Flags QnResource::flags() const
@@ -189,7 +192,7 @@ void QnResource::setFlags(Flags flags)
 
     m_flags = flags;
 
-    emit flagsChanged();
+    emit flagsChanged(toSharedPointer(this));
 }
 
 void QnResource::addFlags(Flags flags)
@@ -219,10 +222,6 @@ QString QnResource::toSearchString() const
 QnResourcePtr QnResource::toSharedPointer() const
 {
     return m_weakPointer.toStrongRef();
-
-    /*QnResourcePtr res = qnResPool->getResourceById(getId());
-    Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
-    return res;*/
 }
 
 QnResourcePtr QnResource::getParentResource() const
@@ -351,7 +350,10 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        emit asyncParamGetDone( name, QVariant(), false );
+        if (!name.contains(QLatin1String("VideoLayout")))
+            qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
+
+        emit asyncParamGetDone(toSharedPointer(this), name, QVariant(), false);
         return false;
     }
 
@@ -366,7 +368,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
     if (domain == QnDomainMemory)
     {
-        emit asyncParamGetDone( name, val, true );
+        emit asyncParamGetDone(toSharedPointer(this), name, val, true);
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -381,7 +383,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 m_mutex.unlock();
                 QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
             }
-            emit asyncParamGetDone( name, newValue, true );
+            emit asyncParamGetDone(toSharedPointer(this), name, newValue, true);
             return true;
         }
     }
@@ -389,12 +391,12 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     {
         if (param.isPhysical())
         {
-            emit asyncParamGetDone( name, val, true );
+            emit asyncParamGetDone(toSharedPointer(this), name, val, true);
             return true;
         }
     }
 
-    emit asyncParamGetDone( name, QVariant(), false );
+    emit asyncParamGetDone(toSharedPointer(this), name, QVariant(), false);
     return false;
 }
 
@@ -402,7 +404,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
 {
     if (setSpecialParam(name, val, domain))
     {
-        emit asyncParamSetDone( name, val, true );
+        emit asyncParamSetDone(toSharedPointer(this), name, val, true);
         return true;
     }
 
@@ -410,7 +412,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (!m_resourceParamList.contains(name))
     {
         qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
-        emit asyncParamSetDone( name, val, false );
+        emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;
     }
 
@@ -420,7 +422,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
-        emit asyncParamSetDone( name, val, false );
+        emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;
     }
     param.setDomain(domain);
@@ -432,7 +434,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     {
         if (!param.isPhysical() || !setParamPhysical(param, val))
         {
-            emit asyncParamSetDone( name, val, false );
+            emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
         }
     }
@@ -444,17 +446,15 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         if (!m_resourceParamList[name].setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
-            emit asyncParamSetDone( name, val, false );
+            emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
-
         }
-
     }
 
     if (oldValue != val)
         QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
 
-    emit asyncParamSetDone( name, val, true );
+    emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;
 }
 
@@ -487,7 +487,7 @@ typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 
 void QnResource::getParamAsync(const QString &name, QnDomain domain)
 {
-    QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(), name, domain));
+    QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name, domain));
     addCommandToProc(command);
 }
 
@@ -521,7 +521,7 @@ typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 void QnResource::setParamAsync(const QString& name, const QVariant& val, QnDomain domain)
 {
-    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(), name, val, domain));
+    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, val, domain));
     addCommandToProc(command);
 }
 
@@ -577,7 +577,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
-    emit statusChanged(oldStatus, m_status);
+    emit statusChanged(toSharedPointer(this));
 
     QMutexLocker mutexLocker(&m_mutex);
     m_lastStatusUpdateTime = qnSyncTime->currentDateTime();
@@ -615,10 +615,6 @@ void QnResource::setId(QnId id) {
 
     QnId oldId = m_id;
     m_id = id;
-
-    mutexLocker.unlock();
-
-    emit idChanged(oldId, id);
 }
 
 QString QnResource::getUrl() const
@@ -639,7 +635,7 @@ void QnResource::setUrl(const QString &url)
 
     mutexLocker.unlock();
 
-    emit urlChanged();
+    emit urlChanged(toSharedPointer(this));
 }
 
 void QnResource::addTag(const QString& tag)
@@ -786,8 +782,7 @@ void QnResource::setDisabled(bool disabled)
     }
 
     if (oldDisabled != disabled)
-        emit disabledChanged(oldDisabled, disabled);
-
+        emit disabledChanged(toSharedPointer(this));
 }
 
 void QnResource::init()
@@ -804,7 +799,7 @@ void QnResource::init()
 void QnResource::initAndEmit()
 {
     init();
-    emit initAsyncFinished(toSharedPointer(), isInitialized());
+    emit initAsyncFinished(toSharedPointer(this), isInitialized());
 }
 
 class InitAsyncTask: public QRunnable
@@ -821,7 +816,7 @@ private:
 
 void QnResource::initAsync()
 {
-    InitAsyncTask *task = new InitAsyncTask(toSharedPointer());
+    InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     QThreadPool::globalInstance()->start(task);
 }
 

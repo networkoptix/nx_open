@@ -26,6 +26,7 @@ class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
+class QnBusinessRulesDialog;
 class QnVideoCamera;
 
 // TODO: move out.
@@ -189,6 +190,10 @@ protected:
         return m_cameraSettingsDialog.data();
     }
 
+    QnBusinessRulesDialog *businessRulesDialog() const {
+        return m_businessRulesDialog.data();
+    }
+
 protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
@@ -241,6 +246,7 @@ protected slots:
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
+    void at_businessEventsAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
@@ -333,6 +339,7 @@ private:
     QWeakPointer<QMenu> m_currentUserLayoutsMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

@@ -4,26 +4,6 @@
 #include <serializer.h>
 #include <parser.h>
 
-
-namespace ToggleState
-{
-    QString toString( Value val )
-    {
-        switch( val )
-        {
-            case Off:
-                return QObject::tr("Stops");
-            case On:
-                return QObject::tr("Starts");
-            case Any:
-                return QObject::tr("Starts/stops");
-            case NotDefined:
-                return QObject::tr("Occurs");
-        }
-        return QLatin1String("---");
-    }
-}
-
 QByteArray serializeBusinessParams(const QnBusinessParams& params)
 {
     QJson::Serializer serializer;

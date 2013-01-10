@@ -1,7 +1,6 @@
-
 #include "abstract_business_event.h"
-#include "utils/common/synctime.h"
 
+#include "utils/common/synctime.h"
 #include "core/resource/resource.h"
 
 
@@ -177,15 +176,15 @@ namespace QnBusinessEventRuntime {
     }
 }
 
-QnAbstractBusinessEvent::QnAbstractBusinessEvent(
-        BusinessEventType::Value eventType,
-        QnResourcePtr resource,
-        ToggleState::Value toggleState,
-        qint64 timeStamp):
+QnAbstractBusinessEvent::QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, ToggleState::Value toggleState, qint64 timeStamp):
     m_eventType(eventType),
     m_timeStamp(timeStamp),
     m_resource(resource),
     m_toggleState(toggleState)
+{
+}
+
+QnAbstractBusinessEvent::~QnAbstractBusinessEvent()
 {
 }
 
@@ -194,12 +193,6 @@ QString QnAbstractBusinessEvent::toString() const
     QString text = QObject::tr("event type: %1\n").arg(BusinessEventType::toString(m_eventType));
     text += QObject::tr("timestamp: %1\n").arg(QDateTime::fromMSecsSinceEpoch(m_timeStamp/1000).toString());
     return text;
-}
-
-bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const {
-    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(params);
-    return toggleState == ToggleState::NotDefined
-            ||  ToggleState::Any || toggleState == m_toggleState;
 }
 
 QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {

@@ -12,8 +12,7 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
     return static_instance();
 }
 
-
-void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp, QnMetaDataV1Ptr metadata)
+void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnMetaDataV1Ptr metadata)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(
                                              resource,
@@ -23,20 +22,16 @@ void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool va
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
 }
 
-void QnBusinessEventConnector::at_cameraDisconnected(QnResourcePtr cameraResource, qint64 timeStamp)
+void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resource, qint64 timeStamp)
 {
     QnCameraDisconnectedBusinessEventPtr cameraEvent(new QnCameraDisconnectedBusinessEvent(
-        cameraResource->getParentResource(),
-        cameraResource,
+        resource->getParentResource(),
+        resource,
         timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
 }
 
-void QnBusinessEventConnector::at_cameraInput(
-    QnResourcePtr resource,
-    const QString& inputPortID,
-    bool value,
-    qint64 timeStamp )
+void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp)
 {
     if( !resource )
         return;

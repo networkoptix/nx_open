@@ -57,7 +57,7 @@ protected:
     explicit QnAbstractBusinessAction(BusinessActionType::Value actionType);
 
 public:
-    virtual ~QnAbstractBusinessAction() {}
+    virtual ~QnAbstractBusinessAction();
     BusinessActionType::Value actionType() const { return m_actionType; }
 
     QByteArray serialize();
@@ -68,7 +68,7 @@ public:
     * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
     * For actions: BA_SendMail, BA_Alert, BA_ShowPopup resource is not used
     */
-    void setResource(QnResourcePtr resource);
+    void setResource(const QnResourcePtr& resource);
 
     const QnResourcePtr& getResource();
 
@@ -83,6 +83,7 @@ public:
 
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
+
 private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;

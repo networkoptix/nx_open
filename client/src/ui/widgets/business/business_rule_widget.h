@@ -5,8 +5,10 @@
 
 #include <events/business_event_rule.h>
 #include <events/business_logic_common.h>
+#include <events/abstract_business_event.h>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class QnBusinessRuleWidget;
@@ -15,28 +17,29 @@ namespace Ui {
 class QStateMachine;
 class QStandardItemModel;
 
-class QnBusinessRuleWidget : public QWidget
+class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     
+    typedef QWidget base_type;
 public:
-    explicit QnBusinessRuleWidget(QWidget *parent = 0);
+    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnBusinessRuleWidget();
 
-    void setRule(QnBusinessEventRulePtr rule);
-    QnBusinessEventRulePtr getRule() const;
+    QnBusinessEventRulePtr rule() const;
 
-    void setExpanded(bool expanded = true);
-    bool expanded() const;
+    bool hasChanges() const;
+    void setHasChanges(bool hasChanges);
 
+    void apply();
+    void resetFromRule();
 signals:
-    /**
-     * @brief deleteConfirmed       Signal is emitted when "Delete" button was clicked and user has confirmed deletion.
-     * @param rule                  Rule to delete. Should be replaced by ID if it is convinient.
-     */
-    void deleteConfirmed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
-
-    void apply(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
+    void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
+    void eventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
+    void eventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void eventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
+    void actionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
+    void actionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -67,18 +70,19 @@ protected:
 
     void initActionParameters(BusinessActionType::Value actionType);
 
-private slots:
-    void at_expandButton_clicked();
-    void at_deleteButton_clicked();
-    void at_applyButton_clicked();
-    void at_eventTypeComboBox_currentIndexChanged(int index);
-    void at_eventStatesComboBox_currentIndexChanged(int index);
-    void at_actionTypeComboBox_currentIndexChanged(int index);
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 private slots:
-    void updateDisplay();
-    void resetFromRule();
-    void updateSummary();
+    void at_eventTypeComboBox_currentIndexChanged(int index);
+    void at_eventStatesComboBox_currentIndexChanged(int index);
+    void at_eventResourceComboBox_currentIndexChanged(int index);
+    void at_actionTypeComboBox_currentIndexChanged(int index);
+    void at_actionResourceComboBox_currentIndexChanged(int index);
+
+    void at_eventResourcesButton_clicked();
+
+private slots:
+    void updateResources();
 
 private:
     BusinessEventType::Value getCurrentEventType() const;
@@ -92,9 +96,8 @@ private:
 private:
     Ui::QnBusinessRuleWidget *ui;
 
-    bool m_expanded;
-
     QnBusinessEventRulePtr m_rule;
+    bool m_hasChanges;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
@@ -107,6 +110,10 @@ private:
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
     QStandardItemModel *m_actionResourcesModel;
+
+    QnResourceList m_dropResources;
+    QnResourceList m_eventResources;
+    QnResourceList m_actionResources;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

@@ -87,7 +87,10 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value act
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false)
 {
+}
 
+QnAbstractBusinessAction::~QnAbstractBusinessAction()
+{
 }
 
 QByteArray QnAbstractBusinessAction::serialize()
@@ -132,7 +135,7 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
     return businessAction;
 }
 
-void QnAbstractBusinessAction::setResource(QnResourcePtr resource) {
+void QnAbstractBusinessAction::setResource(const QnResourcePtr& resource) {
     m_resource = resource;
 }
 

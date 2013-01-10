@@ -3,7 +3,6 @@
 
 #include <QtCore/QVariant>
 
-#include <utils/common/mpl.h>
 #include <core/resource/resource_fwd.h>
 
 #include "action_fwd.h"

@@ -29,11 +29,18 @@
 			<classifier>${customization}</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org</groupId>
-			<artifactId>qjson</artifactId>
-			<version>0.7.1</version>
+			<groupId>org.boost</groupId>
+			<artifactId>boost</artifactId>
+			<version>1.52-SNAPSHOT</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
+			<classifier>${platform}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge</groupId>
+			<artifactId>qjson</artifactId>
+			<version>0.7.1-SNAPSHOT</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.openssl</groupId>

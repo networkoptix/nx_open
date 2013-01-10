@@ -135,7 +135,7 @@ QnAbstractStreamDataProvider* QnMediaServerResource::createDataProviderInternal(
 class TestConnectionTask: public QRunnable
 {
 public:
-    TestConnectionTask(QnMediaServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+    TestConnectionTask(QnMediaServerResourcePtr owner, const QUrl& url): m_owner(owner), m_url(url) {}
 
     void run()
     {
@@ -149,7 +149,7 @@ public:
         }
     }
 private:
-    QnMediaServerResource* m_owner;
+    QnMediaServerResourcePtr m_owner;
     QUrl m_url;
 };
 
@@ -169,7 +169,7 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     setUrl(url.toString());
 
     m_primaryIf = primaryIF;
-    emit serverIFFound(primaryIF);
+    emit serverIfFound(::toSharedPointer(this), primaryIF);
 }
 
 QString QnMediaServerResource::getPrimaryIF() const 
@@ -214,7 +214,7 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        TestConnectionTask *task = new TestConnectionTask(this, url);
+        TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
         QThreadPool::globalInstance()->start(task);
     }
 }

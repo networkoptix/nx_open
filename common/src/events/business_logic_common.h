@@ -9,18 +9,12 @@ namespace ToggleState
 {
     enum Value
     {
-        Off = 0,
-        On = 1,
-        //!Used in event rule to associate non-toggle action with event with any toggle state
-        Any,
-        NotDefined,
+        Off,
+        On,
+        // Also Used in event rule to associate non-toggle action with event with any toggle state
+        NotDefined
 
-        /** Used to implement for-loops over the enumeration */
-        Count
     };
-
-    QString toString(Value val);
-
 }
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 

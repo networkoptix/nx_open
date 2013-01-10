@@ -778,7 +778,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     if(widgets(widget->resource()).size() == 1)
-        connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
+        connect(widget->resource().data(),  SIGNAL(disabledChanged(const QnResourcePtr &)),  this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 
@@ -1612,14 +1612,6 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
                 workbench()->removeLayout(layout);
         }
     }
-}
-
-void QnWorkbenchDisplay::at_resource_disabledChanged() {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    at_resource_disabledChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resource) {

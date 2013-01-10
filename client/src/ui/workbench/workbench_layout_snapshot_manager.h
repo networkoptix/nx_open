@@ -106,8 +106,9 @@ protected slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layouts_saved(const QnLayoutResourceList &resources);
     void at_layouts_saveFailed(const QnLayoutResourceList &resources);
-    void at_layout_storeRequested();
-    void at_layout_changed();
+    void at_layout_storeRequested(const QnLayoutResourcePtr &resource);
+    void at_layout_changed(const QnLayoutResourcePtr &resource);
+    void at_layout_changed(const QnResourcePtr &resource);
 
 private:
     friend class detail::QnWorkbenchLayoutReplyProcessor;

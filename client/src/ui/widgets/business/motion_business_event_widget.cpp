@@ -1,8 +1,6 @@
 #include "motion_business_event_widget.h"
 #include "ui_motion_business_event_widget.h"
 
-#include <events/motion_business_event.h>
-
 QnMotionBusinessEventWidget::QnMotionBusinessEventWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnMotionBusinessEventWidget)
@@ -24,5 +22,5 @@ QnBusinessParams QnMotionBusinessEventWidget::parameters() const {
 }
 
 QString QnMotionBusinessEventWidget::description() const {
-    return QObject::tr("Motion");
+    return QObject::tr("When motion");
 }

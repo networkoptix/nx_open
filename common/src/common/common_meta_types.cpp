@@ -10,6 +10,7 @@
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
 #include <api/media_server_statistics_data.h>
+#include <api/media_server_connection.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -20,6 +21,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/media_server_resource.h>
+
 #include <core/misc/schedule_task.h>
 #include <events/abstract_business_action.h>
 #include <events/abstract_business_event.h>
@@ -47,14 +51,18 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
-    qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnUserResourcePtr>();
+    qRegisterMetaType<QnLayoutResourcePtr>();
+    qRegisterMetaType<QnMediaServerResourcePtr>();
+    qRegisterMetaType<QnVirtualCameraResourcePtr>();
+    qRegisterMetaType<QnSecurityCamResourcePtr>();
+    qRegisterMetaType<QnAbstractStorageResourcePtr>();
 
 
     qRegisterMetaType<QnLayoutItemData>();
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
-    qRegisterMetaType<QnScheduleTaskList>();
+    qRegisterMetaType<QnScheduleTaskList>("QnScheduleTaskList");
 
     qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
     qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
@@ -63,21 +71,26 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnCamerasFoundInfoList>();
-    qRegisterMetaType<QnStatisticsDataList>();
+    qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
+    qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
-    qRegisterMetaType<QnUpdateInfoItemList>();
+    qRegisterMetaType<QnUpdateInfoItemList>("QnUpdateInfoItemList");
 
     qRegisterMetaType<TypeSpecificParamMap>("TypeSpecificParamMap");
+    qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
+    qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
+    qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
+    qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
 
     //events/actions
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
+    
 
     qn_commonMetaTypes_initialized = true;
 }

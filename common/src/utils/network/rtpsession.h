@@ -7,6 +7,9 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
+#include "../common/threadqueue.h"
+
+//#define DEBUG_TIMINGS
 
 class RTPSession;
 
@@ -36,26 +39,43 @@ public:
     QnRtspTimeHelper(const QString& resId);
 
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
+    QString getResID() const { return m_resId; }
 private:
-    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime); // time in seconds since 1.1.1970
     bool isLocalTimeChanged();
+    bool isCameraTimeChanged(const RtspStatistic& statistics);
     void reset();
 private:
     qint64 m_lastTime;
-    double m_lastResultInSec;
+    //double m_lastResultInSec;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
+    qint64 m_cameraTimeDrift;
+    double m_rtcpReportTimeDiff;
 
     struct CamSyncInfo {
-        CamSyncInfo(): value(INT_MAX) {}
+        CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
         QMutex mutex;
-        double value;
+        double timeDiff;
+        QnUnsafeQueue<qint64> driftStats;
+        qint64 driftSum;
     };
 
     CamSyncInfo* m_cameraClockToLocalDiff;
+    QString m_resId;
 
     static QMutex m_camClockMutex;
     static QMap<QString, CamSyncInfo*> m_camClock;
+    qint64 m_lastWarnTime;
+
+#ifdef DEBUG_TIMINGS
+    void printTime(double jitter);
+    QTime m_statsTimer;
+    double m_minJitter;
+    double m_maxJitter;
+    double m_jitterSum;
+    int m_jitPackets;
+#endif
 };
 
 class RTPIODevice

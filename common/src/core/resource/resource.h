@@ -157,6 +157,10 @@ public:
 
 
     QnResourcePtr toSharedPointer() const;
+    
+    template<class Resource>
+    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
+
     QnResourcePtr getParentResource() const;
 
     // ==================================================
@@ -214,30 +218,29 @@ public:
 
 signals:
     void parameterValueChanged(const QnParam &param);
-    void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-    void disabledChanged(bool oldValue, bool newValue);
-    void nameChanged();
-    void parentIdChanged();
-    void idChanged(const QnId &oldId, const QnId &newId);
-    void flagsChanged();
-    void urlChanged();
+    void statusChanged(const QnResourcePtr &resource);
+    void disabledChanged(const QnResourcePtr &resource);
+    void nameChanged(const QnResourcePtr &resource);
+    void parentIdChanged(const QnResourcePtr &resource);
+    void flagsChanged(const QnResourcePtr &resource);
+    void urlChanged(const QnResourcePtr &resource);
+    void resourceChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
-    void asyncParamGetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully set, false otherwises
     */
-    void asyncParamSetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void resourceChanged();
-    void initAsyncFinished(QnResourcePtr resource, bool initialized);
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
 public:
     // this is thread to process commands like setparam
@@ -355,6 +358,11 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     }
 }
 
+template<class Resource>
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource) {
+    using ::toSharedPointer; /* Let ADL kick in. */
+    return toSharedPointer(resource);
+}
 
 
 class QnResourceFactory

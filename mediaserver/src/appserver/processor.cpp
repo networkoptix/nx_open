@@ -87,7 +87,7 @@ bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &re
     return false;
 }
 
-void QnAppserverResourceProcessor::onResourceStatusChanged(const QnResourcePtr &resource)
+void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
 {
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);

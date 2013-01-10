@@ -96,20 +96,21 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
         NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. Unknown camera %1 in request %2. Ignoring...").arg(camID).arg(path), cl_logWARNING );
         return HttpStatusCode::notFound;
     }
+    awaitedParams.resource = res;
 
     if( cmdType == ctGetParam )
         connect(
             res.data(),
-            SIGNAL(asyncParamGetDone(const QString&, const QVariant&, bool)),
+            SIGNAL(asyncParamGetDone(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             this,
-            SLOT(asyncParamGetComplete(const QString&, const QVariant&, bool)),
+            SLOT(asyncParamGetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             Qt::DirectConnection );
     else
         connect(
             res.data(),
-            SIGNAL(asyncParamSetDone(const QString&, const QVariant&, bool)),
+            SIGNAL(asyncParamSetDone(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             this,
-            SLOT(asyncParamSetComplete(const QString&, const QVariant&, bool)),
+            SLOT(asyncParamSetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             Qt::DirectConnection );
     for( QnRequestParamList::const_iterator
         it = params.begin();
@@ -156,15 +157,15 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
     if( cmdType == ctGetParam )
         disconnect(
             res.data(),
-            SIGNAL(asyncParamGetDone(const QString&, const QVariant&, bool)),
+            SIGNAL(asyncParamGetDone(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             this,
-            SLOT(asyncParamGetComplete(const QString&, const QVariant&, bool)) );
+            SLOT(asyncParamGetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)) );
     else
         disconnect(
             res.data(),
-            SIGNAL(asyncParamSetDone(const QString&, const QVariant&, bool)),
+            SIGNAL(asyncParamSetDone(const QnResourcePtr &, const QString&, const QVariant&, bool)),
             this,
-            SLOT(asyncParamSetComplete(const QString&, const QVariant&, bool)) );
+            SLOT(asyncParamSetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)) );
 
     //serializing answer
     for( std::map<QString, std::pair<QVariant, bool> >::const_iterator
@@ -216,7 +217,7 @@ int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnReque
 //
 //}
 
-void QnCameraSettingsHandler::asyncParamGetComplete( const QString& paramName, const QVariant& paramValue, bool result )
+void QnCameraSettingsHandler::asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
 {
     QMutexLocker lk( &m_mutex );
 
@@ -227,6 +228,9 @@ void QnCameraSettingsHandler::asyncParamGetComplete( const QString& paramName, c
         it != m_awaitedParamsSets.end();
         ++it )
     {
+        if((*it)->resource != resource)
+            continue;
+
         std::set<QString>::iterator paramIter = (*it)->paramsToWaitFor.find( paramName );
         if( paramIter == (*it)->paramsToWaitFor.end() )
             continue;
@@ -238,10 +242,10 @@ void QnCameraSettingsHandler::asyncParamGetComplete( const QString& paramName, c
     m_cond.wakeAll();
 }
 
-void QnCameraSettingsHandler::asyncParamSetComplete( const QString& paramName, const QVariant& paramValue, bool result )
+void QnCameraSettingsHandler::asyncParamSetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
 {
     //processing is identical to the previous method
-    asyncParamGetComplete( paramName, paramValue, result );
+    asyncParamGetComplete(resource, paramName, paramValue, result);
 }
 
 QString QnSetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const

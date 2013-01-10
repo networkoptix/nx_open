@@ -6,14 +6,19 @@
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
 
+#include "utils/common/adl_connective.h"
+
 /**
  * Button box dialog that can be queried for the button that was clicked to close it.
  */
-class QnButtonBoxDialog: public QDialog {
+class QnButtonBoxDialog: public AdlConnective<QDialog> {
     Q_OBJECT;
+
+    typedef AdlConnective<QDialog> base_type;
+
 public:
     QnButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        QDialog(parent, windowFlags), 
+        base_type(parent, windowFlags), 
         m_clickedButton(QDialogButtonBox::NoButton)
     {}
 
@@ -24,17 +29,17 @@ public:
 protected:
     void setButtonBox(QDialogButtonBox *buttonBox) {
         if(m_buttonBox) {
-            disconnect(m_buttonBox.data(), SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
-            disconnect(m_buttonBox.data(), SIGNAL(accepted()), this, SLOT(accept()));
-            disconnect(m_buttonBox.data(), SIGNAL(rejected()), this, SLOT(reject()));
+            disconnect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
+            disconnect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+            disconnect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
         }
 
         m_buttonBox = buttonBox;
 
         if(m_buttonBox) {
-            connect(m_buttonBox.data(), SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
-            connect(m_buttonBox.data(), SIGNAL(accepted()),                 this, SLOT(accept()));
-            connect(m_buttonBox.data(), SIGNAL(rejected()),                 this, SLOT(reject()));
+            connect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
+            connect(m_buttonBox, SIGNAL(accepted()),                 this, SLOT(accept()));
+            connect(m_buttonBox, SIGNAL(rejected()),                 this, SLOT(reject()));
         }
     }
 

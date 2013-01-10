@@ -224,7 +224,7 @@ namespace Qn {
         ClientTimeMode  
     };
 
-    // TODO: this enum belongs to resource tree model as it's not used outside its context.
+    // TODO: #GDM this enum belongs to resource tree model as it's not used outside its context.
     /**
      * Columns in the resource tree model.
      */

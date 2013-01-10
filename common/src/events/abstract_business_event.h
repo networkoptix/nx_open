@@ -68,25 +68,24 @@ namespace QnBusinessEventRuntime {
  * @brief The QnAbstractBusinessEvent class
  *                              Base class for business events. Contains parameters of the
  *                              occured event and methods for checking it against the rules.
+ *                              No classes should directly inherit QnAbstractBusinessEvent
+ *                              except the QnInstantBusinessEvent and QnProlongedBusinessEvent.
  */
 class QnAbstractBusinessEvent
 {
 protected:
     /**
      * @brief QnAbstractBusinessEvent
-     *                          Explicit constructor that MUST be overriden in descendants.
+     *                          Explicit constructor that MUST be overridden in descendants.
      * @param eventType         Type of the event.
      * @param resource          Resources that provided the event.
      * @param toggleState       On/off state of the event if it is toggleable.
      * @param timeStamp         Event date and time in usec from UTC.
      */
-    explicit QnAbstractBusinessEvent (
-            BusinessEventType::Value eventType,
-            QnResourcePtr resource,
-            ToggleState::Value toggleState,
-            qint64 timeStamp);
+    QnAbstractBusinessEvent(BusinessEventType::Value eventType, const QnResourcePtr& resource, ToggleState::Value toggleState, qint64 timeStamp);
+
 public:
-    virtual ~QnAbstractBusinessEvent() {}
+    virtual ~QnAbstractBusinessEvent();
 
     /**
      * @brief toString          Convert event to human-readable string in debug purposes and as sendMail text.
@@ -98,7 +97,7 @@ public:
      * @brief getResource       Get resource that provided this event.
      * @return                  Shared pointer on the resource.
      */
-    QnResourcePtr getResource()             const { return m_resource; }
+    const QnResourcePtr& getResource() const { return m_resource; }
 
     /**
      * @brief getEventType      Get type of event. See BusinessEventType::Value.
@@ -118,9 +117,10 @@ public:
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(const QnBusinessParams& params) const;
+    virtual bool checkCondition(const QnBusinessParams& params) const = 0;
 
     virtual QnBusinessParams getRuntimeParams() const;
+
 private:
     /**
      * @brief m_eventType       Type of event. See BusinessEventType::Value.

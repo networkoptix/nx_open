@@ -80,7 +80,6 @@ protected slots:
 
     void at_workbench_currentLayoutChanged();
 
-    void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
 private:

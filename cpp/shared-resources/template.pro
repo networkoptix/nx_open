@@ -18,29 +18,29 @@ isEmpty(BUILDLIB) {
 
 CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ${libdir}/bin/debug
+	DESTDIR = ../../build-environment/${arch}/bin/debug
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
 	} else {
-    DESTDIR = ${libdir}/build/bin/debug
+    DESTDIR = ../../build-environment/${arch}/build/bin/debug
   }  
-  OBJECTS_DIR  = ${project.build.directory}/build/debug
-  MOC_DIR = ${project.build.directory}/build/debug/generated
-  UI_DIR = ${project.build.directory}/build/debug/generated
-  RCC_DIR = ${project.build.directory}/build/debug/generated
+  OBJECTS_DIR  = ./build/debug
+  MOC_DIR = ./build/debug/generated
+  UI_DIR = ./build/debug/generated
+  RCC_DIR = ./build/debug/generated
   LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
 }
 
 CONFIG(release, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ${libdir}/bin/release
+	DESTDIR = ../../build-environment/${arch}/bin/release
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
   } else {
-    DESTDIR = ${libdir}/build/bin/release
+    DESTDIR = ../../build-environment/${arch}/build/bin/release
   }  
-  OBJECTS_DIR  = ${project.build.directory}/build/release
-  MOC_DIR = ${project.build.directory}/build/release/generated
-  UI_DIR = ${project.build.directory}/build/release/generated
-  RCC_DIR = ${project.build.directory}/build/release/generated
+  OBJECTS_DIR  = ./build/release
+  MOC_DIR = ./build/release/generated
+  UI_DIR = ./build/release/generated
+  RCC_DIR = ./build/release/generated
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
