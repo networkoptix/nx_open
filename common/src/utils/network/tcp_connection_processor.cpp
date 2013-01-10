@@ -308,6 +308,19 @@ int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )
             return false; // ssl error
     }
 
+    if( !d->clientRequest.isEmpty() )
+    {
+        const size_t bytesToCopy = std::min<>( bufSize, d->clientRequest.size() - d->clientRequestOffset );
+        memcpy( buffer, d->clientRequest.data() + d->clientRequestOffset, bytesToCopy );
+        d->clientRequestOffset += bytesToCopy;
+        if( d->clientRequestOffset == d->clientRequest.size() )
+        {
+            d->clientRequestOffset = 0;
+            d->clientRequest.clear();
+        }
+        return bytesToCopy;
+    }
+
     return d->ssl
         ? SSL_read(d->ssl, buffer, bufSize )
         : d->socket->recv( buffer, bufSize );

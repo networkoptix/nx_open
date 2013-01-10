@@ -12,14 +12,14 @@ SelfRemovable::SelfRemovable()
 {
 }
 
-SelfRemovable::~SelfRemovable()
-{
-}
-
 void SelfRemovable::scheduleForRemoval()
 {
     if( m_counter.fetchAndAddOrdered( -1 ) <= 1 )   //originally 1, current value - zero
         delete this;
+}
+
+SelfRemovable::~SelfRemovable()
+{
 }
 
 //bool SelfRemovable::isScheduledForRemoval() const

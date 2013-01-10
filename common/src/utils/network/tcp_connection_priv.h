@@ -34,7 +34,8 @@ public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-        socket(0)
+        socket(0),
+        clientRequestOffset(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5000 * 1000;
@@ -62,5 +63,6 @@ public:
     int socketTimeout;
     bool chunkedMode;
     SSL* ssl;
+    int clientRequestOffset;
 
 };

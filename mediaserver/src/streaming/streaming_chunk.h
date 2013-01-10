@@ -9,6 +9,8 @@
 #include <QSize>
 #include <QString>
 
+#include "streaming_chunk_cache_key.h"
+
 
 /*!
     Chunk of data, ready to be used by some streaming protocol (e.g., hls). 
@@ -40,31 +42,41 @@ public:
         closed
     };
 
-    StreamingChunk();
+    enum ResultCode
+    {
+        rcEndOfData,
+        rcError
+    };
 
-    //!Data source (camera id, stream id)
-    QString srcResourceUniqueID() const;
-    unsigned int channelNumber() const;
-    //!Start date
-    /*!
-        \return millis since 1970/1/1 00:00, UTC
-    */
-    quint64 startTimestamp() const;
-    //!Duration in millis
-    quint64 duration() const;
-    //!Video resolution
-    QSize pictureSizePixels() const;
-    //!Media format (codec format, container format)
-    QString containerFormat() const;
-    QString videoCodec() const;
-    QString audioCodec() const;
+    StreamingChunk( const StreamingChunkCacheKey& params );
+
+    const StreamingChunkCacheKey& params() const;
+
+    ////!Data source (camera id, stream id)
+    //QString srcResourceUniqueID() const;
+    //unsigned int channelNumber() const;
+    ////!Start date
+    ///*!
+    //    \return millis since 1970/1/1 00:00, UTC
+    //*/
+    //quint64 startTimestamp() const;
+    ////!Duration in millis
+    //quint64 duration() const;
+    ////!Video resolution
+    //QSize pictureSizePixels() const;
+    ////!Media format (codec format, container format)
+    //QString containerFormat() const;
+    //QString videoCodec() const;
+    //QString audioCodec() const;
+    QString mimeType() const;
 
     //!Returns whole chunk data
     QByteArray data() const;
 
     //!sequential reading
     /*!
-        End-of stream is signalled with returning empty \a dataBuffer and returning \a true
+        Appends data to \a dataBuffer.
+        End-of stream is signalled with returning no data and returning \a true
         \param ctx Used to save position
         \return true, if data read. false, if no data in chunk
         \note If chunk is not being modified, then first call returns whole chunk data
@@ -75,13 +87,17 @@ public:
     //!Only one thread is allowed to modify chunk data at a time
     void openForModification();
     void appendData( const QByteArray& data );
-    void doneModification();
+    void doneModification( ResultCode result );
 
 signals:
     /*!
+        \param pThis \a this for a case of direct connection
         \param newSizeBytes new size of chunk (in bytes)
     */
-    void newDataIsAvailable( quint64 newSizeBytes );
+    void newDataIsAvailable( StreamingChunk* pThis, quint64 newSizeBytes );
+
+private:
+    StreamingChunkCacheKey m_params;
 };
 
 #endif  //STREAMINGCHUNK_H

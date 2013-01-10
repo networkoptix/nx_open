@@ -6,15 +6,22 @@
 #define HLS_SERVER_H
 
 #include <QDateTime>
+#include <QMutex>
+#include <QWaitCondition>
 
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
+
+#include "../streaming_chunk.h"
+#include "../streaming_chunk_cache_key.h"
 
 
 class QnHttpLiveStreamingProcessor
 :
     virtual public QnTCPConnectionProcessor
 {
+    Q_OBJECT
+
 public:
     QnHttpLiveStreamingProcessor( TCPSocket* socket, QnTcpListener* owner );
     virtual ~QnHttpLiveStreamingProcessor();
@@ -33,8 +40,14 @@ private:
 
     nx_http::HttpStreamReader m_httpStreamReader;
     State m_state;
-    //!Used to accept/send data
-    nx_http::BufferType m_msgBuffer;
+    nx_http::BufferType m_readBuffer;
+    nx_http::BufferType m_writeBuffer;
+    StreamingChunk* m_currentChunk;
+    StreamingChunk::SequentialReadingContext m_chunkReadCtx;
+    QMutex m_mutex;
+    QWaitCondition m_cond;
+    bool m_useChunkedTransfer;
+    StreamingChunkCacheKey m_currentChunkKey;
 
     /*!
         \return false in case if error
@@ -49,7 +62,7 @@ private:
     nx_http::StatusCode::Value getRequestedFile( const nx_http::Request& request, nx_http::Response* const response );
     void sendResponse( const nx_http::Response& response );
     /*!
-        \return false, if no more data to send
+        \return false, if no more data to send (reached end of file)
     */
     bool prepareDataToSend();
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
@@ -57,9 +70,13 @@ private:
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response );
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
+        const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response );
+
+private slots:
+    void chunkDataAvailable( StreamingChunk* pThis, quint64 newSizeBytes );
 };
 
 #endif  //HLS_SERVER_H

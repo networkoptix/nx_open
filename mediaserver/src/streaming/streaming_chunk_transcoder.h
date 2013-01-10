@@ -5,7 +5,20 @@
 #ifndef STREAMINGCHUNKTRANSCODER_H
 #define STREAMINGCHUNKTRANSCODER_H
 
+#include <map>
+#include <vector>
 
+#include <QAtomicInt>
+#include <QMutex>
+#include <QThread>
+
+#include <core/resource/media_resource.h>
+#include <utils/common/timermanager.h>
+
+#include "streaming_chunk_cache_key.h"
+
+
+class AbstractOnDemandDataProvider;
 class StreamingChunkCacheKey;
 class StreamingChunk;
 
@@ -15,6 +28,8 @@ class StreamingChunk;
     Holds thread pool inside, which actually performes transcoding
 */
 class StreamingChunkTranscoder
+:
+    public TimerEventHandler
 {
 public:
     enum Flags
@@ -49,6 +64,43 @@ public:
     bool transcodeAsync(
         const StreamingChunkCacheKey& transcodeParams,
         StreamingChunk* const chunk );
+
+    static StreamingChunkTranscoder* instance();
+
+protected:
+    virtual void onTimer( const quint64& timerID );
+
+private:
+    struct TranscodeContext
+    {
+        QnMediaResourcePtr mediaResource;
+        QSharedPointer<AbstractOnDemandDataProvider> dataSource;
+        StreamingChunkCacheKey transcodeParams;
+        StreamingChunk* const chunk;
+
+        TranscodeContext();
+    };
+
+    Flags m_flags;
+    QMutex m_mutex;
+    //!map<transcoding id, data>
+    std::map<int, TranscodeContext> m_transcodings;
+    //!map<task id, transcoding id>
+    std::map<quint64, int> m_taskIDToTranscode;
+    QAtomicInt m_newTranscodeID;
+    std::vector<QThread> m_transcodeThreads;
+
+    bool startTranscoding(
+        int transcodingID,
+        const QnMediaResourcePtr& mediaResource,
+        QSharedPointer<AbstractOnDemandDataProvider> dataSource,
+        const StreamingChunkCacheKey& transcodeParams,
+        StreamingChunk* const chunk );
+    bool scheduleTranscoding(
+        const int transcodeID,
+        const QDateTime& startTimeUTC );
+    bool validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams );
+    void threadFunc();
 };
 
 #endif  //STREAMINGCHUNKTRANSCODER_H

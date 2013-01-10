@@ -171,7 +171,7 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
     return 0;
 }
 
-bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
     Q_UNUSED(method);
     m_audioCodec = codec;
@@ -196,7 +196,7 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             m_lastErrMessage = tr("Unknown Transcode Method");
             return -1;
     }
-    return m_lastErrMessage.isEmpty();
+    return m_lastErrMessage.isEmpty() ? 0 : 1;
 }
 
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)

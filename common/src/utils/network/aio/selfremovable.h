@@ -15,7 +15,8 @@
     \note Class methods are not thread-safe
     \note Descendant class should make its destructor private not to allow object to be created on stack and force clients to use \a scheduleForRemoval method
     \note This class is not thread-safe. That means it is not planned to use \a prohibitDestruction and \a allowDestruction in different threads
-*/
+    \todo Consider discarding this class in favour of forcing its decendants to use \a shared_ptr, \a shared_ptr_from_this and create additional ref for calling \a eventTriggered
+*/  
 class SelfRemovable
 {
 public:
@@ -39,7 +40,6 @@ public:
     };
 
     SelfRemovable();
-    virtual ~SelfRemovable();
 
     //!Tells object to remove itself as soon as possible
     /*!
@@ -50,6 +50,7 @@ public:
     void scheduleForRemoval();
 
 protected:
+    virtual ~SelfRemovable();
     //bool isScheduledForRemoval() const;
 
     //!Prohibites object destruction in current thread till \a allowDestruction call
