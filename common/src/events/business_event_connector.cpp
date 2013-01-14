@@ -4,6 +4,7 @@
 #include "core/resource/resource.h"
 #include "business_rule_processor.h"
 #include "camera_disconnected_business_event.h"
+#include "storage_failure_business_event.h"
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 
@@ -28,6 +29,15 @@ void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resour
         resource->getParentResource(),
         resource,
         timeStamp));
+    qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
+}
+
+void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason)
+{
+    QnStorageFailureBusinessEventPtr cameraEvent(new QnStorageFailureBusinessEvent(
+        resource,
+        timeStamp,
+        reason));
     qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
 }
 

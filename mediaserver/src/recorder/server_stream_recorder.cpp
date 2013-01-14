@@ -45,12 +45,20 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     scheduleData.m_streamQuality = QnQualityHighest;
     m_panicSchedileRecord.setData(scheduleData);
 
-    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnMetaDataV1Ptr)), qnBusinessRuleConnector, SLOT(at_motionDetected(QnResourcePtr, bool, qint64, QnMetaDataV1Ptr)));
+    connect(this, SIGNAL(recordingFailed(QString)), this, SLOT(at_recordingFailed(QString)));
+
+    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnMetaDataV1Ptr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnMetaDataV1Ptr)));
+    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, const QString&)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, const QString&)));
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
     stop();
+}
+
+void QnServerStreamRecorder::at_recordingFailed(QString msg)
+{
+    emit storageFailure(m_storage, qnSyncTime->currentUSecsSinceEpoch(), QLatin1String("IO error occured."));
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -83,6 +91,8 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
+        emit storageFailure(m_storage, qnSyncTime->currentUSecsSinceEpoch(), "Not enough HDD/SSD speed for recording");
+
 		qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
         markNeedKeyData();
 		m_dataQueue.clear();

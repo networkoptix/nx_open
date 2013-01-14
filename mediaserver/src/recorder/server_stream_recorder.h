@@ -37,6 +37,8 @@ public:
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnMetaDataV1Ptr motion);
+
+    void storageFailure(QnResourcePtr resource, qint64 timestamp, const QString& errMessage);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
@@ -57,6 +59,8 @@ private:
     bool isMotionRec(Qn::RecordingType recType) const;
     void updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData);
     void setSpecialRecordingMode(QnScheduleTask& task, int fps);
+private slots:
+    void at_recordingFailed(QString msg);
 private:
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
