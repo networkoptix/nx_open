@@ -34,7 +34,7 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(QnResourcePtr, qint64)));
+    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
 
     m_scheduleWatchingTimer.start(1000);
 

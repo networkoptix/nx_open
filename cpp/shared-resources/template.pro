@@ -23,10 +23,10 @@ CONFIG(debug, debug|release) {
 	} else {
     DESTDIR = ../../build-environment/${arch}/build/bin/debug
   }  
-  OBJECTS_DIR  = ./build/debug
-  MOC_DIR = ./build/debug/generated
-  UI_DIR = ./build/debug/generated
-  RCC_DIR = ./build/debug/generated
+  OBJECTS_DIR = ../${arch}/build/debug
+  MOC_DIR = ../${arch}/build/debug/generated
+  UI_DIR = ../${arch}/build/debug/generated
+  RCC_DIR = ../${arch}/build/debug/generated
   LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
 }
 
@@ -37,10 +37,10 @@ CONFIG(release, debug|release) {
   } else {
     DESTDIR = ../../build-environment/${arch}/build/bin/release
   }  
-  OBJECTS_DIR  = ./build/release
-  MOC_DIR = ./build/release/generated
-  UI_DIR = ./build/release/generated
-  RCC_DIR = ./build/release/generated
+  OBJECTS_DIR  = ../${arch}/build/release
+  MOC_DIR = ../${arch}/build/release/generated
+  UI_DIR = ../${arch}/build/release/generated
+  RCC_DIR = ../${arch}/build/release/generated
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
