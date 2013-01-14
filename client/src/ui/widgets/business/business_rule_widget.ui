@@ -7,14 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>737</width>
-    <height>170</height>
+    <height>90</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="acceptDrops">
    <bool>true</bool>
@@ -23,12 +17,33 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QFrame" name="eventDefinitionFrame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="acceptDrops">
       <bool>true</bool>
      </property>
      <layout class="QHBoxLayout" name="eventDefinitionLayout">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QLabel" name="eventDoLabel">
         <property name="minimumSize">
@@ -104,12 +119,6 @@
    </item>
    <item>
     <widget class="QFrame" name="eventParamsFrame">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>38</height>
-      </size>
-     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -128,10 +137,22 @@
    </item>
    <item>
     <widget class="QFrame" name="actionDefinitionFrame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="acceptDrops">
       <bool>true</bool>
      </property>
      <layout class="QHBoxLayout" name="actionTypeLayout">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QLabel" name="actionDoLabel">
         <property name="minimumSize">
@@ -203,7 +224,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>38</height>
+       <height>30</height>
       </size>
      </property>
      <property name="frameShape">

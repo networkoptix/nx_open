@@ -19,7 +19,6 @@ namespace BusinessActionType
                 - emailAddress (string, required)
         */
         BA_SendMail,
-        BA_Alert,
 
         //TODO: #gdm make!
         BA_ShowPopup,
@@ -32,6 +31,7 @@ namespace BusinessActionType
         */
         BA_CameraOutput,
 
+        BA_Alert,              // write a record to the server's log
         BA_Bookmark,           // mark part of camera archive as undeleted
 
         // media server based actions

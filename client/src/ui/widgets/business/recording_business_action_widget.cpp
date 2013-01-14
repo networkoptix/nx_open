@@ -12,6 +12,10 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
     for (int i = QnQualityLowest; i <= QnQualityHighest; i++) {
         ui->qualityComboBox->addItem(QnStreamQualityToString((QnStreamQuality)i), i);
     }
+    ui->afterLabel->setVisible(false);
+    ui->afterSpinBox->setVisible(false);
+    ui->beforeLabel->setVisible(false);
+    ui->beforeSpinBox->setVisible(false);
 
 }
 
