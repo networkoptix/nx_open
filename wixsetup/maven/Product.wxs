@@ -877,6 +877,10 @@
 								<File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 								<File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 							</Component>
+							
+							<Component Id="ClientQjson" Guid="{2e2bfc05-4e12-4e4e-93f1-97afae6c15e3}">
+								<File Id="ClientQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+							</Component>							
 
 							<Component Id="ClientSigar" Guid="{B2CBBF7C-55F2-4c8a-89A6-2F9053BC4E7B}">
 								<File Id="ClientSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
@@ -1000,7 +1004,8 @@
 			<ComponentRef Id="ImageFormats" />
 			<ComponentRef Id="ClientOpenAL" />
 			<ComponentRef Id="ClientOpenSSL" />
-			<ComponentRef Id="ClientSigar"/>			
+			<ComponentRef Id="ClientSigar"/>	
+			<ComponentRef Id="ClientQjson"/>			
 			<ComponentRef Id="ClientQtColorPicker"/>
 			<ComponentRef Id="ClientVsRedistributable"/>
 			<ComponentRef Id="bespin" />
