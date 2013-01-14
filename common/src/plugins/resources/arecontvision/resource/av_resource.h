@@ -67,7 +67,7 @@ public:
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
     static QnPlAreconVisionResource* createResourceByTypeId(QnId rt);
 
-    static bool isPanoramic(const QString &name);
+    static bool isPanoramic(const QString &model);
 
 protected:
     QString m_description;

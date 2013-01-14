@@ -17,6 +17,8 @@
 const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 #define MAX_RESPONSE_LEN (4*1024)
 
+static const char* dualSensorModels[] = {"3130", "3135"};
+
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64)
@@ -25,13 +27,20 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 
 bool QnPlAreconVisionResource::isPanoramic() const
 {
-    return QnPlAreconVisionResource::isPanoramic(getName());
+    return QnPlAreconVisionResource::isPanoramic(getModel());
 }
 
 bool QnPlAreconVisionResource::isDualSensor() const
 {
-    const QString name = getName();
-    return name.contains(QLatin1String("3130")) || name.contains(QLatin1String("3135"));
+    const QString model = getModel();
+
+    for (int i = 0; i < sizeof(dualSensorModels)/sizeof(char*); ++i)
+    {
+        if (model.contains(QLatin1String(dualSensorModels[i])))
+            return true;
+    }
+
+    return false;
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
@@ -425,10 +434,18 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
     return res;
 }
 
-bool QnPlAreconVisionResource::isPanoramic(const QString &name)
+bool QnPlAreconVisionResource::isPanoramic(const QString &model)
 {
-    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) || name.contains(QLatin1String("20365")) ||
-           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365"));
+
+    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String(MANUFACTURE), model);
+    if (!rt.isValid())
+        return QnResourcePtr(0);
+
+    QnPlAreconVisionResourcePtr res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(model));
+
+    res->setTypeId(rt);
+
+    return (res->getVideoLayout()->numberOfChannels() > 1);
 }
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
