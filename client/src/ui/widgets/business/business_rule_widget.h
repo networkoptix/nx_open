@@ -74,15 +74,16 @@ private slots:
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
 
-    void at_eventResourcesButton_clicked();
+    void at_eventResourcesHolder_clicked();
+    void at_actionResourcesHolder_clicked();
 
+    void updateEventResources();
+    void updateActionResources();
 private:
     BusinessEventType::Value getCurrentEventType() const;
-    QnResourceList& getCurrentEventResources() const;
     ToggleState::Value getCurrentEventToggleState() const;
 
     BusinessActionType::Value getCurrentActionType() const;
-    QnResourceList& getCurrentActionResources() const;
 
     QString getResourceName(const QnResourcePtr& resource) const;
 private:

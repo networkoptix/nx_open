@@ -70,7 +70,10 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     ui->eventStatesComboBox->setModel(m_eventStatesModel);
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
 
-    ui->eventResourcePlaceholder->installEventFilter(this);
+    ui->eventParamsFrame->setVisible(false);
+
+    ui->eventDefinitionFrame->installEventFilter(this);
+    ui->actionDefinitionFrame->installEventFilter(this);
 
     QPalette pal = this->palette();
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
@@ -78,7 +81,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
 
     connect(ui->eventTypeComboBox,      SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
     connect(ui->eventStatesComboBox,    SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
-    connect(ui->eventResourcesButton,   SIGNAL(clicked()),                this, SLOT(at_eventResourcesButton_clicked()));
+    connect(ui->eventResourcesHolder,   SIGNAL(clicked()),                this, SLOT(at_eventResourcesHolder_clicked()));
+    connect(ui->actionResourcesHolder,  SIGNAL(clicked()),                this, SLOT(at_actionResourcesHolder_clicked()));
 
     connect(ui->actionTypeComboBox,     SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
 
@@ -92,7 +96,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));*/
 
     initEventTypes();
-    resetFromRule();
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
@@ -140,13 +143,12 @@ void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
         row << item;
         m_eventStatesModel->appendRow(row);
     }
-    ui->eventStatesComboBox->setEnabled(prolonged);
+    ui->eventStatesComboBox->setVisible(prolonged);
 }
 
 void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
     if (m_eventParameters) {
         ui->eventParamsLayout->removeWidget(m_eventParameters);
-        //ui->eventLayout->removeWidget(m_eventParameters);
         m_eventParameters->setVisible(false);
     }
 
@@ -158,7 +160,6 @@ void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventTyp
     }
     if (m_eventParameters) {
         ui->eventParamsLayout->addWidget(m_eventParameters);
-        //ui->eventLayout->addWidget(m_eventParameters);
         m_eventParameters->setVisible(true);
     }
 }
@@ -217,13 +218,23 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
     } else if (event->type() == QEvent::Drop) {
         QDropEvent* de = static_cast<QDropEvent*>(event);
         if (!m_dropResources.empty()) {
-            de->acceptProposedAction();
-            foreach(QnResourcePtr res, m_dropResources) {
-                if (m_eventResources.contains(res))
-                    continue;
-                m_eventResources.append(res);
+            if (object == ui->eventDefinitionFrame) {
+                foreach(QnResourcePtr res, m_dropResources) {
+                    if (m_eventResources.contains(res))
+                        continue;
+                    m_eventResources.append(res);
+                }
+                updateEventResources();
+            } else if (object == ui->actionDefinitionFrame) {
+                foreach(QnResourcePtr res, m_dropResources) {
+                    if (m_actionResources.contains(res))
+                        continue;
+                    m_actionResources.append(res);
+                }
+                updateActionResources();
             }
             m_dropResources = QnResourceList();
+            de->acceptProposedAction();
         }
         return true;
     } else if (event->type() == QEvent::DragLeave) {
@@ -297,10 +308,10 @@ void QnBusinessRuleWidget::resetFromRule() {
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
     emit eventTypeChanged(this, m_rule->eventType());
-    emit eventResourcesChanged(this, m_rule->eventResources());
+    updateEventResources();
     emit eventStateChanged(this, toggleState);
     emit actionTypeChanged(this, m_rule->actionType());
-    emit actionResourcesChanged(this, m_rule->actionResources());
+    updateActionResources();
 
     setHasChanges(false);
 }
@@ -333,15 +344,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
     int typeIdx = m_eventTypesModel->item(index)->data().toInt();
     BusinessEventType::Value val = (BusinessEventType::Value)typeIdx;
 
-    bool isResourceRequired = BusinessEventType::isResourceRequired(val);
-    ui->eventAtLabel->setVisible(isResourceRequired);
-    /*ui->eventResourceComboBox->setVisible(isResourceRequired);
-
-    if (isResourceRequired)
-        initEventResources(val);
-    else
-        emit eventResourceChanged(this, QnResourcePtr());
-        */
+    updateEventResources();
     initEventStates(val);
     initEventParameters(val);
 
@@ -363,26 +366,84 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     int typeIdx = m_actionTypesModel->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
 
-    bool isResourceRequired = BusinessActionType::isResourceRequired(val);
-    ui->actionAtLabel->setVisible(isResourceRequired);
-    /*ui->actionResourceComboBox->setVisible(isResourceRequired);
-    if (isResourceRequired)
-        initActionResources(val);
-    else
-        emit actionResourceChanged(this, QnResourcePtr());
-*/
+    updateActionResources();
     initActionParameters(val);
 
     setHasChanges(true);
     emit actionTypeChanged(this, val);
 }
 
-void QnBusinessRuleWidget::at_eventResourcesButton_clicked() {
+void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     QnSelectCamerasDialog dialog(this, context());
     dialog.setSelectedResources(m_eventResources.filtered<QnVirtualCameraResource>());
     if (dialog.exec() != QDialog::Accepted)
         return;
     m_eventResources.clear();
     m_eventResources.append(dialog.getSelectedResources());
+    updateEventResources();
+}
+
+void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
+    QnSelectCamerasDialog dialog(this, context());
+    dialog.setSelectedResources(m_actionResources);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_actionResources.clear();
+    m_actionResources.append(dialog.getSelectedResources());
+    updateActionResources();
+}
+
+void QnBusinessRuleWidget::updateEventResources() {
+    BusinessEventType::Value eventType = getCurrentEventType();
+    QPushButton* item = ui->eventResourcesHolder;
+
+    bool isResourceRequired = BusinessEventType::isResourceRequired(eventType);
+    item->setVisible(isResourceRequired);
+    ui->eventAtLabel->setVisible(isResourceRequired);
+    ui->eventDropLabel->setVisible(isResourceRequired);
+
+    if (m_eventResources.size() == 1) {
+        QnResourcePtr resource = m_eventResources.first();
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setText(getResourceName(resource));
+    } else if (BusinessEventType::requiresServerResource(eventType)){
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server));
+        if (m_eventResources.size() == 0)
+            item->setText(tr("<Any Server>"));
+        else
+            item->setText(tr("%1 Servers").arg(m_eventResources.size())); //TODO: fix tr to %n
+    } else if (BusinessEventType::requiresCameraResource(eventType)) {
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
+        if (m_eventResources.size() == 0)
+            item->setText(tr("<Any Camera>"));
+        else
+            item->setText(tr("%1 Cameras").arg(m_eventResources.size())); //TODO: fix tr to %n
+    }
+
+    //TODO: filtered resources list
     emit eventResourcesChanged(this, m_eventResources);
+}
+
+void QnBusinessRuleWidget::updateActionResources() {
+    BusinessActionType::Value actionType = getCurrentActionType();
+    QPushButton* item = ui->actionResourcesHolder;
+
+    bool isResourceRequired = BusinessActionType::isResourceRequired(actionType);
+    item->setVisible(isResourceRequired);
+    ui->actionAtLabel->setVisible(isResourceRequired);
+    ui->actionDropLabel->setVisible(isResourceRequired);
+
+    if (m_actionResources.size() == 1) {
+        QnResourcePtr resource = m_actionResources.first();
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setText(getResourceName(resource));
+    } else {
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
+        if (m_actionResources.size() == 0)
+            item->setText(tr("<Select at least one camera>"));
+        else
+            item->setText(tr("%1 Cameras").arg(m_actionResources.size())); //TODO: fix tr to %n
+    }
+
+    emit actionResourcesChanged(this, m_actionResources);
 }

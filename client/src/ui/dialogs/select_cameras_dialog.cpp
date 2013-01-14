@@ -16,7 +16,6 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext
     ui->setupUi(this);
 
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
-    connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged(QModelIndex,QModelIndex)));
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
 }
@@ -69,10 +68,4 @@ void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
         return;
     }
     base_type::keyPressEvent(event);
-}
-
-// ------------ Handlers ---------------------
-
-void QnSelectCamerasDialog::at_resourceModel_dataChanged(QModelIndex old, QModelIndex upd){
-    qDebug() << "datachanged" << old << upd;
 }
