@@ -784,6 +784,10 @@
 								<File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 								<File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 							</Component>
+							
+							<Component Id="ServerQjson" Guid="{4e3f101f-3a9b-4447-afd2-61dd8cbe51b0}">
+								<File Id="ServerQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+							</Component>						
 
 							<Component Id="ServerSigar" Guid="{15E53052-24D8-4c7f-ACBB-2D404BE06A03}">
 								<File Id="ServerSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
@@ -976,6 +980,7 @@
 			<ComponentRef Id="ServerQTLibraries" />
 			<ComponentRef Id="ServerOpenSSL"/>
 			<ComponentRef Id="ServerSigar"/>
+			<ComponentRef Id="ServerQjson"/>
 			<ComponentRef Id="sysfomediaservercomponent"/>
 		</Feature>
 

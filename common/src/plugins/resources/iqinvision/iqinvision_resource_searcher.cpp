@@ -66,11 +66,11 @@ QString QnPlIqResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    return QnResourcePtr(0);
+    return QList<QnResourcePtr>();
 }
 
 QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)

@@ -166,7 +166,7 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
     resultByteArray.append("<root>\n");
     bool registered = QnResourceDiscoveryManager::instance().registerManualCameras(cameras);
     if (registered) {
-        QnResourceDiscoveryManager::instance().processManualAddedResources();
+        //QnResourceDiscoveryManager::instance().processManualAddedResources();
         resultByteArray.append("OK\n");
     }
     else
