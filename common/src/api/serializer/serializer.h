@@ -27,7 +27,6 @@ QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 QString serializeRegion(const QRegion& region);
 QString serializeRegionList(const QList<QRegion>& regions);
 
-
 class QnSerializeException : public std::exception
 {
 public:

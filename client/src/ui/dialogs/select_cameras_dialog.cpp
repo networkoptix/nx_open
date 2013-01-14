@@ -16,11 +16,8 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext
     ui->setupUi(this);
 
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
-    connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
-
-    at_resourceModel_dataChanged();
 }
 
 QnSelectCamerasDialog::~QnSelectCamerasDialog()
@@ -28,7 +25,7 @@ QnSelectCamerasDialog::~QnSelectCamerasDialog()
     delete ui;
 }
 
-QnVirtualCameraResourceList QnSelectCamerasDialog::getSelectedCameras() const {
+QnResourceList QnSelectCamerasDialog::getSelectedResources() const {
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
         //servers
@@ -36,7 +33,7 @@ QnVirtualCameraResourceList QnSelectCamerasDialog::getSelectedCameras() const {
         for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
             //cameras
             QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
-            QModelIndex checkedIdx = camIdx.sibling(camIdx.row(), Qn::CheckColumn);
+            QModelIndex checkedIdx = camIdx.sibling(j, Qn::CheckColumn);
             bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
             if (!checked)
                 continue;
@@ -45,8 +42,24 @@ QnVirtualCameraResourceList QnSelectCamerasDialog::getSelectedCameras() const {
                  result.append(resource);
         }
     }
-    QnVirtualCameraResourceList cameras = result.filtered<QnVirtualCameraResource>(); //safety check
-    return cameras;
+    return result;
+}
+
+void QnSelectCamerasDialog::setSelectedResources(const QnResourceList &selected) {
+    for (int i = 0; i < m_resourceModel->rowCount(); ++i){
+        //servers
+        QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn);
+        for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
+            //cameras
+            QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
+            QModelIndex checkedIdx = camIdx.sibling(j, Qn::CheckColumn);
+
+            QnResourcePtr resource = camIdx.data(Qn::ResourceRole).value<QnResourcePtr>();
+            bool checked = selected.contains(resource);
+            m_resourceModel->setData(checkedIdx,
+                                     checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+        }
+    }
 }
 
 void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
@@ -55,10 +68,4 @@ void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
         return;
     }
     base_type::keyPressEvent(event);
-}
-
-// ------------ Handlers ---------------------
-
-void QnSelectCamerasDialog::at_resourceModel_dataChanged(){
-//
 }

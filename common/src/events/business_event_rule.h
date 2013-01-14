@@ -24,19 +24,22 @@ public:
 
 
     BusinessEventType::Value eventType() const;
-    void setEventType(BusinessEventType::Value value);
+    void setEventType(const BusinessEventType::Value value);
 
-    QnResourcePtr eventResource() const;
-    void setEventResource(QnResourcePtr value);
+    QnResourceList eventResources() const;
+    void setEventResources(const QnResourceList &value);
 
     QnBusinessParams eventParams() const;
     void setEventParams(const QnBusinessParams& params);
 
-    BusinessActionType::Value actionType() const;
-    void setActionType(BusinessActionType::Value value);
+    ToggleState::Value eventState() const;
+    void setEventState(ToggleState::Value state);
 
-    QnResourcePtr actionResource() const;
-    void setActionResource(QnResourcePtr value);
+    BusinessActionType::Value actionType() const;
+    void setActionType(const BusinessActionType::Value value);
+
+    QnResourceList actionResources() const;
+    void setActionResources(const QnResourceList &value);
 
     QnBusinessParams actionParams() const;
     void setActionParams(const QnBusinessParams& params);
@@ -44,11 +47,12 @@ private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
     BusinessEventType::Value m_eventType;
-    QnResourcePtr m_eventResource;
+    QnResourceList m_eventResources;
     QnBusinessParams m_eventParams;
+    ToggleState::Value m_eventState;
 
     BusinessActionType::Value m_actionType;
-    QnResourcePtr m_actionResource;
+    QnResourceList m_actionResources;
     QnBusinessParams m_actionParams;
 };
 

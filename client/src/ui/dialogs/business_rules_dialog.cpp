@@ -33,7 +33,7 @@ namespace {
             return QString(prolongedEvent).arg(typeStr);
         else
             return QString(instantEvent).arg(typeStr)
-                    .arg(toggleStateToString(BusinessEventParameters::getToggleState(rule->eventParams())));
+                    .arg(toggleStateToString(rule->eventState()));
     }
 
     QString extractHost(const QString &url) {
@@ -254,19 +254,36 @@ void QnBusinessRulesDialog::at_ruleHasChangesChanged(QnBusinessRuleWidget* sourc
 void QnBusinessRulesDialog::at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value) {
     QStandardItem *item = tableItem(source, 1);
     item->setText(BusinessEventType::toString(value));
+    item->setData(value);
     //ui->tableView->resizeColumnsToContents();
 }
 
-void QnBusinessRulesDialog::at_ruleEventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource) {
+void QnBusinessRulesDialog::at_ruleEventResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources) {
+
+    QStandardItem *eventTypeItem = tableItem(source, 1);
+    BusinessEventType::Value eventType = (BusinessEventType::Value)eventTypeItem->data().toInt();
+
     QStandardItem *item = tableItem(source, 2);
-    if (resource) {
+    if (resources.size() == 1) {
+        QnResourcePtr resource = resources.first();
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         item->setText(getResourceName(resource));
+    } else if (BusinessEventType::requiresServerResource(eventType)){
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Server));
+        if (resources.size() == 0)
+            item->setText(tr("<Any Server>"));
+        else
+            item->setText(tr("%1 Servers").arg(resources.size())); //TODO: fix tr to %n
+    } else if (BusinessEventType::requiresCameraResource(eventType)) {
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
+        if (resources.size() == 0)
+            item->setText(tr("<Any Camera>"));
+        else
+            item->setText(tr("%1 Cameras").arg(resources.size())); //TODO: fix tr to %n
     } else {
         item->setIcon(QIcon());
         item->setText(QString());
     }
-    //ui->tableView->resizeColumnsToContents();
 }
 
 void QnBusinessRulesDialog::at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value) {
@@ -280,15 +297,15 @@ void QnBusinessRulesDialog::at_ruleActionTypeChanged(QnBusinessRuleWidget* sourc
     //ui->tableView->resizeColumnsToContents();
 }
 
-void QnBusinessRulesDialog::at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource) {
-    QStandardItem *item = tableItem(source, 5);
+void QnBusinessRulesDialog::at_ruleActionResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources) {
+  /*  QStandardItem *item = tableItem(source, 5);
     if (resource) {
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         item->setText(getResourceName(resource));
     } else {
         item->setIcon(QIcon());
         item->setText(QString());
-    }
+    }*/
     //ui->tableView->resizeColumnsToContents();
 }
 
@@ -320,12 +337,12 @@ QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr
             this, SLOT(at_ruleEventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)));
     connect(w, SIGNAL(eventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)),
             this, SLOT(at_ruleEventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)));
-    connect(w, SIGNAL(eventResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)),
-            this, SLOT(at_ruleEventResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)));
+    connect(w, SIGNAL(eventResourcesChanged(QnBusinessRuleWidget*,QnResourceList)),
+            this, SLOT(at_ruleEventResourcesChanged(QnBusinessRuleWidget*,QnResourceList)));
     connect(w, SIGNAL(actionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)),
             this, SLOT(at_ruleActionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)));
-    connect(w, SIGNAL(actionResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)),
-            this, SLOT(at_ruleActionResourceChanged(QnBusinessRuleWidget*,QnResourcePtr)));
+    connect(w, SIGNAL(actionResourcesChanged(QnBusinessRuleWidget*,QnResourceList)),
+            this, SLOT(at_ruleActionResourcesChanged(QnBusinessRuleWidget*,QnResourceList)));
     w->setVisible(false);
     return w;
 }

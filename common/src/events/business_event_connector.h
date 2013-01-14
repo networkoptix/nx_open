@@ -25,6 +25,14 @@ public slots:
     */
     void at_cameraDisconnected(const QnResourcePtr &resource, qint64 timeStamp);
 
+    /*! Some problem with storage
+    */
+    void at_storageFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason);
+
+    /*! Some problem with network
+    */
+    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason);
+
     /*!
         \param inputPortID device-specific ID of input port
         \param value true, if input activated. false, if deactivated

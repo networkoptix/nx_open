@@ -49,10 +49,10 @@ private slots:
     /* Widget changes handlers */
     void at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value);
     void at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
-    void at_ruleEventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void at_ruleEventResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources);
     void at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
     void at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
-    void at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
+    void at_ruleActionResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources);
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
 private:

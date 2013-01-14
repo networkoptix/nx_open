@@ -1,7 +1,7 @@
-#include "storage_failure_business_event.h"
+#include "network_issue_business_event.h"
 #include "core/resource/resource.h"
 
-QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
+QnNetworkIssueBusinessEvent::QnNetworkIssueBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
         const QString& reason):
@@ -12,7 +12,7 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
 {
 }
 
-QString QnStorageFailureBusinessEvent::toString() const
+QString QnNetworkIssueBusinessEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
     text += QObject::tr("  reason%1\n").arg(m_reason);
