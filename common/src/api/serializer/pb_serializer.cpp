@@ -593,13 +593,14 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
         return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
 
     switch(pbValue) {
-        case pb::NotDefinedEvent:   return BusinessEventType::BE_NotDefined;
-        case pb::Camera_Motion:     return BusinessEventType::BE_Camera_Motion;
-        case pb::Camera_Input:      return BusinessEventType::BE_Camera_Input;
-        case pb::Camera_Disconnect: return BusinessEventType::BE_Camera_Disconnect;
-        case pb::Storage_Failure:   return BusinessEventType::BE_Storage_Failure;
-        case pb::Network_Issue:     return BusinessEventType::BE_Network_Issue;
-        case pb::Camera_Ip_Conflict:return BusinessEventType::BE_Camera_Ip_Conflict;
+        case pb::NotDefinedEvent:       return BusinessEventType::BE_NotDefined;
+        case pb::Camera_Motion:         return BusinessEventType::BE_Camera_Motion;
+        case pb::Camera_Input:          return BusinessEventType::BE_Camera_Input;
+        case pb::Camera_Disconnect:     return BusinessEventType::BE_Camera_Disconnect;
+        case pb::Storage_Failure:       return BusinessEventType::BE_Storage_Failure;
+        case pb::Network_Issue:         return BusinessEventType::BE_Network_Issue;
+        case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
+        case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
     }
     return BusinessEventType::BE_NotDefined;
 }
@@ -616,6 +617,7 @@ int serializeBusinessEventTypeToPb(BusinessEventType::Value value) {
         case BusinessEventType::BE_Storage_Failure:     return pb::Storage_Failure;
         case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
         case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
+        case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
         default:
             break;
     }

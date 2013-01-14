@@ -8,6 +8,7 @@ enum BusinessEventType {
     Storage_Failure    = 4;
     Network_Issue      = 5;
     Camera_Ip_Conflict = 6;
+    MediaServer_Failure= 7;
     UserDefinedEvent   = 1000;
 }
 

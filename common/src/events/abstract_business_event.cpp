@@ -26,6 +26,8 @@ namespace BusinessEventType
                 return QObject::tr("Network Issue");
             case BE_Camera_Ip_Conflict:
                 return QObject::tr("Camera IP Conflict");
+            case BE_MediaServer_Failure:
+                return QObject::tr("Mediaserver connection lost");
             case BE_UserDefined:
                 return QObject::tr("User Defined");
             //warning should be raised on unknown enumeration values
@@ -57,6 +59,8 @@ namespace BusinessEventType
                 return false;
             case BE_Camera_Ip_Conflict:
                 return false;
+            case BE_MediaServer_Failure:
+                return false;
             case BE_UserDefined:
                 return false;
         }
@@ -84,6 +88,8 @@ namespace BusinessEventType
                 return false;
             case BE_Camera_Ip_Conflict:
                 return false;
+            case BE_MediaServer_Failure:
+                return false;
             case BE_UserDefined:
                 return false;
             //warning should be raised on unknown enumeration values
@@ -110,6 +116,8 @@ namespace BusinessEventType
             case BE_Network_Issue:
                 return false;
             case BE_Camera_Ip_Conflict:
+                return false;
+            case BE_MediaServer_Failure:
                 return false;
             case BE_UserDefined:
                 return false;

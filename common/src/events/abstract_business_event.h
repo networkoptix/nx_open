@@ -29,6 +29,9 @@ namespace BusinessEventType
         /** Camera input signal is received. */
         BE_Camera_Input,
 
+        /** Connection to mediaserver lost. */
+        BE_MediaServer_Failure,
+
         /** Event type is not defined. Used in rules. */
         BE_NotDefined,
 
