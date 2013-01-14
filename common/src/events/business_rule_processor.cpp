@@ -104,7 +104,7 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
 //                !rule->eventResource() || !bEvent->getResource() || rule->eventResource()->getId() == bEvent->getResource()->getId();
         if (typeOK && resOK)
         {
-            bool condOK = bEvent->checkCondition(rule->eventParams());
+            bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
             QnAbstractBusinessActionPtr action;
 
             if (m_rulesInProgress.contains(rule->getUniqueId()))

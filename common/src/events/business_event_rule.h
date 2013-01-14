@@ -32,6 +32,9 @@ public:
     QnBusinessParams eventParams() const;
     void setEventParams(const QnBusinessParams& params);
 
+    ToggleState::Value eventState() const;
+    void setEventState(ToggleState::Value state);
+
     BusinessActionType::Value actionType() const;
     void setActionType(const BusinessActionType::Value value);
 
@@ -46,6 +49,7 @@ private:
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
     QnBusinessParams m_eventParams;
+    ToggleState::Value m_eventState;
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;

@@ -12,9 +12,9 @@ QnCameraDisconnectedBusinessEvent::QnCameraDisconnectedBusinessEvent(
 {
 }
 
-bool QnCameraDisconnectedBusinessEvent::checkCondition(const QnBusinessParams& params) const
+bool QnCameraDisconnectedBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessParams& params) const
 {
-    if (!base_type::checkCondition(params))
+    if (!base_type::checkCondition(state, params))
         return false;
     QString cameraUniqId = params.value(QLatin1String("camera")).toString();
     return cameraUniqId.isEmpty() || m_cameraResource->getUniqueId() == cameraUniqId;

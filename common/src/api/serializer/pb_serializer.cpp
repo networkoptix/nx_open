@@ -539,15 +539,16 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRulePtr& businessRulePtr)
 {
     pb_businessRule.set_id(businessRulePtr->getId().toInt());
-    pb_businessRule.set_eventtype((pb::BusinessEventType)businessRulePtr->eventType());
-    //TODO: #GDM resource list
-//    if (businessRulePtr->eventResource())
-//        pb_businessRule.set_eventresource(businessRulePtr->eventResource()->getId().toInt());
-    pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventParams()));
 
-    pb_businessRule.set_actiontype((pb::BusinessActionType)businessRulePtr->actionType());
-//    if (businessRulePtr->actionResource())
-//        pb_businessRule.set_actionresource(businessRulePtr->actionResource()->getId().toInt());
+    pb_businessRule.set_eventtype((pb::BusinessEventType) serializeBusinessEventTypeToPb(businessRulePtr->eventType()));
+    foreach(QnResourcePtr res, businessRulePtr->eventResources())
+        pb_businessRule.add_eventresource(res->getId().toInt());
+    pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventParams()));
+    pb_businessRule.set_eventstate((pb::ToggleStateType)businessRulePtr->eventState());
+
+    pb_businessRule.set_actiontype((pb::BusinessActionType) serializeBusinessActionTypeToPb(businessRulePtr->actionType()));
+    foreach(QnResourcePtr res, businessRulePtr->actionResources())
+        pb_businessRule.add_actionresource(res->getId().toInt());
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 }
 
@@ -584,6 +585,69 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 }
 
 }
+
+BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
+    if (int userEvent = pbValue - pb::UserDefinedEvent >= 0)
+        return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
+
+    switch(pbValue) {
+        case pb::NotDefinedEvent:   return BusinessEventType::BE_NotDefined;
+        case pb::Camera_Motion:     return BusinessEventType::BE_Camera_Motion;
+        case pb::Camera_Input:      return BusinessEventType::BE_Camera_Input;
+        case pb::Camera_Disconnect: return BusinessEventType::BE_Camera_Disconnect;
+        case pb::Storage_Failure:   return BusinessEventType::BE_Storage_Failure;
+        case pb::Network_Issue:     return BusinessEventType::BE_Network_Issue;
+        case pb::Camera_Ip_Conflict:return BusinessEventType::BE_Camera_Ip_Conflict;
+    }
+    return BusinessEventType::BE_NotDefined;
+}
+
+int serializeBusinessEventTypeToPb(BusinessEventType::Value value) {
+    if (int userEvent = value - BusinessEventType::BE_UserDefined >= 0)
+        return (pb::UserDefinedEvent + userEvent);
+
+    switch(value) {
+        case BusinessEventType::BE_NotDefined:          return pb::NotDefinedEvent;
+        case BusinessEventType::BE_Camera_Motion:       return pb::Camera_Motion;
+        case BusinessEventType::BE_Camera_Input:        return pb::Camera_Input;
+        case BusinessEventType::BE_Camera_Disconnect:   return pb::Camera_Disconnect;
+        case BusinessEventType::BE_Storage_Failure:     return pb::Storage_Failure;
+        case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
+        case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
+        default:
+            break;
+    }
+    return pb::NotDefinedEvent;
+}
+
+BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
+    switch (pbValue) {
+        case pb::NotDefinedAction:  return BusinessActionType::BA_NotDefined;
+        case pb::CameraOutput:      return BusinessActionType::BA_CameraOutput;
+        case pb::Bookmark:          return BusinessActionType::BA_Bookmark;
+        case pb::CameraRecording:   return BusinessActionType::BA_CameraRecording;
+        case pb::PanicRecording:    return BusinessActionType::BA_PanicRecording;
+        case pb::SendMail:          return BusinessActionType::BA_SendMail;
+        case pb::Alert:             return BusinessActionType::BA_Alert;
+        case pb::ShowPopup:         return BusinessActionType::BA_ShowPopup;
+    }
+    return BusinessActionType::BA_NotDefined;
+}
+
+int serializeBusinessActionTypeToPb(BusinessActionType::Value value) {
+    switch(value) {
+        case BusinessActionType::BA_NotDefined:         return pb::NotDefinedAction;
+        case BusinessActionType::BA_CameraOutput:       return pb::CameraOutput;
+        case BusinessActionType::BA_Bookmark:           return pb::Bookmark;
+        case BusinessActionType::BA_CameraRecording:    return pb::CameraRecording;
+        case BusinessActionType::BA_PanicRecording:     return pb::PanicRecording;
+        case BusinessActionType::BA_SendMail:           return pb::SendMail;
+        case BusinessActionType::BA_Alert:              return pb::Alert;
+        case BusinessActionType::BA_ShowPopup:          return pb::ShowPopup;
+    }
+    return pb::NotDefinedAction;
+}
+
 
 void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
@@ -739,14 +803,20 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessR
         QnBusinessEventRulePtr businessRule(new QnBusinessEventRule());
 
         businessRule->setId(ci->id());
+        businessRule->setEventType(parsePbBusinessEventType(ci->eventtype()));
 
-        businessRule->setEventType((BusinessEventType::Value)ci->eventtype());
-        //TODO: #GDM resources list
-        //businessRule->setEventResource(qnResPool->getResourceById(ci->eventresource()));
+        QnResourceList eventResources;
+        for (int i = 0; i < ci->eventresource_size(); i++)
+            eventResources << qnResPool->getResourceById(ci->eventresource(i));
+        businessRule->setEventResources(eventResources);
         businessRule->setEventParams(deserializeBusinessParams(ci->eventcondition().c_str()));
+        businessRule->setEventState((ToggleState::Value)ci->eventstate());
 
-        businessRule->setActionType((BusinessActionType::Value)ci->actiontype());
-        //businessRule->setActionResource(qnResPool->getResourceById(ci->actionresource(), QnResourcePool::rfAllResources)); //destination resource can belong to another server
+        businessRule->setActionType(parsePbBusinessActionType(ci->actiontype()));
+        QnResourceList actionResources;
+        for (int i = 0; i < ci->actionresource_size(); i++) //destination resource can belong to another server
+            actionResources << qnResPool->getResourceById(ci->actionresource(i), QnResourcePool::rfAllResources);
+        businessRule->setActionResources(actionResources);
         businessRule->setActionParams(deserializeBusinessParams(ci->actionparams().c_str()));
 
         businessRules.append(businessRule);

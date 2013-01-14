@@ -33,7 +33,7 @@ namespace {
             return QString(prolongedEvent).arg(typeStr);
         else
             return QString(instantEvent).arg(typeStr)
-                    .arg(toggleStateToString(BusinessEventParameters::getToggleState(rule->eventParams())));
+                    .arg(toggleStateToString(rule->eventState()));
     }
 
     QString extractHost(const QString &url) {

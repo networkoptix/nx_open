@@ -11,14 +11,6 @@ namespace BusinessActionType
 {
     enum Value
     {
-        //!change camera output state
-        /*!
-            parameters:\n
-                - relayOutputID (string, required)          - id of output to trigger
-                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
-        */
-        BA_CameraOutput,
-        BA_Bookmark,           // mark part of camera archive as undeleted
         BA_CameraRecording,    // start camera recording
         BA_PanicRecording,     // activate panic recording mode
         // these actions can be executed from any endpoint. actually these actions call specified function at ec
@@ -28,12 +20,29 @@ namespace BusinessActionType
         */
         BA_SendMail,
         BA_Alert,
+
+        //TODO: #gdm make!
         BA_ShowPopup,
+
+        //!change camera output state
+        /*!
+            parameters:\n
+                - relayOutputID (string, required)          - id of output to trigger
+                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
+        */
+        BA_CameraOutput,
+
+        BA_Bookmark,           // mark part of camera archive as undeleted
+
         // media server based actions
         BA_NotDefined,
 
-        BA_FirstType = BA_CameraOutput,
-        BA_LastType = BA_ShowPopup
+        /**
+         * Used when enumerating to build GUI lists, this and followed actions
+         * should not be displayed.
+         */
+        BA_Count = BA_CameraOutput
+
     };
 
     QString toString( Value val );

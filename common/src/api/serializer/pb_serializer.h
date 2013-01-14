@@ -3,6 +3,12 @@
 
 #include "serializer.h"
 
+BusinessEventType::Value parsePbBusinessEventType(int pbValue);
+int serializeBusinessEventTypeToPb(BusinessEventType::Value value);
+
+BusinessActionType::Value parsePbBusinessActionType(int pbValue);
+int serializeBusinessActionTypeToPb(BusinessActionType::Value value);
+
 /**
   * Serialize resource to protobuf
   */

@@ -113,7 +113,7 @@ bool QnBusinessRuleWidget::hasChanges() const {
 
 void QnBusinessRuleWidget::initEventTypes() {
     m_eventTypesModel->clear();
-    for (int i = BusinessEventType::BE_FirstType; i <= BusinessEventType::BE_LastType; i++) {
+    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
         QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
@@ -171,7 +171,7 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
     bool instantActionsFilter = (eventState == ToggleState::On || eventState == ToggleState::Off)
             || (!BusinessEventType::hasToggleState(getCurrentEventType()));
 
-    for (int i = BusinessActionType::BA_FirstType; i <= BusinessActionType::BA_LastType; i++) {
+    for (int i = 0; i < BusinessActionType::BA_Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
 
         if (BusinessActionType::hasToggleState(val) && instantActionsFilter)
@@ -292,8 +292,7 @@ void QnBusinessRuleWidget::resetFromRule() {
 
     m_eventResources = m_rule->eventResources();
 
-    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(m_rule->eventParams());
-    QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)toggleState);
+    QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->eventState());
     ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
 
     QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->actionType());
@@ -309,7 +308,7 @@ void QnBusinessRuleWidget::resetFromRule() {
 
     emit eventTypeChanged(this, m_rule->eventType());
     updateEventResources();
-    emit eventStateChanged(this, toggleState);
+    emit eventStateChanged(this, m_rule->eventState());
     emit actionTypeChanged(this, m_rule->actionType());
     updateActionResources();
 
@@ -320,12 +319,8 @@ void QnBusinessRuleWidget::apply() {
     //TODO: validate params!
 
     m_rule->setEventType(getCurrentEventType());
-
-    QnBusinessParams eventParams;
-    if (m_eventParameters)
-        eventParams = m_eventParameters->parameters();
-    BusinessEventParameters::setToggleState(&eventParams, getCurrentEventToggleState());
-    m_rule->setEventParams(eventParams);
+    m_rule->setEventState(getCurrentEventToggleState());
+    m_rule->setEventParams(m_eventParameters ? m_eventParameters->parameters() : QnBusinessParams());
 
     if (!BusinessEventType::isResourceRequired(m_rule->eventType()))
         m_rule->setEventResources(QnResourceList());
@@ -335,9 +330,7 @@ void QnBusinessRuleWidget::apply() {
         m_rule->setEventResources(m_eventResources.filtered<QnMediaServerResource>());
 
     m_rule->setActionType(getCurrentActionType());
-
-    if (m_actionParameters)
-        m_rule->setActionParams(m_actionParameters->parameters());
+    m_rule->setActionParams(m_actionParameters ? m_actionParameters->parameters() : QnBusinessParams());
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
@@ -421,6 +414,7 @@ void QnBusinessRuleWidget::updateEventResources() {
     }
 
     //TODO: filtered resources list
+    setHasChanges(true);
     emit eventResourcesChanged(this, m_eventResources);
 }
 
@@ -445,5 +439,6 @@ void QnBusinessRuleWidget::updateActionResources() {
             item->setText(tr("%1 Cameras").arg(m_actionResources.size())); //TODO: fix tr to %n
     }
 
+    setHasChanges(true);
     emit actionResourcesChanged(this, m_actionResources);
 }

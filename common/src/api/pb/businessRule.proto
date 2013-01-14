@@ -1,26 +1,29 @@
 package pb;
 
 enum BusinessEventType {
-    NotDefined         = 0;
+    NotDefinedEvent    = 0;
     Camera_Motion      = 1;
     Camera_Input       = 2;
     Camera_Disconnect  = 3;
     Storage_Failure    = 4;
-    UserDefined        = 1000;
+    Network_Issue      = 5;
+    Camera_Ip_Conflict = 6;
+    UserDefinedEvent   = 1000;
 }
 
 enum BusinessActionType
 {
     // media server based actions
-    CameraOutput     = 0;    // set camera output signal
-    Bookmark         = 1;    // mark part of camera archive as undeleted
-    CameraRecording  = 2;    // start camera recording
-    PanicRecording   = 3;    // activate panic recording mode
+    NotDefinedAction = 0;
+    CameraOutput     = 1;    // set camera output signal
+    Bookmark         = 2;    // mark part of camera archive as undeleted
+    CameraRecording  = 3;    // start camera recording
+    PanicRecording   = 4;    // activate panic recording mode
 
     // these actions can be executed from any endpoint. Actually these actions call specified function at EC
-    SendMail         = 4;
-    Alert            = 5;
-    ShowPopup        = 6;
+    SendMail         = 5;
+    Alert            = 6;
+    ShowPopup        = 7;
 }
 
 enum ToggleStateType
@@ -32,18 +35,20 @@ enum ToggleStateType
 
 message BusinessRule {
     optional int32 id                      = 1;
-    optional BusinessEventType eventType   = 2;
-    optional int32  eventResource          = 3;
-    optional string eventCondition         = 4;
 
-    optional BusinessActionType actionType = 5;
-    optional int32 actionResource          = 6;
-    optional string actionParams           = 7;
+    optional BusinessEventType eventType   = 2;
+    repeated int32  eventResource          = 3;
+    optional string eventCondition         = 4;
+    optional ToggleStateType eventState    = 5;
+
+    optional BusinessActionType actionType = 6;
+    repeated int32 actionResource          = 7;
+    optional string actionParams           = 8;
 }
 
 message BusinessAction {
     optional BusinessActionType actionType = 1;
-    optional int32 actionResource          = 2;
+    repeated int32 actionResource          = 2;
     optional string actionParams           = 3;
     optional int32 businessRuleId          = 4;
     optional string runtimeParams          = 5;
