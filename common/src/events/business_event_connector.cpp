@@ -34,11 +34,11 @@ void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resour
 
 void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason)
 {
-    QnStorageFailureBusinessEventPtr cameraEvent(new QnStorageFailureBusinessEvent(
+    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(
         resource,
         timeStamp,
         reason));
-    qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
+    qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
 void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp)
