@@ -38,6 +38,8 @@ public slots:
         \param value true, if input activated. false, if deactivated
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
+
+    void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

@@ -6,6 +6,7 @@
 #include "camera_disconnected_business_event.h"
 #include "storage_failure_business_event.h"
 #include "network_issue_business_event.h"
+#include "mserver_failure_business_event.h"
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 
@@ -40,6 +41,14 @@ void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &resource, 
         timeStamp,
         reason));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
+}
+
+void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp)
+{
+    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(
+        resource,
+        timeStamp));
+    qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 
 void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason)
