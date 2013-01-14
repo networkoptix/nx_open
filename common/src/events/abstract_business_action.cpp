@@ -59,7 +59,8 @@ namespace BusinessActionType {
 QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value actionType):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
-    m_receivedFromRemoteHost(false)
+    m_receivedFromRemoteHost(false),
+    m_aggregationCount(1)
 {
 }
 
@@ -77,7 +78,7 @@ QByteArray QnAbstractBusinessAction::serialize()
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
     pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
     pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
-
+    // todo: #gdem add aggregation count here
     std::string str;
     pb_businessAction.SerializeToString(&str);
     return QByteArray(str.data(), str.length());
@@ -86,6 +87,8 @@ QByteArray QnAbstractBusinessAction::serialize()
 QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
 {
     pb::BusinessAction pb_businessAction;
+
+    // todo: #gdem add aggregation count here
 
     if (!pb_businessAction.ParseFromArray(data.data(), data.size()))
     {
@@ -151,4 +154,14 @@ void QnAbstractBusinessAction::setReceivedFromRemoteHost(bool value) {
 
 bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
     return m_receivedFromRemoteHost;
+}
+
+int QnAbstractBusinessAction::getAggregationCount() const
+{
+    return m_aggregationCount;
+}
+
+void QnAbstractBusinessAction::setAggregationCount(int value)
+{
+    m_aggregationCount = value;
 }

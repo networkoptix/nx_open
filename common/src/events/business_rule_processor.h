@@ -49,6 +49,7 @@ private slots:
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
 protected:
+    bool containResource(QnResourceList resList, const QnId& resId) const;
     QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
@@ -72,10 +73,23 @@ private:
 
     bool sendMail( const QnSendMailBusinessActionPtr& action );
 
+
+    QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
+    QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
+
     /**
      * @brief m_rulesInProgress         Stores actions that are toggled and state is On
      */
     QSet<QString> m_rulesInProgress;
+
+    struct QAggregationInfo 
+    {
+        QAggregationInfo(): timeStamp(0), count(0) {}
+        QAggregationInfo(qint64 _timeStamp, qint64 _count): timeStamp(_timeStamp), count(_count) {}
+        qint64 timeStamp;
+        int count;
+    };
+    QMap<QString, QAggregationInfo> m_aggregateActions;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

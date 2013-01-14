@@ -6,6 +6,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "events/business_event_rule.h"
 #include "api/app_server_connection.h"
+#include "utils/common/synctime.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -93,39 +94,80 @@ void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bE
     }
 }
 
+bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId& resId) const
+{
+    for (int i = 0; i < resList.size(); ++i)
+    {
+        if (resList.at(i)->getId() == resId)
+            return true;
+    }
+    return false;
+}
+
+QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
+{
+    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
+    QnAbstractBusinessActionPtr action;
+    if (m_rulesInProgress.contains(rule->getUniqueId()))
+    {
+        // Toggle event repeated with some interval with state 'on'.
+        if (!condOK)
+            action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
+        else if (bEvent->getToggleState() == ToggleState::Off)
+            action = rule->instantiateAction(bEvent); // Toggle event goes to 'off'. stop action
+    }
+    else if (condOK)
+        action = rule->instantiateAction(bEvent);
+
+    bool actionInProgress = action && action->getToggleState() == ToggleState::On;
+    if (actionInProgress)
+        m_rulesInProgress.insert(rule->getUniqueId());
+    else
+        m_rulesInProgress.remove(rule->getUniqueId());
+
+    return action;
+}
+
+QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
+{
+    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
+    if (!condOK)
+        return QnAbstractBusinessActionPtr();
+
+    QString eventKey = rule->getUniqueId();
+    if (bEvent->getResource())
+        eventKey += bEvent->getResource()->getUniqueId();
+
+    QAggregationInfo& aggInfo = m_aggregateActions[eventKey];
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    aggInfo.count++;
+    if (currentTime - aggInfo.timeStamp < rule->aggregationPeriod()*1000ll)
+        return QnAbstractBusinessActionPtr();
+    
+    QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent);
+    action->setAggregationCount(aggInfo.count);
+    aggInfo.count = 0;
+    return action;
+}
+
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
     QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         bool typeOK = rule->eventType() == bEvent->getEventType();
-        bool resOK = true;
-        //TODO: #vasilenko resources list
-//                !rule->eventResource() || !bEvent->getResource() || rule->eventResource()->getId() == bEvent->getResource()->getId();
+        bool resOK = rule->eventResources().isEmpty() || !bEvent->getResource() || containResource(rule->eventResources(), bEvent->getResource()->getId());
         if (typeOK && resOK)
         {
-            bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
             QnAbstractBusinessActionPtr action;
 
-            if (m_rulesInProgress.contains(rule->getUniqueId()))
-            {
-                // Toggle event repeated with some interval with state 'on'.
-                if (!condOK)
-                    action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
-                else if (bEvent->getToggleState() == ToggleState::Off)
-                    action = rule->instantiateAction(bEvent); // Toggle event goes to 'off'. stop action
-            }
-            else if (condOK)
-                action = rule->instantiateAction(bEvent);
+            if (BusinessActionType::hasToggleState(rule->actionType()))
+                action = processToggleAction(bEvent, rule);
+            else
+                action = processInstantAction(bEvent, rule);
 
             if (action)
                 result << action;
-
-            bool actionInProgress = action && action->getToggleState() == ToggleState::On;
-            if (actionInProgress)
-                m_rulesInProgress.insert(rule->getUniqueId());
-            else
-                m_rulesInProgress.remove(rule->getUniqueId());
         }
     }
     return result;

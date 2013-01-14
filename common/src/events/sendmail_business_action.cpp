@@ -66,5 +66,8 @@ QString QnSendMailBusinessAction::getMessageBody() const {
         text += QLatin1String("  ") + it.key() + QLatin1String(" = ") + it.value().toString() + QLatin1String("\n");
     }
 
+    if (getAggregationCount() > 1)
+        text += QString(QLatin1String("  (repeated %1 times)")).arg(getAggregationCount());
+
     return text;
 }

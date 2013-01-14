@@ -44,6 +44,7 @@ public:
     QnBusinessParams actionParams() const;
     void setActionParams(const QnBusinessParams& params);
 
+    /* action aggregation period in ms */
     int aggregationPeriod() const;
     void setAggregationPeriod(int msecs);
 private:
