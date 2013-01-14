@@ -86,6 +86,8 @@ private slots:
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
 
+    void at_aggregationPeriodChanged();
+
     void updateEventResources();
     void updateActionResources();
     void updateDefinition();

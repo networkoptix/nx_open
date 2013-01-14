@@ -79,12 +79,16 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
     this->setPalette(pal);
 
-    connect(ui->eventTypeComboBox,      SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
-    connect(ui->eventStatesComboBox,    SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
-    connect(ui->eventResourcesHolder,   SIGNAL(clicked()),                this, SLOT(at_eventResourcesHolder_clicked()));
-    connect(ui->actionResourcesHolder,  SIGNAL(clicked()),                this, SLOT(at_actionResourcesHolder_clicked()));
+    connect(ui->eventTypeComboBox,          SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
+    connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
+    connect(ui->eventResourcesHolder,       SIGNAL(clicked()),                  this, SLOT(at_eventResourcesHolder_clicked()));
+    connect(ui->actionResourcesHolder,      SIGNAL(clicked()),                  this, SLOT(at_actionResourcesHolder_clicked()));
 
-    connect(ui->actionTypeComboBox,     SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
+    connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
+
+    connect(ui->aggregationCheckBox,        SIGNAL(toggled(bool)),              this, SLOT(at_aggregationPeriodChanged()));
+    connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_aggregationPeriodChanged()));
+    connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_aggregationPeriodChanged()));
 
     //TODO: connect notifyChaged on subitems
     //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
@@ -138,6 +142,9 @@ void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
         m_eventStatesModel->appendRow(row);
     }
     ui->eventStatesComboBox->setVisible(prolonged);
+    ui->aggregationCheckBox->setVisible(!prolonged);
+    ui->aggregationValueSpinBox->setVisible(!prolonged);
+    ui->aggregationPeriodComboBox->setVisible(!prolonged);
 }
 
 void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
@@ -300,6 +307,19 @@ void QnBusinessRuleWidget::resetFromRule() {
         m_actionParameters->loadParameters(m_rule->actionParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
+    {
+        int i = m_rule->aggregationPeriod();
+        int idx = 0;
+        ui->aggregationCheckBox->setChecked(i > 0);
+        while (i > 0 && i % 60 == 0 && idx < ui->aggregationPeriodComboBox->count() - 1) {
+            i /= 60;
+            idx++;
+        }
+        ui->aggregationPeriodComboBox->setCurrentIndex(idx);
+        ui->aggregationValueSpinBox->setValue(i);
+    }
+
+
     updateDefinition();
     updateEventResources();
     updateActionResources();
@@ -323,6 +343,13 @@ void QnBusinessRuleWidget::apply() {
 
     m_rule->setActionType(getCurrentActionType());
     m_rule->setActionParams(m_actionParameters ? m_actionParameters->parameters() : QnBusinessParams());
+    {
+        int i = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
+        for (int idx = ui->aggregationPeriodComboBox->currentIndex(); idx >= 0; idx--)
+            i *= 60;
+        m_rule->setAggregationPeriod(i);
+    }
+
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
@@ -376,6 +403,10 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     m_actionResources.clear();
     m_actionResources.append(dialog.getSelectedResources());
     updateActionResources();
+}
+
+void QnBusinessRuleWidget::at_aggregationPeriodChanged() {
+    setHasChanges(true);
 }
 
 void QnBusinessRuleWidget::updateEventResources() {
