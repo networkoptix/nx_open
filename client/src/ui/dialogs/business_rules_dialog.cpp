@@ -22,18 +22,20 @@ namespace {
         switch (state) {
         case ToggleState::On: return QObject::tr("start");
         case ToggleState::Off: return QObject::tr("stop");
-        default: return QObject::tr("start/stop");
+            default: return QString();
         }
         return QString();
     }
 
-    QString eventTypeString(const QnBusinessEventRulePtr &rule){
-        QString typeStr = BusinessEventType::toString(rule->eventType());
-        if (BusinessActionType::hasToggleState(rule->actionType()))
+    QString eventTypeString(BusinessEventType::Value eventType,
+                            ToggleState::Value eventState,
+                            BusinessActionType::Value actionType){
+        QString typeStr = BusinessEventType::toString(eventType);
+        if (BusinessActionType::hasToggleState(actionType))
             return QString(prolongedEvent).arg(typeStr);
         else
             return QString(instantEvent).arg(typeStr)
-                    .arg(toggleStateToString(rule->eventState()));
+                    .arg(toggleStateToString(eventState));
     }
 
     QString extractHost(const QString &url) {
@@ -86,14 +88,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     QStringList header;
     header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
     m_listModel->setHorizontalHeaderLabels(header);
-    /*m_listModel->setColumnCount(6);
-    m_listModel->setHeaderData(0, Qt::Horizontal, tr("#"));
-    m_listModel->setHeaderData(1, Qt::Horizontal, tr("Event"));
-    m_listModel->setHeaderData(2, Qt::Horizontal, tr("Source"));
-    m_listModel->setHeaderData(3, Qt::Horizontal, QString());
-    m_listModel->setHeaderData(4, Qt::Horizontal, tr("Action"));
-    m_listModel->setHeaderData(5, Qt::Horizontal, tr("Target"));*/
-
 
     QnBusinessEventRules rules;
     connection->getBusinessRules(rules); // TODO: replace synchronous call
@@ -153,12 +147,6 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 
     //ui->tableView->resizeColumnsToContents();
     ui->tableView->selectRow(m_listModel->rowCount() - 1);
-}
-
-void QnBusinessRulesDialog::at_saveButton_clicked() {
-    if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
-        return;
-    saveRule(m_currentDetailsWidget);
 }
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
@@ -243,7 +231,7 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
 */
 }
 
-void QnBusinessRulesDialog::at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value) {
+void QnBusinessRulesDialog::at_widgetHasChangesChanged(QnBusinessRuleWidget* source, bool value) {
     QStandardItem *item = tableItem(source, 0);
     item->setText(value ? QLatin1String("*") : QString());
     item->setData(value, ModifiedRole);
@@ -251,20 +239,24 @@ void QnBusinessRulesDialog::at_ruleHasChangesChanged(QnBusinessRuleWidget* sourc
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value) {
-    QStandardItem *item = tableItem(source, 1);
-    item->setText(BusinessEventType::toString(value));
-    item->setData(value);
-    //ui->tableView->resizeColumnsToContents();
+void QnBusinessRulesDialog::at_widgetDefinitionChanged(QnBusinessRuleWidget *source,
+                                                       BusinessEventType::Value eventType,
+                                                       ToggleState::Value eventState,
+                                                       BusinessActionType::Value actionType) {
+    QStandardItem *eventItem = tableItem(source, 1);
+    eventItem->setText(eventTypeString(eventType, eventState, actionType));
+
+    QStandardItem *actionItem = tableItem(source, 4);
+    actionItem->setText(BusinessActionType::toString(actionType));
 }
 
-void QnBusinessRulesDialog::at_ruleEventResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources) {
 
-    QStandardItem *eventTypeItem = tableItem(source, 1);
-    BusinessEventType::Value eventType = (BusinessEventType::Value)eventTypeItem->data().toInt();
-
+void QnBusinessRulesDialog::at_widgetEventResourcesChanged(QnBusinessRuleWidget* source, BusinessEventType::Value eventType, const QnResourceList &resources) {
     QStandardItem *item = tableItem(source, 2);
-    if (resources.size() == 1) {
+    if (!BusinessEventType::isResourceRequired(eventType)) {
+        item->setIcon(QIcon());
+        item->setText(QString());
+    } else if (resources.size() == 1) {
         QnResourcePtr resource = resources.first();
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         item->setText(getResourceName(resource));
@@ -274,39 +266,33 @@ void QnBusinessRulesDialog::at_ruleEventResourcesChanged(QnBusinessRuleWidget* s
             item->setText(tr("<Any Server>"));
         else
             item->setText(tr("%1 Servers").arg(resources.size())); //TODO: fix tr to %n
-    } else if (BusinessEventType::requiresCameraResource(eventType)) {
+    } else /*if (BusinessEventType::requiresCameraResource(eventType))*/ {
         item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
         if (resources.size() == 0)
             item->setText(tr("<Any Camera>"));
         else
             item->setText(tr("%1 Cameras").arg(resources.size())); //TODO: fix tr to %n
-    } else {
-        item->setIcon(QIcon());
-        item->setText(QString());
     }
 }
 
-void QnBusinessRulesDialog::at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value) {
-    //QStandardItem *item = tableItem(source, 1);
-    //item->setText(eventTypeString(source->rule()));
-}
 
-void QnBusinessRulesDialog::at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value) {
-    QStandardItem *item = tableItem(source, 4);
-    item->setText(BusinessActionType::toString(value));
-    //ui->tableView->resizeColumnsToContents();
-}
+void QnBusinessRulesDialog::at_widgetActionResourcesChanged(QnBusinessRuleWidget* source, BusinessActionType::Value actionType, const QnResourceList &resources) {
+    QStandardItem *item = tableItem(source, 5);
 
-void QnBusinessRulesDialog::at_ruleActionResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources) {
-  /*  QStandardItem *item = tableItem(source, 5);
-    if (resource) {
+    if (!BusinessActionType::isResourceRequired(actionType)) {
+        item->setIcon(QIcon());
+        item->setText(QString());
+    } else if (resources.size() == 1) {
+        QnResourcePtr resource = resources.first();
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         item->setText(getResourceName(resource));
     } else {
-        item->setIcon(QIcon());
-        item->setText(QString());
-    }*/
-    //ui->tableView->resizeColumnsToContents();
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
+        if (resources.size() == 0)
+            item->setText(tr("<Select camera>"));
+        else
+            item->setText(tr("%1 Cameras").arg(resources.size())); //TODO: fix tr to %n
+    }
 }
 
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -332,17 +318,13 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
 QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr rule) {
     QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this, context());
     connect(w, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
-            this, SLOT(at_ruleHasChangesChanged(QnBusinessRuleWidget*,bool)));
-    connect(w, SIGNAL(eventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)),
-            this, SLOT(at_ruleEventTypeChanged(QnBusinessRuleWidget*,BusinessEventType::Value)));
-    connect(w, SIGNAL(eventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)),
-            this, SLOT(at_ruleEventStateChanged(QnBusinessRuleWidget*,ToggleState::Value)));
-    connect(w, SIGNAL(eventResourcesChanged(QnBusinessRuleWidget*,QnResourceList)),
-            this, SLOT(at_ruleEventResourcesChanged(QnBusinessRuleWidget*,QnResourceList)));
-    connect(w, SIGNAL(actionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)),
-            this, SLOT(at_ruleActionTypeChanged(QnBusinessRuleWidget*,BusinessActionType::Value)));
-    connect(w, SIGNAL(actionResourcesChanged(QnBusinessRuleWidget*,QnResourceList)),
-            this, SLOT(at_ruleActionResourcesChanged(QnBusinessRuleWidget*,QnResourceList)));
+            this, SLOT(at_widgetHasChangesChanged(QnBusinessRuleWidget*,bool)));
+    connect(w, SIGNAL(definitionChanged(QnBusinessRuleWidget*,BusinessEventType::Value,ToggleState::Value,BusinessActionType::Value)),
+            this, SLOT(at_widgetDefinitionChanged(QnBusinessRuleWidget*,BusinessEventType::Value,ToggleState::Value,BusinessActionType::Value)));
+    connect(w, SIGNAL(eventResourcesChanged(QnBusinessRuleWidget*,BusinessEventType::Value,QnResourceList)),
+            this, SLOT(at_widgetEventResourcesChanged(QnBusinessRuleWidget*,BusinessEventType::Value,QnResourceList)));
+    connect(w, SIGNAL(actionResourcesChanged(QnBusinessRuleWidget*,BusinessActionType::Value,QnResourceList)),
+            this, SLOT(at_widgetActionResourcesChanged(QnBusinessRuleWidget*,BusinessActionType::Value,QnResourceList)));
     w->setVisible(false);
     return w;
 }

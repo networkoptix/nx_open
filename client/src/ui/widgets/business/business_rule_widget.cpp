@@ -89,12 +89,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     //TODO: connect notifyChaged on subitems
     //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
 
-/*    connect(ui->resetButton,  SIGNAL(clicked()), this, SLOT(resetFromRule()));
-
-    connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->applyButton,  SIGNAL(clicked()), this, SLOT(at_applyButton_clicked()));
-    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));*/
-
     initEventTypes();
 }
 
@@ -306,10 +300,8 @@ void QnBusinessRuleWidget::resetFromRule() {
         m_actionParameters->loadParameters(m_rule->actionParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
-    emit eventTypeChanged(this, m_rule->eventType());
+    updateDefinition();
     updateEventResources();
-    emit eventStateChanged(this, m_rule->eventState());
-    emit actionTypeChanged(this, m_rule->actionType());
     updateActionResources();
 
     setHasChanges(false);
@@ -342,7 +334,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
     initEventParameters(val);
 
     setHasChanges(true);
-    emit eventTypeChanged(this, val);
+    updateDefinition();
 }
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
@@ -352,7 +344,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     initActionTypes(val);
 
     setHasChanges(true);
-    emit eventStateChanged(this, val);
+    updateDefinition();
 }
 
 void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) {
@@ -363,7 +355,7 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     initActionParameters(val);
 
     setHasChanges(true);
-    emit actionTypeChanged(this, val);
+    updateDefinition();
 }
 
 void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
@@ -413,9 +405,9 @@ void QnBusinessRuleWidget::updateEventResources() {
             item->setText(tr("%1 Cameras").arg(m_eventResources.size())); //TODO: fix tr to %n
     }
 
-    //TODO: filtered resources list
+    //TODO: #GDM filtered or empty resource list
     setHasChanges(true);
-    emit eventResourcesChanged(this, m_eventResources);
+    emit eventResourcesChanged(this, eventType, m_eventResources);
 }
 
 void QnBusinessRuleWidget::updateActionResources() {
@@ -439,6 +431,14 @@ void QnBusinessRuleWidget::updateActionResources() {
             item->setText(tr("%1 Cameras").arg(m_actionResources.size())); //TODO: fix tr to %n
     }
 
+    //TODO: #GDM filtered or empty resource list
     setHasChanges(true);
-    emit actionResourcesChanged(this, m_actionResources);
+    emit actionResourcesChanged(this, actionType, m_actionResources);
+}
+
+void QnBusinessRuleWidget::updateDefinition() {
+    emit definitionChanged(this,
+                           getCurrentEventType(),
+                           getCurrentEventToggleState(),
+                           getCurrentActionType());
 }

@@ -35,11 +35,20 @@ public:
     void resetFromRule();
 signals:
     void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
-    void eventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
-    void eventResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resource);
-    void eventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
-    void actionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
-    void actionResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resource);
+
+    void definitionChanged(QnBusinessRuleWidget* source,
+                           BusinessEventType::Value eventType,
+                           ToggleState::Value eventState,
+                           BusinessActionType::Value actionType);
+
+    void eventResourcesChanged(QnBusinessRuleWidget* source,
+                               BusinessEventType::Value eventType,
+                               const QnResourceList &resource);
+
+
+    void actionResourcesChanged(QnBusinessRuleWidget* source,
+                                BusinessActionType::Value actionType,
+                                const QnResourceList &resource);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -79,6 +88,7 @@ private slots:
 
     void updateEventResources();
     void updateActionResources();
+    void updateDefinition();
 private:
     BusinessEventType::Value getCurrentEventType() const;
     ToggleState::Value getCurrentEventToggleState() const;

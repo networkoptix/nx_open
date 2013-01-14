@@ -39,7 +39,6 @@ protected:
 
 private slots:
     void at_newRuleButton_clicked();
-    void at_saveButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
 
@@ -47,12 +46,14 @@ private slots:
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
     /* Widget changes handlers */
-    void at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value);
-    void at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
-    void at_ruleEventResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources);
-    void at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
-    void at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
-    void at_ruleActionResourcesChanged(QnBusinessRuleWidget* source, const QnResourceList &resources);
+    void at_widgetHasChangesChanged(QnBusinessRuleWidget* source, bool value);
+    void at_widgetDefinitionChanged(QnBusinessRuleWidget* source,
+                                    BusinessEventType::Value eventType,
+                                    ToggleState::Value eventState,
+                                    BusinessActionType::Value actionType);
+
+    void at_widgetEventResourcesChanged(QnBusinessRuleWidget* source, BusinessEventType::Value eventType, const QnResourceList &resources);
+    void at_widgetActionResourcesChanged(QnBusinessRuleWidget* source, BusinessActionType::Value actionType, const QnResourceList &resources);
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
 private:
