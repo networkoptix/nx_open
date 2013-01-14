@@ -44,6 +44,8 @@ message BusinessRule {
     optional BusinessActionType actionType = 6;
     repeated int32 actionResource          = 7;
     optional string actionParams           = 8;
+
+    optional int32 aggregationPeriod       = 9; // msecs
 }
 
 message BusinessAction {

@@ -550,6 +550,8 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     foreach(QnResourcePtr res, businessRulePtr->actionResources())
         pb_businessRule.add_actionresource(res->getId().toInt());
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
+
+    pb_businessRule.set_aggregationperiod(businessRulePtr->aggregationPeriod());
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
@@ -818,6 +820,8 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessR
             actionResources << qnResPool->getResourceById(ci->actionresource(i), QnResourcePool::rfAllResources);
         businessRule->setActionResources(actionResources);
         businessRule->setActionParams(deserializeBusinessParams(ci->actionparams().c_str()));
+
+        businessRule->setAggregationPeriod(ci->aggregationperiod());
 
         businessRules.append(businessRule);
     }

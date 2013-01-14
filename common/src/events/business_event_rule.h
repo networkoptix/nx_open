@@ -43,6 +43,9 @@ public:
 
     QnBusinessParams actionParams() const;
     void setActionParams(const QnBusinessParams& params);
+
+    int aggregationPeriod() const;
+    void setAggregationPeriod(int msecs);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
@@ -54,6 +57,8 @@ private:
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;
     QnBusinessParams m_actionParams;
+
+    int m_aggregationPeriod;
 };
 
 typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;
