@@ -439,7 +439,7 @@ bool QnPlAreconVisionResource::isPanoramic(const QString &model)
 
     QnId rt = qnResTypePool->getResourceTypeId(QLatin1String(MANUFACTURE), model);
     if (!rt.isValid())
-        return QnResourcePtr(0);
+        return false;
 
     QnPlAreconVisionResourcePtr res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(model));
 
