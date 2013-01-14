@@ -187,3 +187,8 @@ QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
 
     return params;
 }
+
+QnAbstractBusinessEvent* QnAbstractBusinessEvent::createFromRuntimeParams()
+{
+    return 0;
+}

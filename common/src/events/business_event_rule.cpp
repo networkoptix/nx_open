@@ -15,7 +15,7 @@ QnBusinessEventRule::QnBusinessEventRule()
     m_eventType(BusinessEventType::BE_NotDefined),
     m_eventState(ToggleState::On), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
     m_actionType(BusinessActionType::BA_NotDefined),
-    m_aggregationPeriod(10*1000)
+    m_aggregationPeriod(0)
 {
 
 }

@@ -93,6 +93,9 @@ public:
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
 
+    void setAggregationCount(int value);
+    int getAggregationCount() const;
+
 private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;
@@ -100,6 +103,7 @@ private:
     QnResourceList m_resources;
     QnBusinessParams m_params;
     QnId m_businessRuleId; // business rule, that generated this action
+    int m_aggregationCount;
 };
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
