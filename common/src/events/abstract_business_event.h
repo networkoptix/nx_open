@@ -128,8 +128,6 @@ public:
 
     virtual QnBusinessParams getRuntimeParams() const;
 
-    static QnAbstractBusinessEvent* createFromRuntimeParams();
-
 private:
     /**
      * @brief m_eventType       Type of event. See BusinessEventType::Value.

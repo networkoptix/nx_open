@@ -1,5 +1,6 @@
 #include "universal_tcp_listener.h"
 #include "utils/network/tcp_connection_priv.h"
+#include <QUrl>
 
 class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
 {
@@ -40,7 +41,7 @@ void QnUniversalRequestProcessor::run()
         {
             QByteArray protocol = header[2].split('/')[0].toUpper();
             QMutexLocker lock(&d->mutex);
-            d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(header[1]).path());
+            d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])).path());
             if (d->processor && !m_needStop) 
             {
                 copyClientRequestTo(*d->processor);
@@ -78,7 +79,7 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path)
 {
-    QString normPath = path.startsWith('/') ? path.mid(1) : path;
+    QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
     for (int i = 0; i < m_handlers.size(); ++i)
     {
         if (m_handlers[i].protocol == protocol && normPath.startsWith(m_handlers[i].path))
@@ -88,7 +89,14 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocke
     // check default '*' path handler
     for (int i = 0; i < m_handlers.size(); ++i)
     {
-        if (m_handlers[i].protocol == protocol && m_handlers[i].path == QString("*"))
+        if (m_handlers[i].protocol == protocol && m_handlers[i].path == QLatin1String("*"))
+            return m_handlers[i].instanceFunc(clientSocket, this);
+    }
+
+    // check default '*' path and protocol handler
+    for (int i = 0; i < m_handlers.size(); ++i)
+    {
+        if (m_handlers[i].protocol == "*" && m_handlers[i].path == QLatin1String("*"))
             return m_handlers[i].instanceFunc(clientSocket, this);
     }
 

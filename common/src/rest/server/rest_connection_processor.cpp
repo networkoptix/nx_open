@@ -41,10 +41,10 @@ void QnRestConnectionProcessor::run()
         if (ready)
         {
             parseRequest();
-            isKeepAlive = d->requestHeaders.value("Connection").toLower() == QString("keep-alive");
+            isKeepAlive = d->requestHeaders.value(QLatin1String("Connection")).toLower() == QString(QLatin1String("keep-alive"));
             if (isKeepAlive) {
-                d->responseHeaders.addValue(QString("Connection"), QString("Keep-Alive"));
-                d->responseHeaders.addValue(QString("Keep-Alive"), QString("timeout=%1").arg(d->socketTimeout/1000));
+                d->responseHeaders.addValue(QLatin1String("Connection"), QLatin1String("Keep-Alive"));
+                d->responseHeaders.addValue(QLatin1String("Keep-Alive"), QString(QLatin1String("timeout=%1")).arg(d->socketTimeout/1000));
             }
 
             d->responseBody.clear();
@@ -57,10 +57,10 @@ void QnRestConnectionProcessor::run()
                 QList<QPair<QString, QString> > params = url.queryItems();
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
-                    if (d->requestHeaders.method().toUpper() == "GET") {
+                    if (d->requestHeaders.method().toUpper() == QLatin1String("GET")) {
                         rez = handler->executeGet(url.path(), params, d->responseBody, encoding);
                     }
-                    else if (d->requestHeaders.method().toUpper() == "POST") {
+                    else if (d->requestHeaders.method().toUpper() == QLatin1String("POST")) {
                         rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, encoding);
                     }
                     else {
@@ -77,7 +77,7 @@ void QnRestConnectionProcessor::run()
                 }
             }
             else {
-                if (url.path() != "/api/ping/")
+                if (url.path() != QLatin1String("/api/ping/"))
                     qWarning() << "Unknown REST path " << url.path();
                 encoding = "text/html";
                 d->responseBody.clear();
@@ -92,7 +92,7 @@ void QnRestConnectionProcessor::run()
                 for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
                 {
                     QString str = itr.key();
-                    if (str.startsWith("api/"))
+                    if (str.startsWith(QLatin1String("api/")))
                     {
                         d->responseBody.append("<TR><TD>");
                         d->responseBody.append(str.toAscii());
@@ -125,9 +125,9 @@ void QnRestConnectionProcessor::registerHandler(const QString& path, QnRestReque
 
 QnRestRequestHandlerPtr QnRestConnectionProcessor::findHandler(QString path)
 {
-    if (path.startsWith('/'))
+    if (path.startsWith(L'/'))
         path = path.mid(1);
-    if (path.endsWith('/'))
+    if (path.endsWith(L'/'))
         path = path.left(path.length()-1);
 
     for (Handlers::iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
