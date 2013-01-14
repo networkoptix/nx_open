@@ -78,7 +78,8 @@ QByteArray QnAbstractBusinessAction::serialize()
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
     pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
     pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
-    // todo: #gdem add aggregation count here
+    pb_businessAction.set_aggregationcount(getAggregationCount());
+
     std::string str;
     pb_businessAction.SerializeToString(&str);
     return QByteArray(str.data(), str.length());
@@ -87,8 +88,6 @@ QByteArray QnAbstractBusinessAction::serialize()
 QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
 {
     pb::BusinessAction pb_businessAction;
-
-    // todo: #gdem add aggregation count here
 
     if (!pb_businessAction.ParseFromArray(data.data(), data.size()))
     {
@@ -112,6 +111,7 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
     businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
     businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
+    businessAction->setAggregationCount(pb_businessAction.aggregationcount());
 
     return businessAction;
 }
