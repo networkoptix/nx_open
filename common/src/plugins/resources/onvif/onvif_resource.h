@@ -393,6 +393,7 @@ private:
     QMutex m_subscriptionMutex;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
+    quint64 m_renewSubscriptionTaskID;
     int m_channelNumer; // video/audio source number
     int m_maxChannels;
 	

@@ -46,6 +46,7 @@ static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 1
 //!if renew subscription exactly at termination time, camera can already terminate subscription, so have to do that a little bit earlier..
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
 static const unsigned int MS_PER_SECOND = 1000;
+static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -179,8 +180,9 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_timeDrift(0),
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
-    m_maxChannels(1),
-    m_channelNumer(0)
+    m_renewSubscriptionTaskID(0),
+    m_channelNumer(0),
+    m_maxChannels(1)
 {
     connect(
         this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
@@ -705,7 +707,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         NetIfacesResp response;
 
         int soapRes = soapWrapper.getNetworkInterfaces(request, response);
-        if (soapRes != SOAP_OK) 
+        if( soapRes != SOAP_OK )
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
@@ -722,9 +724,25 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             setPhysicalId(hardwareId);
         }
     }
-            
+
     return true;
-    }
+}
+
+/*
+    if defined, expecting following notification:
+
+    <tt:Message UtcTime="2012-12-13T04:00:57Z" PropertyOperation="Changed">
+        <tt:Source>
+            <tt:SimpleItem Value="0" Name="RelayToken">
+            </tt:SimpleItem>
+        </tt:Source>
+        <tt:Data>
+            <tt:SimpleItem Value="active" Name="LogicalState">
+            </tt:SimpleItem>
+        </tt:Data>
+    </tt:Message>
+*/
+//#define MONITOR_TRIGGER_RELAY_NOTIFICATION
 
 void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification )
 {
@@ -732,14 +750,23 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     {
         cl_log.log( QString::fromLatin1("Received notification with empty message. Ignoring..."), cl_logDEBUG1 );
         return;
-}
+    }
 
     if( !notification.oasisWsnB2__Topic ||
-        !notification.oasisWsnB2__Topic->__item ||
-        strcmp(notification.oasisWsnB2__Topic->__item, "tns:Device/tnsw4n:IO/Port") != 0 )
-{
+        !notification.oasisWsnB2__Topic->__item )
+    {
+        cl_log.log( QString::fromLatin1("Received notification with no topic specified. Ignoring..."), cl_logDEBUG1 );
+        return;
+    }
+
+#ifdef MONITOR_TRIGGER_RELAY_NOTIFICATION
+    if( strcmp(notification.oasisWsnB2__Topic->__item, "tns:Device/Trigger/Relay") != 0 )
+#else
+    if( strcmp(notification.oasisWsnB2__Topic->__item, "tns:Device/tnsw4n:IO/Port") != 0 )
+#endif
+    {
         cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
-            arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : std::string())), cl_logDEBUG1 );
+            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG1 );
         return;
     }
 
@@ -762,7 +789,11 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
         it != handler.source.end();
         ++it )
     {
+#ifdef MONITOR_TRIGGER_RELAY_NOTIFICATION
+        if( it->name == QLatin1String("RelayToken") )
+#else
         if( it->name == QLatin1String("port") )
+#endif
         {
             portSourceIter = it;
             break;
@@ -770,40 +801,41 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     }
 
     if( portSourceIter == handler.source.end()  //source is not port
-        || handler.data.name != QLatin1String("state") )       //monitoring only "state" parameter of input port
+#ifdef MONITOR_TRIGGER_RELAY_NOTIFICATION
+        || handler.data.name != QLatin1String("LogicalState") )
+#else
+        || handler.data.name != QLatin1String("state") )
+#endif
     {
         return;
     }
 
     //saving port state
+#ifdef MONITOR_TRIGGER_RELAY_NOTIFICATION
+    const bool newPortState = handler.data.value == QLatin1String("active");
+#else
     const bool newPortState = handler.data.value == QLatin1String("true");
+#endif
     bool& currentPortState = m_relayInputStates[portSourceIter->value];
     if( currentPortState != newPortState )
+    {
         currentPortState = newPortState;
-        //m_relayInputStates[portSourceIter->value] = handler.data.value == QLatin1String("true");
+        emit cameraInput(
+            toSharedPointer(),
+            portSourceIter->value,
+            newPortState,
+            handler.utcTime.toMSecsSinceEpoch() );
+    }
+}
 
-//    //firing signal
-    emit cameraInput(
-        toSharedPointer(),
-        portSourceIter->value,
-        newPortState,
-        handler.utcTime.toMSecsSinceEpoch() );
-
-    /*
-        Topic: tns1:Device/Trigger/DigitalInput
-        <tt:MessageDescription IsProperty="true">
-            <tt:Source>
-                <tt:SimpleItemDescription Name="InputToken" Type="tt:ReferenceToken"/>
-            </tt:Source>
-            <tt:Data>
-                <tt:SimpleItemDescription Name="LogicalState" Type="xs:boolean"/>
-            </tt:Data>
-        </tt:MessageDescription>
-    */
+void QnPlOnvifResource::onTimer( const quint64& timerID )
+{
+    if( timerID == m_renewSubscriptionTaskID )
+    {
+        onRenewSubscriptionTimer();
+        return;
     }
 
-void QnPlOnvifResource::onTimer( const quint64& /*timerID*/ )
-{
     switch( m_eventMonitorType )
     {
         case emtNotification:
@@ -2007,7 +2039,6 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
     _oasisWsnB2__Renew request;
     sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
     std::string initialTerminationTime = buf;
-    time_t utcTerminationTime = ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     request.TerminationTime = &initialTerminationTime;
     sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"(null)\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLocal8Bit().data() );
     request.__any.push_back( buf );
@@ -2020,11 +2051,20 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
         return;
     }
 
-    unsigned int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
-    renewSubsciptionTimeoutSec = renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
-        ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
-        : 0;
-    m_timerID = TimerManager::instance()->addTimer( this, renewSubsciptionTimeoutSec*MS_PER_SECOND );
+    unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__CurrentTime
+        ? (response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime)
+        : DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
+        this,
+        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+
+    //unsigned int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
+    //renewSubsciptionTimeoutSec = renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+    //    ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
+    //    : 0;
+    //m_timerID = TimerManager::instance()->addTimer( this, renewSubsciptionTimeoutSec*MS_PER_SECOND );
 }
 
 void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& encoderId)
@@ -2124,6 +2164,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
 {
     //removing timer
     TimerManager::instance()->deleteTimer( m_timerID );
+    TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
     //TODO/IMPL removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -2352,12 +2393,17 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             m_onvifNotificationSubscriptionID = handler.subscriptionID;
     }
 
-    unsigned int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
-    renewSubsciptionTimeoutSec = renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
-        ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
-        : 0;
     //launching renew-subscription timer
-    m_timerID = TimerManager::instance()->addTimer( this, renewSubsciptionTimeoutSec*MS_PER_SECOND );
+    unsigned int renewSubsciptionTimeoutSec = 0;
+    if( response.oasisWsnB2__CurrentTime && response.oasisWsnB2__TerminationTime )
+        renewSubsciptionTimeoutSec = *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
+    else
+        renewSubsciptionTimeoutSec = DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
+        this,
+        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
     QnSoapServer::instance()->getService()->registerResource(
         this,
@@ -2368,8 +2414,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     cl_log.log( QString::fromAscii("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logDEBUG1 );
     return true;
 }
-
-static const unsigned int PULLPOINT_MESSAGE_CHECK_TIMEOUT_SEC = 5;
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {
@@ -2412,9 +2456,17 @@ bool QnPlOnvifResource::createPullPointSubscription()
             m_onvifNotificationSubscriptionID = handler.subscriptionID;
     }
 
+    //adding task to refresh subscription
+    unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__TerminationTime - response.oasisWsnB2__CurrentTime;
+    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
+        this,
+        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+
     m_eventMonitorType = emtPullPoint;
 
-    m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_MESSAGE_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
+    m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
 }
 
@@ -2430,7 +2482,8 @@ bool QnPlOnvifResource::pullMessages()
     char buf[512];
 
     _onvifEvents__PullMessages request;
-    sprintf( buf, "PT%dS", PULLPOINT_MESSAGE_CHECK_TIMEOUT_SEC );
+    sprintf( buf, "PT%dS", PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC );
+    //sprintf( buf, "PT1M" );
     request.Timeout = buf;
     request.MessageLimit = 1024;
     QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
@@ -2444,7 +2497,7 @@ bool QnPlOnvifResource::pullMessages()
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
         cl_log.log( QString::fromAscii("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
-        m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_MESSAGE_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
+        m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
         return false;
     }
 
@@ -2458,7 +2511,7 @@ bool QnPlOnvifResource::pullMessages()
         }
     }
 
-    m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_MESSAGE_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
+    m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
 }
 
