@@ -287,8 +287,8 @@ void QnBusinessRulesDialog::at_widgetDefinitionChanged(QnBusinessRuleWidget *sou
 void QnBusinessRulesDialog::at_widgetEventResourcesChanged(QnBusinessRuleWidget* source, BusinessEventType::Value eventType, const QnResourceList &resources) {
     QStandardItem *item = tableItem(source, 2);
     if (!BusinessEventType::isResourceRequired(eventType)) {
-        item->setIcon(QIcon());
-        item->setText(QString());
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        item->setText(tr("<System>"));
     } else if (resources.size() == 1) {
         QnResourcePtr resource = resources.first();
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
@@ -313,6 +313,9 @@ void QnBusinessRulesDialog::at_widgetActionResourcesChanged(QnBusinessRuleWidget
     QStandardItem *item = tableItem(source, 5);
 
     if (!BusinessActionType::isResourceRequired(actionType)) {
+
+        //TODO: #GDM use parameters to show target (receipients in case of email, etc)
+
         item->setIcon(QIcon());
         item->setText(QString());
     } else if (resources.size() == 1) {

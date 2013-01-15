@@ -156,7 +156,7 @@ void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventTyp
     if (m_eventWidgetsByType.contains(eventType)) {
         m_eventParameters = m_eventWidgetsByType.find(eventType).value();
     } else {
-        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this);
+        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this, context());
         m_eventWidgetsByType[eventType] = m_eventParameters;
     }
     if (m_eventParameters) {
@@ -193,8 +193,6 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
 }
 
 void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
-    //menu()->trigger(Qn::GetMoreLicensesAction);
-
     if (m_actionParameters) {
         //ui->actionLayout->removeWidget(m_actionParameters);
         ui->actionParamsLayout->removeWidget(m_actionParameters);
@@ -204,7 +202,7 @@ void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value action
     if (m_actionWidgetsByType.contains(actionType)) {
         m_actionParameters = m_actionWidgetsByType.find(actionType).value();
     } else {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this);
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this, context());
         m_actionWidgetsByType[actionType] = m_actionParameters;
     }
 
