@@ -41,7 +41,7 @@ namespace BusinessActionType
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        BA_Count = BA_CameraOutput
+        BA_Count = BA_Alert
 
     };
 
