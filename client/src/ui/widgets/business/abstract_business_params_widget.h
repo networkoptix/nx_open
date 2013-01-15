@@ -17,6 +17,9 @@ public:
     virtual QnBusinessParams parameters() const = 0;
     virtual QString description() const = 0;
 
+signals:
+    void parametersChanged();
+
 };
 
 #endif // ABSTRACT_BUSINESS_PARAMS_WIDGET_H

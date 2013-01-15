@@ -33,6 +33,8 @@ public:
 
     void apply();
     void resetFromRule();
+
+    QString actionResourcesText();
 signals:
     void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
 
@@ -82,6 +84,7 @@ private slots:
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
+    void at_actionParametersChanged();
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();

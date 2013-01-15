@@ -13,6 +13,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, 
 {
     ui->setupUi(this);
 
+    connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SIGNAL(parametersChanged()));
     connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 }
 
@@ -32,11 +33,7 @@ QnBusinessParams QnSendmailBusinessActionWidget::parameters() const {
 }
 
 QString QnSendmailBusinessActionWidget::description() const {
-    QString fmt = QLatin1String("%1 <span style=\"font-style:italic;\">%2</span>");
-    QString recordStr = QObject::tr("E-mail to");
-    return fmt
-            .arg(recordStr)
-            .arg(ui->emailLineEdit->text());
+    return ui->emailLineEdit->text();
 }
 
 void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
