@@ -248,6 +248,7 @@ protected slots:
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
     void at_getMoreLicensesAction_triggered();
+    void at_openServerSettingsAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
