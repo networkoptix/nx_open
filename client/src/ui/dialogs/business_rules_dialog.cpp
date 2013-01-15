@@ -87,10 +87,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
 
-    QStringList header;
-    header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
-    m_listModel->setHorizontalHeaderLabels(header);
-
     ui->tableView->setModel(m_listModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
@@ -133,14 +129,22 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
 
 void QnBusinessRulesDialog::at_context_userChanged() {
    // bool enabled = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    m_listModel->clear();
-    //TODO: #GDM make sure unused widgets are destroyed
 
     if (m_currentDetailsWidget) {
         ui->detailsLayout->removeWidget(m_currentDetailsWidget);
         m_currentDetailsWidget->setVisible(false);
         m_currentDetailsWidget = NULL;
     }
+
+    for(int i = 0; i < m_listModel->rowCount(); i++) {
+        QnBusinessRuleWidget* w = (QnBusinessRuleWidget *)m_listModel->item(i, 0)->data(WidgetRole).value<QWidget *>();
+        delete w;
+    }
+    m_listModel->clear();
+
+    QStringList header;
+    header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
+    m_listModel->setHorizontalHeaderLabels(header);
 
     if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         QnBusinessEventRules rules;
@@ -235,20 +239,29 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
     m_processingWidgets.remove(handle);
 
     if(response.status != 0) {
-        qDebug() << response.errorString;
+        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
         return;
     }
 
     updateControlButtons();
-/*
-    QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole, m_deletingRule->getUniqueId());
-    if (!ruleIdx.isEmpty()) {
-        int rowNum = ruleIdx.first().row();
-        m_listModel->removeRow(rowNum);
+
+    QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole,
+                                                 QVariant::fromValue<QWidget *>(w),
+                                                 1, Qt::MatchExactly);
+    if (ruleIdx.isEmpty())
+        return;
+    int row = ruleIdx.first().row();
+    m_listModel->removeRow(row);
+
+    if (m_currentDetailsWidget == w) {
+        ui->detailsLayout->removeWidget(m_currentDetailsWidget);
+        m_currentDetailsWidget->setVisible(false);
+        m_currentDetailsWidget = NULL;
         ui->tableView->clearSelection();
     }
-*/
+
+    delete w;
 }
 
 void QnBusinessRulesDialog::at_widgetHasChangesChanged(QnBusinessRuleWidget* source, bool value) {

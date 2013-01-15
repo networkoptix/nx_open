@@ -182,12 +182,15 @@
       <item>
        <widget class="QCheckBox" name="aggregationCheckBox">
         <property name="text">
-         <string>not as often as once per</string>
+         <string>no more than once per</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QSpinBox" name="aggregationValueSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="correctionMode">
          <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
         </property>
@@ -201,6 +204,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="aggregationPeriodComboBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="currentIndex">
          <number>1</number>
         </property>
