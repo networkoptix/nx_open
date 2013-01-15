@@ -182,7 +182,7 @@
       <item>
        <widget class="QCheckBox" name="aggregationCheckBox">
         <property name="text">
-         <string>not often than once per</string>
+         <string>not as often as once per</string>
         </property>
        </widget>
       </item>

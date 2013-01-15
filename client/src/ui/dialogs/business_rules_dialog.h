@@ -38,6 +38,8 @@ protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 
 private slots:
+    void at_context_userChanged();
+
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
@@ -57,6 +59,8 @@ private slots:
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
 private:
+    Q_DISABLE_COPY(QnBusinessRulesDialog)
+
     QList<QStandardItem *> createRow(QnBusinessRuleWidget* widget);
     QnBusinessRuleWidget* createWidget(QnBusinessEventRulePtr rule);
 

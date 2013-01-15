@@ -9,7 +9,9 @@
 #include <core/resource/resource.h>
 
 #include <ui/style/resource_icon_cache.h>
+
 #include <ui/workbench/workbench_context.h>
+#include "ui/workbench/workbench_access_controller.h"
 
 #include <utils/settings.h>
 
@@ -89,14 +91,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
     m_listModel->setHorizontalHeaderLabels(header);
 
-    QnBusinessEventRules rules;
-    connection->getBusinessRules(rules); // TODO: replace synchronous call
-    foreach (QnBusinessEventRulePtr rule, rules) {
-        QnBusinessRuleWidget* w = createWidget(rule);
-        m_listModel->appendRow(createRow(w));
-        w->resetFromRule(); //here row data will be updated
-    }
-
     ui->tableView->setModel(m_listModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
@@ -114,8 +108,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
 
+    connect(context,  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
+
 //    connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
 
+    at_context_userChanged();
     updateControlButtons();
 }
 
@@ -134,6 +131,30 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
     return base_type::eventFilter(object, event);
 }
 
+void QnBusinessRulesDialog::at_context_userChanged() {
+   // bool enabled = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    m_listModel->clear();
+    //TODO: #GDM make sure unused widgets are destroyed
+
+    if (m_currentDetailsWidget) {
+        ui->detailsLayout->removeWidget(m_currentDetailsWidget);
+        m_currentDetailsWidget->setVisible(false);
+        m_currentDetailsWidget = NULL;
+    }
+
+    if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
+        QnBusinessEventRules rules;
+        m_connection->getBusinessRules(rules); // TODO: replace synchronous call
+        foreach (QnBusinessEventRulePtr rule, rules) {
+            QnBusinessRuleWidget* w = createWidget(rule);
+            m_listModel->appendRow(createRow(w));
+            w->resetFromRule(); //here row data will be updated
+        }
+    }
+
+    updateControlButtons();
+}
+
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule());
     //TODO: wizard dialog?
@@ -145,7 +166,6 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     w->resetFromRule(); //here row data will be updated
     w->setHasChanges(true);
 
-    //ui->tableView->resizeColumnsToContents();
     ui->tableView->selectRow(m_listModel->rowCount() - 1);
 }
 
@@ -395,7 +415,13 @@ QStandardItem* QnBusinessRulesDialog::tableItem(QnBusinessRuleWidget *widget, in
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
+    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+
 //    ui->saveButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(!m_listModel->match(m_listModel->index(0, 0), ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
-    ui->deleteRuleButton->setEnabled(m_currentDetailsWidget);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights &&
+         !m_listModel->match(m_listModel->index(0, 0), ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
+
+    ui->deleteRuleButton->setEnabled(hasRights && m_currentDetailsWidget);
+    ui->addRuleButton->setEnabled(hasRights);
 }

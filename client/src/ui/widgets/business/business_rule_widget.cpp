@@ -90,6 +90,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_aggregationPeriodChanged()));
     connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_aggregationPeriodChanged()));
 
+    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
+    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
+
     //TODO: connect notifyChaged on subitems
     //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
 
@@ -142,9 +145,6 @@ void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
         m_eventStatesModel->appendRow(row);
     }
     ui->eventStatesComboBox->setVisible(prolonged);
-    ui->aggregationCheckBox->setVisible(!prolonged);
-    ui->aggregationValueSpinBox->setVisible(!prolonged);
-    ui->aggregationPeriodComboBox->setVisible(!prolonged);
 }
 
 void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
@@ -169,13 +169,13 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
 
     m_actionTypesModel->clear();
     // what type of actions to show: prolonged or instant
-    bool instantActionsFilter = (eventState == ToggleState::On || eventState == ToggleState::Off)
+    bool onlyInstantActions = (eventState == ToggleState::On || eventState == ToggleState::Off)
             || (!BusinessEventType::hasToggleState(getCurrentEventType()));
 
     for (int i = 0; i < BusinessActionType::BA_Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
 
-        if (BusinessActionType::hasToggleState(val) && instantActionsFilter)
+        if (BusinessActionType::hasToggleState(val) && onlyInstantActions)
             continue;
 
         QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
@@ -186,9 +186,15 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
         m_actionTypesModel->appendRow(row);
     }
 
+    ui->aggregationCheckBox->setVisible(onlyInstantActions);
+    ui->aggregationValueSpinBox->setVisible(onlyInstantActions);
+    ui->aggregationPeriodComboBox->setVisible(onlyInstantActions);
+
 }
 
 void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
+    //menu()->trigger(Qn::GetMoreLicensesAction);
+
     if (m_actionParameters) {
         //ui->actionLayout->removeWidget(m_actionParameters);
         ui->actionParamsLayout->removeWidget(m_actionParameters);
