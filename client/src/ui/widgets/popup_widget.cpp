@@ -7,7 +7,10 @@ QnPopupWidget::QnPopupWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     int r = qrand();
-    ui->label->setText(ui->label->text() + QString::number(r));
+    if (r % 2)
+        ui->label_2->setVisible(false);
+    else
+        ui->label_3->setVisible(false);
 }
 
 QnPopupWidget::~QnPopupWidget()
