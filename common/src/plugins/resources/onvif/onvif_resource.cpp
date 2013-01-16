@@ -748,14 +748,14 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
 {
     if( !notification.Message.__any )
     {
-        cl_log.log( QString::fromLatin1("Received notification with empty message. Ignoring..."), cl_logDEBUG1 );
+        cl_log.log( QString::fromLatin1("Received notification with empty message. Ignoring..."), cl_logDEBUG2 );
         return;
     }
 
     if( !notification.oasisWsnB2__Topic ||
         !notification.oasisWsnB2__Topic->__item )
     {
-        cl_log.log( QString::fromLatin1("Received notification with no topic specified. Ignoring..."), cl_logDEBUG1 );
+        cl_log.log( QString::fromLatin1("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2 );
         return;
     }
 
@@ -766,7 +766,7 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
 #endif
     {
         cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
-            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG1 );
+            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
         return;
     }
 
