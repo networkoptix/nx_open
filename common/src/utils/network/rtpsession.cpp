@@ -46,7 +46,8 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0),
-    ssrc(0)
+    ssrc(0),
+    m_rtpTrackNum(0)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode) 

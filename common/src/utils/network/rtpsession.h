@@ -92,6 +92,10 @@ public:
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
+    
+    void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
+    quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
+    quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
     void processRtcpData();
 private:
@@ -101,6 +105,7 @@ private:
     UDPSocket* m_mediaSocket;
     UDPSocket* m_rtcpSocket;
     quint32 ssrc;
+    quint8 m_rtpTrackNum;
 };
 
 class RTPSession: public QObject
@@ -133,6 +138,7 @@ public:
                 trackType = TT_UNKNOWN;
 
             ioDevice = new RTPIODevice(owner, useTCP);
+            ioDevice->setRtpTrackNum(_trackNum * 2);
         }
 
         void setSSRC(quint32 value);

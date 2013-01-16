@@ -14,6 +14,7 @@
 
 extern QSettings qSettings;
 static const int RTSP_RETRY_COUNT = 6;
+static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     QnResourceConsumer(res),
@@ -89,7 +90,23 @@ void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer
         if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
             ioDevice->setStatistic(stats);
     }
+    
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
+    if (outBufSize > 0)
+    {
+        quint16* sizeField = (quint16*) (buffer+2);
+        *sizeField = htons(outBufSize);
+        m_RtpSession.sendBynaryResponse(buffer, outBufSize+4);
+    }
+    m_rtcpReportTimer.restart();
+}
+
+void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
+{
+    quint8 buffer[1024*4];
+    buffer[0] = '$';
+    buffer[1] = chNumber;
+    int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, sizeof(buffer)-4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -159,6 +176,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         else {
             m_demuxedData[channelNum]->clear();
         }
+
+        if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
+            if (m_videoIO)
+                buildClientRTCPReport(m_videoIO->getRtcpTrackNum());
+            if (m_audioIO)
+                buildClientRTCPReport(m_audioIO->getRtcpTrackNum());
+            m_rtcpReportTimer.restart();
+        }
+
     }
 
     if (m_lastVideoData)
@@ -406,6 +432,7 @@ void QnMulticodecRtpReader::openStream()
         initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
         if (!m_videoIO && !m_audioIO)
             m_RtpSession.stop();
+        m_rtcpReportTimer.restart();
     }
 }
 
