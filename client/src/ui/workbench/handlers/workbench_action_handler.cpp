@@ -66,6 +66,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/widgets/popup_collection_widget.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -309,6 +311,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (businessRulesDialog())
         delete businessRulesDialog();
+
+    if (popupCollectionWidget())
+        delete popupCollectionWidget();
 
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
@@ -1289,7 +1294,13 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     businessRulesDialog()->show();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
+}
 
+void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->add();
+    popupCollectionWidget()->show();
 
 }
 
@@ -1811,6 +1822,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         name = dialog->name();
     }
 
+    at_showPopupAction_triggered();
     if(name == resource->getName())
         return;
 

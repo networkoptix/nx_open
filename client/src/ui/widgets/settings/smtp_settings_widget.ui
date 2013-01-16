@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>442</width>
-    <height>199</height>
+    <height>205</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -169,6 +169,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>serverLineEdit</tabstop>
+  <tabstop>portComboBox</tabstop>
+  <tabstop>userLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>tlsRadioButton</tabstop>
+  <tabstop>sslRadioButton</tabstop>
+  <tabstop>unsecuredRadioButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

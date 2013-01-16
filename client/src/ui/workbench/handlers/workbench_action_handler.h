@@ -28,6 +28,7 @@ class QnAction;
 class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnVideoCamera;
+class QnPopupCollectionWidget;
 
 // TODO: move out.
 struct QnThumbnailsSearchState {
@@ -194,6 +195,10 @@ protected:
         return m_businessRulesDialog.data();
     }
 
+    QnPopupCollectionWidget *popupCollectionWidget() const {
+        return m_popupCollectionWidget.data();
+    }
+
 protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
@@ -247,6 +252,7 @@ protected slots:
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_showPopupAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
     void at_connectToServerAction_triggered();
@@ -341,6 +347,7 @@ private:
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
+    QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

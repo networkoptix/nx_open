@@ -379,6 +379,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
+    factory(Qn::OpenServerSettingsAction).
+        flags(Qn::NoTarget).
+        text(tr("Settings..."));
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));

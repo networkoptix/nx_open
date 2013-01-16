@@ -44,9 +44,9 @@ public:
     QnBusinessParams actionParams() const;
     void setActionParams(const QnBusinessParams& params);
 
-    /* action aggregation period in ms */
+    /* action aggregation period in seconds */
     int aggregationPeriod() const;
-    void setAggregationPeriod(int msecs);
+    void setAggregationPeriod(int secs);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule

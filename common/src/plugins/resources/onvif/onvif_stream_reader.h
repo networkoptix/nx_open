@@ -59,7 +59,12 @@ private:
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
     bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    
     bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary) const;
+    bool sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;
+    bool createNewProfile(const QString& name, const QString& token) const;
+
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
@@ -69,7 +74,6 @@ private:
 
     void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const;
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
-    void updateProfile(Profile& profile, bool isPrimary) const;
 
     bool sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
     bool sendVideoEncoderToCamera(VideoEncoder& encoder) const;

@@ -50,6 +50,14 @@ namespace {
         return QString();
     }
 
+    // make sure size is equal to ui->aggregationComboBox->count()
+    const int aggregationSteps[] = {
+        1,                    /* 1 second. */
+        60,                   /* 1 minute. */
+        60 * 60,              /* 1 hour. */
+        60 * 60 * 24          /* 1 day. */
+    };
+
 } // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent, QnWorkbenchContext *context) :
@@ -156,7 +164,7 @@ void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventTyp
     if (m_eventWidgetsByType.contains(eventType)) {
         m_eventParameters = m_eventWidgetsByType.find(eventType).value();
     } else {
-        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this);
+        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this, context());
         m_eventWidgetsByType[eventType] = m_eventParameters;
     }
     if (m_eventParameters) {
@@ -193,18 +201,17 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
 }
 
 void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
-    //menu()->trigger(Qn::GetMoreLicensesAction);
-
     if (m_actionParameters) {
         //ui->actionLayout->removeWidget(m_actionParameters);
         ui->actionParamsLayout->removeWidget(m_actionParameters);
         m_actionParameters->setVisible(false);
+        disconnect(m_actionParameters, 0, this, 0);
     }
 
     if (m_actionWidgetsByType.contains(actionType)) {
         m_actionParameters = m_actionWidgetsByType.find(actionType).value();
     } else {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this);
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this, context());
         m_actionWidgetsByType[actionType] = m_actionParameters;
     }
 
@@ -212,6 +219,7 @@ void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value action
         //ui->actionLayout->addWidget(m_actionParameters);
         ui->actionParamsLayout->addWidget(m_actionParameters);
         m_actionParameters->setVisible(true);
+        connect(m_actionParameters, SIGNAL(parametersChanged()), this, SLOT(at_actionParametersChanged()));
     }
 }
 
@@ -313,18 +321,16 @@ void QnBusinessRuleWidget::resetFromRule() {
         m_actionParameters->loadParameters(m_rule->actionParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
-    {
-        int i = m_rule->aggregationPeriod();
+    int msecs = m_rule->aggregationPeriod();
+    ui->aggregationCheckBox->setChecked(msecs > 0);
+    if (msecs > 0) {
         int idx = 0;
-        ui->aggregationCheckBox->setChecked(i > 0);
-        while (i > 0 && i % 60 == 0 && idx < ui->aggregationPeriodComboBox->count() - 1) {
-            i /= 60;
+        while (idx < ui->aggregationPeriodComboBox->count() - 1 && msecs >= aggregationSteps[idx+1])
             idx++;
-        }
-        ui->aggregationPeriodComboBox->setCurrentIndex(idx);
-        ui->aggregationValueSpinBox->setValue(i);
-    }
 
+        ui->aggregationPeriodComboBox->setCurrentIndex(idx);
+        ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
+    }
 
     updateDefinition();
     updateEventResources();
@@ -350,12 +356,23 @@ void QnBusinessRuleWidget::apply() {
     m_rule->setActionType(getCurrentActionType());
     m_rule->setActionParams(m_actionParameters ? m_actionParameters->parameters() : QnBusinessParams());
     {
-        int i = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
-        for (int idx = ui->aggregationPeriodComboBox->currentIndex(); idx >= 0; idx--)
-            i *= 60;
-        m_rule->setAggregationPeriod(i);
+        int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
+        int idx = ui->aggregationPeriodComboBox->currentIndex();
+        m_rule->setAggregationPeriod(val * aggregationSteps[idx]);
     }
 
+}
+
+QString QnBusinessRuleWidget::actionResourcesText() {
+    //TODO: #GDM ugly hack. standartize.
+
+    if (getCurrentActionType() != BusinessActionType::BA_SendMail)
+        return QString();
+
+    if (!m_actionParameters)
+        return QString();
+
+    return m_actionParameters->description();
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
@@ -384,11 +401,15 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     int typeIdx = m_actionTypesModel->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
 
-    updateActionResources();
     initActionParameters(val);
 
     setHasChanges(true);
     updateDefinition();
+    updateActionResources();
+}
+
+void QnBusinessRuleWidget::at_actionParametersChanged() {
+    updateActionResources();
 }
 
 void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
@@ -456,16 +477,18 @@ void QnBusinessRuleWidget::updateActionResources() {
     ui->actionAtLabel->setVisible(isResourceRequired);
     ui->actionDropLabel->setVisible(isResourceRequired);
 
-    if (m_actionResources.size() == 1) {
-        QnResourcePtr resource = m_actionResources.first();
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        item->setText(getResourceName(resource));
-    } else {
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
-        if (m_actionResources.size() == 0)
-            item->setText(tr("<Select at least one camera>"));
-        else
-            item->setText(tr("%1 Cameras").arg(m_actionResources.size())); //TODO: fix tr to %n
+    if (isResourceRequired) {
+        if (m_actionResources.size() == 1) {
+            QnResourcePtr resource = m_actionResources.first();
+            item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+            item->setText(getResourceName(resource));
+        } else {
+            item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
+            if (m_actionResources.size() == 0)
+                item->setText(tr("<Select at least one camera>"));
+            else
+                item->setText(tr("%1 Cameras").arg(m_actionResources.size())); //TODO: fix tr to %n
+        }
     }
 
     //TODO: #GDM filtered or empty resource list

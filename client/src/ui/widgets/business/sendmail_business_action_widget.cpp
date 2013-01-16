@@ -3,11 +3,18 @@
 
 #include <events/sendmail_business_action.h>
 
-QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) :
+#include <ui/actions/action_manager.h>
+#include <ui/workbench/workbench_context.h>
+
+QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnSendmailBusinessActionWidget)
 {
     ui->setupUi(this);
+
+    connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SIGNAL(parametersChanged()));
+    connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
@@ -26,9 +33,9 @@ QnBusinessParams QnSendmailBusinessActionWidget::parameters() const {
 }
 
 QString QnSendmailBusinessActionWidget::description() const {
-    QString fmt = QLatin1String("%1 <span style=\"font-style:italic;\">%2</span>");
-    QString recordStr = QObject::tr("E-mail to");
-    return fmt
-            .arg(recordStr)
-            .arg(ui->emailLineEdit->text());
+    return ui->emailLineEdit->text();
+}
+
+void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
+    menu()->trigger(Qn::OpenServerSettingsAction);
 }

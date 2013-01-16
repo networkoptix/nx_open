@@ -287,8 +287,8 @@ void QnBusinessRulesDialog::at_widgetDefinitionChanged(QnBusinessRuleWidget *sou
 void QnBusinessRulesDialog::at_widgetEventResourcesChanged(QnBusinessRuleWidget* source, BusinessEventType::Value eventType, const QnResourceList &resources) {
     QStandardItem *item = tableItem(source, 2);
     if (!BusinessEventType::isResourceRequired(eventType)) {
-        item->setIcon(QIcon());
-        item->setText(QString());
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        item->setText(tr("<System>"));
     } else if (resources.size() == 1) {
         QnResourcePtr resource = resources.first();
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
@@ -312,19 +312,42 @@ void QnBusinessRulesDialog::at_widgetEventResourcesChanged(QnBusinessRuleWidget*
 void QnBusinessRulesDialog::at_widgetActionResourcesChanged(QnBusinessRuleWidget* source, BusinessActionType::Value actionType, const QnResourceList &resources) {
     QStandardItem *item = tableItem(source, 5);
 
-    if (!BusinessActionType::isResourceRequired(actionType)) {
-        item->setIcon(QIcon());
-        item->setText(QString());
+    if (actionType == BusinessActionType::BA_SendMail) {
+        QString recipients = source->actionResourcesText();
+        QStringList list = recipients.split(QLatin1Char(';'), QString::SkipEmptyParts);
+
+        switch (list.size()){
+            case 0:
+                item->setIcon(qnResIconCache->icon(QnResourceIconCache::Offline, true));
+                item->setText(tr("<Enter at least one address>"));
+                break;
+            case 1:
+                item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
+                item->setText(recipients);
+                break;
+            default:
+                item->setIcon(qnResIconCache->icon(QnResourceIconCache::Users));
+                item->setText(recipients);
+                break;
+        }
+    }
+    else if (!BusinessActionType::isResourceRequired(actionType)) {
+        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
+        item->setText(tr("<System>"));
     } else if (resources.size() == 1) {
         QnResourcePtr resource = resources.first();
         item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
         item->setText(getResourceName(resource));
     } else {
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
-        if (resources.size() == 0)
-            item->setText(tr("<Select camera>"));
-        else
+        //TODO: #GDM popup action will require user resources
+        if (resources.size() == 0) {
+            item->setIcon(qnResIconCache->icon(QnResourceIconCache::Offline, true));
+            item->setText(tr("<Select at least one camera>"));
+        }
+        else {
+            item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
             item->setText(tr("%1 Cameras").arg(resources.size())); //TODO: fix tr to %n
+        }
     }
 }
 

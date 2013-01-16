@@ -39,7 +39,7 @@ namespace BusinessEventType
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        BE_Count = BE_Camera_Input,
+        BE_Count = BE_NotDefined,
 
         /** Base index for the user defined events. */
         BE_UserDefined = 1000
