@@ -13,7 +13,7 @@ class QnPopupCollectionWidget : public QWidget
     typedef QWidget base_type;
     
 public:
-    explicit QnPopupCollectionWidget(QWidget *parent = 0);
+    explicit QnPopupCollectionWidget(QWidget *parent);
     ~QnPopupCollectionWidget();
     
     void add();
@@ -23,6 +23,8 @@ protected:
 
 private:
     Ui::QnPopupCollectionWidget *ui;
+
+    bool m_adding;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

@@ -6,6 +6,8 @@ QnPopupWidget::QnPopupWidget(QWidget *parent) :
     ui(new Ui::QnPopupWidget)
 {
     ui->setupUi(this);
+    int r = qrand();
+    ui->label->setText(ui->label->text() + QString::number(r));
 }
 
 QnPopupWidget::~QnPopupWidget()

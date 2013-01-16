@@ -28,6 +28,13 @@
     <widget class="QLineEdit" name="emailLineEdit"/>
    </item>
    <item>
+    <widget class="QPushButton" name="settingsButton">
+     <property name="text">
+      <string>Settings..</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -39,13 +46,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <widget class="QPushButton" name="settingsButton">
-     <property name="text">
-      <string>Settings..</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

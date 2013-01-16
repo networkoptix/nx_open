@@ -21,6 +21,7 @@ namespace {
     const QLatin1String statusObject("status");
     const QLatin1String disabledObject("disabled");
     const QLatin1String panicObject("panic");
+    const QLatin1String bbaObject("broadcastBusinessAction");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -966,6 +967,26 @@ bool QnAppServerConnection::setPanicMode(bool value)
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, panicObject, requestHeaders, requestParams, "", response);
+
+    if (result)
+        m_lastError = response.errorString;
+
+    return result;
+}
+
+bool QnAppServerConnection::broadcastBusinessAction(const QnBusinessAction& businessAction)
+{
+    m_lastError.clear();
+
+    QnRequestHeaderList requestHeaders(m_requestHeaders);
+    QnRequestParamList requestParams(m_requestParams);
+
+    QByteArray body;
+    // TODO: gdm  serialize business action here
+    m_serializer.serializePopup(text, body);
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
 
     if (result)
         m_lastError = response.errorString;
