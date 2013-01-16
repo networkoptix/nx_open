@@ -4,6 +4,7 @@ import "resource.proto";
 import "license.proto";
 import "cameraServerItem.proto";
 import "businessRule.proto";
+import "businessAction.proto";
 
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "MessageProtos";
