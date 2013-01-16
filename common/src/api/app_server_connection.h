@@ -12,7 +12,6 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "core/resource/media_server_resource.h"
-#include "core/resource/storage_resource.h"
 #include "core/misc/schedule_task.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_resource.h"

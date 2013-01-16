@@ -270,7 +270,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
         }
 
         m_formatContext = avformat_alloc_context();
-        m_formatContext->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
+        m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
         if (!m_ioContext) {
             close();
             m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
@@ -310,7 +310,7 @@ void QnAviArchiveDelegate::close()
 
     if (m_ioContext)
     {
-        m_storage->closeFfmpegIOContext(m_ioContext);
+        QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
         m_ioContext = 0;
     }
     

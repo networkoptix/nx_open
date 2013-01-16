@@ -95,7 +95,7 @@ void QnStreamRecorder::close()
         if (m_startDateTime != qint64(AV_NOPTS_VALUE))
         {
             qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
-            fileFinished(fileDuration, m_fileName, m_mediaProvider, m_storage->getFileSizeByIOContext(m_ioContext));
+            fileFinished(fileDuration, m_fileName, m_mediaProvider, QnFfmpegHelper::getFileSizeByIOContext(m_ioContext));
         }
 
         //QMutexLocker mutex(&global_ffmpeg_mutex);
@@ -107,7 +107,7 @@ void QnStreamRecorder::close()
         
         if (m_ioContext)
         {
-            m_storage->closeFfmpegIOContext(m_ioContext);
+            QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
 #ifndef SIGN_FRAME_ENABLED
             if (m_needCalcSignature)
                 updateSignatureAttr();
@@ -576,7 +576,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             audioStream->first_dts = 0;
         }
 
-        m_formatCtx->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
+        m_formatCtx->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::WriteOnly);
         if (m_ioContext == 0)
         {
             avformat_close_input(&m_formatCtx);
@@ -588,7 +588,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         int rez = avformat_write_header(m_formatCtx, 0);
         if (rez < 0) 
         {
-            m_storage->closeFfmpegIOContext(m_ioContext);
+            QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
             m_ioContext = 0;
             m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);

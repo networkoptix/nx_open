@@ -32,7 +32,7 @@ QnResourceList QnAppServerResourceSearcher::findResources()
 
     if (appServerConnection->getResources(resources) != 0)
     {
-        qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << appServerConnection->getLastError();
+        qWarning() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << appServerConnection->getLastError();
     } else
     {
         setShouldBeUsed(false);

@@ -36,16 +36,21 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
         errStr = tr("Parameter 'event_type' is absent or empty. \n");
     else {
         resource= qnResPool->getResourceByUniqId(resourceId);
-        if (!resource)
-            errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
+        if (!resource) {
+            resource= qnResPool->getResourceByGuid(resourceId);
+            if (!resource)
+                errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
+        }
     }
 
-    if (eventType == QLatin1String("MServerFailure"))
-        qnBusinessRuleConnector->at_mserverFailure(resource, qnSyncTime->currentUSecsSinceEpoch());
-    //else if (eventType == "UserEvent")
-    //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
-    else if (errStr.isEmpty())
-        errStr = QString(QLatin1String("Unknown business event type '%1' \n")).arg(eventType);
+    if (errStr.isEmpty()) {
+        if (eventType == QLatin1String("MServerFailure"))
+            qnBusinessRuleConnector->at_mserverFailure(resource, qnSyncTime->currentUSecsSinceEpoch());
+        //else if (eventType == "UserEvent")
+        //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
+        else if (errStr.isEmpty())
+            errStr = QString(QLatin1String("Unknown business event type '%1' \n")).arg(eventType);
+    }
 
     if (!errStr.isEmpty())
     {
