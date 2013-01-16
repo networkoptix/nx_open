@@ -1358,8 +1358,6 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     //updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
-
-    at_showPopupAction_triggered();
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
@@ -1824,6 +1822,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         name = dialog->name();
     }
 
+    at_showPopupAction_triggered();
     if(name == resource->getName())
         return;
 
