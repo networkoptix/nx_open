@@ -63,6 +63,7 @@ public:
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
     virtual void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data) = 0;
+    virtual void deserializePopup(QString& text, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
@@ -72,6 +73,7 @@ public:
     virtual void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
     virtual void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data) = 0;
+    virtual void serializePopup(const QString& text, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
