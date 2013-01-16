@@ -6,6 +6,7 @@
 #include "utils/common/sleep.h"
 #include "session_manager.h"
 #include "utils/common/synctime.h"
+#include "message.pb.h"
 
 namespace {
     const QLatin1String cameraObject("camera");
@@ -974,16 +975,22 @@ bool QnAppServerConnection::setPanicMode(bool value)
     return result;
 }
 
-int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
+int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& action)
 {
     m_lastError.clear();
 
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);
 
-    QByteArray body;
-    // TODO: gdm  serialize business action here
+    pb::BroadcastBusinessActionMessage msg;
+    // TODO: #gdm  serialize business action here
     // m_serializer.serializePopup(text, body);
+
+    std::string str;
+    if (!msg.SerializeToString(&str))
+        return false;
+
+    QByteArray body = QByteArray(str.data(), str.length());
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
