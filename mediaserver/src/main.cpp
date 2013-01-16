@@ -72,6 +72,8 @@
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
+#include "events/business_event_connector.h"
+#include "utils/common/synctime.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -615,6 +617,16 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
         qWarning() << "Error saving server: " << errorString;
 }
 
+void QnMain::at_cameraIPConflict(QHostAddress host)
+{
+    qnBusinessRuleConnector->at_cameraIPConflict(
+        m_mediaServer,
+        host,
+        qnResPool->getAllNetResourceByHostAddress(host),
+        qnSyncTime->currentUSecsSinceEpoch());
+}
+
+
 void QnMain::initTcpListener()
 {
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
@@ -718,6 +730,7 @@ void QnMain::run()
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    connect(&QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress)), this, SLOT(at_cameraIPConflict(QHostAddress)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())

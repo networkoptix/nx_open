@@ -406,6 +406,16 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         }
     }
 
+    // ========================= send conflict info =====================
+    for (QMap<quint32, int>::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    {
+        if (itr.value() > 1) 
+        {
+            QHostAddress hostAddr(itr.key());
+            emit CameraIPConflict(hostAddr);
+        }
+    }
+
     //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
     if (doOfflineCheck)
         markOfflineIfNeeded(discoveredResources);

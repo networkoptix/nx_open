@@ -25,7 +25,7 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first.toLocal8Bit() == "res_id")
+        if (params[i].first.toLocal8Bit() == "res_id" || params[i].first.toLocal8Bit() == "guid")
             resourceId = params[i].second;
         else if (params[i].first.toLocal8Bit() == "event_type")
             eventType = params[i].second;

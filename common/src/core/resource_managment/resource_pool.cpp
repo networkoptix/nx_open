@@ -310,6 +310,24 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QStrin
     return result;
 }
 
+QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const
+{
+    return getAllNetResourceByHostAddress(hostAddress.toString());
+}
+
+QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QString &hostAddress) const
+{
+    QnNetworkResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
+        if (netResource != 0 && netResource->getHostAddress() == hostAddress)
+            result << netResource;
+    }
+
+    return result;
+}
+
 QnNetworkResourcePtr QnResourcePool::getEnabledResourceByPhysicalId(const QString &physicalId) const {
     foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByPhysicalId(physicalId))
         if(!resource->isDisabled())
