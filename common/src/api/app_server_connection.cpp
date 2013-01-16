@@ -982,10 +982,11 @@ bool QnAppServerConnection::broadcastBusinessAction(const QnBusinessAction& busi
     QnRequestParamList requestParams(m_requestParams);
 
     QByteArray body;
+    // TODO: gdm  serialize business action here
     m_serializer.serializePopup(text, body);
 
     QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendPostRequest(m_url, popupObject, requestHeaders, requestParams, body, response);
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
 
     if (result)
         m_lastError = response.errorString;
