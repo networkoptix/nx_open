@@ -1,0 +1,8 @@
+package pb;
+
+enum ToggleStateType {
+    State_Off        = 0;
+    State_On         = 1;
+    State_NotDefined = 2;
+}
+
