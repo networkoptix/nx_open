@@ -323,7 +323,9 @@ void QnBusinessRuleWidget::resetFromRule() {
     ui->aggregationCheckBox->setChecked(msecs > 0);
     if (msecs > 0) {
         int idx = 0;
-        while (idx < ui->aggregationPeriodComboBox->count() - 1 && msecs >= aggregationSteps[idx+1])
+        while (idx < ui->aggregationPeriodComboBox->count() - 1
+               && msecs >= aggregationSteps[idx+1]
+               && msecs % aggregationSteps[idx+1] == 0)
             idx++;
 
         ui->aggregationPeriodComboBox->setCurrentIndex(idx);

@@ -201,7 +201,7 @@
          <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
         </property>
         <property name="maximum">
-         <number>60</number>
+         <number>9999</number>
         </property>
         <property name="value">
          <number>10</number>

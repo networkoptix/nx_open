@@ -213,22 +213,18 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
         QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
         return;
     }
-    w->setHasChanges(false);
-
-    updateControlButtons();
+    //w->setHasChanges(false);
 
     //TODO: load changes from resource
 
-    if (success) {
-        QnResourcePtr res = resources.first();
-        QnBusinessEventRulePtr rule = res.dynamicCast<QnBusinessEventRule>();
-        if (!rule)
-            success = false;
-        else
-            w->rule()->setId(rule->getId());
-    }
+    QnResourcePtr res = resources.first();
+    QnBusinessEventRulePtr rule = res.dynamicCast<QnBusinessEventRule>();
+    if (!rule)
+        return;
 
-
+    w->rule()->setId(rule->getId());
+    w->resetFromRule();
+    updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
