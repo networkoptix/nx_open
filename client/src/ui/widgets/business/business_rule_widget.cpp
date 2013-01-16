@@ -50,6 +50,14 @@ namespace {
         return QString();
     }
 
+    // make sure size is equal to ui->aggregationComboBox->count()
+    const int aggregationSteps[] = {
+        1,                    /* 1 second. */
+        60,                   /* 1 minute. */
+        60 * 60,              /* 1 hour. */
+        60 * 60 * 24          /* 1 day. */
+    };
+
 } // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent, QnWorkbenchContext *context) :
@@ -313,18 +321,16 @@ void QnBusinessRuleWidget::resetFromRule() {
         m_actionParameters->loadParameters(m_rule->actionParams());
     //TODO: setup widget depending on resource, e.g. max fps or channel list
 
-    {
-        int i = m_rule->aggregationPeriod();
+    int msecs = m_rule->aggregationPeriod();
+    ui->aggregationCheckBox->setChecked(msecs > 0);
+    if (msecs > 0) {
         int idx = 0;
-        ui->aggregationCheckBox->setChecked(i > 0);
-        while (i > 0 && i % 60 == 0 && idx < ui->aggregationPeriodComboBox->count() - 1) {
-            i /= 60;
+        while (idx < ui->aggregationPeriodComboBox->count() - 1 && msecs >= aggregationSteps[idx+1])
             idx++;
-        }
-        ui->aggregationPeriodComboBox->setCurrentIndex(idx);
-        ui->aggregationValueSpinBox->setValue(i);
-    }
 
+        ui->aggregationPeriodComboBox->setCurrentIndex(idx);
+        ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
+    }
 
     updateDefinition();
     updateEventResources();
@@ -350,10 +356,9 @@ void QnBusinessRuleWidget::apply() {
     m_rule->setActionType(getCurrentActionType());
     m_rule->setActionParams(m_actionParameters ? m_actionParameters->parameters() : QnBusinessParams());
     {
-        int i = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
-        for (int idx = ui->aggregationPeriodComboBox->currentIndex(); idx >= 0; idx--)
-            i *= 60;
-        m_rule->setAggregationPeriod(i);
+        int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
+        int idx = ui->aggregationPeriodComboBox->currentIndex();
+        m_rule->setAggregationPeriod(val * aggregationSteps[idx]);
     }
 
 }

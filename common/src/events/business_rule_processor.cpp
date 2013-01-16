@@ -141,7 +141,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     QAggregationInfo& aggInfo = m_aggregateActions[eventKey];
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
     aggInfo.count++;
-    if (currentTime - aggInfo.timeStamp < rule->aggregationPeriod()*1000ll)
+    if (currentTime - aggInfo.timeStamp < rule->aggregationPeriod()*1000ll*1000ll)
         return QnAbstractBusinessActionPtr();
     
     QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent);
