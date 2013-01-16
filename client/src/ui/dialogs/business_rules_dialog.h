@@ -40,6 +40,9 @@ protected:
 private slots:
     void at_context_userChanged();
 
+    void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
+    void at_message_ruleDeleted(QnId id);
+
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();

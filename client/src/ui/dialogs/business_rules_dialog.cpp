@@ -15,6 +15,8 @@
 
 #include <utils/settings.h>
 
+#include <client_message_processor.h>
+
 namespace {
 //TODO: tr
     static QLatin1String prolongedEvent("While %1");
@@ -107,6 +109,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
 
     connect(context,  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
 
+    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
+            this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
+    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
+            this, SLOT(at_message_ruleDeleted(QnId)));
+
 //    connect(ui->closeButton,    SIGNAL(clicked()), this, SLOT(reject()));
 
     at_context_userChanged();
@@ -158,6 +165,16 @@ void QnBusinessRulesDialog::at_context_userChanged() {
     }
 
     updateControlButtons();
+}
+
+void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
+    //widget by rule, item by widget - already written
+    qDebug() << "rule changed" << rule->getId();
+}
+
+void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+    //widget by rule, item by widget - already written
+    qDebug() << "rule deleted" << id;
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
