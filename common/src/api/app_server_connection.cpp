@@ -974,7 +974,7 @@ bool QnAppServerConnection::setPanicMode(bool value)
     return result;
 }
 
-bool QnAppServerConnection::broadcastBusinessAction(const QnBusinessAction& businessAction)
+int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
 {
     m_lastError.clear();
 
@@ -983,7 +983,7 @@ bool QnAppServerConnection::broadcastBusinessAction(const QnBusinessAction& busi
 
     QByteArray body;
     // TODO: gdm  serialize business action here
-    m_serializer.serializePopup(text, body);
+    // m_serializer.serializePopup(text, body);
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
