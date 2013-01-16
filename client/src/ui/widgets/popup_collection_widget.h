@@ -10,12 +10,16 @@ namespace Ui {
 class QnPopupCollectionWidget : public QWidget
 {
     Q_OBJECT
+    typedef QWidget base_type;
     
 public:
     explicit QnPopupCollectionWidget(QWidget *parent = 0);
     ~QnPopupCollectionWidget();
     
     void add();
+
+protected:
+    virtual void showEvent(QShowEvent *event) override;
 
 private:
     Ui::QnPopupCollectionWidget *ui;
