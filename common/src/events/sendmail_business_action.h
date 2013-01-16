@@ -18,7 +18,7 @@ class QnSendMailBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnSendMailBusinessAction(QnBusinessParams runtimeParams);
+    explicit QnSendMailBusinessAction(const QnBusinessParams &runtimeParams);
     ~QnSendMailBusinessAction() {}
 
     QString getSubject() const;

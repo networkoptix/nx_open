@@ -18,8 +18,8 @@ namespace BusinessActionParameters {
 
 }
 
-QnSendMailBusinessAction::QnSendMailBusinessAction(QnBusinessParams runtimeParams):
-    base_type(BusinessActionType::BA_SendMail)
+QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessParams &runtimeParams):
+    base_type(BusinessActionType::BA_SendMail, runtimeParams)
 {
     m_eventType =           QnBusinessEventRuntime::getEventType(runtimeParams);
     m_eventResourceName =   QnBusinessEventRuntime::getEventResourceName(runtimeParams);

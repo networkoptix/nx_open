@@ -13,7 +13,7 @@ namespace BusinessActionParameters {
 
 }
 
-QnPopupBusinessAction::QnPopupBusinessAction():
-    base_type(BusinessActionType::BA_ShowPopup)
+QnPopupBusinessAction::QnPopupBusinessAction(const QnBusinessParams &runtimeParams):
+    base_type(BusinessActionType::BA_ShowPopup, runtimeParams)
 {
 }

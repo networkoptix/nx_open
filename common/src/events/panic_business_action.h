@@ -15,7 +15,7 @@ class QnPanicBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnPanicBusinessAction();
+    explicit QnPanicBusinessAction(const QnBusinessParams &runtimeParams);
 
 private:
 };

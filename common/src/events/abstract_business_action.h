@@ -63,7 +63,7 @@ typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 class QnAbstractBusinessAction
 {
 protected:
-    explicit QnAbstractBusinessAction(BusinessActionType::Value actionType);
+    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams);
 
 public:
     virtual ~QnAbstractBusinessAction();
@@ -84,6 +84,9 @@ public:
     void setParams(const QnBusinessParams& params);
     const QnBusinessParams& getParams() const;
 
+    void setRuntimeParams(const QnBusinessParams& params);
+    const QnBusinessParams& getRuntimeParams() const;
+
     void setBusinessRuleId(const QnId& value);
     QnId getBusinessRuleId() const;
 
@@ -102,6 +105,7 @@ private:
     bool m_receivedFromRemoteHost;
     QnResourceList m_resources;
     QnBusinessParams m_params;
+    QnBusinessParams m_runtimeParams;
     QnId m_businessRuleId; // business rule, that generated this action
     int m_aggregationCount;
 };

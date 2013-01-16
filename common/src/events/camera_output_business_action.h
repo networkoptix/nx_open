@@ -16,7 +16,7 @@ class QnCameraOutputBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnCameraOutputBusinessAction();
+    explicit QnCameraOutputBusinessAction(const QnBusinessParams &runtimeParams);
 
     QString getRelayOutputId() const;
     int getRelayAutoResetTimeout() const;

@@ -56,10 +56,11 @@ namespace BusinessActionType {
     }
 }
 
-QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value actionType):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false),
+    m_runtimeParams(runtimeParams),
     m_aggregationCount(1)
 {
 }
@@ -76,6 +77,7 @@ QByteArray QnAbstractBusinessAction::serialize()
     foreach(QnResourcePtr res, getResources())
         pb_businessAction.add_actionresource(res->getId());
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
+    pb_businessAction.set_runtimeparams(serializeBusinessParams(getRuntimeParams()));
     pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
     pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
     pb_businessAction.set_aggregationcount(getAggregationCount());
@@ -130,6 +132,14 @@ void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
 
 const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
     return m_params;
+}
+
+void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessParams& params) {
+    m_runtimeParams = params;
+}
+
+const QnBusinessParams& QnAbstractBusinessAction::getRuntimeParams() const {
+    return m_runtimeParams;
 }
 
 void QnAbstractBusinessAction::setBusinessRuleId(const QnId& value) {

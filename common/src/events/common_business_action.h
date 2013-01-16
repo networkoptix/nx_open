@@ -12,7 +12,7 @@ class QnCommonBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnCommonBusinessAction( BusinessActionType::Value actionType );
+    explicit QnCommonBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams &runtimeParams);
 };
 
 #endif  //COMMON_BUSINESS_ACTION_H

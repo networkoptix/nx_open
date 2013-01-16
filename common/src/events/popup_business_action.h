@@ -12,7 +12,7 @@ class QnPopupBusinessAction : public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    QnPopupBusinessAction();
+    QnPopupBusinessAction(const QnBusinessParams &runtimeParams);
 };
 
 #endif // POPUP_BUSINESS_ACTION_H

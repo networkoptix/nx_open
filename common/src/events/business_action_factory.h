@@ -6,7 +6,7 @@
 class QnBusinessActionFactory
 {
 public:
-    static QnAbstractBusinessActionPtr createAction(BusinessActionType::Value actionType, QnBusinessParams runtimeParams);
+    static QnAbstractBusinessActionPtr createAction(const BusinessActionType::Value actionType, const QnBusinessParams &runtimeParams);
 };
 
 #endif // BUSINESS_ACTION_FACTORY_H
