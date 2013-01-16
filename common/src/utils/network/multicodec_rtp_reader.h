@@ -41,6 +41,7 @@ private:
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
+	void buildClientRTCPReport(quint8 chNumber);
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
 private:
@@ -60,6 +61,7 @@ private:
     QnRtspTimeHelper m_timeHelper;
     QVector<int> m_gotKeyData;
     bool m_pleaseStop;
+    QTime m_rtcpReportTimer;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__
