@@ -996,6 +996,30 @@ void QnApiPbSerializer::serializeEmail(const QString& to, const QString& subject
     data = QByteArray(str.data(), str.length());
 }
 
+void QnApiPbSerializer::deserializePopup(QString& text, const QByteArray& data)
+{
+    pb::Popup pb_popup;
+
+    if (!pb_popup.ParseFromArray(data.data(), data.size()))
+    {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializePopup(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    text = pb_popup.text();
+}
+
+void QnApiPbSerializer::serializePopup(const QString& text, QByteArray& data)
+{
+    pb::Popup pb_popup;
+    pb_popup.set_text(text.toUtf8().constData());
+
+    std::string str;
+    pb_popup.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory)
 {
     switch (pb_resource.type())

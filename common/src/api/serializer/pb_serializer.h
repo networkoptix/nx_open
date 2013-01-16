@@ -28,6 +28,7 @@ public:
     void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) override;
     void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
     void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data);
+    void deserializePopup(QString& text, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
     void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) override;
@@ -37,6 +38,7 @@ public:
     void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) override;
     void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
     void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data);
+    void serializePopup(const QString& text, QByteArray& data);
 
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) override;

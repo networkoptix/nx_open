@@ -4,6 +4,7 @@ import "resource.proto";
 import "license.proto";
 import "cameraServerItem.proto";
 import "businessRule.proto";
+import "popup.proto";
 
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "MessageProtos";
@@ -25,6 +26,8 @@ message Message {
 
         BusinessRuleChange     = 8;
         BusinessRuleDelete     = 9;
+
+        Popup                  = 10;
     }
 
     required Type type = 1;
@@ -63,3 +66,10 @@ message BusinessRuleMessage {
     required BusinessRule businessRule = 1;
 }
 
+message PopupMessage {
+    extend Message {
+        required PopupMessage message = 104;
+    }
+
+    required Popup popup = 1;
+}
