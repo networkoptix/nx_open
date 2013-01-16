@@ -21,7 +21,7 @@ namespace {
     const QLatin1String statusObject("status");
     const QLatin1String disabledObject("disabled");
     const QLatin1String panicObject("panic");
-    const QLatin1String popupObject("popup");
+    const QLatin1String bbaObject("broadcastBusinessAction");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -974,7 +974,7 @@ bool QnAppServerConnection::setPanicMode(bool value)
     return result;
 }
 
-bool QnAppServerConnection::popup(const QString& text)
+bool QnAppServerConnection::broadcastBusinessAction(const QnBusinessAction& businessAction)
 {
     m_lastError.clear();
 

@@ -4,7 +4,6 @@ import "resource.proto";
 import "license.proto";
 import "cameraServerItem.proto";
 import "businessRule.proto";
-import "popup.proto";
 
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "MessageProtos";
@@ -13,21 +12,21 @@ message Message {
     extensions 100 to max;
 
     enum Type {
-        Initial                = 0;
-        Ping                   = 1;
+        Initial                 = 0;
+        Ping                    = 1;
 
-        ResourceChange         = 2;
-        ResourceDelete         = 3;
-        ResourceStatusChange   = 4;
-        ResourceDisabledChange = 5;
+        ResourceChange          = 2;
+        ResourceDelete          = 3;
+        ResourceStatusChange    = 4;
+        ResourceDisabledChange  = 5;
 
-        License                = 6;
-        CameraServerItem       = 7;
+        License                 = 6;
+        CameraServerItem        = 7;
 
-        BusinessRuleChange     = 8;
-        BusinessRuleDelete     = 9;
+        BusinessRuleChange      = 8;
+        BusinessRuleDelete      = 9;
 
-        Popup                  = 10;
+        BroadcastBusinessAction = 10;
     }
 
     required Type type = 1;
@@ -66,10 +65,10 @@ message BusinessRuleMessage {
     required BusinessRule businessRule = 1;
 }
 
-message PopupMessage {
+message BroadcastBusinessActionMessage {
     extend Message {
-        required PopupMessage message = 104;
+        required BroadcastBusinessActionMessage message = 104;
     }
 
-    required Popup popup = 1;
+    required BusinessAction businessAction = 1;
 }

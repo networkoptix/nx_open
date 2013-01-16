@@ -1,8 +1,0 @@
-package pb;
-
-option java_package = "com.google.protobuf.implementation";
-option java_outer_classname = "PopupProtos";
-
-message Popup {
-    optional string text  = 1;
-}
