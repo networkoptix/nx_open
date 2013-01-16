@@ -144,7 +144,7 @@ void QnBusinessRulesDialog::at_context_userChanged() {
     m_listModel->clear();
 
     QStringList header;
-    header << tr("#") << tr("Event") << tr("Source") << QString() << tr("Action") << tr("Target");
+    header << tr("#") << tr("Event") << tr("Source") << QLatin1String("->") << tr("Action") << tr("Target");
     m_listModel->setHorizontalHeaderLabels(header);
 
     if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {

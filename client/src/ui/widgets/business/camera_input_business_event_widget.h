@@ -16,7 +16,6 @@ class QnCameraInputBusinessEventWidget : public QnAbstractBusinessParamsWidget
 public:
     explicit QnCameraInputBusinessEventWidget(QWidget *parent = 0);
     ~QnCameraInputBusinessEventWidget();
-    
 
     virtual void loadParameters(const QnBusinessParams &params) override;
     virtual QnBusinessParams parameters() const override;

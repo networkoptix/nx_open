@@ -26,9 +26,5 @@ QnBusinessParams QnCameraInputBusinessEventWidget::parameters() const {
 }
 
 QString QnCameraInputBusinessEventWidget::description() const {
-    QString fmt = QLatin1String("%1 <span style=\"font-weight:600;\">%2</span>");
-    QString recordStr = QObject::tr("On input");
-    return fmt
-            .arg(recordStr)
-            .arg(ui->inputIdLineEdit->text());
+    //TODO: #GDM remove me
 }

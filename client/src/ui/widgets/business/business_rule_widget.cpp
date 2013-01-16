@@ -78,8 +78,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     ui->eventStatesComboBox->setModel(m_eventStatesModel);
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
 
-    ui->eventParamsFrame->setVisible(false);
-
     ui->eventDefinitionFrame->installEventFilter(this);
     ui->actionDefinitionFrame->installEventFilter(this);
 
