@@ -3,6 +3,7 @@ package pb;
 import "resource.proto";
 import "license.proto";
 import "cameraServerItem.proto";
+import "businessRule.proto";
 
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "MessageProtos";
@@ -13,12 +14,17 @@ message Message {
     enum Type {
         Initial                = 0;
         Ping                   = 1;
+
         ResourceChange         = 2;
         ResourceDelete         = 3;
         ResourceStatusChange   = 4;
         ResourceDisabledChange = 5;
+
         License                = 6;
         CameraServerItem       = 7;
+
+        BusinessRuleChange     = 8;
+        BusinessRuleDelete     = 9;
     }
 
     required Type type = 1;
@@ -48,3 +54,12 @@ message CameraServerItemMessage {
 
     required CameraServerItem cameraServerItem = 1;
 }
+
+message BusinessRuleMessage {
+    extend Message {
+        required BusinessRuleMessage message = 103;
+    }
+
+    required BusinessRule businessRule = 1;
+}
+
