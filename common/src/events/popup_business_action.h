@@ -15,4 +15,6 @@ public:
     QnPopupBusinessAction();
 };
 
+typedef QSharedPointer<QnPopupBusinessAction> QnPopupBusinessActionPtr;
+
 #endif // POPUP_BUSINESS_ACTION_H

@@ -57,6 +57,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
             break;
 
         case BusinessActionType::BA_ShowPopup:
+            return showPopup(action.dynamicCast<QnPopupBusinessAction>());
             break;
 
         default:
@@ -243,6 +244,17 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
             arg(emailAddress).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
+        return false;
+    }
+    return true;
+}
+
+bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
+{
+    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
+    if( appServerConnection->broadcastBusinessAction(action))
+    {
+        qWarning() << "Error processing action broadcastBusinessAction";
         return false;
     }
     return true;
