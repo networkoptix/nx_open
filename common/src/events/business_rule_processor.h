@@ -46,6 +46,10 @@ public slots:
 
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
+
+    void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
+    void at_businessRuleDeleted(QnId id);
+
 private slots:
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
@@ -93,6 +97,7 @@ private:
         int count;
     };
     QMap<QString, QAggregationInfo> m_aggregateActions;
+    mutable QMutex m_mutex;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

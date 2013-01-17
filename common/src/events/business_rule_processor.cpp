@@ -82,6 +82,7 @@ void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
 
 void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
 {
+    QMutexLocker lock(&m_mutex);
     m_rules << value;
 }
 
@@ -152,6 +153,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
 
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
+    QMutexLocker lock(&m_mutex);
     QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
@@ -257,4 +259,31 @@ bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
         return false;
     }
     return true;
+}
+
+void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRule)
+{
+    QMutexLocker lock(&m_mutex);
+    for (int i = 0; i < m_rules.size(); ++i)
+    {
+        if (m_rules[i]->getId() == bRule->getId())
+        {
+            m_rules[i] = bRule;
+            return;
+        }
+    }
+    m_rules << bRule;
+}
+
+void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
+{
+    QMutexLocker lock(&m_mutex);
+    for (int i = 0; i < m_rules.size(); ++i)
+    {
+        if (m_rules[i]->getId() == id)
+        {
+            m_rules.removeAt(i);
+            break;
+        }
+    }
 }
