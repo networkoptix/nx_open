@@ -48,6 +48,7 @@ namespace conn_detail
     signals:
         void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
         void finishedLicense(int status, const QByteArray &errorString, QnLicenseList licenses, int handle);
+        void finishedKvPair(int status, const QByteArray& errorString, QnKvPairList kvPairs, int handle);
         void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
 
     private:
@@ -118,6 +119,8 @@ public:
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
     int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
+
+    int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
 
     int deleteAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);

@@ -23,6 +23,7 @@ public:
     void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
     void deserializeBusinessRules(QnBusinessEventRules& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
+    void deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
     void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) override;
@@ -33,6 +34,8 @@ public:
     void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
     void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data) override;
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
+    void serializeKvPair(const QnKvPair& kvPair, QByteArray& data);
+    void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data);
 
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) override;
