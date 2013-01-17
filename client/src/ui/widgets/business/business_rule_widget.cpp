@@ -60,12 +60,11 @@ namespace {
 
 } // namespace
 
-QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent, QnWorkbenchContext *context) :
+QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnBusinessRuleWidget),
-    m_rule(rule),
-    m_hasChanges(false),
+    m_model(NULL),
     m_eventParameters(NULL),
     m_actionParameters(NULL),
     m_eventTypesModel(new QStandardItemModel(this)),
@@ -103,6 +102,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget 
     //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
 
     initEventTypes();
+
+    setVisible(false);
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
@@ -110,12 +111,9 @@ QnBusinessRuleWidget::~QnBusinessRuleWidget()
     delete ui;
 }
 
-QnBusinessEventRulePtr QnBusinessRuleWidget::rule() const {
-    return m_rule;
-}
-
-bool QnBusinessRuleWidget::hasChanges() const {
-    return m_hasChanges;
+void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
+    m_model = model;
+    setVisible(m_model);
 }
 
 void QnBusinessRuleWidget::initEventTypes() {

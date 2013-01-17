@@ -15,6 +15,9 @@
 #include <events/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>
+
+#include <ui/models/business_rules_view_model.h>
+
 #include <ui/widgets/business/business_rule_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -77,10 +80,14 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QStandardItemModel* m_listModel;
+    QnBusinessRulesViewModel* m_rulesViewModel;
+
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     QMap<int, QnBusinessRuleWidget*> m_processingWidgets;
     QnAppServerConnectionPtr m_connection;
+
+
 };
 
 #endif // QN_BUSINESS_RULES_DIALOG_H

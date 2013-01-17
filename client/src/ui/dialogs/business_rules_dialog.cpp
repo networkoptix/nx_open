@@ -89,10 +89,14 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
 
+    m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
+
     ui->tableView->setModel(m_listModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->installEventFilter(this);
+
+    ui->tableView_2->setModel(m_rulesViewModel);
 
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
@@ -148,6 +152,7 @@ void QnBusinessRulesDialog::at_context_userChanged() {
         QnBusinessRuleWidget* w = (QnBusinessRuleWidget *)m_listModel->item(i, 0)->data(WidgetRole).value<QWidget *>();
         delete w;
     }
+    m_rulesViewModel->clear();
     m_listModel->clear();
 
     QStringList header;
@@ -157,6 +162,7 @@ void QnBusinessRulesDialog::at_context_userChanged() {
     if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         QnBusinessEventRules rules;
         m_connection->getBusinessRules(rules); // TODO: replace synchronous call
+        m_rulesViewModel->addRules(rules);
         foreach (QnBusinessEventRulePtr rule, rules) {
             QnBusinessRuleWidget* w = createWidget(rule);
             m_listModel->appendRow(createRow(w));
@@ -367,7 +373,7 @@ void QnBusinessRulesDialog::at_widgetActionResourcesChanged(QnBusinessRuleWidget
 
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
-
+/*
     if (m_currentDetailsWidget) {
         ui->detailsLayout->removeWidget(m_currentDetailsWidget);
         m_currentDetailsWidget->setVisible(false);
@@ -381,12 +387,19 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
         ui->detailsLayout->addWidget(m_currentDetailsWidget);
         m_currentDetailsWidget->setVisible(true);
     }
+*/
+    QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->getRuleModel(current.row());
+    if (!m_currentDetailsWidget) {
+        m_currentDetailsWidget = new QnBusinessRuleWidget(this, context());
+        ui->detailsLayout->addWidget(m_currentDetailsWidget);
+    }
+    m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
 }
 
 QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr rule) {
-    QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this, context());
+ /*   QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this, context());
     connect(w, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
             this, SLOT(at_widgetHasChangesChanged(QnBusinessRuleWidget*,bool)));
     connect(w, SIGNAL(definitionChanged(QnBusinessRuleWidget*,BusinessEventType::Value,ToggleState::Value,BusinessActionType::Value)),
@@ -396,7 +409,7 @@ QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr
     connect(w, SIGNAL(actionResourcesChanged(QnBusinessRuleWidget*,BusinessActionType::Value,QnResourceList)),
             this, SLOT(at_widgetActionResourcesChanged(QnBusinessRuleWidget*,BusinessActionType::Value,QnResourceList)));
     w->setVisible(false);
-    return w;
+    return w;*/
 }
 
 QList<QStandardItem *> QnBusinessRulesDialog::createRow(QnBusinessRuleWidget* widget) {

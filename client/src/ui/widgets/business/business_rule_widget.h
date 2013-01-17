@@ -7,6 +7,8 @@
 #include <events/business_logic_common.h>
 #include <events/abstract_business_event.h>
 
+#include <ui/models/business_rules_view_model.h>
+
 #include <ui/widgets/business/abstract_business_params_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -23,34 +25,10 @@ class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
     
     typedef QWidget base_type;
 public:
-    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnBusinessRuleWidget();
 
-    QnBusinessEventRulePtr rule() const;
-
-    bool hasChanges() const;
-    void setHasChanges(bool hasChanges);
-
-    void apply();
-    void resetFromRule();
-
-    QString actionResourcesText();
-signals:
-    void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
-
-    void definitionChanged(QnBusinessRuleWidget* source,
-                           BusinessEventType::Value eventType,
-                           ToggleState::Value eventState,
-                           BusinessActionType::Value actionType);
-
-    void eventResourcesChanged(QnBusinessRuleWidget* source,
-                               BusinessEventType::Value eventType,
-                               const QnResourceList &resource);
-
-
-    void actionResourcesChanged(QnBusinessRuleWidget* source,
-                                BusinessActionType::Value actionType,
-                                const QnResourceList &resource);
+    void setModel(QnBusinessRuleViewModel* model);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -104,8 +82,7 @@ private:
 private:
     Ui::QnBusinessRuleWidget *ui;
 
-    QnBusinessEventRulePtr m_rule;
-    bool m_hasChanges;
+    QnBusinessRuleViewModel* m_model;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
