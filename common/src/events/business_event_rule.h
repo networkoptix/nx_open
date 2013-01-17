@@ -65,4 +65,6 @@ private:
 typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;
 typedef QnSharedResourcePointerList<QnBusinessEventRule> QnBusinessEventRules;
 
+Q_DECLARE_METATYPE(QnBusinessEventRulePtr)
+
 #endif // __ABSTRACT_BUSINESS_EVENT_RULE_H__
