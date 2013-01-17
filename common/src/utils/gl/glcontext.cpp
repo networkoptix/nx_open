@@ -30,23 +30,53 @@
 //    }
 //}
 
+#define USE_INTERNAL_WIDGET
+
 GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
 :
     m_handle( NULL ),
     m_dc( NULL ),
     m_winID( wnd ),
     m_previousErrorCode( 0 )
+#ifdef USE_INTERNAL_WIDGET
+    ,m_widget( new QWidget() )
+#endif
 {
+#ifdef USE_INTERNAL_WIDGET
+    m_winID = m_widget->winId();
+#endif
+
 #ifdef _WIN32
+    Q_ASSERT( IsWindow( m_winID ) );
+
     HDC dc = GetDC( m_winID );
+#ifdef USE_INTERNAL_WIDGET
+    //reading pixel format of src window
+    {
+        HDC hdc = GetDC( wnd );
+        // get the current pixel format index  
+        int iPixelFormat = GetPixelFormat(hdc); 
+
+        memset( &m_pfd, 0, sizeof(m_pfd) );
+        // obtain a detailed description of that pixel format  
+        DescribePixelFormat( hdc, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &m_pfd );
+        ReleaseDC( wnd, hdc );
+
+        if( !SetPixelFormat( dc, iPixelFormat, &m_pfd ) )
+        {
+            m_previousErrorCode = GetLastError();
+            ReleaseDC( m_winID, dc );
+            return;
+        }
+    }
+#endif
     m_handle = wglCreateContext( dc );
+    if( m_handle == NULL )
+        m_previousErrorCode = GetLastError();
     ReleaseDC( m_winID, dc );
     dc = NULL;
     if( m_handle == NULL )
-    {
-        m_previousErrorCode = GetLastError();
         return;
-    }
 
     if( contextHandleToShareWith == NULL )
         return;
@@ -102,6 +132,10 @@ GLContext::~GLContext()
 
 bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
 {
+    //qDebug()<<"GLContext::makeCurrent. "<<m_handle;
+
+    //return true;
+
 #ifdef _WIN32
     if( paintDevToUse != NULL )
     {

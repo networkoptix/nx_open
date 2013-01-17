@@ -137,7 +137,6 @@ public:
     */
     DecodedPictureToOpenGLUploader(
         const QGLContext* const mainContext,
-        GLContext::SYS_GL_CTX_HANDLE mainContextHandle,
         unsigned int asyncDepth = 1 );
     ~DecodedPictureToOpenGLUploader();
 
@@ -230,6 +229,8 @@ private:
     mutable std::deque<AsyncPicDataUploader*> m_unusedUploaders;
     std::deque<AsyncPicDataUploader*> m_usedUploaders;
     QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
+    quint8* m_rgbaBuf;
+    int m_fileNumber;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
@@ -238,6 +239,7 @@ private:
     unsigned int nextPicSequenceValue();
     void ensurePBOInitialized( DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf, size_t sizeInBytes );
     void releasePictureBuffers();
+    void savePicToFile( AVFrame* const pic, int pts );
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H
