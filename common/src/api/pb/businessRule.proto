@@ -1,5 +1,8 @@
 package pb;
 
+import "businessCommon.proto";
+import "businessAction.proto";
+
 enum BusinessEventType {
     NotDefinedEvent    = 0;
     Camera_Motion      = 1;
@@ -10,28 +13,6 @@ enum BusinessEventType {
     Camera_Ip_Conflict = 6;
     MediaServer_Failure= 7;
     UserDefinedEvent   = 1000;
-}
-
-enum BusinessActionType
-{
-    // media server based actions
-    NotDefinedAction = 0;
-    CameraOutput     = 1;    // set camera output signal
-    Bookmark         = 2;    // mark part of camera archive as undeleted
-    CameraRecording  = 3;    // start camera recording
-    PanicRecording   = 4;    // activate panic recording mode
-
-    // these actions can be executed from any endpoint. Actually these actions call specified function at EC
-    SendMail         = 5;
-    Alert            = 6;
-    ShowPopup        = 7;
-}
-
-enum ToggleStateType
-{
-    State_Off        = 0;
-    State_On         = 1;
-    State_NotDefined = 2;
 }
 
 message BusinessRule {
@@ -47,16 +28,6 @@ message BusinessRule {
     optional string actionParams           = 8;
 
     optional int32 aggregationPeriod       = 9; // msecs
-}
-
-message BusinessAction {
-    optional BusinessActionType actionType = 1;
-    repeated int32 actionResource          = 2;
-    optional string actionParams           = 3;
-    optional int32 businessRuleId          = 4;
-    optional string runtimeParams          = 5;
-    optional ToggleStateType toggleState   = 6;
-    optional int32 aggregationCount        = 7;
 }
 
 message BusinessRules {

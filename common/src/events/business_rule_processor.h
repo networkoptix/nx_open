@@ -10,6 +10,7 @@
 #include "business_event_rule.h"
 #include "sendmail_business_action.h"
 #include "camera_output_business_action.h"
+#include "popup_business_action.h"
 
 /*
 * This class route business event and generate business action
@@ -72,6 +73,8 @@ private:
     bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action );
 
     bool sendMail( const QnSendMailBusinessActionPtr& action );
+
+    bool showPopup(QnPopupBusinessActionPtr action);
 
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);

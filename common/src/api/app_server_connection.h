@@ -12,7 +12,6 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "core/resource/media_server_resource.h"
-#include "core/resource/storage_resource.h"
 #include "core/misc/schedule_task.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_resource.h"
@@ -81,7 +80,8 @@ public:
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
     bool setPanicMode(bool value);
-    bool popup(const QString& text);
+    int broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
@@ -129,6 +129,7 @@ public:
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
+    bool broadcastBusinessAction(const QnAbstractBusinessAction& businessAction);
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
 

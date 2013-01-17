@@ -1,5 +1,6 @@
 #include "session_manager.h"
 
+#include <QUrl>
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
 
@@ -7,6 +8,7 @@
 
 #include "utils/common/warnings.h"
 #include "common/common_meta_types.h"
+#include "app_server_connection.h"
 
 Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManagerInstance);
 QAtomicInt QnSessionManager::m_handle(1);
@@ -333,3 +335,23 @@ void QnSessionManager::processReply(const QnHTTPRawResponse& response, int) {
     emit replyReceived(response.status);
 }
 
+
+bool QnSessionManager::checkIfAppServerIsOld()
+{
+    // Check if that was 1.0/1.1
+    QUrl httpUrl;
+    httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
+    httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
+    httpUrl.setScheme(QLatin1String("https"));
+    httpUrl.setUserName(QLatin1String(""));
+    httpUrl.setPassword(QLatin1String(""));
+
+    QnHTTPRawResponse response;
+    if (QnSessionManager::instance()->sendGetRequest(httpUrl, QLatin1String("resourceEx"), response) == 204)
+    {
+        qWarning() << "Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler";
+        return true;
+    }
+
+    return false;
+}

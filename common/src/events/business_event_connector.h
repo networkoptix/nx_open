@@ -40,6 +40,8 @@ public slots:
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
 
     void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp);
+
+    void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QnNetworkResourceList& cameras, qint64 timeStamp);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

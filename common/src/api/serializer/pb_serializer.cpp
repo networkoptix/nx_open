@@ -203,8 +203,8 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
 
             QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters); // TODO: no types in pool => crash
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
-
-            storages.append(storage);
+            if (storage)
+                storages.append(storage);
         }
 
         server->setStorages(storages);

@@ -7,7 +7,6 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
-#include "core/resource/storage_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_history.h"
 #include "events/business_event_rule.h"

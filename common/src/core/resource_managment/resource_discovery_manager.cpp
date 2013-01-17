@@ -11,6 +11,9 @@
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
+#include "core/resource/abstract_storage_resource.h"
+#include "core/resource/storage_resource.h"
+
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
 namespace {
@@ -109,7 +112,8 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
     {
 
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters[QLatin1String("url")]));
-        result->deserialize(parameters);
+        if (result)
+            result->deserialize(parameters);
     }
     else {
         ResourceSearcherList searchersList;
@@ -399,6 +403,16 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
                 it = resources.erase(it); // race condition: manual resource just deleted.
             else
                 ++it; // new resource => shouls keep it
+        }
+    }
+
+    // ========================= send conflict info =====================
+    for (QMap<quint32, int>::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    {
+        if (itr.value() > 1) 
+        {
+            QHostAddress hostAddr(itr.key());
+            emit CameraIPConflict(hostAddr);
         }
     }
 

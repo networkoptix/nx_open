@@ -7,6 +7,8 @@
 #include "storage_failure_business_event.h"
 #include "network_issue_business_event.h"
 #include "mserver_failure_business_event.h"
+#include "ip_conflict_business_event.h"
+#include "core/resource_managment/resource_pool.h"
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 
@@ -49,6 +51,16 @@ void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, 
         resource,
         timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
+}
+
+void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QnNetworkResourceList& cameras, qint64 timeStamp)
+{
+    QnIPConflictBusinessEventPtr ipConflictEvent(new QnIPConflictBusinessEvent(
+        resource,
+        hostAddress,
+        cameras,
+        timeStamp));
+    qnBusinessRuleProcessor->processBusinessEvent(ipConflictEvent);
 }
 
 void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason)

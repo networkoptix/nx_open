@@ -72,6 +72,8 @@
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
+#include "events/business_event_connector.h"
+#include "utils/common/synctime.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -456,26 +458,6 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-bool checkIfAppServerIsOld()
-{
-    // Check if that was 1.0/1.1
-    QUrl httpUrl;
-    httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
-    httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
-    httpUrl.setScheme("https");
-    httpUrl.setUserName("");
-    httpUrl.setPassword("");
-
-    QnHTTPRawResponse response;
-    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", response) == 204)
-    {
-        cl_log.log("Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler", cl_logERROR);
-        return true;
-    }
-
-    return false;
-}
-
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
@@ -635,6 +617,16 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
         qWarning() << "Error saving server: " << errorString;
 }
 
+void QnMain::at_cameraIPConflict(QHostAddress host)
+{
+    qnBusinessRuleConnector->at_cameraIPConflict(
+        m_mediaServer,
+        host,
+        qnResPool->getAllNetResourceByHostAddress(host),
+        qnSyncTime->currentUSecsSinceEpoch());
+}
+
+
 void QnMain::initTcpListener()
 {
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
@@ -738,11 +730,12 @@ void QnMain::run()
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    connect(&QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress)), this, SLOT(at_cameraIPConflict(QHostAddress)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
-        if (checkIfAppServerIsOld())
+        if (QnSessionManager::checkIfAppServerIsOld())
             return;
 
         if (appServerConnection->connect(connectInfo) == 0)
