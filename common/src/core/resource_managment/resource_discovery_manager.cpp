@@ -335,12 +335,16 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
             {
                 if (!newNetRes->hasFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
                 {
-                    quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-                    if (ips) {
-                        if (ipsList.contains(ips))
-                            ipsList[ips]++;
-                        else
-                            ipsList[ips] = 1;
+                    if (newNetRes->getChannel() == 0) 
+                    {
+                        // do not count 2--N channels of multichannel cameras as conflict
+                        quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+                        if (ips) {
+                            if (ipsList.contains(ips))
+                                ipsList[ips]++;
+                            else
+                                ipsList[ips] = 1;
+                        }
                     }
                 }
 

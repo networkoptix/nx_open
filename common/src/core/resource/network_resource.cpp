@@ -285,6 +285,10 @@ bool QnNetworkResource::conflicting()
     return false;
 }
 
+int QnNetworkResource::getChannel() const
+{
+    return 0;
+}
 
 /*
 void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)

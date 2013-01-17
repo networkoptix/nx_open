@@ -82,6 +82,7 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocke
     QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
     for (int i = 0; i < m_handlers.size(); ++i)
     {
+        HandlerInfo h = m_handlers[i];
         if (m_handlers[i].protocol == protocol && normPath.startsWith(m_handlers[i].path))
             return m_handlers[i].instanceFunc(clientSocket, this);
     }

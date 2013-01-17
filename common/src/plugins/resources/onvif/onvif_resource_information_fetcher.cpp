@@ -4,6 +4,7 @@
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
 #include "core/resource_managment/resource_pool.h"
+#include "plugins/resources/flex_watch/flexwatch_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
@@ -194,6 +195,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
+    else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
+        resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

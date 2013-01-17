@@ -126,14 +126,14 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         }
     } else if (event.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
     {
-//       emit businessRuleChanged(message.businessRule);
+       emit businessRuleChanged(event.businessRule);
 
     } else if (event.eventType == Qn::Message_Type_BusinessRuleDelete)
     {
-//        emit businessRuleDeleted(message.resourceId);
+        emit businessRuleDeleted(event.resourceId);
     } else if (event.eventType == Qn::Message_Type_BroadcastBusinessAction)
     {
-//        emit businessActionReceived(message.businessAction);
+        emit businessActionReceived(event.businessAction);
     }
 }
 

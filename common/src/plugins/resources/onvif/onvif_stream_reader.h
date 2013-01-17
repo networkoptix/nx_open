@@ -76,7 +76,6 @@ private:
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
 
     bool sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
-    bool sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool sendVideoSourceToCamera(VideoSource& source) const;
     bool sendAudioEncoderToCamera(AudioEncoder& encoder) const;
 

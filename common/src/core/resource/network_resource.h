@@ -93,7 +93,7 @@ public:
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source);
 
-
+    virtual int getChannel() const;
 private:
     QAuthenticator m_auth;
     bool m_authenticated;

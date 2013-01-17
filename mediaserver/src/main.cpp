@@ -74,6 +74,7 @@
 #include "rest/handlers/ext_bevent_handler.h"
 #include "events/business_event_connector.h"
 #include "utils/common/synctime.h"
+#include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -874,6 +875,8 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
     //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
+
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnFlexWatchResourceSearcher::instance());
 
     QnResourceDiscoveryManager::instance().addDTSServer(&QnColdStoreDTSSearcher::instance());
 
