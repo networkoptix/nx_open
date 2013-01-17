@@ -93,6 +93,24 @@ bool QnMessage::load(const pb::Message &message)
             break;
         case pb::Message_Type_Ping:
             break;
+        case pb::Message_Type_BusinessRuleChange:
+        {
+            //TODO: TODODODOD
+            const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
+            ///parseResource(resource, resourceMessage.resource(), *QnAppServerConnectionFactory::defaultFactory());
+            break;
+        }
+        case pb::Message_Type_BusinessRuleDelete:
+        {
+            const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
+            resourceId = resourceMessage.resource().id();
+            break;
+        }
+        case pb::Message_Type_BroadcastBusinessAction:
+        {
+            //TODO: #GDM
+            break;
+        }
     }
 
     return true;

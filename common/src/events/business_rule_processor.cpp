@@ -57,8 +57,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
             break;
 
         case BusinessActionType::BA_ShowPopup:
-            return showPopup(action.dynamicCast<QnPopupBusinessAction>());
-            break;
+            return showPopup( action.dynamicCast<QnPopupBusinessAction>() );
 
         default:
             break;

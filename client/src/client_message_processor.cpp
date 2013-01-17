@@ -175,10 +175,15 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     {
         if (QnBusinessEventRulePtr rule = message.resource.dynamicCast<QnBusinessEventRule>())
             emit businessRuleChanged(rule);
+
     }
     else if (message.eventType == Qn::Message_Type_BusinessRuleDelete)
     {
         emit businessRuleDeleted(message.resourceId);
+    }
+    else if (message.eventType == Qn::Message_Type_BroadcastBusinessAction)
+    {
+        emit businessActionReceived(message.businessAction);
     }
 
 }

@@ -19,6 +19,6 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const Business
         case BusinessActionType::BA_Alert:              return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
         case BusinessActionType::BA_ShowPopup:          return QnAbstractBusinessActionPtr(new QnPopupBusinessAction(runtimeParams));
     }
-    return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType));
+    return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 }
 

@@ -8,6 +8,8 @@
 #include "utils/common/synctime.h"
 #include "message.pb.h"
 
+#include <events/abstract_business_action.h>
+
 namespace {
     const QLatin1String cameraObject("camera");
     const QLatin1String resourceObject("resource");
@@ -975,23 +977,14 @@ bool QnAppServerConnection::setPanicMode(bool value)
     return result;
 }
 
-int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& action)
+bool QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
 {
     m_lastError.clear();
 
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);
 
-    pb::BroadcastBusinessActionMessage msg;
-    // TODO: #gdm  serialize business action here
-    // m_serializer.serializePopup(text, body);
-
-    std::string str;
-    if (!msg.SerializeToString(&str))
-        return false;
-
-    QByteArray body = QByteArray(str.data(), str.length());
-
+    QByteArray body = businessAction->serialize();
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
 
