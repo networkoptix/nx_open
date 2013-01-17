@@ -7,6 +7,8 @@
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
+void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 
 namespace Qn
 {
@@ -96,19 +98,20 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_BusinessRuleChange:
         {
             //TODO: TODODODOD
-            const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
-            ///parseResource(resource, resourceMessage.resource(), *QnAppServerConnectionFactory::defaultFactory());
+            const pb::BusinessRuleMessage& businessRuleMessage = message.GetExtension(pb::BusinessRuleMessage::message);
+            parseBusinessRule(businessRule, businessRuleMessage.businessrule());
             break;
         }
         case pb::Message_Type_BusinessRuleDelete:
         {
-            const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
-            resourceId = resourceMessage.resource().id();
+            const pb::BusinessRuleMessage& businessRuleMessage = message.GetExtension(pb::BusinessRuleMessage::message);
+            resourceId = businessRuleMessage.businessrule().id();
             break;
         }
         case pb::Message_Type_BroadcastBusinessAction:
         {
-            //TODO: #GDM
+            const pb::BroadcastBusinessActionMessage& businessActionMessage = message.GetExtension(pb::BroadcastBusinessActionMessage::message);
+            parseBusinessAction(businessAction, businessActionMessage.businessaction());
             break;
         }
     }

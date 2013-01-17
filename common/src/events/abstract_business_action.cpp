@@ -1,13 +1,7 @@
-#include "core/resource/resource.h"
-#include "core/resource_managment/resource_pool.h"
-
-#include "businessRule.pb.h"
-
-#include "api/serializer/serializer.h"
-#include "api/serializer/pb_serializer.h"
 #include "abstract_business_action.h"
-#include "business_action_factory.h"
+
 #include <core/resource/resource.h>
+#include <core/resource_managment/resource_pool.h>
 
 namespace BusinessActionType {
 
@@ -67,55 +61,6 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Val
 
 QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
-}
-
-QByteArray QnAbstractBusinessAction::serialize()
-{
-    pb::BusinessAction pb_businessAction;
-
-    pb_businessAction.set_actiontype((pb::BusinessActionType) serializeBusinessActionTypeToPb(m_actionType));
-    foreach(QnResourcePtr res, getResources())
-        pb_businessAction.add_actionresource(res->getId());
-    pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
-    pb_businessAction.set_runtimeparams(serializeBusinessParams(getRuntimeParams()));
-    pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
-    pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
-    pb_businessAction.set_aggregationcount(getAggregationCount());
-
-    std::string str;
-    pb_businessAction.SerializeToString(&str);
-    return QByteArray(str.data(), str.length());
-}
-
-QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
-{
-    pb::BusinessAction pb_businessAction;
-
-    if (!pb_businessAction.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnAbstractBusinessAction::fromByteArray(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
-
-    QnBusinessParams runtimeParams;
-    if (pb_businessAction.has_runtimeparams())
-        runtimeParams = deserializeBusinessParams(pb_businessAction.runtimeparams().c_str());
-    QnAbstractBusinessActionPtr businessAction = QnBusinessActionFactory::createAction(
-                parsePbBusinessActionType(pb_businessAction.actiontype()),
-                runtimeParams);
-
-    QnResourceList resources;
-    for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
-        resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
-    businessAction->setResources(resources);
-
-    businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
-    businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
-    businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
-    businessAction->setAggregationCount(pb_businessAction.aggregationcount());
-
-    return businessAction;
 }
 
 void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {

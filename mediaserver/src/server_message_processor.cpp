@@ -126,8 +126,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         }
     } else if (event.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
     {
-//        if (QnBusinessEventRulePtr rule = message.resource.dynamicCast<QnBusinessEventRule>())
-//            emit businessRuleChanged(rule);
+//       emit businessRuleChanged(message.businessRule);
 
     } else if (event.eventType == Qn::Message_Type_BusinessRuleDelete)
     {

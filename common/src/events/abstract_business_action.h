@@ -69,9 +69,6 @@ public:
     virtual ~QnAbstractBusinessAction();
     BusinessActionType::Value actionType() const { return m_actionType; }
 
-    QByteArray serialize();
-    static QnAbstractBusinessActionPtr fromByteArray(const QByteArray&);
-
     /*
     * Resource depend of action type.
     * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera

@@ -984,7 +984,9 @@ bool QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActi
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);
 
-    QByteArray body = businessAction->serialize();
+    QByteArray body;
+    m_serializer.serializeBusinessAction(businessAction, body);
+
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
 
