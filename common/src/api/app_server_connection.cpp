@@ -25,6 +25,7 @@ namespace {
     const QLatin1String disabledObject("disabled");
     const QLatin1String panicObject("panic");
     const QLatin1String bbaObject("broadcastBusinessAction");
+    const QLatin1String kvPairObject("kvPair");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -127,6 +128,19 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedConnect(status, errorString, connectInfo, handle);
+    } else if (m_objectName == kvPairObject)
+    {
+        QnKvPairList kvPairs;
+
+        if(status == 0) {
+            try {
+                m_serializer.deserializeKvPairs(kvPairs, result);
+            } catch (const QnSerializeException& e) {
+                errorString += e.errorString();
+            }
+        }
+
+        emit finishedKvPair(status, errorString, kvPairs, handle);
     } else if (m_objectName == businessRuleObject) {
         QnBusinessEventRules rules;
 
@@ -417,6 +431,17 @@ int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject 
     m_serializer.serializeLicense(license, data);
 
     return addObjectAsync(licenseObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::saveAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("kvPair"));
+    QObject::connect(processor, SIGNAL(finishedKvPair(int, const QByteArray&, const QnKvPairList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeKvPairs(kvPairs, data);
+
+    return addObjectAsync(kvPairObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)

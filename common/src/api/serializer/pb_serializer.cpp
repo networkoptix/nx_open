@@ -9,6 +9,7 @@
 #include "connectinfo.pb.h"
 #include "businessRule.pb.h"
 #include "email.pb.h"
+#include "kvPair.pb.h"
 
 #include "pb_serializer.h"
 
@@ -28,6 +29,7 @@ typedef google::protobuf::RepeatedPtrField<pb::ResourceType>        PbResourceTy
 typedef google::protobuf::RepeatedPtrField<pb::License>             PbLicenseList;
 typedef google::protobuf::RepeatedPtrField<pb::CameraServerItem>    PbCameraServerItemList;
 typedef google::protobuf::RepeatedPtrField<pb::BusinessRule>        PbBusinessRuleList;
+typedef google::protobuf::RepeatedPtrField<pb::KvPair>           PbKvPairList;
 
 QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {
@@ -434,6 +436,20 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
     }
 }
 
+void parseKvPairs(QnKvPairList& kvPairs, const PbKvPairList& pb_kvPairs)
+{
+    for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
+    {
+        QnKvPairPtr kvPairPtr(new QnKvPair());
+
+        kvPairPtr->setName(ci->name().c_str());
+        kvPairPtr->setValue(ci->value().c_str());
+
+        kvPairs.append(kvPairPtr);
+    }
+}
+
+
 void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
 {
     typedef QMap<qint64, QString> TimestampGuid;
@@ -601,6 +617,12 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 
     pb_businessRule.set_aggregationperiod(businessRulePtr->aggregationPeriod());
+}
+
+void serializeKvPair_i(pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
+{
+    pb_kvPair.set_name(kvPair.name().toStdString());
+    pb_kvPair.set_value(kvPair.value().toStdString());
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
@@ -778,6 +800,20 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     }
 
     parserCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
+}
+
+void QnApiPbSerializer::deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data)
+{
+    pb::KvPairs pb_kvPairs;
+
+    if (!pb_kvPairs.ParseFromArray(data.data(), data.size()))
+    {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializeKvPairs(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    parseKvPairs(kvPairs, pb_kvPairs.kvpair());
 }
 
 void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data)
@@ -1012,6 +1048,28 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
 
     std::string str;
     pb_businessAction.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeKvPair(const QnKvPair& kvPair, QByteArray& data)
+{
+    pb::KvPairs pb_kvPairs;
+    serializeKvPair_i(*pb_kvPairs.add_kvpair(), kvPair);
+
+    std::string str;
+    pb_kvPairs.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data)
+{
+    pb::KvPairs pb_kvPairs;
+
+    foreach(QnKvPairPtr kvPair, kvPairs)
+        serializeKvPair_i(*pb_kvPairs.add_kvpair(), *kvPair);
+
+    std::string str;
+    pb_kvPairs.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 
