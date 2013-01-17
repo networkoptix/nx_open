@@ -10,16 +10,6 @@
 
 namespace {
 
-    enum ColumnCount {
-        ModifiedColumn,
-        EventColumn,
-        SourceColumn,
-        SpacerColumn,
-        ActionColumn,
-        TargetColumn,
-        ColumnCount
-    };
-
     static QLatin1String prolongedEvent("While %1");
     static QLatin1String instantEvent("On %1 %2");
 
@@ -69,6 +59,10 @@ namespace {
     }
 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+////// ----------------- QnBusinessRuleViewModel -----------------------////////
+////////////////////////////////////////////////////////////////////////////////
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
@@ -122,9 +116,86 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    emit dataChanged(this, 0, ColumnCount - 1);
+    emit dataChanged(this, AllFieldsMask);
 }
 
+// setters and getters
+
+BusinessEventType::Value QnBusinessRuleViewModel::eventType() const {
+    return m_eventType;
+}
+
+void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value) {
+    if (m_eventType == value)
+        return;
+
+    m_eventType = value;
+    emit dataChanged(this, EventTypeField);
+
+    //TODO: #GDM check others, params and resources should be merged
+}
+
+
+QnResourceList QnBusinessRuleViewModel::eventResources() const {
+    return m_eventResources;
+}
+
+void QnBusinessRuleViewModel::setEventResources(const QnResourceList &value) {
+    m_eventResources = value;
+}
+
+QnBusinessParams QnBusinessRuleViewModel::eventParams() const {
+    return m_eventParams;
+}
+
+void QnBusinessRuleViewModel::setEventParams(const QnBusinessParams &params)
+{
+    m_eventParams = params;
+}
+
+ToggleState::Value QnBusinessRuleViewModel::eventState() const {
+    return m_eventState;
+}
+
+void QnBusinessRuleViewModel::setEventState(ToggleState::Value state) {
+    m_eventState = state;
+}
+
+BusinessActionType::Value QnBusinessRuleViewModel::actionType() const {
+    return m_actionType;
+}
+
+void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value value) {
+    m_actionType = value;
+}
+
+QnResourceList QnBusinessRuleViewModel::actionResources() const {
+    return m_actionResources;
+}
+
+void QnBusinessRuleViewModel::setActionResources(const QnResourceList &value) {
+    m_actionResources = value;
+}
+
+QnBusinessParams QnBusinessRuleViewModel::actionParams() const
+{
+    return m_actionParams;
+}
+
+void QnBusinessRuleViewModel::setActionParams(const QnBusinessParams &params)
+{
+    m_actionParams = params;
+}
+
+int QnBusinessRuleViewModel::aggregationPeriod() const {
+    return m_aggregationPeriod;
+}
+
+void QnBusinessRuleViewModel::setAggregationPeriod(int msecs) {
+    m_aggregationPeriod = msecs;
+}
+
+// utilities
 
 QVariant QnBusinessRuleViewModel::getText(const int column) const {
     switch (column) {
@@ -226,7 +297,7 @@ int QnBusinessRulesViewModel::rowCount(const QModelIndex &parent) const {
 int QnBusinessRulesViewModel::columnCount(const QModelIndex &parent) const {
     Q_UNUSED(parent)
 
-    return ColumnCount;
+    return QnBusinessRuleViewModel::ColumnCount;
 }
 
 QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const {
@@ -250,12 +321,12 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
     }
 
     switch (section) {
-        case ModifiedColumn:    return tr("#");
-        case EventColumn:       return tr("Event");
-        case SourceColumn:      return tr("Source");
-        case SpacerColumn:      return tr("->");
-        case ActionColumn:      return tr("Action");
-        case TargetColumn:      return tr("Target");
+        case QnBusinessRuleViewModel::ModifiedColumn:    return tr("#");
+        case QnBusinessRuleViewModel::EventColumn:       return tr("Event");
+        case QnBusinessRuleViewModel::SourceColumn:      return tr("Source");
+        case QnBusinessRuleViewModel::SpacerColumn:      return tr("->");
+        case QnBusinessRuleViewModel::ActionColumn:      return tr("Action");
+        case QnBusinessRuleViewModel::TargetColumn:      return tr("Target");
         default:
             break;
     }
@@ -274,4 +345,10 @@ void QnBusinessRulesViewModel::addRules(const QnBusinessEventRules &businessRule
         ruleModel->loadFromRule(rule);
         m_rules << ruleModel;
     }
+}
+
+QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
+    if (row >= m_rules.size())
+        return NULL;
+    return m_rules[row];
 }

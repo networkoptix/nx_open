@@ -19,15 +19,64 @@ class QnBusinessRuleViewModel: public QObject {
     Q_OBJECT
 
     typedef QObject base_type;
+
 public:
+    enum Columns {
+        ModifiedColumn,
+        EventColumn,
+        SourceColumn,
+        SpacerColumn,
+        ActionColumn,
+        TargetColumn,
+        ColumnCount
+    };
+
+    enum Field {
+        ModifiedField           = 0x00000001,
+        EventTypeField          = 0x00000002,
+        EventResourcesField     = 0x00000004,
+        EventParamsField        = 0x00000008,
+        EventStateField         = 0x00000010,
+        ActionTypeField         = 0x00000020,
+        ActionResourcesField    = 0x00000040,
+        ActionParamsField       = 0x00000080,
+        AggregationField        = 0x00000100,
+        AllFieldsMask           = 0x0000FFFF
+    };
+    Q_DECLARE_FLAGS(Fields, Field)
+
     QnBusinessRuleViewModel(QObject *parent = 0);
 
-    QVariant data(const int column, const int role) const;
+    QVariant data(const int column, const int role = Qt::DisplayRole) const;
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
 
+    BusinessEventType::Value eventType() const;
+    void setEventType(const BusinessEventType::Value value);
+
+    QnResourceList eventResources() const;
+    void setEventResources(const QnResourceList &value);
+
+    QnBusinessParams eventParams() const;
+    void setEventParams(const QnBusinessParams& params);
+
+    ToggleState::Value eventState() const;
+    void setEventState(ToggleState::Value state);
+
+    BusinessActionType::Value actionType() const;
+    void setActionType(const BusinessActionType::Value value);
+
+    QnResourceList actionResources() const;
+    void setActionResources(const QnResourceList &value);
+
+    QnBusinessParams actionParams() const;
+    void setActionParams(const QnBusinessParams& params);
+
+    int aggregationPeriod() const;
+    void setAggregationPeriod(int secs);
+
 signals:
-    void dataChanged(QnBusinessRuleViewModel* source, int left, int right);
+    void dataChanged(QnBusinessRuleViewModel* source, Fields fields);
 
 private:
     QVariant getText(const int column) const;
@@ -67,10 +116,13 @@ public:
 
     void clear();
     void addRules(const QnBusinessEventRules &businessRules);
+    QnBusinessRuleViewModel* getRuleModel(int row);
 
 private:
     QList<QnBusinessRuleViewModel *> m_rules;
     
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusinessRuleViewModel::Fields)
 
 #endif // BUSINESS_RULES_VIEW_MODEL_H

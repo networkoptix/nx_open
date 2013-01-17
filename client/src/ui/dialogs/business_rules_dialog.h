@@ -53,16 +53,6 @@ private slots:
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
-    /* Widget changes handlers */
-    void at_widgetHasChangesChanged(QnBusinessRuleWidget* source, bool value);
-    void at_widgetDefinitionChanged(QnBusinessRuleWidget* source,
-                                    BusinessEventType::Value eventType,
-                                    ToggleState::Value eventState,
-                                    BusinessActionType::Value actionType);
-
-    void at_widgetEventResourcesChanged(QnBusinessRuleWidget* source, BusinessEventType::Value eventType, const QnResourceList &resources);
-    void at_widgetActionResourcesChanged(QnBusinessRuleWidget* source, BusinessActionType::Value actionType, const QnResourceList &resources);
-
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
@@ -79,7 +69,6 @@ private:
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
-    QStandardItemModel* m_listModel;
     QnBusinessRulesViewModel* m_rulesViewModel;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;

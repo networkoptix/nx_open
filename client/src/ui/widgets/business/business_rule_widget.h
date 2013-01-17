@@ -29,6 +29,10 @@ public:
     ~QnBusinessRuleWidget();
 
     void setModel(QnBusinessRuleViewModel* model);
+
+public slots:
+    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusinessRuleViewModel::Fields fields);
+
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -37,24 +41,20 @@ protected:
 
     /**
      * @brief initEventStates       Fill combobox with event states allowed to current event type.
-     * @param eventType             Selected event type.
      */
-    void initEventStates(BusinessEventType::Value eventType);
+    void initEventStates();
 
     /**
      * @brief initEventParameters   Display widget with current event paramenters.
-     * @param eventType             Selected event type.
      */
-    void initEventParameters(BusinessEventType::Value eventType);
+    void initEventParameters();
 
     /**
      * @brief initActionTypes       Fill combobox with actions allowed with current event state.
-     * @param eventState            Selected event state.
      */
-    void initActionTypes(ToggleState::Value eventState);
+    void initActionTypes();
 
-
-    void initActionParameters(BusinessActionType::Value actionType);
+    void initActionParameters();
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
@@ -62,7 +62,6 @@ private slots:
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
-    void at_actionParametersChanged();
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
@@ -71,14 +70,6 @@ private slots:
 
     void updateEventResources();
     void updateActionResources();
-    void updateDefinition();
-private:
-    BusinessEventType::Value getCurrentEventType() const;
-    ToggleState::Value getCurrentEventToggleState() const;
-
-    BusinessActionType::Value getCurrentActionType() const;
-
-    QString getResourceName(const QnResourcePtr& resource) const;
 private:
     Ui::QnBusinessRuleWidget *ui;
 
@@ -95,9 +86,6 @@ private:
     QStandardItemModel *m_actionTypesModel;
 
     QnResourceList m_dropResources;
-
-    QnResourceList m_eventResources;
-    QnResourceList m_actionResources;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H
