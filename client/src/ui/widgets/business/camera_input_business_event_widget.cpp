@@ -27,4 +27,5 @@ QnBusinessParams QnCameraInputBusinessEventWidget::parameters() const {
 
 QString QnCameraInputBusinessEventWidget::description() const {
     //TODO: #GDM remove me
+    return QString();
 }
