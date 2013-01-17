@@ -45,12 +45,12 @@ GLContext* DecodedPictureToOpenGLUploadThread::glContext()
 
 void DecodedPictureToOpenGLUploadThread::run()
 {
-    GLContext::ScopedContextUsage scu( m_glContext );
-    if( !scu.isCurrent() )
-    {
-        NX_LOG( QString::fromAscii("Failed to make gl context current %1").arg(m_glContext->getLastErrorString()), cl_logWARNING );
-        return;
-    }
+    //GLContext::ScopedContextUsage scu( m_glContext );
+    //if( !scu.isCurrent() )
+    //{
+    //    NX_LOG( QString::fromAscii("Failed to make gl context current %1").arg(m_glContext->getLastErrorString()), cl_logWARNING );
+    //    return;
+    //}
 
     NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread started"), cl_logDEBUG1 );
 
@@ -65,6 +65,13 @@ void DecodedPictureToOpenGLUploadThread::run()
             break;
 
         std::auto_ptr<QRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
+
+        GLContext::ScopedContextUsage scu( m_glContext );
+        if( !scu.isCurrent() )
+        {
+            NX_LOG( QString::fromAscii("Failed to make gl context current %1").arg(m_glContext->getLastErrorString()), cl_logWARNING );
+            return;
+        }
 
         toRun->run();
     }
@@ -102,6 +109,11 @@ DecodedPictureToOpenGLUploaderContextPool::~DecodedPictureToOpenGLUploaderContex
 void DecodedPictureToOpenGLUploaderContextPool::setPaintWindowHandle( WId paintWindowId )
 {
     QMutexLocker lk( &m_mutex );    //while this mutex is locked no change to pool context can occur
+
+#ifdef _WIN32
+    if( paintWindowId )
+        Q_ASSERT( IsWindow( paintWindowId ) );
+#endif
 
     if( m_paintWindowId )
     {
