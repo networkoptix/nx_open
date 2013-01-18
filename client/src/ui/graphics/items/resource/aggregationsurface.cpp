@@ -657,7 +657,7 @@ void AggregationSurfaceRect::ensureUploadedToOGL( qreal opacity )
 Q_GLOBAL_STATIC( AggregationSurfacePool, aggregationSurfacePoolInstanceGetter );
 
 QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
-    const QGLContext* glContext,
+    const GLContext* glContext,
     const PixelFormat format,
     const QSize& requiredEmptySize )
 {
@@ -692,7 +692,7 @@ QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
     return QSharedPointer<AggregationSurfaceRect>( new AggregationSurfaceRect( newSurface, lockedRect ) );
 }
 
-void AggregationSurfacePool::removeSurfaces( QGLContext* const /*glContext*/ )
+void AggregationSurfacePool::removeSurfaces( GLContext* const /*glContext*/ )
 {
     QMutexLocker lk( &m_mutex );
     //TODO/IMPL

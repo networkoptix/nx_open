@@ -69,6 +69,11 @@ public:
         \note This method MUST be called from GUI thread only
     */
     GLContext( WId wnd = 0, SYS_GL_CTX_HANDLE contextHandleToShareWith = NULL );
+    //!Create context, shared with \a shareWidget context 
+    /*!
+        \note This constructor can be called from GUI thread only, since it uses \a getSysHandleOfQtContext method
+    */
+    GLContext( const QGLWidget* shareWidget );
     ~GLContext();
 
     /*!
@@ -91,6 +96,7 @@ public:
         This method can be relied on as long as \a QGLContext is not thread-safe
         \param paintDeviceHandle if not NULL, will be filled with handle of paint device of context \a ctx
         \note This method can be called from GUI thread only
+        \note This method can perform gl context switching, so it can be performance-heavy
     */
     static SYS_GL_CTX_HANDLE getSysHandleOfQtContext( const QGLContext* ctx, SYS_PAINT_DEVICE_HANDLE* const paintDeviceHandle = NULL );
 
@@ -105,6 +111,8 @@ private:
 #if defined(USE_INTERNAL_WIDGET) && defined(_WIN32)
     PIXELFORMATDESCRIPTOR m_pfd;
 #endif
+
+    void initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith );
 };
 
 #endif  //GLCONTEXT_H
