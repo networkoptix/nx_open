@@ -17,16 +17,6 @@
 
 #include <client_message_processor.h>
 
-namespace {
-    QnBusinessEventRulePtr ruleById(QnBusinessEventRules rules, QString uniqId) {
-        foreach(const QnBusinessEventRulePtr& rule, rules)
-            if (rule->getUniqueId() == uniqId)
-                return rule;
-        return QnBusinessEventRulePtr();
-    }
-
-}
-
 QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
@@ -47,7 +37,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
 
-    //ui->tableView->resizeColumnsToContents();
     ui->tableView->clearSelection();
 
     //TODO: show description label if no rules are loaded
@@ -100,11 +89,6 @@ void QnBusinessRulesDialog::at_context_userChanged() {
         QnBusinessEventRules rules;
         m_connection->getBusinessRules(rules); // TODO: replace synchronous call
         m_rulesViewModel->addRules(rules);
-       /* foreach (QnBusinessEventRulePtr rule, rules) {
-            QnBusinessRuleWidget* w = createWidget(rule);
-            m_listModel->appendRow(createRow(w));
-            w->resetFromRule(); //here row data will be updated
-        }*/
     }
 
     updateControlButtons();
@@ -113,42 +97,37 @@ void QnBusinessRulesDialog::at_context_userChanged() {
 void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
     //widget by rule, item by widget - already written
     qDebug() << "rule changed" << rule->getId();
+    //TODO: ask user
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
     //widget by rule, item by widget - already written
     qDebug() << "rule deleted" << id;
+    //TODO: ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-   /* QnBusinessEventRulePtr rule = QnBusinessEventRulePtr(new QnBusinessEventRule());
-    //TODO: wizard dialog?
-    rule->setEventType(BusinessEventType::BE_Camera_Disconnect);
-    rule->setActionType(BusinessActionType::BA_Alert);
-
-    QnBusinessRuleWidget* w = createWidget(rule);
-    m_listModel->appendRow(createRow(w));
-    w->resetFromRule(); //here row data will be updated
-    w->setHasChanges(true);
-
-    ui->tableView->selectRow(m_listModel->rowCount() - 1);*/
+    m_rulesViewModel->addRule(QnBusinessEventRulePtr());
 }
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
-  /*  for (int i = 0; i < m_listModel->rowCount(); i++) {
-        QStandardItem* item = m_listModel->item(i);
-        QnBusinessRuleWidget* w = (QnBusinessRuleWidget *)item->data(WidgetRole).value<QWidget *>();
-        if (!w || !w->hasChanges())
+    for (int i = 0; i < m_rulesViewModel->rowCount(); i++) {
+        QnBusinessRuleViewModel* rule = m_rulesViewModel->getRuleModel(i);
+        if (!rule->isModified())
             continue;
-        saveRule(w);
-    }*/
+        saveRule(rule);
+    }
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
-  /*  if (!m_currentDetailsWidget && !m_currentDetailsWidget->hasChanges())
+    if (!m_currentDetailsWidget)
         return;
 
-    if (m_currentDetailsWidget->rule()->getId() &&
+    QnBusinessRuleViewModel* model = m_currentDetailsWidget->model();
+    if (!model)
+        return;
+
+    if (model->id() &&
             QMessageBox::question(this,
                               tr("Confirm rule deletion"),
                               tr("Are you sure you want to delete this rule?"),
@@ -156,44 +135,38 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
                               QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    deleteRule(m_currentDetailsWidget);*/
+    deleteRule(model);
 }
 
 void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
 
-    /*if (!m_processingWidgets.contains(handle))
+    if (!m_processing.contains(handle))
         return;
-
-    QnBusinessRuleWidget* w = m_processingWidgets[handle];
-    w->setEnabled(true);
-    m_processingWidgets.remove(handle);
+    QnBusinessRuleViewModel* model = m_processing[handle];
+    m_processing.remove(handle);
 
     bool success = (status == 0 && resources.size() == 1);
     if(!success) {
+        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
         return;
     }
-    //w->setHasChanges(false);
-
-    //TODO: load changes from resource
 
     QnResourcePtr res = resources.first();
     QnBusinessEventRulePtr rule = res.dynamicCast<QnBusinessEventRule>();
     if (!rule)
         return;
 
-    w->rule()->setId(rule->getId());
-    w->resetFromRule();
-    updateControlButtons();*/
+    model->loadFromRule(rule);
+    updateControlButtons();
 }
 
 void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
 
-  /*  if (!m_processingWidgets.contains(handle))
+    if (!m_processing.contains(handle))
         return;
-    QnBusinessRuleWidget* w = m_processingWidgets[handle];
-    w->setEnabled(true);
-    m_processingWidgets.remove(handle);
+    QnBusinessRuleViewModel* model = m_processing[handle];
+    m_processing.remove(handle);
 
     if(response.status != 0) {
         //TODO: #GDM remove password from error message
@@ -201,85 +174,13 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
         return;
     }
 
+    m_rulesViewModel->deleteRule(model);
     updateControlButtons();
-
-    QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole,
-                                                 QVariant::fromValue<QWidget *>(w),
-                                                 1, Qt::MatchExactly);
-    if (ruleIdx.isEmpty())
-        return;
-    int row = ruleIdx.first().row();
-    m_listModel->removeRow(row);
-
-    if (m_currentDetailsWidget == w) {
-        ui->detailsLayout->removeWidget(m_currentDetailsWidget);
-        m_currentDetailsWidget->setVisible(false);
-        m_currentDetailsWidget = NULL;
-        ui->tableView->clearSelection();
-    }
-
-    delete w;*/
 }
-
-/*void QnBusinessRulesDialog::at_widgetActionResourcesChanged(QnBusinessRuleWidget* source, BusinessActionType::Value actionType, const QnResourceList &resources) {
-    QStandardItem *item = tableItem(source, 5);
-
-    if (actionType == BusinessActionType::BA_SendMail) {
-        QString recipients = source->actionResourcesText();
-        QStringList list = recipients.split(QLatin1Char(';'), QString::SkipEmptyParts);
-
-        switch (list.size()){
-            case 0:
-                item->setIcon(qnResIconCache->icon(QnResourceIconCache::Offline, true));
-                item->setText(tr("<Enter at least one address>"));
-                break;
-            case 1:
-                item->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
-                item->setText(recipients);
-                break;
-            default:
-                item->setIcon(qnResIconCache->icon(QnResourceIconCache::Users));
-                item->setText(recipients);
-                break;
-        }
-    }
-    else if (!BusinessActionType::isResourceRequired(actionType)) {
-        item->setIcon(qnResIconCache->icon(QnResourceIconCache::Servers));
-        item->setText(tr("<System>"));
-    } else if (resources.size() == 1) {
-        QnResourcePtr resource = resources.first();
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        item->setText(getResourceName(resource));
-    } else {
-        //TODO: #GDM popup action will require user resources
-        if (resources.size() == 0) {
-            item->setIcon(qnResIconCache->icon(QnResourceIconCache::Offline, true));
-            item->setText(tr("<Select at least one camera>"));
-        }
-        else {
-            item->setIcon(qnResIconCache->icon(QnResourceIconCache::Camera));
-            item->setText(tr("%1 Cameras").arg(resources.size())); //TODO: fix tr to %n
-        }
-    }
-}*/
 
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
-/*
-    if (m_currentDetailsWidget) {
-        ui->detailsLayout->removeWidget(m_currentDetailsWidget);
-        m_currentDetailsWidget->setVisible(false);
-        m_currentDetailsWidget = NULL;
-    }
 
-    QStandardItem* item = m_listModel->itemFromIndex(current.sibling(current.row(), 0));
-    m_currentDetailsWidget = (QnBusinessRuleWidget *)item->data(WidgetRole).value<QWidget *>();
-
-    if (m_currentDetailsWidget) {
-        ui->detailsLayout->addWidget(m_currentDetailsWidget);
-        m_currentDetailsWidget->setVisible(true);
-    }
-*/
     QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->getRuleModel(current.row());
     if (!m_currentDetailsWidget) {
         m_currentDetailsWidget = new QnBusinessRuleWidget(this, context());
@@ -290,53 +191,38 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::saveRule(QnBusinessRuleWidget* widget) {
-  /*  if (m_processingWidgets.values().contains(widget))
+void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
+    if (m_processing.values().contains(ruleModel))
         return;
+    //TODO: set rule status to "Saving"
 
-    //save changes to the rule field
-    widget->apply();
-
-    QnBusinessEventRulePtr rule = widget->rule();
+    QnBusinessEventRulePtr rule = ruleModel->createRule();
     int handle = m_connection->saveAsync(rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
-    widget->setEnabled(false);
-    m_processingWidgets[handle] = widget;
-    //TODO: update row
-    //TODO: rule caption should be modified with "Saving..."*/
+    m_processing[handle] = ruleModel;
 }
 
-void QnBusinessRulesDialog::deleteRule(QnBusinessRuleWidget* widget) {
- /*   if (m_processingWidgets.values().contains(widget))
+void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
+    if (m_processing.values().contains(ruleModel))
         return;
 
-    QnBusinessEventRulePtr rule = widget->rule();
-    if (!rule->getId()) {
-        QModelIndexList ruleIdx = m_listModel->match(m_listModel->index(0, 0), WidgetRole,
-                                                     QVariant::fromValue<QWidget *>(widget),
-                                                     1, Qt::MatchExactly);
-        if (!ruleIdx.isEmpty()) {
-            int rowNum = ruleIdx.first().row();
-            m_listModel->removeRow(rowNum);
-            ui->tableView->clearSelection();
-        }
+    if (!ruleModel->id()) {
+        m_rulesViewModel->deleteRule(ruleModel);
         return;
     }
 
+    QnBusinessEventRulePtr rule = ruleModel->createRule();
     int handle = m_connection->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
-    widget->setEnabled(false);
-    m_processingWidgets[handle] = widget;
+    m_processing[handle] = ruleModel;
 
-    //TODO: rule caption should be modified with "Removing..."*/
+    //TODO: rule status should be set to "Removing..."
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
- /*   bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
 
-//    ui->saveButton->setEnabled(m_currentDetailsWidget && m_currentDetailsWidget->hasChanges());
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights &&
-         !m_listModel->match(m_listModel->index(0, 0), ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
+    //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && m_rulesViewModel->hasModifiedItems());
 
     ui->deleteRuleButton->setEnabled(hasRights && m_currentDetailsWidget);
-    ui->addRuleButton->setEnabled(hasRights);*/
+    ui->addRuleButton->setEnabled(hasRights);
 }

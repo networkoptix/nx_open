@@ -58,9 +58,15 @@ public:
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
     bool actionTypeShouldBeInstant();
+    QnBusinessEventRulePtr createRule() const;
 
     QVariant getText(const int column, const bool detailed = true) const;
     QVariant getIcon(const int column) const;
+
+    QnId id() const;
+
+    bool isModified() const;
+    void setModified(bool value);
 
     BusinessEventType::Value eventType() const;
     void setEventType(const BusinessEventType::Value value);
@@ -89,7 +95,6 @@ public:
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
-
 signals:
     void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
 
@@ -129,18 +134,22 @@ class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchCo
 public:
     explicit QnBusinessRulesViewModel(QObject *parent = 0, QnWorkbenchContext *context = NULL);
 
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     virtual QModelIndex parent(const QModelIndex &child) const override;
-    virtual int rowCount(const QModelIndex &parent) const override;
-    virtual int columnCount(const QModelIndex &parent) const override;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void clear();
     void addRules(const QnBusinessEventRules &businessRules);
-    QnBusinessRuleViewModel* getRuleModel(int row);
+    void addRule(QnBusinessEventRulePtr rule);
+    void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
+    bool hasModifiedItems() const;
+
+    QnBusinessRuleViewModel* getRuleModel(int row);
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
 

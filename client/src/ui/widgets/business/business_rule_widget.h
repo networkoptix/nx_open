@@ -28,6 +28,7 @@ public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnBusinessRuleWidget();
 
+    QnBusinessRuleViewModel* model() const;
     void setModel(QnBusinessRuleViewModel* model);
 
 protected:

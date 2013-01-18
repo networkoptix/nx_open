@@ -82,16 +82,16 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
-
-    //TODO: connect notifyChaged on subitems
-    //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
-
     setVisible(false);
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
 {
     delete ui;
+}
+
+QnBusinessRuleViewModel* QnBusinessRuleWidget::model() const {
+    return m_model;
 }
 
 void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
@@ -144,7 +144,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         initEventParameters();
     }
 
-    //TODO: dependencies
     if (fields & QnBusiness::EventStateField) {
         QModelIndexList stateIdx = m_model->eventStatesModel()->match(
                     m_model->eventStatesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventState());
@@ -178,7 +177,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
-        ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn).toString()); //TODO: UserRole? do not show fps ot other details here
+        ui->actionResourcesHolder->setText(m_model->getText(QnBusiness::TargetColumn, false).toString());
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }
 
@@ -196,7 +195,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
             ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
         }
     }
-    //TODO: setup widget depending on resource, e.g. max fps or channel list
 }
 
 void QnBusinessRuleWidget::initEventParameters() {

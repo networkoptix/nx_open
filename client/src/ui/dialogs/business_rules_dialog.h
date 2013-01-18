@@ -57,10 +57,8 @@ private slots:
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
 
-    void saveRule(QnBusinessRuleWidget* widget);
-    void deleteRule(QnBusinessRuleWidget* widget);
-
-    QStandardItem *tableItem(QnBusinessRuleWidget* widget, int column) const;
+    void saveRule(QnBusinessRuleViewModel* ruleModel);
+    void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
     void updateControlButtons();
 
@@ -70,7 +68,7 @@ private:
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
-    QMap<int, QnBusinessRuleWidget*> m_processingWidgets;
+    QMap<int, QnBusinessRuleViewModel*> m_processing;
     QnAppServerConnectionPtr m_connection;
 
 

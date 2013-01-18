@@ -111,6 +111,8 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionTypesModel(new QStandardItemModel(this))
 {
     updateEventTypesModel();
+    updateEventStatesModel();
+    updateActionTypesModel();
 }
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
@@ -129,6 +131,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     }
     return QVariant();
 }
+
 
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
     m_id = businessRule->getId();
@@ -164,7 +167,38 @@ bool QnBusinessRuleViewModel::actionTypeShouldBeInstant() {
                 || (!BusinessEventType::hasToggleState(m_eventType));
 }
 
+QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
+    QnBusinessEventRulePtr rule(new QnBusinessEventRule());
+    rule->setId(m_id);
+    rule->setEventType(m_eventType);
+    rule->setEventResources(m_eventResources); //TODO: #GDM filtered
+    rule->setEventState(m_eventState);
+    rule->setEventParams(m_eventParams);
+    rule->setActionType(m_actionType);
+    rule->setActionResources(m_actionResources);
+    rule->setActionParams(m_actionParams);
+    rule->setAggregationPeriod(m_aggregationPeriod);
+    return rule;
+}
+
 // setters and getters
+
+
+QnId QnBusinessRuleViewModel::id() const {
+    return m_id;
+}
+
+bool QnBusinessRuleViewModel::isModified() const {
+    return m_modified;
+}
+
+void QnBusinessRuleViewModel::setModified(bool value) {
+    if (m_modified == value)
+        return;
+
+    m_modified = value;
+    emit dataChanged(this, QnBusiness::ModifiedField);
+}
 
 BusinessEventType::Value QnBusinessRuleViewModel::eventType() const {
     return m_eventType;
@@ -563,12 +597,40 @@ void QnBusinessRulesViewModel::clear() {
 
 void QnBusinessRulesViewModel::addRules(const QnBusinessEventRules &businessRules) {
     foreach (QnBusinessEventRulePtr rule, businessRules) {
-        QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
-        ruleModel->loadFromRule(rule);
-        connect(ruleModel, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
-                this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
-        m_rules << ruleModel;
+        addRule(rule);
     }
+}
+
+void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
+    QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
+    if (rule)
+        ruleModel->loadFromRule(rule);
+    else
+        ruleModel->setModified(true);
+    connect(ruleModel, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
+            this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
+
+    int row = m_rules.size();
+    beginInsertRows(QModelIndex(), row, row);
+    m_rules << ruleModel;
+    endInsertRows();
+}
+
+void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
+    int row = m_rules.indexOf(ruleModel);
+    if (row < 0)
+        return;
+    beginRemoveRows(QModelIndex(), row, row);
+    m_rules.removeAt(row);
+    endRemoveRows();
+}
+
+bool QnBusinessRulesViewModel::hasModifiedItems() const {
+    foreach (QnBusinessRuleViewModel* rule, m_rules) {
+        if (rule->isModified())
+            return true;
+    }
+    return false;
 }
 
 QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
