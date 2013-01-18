@@ -2,10 +2,20 @@
 #define abstract_data_h_1112
 
 #include <QSharedPointer>
+#include <QSharedPointer>
 #include "utils/common/threadqueue.h"
 
 
 class QnAbstractStreamDataProvider;
+
+class QnAbstractMediaContext
+{
+public:
+    QnAbstractMediaContext() {}
+    virtual ~QnAbstractMediaContext() {}
+};
+typedef QSharedPointer<QnAbstractMediaContext> QnAbstractMediaContextPtr;
+
 
 struct QnAbstractDataPacket
 {

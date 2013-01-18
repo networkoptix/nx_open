@@ -557,10 +557,19 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 return false;
             }
 
-            CodecID srcAudioCodec = audioLayout->getAudioTrackInfo(i).codecContext->ctx()->codec_id;
+            CodecID srcAudioCodec = CODEC_ID_NONE;
+            QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
+            if (!mediaContext) {
+                m_lastErrMessage = tr("Internal server error: invalid audio codec information");
+                cl_log.log(m_lastErrMessage, cl_logERROR);
+                return false;
+            }
+
+            srcAudioCodec = mediaContext->ctx()->codec_id;
+
             if (m_dstAudioCodec == CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
             {
-                avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+                avcodec_copy_context(audioStream->codec, mediaContext->ctx());
 
                 // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
                 if (srcAudioCodec == CODEC_ID_MP3 && audioStream->codec->channels == 1)
@@ -569,7 +578,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             else {
                 // transcode audio
                 m_audioTranscoder = new QnFfmpegAudioTranscoder(m_dstAudioCodec);
-                m_audioTranscoder->open(audioLayout->getAudioTrackInfo(i).codecContext);
+                m_audioTranscoder->open(mediaContext);
                 avcodec_copy_context(audioStream->codec, m_audioTranscoder->getCodecContext());
             }
             audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;

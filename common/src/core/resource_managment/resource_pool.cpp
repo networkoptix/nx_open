@@ -9,7 +9,6 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -96,6 +95,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 
         /* Fix up items that are stored in layout. */
+        /*
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             foreach(QnLayoutItemData data, layout->getItems()) {
                 if(!data.resource.id.isValid()) {
@@ -124,6 +124,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 }
             }
         }
+        */
 
         resource->setResourcePool(this);
     }
