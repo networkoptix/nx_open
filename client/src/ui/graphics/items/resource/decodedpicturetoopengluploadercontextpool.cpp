@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include "decodedpicturetoopengluploader.h"
+
 
 static const size_t uploadingThreadCountOverride = 1;
 
@@ -33,10 +35,17 @@ void DecodedPictureToOpenGLUploadThread::push( QRunnable* toRun )
     m_queue.push( toRun );
 }
 
+const QGLContext* DecodedPictureToOpenGLUploadThread::glContext() const
+{
+    return m_glWidget ? m_glWidget->context() : NULL;
+}
+
 void DecodedPictureToOpenGLUploadThread::run()
 {
+#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
     m_glWidget->makeCurrent();
     Q_ASSERT( QGLContext::currentContext() == m_glWidget->context() );
+#endif
 
     NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread started"), cl_logDEBUG1 );
 
@@ -52,13 +61,12 @@ void DecodedPictureToOpenGLUploadThread::run()
 
         std::auto_ptr<QRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
 
-        //m_glWidget->makeCurrent();
-        //Q_ASSERT( QGLContext::currentContext() == m_glWidget->context() );
         toRun->run();
-        //m_glWidget->doneCurrent();
     }
 
+#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
     m_glWidget->doneCurrent();
+#endif
     NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread stopped"), cl_logDEBUG1 );
 }
 
@@ -109,11 +117,16 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
             poolSizeIncrement = m_optimalGLContextPoolSize;
         for( int i = 0; i < poolSizeIncrement; ++i )
         {
+#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
             //creating gl context (inside QGLWidget)
             std::auto_ptr<QGLWidget> newWidget( new QGLWidget( NULL, shareWidget ) );
             if( !newWidget->isSharing() )
                 break;
             QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( newWidget.release() ) );
+#else
+            //no need to create additional context
+            QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( NULL ) );
+#endif
             uploadThread->start();
             if( !uploadThread->isRunning() )
                 break;

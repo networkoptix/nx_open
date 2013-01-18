@@ -27,8 +27,7 @@ public:
     virtual ~DecodedPictureToOpenGLUploadThread();
 
     void push( QRunnable* toRun );
-    //const GLContext* glContext() const;
-    //GLContext* glContext();
+    const QGLContext* glContext() const;
 
 protected:
     virtual void run();

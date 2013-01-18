@@ -17,7 +17,7 @@
 
 
 class QnGlRendererTexture1;
-class GLContext;
+class QGLContext;
 
 /*!
     \note All region-arithmetic is thread-safe, but synchronization of memory operations is out of this class
@@ -143,16 +143,16 @@ public:
         \note Method assumes that context \a glContext is current
     */
     QSharedPointer<AggregationSurfaceRect> takeSurfaceRect(
-        GLContext* const glContext,
+        const QGLContext* glContext,
         const PixelFormat format,
         const QSize& requiredEmptySize );
     //!Removes all surfaces associated with \a glContext. \a glContext MUST NOT be NULL
-    void removeSurfaces( GLContext* const glContext );
+    void removeSurfaces( QGLContext* const glContext );
 
     static AggregationSurfacePool* instance();
 
 private:
-    typedef std::multimap<std::pair<GLContext*, PixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
+    typedef std::multimap<std::pair<const QGLContext*, PixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
 
     QMutex m_mutex;
     AggregationSurfaceContainer m_surfaces;

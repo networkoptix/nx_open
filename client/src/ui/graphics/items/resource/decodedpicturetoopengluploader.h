@@ -24,6 +24,7 @@
 //#define GL_COPY_AGGREGATION
 #ifdef GL_COPY_AGGREGATION
 #include "aggregationsurface.h"
+#define UPLOAD_TO_GL_IN_GUI_THREAD
 #endif
 
 
