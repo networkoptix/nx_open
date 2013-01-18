@@ -26,6 +26,8 @@ namespace {
     const QLatin1String panicObject("panic");
     const QLatin1String bbaObject("broadcastBusinessAction");
     const QLatin1String kvPairObject("kvPair");
+    const QLatin1String dumpdbObject("dumpdb");
+    const QLatin1String restoredbObject("restoredb");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -995,6 +997,34 @@ bool QnAppServerConnection::setPanicMode(bool value)
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, panicObject, requestHeaders, requestParams, "", response);
+
+    if (result)
+        m_lastError = response.errorString;
+
+    return result;
+}
+
+bool QnAppServerConnection::dumpDatabase(QString& data)
+{
+    m_lastError.clear();
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendGetRequest(m_url, dumpdbObject, m_requestHeaders, m_requestParams, response);
+
+    if (result)
+        m_lastError = response.errorString;
+    else
+        data = response.data;
+
+    return result;
+}
+
+bool QnAppServerConnection::restoreDatabase(const QString& data)
+{
+    m_lastError.clear();
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, restoredbObject, m_requestHeaders, m_requestParams, data, response);
 
     if (result)
         m_lastError = response.errorString;
