@@ -9,7 +9,7 @@
 #include "connectinfo.pb.h"
 #include "businessRule.pb.h"
 #include "email.pb.h"
-#include "kvPair.pb.h"
+#include "kvpair.pb.h"
 
 #include "pb_serializer.h"
 

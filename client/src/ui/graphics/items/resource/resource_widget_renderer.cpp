@@ -26,25 +26,25 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
 
     Q_ASSERT( context != NULL );
 
-    GLContext::SYS_PAINT_DEVICE_HANDLE curDeviceHandle = NULL;
-    GLContext::SYS_GL_CTX_HANDLE contextSysID = GLContext::getSysHandleOfQtContext( context, &curDeviceHandle );
+    //GLContext::SYS_PAINT_DEVICE_HANDLE curDeviceHandle = NULL;
+    //GLContext::SYS_GL_CTX_HANDLE contextSysID = GLContext::getSysHandleOfQtContext( context, &curDeviceHandle );
 
     //if context has changed, we need to share existing contexts with this one
-    if( !DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-            contextSysID,
-            DecodedPictureToOpenGLUploaderContextPool::instance()->paintWindowHandle(),
-            1 ) )
-    {
-        cl_log.log( QString::fromAscii("QnResourceWidgetRenderer. Failed to create auxiliary opengl context shared with GUI thread context. "
-            "Rendering of stream is impossible" ), cl_logERROR );
-        return;
-    }
+    //if( !DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
+    //        contextSysID,
+    //        DecodedPictureToOpenGLUploaderContextPool::instance()->paintWindowHandle(),
+    //        1 ) )
+    //{
+    //    cl_log.log( QString::fromAscii("QnResourceWidgetRenderer. Failed to create auxiliary opengl context shared with GUI thread context. "
+    //        "Rendering of stream is impossible" ), cl_logERROR );
+    //    return;
+    //}
 
     m_channelRenderers.resize( channelCount );
     for( int i = 0; i < channelCount; ++i )
     {
         RenderingTools renderingTools;
-        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context, contextSysID );
+        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context );
         renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
         renderingTools.renderer = new QnGLRenderer( context, *renderingTools.uploader );
         renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());

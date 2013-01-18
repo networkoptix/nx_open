@@ -399,9 +399,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             m_view->setViewport(glWidget);
 
             //initializing gl context pool used to render decoded pictures in non-GUI thread
-            DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindow( glWidget );
-            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-                GLContext::getSysHandleOfQtContext( glWidget->context() ) );
+            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( glWidget );
         }
 
         /* Turn on antialiasing at QPainter level. */

@@ -15,6 +15,7 @@
 #endif
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/glext.h>
+#include <libavcodec/avcodec.h>
 
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -25,7 +26,7 @@
 
 //#define RENDERER_SUPPORTS_NV12
 #ifdef _WIN32
-#define USE_PBO
+//#define USE_PBO
 #endif
 
 #ifdef USE_PBO
@@ -270,7 +271,7 @@ public:
                 glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_WIDTH, &textureWidth );
                 GLint textureHeight = 0;
                 glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_HEIGHT, &textureHeight );
-                Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
+                //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
 
                 glTexSubImage2D(
                     GL_TEXTURE_2D, 
@@ -373,6 +374,7 @@ const std::vector<GLuint>& DecodedPictureToOpenGLUploader::UploadedPicture::glTe
     Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
     return m_surfaceRect->surface()->glTextures();
 #else
+    //TODO/IMPL
     m_picTextures.resize( TEXTURE_COUNT );
     for( size_t i = 0; i < TEXTURE_COUNT; ++i )
         m_picTextures[i] = m_textures[i]->id();
@@ -1027,7 +1029,6 @@ static DecodedPictureToOpenGLUploader* runningUploader = NULL;
 
 DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     const QGLContext* const mainContext,
-    GLContext::SYS_GL_CTX_HANDLE mainContextHandle,
     unsigned int asyncDepth )
 :
     d( new DecodedPictureToOpenGLUploaderPrivate(mainContext) ),
@@ -1040,10 +1041,12 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_terminated( false ),
     m_yv12SharedUsed( false ),
     m_nv12SharedUsed( false ),
-    m_uploadThread( NULL )
+    m_uploadThread( NULL ),
+    m_rgbaBuf( NULL ),
+    m_fileNumber( 0 )
 {
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& 
-        pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContextHandle );
+        pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
     Q_ASSERT( !pool.empty() );
 
     m_uploadThread = pool[rand() % pool.size()];    //TODO/IMPL should take 
@@ -1096,11 +1099,13 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 
     //unbinding uploading thread
     m_uploadThread.clear();
+
+    delete[] m_rgbaBuf;
 }
 
 void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture )
 {
-    NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. pts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
+    NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
 
     const bool useAsyncUpload = decodedPicture->picData.data() && (decodedPicture->picData->type() == QnAbstractPictureDataRef::pstD3DSurface);
     m_format = decodedPicture->format;
@@ -1124,8 +1129,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking rendered picture (pts %1) buffer for upload. (%2, %3)" ).
-                    arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
+                NX_LOG( QString::fromAscii( "Taking rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                    arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else if( (!useAsyncUpload && !m_picturesWaitingRendering.empty())
                   || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1 : 0))) )
@@ -1133,7 +1138,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
                 emptyPictureBuf = m_picturesWaitingRendering.front();
                 m_picturesWaitingRendering.pop_front();
-                NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding. (%2, %3)..." ).
+                NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Playback does not catch up with decoding. (%2, %3)..." ).
                     arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logINFO );
             }
             else
@@ -1200,6 +1205,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstOpenGL )
         {
             //TODO/IMPL save reference to existing opengl texture
+            Q_ASSERT( false );
         }
         else
         {
@@ -1219,6 +1225,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
             m_cond.wait( lk.mutex() );
         }
 
+        //savePicToFile( decodedPicture.data(), decodedPicture->pkt_dts );
+
         //if( avPacketUploader->success() )
         //    m_picturesWaitingRendering.push_back( emptyPictureBuf );
         //else
@@ -1235,14 +1243,14 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     {
         pic = m_picturesWaitingRendering.front();
         m_picturesWaitingRendering.pop_front();
-        NX_LOG( QString::fromAscii( "Taking uploaded picture (pts %1) for first-time rendering" ).arg(pic->pts()), cl_logDEBUG2 );
+        NX_LOG( QString::fromAscii( "Taking uploaded picture (pts %1, seq %2) for first-time rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
     }
     else if( !m_renderedPictures.empty() )
     {
         //displaying previous displayed frame, since no new frame available...
         pic = m_renderedPictures.back();
         m_renderedPictures.pop_back();
-        NX_LOG( QString::fromAscii( "Taking previously shown uploaded picture (pts %1) for rendering" ).arg(pic->pts()), cl_logDEBUG1 );
+        NX_LOG( QString::fromAscii( "Taking previously shown uploaded picture (pts %1, seq %2) for rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
     }
     else
     {
@@ -1485,9 +1493,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 planes[i] );
 #endif
 
+            NX_LOG( QString::fromLatin1("uploading to gl texture. id = %1, i = %2, lineSizes[i] = %3, r_w[i] = %4, "
+                "qPower2Ceil(r_w[i],ROUND_COEFF) = %5, h[i] = %6, planes[i] = %7").
+                arg(texture->id()).arg(i).arg(lineSizes[i]).arg(r_w[i]).arg(qPower2Ceil(r_w[i],ROUND_COEFF)).arg(h[i]).arg((size_t)planes[i]), cl_logDEBUG2 );
             glBindTexture( GL_TEXTURE_2D, texture->id() );
+            glCheckError("glBindTexture");
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
+            glCheckError("glPixelStorei");
             Q_ASSERT( lineSizes[i] >= qPower2Ceil(r_w[i],ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
@@ -1504,16 +1517,38 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             NULL
 #endif
                             );
+            glCheckError("glTexSubImage2D");
+
+//#ifdef _DEBUG
+//            uint8_t* tmpBuf = new uint8_t[lineSizes[i]*h[i]];
+//            glGetTexImage( GL_TEXTURE_2D, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, tmpBuf );
+//            const int w = qPower2Ceil(r_w[i],ROUND_COEFF);
+//            for( int l = 0; l < h[i]; ++l )
+//            {
+//                if( memcmp( tmpBuf+l*lineSizes[i], planes[i]+l*lineSizes[i], w ) != 0 )
+//                    int x = 0;
+//            }
+//            glCheckError("glGetTexImage");
+//            delete[] tmpBuf;
+//#endif
 
 #ifdef USE_PBO
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+#else
+            glBindTexture( GL_TEXTURE_2D, 0 );
 #endif
 
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
-            glCheckError("glTexSubImage2D");
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             glCheckError("glPixelStorei");
         }
+
+        //if( d->features() & QnGlFunctions::OpenGL3_2 )
+        //{
+        //    GLsync syncObj = d->glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
+        //    d->glWaitSync( syncObj, 0, GL_TIMEOUT_IGNORED );
+        //    d->glDeleteSync( syncObj );
+        //}
 
         emptyPictureBuf->setColorFormat( PIX_FMT_YUV420P );
     }
@@ -1537,6 +1572,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
                             GL_UNSIGNED_BYTE, pixels );
             glCheckError("glTexSubImage2D");
+            glBindTexture( GL_TEXTURE_2D, 0 );
             bitrateCalculator.bytesProcessed( (i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2)*(i == 0 ? height : height / 2) );
             //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             //glCheckError("glPixelStorei");
@@ -1645,10 +1681,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glCheckError("glPixelStorei");
 
+        glBindTexture( GL_TEXTURE_2D, 0 );
+
         emptyPictureBuf->setColorFormat( PIX_FMT_RGBA );
 
         // TODO: free memory immediately for still images
     }
+
+    glFinish();
 
     return true;
 }
@@ -1759,4 +1799,59 @@ void DecodedPictureToOpenGLUploader::releasePictureBuffers()
     releaseDecodedPicturePool( &m_picturesBeingRendered );
 
     m_cond.wakeAll();
+}
+
+static void yv12ToRgba(
+    int width, int height,
+    quint8* yp, size_t y_stride,
+    quint8* up, size_t u_stride,
+    quint8* vp, size_t v_stride,
+    quint8* const rgbaBuf )
+{
+    static const int PIXEL_SIZE = 4;
+
+    for( int y = 0; y < height; ++y )
+    {
+        for( int x = 0; x < width; ++x )
+        {
+            const int Y = *((quint8*)yp + y*y_stride + x);
+            const int U = *((quint8*)up + (y>>1)*u_stride + (x>>1));
+            const int V = *((quint8*)vp + (y>>1)*v_stride + (x>>1));
+
+            int r = 1.164*(Y-16) + 1.596*(V-128);
+            int g = 1.164*(Y-16) - 0.813*(V-128) - 0.391*(U-128);
+            int b = 1.164*(Y-16)                 + 2.018*(U-128);
+
+            r = std::min<>( 255, std::max<>( r, 0 ) );
+            g = std::min<>( 255, std::max<>( g, 0 ) );
+            b = std::min<>( 255, std::max<>( b, 0 ) );
+
+            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[0] = r;
+            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[1] = g;
+            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[2] = b;
+            (rgbaBuf + (y*width + x)*PIXEL_SIZE)[3] = 255; //a
+        }
+    }
+}
+
+void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts )
+{
+    if( !m_rgbaBuf )
+        m_rgbaBuf = new uint8_t[pic->width*pic->height*4];
+
+    yv12ToRgba(
+        pic->width, pic->height,
+        pic->data[0], pic->linesize[0],
+        pic->data[1], pic->linesize[1],
+        pic->data[2], pic->linesize[2],
+        m_rgbaBuf );
+
+	QImage img(
+		m_rgbaBuf,
+		pic->width,
+		pic->height,
+        QImage::Format_ARGB32_Premultiplied );	//QImage::Format_ARGB4444_Premultiplied );
+    const QString& fileName = QString::fromAscii("C:\\temp\\%1_%2.bmp").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
+	if( !img.save( fileName, "bmp" ) )
+		int x = 0;
 }
