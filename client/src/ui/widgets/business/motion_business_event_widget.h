@@ -17,9 +17,9 @@ public:
     explicit QnMotionBusinessEventWidget(QWidget *parent = 0);
     virtual ~QnMotionBusinessEventWidget();
     
-    virtual void loadParameters(const QnBusinessParams &params) override;
-    virtual QnBusinessParams parameters() const override;
-    virtual QString description() const override;
+    virtual void loadParameters(const QnBusinessParams &params);
+    virtual QnBusinessParams parameters() const;
+    virtual QString description() const;
 private:
     Ui::QnMotionBusinessEventWidget *ui;
 };

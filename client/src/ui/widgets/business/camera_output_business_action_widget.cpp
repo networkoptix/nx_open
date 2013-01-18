@@ -3,38 +3,56 @@
 
 #include <events/camera_output_business_action.h>
 
-QnCameraOutputBusinessActioWidget::QnCameraOutputBusinessActioWidget(QWidget *parent) :
+#include <utils/common/scoped_value_rollback.h>
+
+QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnCameraOutputBusinessActioWidget)
+    ui(new Ui::QnCameraOutputBusinessActionWidget)
 {
     ui->setupUi(this);
+
     connect(ui->autoResetCheckBox, SIGNAL(toggled(bool)), ui->autoResetSpinBox, SLOT(setEnabled(bool)));
+
+    connect(ui->relayIdLineEdit, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
+    connect(ui->autoResetCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
+    connect(ui->autoResetSpinBox, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
 
 }
 
-QnCameraOutputBusinessActioWidget::~QnCameraOutputBusinessActioWidget()
+QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()
 {
     delete ui;
 }
 
-void QnCameraOutputBusinessActioWidget::loadParameters(const QnBusinessParams &params) {
-    ui->relayIdLineEdit->setText(BusinessActionParameters::getRelayOutputId(params));
-    int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params);
-    ui->autoResetCheckBox->setChecked(autoReset > 0);
-    if (autoReset > 0)
-        ui->autoResetSpinBox->setValue(autoReset);
+void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
+    if (!model)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
+
+    if (fields & QnBusiness::ActionParamsField) {
+        QnBusinessParams params = model->actionParams();
+
+        ui->relayIdLineEdit->setText(BusinessActionParameters::getRelayOutputId(params));
+        int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params);
+        ui->autoResetCheckBox->setChecked(autoReset > 0);
+        if (autoReset > 0)
+            ui->autoResetSpinBox->setValue(autoReset);
+    }
+
+    //TODO: #GDM update on resource change
 }
 
-QnBusinessParams QnCameraOutputBusinessActioWidget::parameters() const {
+void QnCameraOutputBusinessActionWidget::paramsChanged() {
+    if (!model() || m_updating)
+        return;
+
     QnBusinessParams params;
     BusinessActionParameters::setRelayOutputId(&params, ui->relayIdLineEdit->text());
     BusinessActionParameters::setRelayAutoResetTimeout(&params, ui->autoResetCheckBox->isChecked()
                                                        ? ui->autoResetSpinBox->value()
                                                        : 0);
-    return params;
-}
+    model()->setActionParams(params);
 
-QString QnCameraOutputBusinessActioWidget::description() const {
-    //TODO: #GDM remove me
-    return QString();
 }

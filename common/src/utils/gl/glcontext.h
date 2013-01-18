@@ -14,6 +14,8 @@
 #include <QString>
 #include <QWidget>
 
+#include <memory>
+
 
 class QGLContext;
 

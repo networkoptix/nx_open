@@ -5,12 +5,16 @@
 
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/common/scoped_value_rollback.h>
+
 QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnPopupBusinessActionWidget)
 {
     ui->setupUi(this);
+
+    connect(ui->adminsCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
 }
 
 QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
@@ -18,16 +22,22 @@ QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
     delete ui;
 }
 
-void QnPopupBusinessActionWidget::loadParameters(const QnBusinessParams &params) {
-    ui->adminsCheckBox->setChecked(BusinessActionParameters::getUserGroup(params) > 0);
+void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
+    if (!model)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
+
+    if (fields & QnBusiness::ActionParamsField)
+        ui->adminsCheckBox->setChecked(BusinessActionParameters::getUserGroup(model->actionParams()) > 0);
 }
 
-QnBusinessParams QnPopupBusinessActionWidget::parameters() const {
+void QnPopupBusinessActionWidget::paramsChanged() {
+    if (!model() || m_updating)
+        return;
+
     QnBusinessParams params;
     BusinessActionParameters::setUserGroup(&params, ui->adminsCheckBox->isChecked() ? 1 : 0);
-    return params;
-}
-
-QString QnPopupBusinessActionWidget::description() const {
-    return QString();
+    model()->setActionParams(params);
 }

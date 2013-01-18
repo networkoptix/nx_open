@@ -5,23 +5,25 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-    class QnCameraOutputBusinessActioWidget;
+    class QnCameraOutputBusinessActionWidget;
 }
 
-class QnCameraOutputBusinessActioWidget : public QnAbstractBusinessParamsWidget
+class QnCameraOutputBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
     
 public:
-    explicit QnCameraOutputBusinessActioWidget(QWidget *parent = 0);
-    ~QnCameraOutputBusinessActioWidget();
-    
-    virtual void loadParameters(const QnBusinessParams &params) override;
-    virtual QnBusinessParams parameters() const override;
-    virtual QString description() const override;
+    explicit QnCameraOutputBusinessActionWidget(QWidget *parent = 0);
+    ~QnCameraOutputBusinessActionWidget();
+
+protected slots:
+    virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
+private slots:
+    void paramsChanged();
+
 private:
-    Ui::QnCameraOutputBusinessActioWidget *ui;
+    Ui::QnCameraOutputBusinessActionWidget *ui;
 };
 
 #endif // CAMERA_OUTPUT_BUSINESS_ACTION_WIDGET_H

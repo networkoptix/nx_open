@@ -7,6 +7,8 @@
 #include <events/business_logic_common.h>
 #include <events/abstract_business_event.h>
 
+#include <ui/models/business_rules_view_model.h>
+
 #include <ui/widgets/business/abstract_business_params_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -23,89 +25,36 @@ class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
     
     typedef QWidget base_type;
 public:
-    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnBusinessRuleWidget();
 
-    QnBusinessEventRulePtr rule() const;
+    QnBusinessRuleViewModel* model() const;
+    void setModel(QnBusinessRuleViewModel* model);
 
-    bool hasChanges() const;
-    void setHasChanges(bool hasChanges);
-
-    void apply();
-    void resetFromRule();
-
-    QString actionResourcesText();
-signals:
-    void hasChangesChanged(QnBusinessRuleWidget* source, bool value);
-
-    void definitionChanged(QnBusinessRuleWidget* source,
-                           BusinessEventType::Value eventType,
-                           ToggleState::Value eventState,
-                           BusinessActionType::Value actionType);
-
-    void eventResourcesChanged(QnBusinessRuleWidget* source,
-                               BusinessEventType::Value eventType,
-                               const QnResourceList &resource);
-
-
-    void actionResourcesChanged(QnBusinessRuleWidget* source,
-                                BusinessActionType::Value actionType,
-                                const QnResourceList &resource);
 protected:
     /**
-     * @brief initEventTypes        Fill combobox with all possible event types.
-     */
-    void initEventTypes();
-
-    /**
-     * @brief initEventStates       Fill combobox with event states allowed to current event type.
-     * @param eventType             Selected event type.
-     */
-    void initEventStates(BusinessEventType::Value eventType);
-
-    /**
      * @brief initEventParameters   Display widget with current event paramenters.
-     * @param eventType             Selected event type.
      */
-    void initEventParameters(BusinessEventType::Value eventType);
+    void initEventParameters();
 
-    /**
-     * @brief initActionTypes       Fill combobox with actions allowed with current event state.
-     * @param eventState            Selected event state.
-     */
-    void initActionTypes(ToggleState::Value eventState);
-
-
-    void initActionParameters(BusinessActionType::Value actionType);
+    void initActionParameters();
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 private slots:
+    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
+
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
-    void at_actionParametersChanged();
+    void at_aggregationPeriodChanged();
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
-
-    void at_aggregationPeriodChanged();
-
-    void updateEventResources();
-    void updateActionResources();
-    void updateDefinition();
-private:
-    BusinessEventType::Value getCurrentEventType() const;
-    ToggleState::Value getCurrentEventToggleState() const;
-
-    BusinessActionType::Value getCurrentActionType() const;
-
-    QString getResourceName(const QnResourcePtr& resource) const;
 private:
     Ui::QnBusinessRuleWidget *ui;
 
-    QnBusinessEventRulePtr m_rule;
-    bool m_hasChanges;
+    QnBusinessRuleViewModel* m_model;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
@@ -113,14 +62,9 @@ private:
     QMap<BusinessEventType::Value, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
     QMap<BusinessActionType::Value, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
-    QStandardItemModel *m_eventTypesModel;
-    QStandardItemModel *m_eventStatesModel;
-    QStandardItemModel *m_actionTypesModel;
-
     QnResourceList m_dropResources;
 
-    QnResourceList m_eventResources;
-    QnResourceList m_actionResources;
+    bool m_updating;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H
