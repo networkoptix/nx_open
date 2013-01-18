@@ -572,17 +572,21 @@ void QnMServerResourceDiscoveryManager::check_if_accessible(QnResourceList& just
 
 bool QnMServerResourceDiscoveryManager::hasRunningLiveProvider(QnNetworkResourcePtr netRes) const
 {
+    bool rez = false;
+    netRes->lockConsumers();
     foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
     {
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)
         {
             QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
-            if (lr && lr->isRunning())
-                return true;
+            if (lr && lr->isRunning()) {
+                rez = true;
+                break;
+            }
         }
     }
 
-
-    return false;
+    netRes->unlockConsumers();
+    return rez;
 }

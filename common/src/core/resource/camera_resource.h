@@ -69,19 +69,11 @@ class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResourc
 public:
     QnPhysicalCameraResource();
 
-    // returns 0 if primary stream does not exist
-    int getPrimaryStreamDesiredFps() const;
-
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    void onPrimaryFpsUpdated(int newFps);
-
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
-#ifdef _DEBUG
-    void debugCheck() const;
-#endif
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);

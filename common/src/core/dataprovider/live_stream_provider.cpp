@@ -134,9 +134,15 @@ void QnLiveStreamProvider::setFps(float f)
     if (getRole() != QnResource::Role_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        m_cameraRes->onPrimaryFpsUpdated(f);
+        m_cameraRes->lockConsumers();
+        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        {
+            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+                lp->onPrimaryFpsUpdated(f);
+        }
+        m_cameraRes->unlockConsumers();
     }
-
 
 
     if (QnClientPullMediaStreamProvider* cpdp = dynamic_cast<QnClientPullMediaStreamProvider*>(this))
