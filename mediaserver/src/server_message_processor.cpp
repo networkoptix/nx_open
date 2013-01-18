@@ -8,6 +8,7 @@
 #include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
+#include "events/business_rule_processor.h"
 
 Q_GLOBAL_STATIC(QnServerMessageProcessor, static_instance)
 
@@ -23,6 +24,9 @@ void QnServerMessageProcessor::init(const QUrl& url, int timeout)
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
+
+    connect(this, SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)), qnBusinessRuleProcessor, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
+    connect(this, SIGNAL(businessRuleDeleted(QnId)), qnBusinessRuleProcessor, SLOT(at_businessRuleDeleted(QnId)));
 }
 
 QnServerMessageProcessor::QnServerMessageProcessor()
@@ -126,14 +130,14 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         }
     } else if (event.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
     {
-//       emit businessRuleChanged(message.businessRule);
+       emit businessRuleChanged(event.businessRule);
 
     } else if (event.eventType == Qn::Message_Type_BusinessRuleDelete)
     {
-//        emit businessRuleDeleted(message.resourceId);
+        emit businessRuleDeleted(event.resourceId);
     } else if (event.eventType == Qn::Message_Type_BroadcastBusinessAction)
     {
-//        emit businessActionReceived(message.businessAction);
+        emit businessActionReceived(event.businessAction);
     }
 }
 

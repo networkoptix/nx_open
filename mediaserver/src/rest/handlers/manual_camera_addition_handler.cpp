@@ -72,7 +72,7 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
     //if (addr2.isNull())
     //    addr2 = addr1;
 
-    QnResourceList resources = QnResourceDiscoveryManager::instance().findResources(addr1, addr2, auth, port);
+    QnResourceList resources = QnResourceDiscoveryManager::instance()->findResources(addr1, addr2, auth, port);
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
     // TODO #gdm implement simple XML-builder, will be quite useful
@@ -164,7 +164,7 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
     resultByteArray.append("<root>\n");
-    bool registered = QnResourceDiscoveryManager::instance().registerManualCameras(cameras);
+    bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(cameras);
     if (registered) {
         //QnResourceDiscoveryManager::instance().processManualAddedResources();
         resultByteArray.append("OK\n");

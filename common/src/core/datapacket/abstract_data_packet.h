@@ -17,4 +17,11 @@ struct QnAbstractDataPacket
 
 typedef QSharedPointer<QnAbstractDataPacket> QnAbstractDataPacketPtr;
 
+class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
+{
+public:
+    CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
+};
+
+
 #endif //abstract_data_h_1112

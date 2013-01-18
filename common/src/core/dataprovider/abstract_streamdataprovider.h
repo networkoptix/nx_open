@@ -56,6 +56,7 @@ public:
 
     void disconnectFromResource();
 
+    virtual void setRole(QnResource::ConnectionRole role) = 0;
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();

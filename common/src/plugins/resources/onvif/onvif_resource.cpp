@@ -384,9 +384,6 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
-    if (!hasDualStreaming())
-        setMotionType(MT_NoMotion);
-
     //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
     //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
 
@@ -398,6 +395,9 @@ bool QnPlOnvifResource::initInternal()
         addFlags |= HasPtz;
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= primaryStreamSoftMotion;
+    else if (!hasDualStreaming())
+        setMotionType(MT_NoMotion);
+
     
     if (addFlags != CFNoFlags)
         addCameraCapabilities(addFlags);
@@ -1387,7 +1387,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
     setVideoEncoderOptions(optionsList[0]);
     if (m_maxChannels == 1)
-    checkMaxFps(confResponse, optionsList[0].id);
+        checkMaxFps(confResponse, optionsList[0].id);
 
     m_mutex.lock();
     m_primaryVideoEncoderId = optionsList[0].id;
@@ -2496,7 +2496,7 @@ bool QnPlOnvifResource::pullMessages()
     m_prevSoapCallResult = soapWrapper.pullMessages( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        cl_log.log( QString::fromAscii("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        cl_log.log( QString::fromAscii("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logDEBUG1 );
         m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
         return false;
     }
@@ -2624,3 +2624,4 @@ void QnPlOnvifResource::updateToChannel(int value)
     setPhysicalId(getPhysicalId() + suffix.replace(QLatin1String("?"), QLatin1String("_")));
     setName(getName() + QString(QLatin1String("-channel %1")).arg(value+1));
 }
+

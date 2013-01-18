@@ -44,16 +44,17 @@ class OnvifResourceInformationFetcher
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
+    OnvifResourceInformationFetcher();
+
     static OnvifResourceInformationFetcher& instance();
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
+    void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const;
     static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
 
     void pleaseStop();
 private:
-    OnvifResourceInformationFetcher();
 
-    void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const;
 
     bool findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender, const QString& manufacturer, QnResourceList& result) const;
 

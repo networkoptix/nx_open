@@ -24,7 +24,6 @@ struct CameraInfoParams
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    QnLiveStreamProvider(res),
     m_multiCodec(res)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
@@ -351,7 +350,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
         bool bResult = false;
         while (!bResult && --triesLeft >= 0) {
-            bResult = sendVideoEncoderToCamera(*result);
+            bResult = m_onvifRes->sendVideoEncoderToCamera(*result) == SOAP_OK;
             if (!bResult)
                 msleep(300);
         }
@@ -580,29 +579,6 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
 
             }
         }
-    }
-
-    return true;
-}
-
-bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
-{
-    QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
-
-    SetVideoConfigReq request;
-    SetVideoConfigResp response;
-    request.Configuration = &encoder;
-    request.ForcePersistence = false;
-
-    int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
-    if (soapRes != SOAP_OK) {
-        qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
-            << soapWrapper.getEndpointUrl() << ", UniqueId: " << m_onvifRes->getUniqueId()
-            << "encoder token=" << request.Configuration->token.c_str()
-            << "encoder name=" << request.Configuration->Name.c_str()
-            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-        return false;
     }
 
     return true;

@@ -119,7 +119,7 @@ void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &sto
 class QnEmptyDataProvider: public QnAbstractMediaStreamDataProvider{
 public:
     QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
-
+    virtual void setRole(QnResource::ConnectionRole role) override {}
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override {
         return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1U));

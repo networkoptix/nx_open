@@ -31,6 +31,8 @@
 
 #include "connectinfo.h"
 #include "version.h"
+#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
+
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -79,6 +81,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,10);
     layout->addWidget(m_renderingWidget);
+    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_renderingWidget );
 
     m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);

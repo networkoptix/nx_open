@@ -4,6 +4,7 @@
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
 #include "core/resource_managment/resource_pool.h"
+#include "plugins/resources/flex_watch/flexwatch_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
@@ -61,7 +62,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //TODO:UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
-    QnNetworkResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId);
+    QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
     if (existResource)
         soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
     else
@@ -71,6 +72,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
 
     //Trying to get name and manufacturer
+    if (existResource)
+    {
+        name = existResource->getModel();
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(existResource->getTypeId());
+        manufacturer = resType->getName();
+    }
+    else
     {
         DeviceInfoReq request;
         DeviceInfoResp response;
@@ -194,6 +202,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
+    else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
+        resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

@@ -251,6 +251,10 @@ public:
 
     void update(QnResourcePtr other);
 
+    // Need use lock/unlock consumers before this call!
+    QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
+    void lockConsumers() { m_consumersMtx.lock(); }
+    void unlockConsumers() { m_consumersMtx.unlock(); }
 protected:
     virtual void updateInner(QnResourcePtr other);
 

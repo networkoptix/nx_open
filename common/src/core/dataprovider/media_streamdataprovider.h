@@ -5,7 +5,7 @@
 #include "core/dataprovider/statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
-#include "../datapacket/media_data_packet.h"
+#include "../datapacket/abstract_data_packet.h"
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;

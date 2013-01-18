@@ -23,6 +23,9 @@ protected:
     virtual void openStream();
     virtual void closeStream();
     virtual bool isStreamOpened() const;
+    
+    virtual void updateStreamParamsBasedOnQuality() override {}
+    virtual void updateStreamParamsBasedOnFps() override {}
 
 private:
     bool init();

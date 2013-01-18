@@ -1395,13 +1395,13 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     // repopulate the resource pool
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
 #ifndef STANDALONE_MODE
     static const char *appserverAddedPropertyName = "_qn_appserverAdded";
-    if(!QnResourceDiscoveryManager::instance().property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
+    if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnAppServerResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
     }
 #endif
 
@@ -1421,8 +1421,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnClientMessageProcessor::instance()->run();
 
     QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
-    QnResourceDiscoveryManager::instance().start();
-    QnResourceDiscoveryManager::instance().setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
+    QnResourceDiscoveryManager::instance()->setReady(true);
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
@@ -1441,7 +1441,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);

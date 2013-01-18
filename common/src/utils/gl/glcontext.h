@@ -12,6 +12,9 @@
 #include <GL/glx.h>
 #endif
 #include <QString>
+#include <QWidget>
+
+#include <memory>
 
 
 class QGLContext;
@@ -78,7 +81,7 @@ public:
     QString getLastErrorString() const;
     //void* getProcAddress( const char* procName ) const;
     //bool shareWith( SYS_GL_CTX_HANDLE ctxID );
-    //!Returns window ID, gl context has been reated with
+    //!Returns window ID, gl context has been created with
     WId wnd() const;
 
     //!Returns system-dependent handle of qt context \a ctx
@@ -92,8 +95,12 @@ public:
 private:
     SYS_GL_CTX_HANDLE m_handle;
     SYS_PAINT_DEVICE_HANDLE m_dc;
+    std::auto_ptr<QWidget> m_widget;
     WId m_winID;
     unsigned int m_previousErrorCode;
+#ifdef _WIN32
+    PIXELFORMATDESCRIPTOR m_pfd;
+#endif
 };
 
 #endif  //GLCONTEXT_H

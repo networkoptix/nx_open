@@ -4,11 +4,12 @@
 
 #include "media_streamdataprovider.h"
 #include "../datapacket/media_data_packet.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 
 struct QnAbstractMediaData;
 
-class CLServerPushStreamreader : public QnAbstractMediaStreamDataProvider
+class CLServerPushStreamreader : public QnLiveStreamProvider
 {
     Q_OBJECT;
 
