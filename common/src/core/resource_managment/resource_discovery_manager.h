@@ -36,12 +36,10 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
+    QnResourceDiscoveryManager();
     ~QnResourceDiscoveryManager();
 
-    static QnResourceDiscoveryManager& instance();
-
-    void setServer(bool serv);
-    bool isServer() const;
+    static QnResourceDiscoveryManager* instance();
 
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
@@ -60,11 +58,15 @@ public:
     QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
+
+    static void init(QnResourceDiscoveryManager* instance);
 protected:
-    QnResourceDiscoveryManager();
+    QMutex m_discoveryMutex;
+    unsigned int m_runNumber;
+protected:
 
     virtual void run();
-
+    virtual bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
 signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr);
@@ -72,49 +74,29 @@ private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
 private:
-    bool hasRunningLiveProvider(QnNetworkResourcePtr netRes) const;
 
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
     QnResourceList findNewResources();
 
-    void check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState);
-
-    void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished, CLNetState& netState);
-
-    
-    void markOfflineIfNeeded(QSet<QString>& discoveredResources);
-
-    void updateResourceStatus(QnResourcePtr res, QSet<QString>& discoveredResources);
-
-
-    // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
-    void pingResources(QnResourcePtr res);
     void appendManualDiscoveredResources(QnResourceList& resources);
-    bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
     void dtsAssignment();
 private:
     QMutex m_searchersListMutex;
-    QMutex m_discoveryMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCamerasMap m_manualCameraMap;
 
     bool m_server;
-    bool m_foundSmth; // minor just to minimize lof output
     volatile bool m_ready;
-
-    unsigned int m_runNumber;
 
     QList<QHostAddress> m_allLocalAddresses;
 
 
-    QMap<QString, int> m_resourceDiscoveryCounter;
     QVector<QnAbstractDTSSearcher*> m_dstList;
-	CLNetState netState;
-    QTime netStateTime;
     QSet<QString> m_disabledVendorsForAutoSearch;
+    static QnResourceDiscoveryManager* m_instance;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

@@ -75,6 +75,7 @@
 #include "events/business_event_connector.h"
 #include "utils/common/synctime.h"
 #include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
+#include "core/resource_managment/mserver_resource_discovery_manager.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -434,7 +435,7 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
-    QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
 void initAppServerEventConnection(const QSettings &settings, const QnMediaServerResourcePtr& mediaServer)
@@ -545,7 +546,7 @@ void QnMain::loadResourcesFromECS()
             }
         }
     }
-    QnResourceDiscoveryManager::instance().registerManualCameras(manualCameras);
+    QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
 
     //reading media servers list
     QnMediaServerResourceList mediaServerList;
@@ -728,10 +729,11 @@ void QnMain::run()
     thread->start();
     sm->start();
 
+    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    connect(&QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress)), this, SLOT(at_cameraIPConflict(QHostAddress)));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress)), this, SLOT(at_cameraIPConflict(QHostAddress)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
@@ -860,25 +862,24 @@ void QnMain::run()
     //IPPH264Decoder::dll.init();
 
     //============================
-    QnResourceDiscoveryManager::instance().setServer(true);
-    QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor);
 
-    QnResourceDiscoveryManager::instance().setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnTestCameraResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
     //Onvif searcher should be the last:
-    QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
 
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnFlexWatchResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
 
-    QnResourceDiscoveryManager::instance().addDTSServer(&QnColdStoreDTSSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 
     //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
@@ -914,11 +915,11 @@ void QnMain::run()
     }
     */
 
-    QnResourceDiscoveryManager::instance().setReady(true);
-    QnResourceDiscoveryManager::instance().start();
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
 
 
-    connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
@@ -979,7 +980,7 @@ void stopServer(int signal)
     Q_UNUSED(signal)
 
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
     QnRecordingManager::instance()->stop();
     if (serviceMainInstance)
     {

@@ -401,7 +401,8 @@ int qnMain(int argc, char *argv[])
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
     QnServerCameraProcessor serverCameraProcessor;
-    QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
+    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&serverCameraProcessor);
 
     //============================
     //QnResourceDirectoryBrowser
@@ -411,43 +412,43 @@ int qnMain(int argc, char *argv[])
         dirs << qnSettings->mediaFolder();
         dirs << qnSettings->extraMediaFolders();
         QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
     }
 
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
 
     QnPlAxisResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
 
     QnPlDlinkResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
 
     QnPlDroidResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
 
     QnPlIqResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
 
     //QnPlIpWebCamResourceSearcher::instance().setLocal(true);
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    //QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
 
     QnPlISDResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
     QnPlOnvifWsSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlOnvifWsSearcher::instance());
 
     QnPlPulseSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
     
 #endif
 
 #ifdef Q_OS_WIN
-//    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
+//    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
-    QnResourceDiscoveryManager::instance().start();
+    QnResourceDiscoveryManager::instance()->start();
 
     qApp->setStyle(qnSkin->style());
 
@@ -534,7 +535,7 @@ int qnMain(int argc, char *argv[])
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
