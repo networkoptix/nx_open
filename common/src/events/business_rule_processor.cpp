@@ -3,7 +3,6 @@
 #include "business_rule_processor.h"
 #include "core/resource/resource.h"
 #include "core/resource/media_server_resource.h"
-#include "core/resource/security_cam_resource.h"
 #include "events/business_event_rule.h"
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
@@ -24,23 +23,31 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
 }
 
-QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action)
+QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
     if (action->actionType() == BusinessActionType::BA_SendMail || action->actionType() == BusinessActionType::BA_Alert)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
-    //TODO: #vasilenko resources list
-//    if (!action->getResources())
+    if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
-//    return action->getResource()->getParentResource().dynamicCast<QnMediaServerResource>();
+    return res->getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnMediaServerResourcePtr routeToServer = getDestMServer(action);
-    if (routeToServer && !action->isReceivedFromRemoteHost() /*&& routeToServer->getGuid() != getGuid()*/)
-        qnBusinessMessageBus->deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
-    else
+    QnResourceList resList = action->getResources();
+    if (resList.isEmpty()) {
         executeActionInternal(action);
+    }
+    else {
+        for (int i = 0; i < resList.size(); ++i)
+        {
+            QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
+            if (routeToServer && !action->isReceivedFromRemoteHost() /*&& routeToServer->getGuid() != getGuid()*/)
+                qnBusinessMessageBus->deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
+            else
+                executeActionInternal(action);
+        }
+    }
 }
 
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)

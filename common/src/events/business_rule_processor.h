@@ -66,7 +66,7 @@ protected:
     /*
     * Some actions can be executed on media server only. In this case, function returns media server there action must be executed
     */
-    QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action);
+    QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 
 private:
     QList<QnBusinessEventRulePtr> m_rules;
