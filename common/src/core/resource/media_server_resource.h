@@ -3,7 +3,7 @@
 
 #include "core/resource/resource.h"
 #include "core/resource/abstract_storage_resource.h"
-#include "core/resource/media_resource.h"
+#include "core/resource/media_stream_quality.h"
 #include "api/media_server_connection.h"
 
 class QnLocalMediaServerResource : public QnResource

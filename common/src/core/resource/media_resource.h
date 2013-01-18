@@ -5,19 +5,11 @@
 #include <QSize>
 #include "resource.h"
 #include "resource_media_layout.h"
+#include "media_stream_quality.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
-
-enum QnStreamQuality {
-    QnQualityLowest,
-    QnQualityLow,
-    QnQualityNormal,
-    QnQualityHigh,
-    QnQualityHighest,
-    QnQualityPreSet
-};
 
 QString QnStreamQualityToString(QnStreamQuality value);
 
