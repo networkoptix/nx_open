@@ -30,8 +30,6 @@
 //    }
 //}
 
-#define USE_INTERNAL_WIDGET
-
 GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
 :
     m_handle( NULL ),
