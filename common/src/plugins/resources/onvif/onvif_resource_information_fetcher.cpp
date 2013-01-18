@@ -62,7 +62,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //TODO:UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
-    QnNetworkResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId);
+    QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
     if (existResource)
         soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
     else
@@ -72,6 +72,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
 
     //Trying to get name and manufacturer
+    if (existResource)
+    {
+        name = existResource->getModel();
+        QnResourceTypePtr resType = qnResTypePool->getResourceType(existResource->getTypeId());
+        manufacturer = resType->getName();
+    }
+    else
     {
         DeviceInfoReq request;
         DeviceInfoResp response;
