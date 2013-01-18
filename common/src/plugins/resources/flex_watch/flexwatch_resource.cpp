@@ -66,5 +66,5 @@ bool QnFlexWatchResource::rebootDevice()
 {
     QUrl url(getMediaUrl());
     CLSimpleHTTPClient httpClient(url.host(), url.port(80), 1000*3, getAuth());
-    return httpClient.doGET("cgi-bin/admin/fwdosyscmd.cgi?Command=/sbin/reboot&FwCgiVer=0x0001&RetPage=/admin/close_all.asp") == CL_HTTP_SUCCESS;
+    return httpClient.doGET(QLatin1String("cgi-bin/admin/fwdosyscmd.cgi?Command=/sbin/reboot&FwCgiVer=0x0001&RetPage=/admin/close_all.asp")) == CL_HTTP_SUCCESS;
 }
