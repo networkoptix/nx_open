@@ -835,3 +835,9 @@ void QnResource::setUniqId(const QString& value)
     Q_UNUSED(value)
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented");
 }
+
+QSet<QnResourceConsumer *> QnResource::getAllConsumers() const 
+{
+    QMutexLocker lock(&m_consumersMtx); 
+    return m_consumers; 
+}

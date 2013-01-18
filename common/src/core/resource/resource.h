@@ -250,7 +250,7 @@ public:
     static int commandProcQueueSize();
 
     void update(QnResourcePtr other);
-
+    QSet<QnResourceConsumer *> getAllConsumers() const;
 protected:
     virtual void updateInner(QnResourcePtr other);
 

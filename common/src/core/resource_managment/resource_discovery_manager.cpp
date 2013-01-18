@@ -13,6 +13,7 @@
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
+#include "../dataprovider/live_stream_provider.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
@@ -357,7 +358,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
                 // sometimes camera could be found with 2 different nics; sometimes just on one nic. so, diffNet will be detected - but camera is still ok,
                 // so status needs to be checked. hasRunningLiveProvider here to avoid situation where there is no recording and live view, but user is about to view the cam. fuck
-                bool shouldInvesigate = (diffAddr || (diffNet && newNetRes->shoudResolveConflicts() )) && ( rpNetRes->getStatus() == QnResource::Offline || !rpNetRes->hasRunningLiveProvider());
+                bool shouldInvesigate = (diffAddr || (diffNet && newNetRes->shoudResolveConflicts() )) && ( rpNetRes->getStatus() == QnResource::Offline || !hasRunningLiveProvider(rpNetRes));
                 if (shouldInvesigate)
                 {
                     // should keep it into resources to investigate it further 
@@ -837,7 +838,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredRe
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !netRes->hasRunningLiveProvider())
+            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !hasRunningLiveProvider(netRes))
             {
                 res->setStatus(QnResource::Offline);
                 m_resourceDiscoveryCounter[uniqId] = 0;
@@ -913,7 +914,7 @@ void QnResourceDiscoveryManager::pingResources(QnResourcePtr res)
 
     if (rpNetRes)
     {
-        if (!rpNetRes->hasRunningLiveProvider())
+        if (!hasRunningLiveProvider(rpNetRes))
         {
             CLPing ping;
             ping.ping(rpNetRes->getHostAddress(), 1, 300);
@@ -1027,4 +1028,21 @@ void QnResourceDiscoveryManager::dtsAssignment()
 void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
 {
     m_disabledVendorsForAutoSearch = vendors.toSet();
+}
+
+bool QnResourceDiscoveryManager::hasRunningLiveProvider(QnNetworkResourcePtr netRes) const
+{
+    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+    {
+        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+        if (lp)
+        {
+            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
+            if (lr && lr->isRunning())
+                return true;
+        }
+    }
+
+
+    return false;
 }

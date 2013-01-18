@@ -86,8 +86,6 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
-    bool hasRunningLiveProvider() const;
-
     virtual bool shoudResolveConflicts() const;
 
     // in some cases I just want to update couple of field from just discovered resource

@@ -72,6 +72,8 @@ private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
 private:
+    bool hasRunningLiveProvider(QnNetworkResourcePtr netRes) const;
+
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
