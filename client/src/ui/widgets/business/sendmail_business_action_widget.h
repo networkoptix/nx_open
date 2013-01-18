@@ -19,11 +19,12 @@ public:
     explicit QnSendmailBusinessActionWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnSendmailBusinessActionWidget();
     
-    virtual void loadParameters(const QnBusinessParams &params) override;
-    virtual QnBusinessParams parameters() const override;
-    virtual QString description() const override;
+protected slots:
+    virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 private slots:
     void at_settingsButton_clicked();
+    void paramsChanged();
+
 private:
     Ui::QnSendmailBusinessActionWidget *ui;
 };

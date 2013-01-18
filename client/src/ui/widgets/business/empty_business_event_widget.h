@@ -16,10 +16,6 @@ class QnEmptyBusinessEventWidget : public QnAbstractBusinessParamsWidget
 public:
     explicit QnEmptyBusinessEventWidget(QWidget *parent = 0);
     ~QnEmptyBusinessEventWidget();
-    
-    virtual void loadParameters(const QnBusinessParams &params) override { Q_UNUSED(params) }
-    virtual QnBusinessParams parameters() const override {return QnBusinessParams(); }
-    virtual QString description() const override;
 private:
     Ui::QnEmptyBusinessEventWidget *ui;
 };

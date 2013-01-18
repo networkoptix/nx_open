@@ -22,7 +22,7 @@
 #include <ui/workbench/workbench_resource.h>
 
 #include <utils/settings.h>
-
+#include <utils/common/scoped_value_rollback.h>
 
 namespace {
     QString toggleStateToString(ToggleState::Value value, bool prolonged) {
@@ -57,7 +57,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     ui(new Ui::QnBusinessRuleWidget),
     m_model(NULL),
     m_eventParameters(NULL),
-    m_actionParameters(NULL)
+    m_actionParameters(NULL),
+    m_updating(false)
 {
     ui->setupUi(this);
 
@@ -106,9 +107,13 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         return;
     }
 
-    ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
-    ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
-    ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
+    {
+        QnScopedValueRollback<bool> guard(&m_updating, true);
+        Q_UNUSED(guard)
+        ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
+        ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
+        ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
+    }
 
     connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
             this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
@@ -116,8 +121,11 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
 }
 
 void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model,  QnBusiness::Fields fields) {
-    if (!model || m_model != model)
+    if (!model || m_model != model || m_updating)
         return;
+
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
 
     if (fields & QnBusiness::EventTypeField) {
 
@@ -132,6 +140,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventResourcesHolder->setVisible(isResourceRequired);
         ui->eventAtLabel->setVisible(isResourceRequired);
         ui->eventDropLabel->setVisible(isResourceRequired);
+
+        initEventParameters();
     }
 
     //TODO: dependencies
@@ -154,10 +164,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventResourcesHolder->setIcon(m_model->data(QnBusiness::SourceColumn, Qt::DecorationRole).value<QIcon>());
     }
 
-    if (fields & QnBusiness::EventParamsField) {
-        initEventParameters();
-    }
-
     if (fields & QnBusiness::ActionTypeField) {
         QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(
                     m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType());
@@ -167,15 +173,13 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionResourcesHolder->setVisible(isResourceRequired);
         ui->actionAtLabel->setVisible(isResourceRequired);
         ui->actionDropLabel->setVisible(isResourceRequired);
+
+        initActionParameters();
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
         ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn).toString()); //TODO: UserRole? do not show fps ot other details here
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
-    }
-
-    if (fields & QnBusiness::ActionParamsField) {
-        initActionParameters();
     }
 
     if (fields & QnBusiness::AggregationField) {
@@ -196,11 +200,10 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 }
 
 void QnBusinessRuleWidget::initEventParameters() {
-    // TODO: connect/disconnect
-
     if (m_eventParameters) {
         ui->eventParamsLayout->removeWidget(m_eventParameters);
         m_eventParameters->setVisible(false);
+        m_eventParameters->setModel(NULL);
     }
 
     if (!m_model)
@@ -215,17 +218,15 @@ void QnBusinessRuleWidget::initEventParameters() {
     if (m_eventParameters) {
         ui->eventParamsLayout->addWidget(m_eventParameters);
         m_eventParameters->setVisible(true);
-
-        m_eventParameters->loadParameters(m_model->eventParams());
+        m_eventParameters->setModel(m_model);
     }
 }
 
 void QnBusinessRuleWidget::initActionParameters() {
     if (m_actionParameters) {
-        //ui->actionLayout->removeWidget(m_actionParameters);
         ui->actionParamsLayout->removeWidget(m_actionParameters);
         m_actionParameters->setVisible(false);
-        disconnect(m_actionParameters, 0, this, 0);
+        m_actionParameters->setModel(NULL);
     }
 
     if (!m_model)
@@ -239,10 +240,9 @@ void QnBusinessRuleWidget::initActionParameters() {
     }
 
     if (m_actionParameters) {
-        //ui->actionLayout->addWidget(m_actionParameters);
         ui->actionParamsLayout->addWidget(m_actionParameters);
         m_actionParameters->setVisible(true);
-        m_actionParameters->loadParameters(m_model->actionParams());
+        m_actionParameters->setModel(m_model);
     }
 }
 
@@ -291,7 +291,7 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
 // Handlers
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
-    if (!m_model)
+    if (!m_model || m_updating)
         return;
 
     int typeIdx = m_model->eventTypesModel()->item(index)->data().toInt();
@@ -300,7 +300,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
 }
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
-    if (!m_model)
+    if (!m_model || m_updating)
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
@@ -309,12 +309,21 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
 }
 
 void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) {
-    if (!m_model)
+    if (!m_model || m_updating)
         return;
 
     int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
     m_model->setActionType(val);
+}
+
+void QnBusinessRuleWidget::at_aggregationPeriodChanged() {
+    if (!m_model || m_updating)
+        return;
+
+    int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
+    int idx = ui->aggregationPeriodComboBox->currentIndex();
+    m_model->setAggregationPeriod(val * aggregationSteps[idx]);
 }
 
 void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
@@ -339,11 +348,4 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     m_model->setActionResources(dialog.getSelectedResources());
 }
 
-void QnBusinessRuleWidget::at_aggregationPeriodChanged() {
-    if (!m_model)
-        return;
 
-    int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
-    int idx = ui->aggregationPeriodComboBox->currentIndex();
-    m_model->setAggregationPeriod(val * aggregationSteps[idx]);
-}

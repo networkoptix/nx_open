@@ -18,9 +18,11 @@ public:
     explicit QnRecordingBusinessActionWidget(QWidget *parent = 0);
     ~QnRecordingBusinessActionWidget();
     
-    virtual void loadParameters(const QnBusinessParams &params) override;
-    virtual QnBusinessParams parameters() const override;
-    virtual QString description() const override;
+protected slots:
+    virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
+private slots:
+    void paramsChanged();
+
 private:
     Ui::QnRecordingBusinessActionWidget *ui;
 };

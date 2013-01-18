@@ -59,6 +59,9 @@ public:
     void loadFromRule(QnBusinessEventRulePtr businessRule);
     bool actionTypeShouldBeInstant();
 
+    QVariant getText(const int column, const bool detailed = true) const;
+    QVariant getIcon(const int column) const;
+
     BusinessEventType::Value eventType() const;
     void setEventType(const BusinessEventType::Value value);
 
@@ -91,12 +94,11 @@ signals:
     void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
 
 private:
-    QVariant getText(const int column) const;
-    QVariant getIcon(const int column) const;
-
     void updateEventTypesModel();
     void updateEventStatesModel();
     void updateActionTypesModel();
+
+    QString getTargetText(const bool detailed) const;
 
 private:
     QnId m_id;
@@ -116,6 +118,7 @@ private:
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
+
 };
 
 class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchContextAware
@@ -143,7 +146,7 @@ private slots:
 
 private:
     QList<QnBusinessRuleViewModel *> m_rules;
-    
+    QMap<int, QnBusiness::Fields> m_fieldsByColumn;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)

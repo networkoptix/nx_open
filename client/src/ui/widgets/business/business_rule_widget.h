@@ -30,9 +30,6 @@ public:
 
     void setModel(QnBusinessRuleViewModel* model);
 
-public slots:
-    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
-
 protected:
     /**
      * @brief initEventParameters   Display widget with current event paramenters.
@@ -44,14 +41,15 @@ protected:
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 private slots:
+    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
+
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
+    void at_aggregationPeriodChanged();
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
-
-    void at_aggregationPeriodChanged();
 private:
     Ui::QnBusinessRuleWidget *ui;
 
@@ -64,6 +62,8 @@ private:
     QMap<BusinessActionType::Value, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
     QnResourceList m_dropResources;
+
+    bool m_updating;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

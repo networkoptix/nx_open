@@ -1,7 +1,11 @@
 #include "business_rules_view_model.h"
 
+#include <QRegExp>
+
 #include <events/abstract_business_event.h>
 #include <events/abstract_business_action.h>
+#include <events/sendmail_business_action.h>
+#include <events/popup_business_action.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -72,6 +76,20 @@ namespace {
             }
         }
         return resource->getName();
+    }
+
+    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b");
+
+    bool isEmailValid(QString email) {
+        QRegExp rx(emailPattern);
+        return rx.exactMatch(email.toUpper());
+    }
+
+    bool isEmailValid(QStringList emails) {
+        foreach (QString email, emails)
+            if (!isEmailValid(email))
+                return false;
+        return true;
     }
 
 }
@@ -282,7 +300,7 @@ QStandardItemModel* QnBusinessRuleViewModel::actionTypesModel() {
 
 // utilities
 
-QVariant QnBusinessRuleViewModel::getText(const int column) const {
+QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed) const {
     switch (column) {
         case QnBusiness::ModifiedColumn:
             {
@@ -319,7 +337,7 @@ QVariant QnBusinessRuleViewModel::getText(const int column) const {
         case QnBusiness::ActionColumn:
             return BusinessActionType::toString(m_actionType);
         case QnBusiness::TargetColumn:
-            return QString();
+            return getTargetText(detailed);
         default:
             break;
     }
@@ -338,13 +356,40 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                     return qnResIconCache->icon(resource->flags(), resource->getStatus());
                 } else if (BusinessEventType::requiresServerResource(m_eventType)){
                     return qnResIconCache->icon(QnResourceIconCache::Server);
-                } else /*if (BusinessEventType::requiresCameraResource(m_eventType))*/ {
+                } else /* ::requiresCameraResource(m_eventType) */ {
                     return qnResIconCache->icon(QnResourceIconCache::Camera);
                 }
             }
         case QnBusiness::TargetColumn:
             {
-                break;
+                if (m_actionType == BusinessActionType::BA_SendMail) {
+                    QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
+                    QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    if (receivers.isEmpty() || !isEmailValid(receivers))
+                        return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+                    if (receivers.size() == 1)
+                        return qnResIconCache->icon(QnResourceIconCache::User);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
+
+                } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
+                    if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
+                        return qnResIconCache->icon(QnResourceIconCache::User);
+                    else
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                }
+
+                QnResourceList resources = m_actionResources; //TODO: filtered by type
+                if (!BusinessActionType::isResourceRequired(m_actionType)) {
+                    return qnResIconCache->icon(QnResourceIconCache::Servers);
+                } else if (resources.size() == 1) {
+                    QnResourcePtr resource = resources.first();
+                    return qnResIconCache->icon(resource->flags(), resource->getStatus());
+                } else if (resources.isEmpty()) {
+                    return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+                } else {
+                    return qnResIconCache->icon(QnResourceIconCache::Camera);
+                }
             }
         default:
             break;
@@ -405,6 +450,39 @@ void QnBusinessRuleViewModel::updateActionTypesModel() {
     }
 }
 
+QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
+    if (m_actionType == BusinessActionType::BA_SendMail) {
+        QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
+        QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
+        if (receivers.isEmpty() )
+            return tr("Enter at least one email address");
+        foreach (QString receiver, receivers) {
+            if (!isEmailValid(receiver))
+                return tr("Invalid email address: %1").arg(receiver);
+        }
+        return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
+
+    } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
+        if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
+            return tr("Show popup for administrators");
+        else
+            return tr("Show popup for all users");
+    }
+
+    QnResourceList resources = m_actionResources; //TODO: filtered by type
+    if (!BusinessActionType::isResourceRequired(m_actionType)) {
+        return tr("<System>");
+    } else if (resources.size() == 1) {
+        QnResourcePtr resource = resources.first();
+        return getResourceName(resource);
+    } else if (resources.isEmpty()) {
+        return tr("Select at least one camera");
+    } else {
+        return tr("%1 Cameras").arg(resources.size()); //TODO: fix tr to %n
+    }
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////// ----------------- QnBusinessRulesViewModel ----------------------////////
@@ -414,6 +492,12 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchC
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent)
 {
+    m_fieldsByColumn[QnBusiness::ModifiedColumn] = QnBusiness::ModifiedField;
+    m_fieldsByColumn[QnBusiness::EventColumn] = QnBusiness::EventTypeField | QnBusiness::EventStateField | QnBusiness::ActionTypeField;
+    m_fieldsByColumn[QnBusiness::SourceColumn] = QnBusiness::EventTypeField | QnBusiness::EventResourcesField;
+    m_fieldsByColumn[QnBusiness::SpacerColumn] = 0;
+    m_fieldsByColumn[QnBusiness::ActionColumn] = QnBusiness::ActionTypeField;
+    m_fieldsByColumn[QnBusiness::TargetColumn] = QnBusiness::ActionTypeField | QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField;
 }
 
 QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelIndex &parent) const {
@@ -498,6 +582,21 @@ void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *sour
     if (row < 0)
         return;
 
-    QModelIndex index = this->index(row, QnBusiness::ModifiedColumn, QModelIndex());
-    emit dataChanged(index, index.sibling(index.row(), QnBusiness::ColumnCount - 1));
+    int leftMostColumn = -1;
+    int rightMostColumn = QnBusiness::ColumnCount - 1;
+
+    for (int i = 0; i < QnBusiness::ColumnCount; i++) {
+        if (fields & m_fieldsByColumn[i]) {
+            if (leftMostColumn < 0)
+                leftMostColumn = i;
+            else
+                rightMostColumn = i;
+        }
+    }
+
+    if (leftMostColumn < 0)
+        return;
+
+    QModelIndex index = this->index(row, leftMostColumn, QModelIndex());
+    emit dataChanged(index, index.sibling(index.row(), rightMostColumn));
 }
