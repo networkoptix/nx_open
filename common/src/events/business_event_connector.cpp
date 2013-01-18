@@ -17,7 +17,7 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
     return static_instance();
 }
 
-void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnMetaDataV1Ptr metadata)
+void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(
                                              resource,
