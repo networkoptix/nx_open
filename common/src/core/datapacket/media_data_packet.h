@@ -22,7 +22,7 @@ struct AVCodecContext;
 
 enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_None};
 
-class QnMediaContext {
+class QnMediaContext: public QnAbstractMediaContext {
 public:
 
     QnMediaContext(AVCodecContext* ctx);
@@ -38,8 +38,8 @@ public:
 private:
     AVCodecContext* m_ctx;
 };
-
 typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
+
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {

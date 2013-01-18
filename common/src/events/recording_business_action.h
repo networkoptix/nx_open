@@ -1,7 +1,7 @@
 #ifndef __RECORDING_BUSINESS_ACTION_H__
 #define __RECORDING_BUSINESS_ACTION_H__
 
-#include "core/resource/media_stream_quality.h"
+#include "core/resource/media_resource.h"
 #include "abstract_business_action.h"
 
 namespace BusinessActionParameters {

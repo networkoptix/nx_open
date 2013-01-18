@@ -32,7 +32,7 @@ public:
     //bool hasDualStreaming() const {return false;}
 
 
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 protected:
     bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
