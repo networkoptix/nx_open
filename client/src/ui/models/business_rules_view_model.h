@@ -2,6 +2,7 @@
 #define BUSINESS_RULES_VIEW_MODEL_H
 
 #include <QAbstractItemModel>
+#include <QStandardItemModel>
 #include <QModelIndex>
 #include <QVariant>
 #include <QList>
@@ -36,7 +37,9 @@ namespace QnBusiness {
         ActionResourcesField    = 0x00000040,
         ActionParamsField       = 0x00000080,
         AggregationField        = 0x00000100,
-        AllFieldsMask           = 0x0000FFFF
+        AllFieldsMask           = 0x0000FFFF,
+
+        ActionIsInstantField    = EventTypeField | EventStateField
     };
     Q_DECLARE_FLAGS(Fields, Field)
 
@@ -54,6 +57,7 @@ public:
     QVariant data(const int column, const int role = Qt::DisplayRole) const;
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
+    bool actionTypeShouldBeInstant();
 
     BusinessEventType::Value eventType() const;
     void setEventType(const BusinessEventType::Value value);
@@ -79,12 +83,20 @@ public:
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
 
+    QStandardItemModel* eventTypesModel();
+    QStandardItemModel* eventStatesModel();
+    QStandardItemModel* actionTypesModel();
+
 signals:
     void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
 
 private:
     QVariant getText(const int column) const;
     QVariant getIcon(const int column) const;
+
+    void updateEventTypesModel();
+    void updateEventStatesModel();
+    void updateActionTypesModel();
 
 private:
     QnId m_id;
@@ -100,6 +112,10 @@ private:
     QnBusinessParams m_actionParams;
 
     int m_aggregationPeriod;
+
+    QStandardItemModel *m_eventTypesModel;
+    QStandardItemModel *m_eventStatesModel;
+    QStandardItemModel *m_actionTypesModel;
 };
 
 class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchContextAware

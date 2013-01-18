@@ -35,24 +35,9 @@ public slots:
 
 protected:
     /**
-     * @brief initEventTypes        Fill combobox with all possible event types.
-     */
-    void initEventTypes();
-
-    /**
-     * @brief initEventStates       Fill combobox with event states allowed to current event type.
-     */
-    void initEventStates();
-
-    /**
      * @brief initEventParameters   Display widget with current event paramenters.
      */
     void initEventParameters();
-
-    /**
-     * @brief initActionTypes       Fill combobox with actions allowed with current event state.
-     */
-    void initActionTypes();
 
     void initActionParameters();
 
@@ -67,9 +52,6 @@ private slots:
     void at_actionResourcesHolder_clicked();
 
     void at_aggregationPeriodChanged();
-
-    void updateEventResources();
-    void updateActionResources();
 private:
     Ui::QnBusinessRuleWidget *ui;
 
@@ -80,10 +62,6 @@ private:
 
     QMap<BusinessEventType::Value, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
     QMap<BusinessActionType::Value, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
-
-    QStandardItemModel *m_eventTypesModel;
-    QStandardItemModel *m_eventStatesModel;
-    QStandardItemModel *m_actionTypesModel;
 
     QnResourceList m_dropResources;
 };

@@ -13,6 +13,22 @@ namespace {
     static QLatin1String prolongedEvent("While %1");
     static QLatin1String instantEvent("On %1 %2");
 
+    QString toggleStateToString(ToggleState::Value value, bool prolonged) {
+        switch( value )
+        {
+            case ToggleState::Off:
+                return QObject::tr("Stops");
+            case ToggleState::On:
+                return QObject::tr("Starts");
+            case ToggleState::NotDefined:
+            if (prolonged)
+                return QObject::tr("Starts/Stops");
+            else
+                return QObject::tr("Occurs");
+        }
+        return QString();
+    }
+
     QString toggleStateToString(ToggleState::Value state) {
         switch (state) {
         case ToggleState::On: return QObject::tr("start");
@@ -71,9 +87,12 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_eventType(BusinessEventType::BE_Camera_Motion),
     m_eventState(ToggleState::NotDefined),
     m_actionType(BusinessActionType::BA_ShowPopup),
-    m_aggregationPeriod(60)
+    m_aggregationPeriod(60),
+    m_eventTypesModel(new QStandardItemModel(this)),
+    m_eventStatesModel(new QStandardItemModel(this)),
+    m_actionTypesModel(new QStandardItemModel(this))
 {
-
+    updateEventTypesModel();
 }
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
@@ -116,7 +135,15 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
+    updateEventStatesModel(); //TODO: connect on dataChanged?
+    updateActionTypesModel();
+
     emit dataChanged(this, QnBusiness::AllFieldsMask);
+}
+
+bool QnBusinessRuleViewModel::actionTypeShouldBeInstant() {
+    return (m_eventState == ToggleState::On || m_eventState == ToggleState::Off)
+                || (!BusinessEventType::hasToggleState(m_eventType));
 }
 
 // setters and getters
@@ -131,6 +158,10 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
 
     m_eventType = value;
     m_modified = true;
+
+    updateEventStatesModel();
+    updateActionTypesModel();
+
     emit dataChanged(this, QnBusiness::EventTypeField | QnBusiness::ModifiedField);
 
     //TODO: #GDM check others, params and resources should be merged
@@ -175,6 +206,7 @@ void QnBusinessRuleViewModel::setEventState(ToggleState::Value state) {
 
     m_eventState = state;
     m_modified = true;
+    updateActionTypesModel();
 
     emit dataChanged(this, QnBusiness::EventStateField | QnBusiness::ModifiedField);
 }
@@ -234,6 +266,18 @@ void QnBusinessRuleViewModel::setAggregationPeriod(int msecs) {
     m_modified = true;
 
     emit dataChanged(this, QnBusiness::AggregationField | QnBusiness::ModifiedField);
+}
+
+QStandardItemModel* QnBusinessRuleViewModel::eventTypesModel() {
+    return m_eventTypesModel;
+}
+
+QStandardItemModel* QnBusinessRuleViewModel::eventStatesModel() {
+    return m_eventStatesModel;
+}
+
+QStandardItemModel* QnBusinessRuleViewModel::actionTypesModel() {
+    return m_actionTypesModel;
 }
 
 // utilities
@@ -306,6 +350,59 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
             break;
     }
     return QVariant();
+}
+
+void QnBusinessRuleViewModel::updateEventTypesModel() {
+    m_eventTypesModel->clear();
+    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+        BusinessEventType::Value val = (BusinessEventType::Value)i;
+
+        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventTypesModel->appendRow(row);
+    }
+}
+
+void QnBusinessRuleViewModel::updateEventStatesModel() {
+    m_eventStatesModel->clear();
+
+    QList<ToggleState::Value> values;
+    values << ToggleState::NotDefined;
+    bool prolonged = BusinessEventType::hasToggleState(m_eventType);
+    if (prolonged)
+        values << ToggleState::On << ToggleState::Off;
+
+    foreach (ToggleState::Value val, values) {
+        QStandardItem *item = new QStandardItem(toggleStateToString(val, prolonged));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventStatesModel->appendRow(row);
+    }
+}
+
+void QnBusinessRuleViewModel::updateActionTypesModel() {
+    m_actionTypesModel->clear();
+    // what type of actions to show: prolonged or instant
+    bool onlyInstantActions = actionTypeShouldBeInstant();
+
+    for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+        BusinessActionType::Value val = (BusinessActionType::Value)i;
+
+        if (BusinessActionType::hasToggleState(val) && onlyInstantActions)
+            continue;
+
+        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_actionTypesModel->appendRow(row);
+    }
 }
 
 

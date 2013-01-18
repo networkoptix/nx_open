@@ -57,16 +57,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     ui(new Ui::QnBusinessRuleWidget),
     m_model(NULL),
     m_eventParameters(NULL),
-    m_actionParameters(NULL),
-    m_eventTypesModel(new QStandardItemModel(this)),
-    m_eventStatesModel(new QStandardItemModel(this)),
-    m_actionTypesModel(new QStandardItemModel(this))
+    m_actionParameters(NULL)
 {
     ui->setupUi(this);
-
-    ui->eventTypeComboBox->setModel(m_eventTypesModel);
-    ui->eventStatesComboBox->setModel(m_eventStatesModel);
-    ui->actionTypeComboBox->setModel(m_actionTypesModel);
 
     ui->eventDefinitionFrame->installEventFilter(this);
     ui->actionDefinitionFrame->installEventFilter(this);
@@ -106,11 +99,19 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
 
     m_model = model;
     setVisible(m_model);
-    if (!m_model)
+    if (!m_model) {
+        ui->eventTypeComboBox->setModel(NULL);
+        ui->eventStatesComboBox->setModel(NULL);
+        ui->actionTypeComboBox->setModel(NULL);
         return;
+    }
 
-    connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusinessRuleViewModel::Fields)),
-            this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusinessRuleViewModel::Fields)));
+    ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
+    ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
+    ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
+
+    connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
+            this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
     at_model_dataChanged(m_model, QnBusiness::AllFieldsMask);
 }
 
@@ -119,22 +120,38 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         return;
 
     if (fields & QnBusiness::EventTypeField) {
-        initEventTypes();
 
-        QModelIndexList eventTypeIdx = m_eventTypesModel->match(m_eventTypesModel->index(0, 0), Qt::UserRole + 1, (int)model->eventType());
+        QModelIndexList eventTypeIdx = m_model->eventTypesModel()->match(
+                    m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType());
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
+
+        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType());
+        ui->eventStatesComboBox->setVisible(prolonged);
+
+        bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
+        ui->eventResourcesHolder->setVisible(isResourceRequired);
+        ui->eventAtLabel->setVisible(isResourceRequired);
+        ui->eventDropLabel->setVisible(isResourceRequired);
     }
 
     //TODO: dependencies
     if (fields & QnBusiness::EventStateField) {
-        initEventStates();
-
-        QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)model->eventState());
+        QModelIndexList stateIdx = m_model->eventStatesModel()->match(
+                    m_model->eventStatesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventState());
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
     }
 
+    if (fields & QnBusiness::ActionIsInstantField) {
+        bool onlyInstantActions = m_model->actionTypeShouldBeInstant();
+
+        ui->aggregationCheckBox->setVisible(onlyInstantActions);
+        ui->aggregationValueSpinBox->setVisible(onlyInstantActions);
+        ui->aggregationPeriodComboBox->setVisible(onlyInstantActions);
+    }
+
     if (fields & QnBusiness::EventResourcesField) {
-        updateEventResources();
+        ui->eventResourcesHolder->setText(m_model->data(QnBusiness::SourceColumn).toString());
+        ui->eventResourcesHolder->setIcon(m_model->data(QnBusiness::SourceColumn, Qt::DecorationRole).value<QIcon>());
     }
 
     if (fields & QnBusiness::EventParamsField) {
@@ -142,12 +159,19 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     if (fields & QnBusiness::ActionTypeField) {
-        QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)model->actionType());
+        QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(
+                    m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType());
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
+
+        bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
+        ui->actionResourcesHolder->setVisible(isResourceRequired);
+        ui->actionAtLabel->setVisible(isResourceRequired);
+        ui->actionDropLabel->setVisible(isResourceRequired);
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
-        updateActionResources();
+        ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn).toString()); //TODO: UserRole? do not show fps ot other details here
+        ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }
 
     if (fields & QnBusiness::ActionParamsField) {
@@ -169,47 +193,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         }
     }
     //TODO: setup widget depending on resource, e.g. max fps or channel list
-}
-
-void QnBusinessRuleWidget::initEventTypes() {
-    if (!m_model)
-        return;
-
-    m_eventTypesModel->clear();
-    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        BusinessEventType::Value val = (BusinessEventType::Value)i;
-
-        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventTypesModel->appendRow(row);
-    }
-}
-
-void QnBusinessRuleWidget::initEventStates() {
-    if (!m_model)
-        return;
-
-    m_eventStatesModel->clear();
-
-    QList<ToggleState::Value> values;
-    values << ToggleState::NotDefined;
-    bool prolonged = BusinessEventType::hasToggleState(m_model->eventType());
-    if (prolonged)
-        values << ToggleState::On << ToggleState::Off;
-
-
-    foreach (ToggleState::Value val, values) {
-        QStandardItem *item = new QStandardItem(toggleStateToString(val, prolonged));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventStatesModel->appendRow(row);
-    }
-    ui->eventStatesComboBox->setVisible(prolonged);
 }
 
 void QnBusinessRuleWidget::initEventParameters() {
@@ -235,35 +218,6 @@ void QnBusinessRuleWidget::initEventParameters() {
 
         m_eventParameters->loadParameters(m_model->eventParams());
     }
-}
-
-void QnBusinessRuleWidget::initActionTypes() {
-    if (!m_model)
-        return;
-
-    m_actionTypesModel->clear();
-    // what type of actions to show: prolonged or instant
-    bool onlyInstantActions = (m_model->eventState() == ToggleState::On || m_model->eventState() == ToggleState::Off)
-            || (!BusinessEventType::hasToggleState(m_model->eventType()));
-
-    for (int i = 0; i < BusinessActionType::BA_Count; i++) {
-        BusinessActionType::Value val = (BusinessActionType::Value)i;
-
-        if (BusinessActionType::hasToggleState(val) && onlyInstantActions)
-            continue;
-
-        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_actionTypesModel->appendRow(row);
-    }
-
-    ui->aggregationCheckBox->setVisible(onlyInstantActions);
-    ui->aggregationValueSpinBox->setVisible(onlyInstantActions);
-    ui->aggregationPeriodComboBox->setVisible(onlyInstantActions);
-
 }
 
 void QnBusinessRuleWidget::initActionParameters() {
@@ -340,7 +294,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
     if (!m_model)
         return;
 
-    int typeIdx = m_eventTypesModel->item(index)->data().toInt();
+    int typeIdx = m_model->eventTypesModel()->item(index)->data().toInt();
     BusinessEventType::Value val = (BusinessEventType::Value)typeIdx;
     m_model->setEventType(val);
 }
@@ -349,7 +303,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model)
         return;
 
-    int typeIdx = m_eventStatesModel->item(index)->data().toInt();
+    int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
     ToggleState::Value val = (ToggleState::Value)typeIdx;
     m_model->setEventState(val);
 }
@@ -358,7 +312,7 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     if (!m_model)
         return;
 
-    int typeIdx = m_actionTypesModel->item(index)->data().toInt();
+    int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
     m_model->setActionType(val);
 }
@@ -392,39 +346,4 @@ void QnBusinessRuleWidget::at_aggregationPeriodChanged() {
     int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
     int idx = ui->aggregationPeriodComboBox->currentIndex();
     m_model->setAggregationPeriod(val * aggregationSteps[idx]);
-}
-
-void QnBusinessRuleWidget::updateEventResources() {
-    if (!m_model)
-        return;
-
-    QPushButton* item = ui->eventResourcesHolder;
-
-    bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
-    item->setVisible(isResourceRequired);
-    ui->eventAtLabel->setVisible(isResourceRequired);
-    ui->eventDropLabel->setVisible(isResourceRequired);
-
-    if (isResourceRequired) {
-        item->setText(m_model->data(2).toString());
-        item->setIcon(m_model->data(2, Qt::DecorationRole).value<QIcon>());
-    }
-
-}
-
-void QnBusinessRuleWidget::updateActionResources() {
-    if (!m_model)
-        return;
-
-    QPushButton* item = ui->actionResourcesHolder;
-
-    bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
-    item->setVisible(isResourceRequired);
-    ui->actionAtLabel->setVisible(isResourceRequired);
-    ui->actionDropLabel->setVisible(isResourceRequired);
-
-    if (isResourceRequired) {
-        item->setText(m_model->data(5).toString()); //TODO: UserRole? do not show fps ot other details here
-        item->setIcon(m_model->data(5, Qt::DecorationRole).value<QIcon>());
-    }
 }
