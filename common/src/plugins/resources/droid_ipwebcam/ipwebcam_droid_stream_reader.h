@@ -2,10 +2,9 @@
 #define QnPlDroidIpWebCamReader_14_04_h
 
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 
-class QnPlDroidIpWebCamReader : public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnPlDroidIpWebCamReader : public CLServerPushStreamreader
 {
     enum {BLOCK_SIZE = 1460};
 public:

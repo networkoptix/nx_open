@@ -3,10 +3,9 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 
-class PlDlinkStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class PlDlinkStreamReader: public CLServerPushStreamreader
 {
 public:
     PlDlinkStreamReader(QnResourcePtr res);

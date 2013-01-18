@@ -2,8 +2,6 @@
 
 #include "common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "core/dataprovider/live_stream_provider.h"
-
 
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
@@ -110,10 +108,13 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
+        result->setRole(role);
+        /*
         if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
         {
                 lsp->setRole(role);
         }
+        */
         return result;
 
     }

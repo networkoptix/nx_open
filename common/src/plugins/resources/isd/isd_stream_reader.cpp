@@ -10,7 +10,6 @@ extern QString getValueFromString(const QString& line);
 
 QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    QnLiveStreamProvider(res),
     m_rtpStreamParser(res)
 {
     //m_axisRes = getResource().dynamicCast<QnPlAxisResource>();

@@ -2,7 +2,6 @@
 #define onvif_stream_reader_h
 
 #include "onvif_helper.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
@@ -19,7 +18,7 @@ typedef onvifXsd__Profile Profile;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
-class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnOnvifStreamReader: public CLServerPushStreamreader
 {
 public:
     /*

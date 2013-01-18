@@ -4,10 +4,11 @@
 
 #include "media_streamdataprovider.h"
 #include "utils/common/adaptive_sleep.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 struct QnAbstractMediaData;
 
-class QnClientPullMediaStreamProvider : public QnAbstractMediaStreamDataProvider
+class QnClientPullMediaStreamProvider : public QnLiveStreamProvider
 {
     Q_OBJECT;
 

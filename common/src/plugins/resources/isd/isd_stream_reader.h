@@ -1,12 +1,11 @@
 #ifndef isd_STREAM_REDER_H__1914
 #define isd_STREAM_REDER_H__1914
 
-#include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
-class QnISDStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnISDStreamReader: public CLServerPushStreamreader
 {
 public:
     QnISDStreamReader(QnResourcePtr res);

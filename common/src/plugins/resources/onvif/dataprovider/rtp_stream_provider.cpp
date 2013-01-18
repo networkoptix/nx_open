@@ -2,7 +2,6 @@
 
 QnRtpStreamReader::QnRtpStreamReader(QnResourcePtr res, const QString& request):
     CLServerPushStreamreader(res),
-    QnLiveStreamProvider(res),
     m_rtpReader(res),
     m_request(request)
 {

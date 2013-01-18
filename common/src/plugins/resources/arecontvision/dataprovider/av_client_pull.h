@@ -2,8 +2,6 @@
 #define cl_av_clien_pull1529
 
 #include "core/dataprovider/cpull_media_stream_provider.h"
-#include "core/dataprovider/live_stream_provider.h"
-
 
 
 struct AVLastPacketSize
@@ -11,7 +9,7 @@ struct AVLastPacketSize
     int x0, y0, width, height;
 };
 
-class QnPlAVClinetPullStreamReader : public QnClientPullMediaStreamProvider, public QnLiveStreamProvider
+class QnPlAVClinetPullStreamReader : public QnClientPullMediaStreamProvider
 {
 public:
     QnPlAVClinetPullStreamReader(QnResourcePtr res);

@@ -1,10 +1,9 @@
 #include "utils/common/sleep.h"
 #include "cpull_media_stream_provider.h"
 #include "../resource/camera_resource.h"
-#include "live_stream_provider.h"
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
-    QnAbstractMediaStreamDataProvider(dev),
+    QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000),
     m_fps(MAX_LIVE_FPS)
 {

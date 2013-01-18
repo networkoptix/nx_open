@@ -6,6 +6,7 @@
 
 
 QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
+QnAbstractMediaStreamDataProvider(res),
 m_livemutex(QMutex::Recursive),
 m_quality(QnQualityNormal),
 m_fps(-1.0),
