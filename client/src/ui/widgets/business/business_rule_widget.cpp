@@ -75,6 +75,17 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
     this->setPalette(pal);
 
+    connect(ui->eventTypeComboBox,          SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
+    connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
+    connect(ui->eventResourcesHolder,       SIGNAL(clicked()),                  this, SLOT(at_eventResourcesHolder_clicked()));
+    connect(ui->actionResourcesHolder,      SIGNAL(clicked()),                  this, SLOT(at_actionResourcesHolder_clicked()));
+
+    connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
+
+    connect(ui->aggregationCheckBox,        SIGNAL(toggled(bool)),              this, SLOT(at_aggregationPeriodChanged()));
+    connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_aggregationPeriodChanged()));
+    connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_aggregationPeriodChanged()));
+
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
 
@@ -90,7 +101,8 @@ QnBusinessRuleWidget::~QnBusinessRuleWidget()
 }
 
 void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
-    disconnect(0, 0, this, 0);
+    if (m_model)
+        disconnect(m_model, 0, this, 0);
 
     m_model = model;
     setVisible(m_model);
@@ -99,25 +111,14 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
 
     connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusinessRuleViewModel::Fields)),
             this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusinessRuleViewModel::Fields)));
-    at_model_dataChanged(m_model, QnBusinessRuleViewModel::AllFieldsMask);
-
-    connect(ui->eventTypeComboBox,          SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
-    connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
-    connect(ui->eventResourcesHolder,       SIGNAL(clicked()),                  this, SLOT(at_eventResourcesHolder_clicked()));
-    connect(ui->actionResourcesHolder,      SIGNAL(clicked()),                  this, SLOT(at_actionResourcesHolder_clicked()));
-
-    connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
-
-    connect(ui->aggregationCheckBox,        SIGNAL(toggled(bool)),              this, SLOT(at_aggregationPeriodChanged()));
-    connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_aggregationPeriodChanged()));
-    connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_aggregationPeriodChanged()));
+    at_model_dataChanged(m_model, QnBusiness::AllFieldsMask);
 }
 
-void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model,  QnBusinessRuleViewModel::Fields fields) {
-    if (model != m_model || !model)
+void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model,  QnBusiness::Fields fields) {
+    if (!model || m_model != model)
         return;
 
-    if (fields & QnBusinessRuleViewModel::EventTypeField) {
+    if (fields & QnBusiness::EventTypeField) {
         initEventTypes();
 
         QModelIndexList eventTypeIdx = m_eventTypesModel->match(m_eventTypesModel->index(0, 0), Qt::UserRole + 1, (int)model->eventType());
@@ -125,35 +126,35 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     //TODO: dependencies
-    if (fields & QnBusinessRuleViewModel::EventStateField) {
+    if (fields & QnBusiness::EventStateField) {
         initEventStates();
 
         QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)model->eventState());
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
     }
 
-    if (fields & QnBusinessRuleViewModel::EventResourcesField) {
+    if (fields & QnBusiness::EventResourcesField) {
         updateEventResources();
     }
 
-    if (fields & QnBusinessRuleViewModel::EventParamsField) {
+    if (fields & QnBusiness::EventParamsField) {
         initEventParameters();
     }
 
-    if (fields & QnBusinessRuleViewModel::ActionTypeField) {
+    if (fields & QnBusiness::ActionTypeField) {
         QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)model->actionType());
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
     }
 
-    if (fields & QnBusinessRuleViewModel::ActionResourcesField) {
+    if (fields & QnBusiness::ActionResourcesField) {
         updateActionResources();
     }
 
-    if (fields & QnBusinessRuleViewModel::ActionParamsField) {
+    if (fields & QnBusiness::ActionParamsField) {
         initActionParameters();
     }
 
-    if (fields & QnBusinessRuleViewModel::AggregationField) {
+    if (fields & QnBusiness::AggregationField) {
         int msecs = model->aggregationPeriod();
         ui->aggregationCheckBox->setChecked(msecs > 0);
         if (msecs > 0) {
@@ -188,6 +189,9 @@ void QnBusinessRuleWidget::initEventTypes() {
 }
 
 void QnBusinessRuleWidget::initEventStates() {
+    if (!m_model)
+        return;
+
     m_eventStatesModel->clear();
 
     QList<ToggleState::Value> values;
@@ -234,6 +238,8 @@ void QnBusinessRuleWidget::initEventParameters() {
 }
 
 void QnBusinessRuleWidget::initActionTypes() {
+    if (!m_model)
+        return;
 
     m_actionTypesModel->clear();
     // what type of actions to show: prolonged or instant
@@ -268,6 +274,9 @@ void QnBusinessRuleWidget::initActionParameters() {
         disconnect(m_actionParameters, 0, this, 0);
     }
 
+    if (!m_model)
+        return;
+
     if (m_actionWidgetsByType.contains(m_model->actionType())) {
         m_actionParameters = m_actionWidgetsByType.find(m_model->actionType()).value();
     } else {
@@ -284,6 +293,9 @@ void QnBusinessRuleWidget::initActionParameters() {
 }
 
 bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
+    if (!m_model)
+        return base_type::eventFilter(object, event);;
+
     if (event->type() == QEvent::DragEnter) {
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
         m_dropResources = QnWorkbenchResource::deserializeResources(de->mimeData());

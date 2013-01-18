@@ -15,12 +15,7 @@
 
 #include <utils/common/qnid.h>
 
-class QnBusinessRuleViewModel: public QObject {
-    Q_OBJECT
-
-    typedef QObject base_type;
-
-public:
+namespace QnBusiness {
     enum Columns {
         ModifiedColumn,
         EventColumn,
@@ -45,6 +40,15 @@ public:
     };
     Q_DECLARE_FLAGS(Fields, Field)
 
+}
+
+
+class QnBusinessRuleViewModel: public QObject {
+    Q_OBJECT
+
+    typedef QObject base_type;
+
+public:
     QnBusinessRuleViewModel(QObject *parent = 0);
 
     QVariant data(const int column, const int role = Qt::DisplayRole) const;
@@ -76,7 +80,7 @@ public:
     void setAggregationPeriod(int secs);
 
 signals:
-    void dataChanged(QnBusinessRuleViewModel* source, Fields fields);
+    void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
 
 private:
     QVariant getText(const int column) const;
@@ -118,11 +122,14 @@ public:
     void addRules(const QnBusinessEventRules &businessRules);
     QnBusinessRuleViewModel* getRuleModel(int row);
 
+private slots:
+    void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
+
 private:
     QList<QnBusinessRuleViewModel *> m_rules;
     
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusinessRuleViewModel::Fields)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)
 
 #endif // BUSINESS_RULES_VIEW_MODEL_H

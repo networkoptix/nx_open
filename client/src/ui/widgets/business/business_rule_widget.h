@@ -31,7 +31,7 @@ public:
     void setModel(QnBusinessRuleViewModel* model);
 
 public slots:
-    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusinessRuleViewModel::Fields fields);
+    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
 protected:
     /**

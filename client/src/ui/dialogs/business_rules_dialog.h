@@ -57,9 +57,6 @@ private slots:
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
 
-    QList<QStandardItem *> createRow(QnBusinessRuleWidget* widget);
-    QnBusinessRuleWidget* createWidget(QnBusinessEventRulePtr rule);
-
     void saveRule(QnBusinessRuleWidget* widget);
     void deleteRule(QnBusinessRuleWidget* widget);
 

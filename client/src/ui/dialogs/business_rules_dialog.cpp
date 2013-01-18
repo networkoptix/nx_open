@@ -18,55 +18,6 @@
 #include <client_message_processor.h>
 
 namespace {
-//TODO: tr
-    static QLatin1String prolongedEvent("While %1");
-    static QLatin1String instantEvent("On %1 %2");
-
-    QString toggleStateToString(ToggleState::Value state) {
-        switch (state) {
-        case ToggleState::On: return QObject::tr("start");
-        case ToggleState::Off: return QObject::tr("stop");
-            default: return QString();
-        }
-        return QString();
-    }
-
-    QString eventTypeString(BusinessEventType::Value eventType,
-                            ToggleState::Value eventState,
-                            BusinessActionType::Value actionType){
-        QString typeStr = BusinessEventType::toString(eventType);
-        if (BusinessActionType::hasToggleState(actionType))
-            return QString(prolongedEvent).arg(typeStr);
-        else
-            return QString(instantEvent).arg(typeStr)
-                    .arg(toggleStateToString(eventState));
-    }
-
-    QString extractHost(const QString &url) {
-        /* Try it as a host address first. */
-        QHostAddress hostAddress(url);
-        if(!hostAddress.isNull())
-            return hostAddress.toString();
-
-        /* Then go default QUrl route. */
-        return QUrl(url).host();
-    }
-
-    QString getResourceName(const QnResourcePtr& resource) {
-        if (!resource)
-            return QObject::tr("<select target>");
-
-        QnResource::Flags flags = resource->flags();
-        if (qnSettings->isIpShownInTree()) {
-            if((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote)) {
-                QString host = extractHost(resource->getUrl());
-                if(!host.isEmpty())
-                    return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
-            }
-        }
-        return resource->getName();
-    }
-
     QnBusinessEventRulePtr ruleById(QnBusinessEventRules rules, QString uniqId) {
         foreach(const QnBusinessEventRulePtr& rule, rules)
             if (rule->getUniqueId() == uniqId)
@@ -74,8 +25,6 @@ namespace {
         return QnBusinessEventRulePtr();
     }
 
-    static int WidgetRole   = Qt::UserRole + 1;
-    static int ModifiedRole = Qt::UserRole + 2;
 }
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent, QnWorkbenchContext *context):
@@ -339,36 +288,6 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
     m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
-}
-
-QnBusinessRuleWidget* QnBusinessRulesDialog::createWidget(QnBusinessEventRulePtr rule) {
- /*   QnBusinessRuleWidget* w = new QnBusinessRuleWidget(rule, this, context());
-    connect(w, SIGNAL(hasChangesChanged(QnBusinessRuleWidget*,bool)),
-            this, SLOT(at_widgetHasChangesChanged(QnBusinessRuleWidget*,bool)));
-    connect(w, SIGNAL(definitionChanged(QnBusinessRuleWidget*,BusinessEventType::Value,ToggleState::Value,BusinessActionType::Value)),
-            this, SLOT(at_widgetDefinitionChanged(QnBusinessRuleWidget*,BusinessEventType::Value,ToggleState::Value,BusinessActionType::Value)));
-    connect(w, SIGNAL(eventResourcesChanged(QnBusinessRuleWidget*,BusinessEventType::Value,QnResourceList)),
-            this, SLOT(at_widgetEventResourcesChanged(QnBusinessRuleWidget*,BusinessEventType::Value,QnResourceList)));
-    connect(w, SIGNAL(actionResourcesChanged(QnBusinessRuleWidget*,BusinessActionType::Value,QnResourceList)),
-            this, SLOT(at_widgetActionResourcesChanged(QnBusinessRuleWidget*,BusinessActionType::Value,QnResourceList)));
-    w->setVisible(false);
-    return w;*/
-}
-
-QList<QStandardItem *> QnBusinessRulesDialog::createRow(QnBusinessRuleWidget* widget) {
-
-    //TODO: source -> event-> target -> action (source = system if none)
-    QStandardItem *statusItem = new QStandardItem();
-    statusItem->setData(QVariant::fromValue<QWidget* >(widget), WidgetRole);
-    QStandardItem *eventTypeItem = new QStandardItem();
-    QStandardItem *eventResourceItem = new QStandardItem();
-    QStandardItem *spacerItem = new QStandardItem(QLatin1String("->"));
-    QStandardItem *actionTypeItem = new QStandardItem();
-    QStandardItem *actionResourceItem = new QStandardItem();
-    QList<QStandardItem *> result;
-
-    result << statusItem << eventTypeItem << eventResourceItem << spacerItem << actionTypeItem << actionResourceItem;
-    return result;
 }
 
 void QnBusinessRulesDialog::saveRule(QnBusinessRuleWidget* widget) {

@@ -116,7 +116,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    emit dataChanged(this, AllFieldsMask);
+    emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
 
 // setters and getters
@@ -130,7 +130,8 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
         return;
 
     m_eventType = value;
-    emit dataChanged(this, EventTypeField);
+    m_modified = true;
+    emit dataChanged(this, QnBusiness::EventTypeField | QnBusiness::ModifiedField);
 
     //TODO: #GDM check others, params and resources should be merged
 }
@@ -141,7 +142,13 @@ QnResourceList QnBusinessRuleViewModel::eventResources() const {
 }
 
 void QnBusinessRuleViewModel::setEventResources(const QnResourceList &value) {
+    if (m_eventResources == value)
+        return; //TODO: check equal
+
     m_eventResources = value;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::EventResourcesField | QnBusiness::ModifiedField);
 }
 
 QnBusinessParams QnBusinessRuleViewModel::eventParams() const {
@@ -150,7 +157,12 @@ QnBusinessParams QnBusinessRuleViewModel::eventParams() const {
 
 void QnBusinessRuleViewModel::setEventParams(const QnBusinessParams &params)
 {
+    //TODO: check equal
+
     m_eventParams = params;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::EventParamsField | QnBusiness::ModifiedField);
 }
 
 ToggleState::Value QnBusinessRuleViewModel::eventState() const {
@@ -158,7 +170,13 @@ ToggleState::Value QnBusinessRuleViewModel::eventState() const {
 }
 
 void QnBusinessRuleViewModel::setEventState(ToggleState::Value state) {
+    if (m_eventState == state)
+        return;
+
     m_eventState = state;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::EventStateField | QnBusiness::ModifiedField);
 }
 
 BusinessActionType::Value QnBusinessRuleViewModel::actionType() const {
@@ -166,7 +184,13 @@ BusinessActionType::Value QnBusinessRuleViewModel::actionType() const {
 }
 
 void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value value) {
+    if (m_actionType == value)
+        return;
+
     m_actionType = value;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::ActionTypeField | QnBusiness::ModifiedField);
 }
 
 QnResourceList QnBusinessRuleViewModel::actionResources() const {
@@ -174,7 +198,13 @@ QnResourceList QnBusinessRuleViewModel::actionResources() const {
 }
 
 void QnBusinessRuleViewModel::setActionResources(const QnResourceList &value) {
+    if (m_actionResources == value)
+        return;
+
     m_actionResources = value;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::ActionResourcesField | QnBusiness::ModifiedField);
 }
 
 QnBusinessParams QnBusinessRuleViewModel::actionParams() const
@@ -184,7 +214,12 @@ QnBusinessParams QnBusinessRuleViewModel::actionParams() const
 
 void QnBusinessRuleViewModel::setActionParams(const QnBusinessParams &params)
 {
+    //TODO: check equal
+
     m_actionParams = params;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::ActionParamsField | QnBusiness::ModifiedField);
 }
 
 int QnBusinessRuleViewModel::aggregationPeriod() const {
@@ -192,24 +227,30 @@ int QnBusinessRuleViewModel::aggregationPeriod() const {
 }
 
 void QnBusinessRuleViewModel::setAggregationPeriod(int msecs) {
+    if (m_aggregationPeriod == msecs)
+        return;
+
     m_aggregationPeriod = msecs;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::AggregationField | QnBusiness::ModifiedField);
 }
 
 // utilities
 
 QVariant QnBusinessRuleViewModel::getText(const int column) const {
     switch (column) {
-        case ModifiedColumn:
+        case QnBusiness::ModifiedColumn:
             {
                 return (m_modified ? QLatin1String("*") : QString());
             }
-        case EventColumn:
+        case QnBusiness::EventColumn:
             {
                 return eventTypeString(m_eventType,
                                        m_eventState,
                                        m_actionType);
             }
-        case SourceColumn:
+        case QnBusiness::SourceColumn:
             {
                 QnResourceList resources = m_eventResources; //TODO: filtered by type
                 if (!BusinessEventType::isResourceRequired(m_eventType)) {
@@ -229,11 +270,11 @@ QVariant QnBusinessRuleViewModel::getText(const int column) const {
                         return tr("%1 Cameras").arg(resources.size()); //TODO: fix tr to %n
                 }
             }
-        case SpacerColumn:
+        case QnBusiness::SpacerColumn:
             return tr("->");
-        case ActionColumn:
+        case QnBusiness::ActionColumn:
             return BusinessActionType::toString(m_actionType);
-        case TargetColumn:
+        case QnBusiness::TargetColumn:
             return QString();
         default:
             break;
@@ -243,7 +284,7 @@ QVariant QnBusinessRuleViewModel::getText(const int column) const {
 
 QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
     switch (column) {
-        case SourceColumn:
+        case QnBusiness::SourceColumn:
             {
                 QnResourceList resources = m_eventResources; //TODO: filtered by type
                 if (!BusinessEventType::isResourceRequired(m_eventType)) {
@@ -257,7 +298,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                     return qnResIconCache->icon(QnResourceIconCache::Camera);
                 }
             }
-        case TargetColumn:
+        case QnBusiness::TargetColumn:
             {
                 break;
             }
@@ -297,7 +338,7 @@ int QnBusinessRulesViewModel::rowCount(const QModelIndex &parent) const {
 int QnBusinessRulesViewModel::columnCount(const QModelIndex &parent) const {
     Q_UNUSED(parent)
 
-    return QnBusinessRuleViewModel::ColumnCount;
+    return QnBusiness::ColumnCount;
 }
 
 QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const {
@@ -321,12 +362,12 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
     }
 
     switch (section) {
-        case QnBusinessRuleViewModel::ModifiedColumn:    return tr("#");
-        case QnBusinessRuleViewModel::EventColumn:       return tr("Event");
-        case QnBusinessRuleViewModel::SourceColumn:      return tr("Source");
-        case QnBusinessRuleViewModel::SpacerColumn:      return tr("->");
-        case QnBusinessRuleViewModel::ActionColumn:      return tr("Action");
-        case QnBusinessRuleViewModel::TargetColumn:      return tr("Target");
+        case QnBusiness::ModifiedColumn:    return tr("#");
+        case QnBusiness::EventColumn:       return tr("Event");
+        case QnBusiness::SourceColumn:      return tr("Source");
+        case QnBusiness::SpacerColumn:      return tr("->");
+        case QnBusiness::ActionColumn:      return tr("Action");
+        case QnBusiness::TargetColumn:      return tr("Target");
         default:
             break;
     }
@@ -343,6 +384,8 @@ void QnBusinessRulesViewModel::addRules(const QnBusinessEventRules &businessRule
     foreach (QnBusinessEventRulePtr rule, businessRules) {
         QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
         ruleModel->loadFromRule(rule);
+        connect(ruleModel, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
+                this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
         m_rules << ruleModel;
     }
 }
@@ -351,4 +394,13 @@ QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
     if (row >= m_rules.size())
         return NULL;
     return m_rules[row];
+}
+
+void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *source, QnBusiness::Fields fields) {
+    int row = m_rules.indexOf(source);
+    if (row < 0)
+        return;
+
+    QModelIndex index = this->index(row, QnBusiness::ModifiedColumn, QModelIndex());
+    emit dataChanged(index, index.sibling(index.row(), QnBusiness::ColumnCount - 1));
 }
