@@ -1004,7 +1004,7 @@ bool QnAppServerConnection::setPanicMode(bool value)
     return result;
 }
 
-bool QnAppServerConnection::dumpDatabase(QString& data)
+bool QnAppServerConnection::dumpDatabase(QByteArray& data)
 {
     m_lastError.clear();
 
@@ -1019,7 +1019,7 @@ bool QnAppServerConnection::dumpDatabase(QString& data)
     return result;
 }
 
-bool QnAppServerConnection::restoreDatabase(const QString& data)
+bool QnAppServerConnection::restoreDatabase(const QByteArray& data)
 {
     m_lastError.clear();
 
