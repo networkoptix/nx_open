@@ -15,27 +15,28 @@
 #include <utils/gl/glcontext.h>
 
 
+class GLContext;
+
 class DecodedPictureToOpenGLUploadThread
 :
     public QThread
 {
 public:
     /*!
-        \param glWidget Destroyed during object destruction
+        \param glContextToUse Destroyed during object destruction
     */
-    DecodedPictureToOpenGLUploadThread( QGLWidget* glWidget );
+    DecodedPictureToOpenGLUploadThread( GLContext* glContextToUse );
     virtual ~DecodedPictureToOpenGLUploadThread();
 
     void push( QRunnable* toRun );
-    //const GLContext* glContext() const;
-    //GLContext* glContext();
+    const GLContext* glContext() const;
 
 protected:
     virtual void run();
 
 private:
     CLThreadQueue<QRunnable*> m_queue;
-    QGLWidget* m_glWidget;
+    GLContext* m_glContext;
 };
 
 //!Pool of ogl contexts, used to upload decoded pictures to opengl textures

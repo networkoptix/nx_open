@@ -40,9 +40,6 @@
 //#define PARTIAL_FRAME_UPLOAD
 //#define SINGLE_STREAM_UPLOAD
 #endif
-#ifdef GL_COPY_AGGREGATION
-#define UPLOAD_TO_GL_IN_GUI_THREAD
-#endif
 
 
 namespace
@@ -1694,7 +1691,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
     bool /*isVideoMemory*/ )
 {
     //taking aggregation surface having enough free space
-    const QSharedPointer<AggregationSurfaceRect>& surfaceRect = AggregationSurfacePool::instance()->takeSurfaceRect( m_uploadThread->glContext(), format, QSize(width, height) );
+    const QSharedPointer<AggregationSurfaceRect>& surfaceRect = AggregationSurfacePool::instance()->takeSurfaceRect(
+        m_uploadThread->glContext(),
+        format,
+        QSize(width, height) );
     if( !surfaceRect )
         return false;
 
