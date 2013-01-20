@@ -194,14 +194,16 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: implement me
 }
 
-//TODO: move to mserver_business_rule_processor
 bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action )
 {
+    bool rez = true;
+    foreach(const QnResourcePtr& resource, action->getResources())
+        rez &= triggerCameraOutput(action, resource);
+    return rez;
+}
 
-    //TODO: #vasilenko resources list
-//    const QnResourcePtr& resource = action->getResource();
-    QnResourcePtr resource;
-
+bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )
+{
     if( !resource )
     {
         cl_log.log( QString::fromLatin1("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );

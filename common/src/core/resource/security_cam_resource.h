@@ -74,7 +74,7 @@ public:
     QList<QnMotionRegion> getMotionRegionList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
-    const QnScheduleTaskList &getScheduleTasks() const;
+    const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 

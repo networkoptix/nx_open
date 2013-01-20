@@ -5,8 +5,12 @@
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
-// TODO: #VASILENKO add doxy-comments for these defines
+/* 
+ * Media data alignment. We use 32 for compatibility with AVX instruction set */
 #define CL_MEDIA_ALIGNMENT 32
+
+/* 
+ * Addition free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
 
 
@@ -70,10 +74,7 @@
 #endif
 
 
-/* I'm really tired of fixing warnings introduced by Vasilenko, so from now on
- * he'll have to fix them himself. Mwahahahaha!!! 
- * 
- * Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
+/* Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
 #ifdef _MSC_VER
 #   pragma warning(error: 4150) /* deletion of pointer to incomplete type 'X'; no destructor called */
 #   pragma warning(error: 4715) /* not all control paths return a value */

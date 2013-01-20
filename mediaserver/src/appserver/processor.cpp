@@ -8,6 +8,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
     m_appServer = QnAppServerConnectionFactory::createConnection();
+    connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)

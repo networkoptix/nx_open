@@ -1,8 +1,5 @@
 #include "live_stream_provider.h"
-#include "media_streamdataprovider.h"
-#include "cpull_media_stream_provider.h"
 #include "core/resource/camera_resource.h"
-
 
 
 QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
@@ -146,13 +143,7 @@ void QnLiveStreamProvider::setFps(float f)
     }
 
 
-    if (QnClientPullMediaStreamProvider* cpdp = dynamic_cast<QnClientPullMediaStreamProvider*>(this))
-    {
-        // all client pull stream providers use the same mechanism 
-        cpdp->setFps(f);
-    }
-    else
-        updateStreamParamsBasedOnFps();
+    updateStreamParamsBasedOnFps();
 }
 
 float QnLiveStreamProvider::getFps() const
@@ -171,7 +162,7 @@ float QnLiveStreamProvider::getFps() const
 bool QnLiveStreamProvider::isMaxFps() const
 {
     QMutexLocker mtx(&m_livemutex);
-    return abs( m_fps - MAX_LIVE_FPS)< .1;
+    return m_fps >= m_cameraRes->getMaxFps()-0.1;
 }
 
 bool QnLiveStreamProvider::needMetaData() 
@@ -221,15 +212,9 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
     // this is secondary stream
     // need to adjust fps 
 
-    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-    Q_ASSERT(ap);
+    int maxFps = m_cameraRes->getMaxFps();
 
-    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(res);
-
-    int maxFps = res->getMaxFps();
-
-    StreamFpsSharingMethod sharingMethod = res->streamFpsSharingMethod();
+    StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     int newSecFps;
 
     if (sharingMethod == sharePixels)
