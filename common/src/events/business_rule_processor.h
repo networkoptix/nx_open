@@ -75,6 +75,7 @@ private:
 
     //TODO: move to mserver_business_rule_processor
     bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action );
+    bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
 
     bool sendMail( const QnSendMailBusinessActionPtr& action );
 
