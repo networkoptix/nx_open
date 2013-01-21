@@ -712,6 +712,11 @@
 								<File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
 								<File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
 							</Component>
+
+							<Component Id="ProxyQjson" Guid="{1b6fc91f-7a75-4802-b648-5482eaf50584}">
+								<File Id="ProxyQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+							</Component>						
+							
 							<Component Id="ProxyOpenSSL" Guid="{B2CFCF46-4618-44a9-9BB5-7C832AA10652}">
 								<File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 								<File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
@@ -954,6 +959,7 @@
 
 			<ComponentRef Id="ProxyExecutable" />
 			<ComponentRef Id="ProxyQTLibraries" />
+			<ComponentRef Id="ProxyQjson" />			
 			<ComponentRef Id="ProxyOpenSSL" />
 		</Feature>
 
