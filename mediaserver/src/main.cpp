@@ -76,6 +76,7 @@
 #include "utils/common/synctime.h"
 #include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
 #include "core/resource_managment/mserver_resource_discovery_manager.h"
+#include "plugins/resources/mserver_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -561,7 +562,6 @@ void QnMain::loadResourcesFromECS()
     {
         if( mediaServer->getGuid() == serverGuid() )
             continue;
-        setMediaServerResource(mediaServer);
 
         qnResPool->addResource( mediaServer );
         //requesting remote server cameras
@@ -654,6 +654,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     m_universalTcpListener->start();
+    QnMServerResourceSearcher::instance()->start();
 #else
     int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
     int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();

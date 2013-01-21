@@ -72,13 +72,3 @@ QString getDataDirectory()
     return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
 }
-
-void setMediaServerResource(QnMediaServerResourcePtr server)
-{
-    m_server = server;
-}
-
-QnMediaServerResourcePtr getMediaServerResource()
-{
-    return m_server;
-}

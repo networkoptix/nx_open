@@ -9,6 +9,7 @@
 #include "mserver_failure_business_event.h"
 #include "ip_conflict_business_event.h"
 #include "core/resource_managment/resource_pool.h"
+#include "mserver_conflict_business_event.h"
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 
@@ -83,4 +84,14 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
                                    value ? ToggleState::On : ToggleState::Off,
                                    timeStamp,
                                    inputPortID)));
+}
+
+
+void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers)
+{
+    QnMServerConflictBusinessEventPtr conflictEvent(new QnMServerConflictBusinessEvent(
+        resource,
+        timeStamp,
+        otherServers));
+    qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
 }

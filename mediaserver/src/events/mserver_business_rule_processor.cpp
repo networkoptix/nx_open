@@ -5,6 +5,7 @@
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
 #include "api/app_server_connection.h"
+#include "core/resource_managment/resource_pool.h"
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
@@ -30,10 +31,11 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
 {
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (action->getToggleState() == ToggleState::On)
-        conn->setPanicMode(true);
-    else
-        conn->setPanicMode(false);
+    bool val = action->getToggleState() == ToggleState::On;
+    conn->setPanicMode(val);
+    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+    if (mediaServer)
+        mediaServer->setPanicMode(val);
     return true;
 }
 
