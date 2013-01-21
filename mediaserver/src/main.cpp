@@ -561,6 +561,7 @@ void QnMain::loadResourcesFromECS()
     {
         if( mediaServer->getGuid() == serverGuid() )
             continue;
+        setMediaServerResource(mediaServer);
 
         qnResPool->addResource( mediaServer );
         //requesting remote server cameras
