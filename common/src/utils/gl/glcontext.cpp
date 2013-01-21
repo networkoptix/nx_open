@@ -106,12 +106,11 @@ void GLContext::doneCurrent()
         ReleaseDC( m_winID, m_dc );
     m_dc = NULL;
 #else
-    bool res = glXMakeCurrent(
+    glXMakeCurrent(
         QX11Info::display(),
         None,
         NULL );
     m_previousErrorCode = glGetError();
-    return res;
 #endif
 }
 

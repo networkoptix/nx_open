@@ -101,9 +101,10 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
     m_model = model;
     setVisible(m_model);
     if (!m_model) {
-        ui->eventTypeComboBox->setModel(NULL);
+/*        ui->eventTypeComboBox->setModel(NULL);
         ui->eventStatesComboBox->setModel(NULL);
-        ui->actionTypeComboBox->setModel(NULL);
+        ui->actionTypeComboBox->setModel(NULL);*/
+        //TODO: clear model? dummy?
         return;
     }
 
