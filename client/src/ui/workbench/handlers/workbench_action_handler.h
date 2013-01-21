@@ -213,6 +213,7 @@ protected slots:
 
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();
+    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& action);
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();

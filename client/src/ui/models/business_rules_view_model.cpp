@@ -17,7 +17,7 @@ namespace {
     static QLatin1String prolongedEvent("While %1");
     static QLatin1String instantEvent("On %1 %2");
 
-    QString toggleStateToString(ToggleState::Value value, bool prolonged) {
+    QString toggleStateToModelString(ToggleState::Value value) {
         switch( value )
         {
             case ToggleState::Off:
@@ -25,10 +25,7 @@ namespace {
             case ToggleState::On:
                 return QObject::tr("Starts");
             case ToggleState::NotDefined:
-            if (prolonged)
                 return QObject::tr("Starts/Stops");
-            else
-                return QObject::tr("Occurs");
         }
         return QString();
     }
@@ -92,6 +89,8 @@ namespace {
         return true;
     }
 
+    const int ProlongedActionRole = Qt::UserRole + 2;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,9 +109,39 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
 {
-    updateEventTypesModel();
-    updateEventStatesModel();
-    updateActionTypesModel();
+    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+        BusinessEventType::Value val = (BusinessEventType::Value)i;
+
+        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventTypesModel->appendRow(row);
+    }
+
+    QList<ToggleState::Value> values;
+    values << ToggleState::NotDefined << ToggleState::On << ToggleState::Off;
+    foreach (ToggleState::Value val, values) {
+        QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
+        item->setData(val);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_eventStatesModel->appendRow(row);
+    }
+
+    for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+        BusinessActionType::Value val = (BusinessActionType::Value)i;
+
+        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+        item->setData(val);
+        item->setData(BusinessActionType::hasToggleState(val), ProlongedActionRole);
+
+        QList<QStandardItem *> row;
+        row << item;
+        m_actionTypesModel->appendRow(row);
+    }
 }
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
@@ -156,8 +185,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    updateEventStatesModel(); //TODO: connect on dataChanged?
-    updateActionTypesModel();
+    updateActionTypesModel();//TODO: connect on dataChanged?
 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
@@ -214,13 +242,24 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
     m_eventType = value;
     m_modified = true;
 
-    updateEventStatesModel();
-    updateActionTypesModel();
-
     QnBusiness::Fields fields = QnBusiness::EventTypeField | QnBusiness::ModifiedField;
+
+    if (!BusinessEventType::hasToggleState(m_eventType) && m_eventState != ToggleState::NotDefined){
+        m_eventState = ToggleState::NotDefined;
+        fields |= QnBusiness::EventStateField;
+    }
+
     if (BusinessEventType::requiresCameraResource(m_eventType) != cameraRequired ||
-             BusinessEventType::requiresServerResource(m_eventType) != serverRequired)
+             BusinessEventType::requiresServerResource(m_eventType) != serverRequired) {
         fields |= QnBusiness::EventResourcesField;
+    }
+
+    if (actionTypeShouldBeInstant() && BusinessActionType::hasToggleState(m_actionType)) {
+        m_actionType = BusinessActionType::BA_ShowPopup;
+        fields |= QnBusiness::ActionTypeField;
+    }
+
+    updateActionTypesModel();
 
     emit dataChanged(this, fields);
     //TODO: #GDM check others, params and resources should be merged
@@ -265,9 +304,16 @@ void QnBusinessRuleViewModel::setEventState(ToggleState::Value state) {
 
     m_eventState = state;
     m_modified = true;
+
+    QnBusiness::Fields fields = QnBusiness::EventStateField | QnBusiness::ModifiedField;
+
+    if (actionTypeShouldBeInstant() && BusinessActionType::hasToggleState(m_actionType)) {
+        m_actionType = BusinessActionType::BA_ShowPopup;
+        fields |= QnBusiness::ActionTypeField;
+    }
     updateActionTypesModel();
 
-    emit dataChanged(this, QnBusiness::EventStateField | QnBusiness::ModifiedField);
+    emit dataChanged(this, fields);
 }
 
 BusinessActionType::Value QnBusinessRuleViewModel::actionType() const {
@@ -444,56 +490,15 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
     return QVariant();
 }
 
-void QnBusinessRuleViewModel::updateEventTypesModel() {
-    m_eventTypesModel->clear();
-    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        BusinessEventType::Value val = (BusinessEventType::Value)i;
-
-        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventTypesModel->appendRow(row);
-    }
-}
-
-void QnBusinessRuleViewModel::updateEventStatesModel() {
-    m_eventStatesModel->clear();
-
-    QList<ToggleState::Value> values;
-    values << ToggleState::NotDefined;
-    bool prolonged = BusinessEventType::hasToggleState(m_eventType);
-    if (prolonged)
-        values << ToggleState::On << ToggleState::Off;
-
-    foreach (ToggleState::Value val, values) {
-        QStandardItem *item = new QStandardItem(toggleStateToString(val, prolonged));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventStatesModel->appendRow(row);
-    }
-}
-
 void QnBusinessRuleViewModel::updateActionTypesModel() {
-    m_actionTypesModel->clear();
+    QModelIndexList prolongedActions = m_actionTypesModel->match(m_actionTypesModel->index(0,0),
+                                                               ProlongedActionRole, true, -1, Qt::MatchExactly);
+
     // what type of actions to show: prolonged or instant
-    bool onlyInstantActions = actionTypeShouldBeInstant();
-
-    for (int i = 0; i < BusinessActionType::BA_Count; i++) {
-        BusinessActionType::Value val = (BusinessActionType::Value)i;
-
-        if (BusinessActionType::hasToggleState(val) && onlyInstantActions)
-            continue;
-
-        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_actionTypesModel->appendRow(row);
+    bool enableProlongedActions = !actionTypeShouldBeInstant();
+    foreach (QModelIndex idx, prolongedActions) {
+        m_actionTypesModel->item(idx.row())->setEnabled(enableProlongedActions);
+        m_actionTypesModel->item(idx.row())->setSelectable(enableProlongedActions);
     }
 }
 

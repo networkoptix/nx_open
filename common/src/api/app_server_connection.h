@@ -50,6 +50,7 @@ namespace conn_detail
         void finishedLicense(int status, const QByteArray &errorString, QnLicenseList licenses, int handle);
         void finishedKvPair(int status, const QByteArray& errorString, QnKvPairList kvPairs, int handle);
         void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
+        void finishedBusinessRule(int status, const QByteArray &errorString, QnBusinessEventRules businessRules, int handle);
 
     private:
         QnResourceFactory& m_resourceFactory;
@@ -102,6 +103,7 @@ public:
     int connectAsync(QObject* target, const char *slot);
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
+    int getBusinessRulesAsync(QObject *target, const char *slot);
 
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
     int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);

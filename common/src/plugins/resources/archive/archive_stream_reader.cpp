@@ -214,17 +214,17 @@ bool QnArchiveStreamReader::init()
         while (1)
         {
 			m_delegate->setQuality(quality, true);
-            qint64 jumpTime = requiredJumpTime != AV_NOPTS_VALUE ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
+            qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
             bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
             Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
-                if (requiredJumpTime != AV_NOPTS_VALUE)
+                if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     m_requiredJumpTime = AV_NOPTS_VALUE;
 				m_oldQuality = quality;
 				m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
-                if (requiredJumpTime != AV_NOPTS_VALUE)
+                if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     emit jumpOccured(requiredJumpTime);
                 break;
             }
@@ -436,7 +436,7 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
-        if (jumpTime != AV_NOPTS_VALUE)
+        if (jumpTime != qint64(AV_NOPTS_VALUE))
             currentTimeHint = jumpTime;
         m_outOfPlaybackMask = false;
         m_bofReached = false;
@@ -469,7 +469,7 @@ begin_label:
                 setSkipFramesToTime(displayTime, false);
         }
         else {
-            if (!reverseMode && displayTime != DATETIME_NOW && displayTime != AV_NOPTS_VALUE)
+            if (!reverseMode && displayTime != DATETIME_NOW && displayTime != qint64(AV_NOPTS_VALUE))
                 setSkipFramesToTime(displayTime, false);
         }
         

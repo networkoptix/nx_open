@@ -59,6 +59,6 @@ struct QnMessage
     static quint32 nextSeqNumber(quint32 seqNumber);
 };
 
-Q_DECLARE_METATYPE(QnMessage);
+Q_DECLARE_METATYPE(QnMessage)
 
 #endif // QN_MESSAGE_H

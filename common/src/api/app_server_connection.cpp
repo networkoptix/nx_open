@@ -28,6 +28,7 @@ namespace {
     const QLatin1String kvPairObject("kvPair");
     const QLatin1String dumpdbObject("dumpdb");
     const QLatin1String restoredbObject("restoredb");
+    const QLatin1String settingObject("setting");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -154,7 +155,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
             }
         }
 
-        emit finished(status, errorString, QnResourceList(rules), handle);
+        emit finishedBusinessRule(status, errorString, rules, handle);
     }
 }
 
@@ -457,9 +458,17 @@ int QnAppServerConnection::getResourcesAsync(const QString& args, const QString&
 int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, licenseObject);
-    QObject::connect(processor, SIGNAL(finished(int,QByteArray,QnLicenseList,int)), target, slot);
+    QObject::connect(processor, SIGNAL(finishedLicense(int,QByteArray,QnLicenseList,int)), target, slot);
 
     return getObjectsAsync(licenseObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, businessRuleObject);
+    QObject::connect(processor, SIGNAL(finishedBusinessRule(int,QByteArray,QnBusinessEventRules,int)), target, slot);
+
+    return getObjectsAsync(businessRuleObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
@@ -509,7 +518,7 @@ int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject*
 int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, businessRuleObject);
-    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+    QObject::connect(processor, SIGNAL(finishedBusinessRule(int,QByteArray,QnBusinessEventRules,int)), target, slot);
 
     QByteArray data;
     m_serializer.serializeBusinessRule(rule, data);

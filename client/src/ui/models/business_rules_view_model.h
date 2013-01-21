@@ -37,9 +37,7 @@ namespace QnBusiness {
         ActionResourcesField    = 0x00000040,
         ActionParamsField       = 0x00000080,
         AggregationField        = 0x00000100,
-        AllFieldsMask           = 0x0000FFFF,
-
-        ActionIsInstantField    = EventTypeField | EventStateField
+        AllFieldsMask           = 0x0000FFFF
     };
     Q_DECLARE_FLAGS(Fields, Field)
 
@@ -99,8 +97,6 @@ signals:
     void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
 
 private:
-    void updateEventTypesModel();
-    void updateEventStatesModel();
     void updateActionTypesModel();
 
     QString getTargetText(const bool detailed) const;

@@ -104,7 +104,7 @@ public:
     virtual double getSpeed() const = 0;
 
     virtual void startPaused() = 0;
-    virtual void setRole(QnResource::ConnectionRole role) override {}
+    virtual void setRole(QnResource::ConnectionRole role) override { Q_UNUSED(role) }
 signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);

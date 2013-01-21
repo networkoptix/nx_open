@@ -34,7 +34,7 @@ class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContex
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRulesDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     virtual ~QnBusinessRulesDialog();
 
 protected:
@@ -50,7 +50,8 @@ private slots:
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
 
-    void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+    void at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
+    void at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
@@ -70,9 +71,7 @@ private:
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     QMap<int, QnBusinessRuleViewModel*> m_processing;
-    QnAppServerConnectionPtr m_connection;
-
-
+    int m_loadingHandle;
 };
 
 #endif // QN_BUSINESS_RULES_DIALOG_H

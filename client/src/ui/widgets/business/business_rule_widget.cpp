@@ -131,7 +131,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     if (fields & QnBusiness::EventTypeField) {
 
         QModelIndexList eventTypeIdx = m_model->eventTypesModel()->match(
-                    m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType());
+                    m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
         bool prolonged = BusinessEventType::hasToggleState(m_model->eventType());
@@ -147,16 +147,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
     if (fields & QnBusiness::EventStateField) {
         QModelIndexList stateIdx = m_model->eventStatesModel()->match(
-                    m_model->eventStatesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventState());
+                    m_model->eventStatesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventState(), 1, Qt::MatchExactly);
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
-    }
-
-    if (fields & QnBusiness::ActionIsInstantField) {
-        bool onlyInstantActions = m_model->actionTypeShouldBeInstant();
-
-        ui->aggregationCheckBox->setVisible(onlyInstantActions);
-        ui->aggregationValueSpinBox->setVisible(onlyInstantActions);
-        ui->aggregationPeriodComboBox->setVisible(onlyInstantActions);
     }
 
     if (fields & QnBusiness::EventResourcesField) {
@@ -166,13 +158,19 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
     if (fields & QnBusiness::ActionTypeField) {
         QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(
-                    m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType());
+                    m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
         bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
         ui->actionResourcesHolder->setVisible(isResourceRequired);
         ui->actionAtLabel->setVisible(isResourceRequired);
         ui->actionDropLabel->setVisible(isResourceRequired);
+
+        bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
+
+        ui->aggregationCheckBox->setVisible(actionIsInstant);
+        ui->aggregationValueSpinBox->setVisible(actionIsInstant);
+        ui->aggregationPeriodComboBox->setVisible(actionIsInstant);
 
         initActionParameters();
     }

@@ -17,12 +17,12 @@
 
 #include <client_message_processor.h>
 
-QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent, QnWorkbenchContext *context):
+QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::BusinessRulesDialog()),
     m_currentDetailsWidget(NULL),
-    m_connection(connection)
+    m_loadingHandle(-1)
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
@@ -87,11 +87,11 @@ void QnBusinessRulesDialog::at_context_userChanged() {
     }
 
     m_rulesViewModel->clear();
+    m_loadingHandle = -1;
 
     if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        QnBusinessEventRules rules;
-        m_connection->getBusinessRules(rules); // TODO: replace synchronous call
-        m_rulesViewModel->addRules(rules);
+        m_loadingHandle = QnAppServerConnectionFactory::createConnection()->getBusinessRulesAsync(
+                    this, SLOT(at_resources_received(int,QByteArray,QnBusinessEventRules,int)));
     }
 
     updateControlButtons();
@@ -141,25 +141,38 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     deleteRule(model);
 }
 
-void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
+
+    if (handle != m_loadingHandle)
+        return;
+
+    bool success = (status == 0);
+    if(!success) {
+        //TODO: #GDM remove password from error message
+        QMessageBox::critical(this, tr("Error while receiving rules"), QString::fromLatin1(errorString));
+        return;
+    }
+    m_rulesViewModel->addRules(rules);
+    m_loadingHandle = -1;
+
+    updateControlButtons();
+}
+
+void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
 
     if (!m_processing.contains(handle))
         return;
     QnBusinessRuleViewModel* model = m_processing[handle];
     m_processing.remove(handle);
 
-    bool success = (status == 0 && resources.size() == 1);
+    bool success = (status == 0 && rules.size() == 1);
     if(!success) {
         //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
         return;
     }
 
-    QnResourcePtr res = resources.first();
-    QnBusinessEventRulePtr rule = res.dynamicCast<QnBusinessEventRule>();
-    if (!rule)
-        return;
-
+    QnBusinessEventRulePtr rule = rules.first();
     model->loadFromRule(rule);
     updateControlButtons();
 }
@@ -206,7 +219,8 @@ void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
     //TODO: set rule status to "Saving"
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
-    int handle = m_connection->saveAsync(rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(
+                rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnBusinessEventRules &, int)));
     m_processing[handle] = ruleModel;
 }
 
@@ -220,7 +234,8 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
     }
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
-    int handle = m_connection->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+    int handle = QnAppServerConnectionFactory::createConnection()->deleteAsync(
+                rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
     m_processing[handle] = ruleModel;
 
     //TODO: rule status should be set to "Removing..."
@@ -228,10 +243,11 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
 
 void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    bool loaded = m_loadingHandle < 0;
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && m_rulesViewModel->hasModifiedItems());
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights && loaded);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && loaded && m_rulesViewModel->hasModifiedItems());
 
-    ui->deleteRuleButton->setEnabled(hasRights && m_currentDetailsWidget);
-    ui->addRuleButton->setEnabled(hasRights);
+    ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget);
+    ui->addRuleButton->setEnabled(hasRights && loaded);
 }

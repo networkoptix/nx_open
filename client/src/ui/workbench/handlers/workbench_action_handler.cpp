@@ -177,6 +177,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -835,6 +836,13 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
 }
 
+void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &action) {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->add();
+    popupCollectionWidget()->show();
+}
+
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
@@ -1262,7 +1270,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 //    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(connection(), widget(), context());
+        m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
         newlyCreated = true;
 /*
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
@@ -1296,12 +1304,12 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
         businessRulesDialog()->setGeometry(oldGeometry);
 }
 
+// can be used for test purposes or for displaying an example for user
 void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
     popupCollectionWidget()->add();
     popupCollectionWidget()->show();
-
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {

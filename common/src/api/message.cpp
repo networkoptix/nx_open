@@ -36,6 +36,8 @@ namespace Qn
                 return QLatin1String("BusinessRuleInsertOrUpdate");
             case Message_Type_BusinessRuleDelete:
                 return QLatin1String("BusinessRuleDelete");
+            case Message_Type_BroadcastBusinessAction:
+                return QLatin1String("BroadcastBusinessAction");
             default:
                 return QString::fromAscii("Unknown %1").arg((int)val);
         }
