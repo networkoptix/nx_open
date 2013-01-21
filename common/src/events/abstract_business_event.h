@@ -32,6 +32,9 @@ namespace BusinessEventType
         /** Connection to mediaserver lost. */
         BE_MediaServer_Failure,
 
+        /** Two or more mediaservers are running. */
+        BE_MediaServer_Conflict,
+
         /** Event type is not defined. Used in rules. */
         BE_NotDefined,
 

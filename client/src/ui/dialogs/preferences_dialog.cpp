@@ -162,14 +162,16 @@ void QnPreferencesDialog::submitToSettings() {
         extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
     m_settings->setExtraMediaFolders(extraMediaFolders);
 
-    if (m_recordingSettingsWidget)
-        m_recordingSettingsWidget->submitToSettings();
-
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
 
     m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
+
+    if (m_recordingSettingsWidget)
+        m_recordingSettingsWidget->submitToSettings();
+    if (m_smtpSettingsWidget)
+        m_smtpSettingsWidget->submit();
 
     m_settings->save();
 }

@@ -14,6 +14,7 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "common/common_meta_types.h"
+#include "serverutil.h"
 
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
 
@@ -48,7 +49,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     connect(this, SIGNAL(recordingFailed(QString)), this, SLOT(at_recordingFailed(QString)));
 
     connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnAbstractDataPacketPtr)));
-    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, const QString&)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, const QString&)));
+    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnResourcePtr, const QString&)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, const QnResourcePtr&, const QString&)));
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -58,7 +59,7 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 void QnServerStreamRecorder::at_recordingFailed(QString msg)
 {
-    emit storageFailure(m_storage, qnSyncTime->currentUSecsSinceEpoch(), QLatin1String("IO error occured."));
+    emit storageFailure(getMediaServerResource(), qnSyncTime->currentUSecsSinceEpoch(), m_storage, QLatin1String("IO error occured."));
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -91,7 +92,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
-        emit storageFailure(m_storage, qnSyncTime->currentUSecsSinceEpoch(), "Not enough HDD/SSD speed for recording");
+        emit storageFailure(getMediaServerResource(), qnSyncTime->currentUSecsSinceEpoch(), m_storage, "Not enough HDD/SSD speed for recording");
 
 		qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
         markNeedKeyData();

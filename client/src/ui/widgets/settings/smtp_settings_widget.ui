@@ -91,11 +91,6 @@
           </item>
           <item>
            <property name="text">
-            <string notr="true">465</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string notr="true">25</string>
            </property>
           </item>
@@ -108,30 +103,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QRadioButton" name="tlsRadioButton">
-       <property name="text">
-        <string>Secured connection using TLS</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QRadioButton" name="unsecuredRadioButton">
-       <property name="text">
-        <string>Unsecured connection</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QRadioButton" name="sslRadioButton">
-       <property name="text">
-        <string>Secured connection using SSL</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QLabel" name="tlsRecommendedLabel">
        <property name="text">
@@ -142,13 +113,20 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="sslRecommendedLabel">
+     <item row="1" column="0">
+      <widget class="QRadioButton" name="unsecuredRadioButton">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Unsecured connection</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QRadioButton" name="tlsRadioButton">
+       <property name="text">
+        <string>Secured connection using TLS</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -175,7 +153,6 @@
   <tabstop>userLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>tlsRadioButton</tabstop>
-  <tabstop>sslRadioButton</tabstop>
   <tabstop>unsecuredRadioButton</tabstop>
  </tabstops>
  <resources/>

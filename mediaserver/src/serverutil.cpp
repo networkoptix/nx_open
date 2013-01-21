@@ -7,6 +7,8 @@
 #include "settings.h"
 #include "version.h"
 
+static QnMediaServerResourcePtr m_server;
+
 QString defaultStoragePath()
 {
 #ifdef Q_OS_WIN
@@ -71,3 +73,12 @@ QString getDataDirectory()
 #endif
 }
 
+void setMediaServerResource(QnMediaServerResourcePtr server)
+{
+    m_server = server;
+}
+
+QnMediaServerResourcePtr getMediaServerResource()
+{
+    return m_server;
+}

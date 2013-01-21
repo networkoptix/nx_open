@@ -99,7 +99,6 @@ bool QnMessage::load(const pb::Message &message)
             break;
         case pb::Message_Type_BusinessRuleChange:
         {
-            //TODO: TODODODOD
             const pb::BusinessRuleMessage& businessRuleMessage = message.GetExtension(pb::BusinessRuleMessage::message);
             parseBusinessRule(businessRule, businessRuleMessage.businessrule());
             break;

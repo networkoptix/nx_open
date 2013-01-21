@@ -1,5 +1,8 @@
 #include "kvpair.h"
 
+QnKvPair::QnKvPair(const QString &name, const QString &value):
+    m_name(name), m_value(value) {}
+
 void QnKvPair::setName(const char* name)
 {
     m_name = QString::fromUtf8(name);

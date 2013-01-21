@@ -7,6 +7,10 @@
 
 class QnKvPair {
 public:
+    QnKvPair() {}
+    QnKvPair(const QString& name, const QString& value);
+    ~QnKvPair() {}
+
     void setName(const char* name);
     void setName(const QString& name);
     const QString& name() const;
