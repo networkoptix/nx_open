@@ -15,7 +15,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, 
 {
     ui->setupUi(this);
 
-    connect(ui->emailLineEdit, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
+    connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 }
 
@@ -31,8 +31,11 @@ void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMode
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
-    if (fields & QnBusiness::ActionParamsField)
-        ui->emailLineEdit->setText(BusinessActionParameters::getEmailAddress(model->actionParams()));
+    if (fields & QnBusiness::ActionParamsField) {
+        QString email = BusinessActionParameters::getEmailAddress(model->actionParams());
+        if (ui->emailLineEdit->text() != email)
+            ui->emailLineEdit->setText(email);
+    }
 }
 
 void QnSendmailBusinessActionWidget::paramsChanged() {
