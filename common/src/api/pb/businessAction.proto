@@ -2,6 +2,9 @@ package pb;
 
 import "businessCommon.proto";
 
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "BusinessActionProtos";
+
 enum BusinessActionType
 {
     // media server based actions
