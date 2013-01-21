@@ -15,6 +15,7 @@ enum BusinessEventType {
     Network_Issue      = 5;
     Camera_Ip_Conflict = 6;
     MediaServer_Failure= 7;
+    MediaServer_Conflict=8;
     UserDefinedEvent   = 1000;
 }
 
