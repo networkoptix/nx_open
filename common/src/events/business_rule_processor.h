@@ -1,6 +1,7 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
+#include <QTimer>
 #include <QThread>
 #include <QMultiMap>
 #include "core/resource/resource_fwd.h"
@@ -53,6 +54,8 @@ public slots:
 private slots:
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
+
+    void at_timer();
 protected:
     bool containResource(QnResourceList resList, const QnId& resId) const;
     QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
@@ -96,9 +99,12 @@ private:
         QAggregationInfo(qint64 _timeStamp, qint64 _count): timeStamp(_timeStamp), count(_count) {}
         qint64 timeStamp;
         int count;
+        QnAbstractBusinessEventPtr bEvent;
+        QnBusinessEventRulePtr bRule;
     };
     QMap<QString, QAggregationInfo> m_aggregateActions;
     mutable QMutex m_mutex;
+    QTimer m_timer;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()
