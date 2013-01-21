@@ -143,6 +143,20 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
     if (!condOK)
         return QnAbstractBusinessActionPtr();
+    
+    if (bEvent->getToggleState() == ToggleState::On) {
+        if (m_rulesInProgress.contains(rule->getUniqueId()))
+            return QnAbstractBusinessActionPtr(); // rule already in progress. ingore repeated event
+        else
+            m_rulesInProgress << rule->getUniqueId();
+    }
+    else {
+        m_rulesInProgress.remove(rule->getUniqueId());
+    }
+
+    if (rule->eventState() != bEvent->getToggleState())
+        return QnAbstractBusinessActionPtr();
+
 
     if (rule->aggregationPeriod() == 0)
         return rule->instantiateAction(bEvent);
