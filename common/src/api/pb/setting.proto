@@ -1,5 +1,8 @@
 package pb;
 
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "SettingProtos";
+
 message Setting {
     required string name  = 1;
     required string value = 2;
