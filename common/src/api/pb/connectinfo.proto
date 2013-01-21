@@ -9,4 +9,5 @@ message ConnectInfo {
     optional string version = 1;
     optional CompatibilityItems compatibilityItems = 2;
     optional int32 proxyPort = 3;
+    optional string ecsGuid = 4;
 }

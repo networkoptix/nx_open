@@ -842,6 +842,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
             QString::fromStdString(ci->comp1()), QString::fromStdString(ci->ver2())));
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
+    connectInfo->ecsGuid = QString::fromStdString(pb_connectInfo.ecsguid());
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessRules, const QByteArray &data)
