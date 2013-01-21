@@ -366,7 +366,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 }
 
 //==========================check_if_accessible========================
-static struct check_if_accessible_STRUCT
+struct check_if_accessible_STRUCT
 {
     QnNetworkResourcePtr resourceNet;
     bool m_isSameSubnet;
