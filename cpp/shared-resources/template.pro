@@ -12,39 +12,41 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-translations.qrc
 
-!contains(BUILDLIB, staticlib) {
+isEmpty(BUILDLIB) {
   ICON = ${project.build.directory}/hdw_logo.ico
 }
 
 CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ${libdir}/bin/debug
+	DESTDIR = ../../build-environment/${arch}/bin/debug
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
 	} else {
-    DESTDIR = ${libdir}/build/bin/debug
+    DESTDIR = ../../build-environment/${arch}/build/bin/debug
   }  
-  OBJECTS_DIR  = ${project.build.directory}/build/debug
-  MOC_DIR = ${project.build.directory}/build/debug/generated
-  UI_DIR = ${project.build.directory}/build/debug/generated
-  RCC_DIR = ${project.build.directory}/build/debug/generated
+  OBJECTS_DIR = ../${arch}/build/debug
+  MOC_DIR = ../${arch}/build/debug/generated
+  UI_DIR = ../${arch}/build/debug/generated
+  RCC_DIR = ../${arch}/build/debug/generated
   LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
 }
 
 CONFIG(release, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ${libdir}/bin/release
+	DESTDIR = ../../build-environment/${arch}/bin/release
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
   } else {
-    DESTDIR = ${libdir}/build/bin/release
+    DESTDIR = ../../build-environment/${arch}/build/bin/release
   }  
-  OBJECTS_DIR  = ${project.build.directory}/build/release
-  MOC_DIR = ${project.build.directory}/build/release/generated
-  UI_DIR = ${project.build.directory}/build/release/generated
-  RCC_DIR = ${project.build.directory}/build/release/generated
+  OBJECTS_DIR  = ../${arch}/build/release
+  MOC_DIR = ../${arch}/build/release/generated
+  UI_DIR = ../${arch}/build/release/generated
+  RCC_DIR = ../${arch}/build/release/generated
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
-LIBS += -lcommon	
+!contains(TARGET,common) {
+  LIBS += -lcommon	
+}
 
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
@@ -58,13 +60,8 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
-# Define override specifier.
-OVERRIDE_DEFINITION = "override="
-win32-msvc*:OVERRIDE_DEFINITION = "override=override"
-DEFINES += $$OVERRIDE_DEFINITION
-
 win* {
-  !contains(BUILDLIB, staticlib) {
+  isEmpty(BUILDLIB) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
 	ICON = ${project.build.directory}/hdw_logo.ico	
   }
@@ -74,16 +71,6 @@ win* {
   DEFINES += ${windows.defines}  
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
-
-    # Don't warn for deprecated 'unsecure' CRT functions.
-    DEFINES += _CRT_SECURE_NO_WARNINGS
-
-    # Don't warn for deprecated POSIX functions.
-    DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
-
-    # Disable warning C4250: 'Derived' : inherits 'Base::method' via dominance.
-    # It is buggy, as described in http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function
-    QMAKE_CXXFLAGS += /wd4250
   }
   
   !staticlib {

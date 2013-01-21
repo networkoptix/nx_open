@@ -67,6 +67,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "watchers/workbench_server_time_watcher.h"
 
 
@@ -396,6 +397,9 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             /*QnGlHardwareChecker* filter =*/
             new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
+
+            //initializing gl context pool used to render decoded pictures in non-GUI thread
+            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( glWidget );
         }
 
         /* Turn on antialiasing at QPainter level. */
@@ -565,10 +569,10 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             oldMediaWidget->display()->camDisplay()->setFullScreen(false);
         }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
+            newMediaWidget->display()->camDisplay()->setFullScreen(true);
             if (newMediaWidget->display()->archiveReader()) {
                 newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             }
-            newMediaWidget->display()->camDisplay()->setFullScreen(true);
         }
 
         /* Hide / show other items when zoomed. */
@@ -772,7 +776,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     if(widgets(widget->resource()).size() == 1)
-        connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
+        connect(widget->resource().data(),  SIGNAL(disabledChanged(const QnResourcePtr &)),  this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 
@@ -1308,7 +1312,7 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     if (m_inChangeLayout)
-        qWarning() << "Changing layout while changing layout. Error! #GDM";
+        return;
 
     m_inChangeLayout = true;
     QnWorkbenchLayout *layout = workbench()->currentLayout();
@@ -1606,14 +1610,6 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
                 workbench()->removeLayout(layout);
         }
     }
-}
-
-void QnWorkbenchDisplay::at_resource_disabledChanged() {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    at_resource_disabledChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resource) {

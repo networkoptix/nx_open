@@ -30,6 +30,14 @@ class QN_EXPORT QnResourcePool : public QObject
     Q_OBJECT
 
 public:
+    enum Filter
+    {
+        //!do not check resources, omwned by another entites
+        rfOnlyFriends,
+        //!check all resources
+        rfAllResources
+    };
+
     QnResourcePool();
     ~QnResourcePool();
 
@@ -48,13 +56,13 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id) const;
+    QnResourcePtr getResourceById(QnId id, Filter searchFilter = rfOnlyFriends) const;
     QnResourcePtr getResourceByGuid(QString guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);
 
-    bool hasSuchResouce(const QString &uniqid) const;
+    bool hasSuchResource(const QString &uniqid) const;
 
     QnResourcePtr getResourceByUrl(const QString &url) const;
 
@@ -62,6 +70,8 @@ public:
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
 
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
+    QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
+    QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
@@ -75,7 +85,7 @@ public:
 
     int activeCameras() const;
 
-    // TODO: this is a hack. Fix.
+    // TODO #gdm: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
 
@@ -87,15 +97,21 @@ signals:
 
     void aboutToBeDestroyed();
 
-private slots:
-    void handleStatusChange();
-    void handleResourceChange();
-
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;
     QnResourcePtr localServer;
     QHash<QString, QnResourcePtr> m_resources;
+    //!Resources with flag \a QnResource::foreign set
+    /*!
+        Using separate dictionary to minimize existing code modification
+    */
+    QHash<QString, QnResourcePtr> m_foreignResources;
+
+    /*!
+        \return true, if \a resource has been inserted. false - if updated existing resource
+    */
+    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool );
 };
 
 

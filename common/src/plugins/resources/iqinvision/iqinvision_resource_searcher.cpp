@@ -66,11 +66,11 @@ QString QnPlIqResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    return QnResourcePtr(0);
+    return QList<QnResourcePtr>();
 }
 
 QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
@@ -134,7 +134,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }
@@ -196,7 +196,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
 
         if (net_res->getMAC() == macAddr)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
             return; // already found;
         }
@@ -216,7 +216,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
     resource->setName(nameStr);
     resource->setModel(nameStr);
     resource->setMAC(macAddr);
-    resource->setHostAddress(peerAddress, QnDomainMemory);
+    resource->setHostAddress(peerAddress.toString(), QnDomainMemory);
     resource->setDiscoveryAddr(discoveryAddress);
 
     result.push_back(resource);

@@ -1,0 +1,13 @@
+package pb;
+
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "KvPairProtos";
+
+message KvPair {
+    required string name  = 1;
+    required string value = 2;
+}
+
+message KvPairs {
+    repeated KvPair kvPair = 1;
+}

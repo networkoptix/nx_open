@@ -25,43 +25,58 @@ namespace detail{
             return m_cameras;
         }
 
-        bool addSuccess(){
-            return (m_addStatus == 0);
+        bool isSuccess(){
+            return (m_status == 0);
         }
 
         bool isCancelled(){
             return m_cancelled;
         }
 
+        QString getLastError() const {
+            return m_lastError;
+        }
+
     signals:
         void replyReceived();
 
     public slots:
-        void processSearchReply(const QnCamerasFoundInfoList &cameras)
-        {
+        void processSearchReply(const QnCamerasFoundInfoList &cameras) {
             if (m_cancelled)
                 return;
 
+            m_status = 0;
+            m_lastError = QString();
             m_cameras = cameras;
             emit replyReceived();
         }
 
-        void processAddReply(int status){
+        void processSearchError(int status, const QString &error) {
             if (m_cancelled)
                 return;
 
-            m_addStatus = status;
+            m_status = status;
+            m_lastError = error;
             emit replyReceived();
         }
 
-        void cancel(){
+        void processAddReply(int status) {
+            if (m_cancelled)
+                return;
+
+            m_status = status;
+            emit replyReceived();
+        }
+
+        void cancel() {
             m_cancelled = true;
         }
 
     private:
         QnCamerasFoundInfoList m_cameras;
-        int m_addStatus;
+        int m_status;
         bool m_cancelled;
+        QString m_lastError;
     };
 }
 
@@ -73,6 +88,7 @@ public:
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
+    void updateSubnetMode();
 
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
@@ -92,7 +108,7 @@ private:
     QnMediaServerResourcePtr m_server;
 
     bool m_inIpRangeEdit;
-    QString m_startLabelTexts[2];
+    bool m_subnetMode;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

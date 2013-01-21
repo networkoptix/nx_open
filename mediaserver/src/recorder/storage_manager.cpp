@@ -127,7 +127,7 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);
-    connect(storage.data(), SIGNAL(archiveRangeChanged(qint64, qint64)), this, SLOT(at_archiveRangeChanged(qint64, qint64)), Qt::DirectConnection);
+    connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
 }
 
 QnStorageResourcePtr QnStorageManager::removeStorage(QnStorageResourcePtr storage)
@@ -300,14 +300,10 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
     }
 }
 
-void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs)
+void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
 {
     Q_UNUSED(newEndTimeMs)
-    QnStorageResource* storage = qobject_cast<QnStorageResource*> (sender());
-    if (!storage)
-        return;
-
-    int storageIndex = detectStorageIndex(storage->getUrl());
+    int storageIndex = detectStorageIndex(resource->getUrl());
 
     foreach(DeviceFileCatalogPtr catalogHi, m_devFileCatalogHi)
         catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);

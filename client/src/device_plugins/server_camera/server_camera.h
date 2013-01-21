@@ -9,9 +9,9 @@ class QnServerCameraProcessor : public QObject, public QnResourceProcessor
 public:
     void processResources(const QnResourceList &resources);
 private:
-    void determineOptimalIF(QnMediaServerResource* mediaServer);
+    void determineOptimalIF(QnMediaServerResource* mediaServer); // TODO: #VASILENKO please don't use plain pointers with resources. Only shared ones.
 private slots:
-    void at_serverIfFound(const QString &);
+    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
 };
 
 class QnServerCamera: public QnVirtualCameraResource
@@ -25,8 +25,8 @@ public:
     virtual QString manufacture() const;
     virtual void setIframeDistance(int frames, int timems);
 
-    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
 protected:
     virtual QString getUniqueId() const override;
     virtual void setCropingPhysical(QRect croping);

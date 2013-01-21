@@ -13,15 +13,6 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT
 
 public:
-    // TODO: move to QnSecurityCamResource
-    enum CameraCapability { 
-        NoCapabilities = 0, 
-        PtzCapability = 1, 
-        ZoomCapability = 2
-    };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
-
-
     QnVirtualCameraResource();
 
     virtual void updateInner(QnResourcePtr other) override;
@@ -47,11 +38,6 @@ public:
     void unLockDTSFactory();
 
     // TODO: move to QnSecurityCamResource
-    CameraCapabilities getCameraCapabilities();
-    void setCameraCapabilities(CameraCapabilities capabilities);
-    void setCameraCapability(CameraCapability capability, bool value = true);
-
-    // TODO: move to QnSecurityCamResource
     QString getModel() const;
     void setModel(QString model);
 
@@ -61,8 +47,7 @@ public:
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
-    void cameraCapabilitiesChanged();
-    virtual void scheduleTasksChanged() override;
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
 
 private:
     bool m_scheduleDisabled;
@@ -84,21 +69,14 @@ class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResourc
 public:
     QnPhysicalCameraResource();
 
-    // returns 0 if primary stream does not exist
-    int getPrimaryStreamDesiredFps() const;
-
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    void onPrimaryFpsUpdated(int newFps);
-
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
-#ifdef _DEBUG
-    void debugCheck() const;
-#endif
 };
 
-Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr)
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+Q_DECLARE_METATYPE(QnVirtualCameraResourceList);
 
 #endif // QN_CAMERA_RESOURCE_H

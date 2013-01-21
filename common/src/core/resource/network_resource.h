@@ -27,8 +27,8 @@ public:
 
     virtual QString getUniqueId() const;
 
-    virtual QHostAddress getHostAddress() const;
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
+    virtual QString getHostAddress() const;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
@@ -86,14 +86,12 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
-    bool hasRunningLiveProvider() const;
-
     virtual bool shoudResolveConflicts() const;
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source);
 
-
+    virtual int getChannel() const;
 private:
     QAuthenticator m_auth;
     bool m_authenticated;

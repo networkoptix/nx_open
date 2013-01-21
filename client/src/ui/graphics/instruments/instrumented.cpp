@@ -7,14 +7,12 @@ void detail::InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem 
     if(m_scene == scene)
         return;
 
-    if(m_scene != NULL)
-        foreach(InstrumentManager *manager, InstrumentManager::managersOf(m_scene))
-            manager->unregisterItem(item);
+    if(InstrumentManager *manager = InstrumentManager::instance(m_scene))
+        manager->unregisterItem(item);
 
     m_scene = scene;
 
-    if(m_scene != NULL)
-        foreach(InstrumentManager *manager, InstrumentManager::managersOf(m_scene))
-            manager->registerItem(item, true);
+    if(InstrumentManager *manager = InstrumentManager::instance(m_scene))
+        manager->registerItem(item, true);
 }
         

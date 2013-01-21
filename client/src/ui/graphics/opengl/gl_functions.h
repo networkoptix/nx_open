@@ -4,8 +4,8 @@
 #include <cstddef> /* For std::ptrdiff_t. */
 
 #include <QtOpenGL/QGLContext>
-
-class QGLContext;
+//#define GL_GLEXT_PROTOTYPES
+//#include <GL/glext.h>
 
 class QnGlFunctionsPrivate;
 
@@ -18,14 +18,18 @@ typedef std::ptrdiff_t GLsizeiptrARB;
 typedef char GLchar;
 #endif
 
+typedef struct __GLsync *GLsync;
+typedef uint64_t GLuint64;
+
 
 class QnGlFunctions {
 public:
     enum Feature {
         ArbPrograms = 0x1,              /**< Supports ARB shader programs. */
-        OpenGL1_3 = 0x2,                /**< Implements OpenGL1.3 spec. */
-        OpenGL1_5 = 0x4,                /**< Implements OpenGL1.5 spec. */
-        OpenGL2_0 = 0x8,                /**< Implements OpenGL2.0 spec. */
+        OpenGL1_3 = 0x02,               /**< Implements OpenGL1.3 spec. */
+        OpenGL1_5 = 0x04,               /**< Implements OpenGL1.5 spec. */
+        OpenGL2_0 = 0x08,               /**< Implements OpenGL2.0 spec. */
+        OpenGL3_2 = 0x10,
         
         ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
         NoOpenGLFullScreen = 0x0002000  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
@@ -94,12 +98,19 @@ public:
     void glBindBuffer(GLenum target, GLuint buffer);
     void glDeleteBuffers(GLsizei n, const GLuint *buffers);
     void glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
+    void glBufferSubData(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data);
+    GLvoid *glMapBuffer(GLenum target, GLenum access);
+    GLboolean glUnmapBuffer(GLenum target);
 
     /* OpenGL2_0 group. */
     
     void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
     void glEnableVertexAttribArray(GLuint index);
     void glDisableVertexAttribArray(GLuint index);
+
+    GLsync glFenceSync(	GLenum condition, GLbitfield flags );
+    void glDeleteSync( GLsync sync );
+    void glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout );
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;

@@ -487,7 +487,7 @@ bool QnDesktopFileEncoder::init()
     m_device = new QFile(m_fileName);
     if (!m_device->open(QIODevice::WriteOnly))
     {
-        m_lastErrorStr = tr("Can't create temporary file in folder '%1'. Please check 'root media folder' setting.").arg(QFileInfo(m_fileName).path());
+        m_lastErrorStr = tr("Can't create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.").arg(QFileInfo(m_fileName).path());
         return false;
     }
 

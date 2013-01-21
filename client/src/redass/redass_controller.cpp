@@ -12,6 +12,7 @@ static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ 
 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
+static const double FPS_EPS = 0.0001;
 
 QnRedAssController* QnRedAssController::instance()
 {
@@ -40,8 +41,10 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
 
 bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
 {
+    if (!display)
+        return false;
     QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
-    return cam && cam->hasDualStreaming() && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
+    return cam && cam->hasDualStreaming(); // && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
 }
 
 QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond, int* displaySize)
@@ -95,20 +98,25 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         return;
     m_lastLqTime = m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
     
-    if (display->getSpeed() > 1.0 || display->getSpeed() < 0)
+    
+    double speed = display->getSpeed();
+    if (isFFSpeed(speed))
     {
         // for high speed mode change same item to LQ (do not try to find least item)
-        gotoLowQuality(display, Reson_FF);
+        gotoLowQuality(display, Reson_FF, speed);
         return;
     }
     
     if (display->isFullScreen())
         return; // do not go to LQ for full screen items (except of FF/REW play)
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return; // do not go to LQ if recently switch occurred
     if (reader->getQuality() == MEDIA_Quality_Low)
         return; // reader already at LQ
+
+    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL) {
+        m_redAssInfo[display].awaitingLQTime = qnSyncTime->currentMSecsSinceEpoch();
+        return; // do not go to LQ if recently switch occurred
+    }
 
     // switch to LQ min item
     display = findDisplay(Find_Least, MEDIA_Quality_High);
@@ -117,6 +125,17 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
         m_lastSwitchTimer.restart();
     }
+}
+
+bool QnRedAssController::existstBufferingDisplay() const
+{
+    for (ConsumersMap::const_iterator itr = m_redAssInfo.constBegin(); itr != m_redAssInfo.constEnd(); ++itr)
+    {
+        const QnCamDisplay* display = itr.key();
+        if (display->isBuffering())
+            return true;
+    }
+    return false;
 }
 
 void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
@@ -130,12 +149,16 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (!isSupportedDisplay(display))
         return;
 
+    m_redAssInfo[display].awaitingLQTime = 0;
+
     if (qAbs(display->getSpeed()) < m_redAssInfo[display].toLQSpeed || (m_redAssInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
     {
         // If item leave high speed mode change same item to HQ (do not try to find biggest item)
         reader->setQuality(MEDIA_Quality_High, true);
         return;
     }
+    else if (isFFSpeed(display))
+        return; // do not return to HQ in FF mode because of retry counter is not increased for FF
 
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
         return; // Some item stuck after HQ switching. Do not switch to HQ any more
@@ -156,6 +179,9 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (m_lastLqTime + QUALITY_SWITCH_INTERVAL > qnSyncTime->currentMSecsSinceEpoch())
         return; // recently slow report received (not all reports affect m_lastSwitchTimer)
 
+    if (existstBufferingDisplay())
+        return; // do not go to HQ if some display perform opening...
+
     display = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem);
     if (display) {
         display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
@@ -172,6 +198,16 @@ bool QnRedAssController::isSmallItem(QnCamDisplay* display)
 bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 {
     return !isSmallItem(display);
+}
+
+bool QnRedAssController::isFFSpeed(QnCamDisplay* display) const
+{
+    return isFFSpeed(display->getSpeed());
+}
+
+bool QnRedAssController::isFFSpeed(double speed) const
+{
+    return speed > 1 + FPS_EPS || speed < 0;
 }
 
 void QnRedAssController::onTimer()
@@ -208,6 +244,13 @@ void QnRedAssController::onTimer()
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
+
+        if (display->isFullScreen() && !isFFSpeed(display))
+            reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
+
+        if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
+            gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
+
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
         {
             gotoLowQuality(display, Reason_Small);
@@ -266,16 +309,21 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
     QMutexLocker lock(&m_mutex);
     if (display->getArchiveReader()) 
     {
-        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
-        {
-            if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
-                gotoLowQuality(display, itr.value().lqReason);
+        if (m_redAssInfo.size() >= 16) {
+            gotoLowQuality(display, Reason_Network);
+        }
+        else {
+            for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+            {
+                if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+                    gotoLowQuality(display, itr.value().lqReason);
+            }
         }
         m_redAssInfo.insert(display, RedAssInfo());
     }
 }
 
-void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
+void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed)
 {
     LQReason oldReason = m_redAssInfo[display].lqReason;
     if ((oldReason == Reason_Network || oldReason == Reason_CPU) && (reason == Reason_Network || reason == Reason_CPU))
@@ -283,7 +331,8 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
 
     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
     m_redAssInfo[display].lqReason = reason;
-    m_redAssInfo[display].toLQSpeed = display->getSpeed();
+    m_redAssInfo[display].toLQSpeed = speed != INT_MAX ? speed : display->getSpeed(); // get speed for FF reason as external varialbe to prevent race condition
+    m_redAssInfo[display].awaitingLQTime = 0;
 }
 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
@@ -298,22 +347,3 @@ void QnRedAssController::addHQTry()
     m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, HIGH_QUALITY_RETRY_COUNTER);
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
-
-/*
-bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
-{
-    if (currentDisplay->isFullScreen() || !currentDisplay->isSyncAllowed())
-        return true;
-
-    QMutexLocker lock(&m_mutex);
-    if (m_redAssInfo.size() <= 1)
-        return true;
-    for (ConsumersMap::const_iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
-    {
-        QnCamDisplay* display = itr.key();
-        if (display->getArchiveReader()->getQuality() == MEDIA_Quality_Low)
-            return false;
-    }
-    return true;
-}
-*/

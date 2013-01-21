@@ -31,9 +31,9 @@ public:
 
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
+    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 private:
-    QnResourcePtr checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth);
+    QList<QnResourcePtr> checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck);
 };
 
 #endif // onvif_resource_searcher_h

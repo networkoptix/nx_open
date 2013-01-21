@@ -304,7 +304,8 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
             /* Media was paused while on live. Jump to archive when resumed. */
             qint64 time = camDisplay->getCurrentTime();
             reader->resumeMedia();
-            reader->directJumpToNonKeyFrame(time+1);
+            if (time != AV_NOPTS_VALUE && reader->getSpeed() > 0)
+                reader->directJumpToNonKeyFrame(time+1);
         } else {
             reader->resumeMedia();
         }
@@ -562,7 +563,7 @@ void QnWorkbenchNavigator::stepBackward() {
 
     m_pausedOverride = false;
 
-    if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime()) {
+    if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering()) {
         quint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
         if (reader->isSingleShotMode())
@@ -629,7 +630,10 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_sliderWindowInvalid = true;
     }
 
-    if (display() && display()->isChangingLayout()) { // TODO: #gdm isChangingLayout is your code? WTF? Where are the comments that would prevent the WTFs?
+    if (display() && display()->isChangingLayout()) {
+        // clear current widget state to avoid incorrect behavior when closing the layout
+        // see: Bug #1341: Selection on timline aren't displayed after thumbnails searching
+        // see: Bug #1344: If make a THMB search from a layout with a result of THMB searc, Timeline are not marked properly
         m_currentWidget = NULL;
         m_currentMediaWidget = NULL;
     } else {
@@ -1169,11 +1173,11 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
     if(m_lastPlaying) 
         setPlayingTemporary(true);
 
-    if(isPlaying())
+    if(isPlaying()) {
         m_pausedOverride = false;
-
-    /* Handler must be re-run for precise seeking. */
-    at_timeSlider_valueChanged(m_timeSlider->value());
+        /* Handler must be re-run for precise seeking. */
+        at_timeSlider_valueChanged(m_timeSlider->value());
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_selectionPressed() {
@@ -1221,7 +1225,7 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
         }
 
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
-    connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
+    connect(widget->resource().data(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -1265,13 +1269,6 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
     }
 }
 
-void QnWorkbenchNavigator::at_resource_flagsChanged() {
-    if(!sender())
-        return;
-
-    at_resource_flagsChanged(checked_cast<QnResource *>(sender())->toSharedPointer());
-}
-
 void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resource) {
     if(!resource || !m_currentWidget || m_currentWidget->resource() != resource)
         return;
@@ -1304,6 +1301,13 @@ void QnWorkbenchNavigator::at_calendar_dateChanged(const QDate &date){
     qint64 startMSec = dt.toMSecsSinceEpoch();
     qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
     m_timeSlider->finishAnimations();
-    m_timeSlider->setWindow(startMSec, endMSec, true);
+    if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
+        m_timeSlider->setWindow(
+                    qMin(startMSec, m_timeSlider->windowStart()),
+                    qMax(endMSec, m_timeSlider->windowEnd()),
+                    true);
+    } else {
+        m_timeSlider->setWindow(startMSec, endMSec, true);
+    }
 }
 

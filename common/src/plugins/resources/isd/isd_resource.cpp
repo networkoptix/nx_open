@@ -219,7 +219,7 @@ void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
 {
 }
 
-const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnRtpStreamReader* rtspReader = dynamic_cast<const QnRtpStreamReader*>(dataProvider);
@@ -254,10 +254,9 @@ int QnPlIsdResource::getMaxFps()
 
 void QnPlIsdResource::save()
 {
-    QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << errorStr;
+            << getPhysicalId() << ". Description: " << conn->getLastError();
     }
 }

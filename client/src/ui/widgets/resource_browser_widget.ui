@@ -23,9 +23,6 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="resourcesTab">
-      <property name="acceptDrops">
-       <bool>true</bool>
-      </property>
       <attribute name="title">
        <string>Resources</string>
       </attribute>
@@ -38,9 +35,6 @@
        </property>
        <item>
         <widget class="QnResourceTreeWidget" name="resourceTreeWidget" native="true">
-         <property name="acceptDrops">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
       </layout>

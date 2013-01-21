@@ -206,22 +206,30 @@ bool QnArchiveStreamReader::init()
 
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
+	MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) && m_reverseMode == m_prevReverseMode) 
+    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode)
     {
         // It is optimization: open and jump at same time
         while (1)
         {
-            bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
+			m_delegate->setQuality(quality, true);
+            qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
+            bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
             Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
-                m_requiredJumpTime = AV_NOPTS_VALUE;
+                if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
+                    m_requiredJumpTime = AV_NOPTS_VALUE;
+				m_oldQuality = quality;
+				m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
-                emit jumpOccured(requiredJumpTime);
+                if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
+                    emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
+			quality = m_quality;
             m_jumpMtx.unlock();
         }
     }
@@ -428,6 +436,8 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
+        if (jumpTime != qint64(AV_NOPTS_VALUE))
+            currentTimeHint = jumpTime;
         m_outOfPlaybackMask = false;
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
@@ -459,7 +469,7 @@ begin_label:
                 setSkipFramesToTime(displayTime, false);
         }
         else {
-            if (!reverseMode && displayTime != DATETIME_NOW && displayTime != AV_NOPTS_VALUE)
+            if (!reverseMode && displayTime != DATETIME_NOW && displayTime != qint64(AV_NOPTS_VALUE))
                 setSkipFramesToTime(displayTime, false);
         }
         

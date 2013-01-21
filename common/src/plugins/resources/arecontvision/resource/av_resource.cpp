@@ -112,10 +112,10 @@ CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int
 
 }
 
-bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain domain)
+bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain domain)
 {
     // this will work only in local networks ( camera must be able ti get broadcat from this ip);
-
+    QHostAddress ip = resolveAddress(hostAddr);
     if (domain == QnDomainPhysical)
     {
         return false; // never change ip 
@@ -142,19 +142,19 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
         sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
 
         removeARPrecord(ip);
-        removeARPrecord(getHostAddress());
+        removeARPrecord(resolveAddress(getHostAddress()));
 
         //
         CLPing ping;
 
-        QString oldIp = getHostAddress().toString();
+        QString oldIp = getHostAddress();
 
         if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed
             return false;
 
     }
 
-    return QnNetworkResource::setHostAddress(ip, QnDomainMemory);
+    return QnNetworkResource::setHostAddress(hostAddr, QnDomainMemory);
 }
 
 QString QnPlAreconVisionResource::toSearchString() const
@@ -427,7 +427,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
-    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) ||
+    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) || name.contains(QLatin1String("20365")) ||
            name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365"));
 }
 

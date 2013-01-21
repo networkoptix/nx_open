@@ -33,6 +33,13 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
+/** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
+ * 
+ * When defined, makes loading overlay much more 'flashy', drawing loading circles
+ * and reducing timeout after which overlay is drawn.
+ */
+// #define QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
+
 namespace {
 
     /** Flashing text flash interval */
@@ -49,7 +56,11 @@ namespace {
     const QPointF defaultShadowDisplacement = QPointF(qnGlobals->workbenchUnitSize(), qnGlobals->workbenchUnitSize()) * 0.05;
 
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
+#ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
     const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
+#else
+    const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
+#endif
 
     /** Default period of progress circle. */
     const qint64 defaultProgressPeriodMSec = 1000;
@@ -269,7 +280,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
-    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(updateTitleText()));
+    connect(m_resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
     setChannelLayout(qn_resourceWidget_defaultContentLayout());
 
 
@@ -849,10 +860,12 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
         glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
+#ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
                 painter->opacity()
             );
+#endif
         } else if(overlay == PausedOverlay) {
             m_pausedPainter->paint(0.5 * painter->opacity());
         }
@@ -861,8 +874,13 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glDisable(GL_BLEND);
         painter->endNativePainting();
 
-        if(overlay == LoadingOverlay)
+        if(overlay == LoadingOverlay) {
+#ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
             paintFlashingText(painter, m_loadingStaticText, 0.05, QPointF(0.0, 0.15));
+#else
+            paintFlashingText(painter, m_loadingStaticText, 0.05);
+#endif
+        }
     }
 
     if (overlay == NoDataOverlay) {

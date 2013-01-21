@@ -50,10 +50,10 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
         }
         else if (params[i].first == "startTime") 
         {
-            startTime = parseDateTime(params[i].second);
+            startTime = parseDateTime(params[i].second.toUtf8());
         }
         else if (params[i].first == "endTime") {
-            endTime = parseDateTime(params[i].second);
+            endTime = parseDateTime(params[i].second.toUtf8());
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();

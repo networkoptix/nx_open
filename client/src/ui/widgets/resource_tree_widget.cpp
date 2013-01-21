@@ -251,6 +251,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui(new Ui::QnResourceTreeWidget()),
     m_resourceProxyModel(0),
     m_checkboxesVisible(true),
+    m_graphicsTweaksFlags(0),
     m_editingEnabled(false)
 {
     ui->setupUi(this);
@@ -274,8 +275,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     connect(ui->clearFilterButton,      SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
 
     ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
-
-    ui->resourcesTreeView->setAcceptDrops(true);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -362,13 +361,30 @@ bool QnResourceTreeWidget::isCheckboxesVisible() const {
     return m_checkboxesVisible;
 }
 
-void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks) {
-    Q_UNUSED(enableTweaks) // TODO: #gdm This is just cruel.
+void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags) {
+    if (m_graphicsTweaksFlags == flags)
+        return;
 
-    ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
-    ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
-    ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    m_graphicsTweaksFlags = flags;
+
+    if (flags & Qn::HideLastRow)
+        ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
+    else
+        ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
+
+    if (flags & Qn::BackgroundOpacity)
+        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
+    else
+        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, QVariant());
+
+    if (flags & Qn::BypassGraphicsProxy) {
+        ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
+        ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    } else {
+        ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() &~ Qt::BypassGraphicsProxyWidget);
+        ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() &~ Qt::BypassGraphicsProxyWidget);
+    }
+
 }
 
 void QnResourceTreeWidget::setFilterVisible(bool visible) {

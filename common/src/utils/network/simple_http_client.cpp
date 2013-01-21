@@ -10,6 +10,38 @@ static const int MAX_LINE_LENGTH = 1024*16;
 
 using namespace std;
 
+QString toString( CLHttpStatus status )
+{
+    switch( status )
+    {
+        case CL_HTTP_SUCCESS:
+            return QString::fromLatin1("%1 (OK)").arg(status);
+        case CL_HTTP_REDIRECT:
+            return QString::fromLatin1("%1 (REDIRECT)").arg(status);
+        case CL_HTTP_BAD_REQUEST:
+            return QString::fromLatin1("%1 (BAD REQUEST)").arg(status);
+        case CL_HTTP_AUTH_REQUIRED:
+            return QString::fromLatin1("%1 (AUTH REQUIRED)").arg(status);
+        case CL_HTTP_NOT_FOUND:
+            return QString::fromLatin1("%1 (NOT FOUND)").arg(status);
+        default:
+            return QString::fromLatin1("%1 (UNKNOWN)").arg(status);
+    }
+}
+
+
+CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_port(port),
+    m_connected(false),
+    m_timeout(timeout),
+    m_auth(auth),
+    m_dataRestPtr(0),
+    m_dataRestLen(0)
+{
+    m_host = resolveAddress(host);
+    initSocket();
+}
+
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_host(host),
     m_port(port),
@@ -407,7 +439,7 @@ QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 }
 
 
-QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
+QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
 {
     CLSimpleHTTPClient http (host, port, timeout, auth);
     status = http.doGET(fileName);

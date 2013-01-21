@@ -32,7 +32,7 @@ qint64 QnBufferedFrameDisplayer::bufferedDuration() {
         return m_lastQueuedTime - m_queue.front()->pkt_dts;
 }
 
-bool QnBufferedFrameDisplayer::addFrame(CLVideoDecoderOutput* outFrame) 
+bool QnBufferedFrameDisplayer::addFrame(const QSharedPointer<CLVideoDecoderOutput>& outFrame) 
 {
     bool wasWaiting = false;
     bool needWait;
@@ -77,7 +77,7 @@ void QnBufferedFrameDisplayer::setLastDisplayedTime(qint64 value)
 
 void QnBufferedFrameDisplayer::run() 
 {
-    CLVideoDecoderOutput* frame;
+    QSharedPointer<CLVideoDecoderOutput> frame;
     while (!m_needStop)
     {
         if (m_queue.size() > 0)

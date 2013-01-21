@@ -59,10 +59,12 @@ public:
         url = 0x02,             /**< Has url, e.g. file name. */
         streamprovider = 0x04,
         media = 0x08,
+
         playback = 0x10,        /**< Something playable (not real time and not a single shot). */
         video = 0x20,
         audio = 0x40,
         live = 0x80,
+
         still_image = 0x100,    /**< Still image device. */
 
         local = 0x200,          /**< Local client resource. */
@@ -74,8 +76,11 @@ public:
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
         periods = 0x8000,       /**< Resource has recorded periods. */
+
         motion = 0x10000,       /**< Resource has motion */
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
+
+        foreigner = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -152,6 +157,11 @@ public:
 
 
     QnResourcePtr toSharedPointer() const;
+    
+    template<class Resource>
+    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
+
+    QnResourcePtr getParentResource() const;
 
     // ==================================================
 
@@ -208,30 +218,29 @@ public:
 
 signals:
     void parameterValueChanged(const QnParam &param);
-    void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-    void disabledChanged(bool oldValue, bool newValue);
-    void nameChanged();
-    void parentIdChanged();
-    void idChanged(const QnId &oldId, const QnId &newId);
-    void flagsChanged();
-    void urlChanged();
+    void statusChanged(const QnResourcePtr &resource);
+    void disabledChanged(const QnResourcePtr &resource);
+    void nameChanged(const QnResourcePtr &resource);
+    void parentIdChanged(const QnResourcePtr &resource);
+    void flagsChanged(const QnResourcePtr &resource);
+    void urlChanged(const QnResourcePtr &resource);
+    void resourceChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
-    void asyncParamGetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully set, false otherwises
     */
-    void asyncParamSetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void resourceChanged();
-    void initAsyncFinished(QnResourcePtr resource, bool initialized);
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
 public:
     // this is thread to process commands like setparam
@@ -242,6 +251,10 @@ public:
 
     void update(QnResourcePtr other);
 
+    // Need use lock/unlock consumers before this call!
+    QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
+    void lockConsumers() { m_consumersMtx.lock(); }
+    void unlockConsumers() { m_consumersMtx.unlock(); }
 protected:
     virtual void updateInner(QnResourcePtr other);
 
@@ -349,6 +362,11 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     }
 }
 
+template<class Resource>
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource) {
+    using ::toSharedPointer; /* Let ADL kick in. */
+    return toSharedPointer(resource);
+}
 
 
 class QnResourceFactory

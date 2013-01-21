@@ -47,6 +47,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/pluginmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -68,7 +69,7 @@
 #include "client_message_processor.h"
 #include "ui/workbench/workbench_translation_manager.h"
 
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
@@ -82,6 +83,7 @@
 
 #include "ui/help/help_handler.h"
 #include "client/client_module.h"
+#include <client/client_connection_data.h>
 #include "platform/platform_abstraction.h"
 
 
@@ -239,11 +241,19 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#endif
+
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
     QnClientModule client(argc, argv);
+    
+#ifdef Q_WS_X11
+	XInitThreads();
+#endif
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -388,10 +398,11 @@ int qnMain(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
     QnServerCameraProcessor serverCameraProcessor;
-    QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
+    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&serverCameraProcessor);
 
     //============================
     //QnResourceDirectoryBrowser
@@ -401,43 +412,43 @@ int qnMain(int argc, char *argv[])
         dirs << qnSettings->mediaFolder();
         dirs << qnSettings->extraMediaFolders();
         QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
     }
 
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
 
     QnPlAxisResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
 
     QnPlDlinkResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
 
     QnPlDroidResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
 
     QnPlIqResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
 
     //QnPlIpWebCamResourceSearcher::instance().setLocal(true);
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    //QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
 
     QnPlISDResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
     QnPlOnvifWsSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlOnvifWsSearcher::instance());
 
     QnPlPulseSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
     
 #endif
 
 #ifdef Q_OS_WIN
-//    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
+//    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
-    QnResourceDiscoveryManager::instance().start();
+    QnResourceDiscoveryManager::instance()->start();
 
     qApp->setStyle(qnSkin->style());
 
@@ -460,7 +471,10 @@ int qnMain(int argc, char *argv[])
 
     mainWindow->show();
     context->action(Qn::EffectiveMaximizeAction)->trigger();
-        
+
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance()->loadPlugins();
+
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
@@ -521,7 +535,7 @@ int qnMain(int argc, char *argv[])
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
@@ -543,6 +557,3 @@ int main(int argc, char *argv[]) {
 
 #endif // API_TEST_MAIN
 #endif
-
-
-

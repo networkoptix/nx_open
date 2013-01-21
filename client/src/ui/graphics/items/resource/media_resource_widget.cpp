@@ -29,8 +29,10 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
+#include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 #include "ui/workbench/workbench_navigator.h" // TODO: this does not belong here
@@ -59,6 +61,7 @@ namespace {
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
+    m_resolutionMode(Qn::AutoResolution),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false)
 {
@@ -70,12 +73,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
-    connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
 
-    m_renderer = new QnResourceWidgetRenderer(channelCount());
+    const QGLWidget* viewPortAsGLWidget = qobject_cast<const QGLWidget*>(QnWorkbenchContextAware::display()->view()->viewport());
+    m_renderer = new QnResourceWidgetRenderer(
+            channelCount(),
+            NULL,
+            viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL );
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
@@ -90,6 +97,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
+    QnImageButtonWidget *radassButton = new QnImageButtonWidget();
+    radassButton->setProperty(Qn::NoBlockMotionSelection, true);
+    radassButton->setToolTip(tr("Radass mode"));
+    connect(radassButton, SIGNAL(clicked()), this, SLOT(at_radassButton_clicked()));
+
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
     searchButton->setCheckable(true);
@@ -121,6 +133,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(zoomOutButton, SIGNAL(pressed()), this, SLOT(at_zoomOutButton_pressed()));
     connect(zoomOutButton, SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
+    buttonBar()->addButton(RadassButton, radassButton);
     buttonBar()->addButton(MotionSearchButton, searchButton);
     buttonBar()->addButton(PtzButton, ptzButton);
     buttonBar()->addButton(ZoomInButton, zoomInButton);
@@ -131,9 +144,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         
         connect(timer,              SIGNAL(timeout()),                                              this,   SLOT(updateIconButton()));
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),        this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(statusChanged(QnResource::Status, QnResource::Status)),  this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(scheduleTasksChanged()),                                 this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(parentIdChanged()),                                      this,   SLOT(updateServerResource()));
+        connect(m_camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(updateServerResource()));
         connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged()),                            this,   SLOT(updateButtonsVisibility()));
 
         timer->start(1000 * 60); /* Update icon button every minute. */
@@ -142,6 +155,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     at_camDisplay_liveChanged();
     updateIconButton();
+    updateRadassButton();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -343,8 +357,30 @@ void QnMediaResourceWidget::ensureMotionSelectionCache() {
     }
 }
 
-void QnMediaResourceWidget::invalidateMotionSelectionCache(){
+void QnMediaResourceWidget::invalidateMotionSelectionCache() {
     m_motionSelectionCacheValid = false;
+}
+
+Qn::ResolutionMode QnMediaResourceWidget::resolutionMode() const {
+    return m_resolutionMode;
+}
+
+void QnMediaResourceWidget::setResolutionMode(Qn::ResolutionMode resolutionMode) {
+    if(resolutionMode < 0 || resolutionMode >= Qn::ResolutionModeCount) {
+        qnWarning("Invalid resolution mode '%1'.", static_cast<int>(resolutionMode));
+        return;
+    }
+
+    if(m_resolutionMode == resolutionMode)
+        return;
+
+    m_resolutionMode = resolutionMode;
+
+    // TODO: #VASILENKO insert code here
+
+    updateRadassButton();
+
+    emit resolutionModeChanged();
 }
 
 
@@ -562,25 +598,25 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = QnScheduleTask::RecordingType_Never;
+    int recordingMode = Qn::RecordingType_Never;
     if(m_camera->getStatus() == QnResource::Recording)
         recordingMode = currentRecordingMode();
     
     iconButton()->setVisible(true);
     switch(recordingMode) {
-    case QnScheduleTask::RecordingType_Never:
+    case Qn::RecordingType_Never:
         iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
         iconButton()->setToolTip(tr("Not recording."));
         break;
-    case QnScheduleTask::RecordingType_Run:
+    case Qn::RecordingType_Run:
         iconButton()->setIcon(qnSkin->icon("item/recording.png"));
         iconButton()->setToolTip(tr("Recording everything."));
         break;
-    case QnScheduleTask::RecordingType_MotionOnly:
+    case Qn::RecordingType_MotionOnly:
         iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
         iconButton()->setToolTip(tr("Recording motion only."));
         break;
-    case QnScheduleTask::RecordingType_MotionPlusLQ:
+    case Qn::RecordingType_MotionPlusLQ:
         iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
         iconButton()->setToolTip(tr("Recording motion and low quality."));
         break;
@@ -588,6 +624,25 @@ void QnMediaResourceWidget::updateIconButton() {
         iconButton()->setVisible(false);
         break;
     }
+}
+
+void QnMediaResourceWidget::updateRadassButton() {
+    QString iconPath;
+    switch(m_resolutionMode) {
+    case Qn::AutoResolution:
+        iconPath = QLatin1String("item/radass_auto.png");
+        break;
+    case Qn::LowResolution:
+        iconPath = QLatin1String("item/radass_low.png");
+        break;
+    case Qn::HighResolution:
+        iconPath = QLatin1String("item/radass_high.png");
+        break;
+    default:
+        assert(false);
+    }
+
+    buttonBar()->button(RadassButton)->setIcon(qnSkin->icon(iconPath));
 }
 
 void QnMediaResourceWidget::updateServerResource() {
@@ -605,7 +660,7 @@ void QnMediaResourceWidget::updateServerResource() {
 
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
-        return QnScheduleTask::RecordingType_Never;
+        return Qn::RecordingType_Never;
 
     // TODO: this should be a resource parameter that is update from the server.
 
@@ -617,7 +672,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
         if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
             return task.getRecordingType();
 
-    return QnScheduleTask::RecordingType_Never;
+    return Qn::RecordingType_Never;
 }
 
 
@@ -744,6 +799,8 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
             if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here
                 result |= ZoomInButton | ZoomOutButton;
         }
+
+        result |= RadassButton;
     }
 
     return result;
@@ -824,6 +881,10 @@ void QnMediaResourceWidget::at_zoomOutButton_pressed() {
 void QnMediaResourceWidget::at_zoomOutButton_released() {
     sendZoomAsync(0.0);
     m_connection.clear();
+}
+
+void QnMediaResourceWidget::at_radassButton_clicked() {
+    setResolutionMode(static_cast<Qn::ResolutionMode>((resolutionMode() + 1) % Qn::ResolutionModeCount));
 }
 
 void QnMediaResourceWidget::at_replyReceived(int status, int handle) {

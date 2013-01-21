@@ -125,7 +125,7 @@ void QnLayoutResource::setCellAspectRatio(qreal cellAspectRatio) {
         m_cellAspectRatio = cellAspectRatio;
     }
 
-    emit cellAspectRatioChanged();
+    emit cellAspectRatioChanged(::toSharedPointer(this));
 }
 
 QSizeF QnLayoutResource::cellSpacing() const {
@@ -144,7 +144,7 @@ void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
         m_cellSpacing = cellSpacing;
     }
 
-    emit cellSpacingChanged();
+    emit cellSpacingChanged(::toSharedPointer(this));
 }
 
 void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
@@ -160,7 +160,7 @@ void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
     m_itemByUuid[item.uuid] = item;
 
     m_mutex.unlock();
-    emit itemAdded(item);
+    emit itemAdded(::toSharedPointer(this), item);
     m_mutex.lock();
 }
 
@@ -172,14 +172,18 @@ void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayout
     }
 
     if(*pos == item) {
-        pos->dataByRole = item.dataByRole; // TODO: hack hack hack
+        QHash<int, QVariant>::const_iterator i = item.dataByRole.constBegin();
+        while (i != item.dataByRole.constEnd()) {
+            pos->dataByRole[i.key()] = i.value();
+            ++i;
+        }
         return;
     }
 
     *pos = item;
 
     m_mutex.unlock();
-    emit itemChanged(item);
+    emit itemChanged(::toSharedPointer(this), item);
     m_mutex.lock();
 }
 
@@ -192,7 +196,7 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_itemByUuid.erase(pos);
 
     m_mutex.unlock();
-    emit itemRemoved(item);
+    emit itemRemoved(::toSharedPointer(this), item);
     m_mutex.lock();
 }
 

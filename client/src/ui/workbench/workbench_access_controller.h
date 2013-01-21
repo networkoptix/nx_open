@@ -100,7 +100,6 @@ signals:
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
     void updatePermissions(const QnResourceList &resources);
-    void updateSenderPermissions();
 
     void at_context_userChanged(const QnUserResourcePtr &user);
     

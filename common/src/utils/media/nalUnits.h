@@ -1,11 +1,15 @@
 #ifndef __NAL_UNITS_H
 #define __NAL_UNITS_H
 
+#include <inttypes.h>
+
+#include <QSet>
+#include <QVector>
 #include <memory.h>
 #include <map>
+
 #include "bitStream.h"
-#include <QVector>
-#include <QSet>
+
 
 const static int 	Extended_SAR = 255;
 const static double h264_ar_coeff[] = {0.0, 1.0, 12.0/11.0, 	10.0/11.0, 	16.0/11.0, 	40.0/33.0, 	24.0/11.0, 	20.0/11.0, 	
@@ -54,7 +58,8 @@ public:
 	virtual ~NALUnit() { 
 		delete [] m_nalBuffer; 
 	}
-	static const quint8* findNextNAL(const quint8* buffer, const quint8* end);
+
+    static const quint8* findNextNAL(const quint8* buffer, const quint8* end);
 	static const quint8* findNALWithStartCode(const quint8* buffer, const quint8* end, bool longCodesAllowed);
 	
     static int encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
@@ -77,12 +82,18 @@ public:
 	void write_byte_align_bits(BitStreamWriter& writer);
 
     int calc_rbsp_trailing_bits_cnt(uint8_t val);
+
 protected:
 	//GetBitContext getBitContext;
 	BitStreamReader bitReader;
 	inline int extractUEGolombCode();
 	inline int extractSEGolombCode();
 	void updateBits(int bitOffset, int bitLen, int value);
+    void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
+
+private:
+    NALUnit( const NALUnit& );
+    NALUnit& operator=( const NALUnit& right );
 };
 
 class NALDelimiter: public NALUnit {
@@ -127,8 +138,13 @@ public:
 	int slice_group_change_rate;
 	int num_slice_groups_minus1;
 	int slice_group_map_type;
+    int second_chroma_qp_index_offset;
+    int scalingLists4x4[6][16];
+    bool useDefaultScalingMatrix4x4Flag[6];
+    int scalingLists8x8[2][64];
+    bool useDefaultScalingMatrix8x8Flag[2];
 
-    PPSUnit(): NALUnit(), transform_8x8_mode_flag(0), pic_scaling_matrix_present_flag(0), m_ready(false) {}
+    PPSUnit();
 	virtual ~PPSUnit() {}
 	bool isReady() {return m_ready;}
 	int deserialize();
@@ -230,6 +246,11 @@ public:
 	int nal_hrd_parameters_bit_pos;
 	int full_sps_bit_len;
 
+    int ScalingList4x4[6][16];
+    int ScalingList8x8[2][64];
+    bool UseDefaultScalingMatrix4x4Flag[6];
+    bool UseDefaultScalingMatrix8x8Flag[2];
+
 
 	int max_dec_frame_buffering;
 
@@ -237,15 +258,19 @@ public:
 
 
 	QString getStreamDescr();
-	int getWidth() { return pic_width_in_mbs*16 - getCropX();}
-	int getHeight() { 
+	int getWidth() const { return pic_width_in_mbs*16 - getCropX();}
+	int getHeight() const {
 		return (2 - frame_mbs_only_flag) * pic_height_in_map_units*16 - getCropY();
 	}
 	double getFPS() const;
 	void setFps(double fps);
 
 
-	SPSUnit():NALUnit(), m_ready(false){
+    SPSUnit()
+    :
+        NALUnit(),
+        m_ready(false)
+    {
 		sar_width = sar_height = 0;
 		num_units_in_tick = time_scale = 0;
 		fixed_frame_rate_flag = -1;
@@ -269,7 +294,12 @@ public:
         qpprime_y_zero_transform_bypass_flag = 0;
         seq_scaling_matrix_present_flag = 0;
 		//m_pulldown = false;
-	}
+
+        memset( ScalingList4x4, 16, sizeof(ScalingList4x4) );
+        memset( ScalingList8x8, 16, sizeof(ScalingList8x8) );
+        std::fill( (bool*)UseDefaultScalingMatrix4x4Flag, ((bool*)UseDefaultScalingMatrix4x4Flag)+sizeof(UseDefaultScalingMatrix4x4Flag)/sizeof(*UseDefaultScalingMatrix4x4Flag), true );
+        std::fill( (bool*)UseDefaultScalingMatrix8x8Flag, ((bool*)UseDefaultScalingMatrix8x8Flag)+sizeof(UseDefaultScalingMatrix8x8Flag)/sizeof(*UseDefaultScalingMatrix8x8Flag), true );
+    }
 	virtual ~SPSUnit() {
 		delete [] bit_rate_value_minus1;
 		delete [] cpb_size_value_minus1;
@@ -279,18 +309,14 @@ public:
 	int deserialize();
 	void insertHdrParameters();
 	int getMaxBitrate();
+
 private:
 	bool seq_scaling_list_present_flag[8];
-	int ScalingList4x4[6][16];
-	int ScalingList8x8[2][64];
-	bool UseDefaultScalingMatrix4x4Flag[6];
-	bool UseDefaultScalingMatrix8x8Flag[2];
 	bool m_ready;
 	void hrd_parameters();
 	void deserializeVuiParameters();
-	int getCropY();
-	int getCropX();
-	void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
+	int getCropY() const;
+	int getCropX() const;
 	void serializeHDRParameters(BitStreamWriter& writer);
 };
 
@@ -501,5 +527,44 @@ private:
     int m_fullHeaderLen;
 	int deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,const QMap<quint32, const PPSUnit*>& ppsMap);
 };
+
+namespace h264
+{
+    namespace AspectRatio
+    {
+        static const int Extended_SAR = 255;
+
+        void decode( int aspect_ratio_idc, unsigned int* w, unsigned int* h );
+    }
+
+    namespace SEIType
+    {
+        enum Value
+        {
+            buffering_period = 0,
+            pic_timing = 1,
+            pan_scan_rect = 2,
+            filler_payload = 3,
+            user_data_registered_itu_t_t35 = 4,
+            user_data_unregistered = 5,
+            recovery_point = 6,
+            dec_ref_pic_marking_repetition = 7,
+            spare_pic = 8,
+            scene_info = 9,
+            sub_seq_info = 10,
+            sub_seq_layer_characteristics = 11,
+            sub_seq_characteristics = 12,
+            full_frame_freeze = 13,
+            full_frame_freeze_release = 14,
+            full_frame_snapshot = 15,
+            progressive_refinement_segment_start = 16,
+            progressive_refinement_segment_end = 17,
+            motion_constrained_slice_group_set = 18,
+            film_grain_characteristics = 19,
+            deblocking_filter_display_preference = 20,
+            stereo_video_info = 21
+        };
+    }
+}
 
 #endif

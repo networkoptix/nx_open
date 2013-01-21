@@ -1,28 +1,18 @@
 #include "gl_functions.h"
+
+#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
+#include <GL/glext.h> /* Pull in all non-standard OpenGL defines. */
+
 #include <QMutex>
+
 #include <utils/common/warnings.h>
+
 #include "gl_context_data.h"
+
 
 #ifndef APIENTRY
 #   define APIENTRY
 #endif
-
-typedef void (APIENTRY *PFNProgramStringARB) (GLenum, GLenum, GLsizei, const GLvoid *);
-typedef void (APIENTRY *PFNBindProgramARB) (GLenum, GLuint);
-typedef void (APIENTRY *PFNDeleteProgramsARB) (GLsizei, const GLuint *);
-typedef void (APIENTRY *PFNGenProgramsARB) (GLsizei, GLuint *);
-typedef void (APIENTRY *PFNProgramLocalParameter4fARB) (GLenum, GLuint, GLfloat, GLfloat, GLfloat, GLfloat);
-
-typedef void (APIENTRY *PFNActiveTexture) (GLenum);
-
-typedef void (APIENTRY *PFNBindBuffer) (GLenum, GLuint);
-typedef void (APIENTRY *PFNDeleteBuffers) (GLsizei, const GLuint *);
-typedef void (APIENTRY *PFNGenBuffers) (GLsizei, GLuint *);
-typedef void (APIENTRY *PFNBufferData) (GLenum, GLsizeiptrARB, const GLvoid *, GLenum);
-
-typedef void (APIENTRY *PFNVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *);
-typedef void (APIENTRY *PFNDisableVertexAttribArray) (GLuint);
-typedef void (APIENTRY *PFNEnableVertexAttribArray) (GLuint);
 
 namespace {
     bool qn_warnOnInvalidCalls = false;
@@ -52,10 +42,18 @@ namespace QnGl {
     void APIENTRY glDeleteBuffers(GLsizei, const GLuint *) { WARN(); }
     void APIENTRY glGenBuffers(GLsizei, GLuint *) { WARN(); }
     void APIENTRY glBufferData(GLenum, GLsizeiptrARB, const GLvoid *, GLenum) { WARN(); }
+    void APIENTRY glBufferSubData(GLenum, GLintptrARB, GLsizeiptrARB, const GLvoid *) { WARN(); }
+    GLvoid* APIENTRY glMapBuffer(GLenum, GLenum) { WARN(); return NULL; }
+    GLboolean APIENTRY glUnmapBuffer(GLenum) { WARN(); return false; }
 
     void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
     void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
     void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
+
+    GLsync APIENTRY glFenceSync( GLenum condition, GLbitfield flags ) { WARN(); return NULL; };
+    void APIENTRY glDeleteSync( GLsync sync ) { WARN(); };
+    void APIENTRY glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout ) { WARN(); };
+    GLAPI GLenum APIENTRY glClientWaitSync (GLsync sync, GLbitfield flags, GLuint64 timeout) { WARN(); return 0; };
 
 #undef WARN
 
@@ -126,37 +124,49 @@ public:
         qn_glFunctionsGlobal()->initialize(context);
 
         bool status;
-#define RESOLVE(FUNCTION)                                                       \
-        status &= resolve<QN_CAT(PFN, FUNCTION)>("gl" QN_STRINGIZE(FUNCTION), &QnGl::QN_CAT(gl, FUNCTION), &QN_CAT(gl, FUNCTION))
+#define RESOLVE(FUNCTION_TYPE, FUNCTION_NAME)                                   \
+        status &= resolve<FUNCTION_TYPE>(QN_STRINGIZE(FUNCTION_NAME), &QnGl::FUNCTION_NAME, &FUNCTION_NAME)
 
         status = true;
-        RESOLVE(ProgramStringARB);
-        RESOLVE(BindProgramARB);
-        RESOLVE(DeleteProgramsARB);
-        RESOLVE(GenProgramsARB);
-        RESOLVE(ProgramLocalParameter4fARB);
+        RESOLVE(PFNGLPROGRAMSTRINGARBPROC,              glProgramStringARB);
+        RESOLVE(PFNGLBINDPROGRAMARBPROC,                glBindProgramARB);
+        RESOLVE(PFNGLDELETEPROGRAMSARBPROC,             glDeleteProgramsARB);
+        RESOLVE(PFNGLGENPROGRAMSARBPROC,                glGenProgramsARB);
+        RESOLVE(PFNGLPROGRAMLOCALPARAMETER4FARBPROC,    glProgramLocalParameter4fARB);
         if(status)
             m_features |= QnGlFunctions::ArbPrograms;
 
         status = true;
-        RESOLVE(ActiveTexture);
+        RESOLVE(PFNGLACTIVETEXTUREPROC,                 glActiveTexture);
         if(status)
             m_features |= QnGlFunctions::OpenGL1_3;
 
         status = true;
-        RESOLVE(BindBuffer);
-        RESOLVE(DeleteBuffers);
-        RESOLVE(GenBuffers);
-        RESOLVE(BufferData);
+        RESOLVE(PFNGLBINDBUFFERPROC,                    glBindBuffer);
+        RESOLVE(PFNGLDELETEBUFFERSPROC,                 glDeleteBuffers);
+        RESOLVE(PFNGLGENBUFFERSPROC,                    glGenBuffers);
+        RESOLVE(PFNGLBUFFERDATAPROC,                    glBufferData);
+        RESOLVE(PFNGLBUFFERSUBDATAPROC,                 glBufferSubData);
+        RESOLVE(PFNGLMAPBUFFERPROC,                     glMapBuffer);
+        RESOLVE(PFNGLUNMAPBUFFERPROC,                   glUnmapBuffer);
         if(status)
             m_features |= QnGlFunctions::OpenGL1_5;
 
         status = true;
-        RESOLVE(VertexAttribPointer);
-        RESOLVE(DisableVertexAttribArray);
-        RESOLVE(EnableVertexAttribArray);
+        RESOLVE(PFNGLVERTEXATTRIBPOINTERPROC,           glVertexAttribPointer);
+        RESOLVE(PFNGLDISABLEVERTEXATTRIBARRAYPROC,      glDisableVertexAttribArray);
+        RESOLVE(PFNGLENABLEVERTEXATTRIBARRAYPROC,       glEnableVertexAttribArray);
         if(status)
             m_features |= QnGlFunctions::OpenGL2_0;
+
+        status = true;
+        RESOLVE( PFNGLFENCESYNCPROC, glFenceSync );
+        RESOLVE( PFNGLDELETESYNCPROC, glDeleteSync );
+        RESOLVE( PFNGLCLIENTWAITSYNCPROC, glClientWaitSync );
+        RESOLVE( PFNGLWAITSYNCPROC, glWaitSync );
+        if(status)
+            m_features |= QnGlFunctions::OpenGL3_2;
+
 #undef RESOLVE
 
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
@@ -178,22 +188,30 @@ public:
     }
 
 public:
-    PFNProgramStringARB glProgramStringARB;
-    PFNBindProgramARB glBindProgramARB;
-    PFNDeleteProgramsARB glDeleteProgramsARB;
-    PFNGenProgramsARB glGenProgramsARB;
-    PFNProgramLocalParameter4fARB glProgramLocalParameter4fARB;
+    PFNGLPROGRAMSTRINGARBPROC glProgramStringARB;
+    PFNGLBINDPROGRAMARBPROC glBindProgramARB;
+    PFNGLDELETEPROGRAMSARBPROC glDeleteProgramsARB;
+    PFNGLGENPROGRAMSARBPROC glGenProgramsARB;
+    PFNGLPROGRAMLOCALPARAMETER4FARBPROC glProgramLocalParameter4fARB;
 
-    PFNActiveTexture glActiveTexture;
+    PFNGLACTIVETEXTUREPROC glActiveTexture;
 
-    PFNBindBuffer glBindBuffer;
-    PFNDeleteBuffers glDeleteBuffers;
-    PFNGenBuffers glGenBuffers;
-    PFNBufferData glBufferData;
+    PFNGLBINDBUFFERPROC glBindBuffer;
+    PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+    PFNGLGENBUFFERSPROC glGenBuffers;
+    PFNGLBUFFERDATAPROC glBufferData;
+    PFNGLBUFFERSUBDATAPROC glBufferSubData;
+    PFNGLMAPBUFFERPROC glMapBuffer;
+    PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 
-    PFNVertexAttribPointer glVertexAttribPointer;
-    PFNDisableVertexAttribArray glDisableVertexAttribArray;
-    PFNEnableVertexAttribArray glEnableVertexAttribArray;
+    PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+    PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+    PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+
+    PFNGLFENCESYNCPROC glFenceSync;
+    PFNGLDELETESYNCPROC glDeleteSync;
+    PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
+    PFNGLWAITSYNCPROC glWaitSync;
 
 private:
     template<class Function>
@@ -286,6 +304,18 @@ void QnGlFunctions::glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid
     d->glBufferData(target, size, data, usage);
 }
 
+void QnGlFunctions::glBufferSubData(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data) {
+    d->glBufferSubData( target, offset, size, data );
+}
+
+GLvoid *QnGlFunctions::glMapBuffer(GLenum target, GLenum access) {
+    return d->glMapBuffer(target, access);
+}
+
+GLboolean QnGlFunctions::glUnmapBuffer(GLenum target) {
+    return d->glUnmapBuffer(target);
+}
+
 void QnGlFunctions::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
     d->glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 }
@@ -296,6 +326,21 @@ void QnGlFunctions::glEnableVertexAttribArray(GLuint index) {
 
 void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
     d->glDisableVertexAttribArray(index);
+}
+
+GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags )
+{
+    return d->glFenceSync( condition, flags );
+}
+
+void QnGlFunctions::glDeleteSync( GLsync sync )
+{
+    d->glDeleteSync( sync );
+}
+
+void QnGlFunctions::glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout )
+{
+    d->glWaitSync( sync, flags, timeout );
 }
 
 #ifdef Q_OS_WIN

@@ -24,10 +24,12 @@ static const int TCP_CONNECT_TIMEOUT = 1000*2;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
-static const int TIME_RESYNC_THRESHOLD = 15;
-static const int TIME_FUTURE_THRESHOLD = 4;
-
-//#define DEBUG_RTSP
+//static const int TIME_RESYNC_THRESHOLD = 15;
+//static const int TIME_FUTURE_THRESHOLD = 4;
+//static const double TIME_RESYNC_THRESHOLD2 = 30;
+static const double TIME_RESYNC_THRESHOLD = 10.0; // at seconds
+static const double LOCAL_TIME_RESYNC_THRESHOLD = 500; // at ms
+static const int DRIFT_STATS_WINDOW_SIZE = 1000;
 
 static QString getValueFromString(const QString& line)
 {
@@ -44,7 +46,8 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0),
-    ssrc(0)
+    ssrc(0),
+    m_rtpTrackNum(0)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode) 
@@ -152,8 +155,9 @@ QMap<QString, QnRtspTimeHelper::CamSyncInfo*> QnRtspTimeHelper::m_camClock;
 
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     m_lastTime(AV_NOPTS_VALUE),
-    m_lastResultInSec(0),
-    m_localStartTime(0)
+    m_resId(resId),
+    m_localStartTime(0),
+    m_rtcpReportTimeDiff(INT_MAX)
 {
     {
         QMutexLocker lock(&m_camClockMutex);
@@ -165,26 +169,52 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     
     m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
     m_timer.restart();
+    m_lastWarnTime = 0;
 }
 
-double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
+double QnRtspTimeHelper::cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime)
 {
+    double localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
+    
     QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
-    if (m_cameraClockToLocalDiff->value == INT_MAX)  
-        m_cameraClockToLocalDiff->value = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;
-    //qDebug() << "diff=" << QString::number(m_cameraClockToLocalDiff - 2000000.0 - 340000.0);
-    return cameraTime + m_cameraClockToLocalDiff->value;
+    if (m_cameraClockToLocalDiff->timeDiff == INT_MAX)  
+        m_cameraClockToLocalDiff->timeDiff = localtime - cameraTime;
+    double result = cameraTime + m_cameraClockToLocalDiff->timeDiff;
+    
+
+    qint64 currentDrift = (localtime - result)*1000;
+    m_cameraClockToLocalDiff->driftSum += currentDrift;
+    m_cameraClockToLocalDiff->driftStats.push(currentDrift);
+    if (m_cameraClockToLocalDiff->driftStats.size() > DRIFT_STATS_WINDOW_SIZE) {
+        qint64 frontVal;
+        m_cameraClockToLocalDiff->driftStats.pop(frontVal);
+        m_cameraClockToLocalDiff->driftSum -= frontVal;
+    }
+
+    //qDebug() << "drift = " << (int) currentDrift;
+    if (m_cameraClockToLocalDiff->driftStats.size() >= DRIFT_STATS_WINDOW_SIZE/4)
+    {
+        double avgDrift = m_cameraClockToLocalDiff->driftSum / (double) m_cameraClockToLocalDiff->driftStats.size();
+        //qDebug() << "avgDrift = " << (int) (avgDrift*1000) << "sz=" << m_cameraClockToLocalDiff->driftStats.size();
+        return result + avgDrift/1000.0;
+    }
+    else {
+        return result;
+    }
 }
 
 void QnRtspTimeHelper::reset()
 {
     QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
     
-    m_cameraClockToLocalDiff->value = INT_MAX;
-    m_lastTime = AV_NOPTS_VALUE;
-    m_lastResultInSec = 0;
-    m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
-    m_timer.restart();
+    m_cameraClockToLocalDiff->timeDiff = INT_MAX;
+    m_cameraClockToLocalDiff->driftStats.clear();
+    m_cameraClockToLocalDiff->driftSum = 0;
+    //m_lastTime = AV_NOPTS_VALUE;
+
+    //m_lastResultInSec = 0;
+    //m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
+    //m_timer.restart();
 }
 
 bool QnRtspTimeHelper::isLocalTimeChanged()
@@ -196,7 +226,7 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
         ct = qnSyncTime->currentMSecsSinceEpoch();
     } while (m_timer.elapsed() != elapsed);
     qint64 expectedLocalTime = elapsed + m_localStartTime;
-    bool timeChanged = qAbs(expectedLocalTime - ct) > TIME_RESYNC_THRESHOLD*1000;
+    bool timeChanged = qAbs(expectedLocalTime - ct) > LOCAL_TIME_RESYNC_THRESHOLD;
     if (!timeChanged && elapsed > 3600) {
         m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
         m_timer.restart();
@@ -204,29 +234,96 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
     return timeChanged;
 }
 
+
+bool QnRtspTimeHelper::isCameraTimeChanged(const RtspStatistic& statistics)
+{
+    double diff = statistics.localtime - statistics.nptTime;
+    if (m_rtcpReportTimeDiff == INT_MAX)
+        m_rtcpReportTimeDiff = diff;
+    bool rez = qAbs(diff - m_rtcpReportTimeDiff) > TIME_RESYNC_THRESHOLD;
+    if (rez)
+        m_rtcpReportTimeDiff = INT_MAX;
+    return rez;
+}
+
+#ifdef DEBUG_TIMINGS
+void QnRtspTimeHelper::printTime(double jitter)
+{
+    if (m_statsTimer.elapsed() < 1000)
+    {
+        m_minJitter = qMin(m_minJitter, jitter);
+        m_maxJitter = qMax(m_maxJitter, jitter);
+        m_jitterSum += jitter;
+        m_jitPackets++;
+    }
+    else {
+        if (m_jitPackets > 0) {
+            QString message(QLatin1String("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms"));
+            message = message.arg(m_resId).arg(int(m_minJitter*1000+0.5)).arg(int(m_maxJitter*1000+0.5)).arg(int(m_jitterSum/m_jitPackets*1000+0.5));
+            cl_log.log(message, cl_logINFO);
+        }
+        m_statsTimer.restart();
+        m_minJitter = INT_MAX;
+        m_maxJitter = 0;
+        m_jitterSum = 0;
+        m_jitPackets = 0;
+    }
+}
+#endif
+
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
 {
     if (statistics.isEmpty())
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
     else {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
+        double resultInSecs = cameraTimeToLocalTime(statistics, statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
         //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
-        bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
-        bool gotInvalidTime = resultInSecs - localTimeInSecs > TIME_FUTURE_THRESHOLD;
-        if ((cameraTimeChanged || isLocalTimeChanged() || gotInvalidTime) && recursiveAllowed)
+
+        //bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
+        //bool gotInvalidTime = resultInSecs - localTimeInSecs > TIME_FUTURE_THRESHOLD;
+        //if ((cameraTimeChanged || isLocalTimeChanged() || gotInvalidTime) && recursiveAllowed)
+
+        //if (localTimeInSecs - resultInSecs > TIME_RESYNC_THRESHOLD2)
+        //    m_lastTime = 0; // time goes to the past
+
+        //qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs;
+        //if (qAbs(localTimeInSecs - resultInSecs) > TIME_RESYNC_THRESHOLD && recursiveAllowed) 
+
+        double jitter = qAbs(resultInSecs - localTimeInSecs);
+        bool gotInvalidTime = jitter > TIME_RESYNC_THRESHOLD;
+        bool camTimeChanged = isCameraTimeChanged(statistics);
+        bool localTimeChanged = isLocalTimeChanged();
+
+#ifdef DEBUG_TIMINGS
+        printTime(jitter);
+#endif
+
+        if ((camTimeChanged || localTimeChanged || gotInvalidTime) && recursiveAllowed)
         {
-            //qDebug() << "reset time";
+            qint64 currentUsecTime = getUsecTimer();
+            if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
+            {
+                if (camTimeChanged)
+                    qWarning() << "Camera time has been changed or receiving latency > 10 seconds. Resync time for camera" << m_resId;
+                else if (localTimeChanged)
+                    qWarning() << "Local time has been changed. Resync time for camera" << m_resId;
+                else
+                    qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs << "seconds. Resync time for camera" << m_resId;
+                m_lastWarnTime = currentUsecTime;
+            }
             reset();
             return getUsecTime(rtpTime, statistics, frequency, false);
         }
         else {
-            m_lastResultInSec = resultInSecs;
+            if (gotInvalidTime)
+                resultInSecs = localTimeInSecs;
+            //m_lastResultInSec = resultInSecs;
             qint64 rez = resultInSecs * 1000000ll;
             // check for negative time if camera timings is inaccurate
             if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)
@@ -455,7 +552,7 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
 
 bool RTPSession::open(const QString& url, qint64 startTime)
 {
-    if (startTime != AV_NOPTS_VALUE)
+    if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
@@ -624,7 +721,7 @@ bool RTPSession::sendDescribe()
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
-    if (m_openedTime != AV_NOPTS_VALUE)
+    if ((quint64)m_openedTime != AV_NOPTS_VALUE)
         addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
     request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
@@ -1069,6 +1166,7 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
         {
             int messageCode = reader.getBits(8);
             int messageLen = reader.getBits(16);
+            Q_UNUSED(messageLen)
             if (messageCode == RTCP_SENDER_REPORT)
             {
                 stats.ssrc = reader.getBits(32);
@@ -1324,7 +1422,19 @@ bool RTPSession::readTextResponce(QByteArray& response)
         if (readMoreData) {
             int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
             if (readed <= 0)
-                return readed;
+            {
+                if( readed == 0 )
+                {
+                    NX_LOG( QString::fromLatin1("RTSP connection to %1:%2 has been unexpectedly closed").
+                        arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()), cl_logINFO );
+                }
+                else
+                {
+                    NX_LOG( QString::fromLatin1("Error reading RTSP response from %1:%2. %3").
+                        arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                }
+                return false;	//error occured or connection closed
+            }
             m_responseBufferLen += readed;
         }
         if (m_responseBuffer[0] == '$') {
@@ -1349,7 +1459,11 @@ bool RTPSession::readTextResponce(QByteArray& response)
         }
         readMoreData = true;
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
+        {
+            NX_LOG( QString::fromLatin1("RTSP response from %1:%2 has exceeded max response size (%3)").
+                arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()).arg(RTSP_BUFFER_LEN), cl_logINFO );
             return false;
+        }
     }
     return false;
 }

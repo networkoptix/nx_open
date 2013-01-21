@@ -55,11 +55,11 @@ QString QnPlIpWebCamResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlIpWebCamResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlIpWebCamResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    return QnResourcePtr(0);
+    return QList<QnResourcePtr>();
 }
 
 
@@ -179,7 +179,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 resource->setTypeId(rt);
                 resource->setName(name);
                 resource->setMAC(smac);
-                resource->setHostAddress(QHostAddress(ad.ip), QnDomainMemory);
+                resource->setHostAddress(QHostAddress(ad.ip).toString(), QnDomainMemory);
                 
                 resource->setDiscoveryAddr(QHostAddress(ad.localAddr));
 

@@ -8,6 +8,7 @@
 #include "workbench_layout_snapshot_storage.h"
 #include "workbench_layout_synchronizer.h"
 #include "workbench_layout.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
@@ -173,13 +174,13 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
 }
 
 void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource) {
-    connect(resource.data(),  SIGNAL(itemAdded(const QnLayoutItemData &)),      this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(itemRemoved(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(itemChanged(const QnLayoutItemData &)),    this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(nameChanged()),                            this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(cellAspectRatioChanged()),                 this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(cellSpacingChanged()),                     this,   SLOT(at_layout_changed()));
-    connect(resource.data(),  SIGNAL(storeRequested()),                         this,   SLOT(at_layout_storeRequested()));
+    connect(resource.data(),  SIGNAL(itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)),     this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)),   this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &)),   this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),                                   this,   SLOT(at_layout_changed(const QnResourcePtr &)));
+    connect(resource.data(),  SIGNAL(cellAspectRatioChanged(const QnLayoutResourcePtr &)),                  this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(cellSpacingChanged(const QnLayoutResourcePtr &)),                      this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(storeRequested(const QnLayoutResourcePtr &)),                          this,   SLOT(at_layout_storeRequested(const QnLayoutResourcePtr &)));
 }
 
 void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource) {
@@ -203,6 +204,36 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
     if(!layoutResource)
         return;
+
+    //todo #Sasha: moved from resourcePool. check it
+    foreach(QnLayoutItemData data, layoutResource->getItems()) 
+    {
+        if(!data.resource.id.isValid()) {
+            QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
+            if(!resource) {
+                if(data.resource.path.isEmpty()) {
+                    qnWarning("Invalid item with empty id and path in layout '%1'.", layoutResource->getName());
+                } else {
+                    resource = QnResourcePtr(new QnAviResource(data.resource.path));
+                    qnResPool->addResource(resource);
+                }
+            }
+
+            if(resource) {
+                data.resource.id = resource->getId();
+                layoutResource->updateItem(data.uuid, data);
+            }
+        } else if(data.resource.path.isEmpty()) {
+            QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
+            if(!resource) {
+                qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
+            } else {
+                data.resource.path = resource->getUniqueId();
+                layoutResource->updateItem(data.uuid, data);
+            }
+        }
+    }
+
 
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
@@ -240,19 +271,15 @@ void QnWorkbenchLayoutSnapshotManager::at_layouts_saveFailed(const QnLayoutResou
         setFlags(resource, flags(resource) & ~Qn::ResourceIsBeingSaved);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_storeRequested() {
-    if(!sender())
-        return; /* Already disconnected. */
-
-    store(toSharedPointer(checked_cast<QnLayoutResource *>(sender())));
+void QnWorkbenchLayoutSnapshotManager::at_layout_storeRequested(const QnLayoutResourcePtr &resource) {
+    store(resource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_changed() {
-    if(!sender())
-        return; /* Already disconnected. */
-
-    QnLayoutResourcePtr resource = toSharedPointer(checked_cast<QnLayoutResource *>(sender()));
+void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
     setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 
-
+void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnResourcePtr &resource) {
+    if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
+        at_layout_changed(layoutResource);
+}

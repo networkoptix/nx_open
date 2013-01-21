@@ -2,6 +2,7 @@
 #include "core/resource/camera_resource.h"
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
+#include "core/resource_managment/resource_pool.h"
 
 /*
 *   Port list used for manual camera add
@@ -42,33 +43,50 @@ QString OnvifResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     if (url.port() == -1)
     {
-        for (int i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i) 
+        for (uint i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i)
         {
             QUrl newUrl(url);
             newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
-            QnResourcePtr result = checkHostAddrInternal(newUrl, auth);
-            if (result)
+            QList<QnResourcePtr> result = checkHostAddrInternal(newUrl, auth, doMultichannelCheck);
+            if (!result.isEmpty())
                 return result;
         }
-        return QnResourcePtr();
+        return QList<QnResourcePtr>();
     }
     else {
-        return checkHostAddrInternal(url, auth);
+        return checkHostAddrInternal(url, auth, doMultichannelCheck);
     }
 }
 
-QnResourcePtr OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    QString urlStr = url.toString();
+
+    QList<QnResourcePtr> resList;
     QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
     if (!typePtr)
-        return QnResourcePtr();
+        return resList;
 
     int onvifPort = url.port(80);
     QString onvifUrl(QLatin1String("onvif/device_service"));
+
+    int channel = url.queryItemValue(QLatin1String("channel")).toInt();
+    if (channel > 0) {
+        QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
+        QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
+        if (rpResource && rpResource->getStatus() != QnResource::Offline) {
+            QnPlOnvifResourcePtr res(new QnPlOnvifResource());
+            res->setPhysicalId(rpResource->getPhysicalId());
+            res->update(rpResource);
+            res->updateToChannel(channel-1);
+            resList << res;
+        }
+        return resList;
+    }
 
     QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
     resource->setTypeId(typePtr->getId());
@@ -88,26 +106,42 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, cons
         QString modelName = fullName.mid(manufacturerPos+1).trimmed().toLower();
 
         if (NameHelper::instance().isSupported(modelName))
-            return QnResourcePtr();
+            return resList;
 
         int modelNamePos = modelName.indexOf(QLatin1String(" "));
         if (modelNamePos >= 0)
         {
             modelName = modelName.mid(modelNamePos+1);
             if (NameHelper::instance().isSupported(modelName))
-                return QnResourcePtr();
+                return resList;
         }
         QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (rt)
             resource->setTypeId(rt);
 
-        if(resource->getUniqueId().isEmpty())
-            return QnResourcePtr();
-        else
-            return resource;
+        if(!resource->getUniqueId().isEmpty())
+        {
+            resource->detectVideoSourceCount();
+            //if (channel > 0)
+            //    resource->updateToChannel(channel-1);
+            resList << resource;
+            
+            // checking for multichannel encoders
+            if (doMultichannelCheck)
+            {
+                for (int i = 1; i < resource->getMaxChannels(); ++i) 
+                {
+                    QnPlOnvifResourcePtr res(new QnPlOnvifResource());
+                    res->setPhysicalId(resource->getPhysicalId());
+                    res->update(resource);
+                    res->updateToChannel(i);
+                    resList << res;
+                }
+            }
+        }
     }
-    else 
-        return QnResourcePtr();
+    
+    return resList;
 }
 
 void OnvifResourceSearcher::pleaseStop()
@@ -118,6 +152,7 @@ void OnvifResourceSearcher::pleaseStop()
 
 QnResourceList OnvifResourceSearcher::findResources()
 {
+
     QnResourceList result;
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected

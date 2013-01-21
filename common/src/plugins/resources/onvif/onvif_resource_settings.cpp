@@ -117,12 +117,12 @@ QString OnvifCameraSettingsResp::getImagingUrl() const
 
 QString OnvifCameraSettingsResp::getLogin() const
 {
-    return m_rangesSoapWrapper? QString::fromLatin1(m_rangesSoapWrapper->getLogin()): QString();
+    return m_rangesSoapWrapper? QString::fromStdString(m_rangesSoapWrapper->getLogin()): QString();
 }
 
 QString OnvifCameraSettingsResp::getPassword() const
 {
-    return m_rangesSoapWrapper? QString::fromLatin1(m_rangesSoapWrapper->getPassword()): QString();
+    return m_rangesSoapWrapper? QString::fromStdString(m_rangesSoapWrapper->getPassword()): QString();
 }
 
 int OnvifCameraSettingsResp::getTimeDrift() const

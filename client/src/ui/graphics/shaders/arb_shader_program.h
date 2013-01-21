@@ -5,6 +5,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtOpenGL/QGLShader>
 
+#include "shader_source.h"
+
 class QnArbShaderProgramPrivate;
 
 class QnArbShaderProgram: public QObject {

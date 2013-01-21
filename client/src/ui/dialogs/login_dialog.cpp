@@ -7,8 +7,10 @@
 #include <QtGui/QInputDialog>
 #include <QtGui/QStandardItemModel>
 
-#include <utils/settings.h>
+#include <client/client_connection_data.h>
+
 #include <core/resource/resource.h>
+
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
@@ -23,10 +25,14 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
+#include <utils/settings.h>
+
 #include "connection_testing_dialog.h"
 
 #include "connectinfo.h"
 #include "version.h"
+#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
+
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -75,6 +81,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,10);
     layout->addWidget(m_renderingWidget);
+    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_renderingWidget );
 
     m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);

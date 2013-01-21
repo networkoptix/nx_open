@@ -11,7 +11,7 @@
 #include <QThread>
 
 #include "networkoptixmodulerevealcommon.h"
-#include "pollset.h"
+#include "aio/pollset.h"
 #include "../common/long_runnable.h"
 
 

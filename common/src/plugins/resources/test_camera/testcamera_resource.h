@@ -21,8 +21,8 @@ public:
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
 
-    virtual QHostAddress getHostAddress() const override;
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain) override;
+    virtual QString getHostAddress() const override;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
     virtual bool shoudResolveConflicts() const override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

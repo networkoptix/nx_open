@@ -2,8 +2,6 @@
 
 #include "common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "core/dataprovider/live_stream_provider.h"
-
 
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
@@ -16,6 +14,8 @@ QnSecurityCamResource::QnSecurityCamResource()
         m_motionMaskList << QnMotionRegion();
 
     addFlags(live_cam);
+
+    connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()
@@ -108,16 +108,28 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
+        result->setRole(role);
+        /*
         if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
         {
                 lsp->setRole(role);
         }
+        */
         return result;
 
     }
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
+}
+
+bool QnSecurityCamResource::startInputPortMonitoring()
+{
+    return false;
+}
+
+void QnSecurityCamResource::stopInputPortMonitoring()
+{
 }
 
 void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
@@ -194,17 +206,17 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
-    // TODO: #VASILENKO needs synchronization. Currently it is not used from multiple threads, but things may change.
+    {
+        QMutexLocker lock(&m_mutex);
+        m_scheduleTasks = scheduleTasks;
+    }
 
-    m_scheduleTasks = scheduleTasks;
-
-    emit scheduleTasksChanged();
+    emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
-const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
+const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 {
-    // TODO: #VASILENKO needs synchronization
-
+    QMutexLocker lock(&m_mutex);
     return m_scheduleTasks;
 }
 
@@ -243,6 +255,24 @@ StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
         return noSharing;
 
     return sharePixels;
+}
+
+QStringList QnSecurityCamResource::getRelayOutputList() const
+{
+    return QStringList();
+}
+
+QStringList QnSecurityCamResource::getInputPortList() const
+{
+    return QStringList();
+}
+
+bool QnSecurityCamResource::setRelayOutputState(
+    const QString& /*ouputID*/,
+    bool /*activate*/,
+    unsigned int /*autoResetTimeout*/ )
+{
+    return false;
 }
 
 MotionType QnSecurityCamResource::getCameraBasedMotionType() const
@@ -342,7 +372,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
             else if (s1 == QLatin1String("motionwindow"))
                 result |= MT_MotionWindow;
         }
-        if (!hasDualStreaming())
+        if (!hasDualStreaming() && !checkCameraCapability(primaryStreamSoftMotion))
             result &= ~MT_SoftwareGrid;
     }
     else {
@@ -361,4 +391,44 @@ MotionType QnSecurityCamResource::getMotionType()
 void QnSecurityCamResource::setMotionType(MotionType value)
 {
     m_motionType = value;
+}
+
+void QnSecurityCamResource::at_disabledChanged()
+{
+    /*if( oldValue == newValue )
+        return;*/
+
+    if(hasFlags(QnResource::foreigner))
+        return;     //we do not own camera
+
+    if(isDisabled())
+        stopInputPortMonitoring();
+    else
+        startInputPortMonitoring();
+}
+
+bool QnSecurityCamResource::checkCameraCapability(CameraCapabilities value) const
+{
+    return getCameraCapabilities() & value;
+}
+
+QnSecurityCamResource::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
+{
+    QVariant mediaVariant;
+    const_cast<QnSecurityCamResource*>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
+    return (CameraCapabilities) mediaVariant.toInt();
+}
+
+void QnSecurityCamResource::addCameraCapabilities(CameraCapabilities value)
+{
+    value |= getCameraCapabilities();
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+}
+
+void QnSecurityCamResource::removeCameraCapabilities(CameraCapabilities value)
+{
+    value = getCameraCapabilities() & ~value;
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }

@@ -379,6 +379,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
+    factory(Qn::OpenServerSettingsAction).
+        flags(Qn::NoTarget).
+        text(tr("Settings..."));
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
@@ -476,7 +480,7 @@ QnActionManager::QnActionManager(QObject *parent):
     } factory.endSubMenu();
 
     factory(Qn::OpenCurrentUserLayoutMenu).
-        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::RequiresChildren).
+        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
         text(tr("Open Layout...")).
         childFactory(new QnOpenCurrentUserLayoutActionFactory(this)).
         icon(qnSkin->icon("titlebar/dropdown.png"));
@@ -572,6 +576,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
+        autoRepeat(false);
+
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Business Events...")).
         autoRepeat(false);
 
     factory().
@@ -734,6 +744,35 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+I")).
         condition(new QnDisplayInfoActionCondition(this));
 
+    factory().
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Change Resolution..."));
+
+    factory.beginSubMenu(); {
+        factory(Qn::RadassAutoAction).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("Auto")).
+            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+
+        factory(Qn::RadassLowAction).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("Low")).
+            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+
+        factory(Qn::RadassHighAction).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("High")).
+            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+    } factory.endSubMenu();
+
+#if 0
+    factory(Qn::ToggleRadassAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Resolution Mode")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(this));
+#endif
+
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion/Smart Search")).
@@ -878,7 +917,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Aspect Ratio"));
+        text(tr("Change Cell Aspect Ratio..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -902,7 +941,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Spacing"));
+        text(tr("Change Cell Spacing..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();

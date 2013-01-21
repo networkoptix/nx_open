@@ -21,6 +21,24 @@ public:
     void updateScheduleInfo(qint64 timeMs);
 
     void setDualStreamingHelper(QnDualStreamingHelperPtr helper);
+
+    /*
+    * Ignore current schedule task param and start (or restart) recording with specified params. 
+    * Both primary and secondary streams are recorded.
+    * Panic mode recording has higher priority (fps may be increased if panic mode activated)
+    */
+    void startForcedRecording(QnStreamQuality quality = QnQualityHighest, int fps = 10, int maxDuration = 0);
+
+    /*
+    * Switch from forced recording mode to normal recording mode specified by schedule task
+    * Panic mode recording has higher priority
+    */
+    void stopForcedRecording();
+signals:
+    void fpsChanged(QnServerStreamRecorder* recorder, float value);
+    void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnAbstractDataPacketPtr motion);
+
+    void storageFailure(QnResourcePtr resource, qint64 timestamp, const QString& errMessage);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
@@ -38,7 +56,11 @@ protected:
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
-    bool isMotionRec(QnScheduleTask::RecordingType recType) const;
+    bool isMotionRec(Qn::RecordingType recType) const;
+    void updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData);
+    void setSpecialRecordingMode(QnScheduleTask& task, int fps);
+private slots:
+    void at_recordingFailed(QString msg);
 private:
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
@@ -53,8 +75,12 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;
-    QnScheduleTask m_panicSchedileRecord;
+    QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
+    QnScheduleTask m_forcedSchedileRecord;  // special recording mode (recording action). Priority higher than regular schedule
     bool m_usedPanicMode;
+    bool m_usedSpecialRecordingMode;
+    int m_forcedRecordFps;  // fps for special recording mode
+    bool m_lastMotionState; // true if motion in progress
     qint64 m_queuedSize;
     QMutex m_queueSizeMutex;
 };

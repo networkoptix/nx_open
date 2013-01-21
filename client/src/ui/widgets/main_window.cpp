@@ -50,6 +50,8 @@
 #include "resource_browser_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
+
 #include "openal/qtvaudiodevice.h"
 #include "ui/graphics/items/controls/volume_slider.h"
 
@@ -184,6 +186,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
+    addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));
@@ -472,6 +475,11 @@ bool QnMainWindow::event(QEvent *event) {
         result |= m_dwm->widgetEvent(event);
 
     return result;
+}
+
+void QnMainWindow::closeEvent(QCloseEvent* event)
+{
+    Q_UNUSED(event)
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {

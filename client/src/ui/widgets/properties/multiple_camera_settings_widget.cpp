@@ -13,6 +13,9 @@
 #include "ui/widgets/properties/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource/resource_widget.h"
 
+//TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
+#include <core/dataprovider/live_stream_provider.h>
+
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
     QnWorkbenchContextAware(parent),
@@ -311,21 +314,19 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     m_inUpdateMaxFps = true;
 
     int maxFps = std::numeric_limits<int>::max();
+    int maxDualStreamingFps  = maxFps;
+
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
-        int cameraFps =camera->getMaxFps();
+        int cameraFps = camera->getMaxFps();
+        int cameraDualStreamingFps = cameraFps;
         if ((((camera->supportedMotionType() & MT_SoftwareGrid))
             || ui->cameraScheduleWidget->isSecondaryStreamReserver()) &&  camera->streamFpsSharingMethod() == shareFps )
-            cameraFps -= 2;
+            cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
         maxFps = qMin(maxFps, cameraFps);
+        maxDualStreamingFps = qMin(maxFps, cameraDualStreamingFps);
     }
-    float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
-    if (currentMaxFps > maxFps)
-    {
-        QMessageBox::warning(this, tr("FPS value is too high"), 
-            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2").arg(currentMaxFps).arg(maxFps));
-    }
-    ui->cameraScheduleWidget->setMaxFps(maxFps);
 
+    ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
 }

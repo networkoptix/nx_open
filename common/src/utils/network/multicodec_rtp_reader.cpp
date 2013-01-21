@@ -9,10 +9,12 @@
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
-
+#include "events/business_event_connector.h"
+#include "utils/common/synctime.h"
 
 extern QSettings qSettings;
 static const int RTSP_RETRY_COUNT = 6;
+static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     QnResourceConsumer(res),
@@ -31,6 +33,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     m_gotKeyData.resize(m_numberOfVideoChannels);
+
+    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, const QString&)), qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, const QString&)));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -86,7 +90,23 @@ void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer
         if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
             ioDevice->setStatistic(stats);
     }
+    
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
+    if (outBufSize > 0)
+    {
+        quint16* sizeField = (quint16*) (buffer+2);
+        *sizeField = htons(outBufSize);
+        m_RtpSession.sendBynaryResponse(buffer, outBufSize+4);
+    }
+    m_rtcpReportTimer.restart();
+}
+
+void QnMulticodecRtpReader::buildClientRTCPReport(quint8 chNumber)
+{
+    quint8 buffer[1024*4];
+    buffer[0] = '$';
+    buffer[1] = chNumber;
+    int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, sizeof(buffer)-4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -156,6 +176,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         else {
             m_demuxedData[channelNum]->clear();
         }
+
+        if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
+            if (m_videoIO)
+                buildClientRTCPReport(m_videoIO->getRtcpTrackNum());
+            if (m_audioIO)
+                buildClientRTCPReport(m_audioIO->getRtcpTrackNum());
+            m_rtcpReportTimer.restart();
+        }
+
     }
 
     if (m_lastVideoData)
@@ -174,8 +203,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         return result;
     }
-    if (m_RtpSession.isOpened() && !m_pleaseStop)
-        qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
+    if (m_RtpSession.isOpened() && !m_pleaseStop) {
+        qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
+        emit networkIssue(getResource(), qnSyncTime->currentUSecsSinceEpoch(), QString(QLatin1String("No video frame during %1 seconds")).arg(MAX_FRAME_DURATION*2/1000));
+    }
     return result;
 }
 
@@ -277,27 +308,29 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         return result;
     }
 
-    qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
+    qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
     return result;
 }
 
 QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 {
+    QnRtpStreamParser* result = 0;
+
     if (codecName == QLatin1String("H264"))
-        return new CLH264RtpParser;
+        result = new CLH264RtpParser;
     else if (codecName == QLatin1String("JPEG"))
-        return new QnMjpegRtpParser;
+        result = new QnMjpegRtpParser;
     else if (codecName == QLatin1String("MPEG4-GENERIC"))
-        return new QnAacRtpParser;
+        result = new QnAacRtpParser;
     else if (codecName == QLatin1String("PCMU")) {
-        QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
-        result->setCodecId(CODEC_ID_PCM_MULAW);
-        return result;
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_PCM_MULAW);
+        result = audioParser;
     }
     else if (codecName == QLatin1String("PCMA")) {
-        QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
-        result->setCodecId(CODEC_ID_PCM_ALAW);
-        return result;
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_PCM_ALAW);
+        result = audioParser;
     }
     else if (codecName.startsWith(QLatin1String("G726"))) // g726-24, g726-32 e.t.c
     { 
@@ -305,15 +338,23 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         if (bitRatePos == -1)
             return 0;
         QString bitsPerSample = codecName.mid(bitRatePos+1);
-        QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
-        result->setCodecId(CODEC_ID_ADPCM_G726);
-        result->setBitsPerSample(bitsPerSample.toInt()/8);
-        result->setSampleFormat(AV_SAMPLE_FMT_S16);
-        return result;
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_ADPCM_G726);
+        audioParser->setBitsPerSample(bitsPerSample.toInt()/8);
+        audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
+        result = audioParser;
     }
-    else
-        return 0;
+    
+    if (result)
+        connect(result, SIGNAL(packetLostDetected(quint32, quint32)), this, SLOT(at_packetLost(quint32, quint32)));
+    return result;
 }
+
+void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
+{
+    emit networkIssue(getResource(), qnSyncTime->currentUSecsSinceEpoch(), QString(QLatin1String("RTP packet lost detected. prev seq.=%1 next seq.=%2")).arg(prev).arg(next));
+}
+
 
 void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const RTPSession::TrackType mediaType)
 {
@@ -354,14 +395,14 @@ void QnMulticodecRtpReader::openStream()
         }
         else 
         {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+            QTextStream(&url) << "rtsp://" << nres->getHostAddress();
             if (!m_request.startsWith(QLatin1Char('/')))
                 url += QLatin1Char('/');
             url += m_request;;
         }
     }
     else
-        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+        QTextStream(&url) << "rtsp://" << nres->getHostAddress();
 
     m_RtpSession.setAuth(nres->getAuth());
 
@@ -391,6 +432,7 @@ void QnMulticodecRtpReader::openStream()
         initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
         if (!m_videoIO && !m_audioIO)
             m_RtpSession.stop();
+        m_rtcpReportTimer.restart();
     }
 }
 

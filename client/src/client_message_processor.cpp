@@ -165,11 +165,25 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
         if(QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
             layout->requestStore();
 
-    } else if (message.eventType == Qn::Message_Type_ResourceDelete)
+    }
+    else if (message.eventType == Qn::Message_Type_ResourceDelete)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
         qnResPool->removeResource(ownResource);
     }
+    else if (message.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
+    {
+        emit businessRuleChanged(message.businessRule);
+    }
+    else if (message.eventType == Qn::Message_Type_BusinessRuleDelete)
+    {
+        emit businessRuleDeleted(message.resourceId);
+    }
+    else if (message.eventType == Qn::Message_Type_BroadcastBusinessAction)
+    {
+        emit businessActionReceived(message.businessAction);
+    }
+
 }
 
 void QnClientMessageProcessor::at_connectionClosed(QString errorString)

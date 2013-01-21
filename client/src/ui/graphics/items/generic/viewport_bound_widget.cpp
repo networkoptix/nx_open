@@ -98,9 +98,7 @@ QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVar
                 m_instrument.clear();
             }
         } else {
-            QList<InstrumentManager *> managers = InstrumentManager::managersOf(scene());
-            if(!managers.empty()) {
-                InstrumentManager *manager = managers[0];
+            if(InstrumentManager *manager = InstrumentManager::instance(scene())) {
                 TransformListenerInstrument *instrument = manager->instrument<TransformListenerInstrument>();
                 if(!instrument) {
                     qnWarning("An instance of TransformListenerInstrument must be installed in order for the widget to work correctly.");

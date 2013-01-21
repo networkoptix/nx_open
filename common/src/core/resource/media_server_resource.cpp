@@ -2,7 +2,6 @@
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
-#include "core/dataprovider/media_streamdataprovider.h"
 #include "api/session_manager.h"
 
 QnLocalMediaServerResource::QnLocalMediaServerResource()
@@ -116,26 +115,12 @@ void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &sto
     m_storages = storages;
 }
 
-class QnEmptyDataProvider: public QnAbstractMediaStreamDataProvider{
-public:
-    QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
-
-protected:
-    virtual QnAbstractMediaDataPtr getNextData() override {
-        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1U));
-    }
-};
-
-QnAbstractStreamDataProvider* QnMediaServerResource::createDataProviderInternal(ConnectionRole ){
-    return new QnEmptyDataProvider(toSharedPointer());
-}
-
 // --------------------------------------------------
 
 class TestConnectionTask: public QRunnable
 {
 public:
-    TestConnectionTask(QnMediaServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+    TestConnectionTask(QnMediaServerResourcePtr owner, const QUrl& url): m_owner(owner), m_url(url) {}
 
     void run()
     {
@@ -149,7 +134,7 @@ public:
         }
     }
 private:
-    QnMediaServerResource* m_owner;
+    QnMediaServerResourcePtr m_owner;
     QUrl m_url;
 };
 
@@ -169,7 +154,7 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     setUrl(url.toString());
 
     m_primaryIf = primaryIF;
-    emit serverIFFound(primaryIF);
+    emit serverIfFound(::toSharedPointer(this), primaryIF);
 }
 
 QString QnMediaServerResource::getPrimaryIF() const 
@@ -214,7 +199,7 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        TestConnectionTask *task = new TestConnectionTask(this, url);
+        TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
         QThreadPool::globalInstance()->start(task);
     }
 }

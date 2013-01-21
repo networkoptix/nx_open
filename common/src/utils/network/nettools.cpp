@@ -1,3 +1,4 @@
+#include <QHostInfo>
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
@@ -535,3 +536,26 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 
 #endif
 
+QString getMacByIP(const QString& host, bool net)
+{
+    return getMacByIP(resolveAddress(host), net);
+}
+
+bool isIpv4Address(const QString& addr)
+{
+    int ip4Addr = inet_addr(addr.toAscii().data());
+    return ip4Addr != 0 && ip4Addr != -1;
+}
+
+QHostAddress resolveAddress(const QString& addr)
+{
+    int ip4Addr = inet_addr(addr.toAscii().data());
+    if (ip4Addr != 0 && ip4Addr != -1)
+        return QHostAddress(ntohl(ip4Addr));
+
+    QHostInfo hi = QHostInfo::fromName(addr);
+    if (!hi.addresses().isEmpty())
+        return hi.addresses()[0];
+    else
+        return QHostAddress();
+}

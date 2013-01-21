@@ -50,7 +50,12 @@ public:
 #undef QN_LOG_BODY
     
     static void initLog(const QString &logLevelStr);
-    static QnLog instance();
+    //!Initializes log with external instance \a externalInstance
+    /*!
+        Introduced to allow logging in dynamically loaded plugins
+    */
+    static void initLog(QnLog* externalInstance);
+    static QnLog* instance();
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
@@ -70,7 +75,13 @@ private:
 #define CL_LOG(level)                                                           \
     if (level > cl_log.logLevel()) {} else                                      \
 
-#define cl_log (QnLog::instance())
+#define NX_LOG(msg, level)                \
+    {                                     \
+        if( level <= cl_log.logLevel() )  \
+            cl_log.log( msg, level );     \
+    }
+
+#define cl_log (*QnLog::instance())
 
 QN_EXPORT void qnLogMsgHandler(QtMsgType type, const char *msg);
 

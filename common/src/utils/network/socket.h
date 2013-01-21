@@ -13,10 +13,12 @@
 #   include <sys/socket.h>
 #   include <sys/types.h>
 #   include <netinet/in.h>
+#   include <arpa/inet.h>
 #endif
 
 #include "nettools.h"
 #include "utils/common/byte_array.h"
+#include "../common/systemerror.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -145,6 +147,7 @@ public:
     bool setNonBlockingMode(bool val);
     //!Returns true, if in non-blocking mode
     bool isNonBlockingMode() const;
+    SystemError::ErrorCode prevErrorCode() const;
 
 protected:
     int sockDesc;              // Socket descriptor
@@ -169,25 +172,39 @@ private:
 class CommunicatingSocket : public Socket {
     Q_DECLARE_TR_FUNCTIONS(CommunicatingSocket)
 public:
+    static const int DEFAULT_TIMEOUT_MILLIS = 3000;
+
     /**
      *   Establish a socket connection with the given foreign
      *   address and port
      *   @param foreignAddress foreign address (IP address or name)
      *   @param foreignPort foreign port
+     *   @param timeoutMs connection timeout. if < 0 - no timeout used. TODO should use write timeout for connection establishment
      *   @return false if unable to establish connection
      */
-    bool connect(const QString &foreignAddress, unsigned short foreignPort);
+    bool connect(const QString &foreignAddress, unsigned short foreignPort, int timeoutMs = DEFAULT_TIMEOUT_MILLIS);
     void shutdown();
     virtual void close();
-    void setReadTimeOut( unsigned int ms );
-    void setWriteTimeOut( unsigned int ms );
+    /*!
+        \param ms. New timeout value. 0 - no timeout
+        \return true. if timeout has been changed
+        By default, there is no timeout
+    */
+    bool setReadTimeOut( unsigned int ms );
+    /*!
+        \param ms. New timeout value. 0 - no timeout
+        \return true. if timeout has been changed
+        By default, there is no timeout
+    */
+    bool setWriteTimeOut( unsigned int ms );
 
     /**
      *   Write the given buffer to this socket.  Call connect() before
      *   calling send()
      *   @param buffer buffer to be written
      *   @param bufferLen number of bytes from buffer to be written
-     *   @exception SocketException thrown if unable to send data
+     *   @return Number of bytes sent. -1 if failed to send something
+     *   If socket is in non-blocking mode and non-blocking send is not possible, method will return -1 and set error code to wouldBlock
      */
     int send(const void *buffer, int bufferLen) ;
     int send(const QnByteArray& data);
@@ -227,7 +244,8 @@ protected:
     CommunicatingSocket(int newConnSD);
 
 protected:
-    unsigned int m_timeout;
+    unsigned int m_readTimeoutMS;
+    unsigned int m_writeTimeoutMS;
     bool mConnected;
 };
 

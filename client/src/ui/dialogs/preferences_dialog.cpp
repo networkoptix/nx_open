@@ -22,6 +22,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
+#include <ui/widgets/settings/smtp_settings_widget.h>
+
 #include <youtube/youtubesettingswidget.h>
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
@@ -66,6 +68,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
+
+    m_smtpSettingsWidget = new QnSmtpSettingsWidget(this);
+    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_smtpSettingsWidget, tr("Server Settings"));
 
     resize(1, 1); // set widget size to minimal possible
 
@@ -149,6 +154,7 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
+    m_settings->setUseHardwareDecoding(ui->isHardwareDecodingCheckBox->isChecked());
     m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
@@ -176,6 +182,7 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
+    ui->isHardwareDecodingCheckBox->setChecked( m_settings->isHardwareDecodingUsed() );
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
 
     ui->extraMediaFoldersList->clear();
@@ -196,6 +203,10 @@ void QnPreferencesDialog::updateFromSettings() {
 
 void QnPreferencesDialog::openLicensesPage() {
     ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
+}
+
+void QnPreferencesDialog::openServerSettingsPage() {
+    ui->tabWidget->setCurrentIndex(m_serverSettingsTabIndex);
 }
 
 
@@ -260,6 +271,7 @@ void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &co
 
 void QnPreferencesDialog::at_context_userChanged() {
     ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+    ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
 }
 
 void QnPreferencesDialog::at_timeModeComboBox_activated() {

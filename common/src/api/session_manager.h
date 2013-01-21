@@ -82,6 +82,8 @@ public:
 
     bool isReady() const;
 
+    static bool checkIfAppServerIsOld();
+
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();

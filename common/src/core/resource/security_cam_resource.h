@@ -30,6 +30,9 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
+    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
     MotionType getCameraBasedMotionType() const;
@@ -65,24 +68,44 @@ public:
 
     void setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain);
     void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
-    
+
     QRegion getMotionMask(int channel) const;
     QnMotionRegion getMotionRegion(int channel) const;
     QList<QnMotionRegion> getMotionRegionList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
-    const QnScheduleTaskList &getScheduleTasks() const;
+    const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
+
+    virtual QStringList getRelayOutputList() const;
+    virtual QStringList getInputPortList() const;
+
+
+    CameraCapabilities getCameraCapabilities() const;
+    bool checkCameraCapability(CameraCapabilities value) const;
+    void addCameraCapabilities(CameraCapabilities value);
+    void removeCameraCapabilities(CameraCapabilities value);
+
+
+    /*!
+        Change output with id \a ouputID state to \a activate
+        \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
+        \return true in case of success. false, if nothing has been done
+    */
+    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
 signals:
     /** 
      * This signal is virtual to work around a problem with inheritance from
      * two <tt>QObject</tt>s. 
      */
-    virtual void scheduleTasksChanged();
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+
+private slots:
+    void at_disabledChanged();
 
 protected:
     void updateInner(QnResourcePtr other) override;
@@ -92,6 +115,10 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
+    //!MUST be overridden for camera with input port. Default implementation does noting
+    virtual bool startInputPortMonitoring();
+    //!MUST be overridden for camera with input port. Default implementation does noting
+    virtual void stopInputPortMonitoring();
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
@@ -102,5 +129,8 @@ private:
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
 };
+
+Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
+Q_DECLARE_METATYPE(QnSecurityCamResourceList)
 
 #endif //sequrity_cam_resource_h_1239

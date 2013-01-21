@@ -15,7 +15,8 @@ namespace Qn {
         UsersNode,
         ResourceNode,   /**< Node that represents a resource. */
         ItemNode,       /**< Node that represents a layout item. */
-        BastardNode     /**< Node that contains hidden resources. */
+        BastardNode,    /**< Node that contains hidden resources. */
+        NodeTypeCount
     };
 
 
@@ -223,6 +224,7 @@ namespace Qn {
         ClientTimeMode  
     };
 
+    // TODO: #GDM this enum belongs to resource tree model as it's not used outside its context.
     /**
      * Columns in the resource tree model.
      */
@@ -231,6 +233,17 @@ namespace Qn {
         CheckColumn,
         ColumnCount
     };
+
+    /**
+     * Video resolution adjustment mode for RADASS.
+     */
+    enum ResolutionMode {
+        AutoResolution,
+        HighResolution,
+        LowResolution,
+        ResolutionModeCount
+    };
+
 
 } // namespace Qn
 
@@ -241,7 +254,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
 
-Q_DECLARE_METATYPE(Qn::ItemRole);
-Q_DECLARE_METATYPE(Qn::TimeMode);
+Q_DECLARE_METATYPE(Qn::ItemRole)
+Q_DECLARE_METATYPE(Qn::TimeMode)
 
 #endif // QN_CLIENT_GLOBALS_H

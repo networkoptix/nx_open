@@ -119,6 +119,11 @@ bool CLNetState::isAddrInMachineSubnet(const QHostAddress& addr) const
 
 }
 
+bool CLNetState::isResourceInMachineSubnet(const QString& addr, const QHostAddress& discAddr) const
+{
+    return isResourceInMachineSubnet(resolveAddress(addr), discAddr);
+}
+
 bool CLNetState::isResourceInMachineSubnet(const QHostAddress& addr, const QHostAddress& discAddr) const
 {
     for (int i = 0; i < m_net_entries.size(); ++i)

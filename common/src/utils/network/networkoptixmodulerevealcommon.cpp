@@ -13,7 +13,7 @@ namespace Serialization
     template<class T>
         bool deserializeSimpleType( T* const val, const quint8** const bufStart, const quint8* bufEnd )
     {
-        if( bufEnd - *bufStart < sizeof(*val) )
+        if( bufEnd - *bufStart < (qint32)sizeof(*val) )
             return false;
         memcpy( val, *bufStart, sizeof(*val) );
         *bufStart += sizeof(*val);
@@ -23,7 +23,7 @@ namespace Serialization
     template<class T>
         bool serializeSimpleType( const T& val, quint8** const bufStart, const quint8* bufEnd )
     {
-        if( bufEnd - *bufStart < sizeof(val) )
+        if( bufEnd - *bufStart < (qint32)sizeof(val) )
             return false;
         memcpy( *bufStart, &val, sizeof(val) );
         *bufStart += sizeof(val);
@@ -86,7 +86,7 @@ namespace Serialization
         quint32 strLength = 0;
         if( !deserialize( &strLength, bufStart, bufEnd ) )
             return false;
-        if( bufEnd - *bufStart < strLength )
+        if( bufEnd - *bufStart < (qint32)strLength )
             return false;
         *val = QString::fromAscii( reinterpret_cast<const char*>(*bufStart), strLength );
         *bufStart += strLength;
@@ -257,6 +257,9 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
                     state = sReadingMap;
                 else if( *ch == '}' )
                     state = finish;
+                break;
+
+            case finish:
                 break;
         }
 

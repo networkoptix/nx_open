@@ -390,23 +390,25 @@ int QnMediaServerConnection::syncGetStatistics(QObject *target, const char *slot
     return status;
 }
 
-int QnMediaServerConnection::asyncGetManualCameraSearch(QObject *target, const char *slot,
-                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port){
+int QnMediaServerConnection::asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+                                                        QObject *target, const char *slotSuccess, const char *slotError){
 
     QnRequestParamList params;
     params << QnRequestParam("start_ip", startAddr);
-    params << QnRequestParam("end_ip", endAddr);
+    if (!endAddr.isEmpty())
+        params << QnRequestParam("end_ip", endAddr);
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
     params << QnRequestParam("port" ,QString::number(port));
 
     detail::QnMediaServerManualCameraReplyProcessor *processor = new detail::QnMediaServerManualCameraReplyProcessor();
-    connect(processor, SIGNAL(finishedSearch(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finishedSearch(const QnCamerasFoundInfoList &)), target, slotSuccess, Qt::QueuedConnection);
+    connect(processor, SIGNAL(searchError(int, const QString &)), target, slotError, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), QnRequestHeaderList(), params, processor, SLOT(at_searchReplyReceived(QnHTTPRawResponse, int)));
 }
 
-int QnMediaServerConnection::asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                                     const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password){
+int QnMediaServerConnection::asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+                                                     QObject *target, const char *slot){
     QnRequestParamList params;
 
     for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
@@ -579,9 +581,11 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(con
             QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
             result.append(QnCamerasFoundInfo(url, name, manufacture));
         } while (resource.length() > 0);
+        emit finishedSearch(result);
+    } else {
+        QString error = QLatin1String(extractXmlBody(reply, "root"));
+        emit searchError(response.status, error);
     }
-
-    emit finishedSearch(result);
     deleteLater();
 }
 

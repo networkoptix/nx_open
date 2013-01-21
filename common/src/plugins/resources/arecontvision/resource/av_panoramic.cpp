@@ -20,7 +20,7 @@ bool QnArecontPanoramicResource::getDescription()
 
 QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider()
 {
-    cl_log.log("Create live provider for camera ", getHostAddress().toString(), cl_logDEBUG1);
+    cl_log.log("Create live provider for camera ", getHostAddress(), cl_logDEBUG1);
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
@@ -133,6 +133,9 @@ bool QnArecontPanoramicResource::initInternal()
         return false;
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
+
+    setParam(QLatin1String("CnannelEnable"), 15, QnDomainPhysical); // to enable all channels
+
     return true;
 }
 

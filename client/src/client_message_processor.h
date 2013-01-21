@@ -22,6 +22,10 @@ signals:
     void connectionOpened();
     void connectionClosed();
 
+    void businessRuleChanged(const QnBusinessEventRulePtr &rule);
+    void businessRuleDeleted(QnId id);
+
+    void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 public slots:
     void run();
 

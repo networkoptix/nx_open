@@ -40,7 +40,7 @@ QnIprangeChecker::~QnIprangeChecker()
 
 }
 
-QList<QHostAddress> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddress endAddr)
+QList<QString> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddress endAddr)
 {
     // sorry; did not have time to mess with asiynch qt sockets + thread isuses;
     // so bad(slow) implementaiton here 
@@ -48,7 +48,7 @@ QList<QHostAddress> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostA
     quint32 endIpv4 = endAddr.toIPv4Address();
 
     if (endIpv4 < startIpv4)
-        return QList<QHostAddress>();
+        return QList<QString>();
 
     QList<QnIprangeCheckerHelper> candidates;
 
@@ -68,13 +68,13 @@ QList<QHostAddress> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostA
     for (int i = 0; i < threads; ++i )global->reserveThread();
 
 
-    QList<QHostAddress> result;
+    QList<QString> result;
 
 
     foreach(QnIprangeCheckerHelper h, candidates)
     {
         if(h.online)
-            result.push_back(QHostAddress(h.ip));
+            result.push_back(QHostAddress(h.ip).toString());
     }
 
     return result;

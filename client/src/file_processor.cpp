@@ -57,7 +57,23 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls)
 
 QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
 {
-    QnResourcePtr result = QnResourceDirectoryBrowser::instance().checkFile(file);
+    // saved layout
+    QString exportedLayoutMagic = QLatin1String("layout://");
+    QString fileName = file;
+    if (fileName.startsWith(exportedLayoutMagic)) {
+        /*
+         * translating filename from something like this:
+         *    layout:///home/user/videos/layout.nov?file.avi
+         * to
+         *    /home/user/videos/layout.nov
+         */
+        fileName = fileName.remove(0, exportedLayoutMagic.length());
+        int n = fileName.indexOf(QLatin1Char('?'));
+        if (n >= 0)
+            fileName = fileName.remove(n, fileName.length());
+    }
+
+    QnResourcePtr result = QnResourceDirectoryBrowser::instance().checkFile(fileName);
 
     if(result)
         qnResPool->addResource(result);

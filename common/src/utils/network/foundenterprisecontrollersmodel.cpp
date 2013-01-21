@@ -131,6 +131,7 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
 
 int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
 {
+    Q_UNUSED(index)
     return 1;
 }
 
@@ -163,7 +164,7 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
 {
     QMutexLocker lk( &m_mutex );
 
-    if( moduleID != QString::fromAscii(NX_ENTERPISE_CONTROLLER_ID) )
+    if( moduleID != nxEntControllerId )
         return;
     if( !moduleParameters.contains(QString::fromAscii("port")) )
         return;
@@ -211,9 +212,10 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     bool isLocal,
     const QString& seed )
 {
+    Q_UNUSED(isLocal)
     QMutexLocker lk( &m_mutex );
 
-    if( moduleID != QString::fromAscii(NX_ENTERPISE_CONTROLLER_ID) )
+    if( moduleID != nxEntControllerId )
         return;
 
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );

@@ -17,11 +17,27 @@ namespace Ui {
     class QnResourceTreeWidget;
 }
 
+namespace Qn {
+    /**
+     * Flags describing graphics tweaks usable in resource tree wigdet.
+     */
+    enum GraphicsTweaksFlag {
+        /** Last row is hidden if there is not enough space to fully show it. */
+        HideLastRow = 0x1,
+
+        /** Set background opacity to items. */
+        BackgroundOpacity = 0x2,
+
+        /** Set Qt::BypassGraphicsProxyWidget flag to items. */
+        BypassGraphicsProxy = 0x4
+    };
+    Q_DECLARE_FLAGS(GraphicsTweaksFlags, GraphicsTweaksFlag)
+}
+
 class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
     
     typedef QWidget base_type;
-
 public:
     explicit QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
@@ -53,9 +69,17 @@ public:
      */
     bool isCheckboxesVisible() const;
 
-    //TODO: #gdm flags?
-    // TODO: #gdm setter starts with set, e.g. setGraphicsTweaksEnabled. And add a getter.
-    void enableGraphicsTweaks(bool enableTweaks = true);
+    /**
+     * @brief setGraphicsTweaks         Set various graphics tweaks for widget displaying.
+     * @param flags                     Set of flags describing tweaks.
+     */
+    void setGraphicsTweaks(Qn::GraphicsTweaksFlags flags);
+
+    /**
+     * @brief getGraphicsTweaks         Which graphics tweaks are enabled for this widget.
+     * @return                          Set of flags describing used tweaks.
+     */
+    Qn::GraphicsTweaksFlags getGraphicsTweaks();
 
     /**
      * @brief setFilterVisible          Show/hide resource tree filter widget.
@@ -111,9 +135,16 @@ private:
     bool m_checkboxesVisible;
 
     /**
+     * @brief m_graphicsTweaksFlags     This property holds which graphics tweaks are used for widget displaying.
+     */
+    Qn::GraphicsTweaksFlags m_graphicsTweaksFlags;
+
+    /**
      * @brief m_editingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
      */
     bool m_editingEnabled;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::GraphicsTweaksFlags)
 
 #endif // RESOURCE_TREE_WIDGET_H

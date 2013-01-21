@@ -3,11 +3,9 @@
 #include "spush_media_stream_provider.h"
 #include "../resource/camera_resource.h"
 #include "utils/common/util.h"
-#include "live_stream_provider.h"
-
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
-QnAbstractMediaStreamDataProvider(dev),
+QnLiveStreamProvider(dev),
 m_needReopen(false),
 m_cameraAudioEnabled(false)
 {
@@ -24,7 +22,7 @@ bool CLServerPushStreamreader::canChangeStatus() const
 
 void CLServerPushStreamreader::run()
 {
-    setPriority(QThread::HighPriority);
+    setPriority(QThread::TimeCriticalPriority);
     qDebug() << "stream reader started.";
 
     beforeRun();

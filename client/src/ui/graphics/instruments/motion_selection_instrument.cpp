@@ -11,6 +11,8 @@
 #include <utils/common/warnings.h>
 #include <utils/common/variant.h>
 
+#include <core/resource/resource.h>
+
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include "selection_item.h"
@@ -147,6 +149,9 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     QGraphicsView *view = this->view(viewport);
     QnMediaResourceWidget *target = dynamic_cast<QnMediaResourceWidget *>(this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
     if(!target)
+        return false;
+
+    if(!(target->resource()->flags() & QnResource::motion))
         return false;
 
     Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);

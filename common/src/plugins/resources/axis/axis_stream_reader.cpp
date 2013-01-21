@@ -14,7 +14,6 @@ static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    QnLiveStreamProvider(res),
     m_rtpStreamParser(res),
     m_oldFirmwareWarned(false)
 {
@@ -104,7 +103,7 @@ void QnAxisStreamReader::openStream()
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
-                cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress().toString() , cl_logERROR);
+                cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
                 m_oldFirmwareWarned = true;
             }
 

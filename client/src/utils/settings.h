@@ -13,84 +13,9 @@
 #include <ui/workbench/workbench_state.h>
 
 #include <client/client_globals.h>
-
+#include <client/client_connection_data.h>
 
 class QSettings;
-
-// TODO: #gdm move these two classes into separate file.
-struct QnConnectionData {
-    QnConnectionData(): readOnly(false) {}
-    QnConnectionData(const QString &name, const QUrl &url, bool readOnly = false): name(name), url(url), readOnly(readOnly) {}
-
-    bool operator==(const QnConnectionData &other) const { 
-        return name == other.name && url == other.url; 
-    }
-
-    bool operator!=(const QnConnectionData &other) const {
-        return !(*this == other);
-    }
-
-    bool isValid() const {
-        return url.isValid() && !url.isRelative() && !url.host().isEmpty();
-    }
-
-    QString name;
-    QUrl url;
-    bool readOnly;
-};
-
-// TODO: #gdm 
-// * Use \returns doxytag.
-// * Don't use "-" after param name, it will be displayed in generated docs.
-//   A better way is to use indentation. See comment for QnConnectionDataList::contains().
-class QnConnectionDataList: public QList<QnConnectionData> {
-public:
-    QnConnectionDataList(): QList<QnConnectionData>(){}
-
-    /**
-     * \param name                      Name of the connection.
-     * \returns                         True if the list contains a connection with the provided name, false otherwise.
-     */
-    bool contains(const QString &name);
-
-    /**
-     * Returns the first occurrence of a connection in the list with the
-     * name provided. Returns empty connection if no such connection was found.
-     * \param name - name of the connection
-     */
-    QnConnectionData getByName(const QString &name);
-
-    /**
-     * Removes the first occurrence of a connection in the list with the
-     * name provided and returns true on success; otherwise returns false.
-     * \param name - name of the connection
-     */
-    bool removeOne(const QString &name);
-
-    /**
-     * Finds the first occurrence of a connection with the url provided
-     * and places it in the head of the list.
-     * \param url - url of the connection (password is not used)
-     * \returns true if the reorder was successful.
-     */
-    bool reorderByUrl(const QUrl &url);
-
-    /**
-     * Generates the unique name with the provided name as the base,
-     * appending number to the end of the string.
-     * \param base - base name of the connection
-     */
-    QString generateUniqueName(const QString &base);
-
-    /**
-     * Returns default name for the last used connection.
-     */
-    static QString defaultLastUsedName();
-};
-
-Q_DECLARE_METATYPE(QnConnectionData)
-Q_DECLARE_METATYPE(QnConnectionDataList)
-
 
 class QnSettings: public QnPropertyStorage {
     Q_OBJECT
@@ -126,6 +51,7 @@ public:
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
 
+        USE_HARDWARE_DECODING,
         TIME_MODE,
 
         DEV_MODE,
@@ -171,6 +97,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QUrl,                    updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
         QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
+        QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_RW_PROPERTY(bool,                    isDevMode,              setDevMode,                 DEV_MODE,                   false)
     QN_END_PROPERTY_STORAGE()

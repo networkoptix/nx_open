@@ -14,6 +14,7 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
 
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
     m_notifier = QnPlatformNotifier::newInstance(this);
+    m_images = QnPlatformImages::newInstance(this);
 
     if(s_instance) {
         qnWarning("QnPlatformAbstraction instance already exists.");

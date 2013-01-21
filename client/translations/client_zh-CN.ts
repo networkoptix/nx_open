@@ -533,7 +533,7 @@
     </message>
     <message>
         <source>License key</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">许可码</translation>
     </message>
 </context>
 <context>
@@ -636,7 +636,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>License Key:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">许可码：</translation>
     </message>
 </context>
 <context>
@@ -1865,7 +1865,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Preview Search...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">上一次搜索</translation>
     </message>
 </context>
 <context>
@@ -2034,7 +2034,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished">移动侦测录像被禁止或所选摄像机不支持。请到摄像机移动侦测配置界面确认是否支持该功能并激活。</translation>
     </message>
     <message>
-        <source>Dual-Streaming and Motion Detection is not available for this camera.</source>
+        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
         <translation type="unfinished">这个摄像机不支持双码流和移动侦测</translation>
     </message>
     <message>
@@ -3688,15 +3688,15 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Could not perform preview search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法执行上一次搜索</translation>
     </message>
     <message>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">选择的时间区域太短无法执行上一次搜索。请选择较长的一个时间区域。</translation>
     </message>
     <message>
         <source>Preview Search for %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">上一次搜索 %1</translation>
     </message>
 </context>
 <context>

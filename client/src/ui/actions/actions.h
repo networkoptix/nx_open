@@ -40,6 +40,12 @@ namespace Qn {
          */
         GetMoreLicensesAction,
 
+
+        /**
+         * Opens server settings preferences tab.
+         */
+        OpenServerSettingsAction,
+
         /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.
@@ -211,6 +217,11 @@ namespace Qn {
          * Opens system settings dialog.
          */
         SystemSettingsAction,
+
+        /**
+         * Opens business events editing dialog.
+         */
+        BusinessEventsAction,
 
         /**
          * Opens about dialog.
@@ -442,6 +453,28 @@ namespace Qn {
          * Hides info widget if it is visible on all items, otherwise displays on all items
          */
         ToggleInfoAction,
+
+        /**
+         * Changes RADASS mode to auto.
+         */
+        RadassAutoAction,
+
+        /**
+         * Changes RADASS mode to high resolution.
+         */
+        RadassHighAction,
+
+        /**
+         * Changes RADASS mode to low resolution.
+         */
+        RadassLowAction,
+
+        /**
+         * Toggles next RADASS state.
+         */
+        ToggleRadassAction,
+
+
 
         /* Layout actions. */
 

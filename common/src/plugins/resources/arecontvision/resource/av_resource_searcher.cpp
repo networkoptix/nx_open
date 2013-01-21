@@ -123,7 +123,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (resource==0)
                     continue;
 
-                resource->setHostAddress(sender, QnDomainMemory);
+                resource->setHostAddress(sender.toString(), QnDomainMemory);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(iface.address);
                 resource->setName(QLatin1String("ArecontVision_Abstract"));
@@ -135,7 +135,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
                         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
+                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
                             net_res->setDiscoveryAddr(iface.address);
                     
                         need_to_continue = true; //already has such
@@ -194,7 +194,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 }
 
 
-QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
 
     QString host = url.host();
@@ -209,12 +209,12 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
         port = 80;
 
     CLHttpStatus status;
-    QString model = QString(QLatin1String(downloadFile(status, QLatin1String("get?model"), QHostAddress(host), port, timeout, auth)));
+    QString model = QString(QLatin1String(downloadFile(status, QLatin1String("get?model"), host, port, timeout, auth)));
 
     if (model.length()==0)
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
-    QString modelRelease = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=releasename"), QHostAddress(host), port, timeout, auth)));
+    QString modelRelease = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=releasename"), host, port, timeout, auth)));
 
 
     if (modelRelease!=model)
@@ -224,7 +224,7 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     }
     else
     {
-        QString modelFull = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=fullname"), QHostAddress(host), port, timeout, auth)));
+        QString modelFull = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=fullname"), host, port, timeout, auth)));
 
         if (modelFull.length())        
             model = modelFull;
@@ -233,19 +233,19 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     model = getValueFromString(model);
 
     if (model.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), model);
     if (!rt.isValid())
-        return QnResourcePtr(0);;
+        return QList<QnResourcePtr>();
 
 
 
-    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("get?mac"), QHostAddress(host), port, timeout, auth)));
+    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("get?mac"), host, port, timeout, auth)));
     mac = getValueFromString(mac);
 
     if (mac.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QnPlAreconVisionResourcePtr res(0);
 
@@ -258,8 +258,10 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
     res->setName(model);
     res->setModel(model);
     res->setMAC(mac);
-    res->setHostAddress(QHostAddress(host), QnDomainMemory);
+    res->setHostAddress(host, QnDomainMemory);
     res->setAuth(auth);
 
-    return res;
+    QList<QnResourcePtr> resList;
+    resList << res;
+    return resList;
 }

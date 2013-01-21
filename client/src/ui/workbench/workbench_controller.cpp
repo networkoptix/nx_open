@@ -1032,11 +1032,6 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(!(widget->resource()->flags() & QnResource::motion)) { // TODO: move to instrument item condition
-        m_motionSelectionInstrument->resetLater();
-        return;
-    }
-
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
@@ -1048,13 +1043,11 @@ void QnWorkbenchController::at_motionSelectionStarted(QGraphicsView *, QnMediaRe
 }
 
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(widget->resource()->flags() & QnResource::motion) // TODO: #Elric maybe there is a better place for this check?
-        widget->clearMotionSelection();
+    widget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region) {
-    if(widget->resource()->flags() & QnResource::motion) // TODO: #Elric maybe there is a better place for this check?
-        widget->addToMotionSelection(region);
+    widget->addToMotionSelection(region);
 }
 
 void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {

@@ -25,8 +25,8 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
 
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
 
+    m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
 #if 0
-    m_cache.insert(Offline,                 Skin::icon("tree/offline.png"));
     m_cache.insert(Unauthorized,            Skin::icon("tree/unauthorized.png"));
 #endif
 }
@@ -39,11 +39,11 @@ QnResourceIconCache *QnResourceIconCache::instance() {
     return qn_resourceIconCache();
 }
 
-QIcon QnResourceIconCache::icon(Key key) {
+QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
     /* This function will be called from GUI thread only, 
      * so no synchronization is needed. */
 
-    if((key & TypeMask) == Unknown)
+    if((key & TypeMask) == Unknown && !unchecked)
         key = Unknown;
 
     if(m_cache.contains(key))

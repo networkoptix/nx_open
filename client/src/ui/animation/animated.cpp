@@ -22,7 +22,7 @@ AnimatedBase::~AnimatedBase() {
 
 void AnimatedBase::updateScene(QGraphicsScene *scene) {
     AnimationTimer *oldTimer = m_listener->timer();
-    AnimationTimer *newTimer = InstrumentManager::animationTimerOf(scene);
+    AnimationTimer *newTimer = InstrumentManager::animationTimer(scene);
     if(newTimer == oldTimer)
         return;
 

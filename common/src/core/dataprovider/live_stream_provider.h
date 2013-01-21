@@ -7,18 +7,19 @@
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
 #include "core/resource/resource_fwd.h"
+#include "media_streamdataprovider.h"
 
 #define META_DATA_DURATION_MS 300
 #define DESIRED_SECOND_STREAM_FPS (7)
 #define MIN_SECOND_STREAM_FPS (2)
 
-class QnLiveStreamProvider
+class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
 {
 public:
     QnLiveStreamProvider(QnResourcePtr res);
     virtual ~QnLiveStreamProvider();
 
-    void setRole(QnResource::ConnectionRole role);
+    virtual void setRole(QnResource::ConnectionRole role) override;
     QnResource::ConnectionRole getRole() const;
 
 
@@ -47,8 +48,8 @@ protected:
     virtual void updateStreamParamsBasedOnFps() = 0;
 
     QnMetaDataV1Ptr getMetaData();
-
     virtual QnMetaDataV1Ptr getCameraMetadata();
+    QnResource::ConnectionRole roleForMotionEstimation();
 protected:
     mutable QMutex m_livemutex;
 
@@ -62,6 +63,7 @@ private:
     QTime m_timeSinceLastMetaData; //used only for live providers
 
     QnResource::ConnectionRole m_role;
+    QnResource::ConnectionRole m_softMotionRole;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     const QnResourceVideoLayout* m_layout;

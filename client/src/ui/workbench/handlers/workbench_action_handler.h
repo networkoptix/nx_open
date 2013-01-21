@@ -26,7 +26,9 @@ class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
+class QnBusinessRulesDialog;
 class QnVideoCamera;
+class QnPopupCollectionWidget;
 
 // TODO: move out.
 struct QnThumbnailsSearchState {
@@ -182,9 +184,19 @@ protected:
     void saveCameraSettingsFromDialog(bool checkControls = false);
 
     void rotateItems(int degrees);
+
+    void setItemsResolutionMode(Qn::ResolutionMode resolutionMode);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
+    }
+
+    QnBusinessRulesDialog *businessRulesDialog() const {
+        return m_businessRulesDialog.data();
+    }
+
+    QnPopupCollectionWidget *popupCollectionWidget() const {
+        return m_popupCollectionWidget.data();
     }
 
 protected slots:
@@ -201,6 +213,7 @@ protected slots:
 
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();
+    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& action);
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
@@ -239,7 +252,10 @@ protected slots:
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
+    void at_businessEventsAction_triggered();
+    void at_showPopupAction_triggered();
     void at_getMoreLicensesAction_triggered();
+    void at_openServerSettingsAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
@@ -281,13 +297,17 @@ protected slots:
     void at_rotate180Action_triggered();
     void at_rotate270Action_triggered();
 
+    void at_radassAutoAction_triggered();
+    void at_radassLowAction_triggered();
+    void at_radassHighAction_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
     void at_camera_exportFailed(QString errorMessage);
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
-    void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
+    void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
@@ -327,6 +347,8 @@ private:
     QWeakPointer<QMenu> m_currentUserLayoutsMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
+    QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

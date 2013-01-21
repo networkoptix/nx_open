@@ -32,6 +32,8 @@
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>
 
+#include <client/client_connection_data.h>
+
 #include <recording/time_period_list.h>
 
 #include <ui/style/skin.h>
@@ -53,6 +55,7 @@
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/business_rules_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -62,6 +65,8 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <ui/widgets/popup_collection_widget.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -172,6 +177,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -185,11 +191,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
+    connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
+    connect(action(Qn::OpenServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_openServerSettingsAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
@@ -247,6 +255,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
+    connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
+    connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
+    connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -298,6 +309,12 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if(cameraSettingsDialog())
         delete cameraSettingsDialog();
+
+    if (businessRulesDialog())
+        delete businessRulesDialog();
+
+    if (popupCollectionWidget())
+        delete popupCollectionWidget();
 
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
@@ -676,6 +693,15 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
     }
 }
 
+void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(QnResourceWidget *widget, widgets)
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+                mediaWidget->setResolutionMode(resolutionMode);
+    }
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -808,6 +834,13 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
+}
+
+void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &action) {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->add();
+    popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1220,10 +1253,63 @@ void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
     dialog->exec();
 }
 
+void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->openServerSettingsPage();
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
+//    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    bool newlyCreated = false;
+    if(!businessRulesDialog()) {
+        m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
+        newlyCreated = true;
+/*
+        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
+        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
+        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
+        */
+    }
+/*
+    if(cameraSettingsDialog()->widget()->resources() != resources) {
+        if(cameraSettingsDialog()->isVisible() && (
+           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
+        {
+            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(cameraSettingsDialog()->widget()->resources()),
+                tr("Camera(s) not Saved"),
+                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No
+            );
+            if(button == QDialogButtonBox::Yes)
+                saveCameraSettingsFromDialog();
+        }
+    }*/
+//    cameraSettingsDialog()->widget()->setResources(resources);
+//    updateCameraSettingsEditibility();
+
+    QRect oldGeometry = businessRulesDialog()->geometry();
+    businessRulesDialog()->show();
+    if(!newlyCreated)
+        businessRulesDialog()->setGeometry(oldGeometry);
+}
+
+// can be used for test purposes or for displaying an example for user
+void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->add();
+    popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
@@ -1317,13 +1403,13 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     // repopulate the resource pool
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
 #ifndef STANDALONE_MODE
     static const char *appserverAddedPropertyName = "_qn_appserverAdded";
-    if(!QnResourceDiscoveryManager::instance().property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
+    if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnAppServerResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
     }
 #endif
 
@@ -1343,8 +1429,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnClientMessageProcessor::instance()->run();
 
     QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
-    QnResourceDiscoveryManager::instance().start();
-    QnResourceDiscoveryManager::instance().setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
+    QnResourceDiscoveryManager::instance()->setReady(true);
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
@@ -1358,10 +1444,12 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     // TODO: Factor out common code from reconnect/disconnect/login actions.
 
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
@@ -1569,7 +1657,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->show();
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
-
 }
 
 void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
@@ -1743,6 +1830,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         name = dialog->name();
     }
 
+    at_showPopupAction_triggered();
     if(name == resource->getName())
         return;
 
@@ -1798,7 +1886,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             if(snapshotManager()->isLocal(layout))
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
 
-        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
+        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
 }
 
@@ -2275,7 +2363,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
-        (*itr).uuid = QUuid();
+        //(*itr).uuid = QUuid();
         QnResourcePtr resource = qnResPool->getResourceById((*itr).resource.id);
         if (resource == 0)
             resource = qnResPool->getResourceByUniqId((*itr).resource.path);
@@ -2285,6 +2373,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
             if (mediaRes) {
                 (*itr).resource.id = 0;
+                (*itr).resource.path = mediaRes->getUniqueId();
                 if (!uniqIdList.contains(mediaRes->getUniqueId())) {
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
@@ -2314,7 +2403,12 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     QnApiPbSerializer serializer;
     QByteArray layoutData;
-    serializer.serializeLayout(layout, layoutData);
+    QnLayoutResourcePtr localLayout(new QnLayoutResource());
+    localLayout->setId(layout->getId());
+    localLayout->setGuid(layout->getGuid());
+    localLayout->update(layout);
+    localLayout->setItems(items);
+    serializer.serializeLayout(localLayout, layoutData);
     device->write(layoutData);
     delete device;
 
@@ -2755,6 +2849,18 @@ void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
     rotateItems(270);
 }
 
+void QnWorkbenchActionHandler::at_radassAutoAction_triggered() {
+    setItemsResolutionMode(Qn::AutoResolution);
+}
+
+void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
+    setItemsResolutionMode(Qn::LowResolution);
+}
+
+void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
+    setItemsResolutionMode(Qn::HighResolution);
+}
+
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
     Q_UNUSED(handle);
 
@@ -2796,14 +2902,13 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
     }
 }
 
-void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {
     Q_UNUSED(handle);
-    Q_UNUSED(data);
 
-    if(status == 0)   
+    if(response.status == 0)
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
+    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {

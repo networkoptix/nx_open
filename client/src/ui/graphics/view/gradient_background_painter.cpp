@@ -44,7 +44,7 @@ VariantAnimator *QnGradientBackgroundPainter::backgroundColorAnimator() {
     if(!view() || !view()->scene())
         return NULL;
 
-    AnimationTimer *animationTimer = InstrumentManager::animationTimerOf(view()->scene());
+    AnimationTimer *animationTimer = InstrumentManager::animationTimer(view()->scene());
     if(!animationTimer)
         return NULL;
 
