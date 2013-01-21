@@ -27,7 +27,7 @@ public slots:
 
     /*! Some problem with storage
     */
-    void at_storageFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason);
+    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, const QnResourcePtr &storageRes, const QString& reason);
 
     /*! Some problem with network
     */

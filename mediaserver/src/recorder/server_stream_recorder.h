@@ -38,7 +38,7 @@ signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnAbstractDataPacketPtr motion);
 
-    void storageFailure(QnResourcePtr resource, qint64 timestamp, const QString& errMessage);
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnResourcePtr storageRes, const QString& errMessage);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
