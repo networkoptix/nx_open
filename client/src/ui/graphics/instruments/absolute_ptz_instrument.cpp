@@ -701,9 +701,9 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
 
             return true;
         }
-    } else {
-        return false;
     }
+
+    return false;
 }
 
 void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {

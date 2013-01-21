@@ -372,7 +372,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
             else if (s1 == QLatin1String("motionwindow"))
                 result |= MT_MotionWindow;
         }
-        if (!hasDualStreaming() && !checkCameraCapability(primaryStreamSoftMotion))
+        if (!hasDualStreaming() && !(getCameraCapabilities() &  PrimaryStreamSoftMotionCapability))
             result &= ~MT_SoftwareGrid;
     }
     else {
@@ -395,11 +395,8 @@ void QnSecurityCamResource::setMotionType(MotionType value)
 
 void QnSecurityCamResource::at_disabledChanged()
 {
-    /*if( oldValue == newValue )
-        return;*/
-
     if(hasFlags(QnResource::foreigner))
-        return;     //we do not own camera
+        return; // we do not own camera
 
     if(isDisabled())
         stopInputPortMonitoring();
@@ -407,28 +404,22 @@ void QnSecurityCamResource::at_disabledChanged()
         startInputPortMonitoring();
 }
 
-bool QnSecurityCamResource::checkCameraCapability(CameraCapabilities value) const
-{
-    return getCameraCapabilities() & value;
-}
-
 QnSecurityCamResource::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
-    const_cast<QnSecurityCamResource*>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
-    return (CameraCapabilities) mediaVariant.toInt();
+    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: const_cast? get rid of it!
+    return static_cast<CameraCapabilities>(mediaVariant.toInt());
 }
 
-void QnSecurityCamResource::addCameraCapabilities(CameraCapabilities value)
-{
-    value |= getCameraCapabilities();
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+void QnSecurityCamResource::setCameraCapabilities(CameraCapabilities capabilities) {
+    setParam(QLatin1String("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+
+    // TODO: #1.5 this signal won't be emitted if parameter was changed directly (e.g. as a result of resource update).
+
+    // TODO: we don't check whether they have actually changed. This better be fixed.
+    emit cameraCapabilitiesChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::removeCameraCapabilities(CameraCapabilities value)
-{
-    value = getCameraCapabilities() & ~value;
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+void QnSecurityCamResource::setCameraCapability(CameraCapability capability, bool value) {
+    setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
 }

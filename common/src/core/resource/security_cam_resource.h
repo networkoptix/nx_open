@@ -30,8 +30,13 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
-    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+    enum CameraCapability { 
+        NoCapabilities = 0, 
+        PtzCapability = 1, 
+        ZoomCapability = 2, 
+        PrimaryStreamSoftMotionCapability = 4
+    };
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
 
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
@@ -85,9 +90,8 @@ public:
 
 
     CameraCapabilities getCameraCapabilities() const;
-    bool checkCameraCapability(CameraCapabilities value) const;
-    void addCameraCapabilities(CameraCapabilities value);
-    void removeCameraCapabilities(CameraCapabilities value);
+    void setCameraCapabilities(CameraCapabilities capabilities);
+    void setCameraCapability(CameraCapability capability, bool value);
 
 
     /*!
@@ -103,6 +107,8 @@ signals:
      * two <tt>QObject</tt>s. 
      */
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
 private slots:
     void at_disabledChanged();
