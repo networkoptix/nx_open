@@ -154,7 +154,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
         m_rulesInProgress.remove(rule->getUniqueId());
     }
 
-    if (rule->eventState() != bEvent->getToggleState())
+    if (rule->eventState() != ToggleState::NotDefined && rule->eventState() != bEvent->getToggleState())
         return QnAbstractBusinessActionPtr();
 
 
