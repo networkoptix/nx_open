@@ -28,7 +28,7 @@
 //#define QT_USE_FAST_OPERATOR_PLUS
 
 
-/* Define override specifier for MSVC. */
+/* Define override specifier. */
 #ifdef _MSC_VER
 #   define override override
 #elif defined(__GNUC__)
@@ -63,18 +63,32 @@
 /* Some windows-specific defines. */
 #ifdef _WIN32
 #   undef NOMINMAX
-#   define NOMINMAX 
+#   define NOMINMAX /* We don't want min & max as macros. */
 #endif
 
 
 /* Some MSVC-specific defines. */
 #ifdef _MSC_VER
 #   undef __STDC_CONSTANT_MACROS
-#   define __STDC_CONSTANT_MACROS
+#   define __STDC_CONSTANT_MACROS /* We want M_PI and other math defines defined. */
 #endif
 
 
-/* Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
+/* Get rid of useless MSVC warnings. */
+#ifdef _MSC_VER
+#   define _CRT_SECURE_NO_WARNINGS /* Don't warn for deprecated 'unsecure' CRT functions. */
+#   define _CRT_NONSTDC_NO_DEPRECATE /* Don't warn for deprecated POSIX functions. */
+#
+#   /* 'Derived' : inherits 'Base::method' via dominance. 
+#    * It is buggy as described here:
+#    * http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function */
+#   pragma warning(disable: 4250) 
+#endif
+
+
+/* Turn some useful MSVC warnings into errors.
+ * 
+ * Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
 #ifdef _MSC_VER
 #   pragma warning(error: 4150) /* deletion of pointer to incomplete type 'X'; no destructor called */
 #   pragma warning(error: 4715) /* not all control paths return a value */

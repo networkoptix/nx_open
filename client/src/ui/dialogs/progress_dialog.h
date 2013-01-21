@@ -1,4 +1,4 @@
-/* This file is a modified version of Qt's QnProgressDialog. 
+/* This file is a modified version of Qt's QProgressDialog. 
  * Original copyright notice follows. */
 
 /****************************************************************************

@@ -16,6 +16,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
     connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
 
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()));
+    m_timer.start(1000);
     start();
 }
 
@@ -142,6 +144,9 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     if (!condOK)
         return QnAbstractBusinessActionPtr();
 
+    if (rule->aggregationPeriod() == 0)
+        return rule->instantiateAction(bEvent);
+
     QString eventKey = rule->getUniqueId();
     if (bEvent->getResource())
         eventKey += bEvent->getResource()->getUniqueId();
@@ -149,13 +154,33 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     QAggregationInfo& aggInfo = m_aggregateActions[eventKey];
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
     aggInfo.count++;
-    if (currentTime - aggInfo.timeStamp < rule->aggregationPeriod()*1000ll*1000ll)
-        return QnAbstractBusinessActionPtr();
-    
-    QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent);
-    action->setAggregationCount(aggInfo.count);
-    aggInfo.count = 0;
-    return action;
+    aggInfo.bEvent = bEvent;
+    aggInfo.bRule = rule;
+    if (aggInfo.timeStamp == 0)
+        aggInfo.timeStamp = currentTime;
+    return QnAbstractBusinessActionPtr();
+}
+
+void QnBusinessRuleProcessor::at_timer()
+{
+    QMutexLocker lock(&m_mutex);
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    QMap<QString, QAggregationInfo>::iterator itr = m_aggregateActions.begin();
+    while (itr != m_aggregateActions.end())
+    {
+        QAggregationInfo& aggInfo = itr.value();
+        qint64 period = aggInfo.bRule->aggregationPeriod()*1000ll*1000ll;
+        if (aggInfo.timeStamp + period < currentTime)
+        {
+            QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
+            action->setAggregationCount(aggInfo.count);
+            executeAction(action);
+            itr = m_aggregateActions.erase(itr);
+        }
+        else {
+            ++itr;
+        }
+    }
 }
 
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)

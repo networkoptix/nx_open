@@ -60,11 +60,6 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
-# Define override specifier.
-OVERRIDE_DEFINITION = "override="
-win32-msvc*:OVERRIDE_DEFINITION = "override=override"
-DEFINES += $$OVERRIDE_DEFINITION
-
 win* {
   isEmpty(BUILDLIB) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
@@ -76,16 +71,6 @@ win* {
   DEFINES += ${windows.defines}  
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
-
-    # Don't warn for deprecated 'unsecure' CRT functions.
-    DEFINES += _CRT_SECURE_NO_WARNINGS
-
-    # Don't warn for deprecated POSIX functions.
-    DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
-
-    # Disable warning C4250: 'Derived' : inherits 'Base::method' via dominance.
-    # It is buggy, as described in http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function
-    QMAKE_CXXFLAGS += /wd4250
   }
   
   !staticlib {
