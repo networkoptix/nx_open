@@ -181,7 +181,7 @@ PollSet::const_iterator::const_iterator( const const_iterator& right )
 
 PollSet::const_iterator::~const_iterator()
 {
-    delete[] m_impl;
+    delete m_impl;
     m_impl = NULL;
 }
 
