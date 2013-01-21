@@ -11,7 +11,6 @@
 #include <QX11Info>
 
 #include <GL/glx.h>
-#include <X11/X.h>
 #include <X11/Xlib.h>
 #endif
 
@@ -106,12 +105,11 @@ void GLContext::doneCurrent()
         ReleaseDC( m_winID, m_dc );
     m_dc = NULL;
 #else
-    bool res = glXMakeCurrent(
+    glXMakeCurrent(
         QX11Info::display(),
-        None,
+        0L,
         NULL );
     m_previousErrorCode = glGetError();
-    return res;
 #endif
 }
 
