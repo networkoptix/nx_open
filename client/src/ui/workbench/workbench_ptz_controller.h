@@ -70,8 +70,7 @@ private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
     
-    void at_camera_statusChanged();
-    void at_camera_statusChanged(const QnVirtualCameraResourcePtr &camera);
+    void at_resource_statusChanged(const QnResourcePtr &resource);
 
     void at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);

@@ -233,7 +233,7 @@ void QnWorkbenchPtzController::emitChanged(const QnVirtualCameraResourcePtr &cam
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchPtzController::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera) {
-    connect(camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_camera_statusChanged()));
+    connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 
     tryInitialize(camera);
 }
@@ -247,12 +247,9 @@ void QnWorkbenchPtzController::at_ptzCameraWatcher_ptzCameraRemoved(const QnVirt
     disconnect(camera.data(), NULL, this, NULL);
 }
 
-void QnWorkbenchPtzController::at_camera_statusChanged(const QnVirtualCameraResourcePtr &camera) {
-    tryInitialize(camera);
-}
-
-void QnWorkbenchPtzController::at_camera_statusChanged() {
-    at_camera_statusChanged(toSharedPointer(checked_cast<QnVirtualCameraResource *>(sender())));
+void QnWorkbenchPtzController::at_resource_statusChanged(const QnResourcePtr &resource) {
+    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        tryInitialize(camera);
 }
 
 void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle) {
