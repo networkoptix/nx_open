@@ -318,6 +318,11 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
             glBindTexture( GL_TEXTURE_2D, texture->id() );
 
+            GLfloat w0 = 0;
+            glGetTexLevelParameterfv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w0 );
+            GLfloat h0 = 0;
+            glGetTexLevelParameterfv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h0 );
+
             glPixelStorei( GL_UNPACK_ROW_LENGTH, m_buffers[i].pitch );
             Q_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
@@ -336,7 +341,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #endif
 
-            if( glCheckError("glTexSubImage2D") )
+            int res = 0;
+            if( res = glCheckError("glTexSubImage2D") )
                 int x = 0;
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             glCheckError("glPixelStorei");

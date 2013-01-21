@@ -181,10 +181,17 @@ public:
 #endif
     }
 
-    virtual ~QnGlFunctionsPrivate() {}
+    virtual ~QnGlFunctionsPrivate()
+    {
+    }
 
     QnGlFunctions::Features features() const {
         return m_features;
+    }
+
+    const QGLContext* context() const
+    {
+        return m_context;
     }
 
 public:
@@ -251,6 +258,11 @@ QnGlFunctions::QnGlFunctions(const QGLContext *context) {
 }
 
 QnGlFunctions::~QnGlFunctions() {}
+
+const QGLContext* QnGlFunctions::context() const
+{
+    return d->context();
+}
 
 QnGlFunctions::Features QnGlFunctions::features() const {
     return d->features();
