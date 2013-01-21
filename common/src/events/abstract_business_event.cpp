@@ -81,7 +81,7 @@ namespace BusinessEventType
             case BE_Camera_Input:
                 return true;
             case BE_Camera_Disconnect:
-                return false;
+                return true;
             case BE_Storage_Failure:
                 return false;
             case BE_Network_Issue:
