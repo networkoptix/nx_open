@@ -30,7 +30,6 @@ void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, 
 void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resource, qint64 timeStamp)
 {
     QnCameraDisconnectedBusinessEventPtr cameraEvent(new QnCameraDisconnectedBusinessEvent(
-        resource->getParentResource(),
         resource,
         timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
