@@ -102,7 +102,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
     m_id(0),
     m_modified(false),
-    m_eventType(BusinessEventType::BE_Camera_Motion),
+    m_eventType(BusinessEventType::BE_Camera_Disconnect),
     m_eventState(ToggleState::NotDefined),
     m_actionType(BusinessActionType::BA_ShowPopup),
     m_aggregationPeriod(60),
@@ -208,14 +208,21 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
     if (m_eventType == value)
         return;
 
+    bool cameraRequired = BusinessEventType::requiresCameraResource(m_eventType);
+    bool serverRequired = BusinessEventType::requiresServerResource(m_eventType);
+
     m_eventType = value;
     m_modified = true;
 
     updateEventStatesModel();
     updateActionTypesModel();
 
-    emit dataChanged(this, QnBusiness::EventTypeField | QnBusiness::ModifiedField);
+    QnBusiness::Fields fields = QnBusiness::EventTypeField | QnBusiness::ModifiedField;
+    if (BusinessEventType::requiresCameraResource(m_eventType) != cameraRequired ||
+             BusinessEventType::requiresServerResource(m_eventType) != serverRequired)
+        fields |= QnBusiness::EventResourcesField;
 
+    emit dataChanged(this, fields);
     //TODO: #GDM check others, params and resources should be merged
 }
 
@@ -271,10 +278,16 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
     if (m_actionType == value)
         return;
 
+    bool resourcesRequired = BusinessActionType::isResourceRequired(m_actionType);
+
     m_actionType = value;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::ActionTypeField | QnBusiness::ModifiedField);
+    QnBusiness::Fields fields = QnBusiness::ActionTypeField | QnBusiness::ModifiedField;
+    if (BusinessActionType::isResourceRequired(m_actionType) != resourcesRequired)
+        fields |= QnBusiness::ActionResourcesField;
+
+    emit dataChanged(this, fields);
 }
 
 QnResourceList QnBusinessRuleViewModel::actionResources() const {
@@ -614,6 +627,8 @@ void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
     beginInsertRows(QModelIndex(), row, row);
     m_rules << ruleModel;
     endInsertRows();
+
+    emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
 void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
@@ -623,6 +638,9 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     beginRemoveRows(QModelIndex(), row, row);
     m_rules.removeAt(row);
     endRemoveRows();
+
+    //TODO: check if dataChanged is required, check row
+    //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
 bool QnBusinessRulesViewModel::hasModifiedItems() const {
@@ -634,7 +652,7 @@ bool QnBusinessRulesViewModel::hasModifiedItems() const {
 }
 
 QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
-    if (row >= m_rules.size())
+    if (row < 0 || row >= m_rules.size())
         return NULL;
     return m_rules[row];
 }
