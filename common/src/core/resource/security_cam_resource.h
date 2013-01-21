@@ -30,7 +30,14 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
-    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
+    enum CameraFlag {
+        CFNoFlags = 0,
+        HasPtz = 1,
+        HasZoom = 2,
+        primaryStreamSoftMotion = 4,
+        relayInput = 0x08,
+        relayOutput = 0x10
+    };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
 
     MotionTypeFlags supportedMotionType() const;
@@ -97,6 +104,10 @@ public:
     */
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
+public slots:
+    void inputPortListenerAttached();
+    void inputPortListenerDetached();
+
 signals:
     /** 
      * This signal is virtual to work around a problem with inheritance from
@@ -128,6 +139,7 @@ private:
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
+    QAtomicInt m_inputPortListenerCount;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
