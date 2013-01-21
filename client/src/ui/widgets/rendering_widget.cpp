@@ -34,7 +34,8 @@ QnRenderingWidget::QnRenderingWidget(QWidget *parent, Qt::WindowFlags f):
 }
 
 QnRenderingWidget::~QnRenderingWidget() {
-    return;
+    if( m_display )
+        m_display->beforeDestroy();
 }
 
 QnMediaResourcePtr QnRenderingWidget::resource() const {

@@ -836,10 +836,17 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
 }
 
-void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &action) {
+void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
+    qDebug() << "action received" << businessAction;
+
+    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+        return;
+
+
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->add();
+
+    popupCollectionWidget()->addBusinessAction(businessAction);
     popupCollectionWidget()->show();
 }
 
@@ -1308,7 +1315,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->add();
+    popupCollectionWidget()->addExample();
     popupCollectionWidget()->show();
 }
 
@@ -1830,7 +1837,6 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         name = dialog->name();
     }
 
-    at_showPopupAction_triggered();
     if(name == resource->getName())
         return;
 

@@ -112,14 +112,14 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
             poolSizeIncrement = m_optimalGLContextPoolSize;
         for( int i = 0; i < poolSizeIncrement; ++i )
         {
-#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
+//#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
             //creating gl context (inside QGLWidget)
             std::auto_ptr<GLContext> newContext( new GLContext( shareWidget ) );
             QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( newContext.release() ) );
-#else
-            //no need to create additional context
-            QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( NULL ) );
-#endif
+//#else
+//            //no need to create additional context
+//            QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( NULL ) );
+//#endif
             uploadThread->start();
             if( !uploadThread->isRunning() )
                 break;

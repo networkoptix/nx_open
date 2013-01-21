@@ -14,6 +14,7 @@
 
 #include "render_status.h"
 #include "core/resource/resource_media_layout.h"
+#include "../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
 
 
 class CLVideoDecoderOutput;
@@ -29,11 +30,10 @@ public:
     QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider );
     ~QnGLRenderer();
 
+    /*!
+        Called with corresponding QGLContext is surely alive
+    */
     void beforeDestroy();
-    //!Sets frame to draw to \a img and returns. Does not block till frame is actually rendered on screen
-    void draw( const QSharedPointer<CLVideoDecoderOutput>& img );
-    //!Blocks until current frame is rendererd
-    void waitForFrameDisplayed(int channel);
     
     Qn::RenderStatus paint(const QRectF &r);
 
@@ -57,9 +57,9 @@ private:
     QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
-    QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
-    QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
-    QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
+    std::auto_ptr<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
+    std::auto_ptr<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
+    std::auto_ptr<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
@@ -69,6 +69,7 @@ private:
     	const float* v_array );
     //!Draws to the screen YV12 image represented with three textures (one for each plane YUV) using shader which mixes all three planes to RGB
     void drawYV12VideoTexture(
+        const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     	const QRectF& tex0Coords,
     	unsigned int tex0ID,
     	unsigned int tex1ID,
