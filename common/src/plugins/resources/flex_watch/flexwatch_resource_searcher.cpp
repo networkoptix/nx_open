@@ -61,7 +61,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             EndpointAdditionalInfo info;
             info.name = QLatin1String(datagram.data() + 36);
             info.manufacturer = QLatin1String(datagram.data() + 36 + 16);
-            if (info.manufacturer != QLatin1String("flex encoder"))
+            if (info.manufacturer != QLatin1String("flex encoder") && !info.manufacturer.toLower().contains(QLatin1String("system")))
                 continue;
             //info.mac = QString::fromLocal8Bit(datagram.mid(30,6).toHex());
             info.mac = QnMacAddress((const unsigned char*) datagram.data() + 30).toString();

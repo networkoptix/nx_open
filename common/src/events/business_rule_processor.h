@@ -66,7 +66,7 @@ protected:
     /*
     * Some actions can be executed on media server only. In this case, function returns media server there action must be executed
     */
-    QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action);
+    QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 
 private:
     QList<QnBusinessEventRulePtr> m_rules;
@@ -75,6 +75,7 @@ private:
 
     //TODO: move to mserver_business_rule_processor
     bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action );
+    bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
 
     bool sendMail( const QnSendMailBusinessActionPtr& action );
 

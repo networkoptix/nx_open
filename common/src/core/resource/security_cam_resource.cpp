@@ -206,17 +206,17 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
-    // TODO: #VASILENKO needs synchronization. Currently it is not used from multiple threads, but things may change.
-
-    m_scheduleTasks = scheduleTasks;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_scheduleTasks = scheduleTasks;
+    }
 
     emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
-const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
+const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 {
-    // TODO: #VASILENKO needs synchronization
-
+    QMutexLocker lock(&m_mutex);
     return m_scheduleTasks;
 }
 

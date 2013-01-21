@@ -26,7 +26,7 @@
 
 //#define RENDERER_SUPPORTS_NV12
 #ifdef _WIN32
-//#define USE_PBO
+#define USE_PBO
 #endif
 
 #ifdef USE_PBO
@@ -39,9 +39,6 @@
 //#define DISABLE_FRAME_UPLOAD
 //#define PARTIAL_FRAME_UPLOAD
 //#define SINGLE_STREAM_UPLOAD
-#endif
-#ifdef GL_COPY_AGGREGATION
-#define UPLOAD_TO_GL_IN_GUI_THREAD
 #endif
 
 
@@ -1519,29 +1516,18 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             );
             glCheckError("glTexSubImage2D");
 
-//#ifdef _DEBUG
-//            uint8_t* tmpBuf = new uint8_t[lineSizes[i]*h[i]];
-//            glGetTexImage( GL_TEXTURE_2D, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, tmpBuf );
-//            const int w = qPower2Ceil(r_w[i],ROUND_COEFF);
-//            for( int l = 0; l < h[i]; ++l )
-//            {
-//                if( memcmp( tmpBuf+l*lineSizes[i], planes[i]+l*lineSizes[i], w ) != 0 )
-//                    int x = 0;
-//            }
-//            glCheckError("glGetTexImage");
-//            delete[] tmpBuf;
-//#endif
-
-#ifdef USE_PBO
-            d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
-#else
-            glBindTexture( GL_TEXTURE_2D, 0 );
-#endif
-
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             glCheckError("glPixelStorei");
+
+#ifdef USE_PBO
+            d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+#endif
+            glFlush();
+            glFinish();
         }
+
+        glBindTexture( GL_TEXTURE_2D, 0 );
 
         //if( d->features() & QnGlFunctions::OpenGL3_2 )
         //{
@@ -1688,6 +1674,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         // TODO: free memory immediately for still images
     }
 
+    glFlush();
     glFinish();
 
     return true;
@@ -1704,7 +1691,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
     bool /*isVideoMemory*/ )
 {
     //taking aggregation surface having enough free space
-    const QSharedPointer<AggregationSurfaceRect>& surfaceRect = AggregationSurfacePool::instance()->takeSurfaceRect( m_uploadThread->glContext(), format, QSize(width, height) );
+    const QSharedPointer<AggregationSurfaceRect>& surfaceRect = AggregationSurfacePool::instance()->takeSurfaceRect(
+        m_uploadThread->glContext(),
+        format,
+        QSize(width, height) );
     if( !surfaceRect )
         return false;
 
@@ -1777,14 +1767,18 @@ void DecodedPictureToOpenGLUploader::ensurePBOInitialized( DecodedPictureToOpenG
     if( picBuf->m_pboID == -1 )
     {
         d->glGenBuffers( 1, &picBuf->m_pboID );
+        glCheckError("glGenBuffers");
         picBuf->m_pboSizeBytes = 0;
     }
 
     if( picBuf->m_pboSizeBytes < sizeInBytes )
     {
         d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, picBuf->m_pboID );
+        glCheckError("glBindBuffer");
         d->glBufferData( GL_PIXEL_UNPACK_BUFFER_ARB, sizeInBytes, NULL, GL_STATIC_DRAW_ARB/*GL_STREAM_DRAW_ARB*/ );
+        glCheckError("glBufferData");
         d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+        glCheckError("glBindBuffer");
         picBuf->m_pboSizeBytes = sizeInBytes;
     }
 }

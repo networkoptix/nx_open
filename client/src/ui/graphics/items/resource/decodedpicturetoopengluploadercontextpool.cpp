@@ -7,15 +7,17 @@
 
 #include <memory>
 
+#include "decodedpicturetoopengluploader.h"
+
 
 static const size_t uploadingThreadCountOverride = 1;
 
 //////////////////////////////////////////////////////////
 // DecodedPictureToOpenGLUploadThread
 //////////////////////////////////////////////////////////
-DecodedPictureToOpenGLUploadThread::DecodedPictureToOpenGLUploadThread( QGLWidget* glWidget )
+DecodedPictureToOpenGLUploadThread::DecodedPictureToOpenGLUploadThread( GLContext* glContextToUse )
 :
-    m_glWidget( glWidget )
+    m_glContext( glContextToUse )
 {
 }
 
@@ -24,8 +26,8 @@ DecodedPictureToOpenGLUploadThread::~DecodedPictureToOpenGLUploadThread()
     m_queue.push( NULL );
     wait();
 
-    delete m_glWidget;
-    m_glWidget = NULL;
+    delete m_glContext;
+    m_glContext = NULL;
 }
 
 void DecodedPictureToOpenGLUploadThread::push( QRunnable* toRun )
@@ -33,10 +35,16 @@ void DecodedPictureToOpenGLUploadThread::push( QRunnable* toRun )
     m_queue.push( toRun );
 }
 
+const GLContext* DecodedPictureToOpenGLUploadThread::glContext() const
+{
+    return m_glContext;
+}
+
 void DecodedPictureToOpenGLUploadThread::run()
 {
-    m_glWidget->makeCurrent();
-    Q_ASSERT( QGLContext::currentContext() == m_glWidget->context() );
+#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
+    GLContext::ScopedContextUsage scu( m_glContext );
+#endif
 
     NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread started"), cl_logDEBUG1 );
 
@@ -51,14 +59,9 @@ void DecodedPictureToOpenGLUploadThread::run()
             break;
 
         std::auto_ptr<QRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
-
-        //m_glWidget->makeCurrent();
-        //Q_ASSERT( QGLContext::currentContext() == m_glWidget->context() );
         toRun->run();
-        //m_glWidget->doneCurrent();
     }
 
-    m_glWidget->doneCurrent();
     NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread stopped"), cl_logDEBUG1 );
 }
 
@@ -109,11 +112,14 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
             poolSizeIncrement = m_optimalGLContextPoolSize;
         for( int i = 0; i < poolSizeIncrement; ++i )
         {
+#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
             //creating gl context (inside QGLWidget)
-            std::auto_ptr<QGLWidget> newWidget( new QGLWidget( NULL, shareWidget ) );
-            if( !newWidget->isSharing() )
-                break;
-            QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( newWidget.release() ) );
+            std::auto_ptr<GLContext> newContext( new GLContext( shareWidget ) );
+            QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( newContext.release() ) );
+#else
+            //no need to create additional context
+            QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( NULL ) );
+#endif
             uploadThread->start();
             if( !uploadThread->isRunning() )
                 break;

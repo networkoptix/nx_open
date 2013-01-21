@@ -58,7 +58,7 @@ public:
     bool isPanicMode() const;
     void setPanicMode(bool panicMode);
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     QString getProxyHost() const;
     int getProxyPort() const;

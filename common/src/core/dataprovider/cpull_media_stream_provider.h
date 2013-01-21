@@ -16,9 +16,6 @@ public:
     QnClientPullMediaStreamProvider(QnResourcePtr dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
-    void setFps(float f);
-    float getFps() const;
-    bool isMaxFps() const;
 protected:
     bool canChangeStatus() const;
 
@@ -27,8 +24,6 @@ private:
     virtual void beforeRun() override;
 
     QnAdaptiveSleep m_fpsSleep;
-
-    float m_fps; //used only for live providers
 };
 
 #endif // client_pull_stream_reader_h1226
