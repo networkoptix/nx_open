@@ -16,6 +16,8 @@
 #include "shared_resource_pointer.h"
 #include "interface/abstract_ptz_controller.h"
 
+#undef Status
+
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
@@ -52,7 +54,11 @@ class QN_EXPORT QnResource : public QObject
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
-    enum Status { Offline, Unauthorized, Online, Recording };
+    enum Status {
+        Offline,
+        Unauthorized,
+        Online,
+        Recording };
 
     enum Flag {
         network = 0x01,         /**< Has ip and mac. */
