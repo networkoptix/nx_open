@@ -406,10 +406,10 @@ bool QnPlOnvifResource::initInternal()
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs( &relayOutputs );
     if( !relayOutputs.empty() )
-        addCameraCapabilities( QnSecurityCamResource::relayOutput );
+        setCameraCapability(QnSecurityCamResource::relayOutput, true);
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )
-    //    addCameraCapabilities( QnSecurityCamResource::relayInput );
+    //    setCameraCapability( QnSecurityCamResource::relayInput, true );
     //startInputPortMonitoring();
 
     save();
