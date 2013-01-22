@@ -6,6 +6,10 @@
 
 static const int READ_BLOCK_SIZE = 1024*512;
 
+extern "C" {
+    quint32 crc32 (quint32 crc, char *buf, quint32 len);
+}
+
 QnRestLogHandler::QnRestLogHandler()
 {
 
@@ -13,6 +17,8 @@ QnRestLogHandler::QnRestLogHandler()
 
 int QnRestLogHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
+    bool enableGZip = true; // todo: check accept-encoding here
+
     qint64 linesToRead = 100;
     for (int i = 0; i < params.size(); ++i)
     {
@@ -69,10 +75,37 @@ int QnRestLogHandler::executeGet(const QString& path, const QnRequestParamList& 
         delete buffers[i].first;
     }
     contentType = "text/plain; charset=UTF-8";
+    if (!enableGZip) {
+        result = solidArray;
+        return CODE_OK;
+    }
 
-    //result = qCompress(solidArray);
-    //contentEncoding = "gzip";
-    result = solidArray;
+    static int QT_HEADER_SIZE = 4;
+    static int ZLIB_HEADER_SIZE = 2;
+    static int ZLIB_SUFFIX_SIZE = 4;
+    static int GZIP_HEADER_SIZE = 10;
+    const char GZIP_HEADER[] = {
+        0x1f, 0x8b      // gzip magic number
+        , 8             // compress method "defalte"
+        , 1             // text data
+        , 0, 0, 0, 0    // timestamp is not set
+        , 2             // maximum compression flag
+        , 255           // unknown OS
+    };
+
+
+
+    QByteArray compressedData = qCompress(solidArray);
+    QByteArray cleanData = QByteArray::fromRawData(compressedData.data() + QT_HEADER_SIZE + ZLIB_HEADER_SIZE, 
+                                                   compressedData.size() - (QT_HEADER_SIZE + ZLIB_HEADER_SIZE + ZLIB_SUFFIX_SIZE));
+    result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
+    result.append(GZIP_HEADER, GZIP_HEADER_SIZE);
+    result.append(cleanData);
+    int tmp = crc32(0, cleanData.data(), cleanData.size());
+    result.append((const char*) &tmp, sizeof(int));
+    tmp = cleanData.size();
+    result.append((const char*) &tmp, sizeof(int));
+    contentEncoding = "gzip";
 
     return CODE_OK;
 }
