@@ -4,16 +4,16 @@
 #include "utils/common/util.h"
 #include "version.h"
 
-int QnVersionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnVersionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     result.append(QString("<root><engineVersion>%1</engineVersion><revision>%2</revision></root>\n").arg(QN_ENGINE_VERSION).arg(QN_APPLICATION_REVISION).toUtf8());
     return CODE_OK;
 }
 
-int QnVersionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnVersionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnVersionHandler::description(TCPSocket* tcpSocket) const

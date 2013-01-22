@@ -47,7 +47,7 @@ int QnImageHandler::noVideoError(QByteArray& result, qint64 time)
     return CODE_INVALID_PARAMETER;
 }
 
-int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     QnVirtualCameraResourcePtr res;
     QString errStr;
@@ -220,10 +220,10 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
 
 }
 
-int QnImageHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnImageHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnImageHandler::description(TCPSocket* tcpSocket) const

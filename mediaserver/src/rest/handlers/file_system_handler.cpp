@@ -15,7 +15,7 @@ QnFileSystemHandler::QnFileSystemHandler(bool detectAvailableOnly):
 
 }
 
-int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     QString pathStr;
@@ -86,10 +86,10 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
     return CODE_OK;
 }
 
-int QnFileSystemHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnFileSystemHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnFileSystemHandler::description(TCPSocket* tcpSocket) const

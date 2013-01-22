@@ -9,16 +9,16 @@ QnRestPingHandler::QnRestPingHandler()
 
 }
 
-int QnRestPingHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnRestPingHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     result.append(QString("<pong>%1</pong>\n").arg(serverGuid()).toUtf8());
     return CODE_OK;
 }
 
-int QnRestPingHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnRestPingHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnRestPingHandler::description(TCPSocket* tcpSocket) const

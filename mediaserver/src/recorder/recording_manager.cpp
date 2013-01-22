@@ -391,7 +391,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
     if (server)
-        connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged()), Qt::QueuedConnection);
+        connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 }
 
 void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource)

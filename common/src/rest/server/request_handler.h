@@ -21,11 +21,11 @@ public:
     /*!
         \return http statusCode
     */
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding) = 0;
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) = 0;
     /*!
         \return http statusCode
     */
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding) = 0;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType) = 0;
 
     // incoming connection socket
     virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket) return QString(); }
@@ -46,8 +46,8 @@ class QnRestGUIRequestHandler: public QnRestRequestHandler {
 public:
     QnRestGUIRequestHandler();
     virtual ~QnRestGUIRequestHandler();
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding);
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
 protected:
     virtual int executeGetGUI(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;
     virtual int executePostGUI(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;

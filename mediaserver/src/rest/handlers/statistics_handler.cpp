@@ -21,7 +21,7 @@ QnStatisticsHandler::~QnStatisticsHandler() {
     return;
 }
 
-int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType, QByteArray& contentEncoding)
+int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -59,10 +59,10 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
     return CODE_OK;
 }
 
-int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnStatisticsHandler::description(TCPSocket* tcpSocket) const

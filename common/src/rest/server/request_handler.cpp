@@ -44,7 +44,7 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
     delete d_ptr;
 }
 
-int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(contentType)
@@ -56,7 +56,7 @@ int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestPara
     return d->code;
 }
 
-int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;

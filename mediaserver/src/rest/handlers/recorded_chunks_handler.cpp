@@ -19,7 +19,7 @@ QRect QnRecordedChunksHandler::deserializeMotionRect(const QString& rectStr)
         return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
 }
 
-int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -144,10 +144,10 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
     return CODE_OK;
 }
 
-int QnRecordedChunksHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnRecordedChunksHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
@@ -167,7 +167,7 @@ QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
     return rez;
 }
 
-int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
     //QString method = path.mid(path.lastIndexOf('/')+1);
@@ -187,8 +187,8 @@ int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList
     }
 }
 
-int QnXsdHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
+int QnXsdHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType, contentEncoding);
+    return executeGet(path, params, result, contentType);
 }
