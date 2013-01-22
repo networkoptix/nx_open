@@ -351,6 +351,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_yv12ToRgbShaderProgram.get()
         && m_yv12ToRgbShaderProgram->isValid();
 }
 
@@ -359,6 +360,7 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
     return (features() & QnGlFunctions::ArbPrograms)
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
-        && !m_decodedPictureProvider.isForcedSoftYUV();
+        && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_nv12ToRgbShaderProgram.get();
         //&& m_nv12ToRgbShaderProgram->isValid();
 }
