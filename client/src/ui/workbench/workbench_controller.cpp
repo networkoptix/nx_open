@@ -214,7 +214,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
-    AbsolutePtzInstrument *ptzInstrument = new AbsolutePtzInstrument(this);
+    PtzInstrument *ptzInstrument = new PtzInstrument(this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));

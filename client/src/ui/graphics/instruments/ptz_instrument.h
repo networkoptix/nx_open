@@ -21,14 +21,14 @@ class PtzManipulatorWidget;
 class QnWorkbenchPtzController;
 class QnMediaResourceWidget;
 
-class AbsolutePtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
+class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef DragProcessingInstrument base_type;
 
 public:
-    AbsolutePtzInstrument(QObject *parent = NULL);
-    virtual ~AbsolutePtzInstrument();
+    PtzInstrument(QObject *parent = NULL);
+    virtual ~PtzInstrument();
 
 signals:
     void ptzProcessStarted(QnMediaResourceWidget *widget);
