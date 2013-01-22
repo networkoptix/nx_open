@@ -139,12 +139,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(m_camera) {
         QTimer *timer = new QTimer(this);
         
-        connect(timer,              SIGNAL(timeout()),                                              this,   SLOT(updateIconButton()));
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),        this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                   this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)), this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(parentIdChanged(const QnResourcePtr &)),                 this,   SLOT(updateServerResource()));
-        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged()),                            this,   SLOT(updateButtonsVisibility()));
+        connect(timer,              SIGNAL(timeout()),                                                  this,   SLOT(updateIconButton()));
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),            this,   SLOT(updateIconButton()));
+        connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
+        connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
+        connect(m_camera.data(),    SIGNAL(parentIdChanged(const QnResourcePtr &)),                     this,   SLOT(updateServerResource()));
+        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateButtonsVisibility()));
 
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
