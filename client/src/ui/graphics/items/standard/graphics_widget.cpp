@@ -138,6 +138,38 @@ void GraphicsWidgetPrivate::mapToFrame(QStyleOptionTitleBar *option) {
     option->rect.setHeight(q->style()->pixelMetric(QStyle::PM_TitleBarHeight, option, q));
 }
 
+QPointF GraphicsWidgetPrivate::calculateTransformOrigin() const {
+    Q_Q(const GraphicsWidget);
+
+    QRectF rect = q->rect();
+    switch(transformOrigin) {
+    default:
+        qnWarning("Invalid transform origin '%1'.", static_cast<int>(transformOrigin));
+        /* Fall through. */
+    case GraphicsWidget::Legacy:
+        return q->transformOriginPoint();
+    case GraphicsWidget::TopLeft:
+        return QPointF(0, 0);
+    case GraphicsWidget::Top:
+        return QPointF(rect.width() / 2., 0);
+    case GraphicsWidget::TopRight:
+        return QPointF(rect.width(), 0);
+    case GraphicsWidget::Left:
+        return QPointF(0, rect.height() / 2.);
+    case GraphicsWidget::Center:
+        return QPointF(rect.width() / 2., rect.height() / 2.);
+    case GraphicsWidget::Right:
+        return QPointF(rect.width(), rect.height() / 2.);
+    case GraphicsWidget::BottomLeft:
+        return QPointF(0, rect.height());
+    case GraphicsWidget::Bottom:
+        return QPointF(rect.width() / 2., rect.height());
+    case GraphicsWidget::BottomRight:
+        return QPointF(rect.width(), rect.height());
+    }
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // GraphicsWidget
@@ -209,6 +241,21 @@ void GraphicsWidget::setStyle(GraphicsStyle *style) {
     setStyle(style->baseStyle());
 }
 
+GraphicsWidget::TransformOrigin GraphicsWidget::transformOrigin() const {
+    return d_func()->transformOrigin;
+}
+
+void GraphicsWidget::setTransformOrigin(TransformOrigin transformOrigin) {
+    Q_D(GraphicsWidget);
+    
+    if (transformOrigin == d->transformOrigin) 
+        return;
+    
+    d->transformOrigin = transformOrigin;
+    setTransformOriginPoint(d->calculateTransformOrigin());
+    emit transformOriginChanged();
+}
+
 QRectF GraphicsWidget::contentsRect() const {
     qreal left, top, right, bottom;
     getContentsMargins(&left, &top, &right, &bottom);
@@ -248,6 +295,15 @@ void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void GraphicsWidget::setGeometry(const QRectF &rect) {
+    Q_D(GraphicsWidget);
+
+    base_type::setGeometry(rect);
+
+    if(d->transformOrigin != Legacy)
+        setTransformOriginPoint(d->calculateTransformOrigin());
+}
+
 void GraphicsWidget::updateGeometry() {
     Q_D(GraphicsWidget);
 

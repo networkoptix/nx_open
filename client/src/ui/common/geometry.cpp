@@ -192,6 +192,13 @@ qreal QnGeometry::scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mo
     }
 }
 
+QPointF QnGeometry::bounded(const QPointF &pos, const QRectF &bounds) {
+    return QPointF(
+        qBound(bounds.left(), pos.x(), bounds.right()),
+        qBound(bounds.top(), pos.y(), bounds.bottom())
+    );
+}
+
 QPoint QnGeometry::bounded(const QPoint &pos, const QRect &bounds) {
     return QPoint(
         qBound(bounds.left(), pos.x(), bounds.right()),
@@ -322,3 +329,18 @@ bool QnGeometry::contains(const QSize &size, const QSize &otherSize) {
     return size.width() >= otherSize.width() && size.height() >= otherSize.height();
 }
 
+QRectF QnGeometry::movedInto(const QRectF &rect, const QRectF &target) {
+    qreal dx = 0.0, dy = 0.0;
+
+    if(rect.left() < target.left())
+        dx += target.left() - rect.left();
+    if(rect.right() > target.right())
+        dx += target.right() - rect.right();
+
+    if(rect.top() < target.top())
+        dy += target.top() - rect.top();
+    if(rect.bottom() > target.bottom())
+        dy += target.bottom() - rect.bottom();
+
+    return rect.translated(dx, dy);
+}

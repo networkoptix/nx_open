@@ -15,6 +15,8 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include "selection_item.h"
+
 namespace {
 
     struct BlocksMotionSelection {
@@ -45,160 +47,42 @@ namespace {
 } // anonymous namespace
 
 
-class MotionSelectionItem: public QGraphicsObject {
-public:
-    MotionSelectionItem(): 
-        QGraphicsObject(NULL),
-        m_viewport(NULL)
-    {
-        setAcceptedMouseButtons(0);
-
-        /* Don't disable this item here or it will swallow mouse wheel events. */
-    }
-
-    virtual QRectF boundingRect() const override {
-        return QRectF(m_origin, m_corner).normalized().united(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
-    }
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
-        if (widget != m_viewport)
-            return; /* Draw it on source viewport only. */
-
-        QnScopedPainterPenRollback penRollback(painter);
-        QnScopedPainterBrushRollback brushRollback(painter);
-
-        /* Draw selection on cells */
-        QRectF rect = QRectF(m_origin, m_corner).normalized();
-        if(!rect.isEmpty()) {
-            painter->setPen(m_colors[MotionSelectionInstrument::Border]);
-            painter->setBrush(m_colors[MotionSelectionInstrument::Base]);
-            painter->drawRect(rect);
-        }
-
-#ifdef QN_SHOW_MOTION_SELECTION_FRAME
-        /* Draw mouse rubber band */
-        painter->setPen(m_colors[MotionSelectionInstrument::MouseBorder]);
-        painter->setBrush(Qt::NoBrush);
-        painter->drawRect(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
-#endif
-    }
-
-    /**
-     * Sets this item's viewport. This item will be drawn only on the given
-     * viewport. This item won't access the given viewport in any way, so it is
-     * safe to delete the viewport without notifying the item.
-     * 
-     * \param viewport                  Viewport to draw this item on.
-     */
-    void setViewport(QWidget *viewport) {
-        prepareGeometryChange();
-        m_viewport = viewport;
-    }
-
-    /**
-     * \returns                         This rubber band item's viewport.
-     */
-    QWidget *viewport() const {
-        return m_viewport;
-    }
-
-    /**
-     * Sets this item's rect. 
-     * This is the rect that will be drawn on the parent item.
-     * 
-     * \param origin                    Origin in parent coordinates.
-     * \param corner                    Corner in parent coordinates.
-     */
-    void setGridRect(const QPointF &origin, const QPointF &corner) {
-        prepareGeometryChange();
-        m_origin = origin;
-        m_corner = corner;
-    }
-
-    /**
-     * Sets this item's mouse rubber band selection.
-     * 
-     * \param mouseOrigin               Origin in parent coordinates
-     * \param mouseCorner               Corner in parent coordinates
-     */
-    void setMouseRect(const QPointF &mouseOrigin, const QPointF &mouseCorner) {
-        prepareGeometryChange();
-        m_mouseOrigin = mouseOrigin;
-        m_mouseCorner = mouseCorner;
-    }
-
-    void setColor(MotionSelectionInstrument::ColorRole role, const QColor &color) {
-        m_colors[role] = color;
-        update();
-    }
-
-private:
-    /** Viewport that this selection item will be drawn at. */
-    QWidget *m_viewport;
-
-    /** Origin of the selection item, in parent coordinates. */
-    QPointF m_origin;
-
-    /** Second corner of the selection item, in parent coordinates. */
-    QPointF m_corner;
-
-    /** Origin of the mouse rubber band, in parent coordinates. */
-    QPointF m_mouseOrigin;
-
-    /** Second corner of the mouse rubber band, in parent coordinates. */
-    QPointF m_mouseCorner;
-
-    /** Colors for drawing the selection rect. */
-    QColor m_colors[MotionSelectionInstrument::RoleCount];
-};
-
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_isClick(false),
     m_selectionModifiers(0),
     m_multiSelectionModifiers(Qt::ControlModifier)
 {
-    /* Initialize colors with some sensible defaults. Calculations are taken from XP style. */
-    QPalette palette = QApplication::style()->standardPalette();
-    QColor highlight = palette.color(QPalette::Active, QPalette::Highlight);
-    m_colors[Border] = highlight.darker(120);
-    m_colors[Base] = QColor(
-        qMin(highlight.red() / 2 + 110, 255),
-        qMin(highlight.green() / 2 + 110, 255),
-        qMin(highlight.blue() / 2 + 110, 255),
-        127
-    );
-    m_colors[MouseBorder] = QColor(
-        qMin(highlight.red() / 2 + 110, 255),
-        255,
-        qMin(highlight.blue() / 2 + 110, 255),
-        127
-    );
+    /* Default-initialize pen & brush from temporary selection item. */
+    QScopedPointer<SelectionItem> item(new SelectionItem());
+    m_pen = item->pen();
+    m_brush = item->brush();
 }
 
 MotionSelectionInstrument::~MotionSelectionInstrument() {
     ensureUninstalled();
 }
 
-void MotionSelectionInstrument::setColor(ColorRole role, const QColor &color) {
-    if(role < 0 || role >= RoleCount) {
-        qnWarning("Invalid color role '%1'.", static_cast<int>(role));
-        return;
-    }
-
-    m_colors[role] = color;
+void MotionSelectionInstrument::setPen(const QPen &pen) {
+    m_pen = pen;
 
     if(selectionItem())
-        selectionItem()->setColor(role, color);
+        selectionItem()->setPen(pen);
 }
 
-QColor MotionSelectionInstrument::color(ColorRole role) const {
-    if(role < 0 || role >= RoleCount) {
-        qnWarning("Invalid color role '%1'.", static_cast<int>(role));
-        return QColor();
-    }
+QPen MotionSelectionInstrument::pen() const {
+    return m_pen;
+}
 
-    return m_colors[role];
+void MotionSelectionInstrument::setBrush(const QBrush &brush) {
+    m_brush = brush;
+
+    if(selectionItem())
+        selectionItem()->setBrush(brush);
+}
+
+QBrush MotionSelectionInstrument::brush() const {
+    return m_brush;
 }
 
 void MotionSelectionInstrument::setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers) {
@@ -242,11 +126,11 @@ void MotionSelectionInstrument::ensureSelectionItem() {
     if(selectionItem() != NULL)
         return;
 
-    m_selectionItem = new MotionSelectionItem();
+    m_selectionItem = new SelectionItem();
     selectionItem()->setVisible(false);
-    selectionItem()->setColor(Base,         m_colors[Base]);
-    selectionItem()->setColor(Border,       m_colors[Border]);
-    selectionItem()->setColor(MouseBorder,  m_colors[MouseBorder]);
+    selectionItem()->setPen(m_pen);
+    selectionItem()->setBrush(m_brush);
+
     if(scene() != NULL)
         scene()->addItem(selectionItem());
 }
@@ -329,12 +213,11 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
 
     QPointF mouseOrigin = target()->mapFromScene(info->mousePressScenePos());
     QPointF mouseCorner = target()->mapFromScene(info->mouseScenePos());
-    selectionItem()->setMouseRect(mouseOrigin, mouseCorner);
 
     QPointF gridStep = target()->mapFromMotionGrid(QPoint(1, 1)) - target()->mapFromMotionGrid(QPoint(0, 0));
     QPointF mouseDelta = mouseOrigin - mouseCorner;
     if(qAbs(mouseDelta.x()) < qAbs(gridStep.x()) / 2 && qAbs(mouseDelta.y()) < qAbs(gridStep.y()) / 2) {
-        selectionItem()->setGridRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
+        selectionItem()->setRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
         m_gridRect = QRect();
     } else {
         QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
@@ -352,7 +235,7 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
 
         QPointF origin = target()->mapFromMotionGrid(gridOrigin);
         QPointF corner = target()->mapFromMotionGrid(gridCorner);
-        selectionItem()->setGridRect(origin, corner);
+        selectionItem()->setRect(origin, corner);
 
         m_gridRect = QRect(gridOrigin, gridCorner).normalized().adjusted(0, 0, -1, -1);
     }

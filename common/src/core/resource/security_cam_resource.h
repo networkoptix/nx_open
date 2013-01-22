@@ -30,15 +30,15 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
-    enum CameraFlag {
-        CFNoFlags = 0,
-        HasPtz = 1,
-        HasZoom = 2,
-        primaryStreamSoftMotion = 4,
+    enum CameraCapability { 
+        NoCapabilities = 0, 
+        PtzCapability = 1, 
+        ZoomCapability = 2, 
+        PrimaryStreamSoftMotionCapability = 4,
         relayInput = 0x08,
         relayOutput = 0x10
     };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
 
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
@@ -92,9 +92,8 @@ public:
 
 
     CameraCapabilities getCameraCapabilities() const;
-    bool checkCameraCapability(CameraCapabilities value) const;
-    void addCameraCapabilities(CameraCapabilities value);
-    void removeCameraCapabilities(CameraCapabilities value);
+    void setCameraCapabilities(CameraCapabilities capabilities);
+    void setCameraCapability(CameraCapability capability, bool value);
 
 
     /*!
@@ -114,6 +113,8 @@ signals:
      * two <tt>QObject</tt>s. 
      */
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
 private slots:
     void at_disabledChanged();
@@ -135,7 +136,7 @@ protected:
     QList<QnMotionRegion> m_motionMaskList;
 
 private:
-    QnDataProviderFactory* m_dpFactory;
+    QnDataProviderFactory *m_dpFactory;
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;

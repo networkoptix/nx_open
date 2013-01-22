@@ -39,7 +39,7 @@ public:
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
-    QnImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     virtual ~QnImageButtonWidget();
 

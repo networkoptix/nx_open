@@ -47,6 +47,19 @@ public:
     };
     Q_DECLARE_FLAGS(HandlingFlags, HandlingFlag);
 
+    enum TransformOrigin {
+        Legacy,
+        TopLeft, 
+        Top, 
+        TopRight,
+        Left, 
+        Center, 
+        Right,
+        BottomLeft, 
+        Bottom, 
+        BottomRight
+    };
+
     /* Note that it is important for these values to fit into unsigned char as sizeof(GraphicsItemChange) may equal 1. */
     static const GraphicsItemChange ItemHandlingFlagsChange = static_cast<GraphicsItemChange>(0x80u);
     static const GraphicsItemChange ItemHandlingFlagsHaveChanged = static_cast<GraphicsItemChange>(0x81u);
@@ -66,10 +79,15 @@ public:
     void setStyle(GraphicsStyle *style);
     using base_type::setStyle;
 
+    TransformOrigin transformOrigin() const;
+    void setTransformOrigin(TransformOrigin transformOrigin);
+
     /**
      * \returns                         The area inside the widget's margins.
      */
     QRectF contentsRect() const;
+
+    virtual void setGeometry(const QRectF &rect) override;
 
     /**
      * Processes pending layout requests for all graphics widgets on the given
@@ -78,6 +96,9 @@ public:
      * \param scene                     Graphics scene to process items at.
      */
     static void handlePendingLayoutRequests(QGraphicsScene *scene);
+
+signals:
+    void transformOriginChanged();
 
 protected:
     GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);

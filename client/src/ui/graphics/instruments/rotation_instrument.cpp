@@ -1,7 +1,7 @@
 #include "rotation_instrument.h"
 
 #include <cassert>
-#include <cmath> /* For std::fmod, std::floor, std::sin and std::cos. */
+#include <cmath> /* For std::fmod, std::floor. */
 #include <limits>
 
 #include <QtGui/QMouseEvent>
@@ -11,6 +11,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
+
+#include <ui/common/coordinate_transformations.h>
 
 namespace {
     const QColor arrowColor(255, 0, 0, 96);
@@ -35,10 +37,6 @@ namespace {
         shape->lineTo(base - headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
         shape->lineTo(base + headSize.height() * frontUnit);
         shape->lineTo(base + headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
-    }
-
-    inline QPointF polar(qreal alpha, qreal r) {
-        return QPointF(r * std::cos(alpha), r * std::sin(alpha));
     }
 
     const qreal centroidBorder = 0.5;
@@ -145,9 +143,9 @@ public:
         shape.moveTo(0, halfWidth);
         shape.arcTo(QRectF(-halfWidth, -halfWidth, width, width), -90.0, -180.0);
         shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), lineAngleDegrees, sideAngleDegrees - lineAngleDegrees);
-        addArrowHead(&shape, polar(-sideAngle, radius), polar(-sideAngle - M_PI / 2, 1), polar(-sideAngle, 1));
+        addArrowHead(&shape, polarToCartesian<QPointF>(radius, -sideAngle), polarToCartesian<QPointF>(1, -sideAngle - M_PI / 2), polarToCartesian<QPointF>(1, -sideAngle));
         shape.arcTo(QRectF(-radius - halfWidth, -radius - halfWidth, 2 * radius + width, 2 * radius + width), sideAngleDegrees, -2.0 * sideAngleDegrees);
-        addArrowHead(&shape, polar(sideAngle, radius), polar(sideAngle + M_PI / 2, 1), -polar(sideAngle, 1));
+        addArrowHead(&shape, polarToCartesian<QPointF>(radius, sideAngle), polarToCartesian<QPointF>(1, sideAngle + M_PI / 2), -polarToCartesian<QPointF>(1, sideAngle));
         shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), -sideAngleDegrees, sideAngleDegrees - lineAngleDegrees);
         shape.closeSubpath();
 
@@ -401,7 +399,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
     /* Calculate rotation head position in scene coordinates. */
     qreal sceneAngle = m_originAngle + newRotation / 180.0 * M_PI;
     qreal headDistance = length(sceneOrigin - info->mouseScenePos());
-    QPointF sceneHead = sceneOrigin + polar(sceneAngle, headDistance);
+    QPointF sceneHead = sceneOrigin + polarToCartesian<QPointF>(headDistance, sceneAngle);
 
     /* Update rotation item. */
     rotationItem()->setHead(sceneHead);

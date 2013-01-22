@@ -390,26 +390,26 @@ bool QnPlOnvifResource::initInternal()
     //Additional camera settings
     fetchAndSetCameraSettings();
 
-    CameraCapabilities addFlags = CFNoFlags;
+    CameraCapabilities addFlags = NoCapabilities;
     if (m_ptzController)
-        addFlags |= HasPtz;
+        addFlags |= PtzCapability;
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
-        addFlags |= primaryStreamSoftMotion;
+        addFlags |= PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming())
         setMotionType(MT_NoMotion);
 
     
-    if (addFlags != CFNoFlags)
-        addCameraCapabilities(addFlags);
+    if (addFlags != NoCapabilities)
+        setCameraCapabilities(getCameraCapabilities() | addFlags);
 
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs( &relayOutputs );
     if( !relayOutputs.empty() )
-        addCameraCapabilities( QnSecurityCamResource::relayOutput );
+        setCameraCapability(QnSecurityCamResource::relayOutput, true);
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )
-    //    addCameraCapabilities( QnSecurityCamResource::relayInput );
+    //    setCameraCapability( QnSecurityCamResource::relayInput, true );
     //startInputPortMonitoring();
 
     save();
