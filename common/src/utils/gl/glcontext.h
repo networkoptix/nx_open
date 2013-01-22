@@ -6,17 +6,18 @@
 #ifndef GLCONTEXT_H
 #define GLCONTEXT_H
 
-#ifdef _WIN32
-#include <Wingdi.h>
-#else
-struct __GLXcontextRec;
-#endif
-
 #include <memory>
 
 #include <QString>
 #include <QWidget>
 
+#ifdef Q_OS_WIN
+#include <WinGDI.h>
+#else
+struct __GLXcontextRec;
+#endif
+
+// TODO: #AK document this define?
 #define USE_INTERNAL_WIDGET
 
 class QGLContext;
@@ -26,7 +27,7 @@ class QGLContext;
 class GLContext
 {
 public:
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     typedef HGLRC SYS_GL_CTX_HANDLE;
     typedef HDC SYS_PAINT_DEVICE_HANDLE;
 #else
@@ -109,7 +110,7 @@ private:
 #endif
     WId m_winID;
     unsigned int m_previousErrorCode;
-#if defined(USE_INTERNAL_WIDGET) && defined(_WIN32)
+#if defined(USE_INTERNAL_WIDGET) && defined(Q_OS_WIN)
     PIXELFORMATDESCRIPTOR m_pfd;
 #endif
 
