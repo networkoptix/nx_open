@@ -37,17 +37,20 @@ namespace Qn {
 
     Qt::CursorShape calculateHoverCursorShape(Qt::WindowFrameSection section);
 
+
+
     QSizeF calculateSizeDelta(const QPointF &dragDelta, Qt::WindowFrameSection section);
 
     QSize calculateSizeDelta(const QPoint &dragDelta, Qt::WindowFrameSection section);
 
-    QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection section);
-
-    QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection section);
-
     QPointF calculatePinPoint(const QRectF &rect, Qt::WindowFrameSection section);
 
     QPoint calculatePinPoint(const QRect &rect, Qt::WindowFrameSection section);
+
+
+    QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection section);
+
+    QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection section);
 
 } // namespace Qn
 

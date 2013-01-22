@@ -1,6 +1,8 @@
 #include "rubber_band_instrument.h"
+
 #include <cassert>
 #include <limits>
+
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QApplication>
@@ -10,6 +12,7 @@
 #include <QRubberBand>
 #include <QWidget>
 #include <QCursor>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {

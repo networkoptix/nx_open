@@ -144,7 +144,7 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId();
+    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); // TODO: evil!
     return result;
 }
 
