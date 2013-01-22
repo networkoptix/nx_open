@@ -7,6 +7,8 @@
 #include <QtCore/QVariant>
 #include "utils/common/qnid.h"
 
+#undef None
+
 enum QN_EXPORT QnDomain
 {
     QnDomainMemory = 1,
