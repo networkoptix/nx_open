@@ -76,6 +76,11 @@ private:
 public:
     BitStreamReader(): BitStream() {}
 
+    BitStreamReader(const quint8* buffer, int size): BitStream()
+    {
+        setBuffer(buffer, buffer + size);
+    }
+
     BitStreamReader(const quint8* buffer, const quint8* end): BitStream()
     {
         setBuffer(buffer, end);
@@ -175,6 +180,12 @@ public:
         m_curVal = 0;
         m_bitWrited = 0;
     }
+    inline void setBuffer(quint8* buffer, int size) {
+        BitStream::setBuffer(buffer, buffer + size);
+        m_curVal = 0;
+        m_bitWrited = 0;
+    }
+
     inline void skipBits(unsigned cnt)
     {
         assert(m_bitWrited % INT_BIT == 0);

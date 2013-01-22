@@ -952,7 +952,12 @@ qint64 QnAppServerConnection::getCurrentTime()
     return response.data.toLongLong();
 }
 
-int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, const QString& message)
+int QnAppServerConnection::sendEmail(const QString& addr, const QString& subject, const QString& message)
+{
+    return sendEmail(QStringList() << addr, subject, message);
+}
+
+int QnAppServerConnection::sendEmail(const QStringList& to, const QString& subject, const QString& message)
 {
     QnRequestParamList requestParams(m_requestParams);
 

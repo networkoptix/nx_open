@@ -43,8 +43,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMaxFps(int maxFps, int maxDualStreamFps);
-    int getMaxFps(bool motionPlusLqOnly);
+    void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
+    int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
 
 signals:
     void cellActivated(const QPoint &cell);
