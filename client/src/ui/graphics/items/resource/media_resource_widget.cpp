@@ -62,6 +62,8 @@ namespace {
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
     m_resolutionMode(Qn::AutoResolution),
+    m_display(NULL),
+    m_renderer(NULL),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false)
 {
@@ -77,11 +79,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
-
-    const QGLWidget *viewPortAsGLWidget = qobject_cast<const QGLWidget *>(QnWorkbenchContextAware::display()->view()->viewport());
-    m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL);
-    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
-    m_display->addRenderer(m_renderer);
 
     /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
@@ -384,7 +381,15 @@ void QnMediaResourceWidget::setResolutionMode(Qn::ResolutionMode resolutionMode)
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QGLWidget *widget) {
+    if(!m_renderer) {
+        m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, widget->context());
+        connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
+        m_display->addRenderer(m_renderer);
+
+        updateRendererChannelScreenSize();
+    }
+
     base_type::paint(painter, option, widget);
 
     if(isDecorationsVisible() && isInfoVisible())
@@ -655,6 +660,11 @@ void QnMediaResourceWidget::updateServerResource() {
     updateIconButton();
 }
 
+void QnMediaResourceWidget::updateRendererChannelScreenSize() {
+    if(m_renderer)
+        m_renderer->setChannelScreenSize(channelScreenSize());
+}
+
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
         return Qn::RecordingType_Never;
@@ -708,6 +718,7 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
         qFreeAligned(m_binaryMotionMask.back());
         m_binaryMotionMask.pop_back();
     }
+
     while(m_binaryMotionMask.size() < channelCount()) {
         m_binaryMotionMask.push_back(static_cast<__m128i *>(qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, 32)));
         memset(m_binaryMotionMask.back(), 0, MD_WIDTH * MD_HEIGHT / 8);
@@ -717,7 +728,7 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
 void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
     base_type::channelScreenSizeChangedNotify();
 
-    m_renderer->setChannelScreenSize(channelScreenSize());
+    updateRendererChannelScreenSize();
 }
 
 void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
@@ -737,6 +748,10 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 }
 
 QString QnMediaResourceWidget::calculateInfoText() const {
+    /* Don't access display object unless renderer has been constructed. */
+    if(!m_renderer)
+        return QString();
+
     qreal fps = 0.0;
     qreal mbps = 0.0;
     for(int i = 0; i < channelCount(); i++) {
