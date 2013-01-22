@@ -4,6 +4,7 @@
 #include <QDateTime>
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
+const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
     QString str = value.toUpper().trimmed();
@@ -39,7 +40,10 @@ public:
 
         m_file.setFileName(currFileName());
 
-        return m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        if (rez)
+            m_file.write(UTF8_BOM);
+        return rez;
     }
 
     void setLogLevel(QnLogLevel logLevel) 
@@ -108,7 +112,8 @@ private:
         }
 
         m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-
+        if (m_file.size() == 0)
+            m_file.write(UTF8_BOM);
     }
 
     QString currFileName() const
