@@ -97,20 +97,6 @@
 
 
 // -------------------------------------------------------------------------- //
-// Hacks to prevent usage of some badly designed libraries / features
-// -------------------------------------------------------------------------- //
-/* Prevent the usage of boost pointer containers. */
-#define ptr_vector      boost_ptr_containers_are_forbidden
-#define ptr_list        boost_ptr_containers_are_forbidden
-#define ptr_deque       boost_ptr_containers_are_forbidden
-#define ptr_array       boost_ptr_containers_are_forbidden
-#define ptr_set         boost_ptr_containers_are_forbidden
-#define ptr_multiset    boost_ptr_containers_are_forbidden
-#define ptr_map         boost_ptr_containers_are_forbidden
-#define ptr_multimap    boost_ptr_containers_are_forbidden
-
-
-// -------------------------------------------------------------------------- //
 // Useful utility definitions
 // -------------------------------------------------------------------------- //
 /* Macros to avoid using #ifdef _DEBUG. */

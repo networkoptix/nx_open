@@ -87,17 +87,13 @@ namespace {
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
         bool first(true);
-
-        QnStatisticsDataIterator iter(values.values);
-        bool last = !iter.hasNext();
+        bool last = false;
         *currentValue = -1;
-
-        while (iter.hasNext()) {
-            qreal value = qMin(iter.next(), 1.0);
+        for(QLinkedList<qreal>::const_iterator pos = values.values.begin(); pos != values.values.end(); pos++) {
+            qreal value = qMin(*pos, 1.0);
             //bool noData = value < 0;
             value = qMax(value, -0.005);
-
-            last = !iter.hasNext();
+            last = std::next(pos) == values.values.end();
             maxValue = qMax(maxValue, value);
             if (first) {
                 y1 = value * scale;
