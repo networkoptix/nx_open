@@ -141,7 +141,11 @@ public:
     void clear();
     void addRules(const QnBusinessEventRules &businessRules);
     void addRule(QnBusinessEventRulePtr rule);
+
+    void updateRule(QnBusinessEventRulePtr rule);
+
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
+    void deleteRule(QnId id);
 
     bool hasModifiedItems() const;
 

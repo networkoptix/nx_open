@@ -98,12 +98,14 @@ void QnBusinessRulesDialog::at_context_userChanged() {
 }
 
 void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
+    m_rulesViewModel->updateRule(rule);
     //widget by rule, item by widget - already written
     qDebug() << "rule changed" << rule->getId();
     //TODO: ask user
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+    m_rulesViewModel->deleteRule(id);
     //widget by rule, item by widget - already written
     qDebug() << "rule deleted" << id;
     //TODO: ask user
@@ -111,6 +113,7 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     m_rulesViewModel->addRule(QnBusinessEventRulePtr());
+    ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
 }
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
