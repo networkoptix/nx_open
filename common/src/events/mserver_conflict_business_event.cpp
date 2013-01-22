@@ -5,7 +5,7 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
         const QnResourcePtr& mServerRes,
         qint64 timeStamp,
         const QList<QByteArray>& conflictList):
-    base_type(BusinessEventType::BE_Camera_Disconnect,
+    base_type(BusinessEventType::BE_MediaServer_Conflict,
                             mServerRes,
                             timeStamp),
     m_conflictList(conflictList)

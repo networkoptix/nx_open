@@ -654,7 +654,6 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     m_universalTcpListener->start();
-    QnMServerResourceSearcher::instance()->start();
 #else
     int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
     int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
@@ -750,6 +749,8 @@ void QnMain::run()
 
         QnSleep::msleep(1000);
     }
+    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
+    QnMServerResourceSearcher::instance()->start();
 
     if (needToStop())
         return;
