@@ -1,4 +1,4 @@
-#include "absolute_ptz_instrument.h"
+#include "ptz_instrument.h"
 
 #include <cmath>
 #include <cassert>
@@ -497,9 +497,9 @@ Q_DECLARE_METATYPE(PtzOverlayWidget *);
 
 
 // -------------------------------------------------------------------------- //
-// AbsolutePtzInstrument
+// PtzInstrument
 // -------------------------------------------------------------------------- //
-AbsolutePtzInstrument::AbsolutePtzInstrument(QObject *parent): 
+PtzInstrument::PtzInstrument(QObject *parent): 
     base_type(
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
@@ -515,11 +515,11 @@ AbsolutePtzInstrument::AbsolutePtzInstrument(QObject *parent):
     connect(m_ptzController, SIGNAL(positionChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &)));
 }
 
-AbsolutePtzInstrument::~AbsolutePtzInstrument() {
+PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
 }
 
-PtzSplashItem *AbsolutePtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
+PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     PtzSplashItem *result;
     if(!m_freeAnimations.empty()) {
         result = m_freeAnimations.back().item;
@@ -535,11 +535,11 @@ PtzSplashItem *AbsolutePtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     return result;
 }
 
-PtzOverlayWidget *AbsolutePtzInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
+PtzOverlayWidget *PtzInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
     return m_dataByWidget[widget].overlayWidget;
 }
 
-void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
+void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     PtzOverlayWidget *overlay = m_dataByWidget[widget].overlayWidget;
     if(overlay)
         return;
@@ -560,7 +560,7 @@ void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     widget->addOverlayWidget(overlay, false, false);
 }
 
-void AbsolutePtzInstrument::ensureSelectionItem() {
+void PtzInstrument::ensureSelectionItem() {
     if(selectionItem() != NULL)
         return;
 
@@ -572,11 +572,11 @@ void AbsolutePtzInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
-void AbsolutePtzInstrument::updateOverlayWidget() {
+void PtzInstrument::updateOverlayWidget() {
     updateOverlayWidget(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
-void AbsolutePtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
+void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
     bool hasCrosshair = widget->options() & QnResourceWidget::DisplayCrosshair;
 
     if(hasCrosshair)
@@ -586,12 +586,12 @@ void AbsolutePtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
         opacityAnimator(overlay, 0.5)->animateTo(hasCrosshair ? 1.0 : 0.0);
 }
 
-void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
+void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
     ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
 }
 
 
-void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
+void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     const QnPtzSpaceMapper *mapper = m_ptzController->mapper(camera);
     if(!mapper)
@@ -628,13 +628,13 @@ void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRect
     m_ptzController->setPhysicalPosition(camera, newPhysicalPosition);
 }
 
-void AbsolutePtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
+void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     QSizeF size = widget->size() * 100;
 
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
 }
 
-void AbsolutePtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant) {
+void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant) {
     PtzData &data = m_dataByWidget[widget];
     data.requestedSpeed = speed;
 
@@ -664,27 +664,27 @@ void AbsolutePtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void AbsolutePtzInstrument::installedNotify() {
+void PtzInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
     base_type::installedNotify();
 }
 
-void AbsolutePtzInstrument::aboutToBeDisabledNotify() {
+void PtzInstrument::aboutToBeDisabledNotify() {
     m_clickTimer.stop();
     m_movementTimer.stop();
 
     base_type::aboutToBeDisabledNotify();
 }
 
-void AbsolutePtzInstrument::aboutToBeUninstalledNotify() {
+void PtzInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
 
     if(selectionItem())
         delete selectionItem();
 }
 
-bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
+bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
     bool result = base_type::registeredNotify(item);
     if(!result)
         return false;
@@ -706,7 +706,7 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
     return false;
 }
 
-void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {
+void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
@@ -714,7 +714,7 @@ void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     m_dataByWidget.remove(object);
 }
 
-void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
+void PtzInstrument::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_clickTimer.timerId()) {
         m_clickTimer.stop();
 
@@ -736,7 +736,7 @@ void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
     }
 }
 
-bool AbsolutePtzInstrument::animationEvent(AnimationEvent *event) {
+bool PtzInstrument::animationEvent(AnimationEvent *event) {
     qreal dt = event->deltaTime() / 1000.0;
     
     for(int i = m_activeAnimations.size() - 1; i >= 0; i--) {
@@ -767,17 +767,17 @@ bool AbsolutePtzInstrument::animationEvent(AnimationEvent *event) {
     return false;
 }
 
-bool AbsolutePtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
+bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
     m_viewport = viewport;
 
     return false;
 }
 
-bool AbsolutePtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     return mousePressEvent(item, event);
 }
 
-bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false; /* Prevent click-through scenarios. */
 
@@ -818,12 +818,12 @@ bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneM
     return false;
 }
 
-void AbsolutePtzInstrument::startDragProcess(DragInfo *) {
+void PtzInstrument::startDragProcess(DragInfo *) {
     m_isClick = true;
     emit ptzProcessStarted(target());
 }
 
-void AbsolutePtzInstrument::startDrag(DragInfo *) {
+void PtzInstrument::startDrag(DragInfo *) {
     m_isClick = false;
     m_ptzStartedEmitted = false;
 
@@ -851,7 +851,7 @@ void AbsolutePtzInstrument::startDrag(DragInfo *) {
     m_ptzStartedEmitted = true;
 }
 
-void AbsolutePtzInstrument::dragMove(DragInfo *info) {
+void PtzInstrument::dragMove(DragInfo *info) {
     if(target() == NULL) {
         dragProcessor()->reset();
         return;
@@ -893,7 +893,7 @@ void AbsolutePtzInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void AbsolutePtzInstrument::finishDrag(DragInfo *) {
+void PtzInstrument::finishDrag(DragInfo *) {
     if(target()) {
         if(!manipulator()) {
             ensureSelectionItem();
@@ -919,7 +919,7 @@ void AbsolutePtzInstrument::finishDrag(DragInfo *) {
         emit ptzFinished(target());
 }
 
-void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
+void PtzInstrument::finishDragProcess(DragInfo *info) {
     if(target()) {
         if(!manipulator() && m_isClick && m_isDoubleClick) {
             PtzSplashItem *splashItem = newSplashItem(target());
@@ -941,14 +941,14 @@ void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
     emit ptzProcessFinished(target());
 }
 
-void AbsolutePtzInstrument::at_splashItem_destroyed() {
+void PtzInstrument::at_splashItem_destroyed() {
     PtzSplashItem *item = static_cast<PtzSplashItem *>(sender());
 
     m_freeAnimations.removeAll(item);
     m_activeAnimations.removeAll(item);
 }
 
-void AbsolutePtzInstrument::at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera) {
+void PtzInstrument::at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera) {
     if(!target() || target()->resource() != camera)
         return;
 
@@ -961,23 +961,23 @@ void AbsolutePtzInstrument::at_ptzController_positionChanged(const QnVirtualCame
     ptzMoveTo(target(), rect);
 }
 
-void AbsolutePtzInstrument::at_zoomInButton_pressed() {
+void PtzInstrument::at_zoomInButton_pressed() {
     at_zoomButton_activated(1.0);
 }
 
-void AbsolutePtzInstrument::at_zoomInButton_released() {
+void PtzInstrument::at_zoomInButton_released() {
     at_zoomButton_activated(0.0);
 }
 
-void AbsolutePtzInstrument::at_zoomOutButton_pressed() {
+void PtzInstrument::at_zoomOutButton_pressed() {
     at_zoomButton_activated(-1.0);
 }
 
-void AbsolutePtzInstrument::at_zoomOutButton_released() {
+void PtzInstrument::at_zoomOutButton_released() {
     at_zoomButton_activated(0.0);
 }
 
-void AbsolutePtzInstrument::at_zoomButton_activated(qreal speed) {
+void PtzInstrument::at_zoomButton_activated(qreal speed) {
     PtzZoomButtonWidget *button = checked_cast<PtzZoomButtonWidget *>(sender());
     
     if(QnMediaResourceWidget *widget = button->target())
