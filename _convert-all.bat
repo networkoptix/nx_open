@@ -7,4 +7,5 @@ echo customization=%INPUT%
 if not [%1] == [] set CUSTOMIZATION=-Dcustomization=%INPUT%
 
 @echo on
-mvn compile -P!installer %CUSTOMIZATION%
+call mvn compile -T 4 --projects build-environment %CUSTOMIZATION%
+call mvn compile -T 4 -rf appserver -P!installer %CUSTOMIZATION%
