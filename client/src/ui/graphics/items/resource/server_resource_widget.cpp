@@ -1,5 +1,7 @@
 #include "server_resource_widget.h"
 
+#include <iterator> /* For std::next. */
+
 #include <utils/common/math.h> /* For M_PI. */
 
 #include <utils/common/warnings.h>
