@@ -59,6 +59,7 @@ public:
 
         QByteArray th;
         QTextStream textStream(&th);
+        textStream.setCodec("UTF-8");
         textStream << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz"))
             << QLatin1String(" Thread ") << QString::number((qint64)QThread::currentThread()->currentThreadId(), 16)
             << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
