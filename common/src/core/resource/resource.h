@@ -16,8 +16,6 @@
 #include "shared_resource_pointer.h"
 #include "interface/abstract_ptz_controller.h"
 
-#undef Status
-
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;

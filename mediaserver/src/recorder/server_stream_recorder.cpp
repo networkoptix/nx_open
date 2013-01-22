@@ -26,7 +26,6 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_dualStreamingHelper(0),
     m_usedPanicMode(false),
     m_usedSpecialRecordingMode(false),
-    m_forcedRecordFps(0),
     m_lastMotionState(false),
     m_queuedSize(0)
 {
@@ -44,6 +43,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     scheduleData.m_endTime = 24*3600*7;
     scheduleData.m_recordType = Qn::RecordingType_Run;
     scheduleData.m_streamQuality = QnQualityHighest;
+    scheduleData.m_fps = getFpsForValue(0);
+
     m_panicSchedileRecord.setData(scheduleData);
 
     connect(this, SIGNAL(recordingFailed(QString)), this, SLOT(at_recordingFailed(QString)));
@@ -246,12 +247,33 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     return isMotionContinue;
 }
 
-void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int fps, int maxDuration)
+int QnServerStreamRecorder::getFpsForValue(int fps)
+{
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    if (camera->streamFpsSharingMethod()==shareFps)
+    {
+        if (m_role == QnResource::Role_LiveVideo)
+            return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
+        else
+            return fps ? qMax(2, qMin(DESIRED_SECOND_STREAM_FPS, camera->getMaxFps()-fps)) : 2;
+    }
+    else
+    {
+        if (m_role == QnResource::Role_LiveVideo)
+            return fps ? fps : camera->getMaxFps();
+        else
+            return DESIRED_SECOND_STREAM_FPS;
+    }
+}
+
+void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;
-    scheduleData.m_afterThreshold = 5; // todo: may be add parameter here?
+    scheduleData.m_beforeThreshold = beforeThreshold;
+    scheduleData.m_afterThreshold = afterThreshold;
+    scheduleData.m_fps = getFpsForValue(fps);
     if (maxDuration) {
         QDateTime dt = qnSyncTime->currentDateTime();
         int currentWeekSeconds = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600 + dt.time().minute()*60 +  dt.time().second();
@@ -260,7 +282,6 @@ void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int f
     scheduleData.m_recordType = Qn::RecordingType_Run;
     scheduleData.m_streamQuality = quality;
     
-    m_forcedRecordFps = fps;
     m_forcedSchedileRecord.setData(scheduleData);
 
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
@@ -293,31 +314,16 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     m_currentScheduleTask = scheduleTask;
 }
 
-void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task, int fps)
+void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 {
     // zero fps value means 'autodetect as maximum possible fps'
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-
-    if (camera->streamFpsSharingMethod()==shareFps)
-    {
-        if (m_role == QnResource::Role_LiveVideo)
-            task.setFps(fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2);
-        else
-            task.setFps(fps ? qMax(2, qMin(DESIRED_SECOND_STREAM_FPS, camera->getMaxFps()-fps)) : 2);
-    }
-    else
-    {
-        if (m_role == QnResource::Role_LiveVideo)
-            task.setFps(fps ? fps : camera->getMaxFps());
-        else
-            task.setFps(DESIRED_SECOND_STREAM_FPS);
-    }
 
 
     // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
     //CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
     bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
-    updateRecordingType(m_panicSchedileRecord);
+    updateRecordingType(task);
     if (!doNotChangeParams)
         updateStreamParams();
     m_lastSchedulePeriod.clear();
@@ -331,7 +337,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     {
         if (!m_usedPanicMode)
         {
-            setSpecialRecordingMode(m_panicSchedileRecord, 0); 
+            setSpecialRecordingMode(m_panicSchedileRecord);
             m_usedPanicMode = true;
         }
         return;
@@ -340,7 +346,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     {
         if (!m_usedSpecialRecordingMode)
         {
-            setSpecialRecordingMode(m_forcedSchedileRecord, m_forcedRecordFps);
+            setSpecialRecordingMode(m_forcedSchedileRecord);
             m_usedSpecialRecordingMode = true;
         }
         return;
@@ -455,4 +461,9 @@ void QnServerStreamRecorder::endOfRun()
 void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)
 {
     m_dualStreamingHelper = helper;
+}
+
+int QnServerStreamRecorder::getFRAfterThreshold() const
+{
+    return m_forcedSchedileRecord.getAfterThreshold();
 }

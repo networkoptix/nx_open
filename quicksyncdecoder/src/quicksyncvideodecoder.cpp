@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include <utils/common/config.h>
+
 #include "quicksyncvideodecoder.h"
 
 #include <intrin.h>

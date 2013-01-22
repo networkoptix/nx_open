@@ -14,6 +14,8 @@
 
 #include <QMutex>
 
+#include <utils/common/config.h>
+
 #include <plugins/videodecoders/abstractvideodecoderusagecalculator.h>
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/stree/resourcenameset.h>
