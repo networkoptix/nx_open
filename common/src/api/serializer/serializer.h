@@ -80,7 +80,6 @@ public:
     virtual void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
     virtual void serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data) = 0;
-    virtual void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data) = 0;
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
     virtual void serializeKvPair(const QnKvPair& kvPair, QByteArray& data) = 0;
     virtual void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data) = 0;
