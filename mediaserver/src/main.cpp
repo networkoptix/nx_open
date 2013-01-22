@@ -76,6 +76,7 @@
 #include "utils/common/synctime.h"
 #include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
 #include "core/resource_managment/mserver_resource_discovery_manager.h"
+#include "plugins/resources/mserver_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -748,6 +749,8 @@ void QnMain::run()
 
         QnSleep::msleep(1000);
     }
+    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
+    QnMServerResourceSearcher::instance()->start();
 
     if (needToStop())
         return;

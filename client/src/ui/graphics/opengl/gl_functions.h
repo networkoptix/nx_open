@@ -51,7 +51,7 @@ public:
     /**
      * \returns                         OpenGL context that this functions instance works with.
      */
-    QGLContext *context() const;
+    const QGLContext *context() const;
 
     /**
      * \returns                         Set of features supported by the current OpenGL context.

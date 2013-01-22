@@ -51,7 +51,7 @@ namespace conn_detail
         void finishedKvPair(int status, const QByteArray& errorString, QnKvPairList kvPairs, int handle);
         void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
         void finishedBusinessRule(int status, const QByteArray &errorString, QnBusinessEventRules businessRules, int handle);
-
+        void finishedSetting(int status, const QByteArray& errorString, QnKvPairList settings, int handle);
     private:
         QnResourceFactory& m_resourceFactory;
         QnApiSerializer& m_serializer;
@@ -104,6 +104,7 @@ public:
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int getBusinessRulesAsync(QObject *target, const char *slot);
+    int getSettingsAsync(QObject *target, const char *slot);
 
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
     int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
@@ -125,6 +126,7 @@ public:
     int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
 
     int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
+    int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);
 
     int deleteAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);

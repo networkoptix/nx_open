@@ -105,6 +105,11 @@ private:
     QMap<QString, QAggregationInfo> m_aggregateActions;
     mutable QMutex m_mutex;
     QTimer m_timer;
+
+    /*!
+        \param isRuleAdded \a true - rule added, \a false - removed
+    */
+    void notifyResourcesAboutEventIfNeccessary( QnBusinessEventRulePtr businessRule, bool isRuleAdded );
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

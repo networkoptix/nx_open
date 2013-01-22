@@ -27,7 +27,7 @@ public slots:
 
     /*! Some problem with storage
     */
-    void at_storageFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason);
+    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, const QnResourcePtr &storageRes, const QString& reason);
 
     /*! Some problem with network
     */
@@ -42,6 +42,8 @@ public slots:
     void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp);
 
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QnNetworkResourceList& cameras, qint64 timeStamp);
+
+    void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

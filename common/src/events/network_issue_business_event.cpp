@@ -5,7 +5,7 @@ QnNetworkIssueBusinessEvent::QnNetworkIssueBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
         const QString& reason):
-    base_type(BusinessEventType::BE_Storage_Failure,
+    base_type(BusinessEventType::BE_Network_Issue,
                             resource,
                             timeStamp),
     m_reason(reason)

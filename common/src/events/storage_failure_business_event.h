@@ -9,11 +9,13 @@ class QnStorageFailureBusinessEvent: public QnInstantBusinessEvent
 public:
     QnStorageFailureBusinessEvent(const QnResourcePtr& resource,
                           qint64 timeStamp,
+                          QnResourcePtr storageResource,
                           const QString& reason);
 
     virtual QString toString() const override;
 private:
     QString m_reason;
+    QnResourcePtr m_storageResource;
 };
 
 typedef QSharedPointer<QnStorageFailureBusinessEvent> QnStorageFailureBusinessEventPtr;

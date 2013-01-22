@@ -93,6 +93,8 @@ void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
 {
     QMutexLocker lock(&m_mutex);
     m_rules << value;
+
+    notifyResourcesAboutEventIfNeccessary( value, true );
 }
 
 void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bEvent)
@@ -108,7 +110,7 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
 {
     for (int i = 0; i < resList.size(); ++i)
     {
-        if (resList.at(i)->getId() == resId)
+        if (resList.at(i) && resList.at(i)->getId() == resId)
             return true;
     }
     return false;
@@ -143,6 +145,20 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
     if (!condOK)
         return QnAbstractBusinessActionPtr();
+    
+    if (bEvent->getToggleState() == ToggleState::On) {
+        if (m_rulesInProgress.contains(rule->getUniqueId()))
+            return QnAbstractBusinessActionPtr(); // rule already in progress. ingore repeated event
+        else
+            m_rulesInProgress << rule->getUniqueId();
+    }
+    else {
+        m_rulesInProgress.remove(rule->getUniqueId());
+    }
+
+    if (rule->eventState() != ToggleState::NotDefined && rule->eventState() != bEvent->getToggleState())
+        return QnAbstractBusinessActionPtr();
+
 
     if (rule->aggregationPeriod() == 0)
         return rule->instantiateAction(bEvent);
@@ -302,11 +318,14 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     {
         if (m_rules[i]->getId() == bRule->getId())
         {
+            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+            notifyResourcesAboutEventIfNeccessary( bRule, true );
             m_rules[i] = bRule;
             return;
         }
     }
     m_rules << bRule;
+    notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
 void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
@@ -316,8 +335,32 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
     {
         if (m_rules[i]->getId() == id)
         {
+            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             m_rules.removeAt(i);
             break;
+        }
+    }
+}
+
+void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessEventRulePtr businessRule, bool isRuleAdded )
+{
+    const QnResourceList& resList = businessRule->eventResources();
+    if( businessRule->eventType() == BusinessEventType::BE_Camera_Input &&
+        !resList.empty() )
+    {
+        //notifying resources to start input monitoring
+        for( QnResourceList::const_iterator
+            it = resList.begin();
+            it != resList.end();
+            ++it )
+        {
+            QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
+            if( !securityCam )
+                continue;
+            if( isRuleAdded )
+                securityCam->inputPortListenerAttached();
+            else
+                securityCam->inputPortListenerDetached();
         }
     }
 }

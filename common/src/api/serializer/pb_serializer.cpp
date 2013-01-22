@@ -595,6 +595,7 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
         case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
         case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
         case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
+        case BusinessEventType::BE_MediaServer_Conflict:return pb::MediaServer_Conflict;
         default:
             break;
     }
@@ -672,6 +673,7 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
         case pb::Network_Issue:         return BusinessEventType::BE_Network_Issue;
         case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
         case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
+        case pb::MediaServer_Conflict:  return BusinessEventType::BE_MediaServer_Conflict;
     }
     return BusinessEventType::BE_NotDefined;
 }
@@ -840,6 +842,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
             QString::fromStdString(ci->comp1()), QString::fromStdString(ci->ver2())));
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
+    connectInfo->ecsGuid = QString::fromStdString(pb_connectInfo.ecsguid());
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessRules, const QByteArray &data)

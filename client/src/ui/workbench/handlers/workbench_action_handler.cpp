@@ -836,10 +836,17 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
 }
 
-void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &action) {
+void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
+    qDebug() << "action received" << businessAction;
+
+    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+        return;
+
+
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->add();
+
+    popupCollectionWidget()->addBusinessAction(businessAction);
     popupCollectionWidget()->show();
 }
 
@@ -1308,7 +1315,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->add();
+    popupCollectionWidget()->addExample();
     popupCollectionWidget()->show();
 }
 
@@ -1346,7 +1353,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     qnSettings->setLastUsedConnection(connectionData);
 
     // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedName());
+    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
     QUrl clean_url(connectionData.url);
     clean_url.setPassword(QString());
@@ -1357,7 +1364,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     } else {
         // save "Last used connection"
         QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedName();
+        last.name = QnConnectionDataList::defaultLastUsedNameKey();
         last.url.setPassword(QString());
         connections.prepend(last);
     }
@@ -1830,7 +1837,6 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         name = dialog->name();
     }
 
-    at_showPopupAction_triggered();
     if(name == resource->getName())
         return;
 

@@ -203,7 +203,6 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
     }
 }
 
-
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
     {
@@ -273,6 +272,24 @@ bool QnSecurityCamResource::setRelayOutputState(
     unsigned int /*autoResetTimeout*/ )
 {
     return false;
+}
+
+void QnSecurityCamResource::inputPortListenerAttached()
+{
+    if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
+        startInputPortMonitoring();
+}
+
+void QnSecurityCamResource::inputPortListenerDetached()
+{
+    if( m_inputPortListenerCount <= 0 )
+        return;
+
+    int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );
+    if( result == 1 )
+        stopInputPortMonitoring();
+    else if( result <= 0 )
+        m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
 MotionType QnSecurityCamResource::getCameraBasedMotionType() const

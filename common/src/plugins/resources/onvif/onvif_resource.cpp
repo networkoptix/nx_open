@@ -405,11 +405,12 @@ bool QnPlOnvifResource::initInternal()
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs( &relayOutputs );
+    if( !relayOutputs.empty() )
+        addCameraCapabilities( QnSecurityCamResource::relayOutput );
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )
-        startInputPortMonitoring();
-    //if( relayOutputs.size() > 0 )
-    //    setRelayOutputState( QString::fromStdString(relayOutputs.front().token), true, 5 );
+    //    addCameraCapabilities( QnSecurityCamResource::relayInput );
+    //startInputPortMonitoring();
 
     save();
 

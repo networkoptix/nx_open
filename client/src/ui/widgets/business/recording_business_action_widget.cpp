@@ -14,10 +14,6 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
     for (int i = QnQualityLowest; i <= QnQualityHighest; i++) {
         ui->qualityComboBox->addItem(QnStreamQualityToString((QnStreamQuality)i), i);
     }
-    ui->afterLabel->setVisible(false);
-    ui->afterSpinBox->setVisible(false);
-    ui->beforeLabel->setVisible(false);
-    ui->beforeSpinBox->setVisible(false);
 
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->fpsSpinBox, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
@@ -67,6 +63,8 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
             ui->qualityComboBox->setCurrentIndex(quality);
         ui->fpsSpinBox->setValue(BusinessActionParameters::getFps(params));
         ui->durationSpinBox->setValue(BusinessActionParameters::getRecordDuration(params));
+        ui->beforeSpinBox->setValue(BusinessActionParameters::getRecordBefore(params));
+        ui->afterSpinBox->setValue(BusinessActionParameters::getRecordAfter(params));
     }
 
     //TODO: #GDM update on resource change
@@ -80,6 +78,8 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
 
     BusinessActionParameters::setFps(&params, ui->fpsSpinBox->value());
     BusinessActionParameters::setRecordDuration(&params, ui->durationSpinBox->value());
+    BusinessActionParameters::setRecordBefore(&params, ui->beforeSpinBox->value());
+    BusinessActionParameters::setRecordAfter(&params, ui->afterSpinBox->value());
     BusinessActionParameters::setStreamQuality(&params,
         (QnStreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
     model()->setActionParams(params);
