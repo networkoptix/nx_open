@@ -24,7 +24,7 @@ namespace {
     const QLatin1String statusObject("status");
     const QLatin1String disabledObject("disabled");
     const QLatin1String panicObject("panic");
-    const QLatin1String bbaObject("broadcastBusinessAction");
+    const QLatin1String bbaObject("businessAction");
     const QLatin1String kvPairObject("kvPair");
     const QLatin1String dumpdbObject("dumpdb");
     const QLatin1String restoredbObject("restoredb");

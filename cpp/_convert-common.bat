@@ -11,7 +11,7 @@ if not [%1] == [] set CUSTOMIZATION=-Dcustomization=%INPUT%
 SET CURRENTDIR=%cd%
 
 cd ..\common
-call mvn compile -U %CUSTOMIZATION%
+start /B cmd.exe /K mvn compile -U %CUSTOMIZATION%
 
 cd %CURRENTDIR%
-call mvn compile -U %CUSTOMIZATION%
+start /B cmd.exe /K mvn compile -U %CUSTOMIZATION%
