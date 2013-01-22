@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <events/abstract_business_action.h>
+#include <events/abstract_business_event.h>
 
 namespace Ui {
     class QnPopupCollectionWidget;
@@ -24,12 +25,16 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
 
 private slots:
-    void at_widget_closed(BusinessActionType::Value actionType);
+    void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
+
+private:
+    void updatePosition();
 
 private:
     Ui::QnPopupCollectionWidget *ui;
 
-    QMap<BusinessActionType::Value, QWidget*> m_widgetsByType;
+    QMap<BusinessEventType::Value, QWidget*> m_widgetsByType;
+    QMap<BusinessEventType::Value, bool> m_ignore;
     bool m_adding;
 };
 
