@@ -142,6 +142,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         row << item;
         m_actionTypesModel->appendRow(row);
     }
+    updateActionTypesModel();
 }
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
