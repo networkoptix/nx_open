@@ -40,7 +40,6 @@ class QnAbstractRenderer;
 class QnClickableWidget;
 class QnSimpleFrameWidget;
 class QnLayoutTabBar;
-class QnHelpWidget;
 class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
@@ -258,8 +257,6 @@ private slots:
     void at_helpHidingProcessor_hoverFocusLeft();
     void at_helpShowingProcessor_hoverEntered();
     void at_helpItem_paintGeometryChanged();
-    void at_helpWidget_showRequested();
-    void at_helpWidget_hideRequested();
 
     void at_calendarShowButton_toggled(bool checked);
     void at_calendarItem_paintGeometryChanged();
@@ -427,7 +424,7 @@ private:
 
     QnMaskedProxyWidget *m_helpItem;
 
-    QnHelpWidget *m_helpWidget;
+    QWidget *m_helpWidget;
 
     QnImageButtonWidget *m_helpPinButton;
 

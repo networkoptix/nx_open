@@ -1,9 +1,8 @@
 #ifndef QN_API_MODEL_KVPAIR_H
 #define QN_API_MODEL_KVPAIR_H
 
-#include <QString>
-#include <QList>
-#include <QSharedPointer>
+#include <QtCore/QString>
+#include <QtCore/QList>
 
 class QnKvPair {
 public:
@@ -18,12 +17,12 @@ public:
     void setValue(const char* value);
     void setValue(const QString& value);
     const QString& value() const;
+
 private:
     QString m_name;
     QString m_value;
 };
 
-typedef QSharedPointer<QnKvPair> QnKvPairPtr;
-typedef QList<QnKvPairPtr> QnKvPairList;
+typedef QList<QnKvPair> QnKvPairList;
 
 #endif // QN_API_MODEL_KVPAIR_H

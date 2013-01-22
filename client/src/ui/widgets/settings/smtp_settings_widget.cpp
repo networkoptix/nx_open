@@ -1,6 +1,8 @@
 #include "smtp_settings_widget.h"
 #include "ui_smtp_settings_widget.h"
 
+#include <QtGui/QMessageBox>
+
 #include <api/app_server_connection.h>
 
 //TODO: #GDM use documentation from http://support.google.com/mail/bin/answer.py?hl=en&answer=1074635
@@ -46,12 +48,12 @@ void QnSmtpSettingsWidget::submit() {
 
     QnKvPairList settings;
     settings
-            << QnKvPairPtr(new QnKvPair(nameHost, ui->serverLineEdit->text()))
-            << QnKvPairPtr(new QnKvPair(namePort, QString::number(port)))
-            << QnKvPairPtr(new QnKvPair(nameUser, ui->userLineEdit->text()))
-            << QnKvPairPtr(new QnKvPair(nameFrom, ui->userLineEdit->text()))
-            << QnKvPairPtr(new QnKvPair(namePassword, ui->passwordLineEdit->text()))
-            << QnKvPairPtr(new QnKvPair(nameTls, useTls ? QLatin1String("True") : QLatin1String("False")));
+        << QnKvPair(nameHost, ui->serverLineEdit->text())
+        << QnKvPair(namePort, QString::number(port))
+        << QnKvPair(nameUser, ui->userLineEdit->text())
+        << QnKvPair(nameFrom, ui->userLineEdit->text())
+        << QnKvPair(namePassword, ui->passwordLineEdit->text())
+        << QnKvPair(nameTls, useTls ? QLatin1String("True") : QLatin1String("False"));
 
     QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(settings);
 }
@@ -79,21 +81,20 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     }
     m_requestHandle = -1;
 
-    foreach (QnKvPairPtr kvpair, settings) {
-        if (kvpair->name() == nameHost)
-            ui->serverLineEdit->setText(kvpair->value());
-        else if (kvpair->name() == namePort) {
+    foreach (const QnKvPair &setting, settings) {
+        if (setting.name() == nameHost) {
+            ui->serverLineEdit->setText(setting.value());
+        } else if (setting.name() == namePort) {
             bool ok;
-            int port = kvpair->value().toInt(&ok);
+            int port = setting.value().toInt(&ok);
             int idx = (ok && port == 25) ? 1 : 0;
             ui->portComboBox->setCurrentIndex(idx);
-        }
-        else if (kvpair->name() == nameUser)
-            ui->userLineEdit->setText(kvpair->value());
-        else if (kvpair->name() == namePassword)
-            ui->passwordLineEdit->setText(kvpair->value());
-        else if (kvpair->name() == nameTls) {
-            bool useTls = kvpair->value() == QLatin1String("True");
+        } else if (setting.name() == nameUser) {
+            ui->userLineEdit->setText(setting.value());
+        } else if (setting.name() == namePassword) {
+            ui->passwordLineEdit->setText(setting.value());
+        } else if (setting.name() == nameTls) {
+            bool useTls = setting.value() == QLatin1String("True");
             if (useTls)
                 ui->tlsRadioButton->setChecked(true);
             else

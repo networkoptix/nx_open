@@ -94,6 +94,8 @@ private:
     QWidget* m_widget;
     int m_tmpFrameWidth;
     int m_tmpFrameHeight;
+    mutable std::auto_ptr<quint8> m_colorBits;
+    mutable size_t m_colorBitsCapacity;
 };
 
 #endif // Q_OS_WIN
