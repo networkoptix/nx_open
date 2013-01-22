@@ -440,12 +440,11 @@ void parseKvPairs(QnKvPairList& kvPairs, const PbKvPairList& pb_kvPairs)
 {
     for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
     {
-        QnKvPairPtr kvPairPtr(new QnKvPair());
+        QnKvPair kvPair;
+        kvPair.setName(ci->name().c_str());
+        kvPair.setValue(ci->value().c_str());
 
-        kvPairPtr->setName(ci->name().c_str());
-        kvPairPtr->setValue(ci->value().c_str());
-
-        kvPairs.append(kvPairPtr);
+        kvPairs.append(kvPair);
     }
 }
 
@@ -1068,8 +1067,8 @@ void QnApiPbSerializer::serializeKvPairs(const QnKvPairList& kvPairs, QByteArray
 {
     pb::KvPairs pb_kvPairs;
 
-    foreach(QnKvPairPtr kvPair, kvPairs)
-        serializeKvPair_i(*pb_kvPairs.add_kvpair(), *kvPair);
+    foreach(const QnKvPair &kvPair, kvPairs)
+        serializeKvPair_i(*pb_kvPairs.add_kvpair(), kvPair);
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);
