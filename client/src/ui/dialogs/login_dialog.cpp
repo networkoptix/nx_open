@@ -191,10 +191,10 @@ void LoginDialog::resetConnectionsModel() {
 
     int selectedIndex = -1;
 
-    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedName());
+    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedNameKey());
     if (lastUsed != QnConnectionData()) {
         QList<QStandardItem *> row;
-        row << new QStandardItem(lastUsed.name)
+        row << new QStandardItem(QnConnectionDataList::defaultLastUsedName())
             << new QStandardItem(lastUsed.url.host())
             << new QStandardItem(QString::number(lastUsed.url.port()))
             << new QStandardItem(lastUsed.url.userName());
@@ -207,7 +207,7 @@ void LoginDialog::resetConnectionsModel() {
     m_connectionsModel->appendRow(headerSavedItem);
 
     foreach (const QnConnectionData &connection, connections) {
-        if (connection.name == QnConnectionDataList::defaultLastUsedName())
+        if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
             continue;
 
         QList<QStandardItem *> row;
@@ -391,7 +391,7 @@ void LoginDialog::at_saveButton_clicked() {
     resetConnectionsModel();
 
     int idx = 1;
-    if (connections.contains(QnConnectionDataList::defaultLastUsedName()))
+    if (connections.contains(QnConnectionDataList::defaultLastUsedNameKey()))
         idx++;
     ui->connectionsComboBox->setCurrentIndex(idx);
     ui->passwordLineEdit->setText(password);

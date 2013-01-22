@@ -77,6 +77,12 @@ public:
      * @return                                  Translated "Last used connection" string.
      */
     static QString defaultLastUsedName();
+
+    /**
+     * @brief defaultLastUsedNameKey            Get the name for the default connection as it stored in settings.
+     * @return                                  Constant "Last used connection" string.
+     */
+    static QString defaultLastUsedNameKey();
 };
 
 Q_DECLARE_METATYPE(QnConnectionData)

@@ -53,3 +53,8 @@ QString QnConnectionDataList::generateUniqueName(const QString &base){
 QString QnConnectionDataList::defaultLastUsedName(){
     return QObject::tr("* Last used connection *");
 }
+
+
+QString QnConnectionDataList::defaultLastUsedNameKey(){
+    return QLatin1String("* Last used connection *");
+}
