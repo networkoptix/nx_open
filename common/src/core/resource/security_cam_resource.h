@@ -136,7 +136,7 @@ protected:
     QList<QnMotionRegion> m_motionMaskList;
 
 private:
-    QnDataProviderFactory* m_dpFactory;
+    QnDataProviderFactory *m_dpFactory;
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
