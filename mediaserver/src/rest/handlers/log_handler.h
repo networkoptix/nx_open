@@ -1,22 +1,18 @@
-#ifndef QN_STATISTICS_HANDLER_H
-#define QN_STATISTICS_HANDLER_H
+#ifndef QN_LOG__HANDLER_H
+#define QN_LOG__HANDLER_H
 
 #include "rest/server/request_handler.h"
 
-class QnGlobalMonitor;
-
-class QnStatisticsHandler: public QnRestRequestHandler {
-    Q_OBJECT
+// TODO: rename to QnTimeHandler, there are no other handlers with 'Get' prefix.
+class QnRestLogHandler: public QnRestRequestHandler
+{
 public:
-    QnStatisticsHandler();
-    virtual ~QnStatisticsHandler();
+    QnRestLogHandler();
 
+protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding);
     virtual QString description(TCPSocket* tcpSocket) const;
-
-private:
-    QnGlobalMonitor *m_monitor;
 };
 
-#endif // QN_STATISTICS_HANDLER_H
+#endif // QN_LOG__HANDLER_H

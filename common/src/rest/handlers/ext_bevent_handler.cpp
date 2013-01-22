@@ -15,7 +15,7 @@ QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 
 }
 
-int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(path)
     QString eventType;
@@ -67,10 +67,10 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
     return CODE_OK;
 }
 
-int QnExternalBusinessEventHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, contentEncoding);
 }
 
 QString QnExternalBusinessEventHandler::description(TCPSocket* tcpSocket) const

@@ -12,7 +12,7 @@ QnPtzHandler::QnPtzHandler()
 
 }
 
-int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     QnVirtualCameraResourcePtr res;
     QnAbstractPtzController* ptz = 0;
@@ -163,10 +163,10 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
 
 }
 
-int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, contentEncoding);
 }
 
 QString QnPtzHandler::description(TCPSocket* tcpSocket) const

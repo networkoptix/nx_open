@@ -8,7 +8,7 @@ QnTimeHandler::QnTimeHandler()
 
 }
 
-int QnTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     int offset = currentTimeZone();
     QString offsetStr = QString::number(offset);
@@ -20,10 +20,10 @@ int QnTimeHandler::executeGet(const QString& path, const QnRequestParamList& par
     return CODE_OK;
 }
 
-int QnTimeHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnTimeHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, contentEncoding);
 }
 
 QString QnTimeHandler::description(TCPSocket* tcpSocket) const

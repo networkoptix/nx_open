@@ -176,7 +176,7 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
+int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(contentType)
 
@@ -197,10 +197,10 @@ int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnReque
     }
 }
 
-int QnManualCameraAdditionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnManualCameraAdditionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(body)
-        return executeGet(path, params, result, contentType);
+        return executeGet(path, params, result, contentType, contentEncoding);
 }
 
 QString QnManualCameraAdditionHandler::description(TCPSocket* tcpSocket) const

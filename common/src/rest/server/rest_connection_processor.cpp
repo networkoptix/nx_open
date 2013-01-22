@@ -49,7 +49,8 @@ void QnRestConnectionProcessor::run()
 
             d->responseBody.clear();
             int rez = CODE_OK;
-            QByteArray encoding = "application/xml";
+            QByteArray contentType = "application/xml";
+            QByteArray contentEncoding;
             QUrl url = getDecodedUrl();
             QnRestRequestHandlerPtr handler = findHandler(url.path());
             if (handler) 
@@ -58,20 +59,20 @@ void QnRestConnectionProcessor::run()
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
                     if (d->requestHeaders.method().toUpper() == QLatin1String("GET")) {
-                        rez = handler->executeGet(url.path(), params, d->responseBody, encoding);
+                        rez = handler->executeGet(url.path(), params, d->responseBody, contentType, contentEncoding);
                     }
                     else if (d->requestHeaders.method().toUpper() == QLatin1String("POST")) {
-                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, encoding);
+                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType, contentEncoding);
                     }
                     else {
                         qWarning() << "Unknown REST method " << d->requestHeaders.method();
-                        encoding = "text/plain";
+                        contentType = "text/plain";
                         d->responseBody = "Invalid HTTP method";
                         rez = CODE_NOT_FOUND;
                     }
                 }
                 else {
-                    encoding = "text/html";
+                    contentType = "text/html";
                     d->responseBody = STATIC_UNAUTHORIZED_HTML;
                     rez = CODE_AUTH_REQUIRED;
                 }
@@ -79,7 +80,7 @@ void QnRestConnectionProcessor::run()
             else {
                 if (url.path() != QLatin1String("/api/ping/"))
                     qWarning() << "Unknown REST path " << url.path();
-                encoding = "text/html";
+                contentType = "text/html";
                 d->responseBody.clear();
                 d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
                 d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
@@ -108,7 +109,7 @@ void QnRestConnectionProcessor::run()
                 d->responseBody.append("</html>\n");
                 rez = CODE_NOT_FOUND;
             }
-            sendResponse("HTTP", rez, encoding);
+            sendResponse("HTTP", rez, contentType, contentEncoding, false);
         }
         if (!isKeepAlive)
             break;

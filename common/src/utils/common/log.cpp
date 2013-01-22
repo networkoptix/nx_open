@@ -73,6 +73,12 @@ public:
             openNextFile();
     }
 
+    QString syncCurrFileName() const
+    {
+        QMutexLocker lock(&m_mutex);
+        return m_baseName + QLatin1String(".log");
+    }
+
 private:
     void openNextFile()
     {
@@ -135,7 +141,7 @@ private:
 
     QFile m_file;
 
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
 };
 
 Q_GLOBAL_STATIC(QnLogPrivate, qn_logPrivateInstance);
@@ -237,6 +243,10 @@ void qnLogMsgHandler(QtMsgType type, const char *msg) {
     cl_log.log(QString::fromLocal8Bit(msg), logLevel);
 }
 
+QString QnLog::logFileName()
+{
+    return instance()->d->syncCurrFileName();
+}
 
 void QnLog::initLog(const QString& logLevelStr) {
     bool needWarnLogLevel = false;

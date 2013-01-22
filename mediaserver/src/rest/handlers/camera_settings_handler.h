@@ -52,9 +52,9 @@ public:
     QnCameraSettingsHandler();
 
     //!Implementation of QnRestRequestHandler::executeGet
-    virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType );
+    virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType, QByteArray& contentEncoding);
     //!Implementation of QnRestRequestHandler::executePost
-    virtual int executePost( const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType );
+    virtual int executePost( const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType, QByteArray& contentEncoding );
     //!Implementation of QnRestRequestHandler::description
     //virtual QString description(TCPSocket* tcpSocket) const;
 

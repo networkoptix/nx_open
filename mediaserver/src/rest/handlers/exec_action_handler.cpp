@@ -4,7 +4,7 @@
 #include "events/business_message_bus.h"
 #include <api/serializer/pb_serializer.h>
 
-int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
+int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType, QByteArray& contentEncoding)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -16,7 +16,7 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
     return CODE_NOT_IMPLEMETED;
 }
 
-int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType, QByteArray& contentEncoding)
 {
     QnAbstractBusinessActionPtr action;
 
