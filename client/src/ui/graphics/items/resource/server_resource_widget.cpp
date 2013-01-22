@@ -1,6 +1,6 @@
 #include "server_resource_widget.h"
 
-#include <iterator> /* For std::next. */
+#include <iterator> /* For std::advance. */
 
 #include <utils/common/math.h> /* For M_PI. */
 
@@ -88,14 +88,18 @@ namespace {
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
-        bool first(true);
+        bool first = true;
         bool last = false;
         *currentValue = -1;
+        
+        QLinkedList<qreal>::const_iterator backPos = values.values.end();
+        backPos--;
+
         for(QLinkedList<qreal>::const_iterator pos = values.values.begin(); pos != values.values.end(); pos++) {
             qreal value = qMin(*pos, 1.0);
             //bool noData = value < 0;
             value = qMax(value, -0.005);
-            last = std::next(pos) == values.values.end();
+            last = backPos == values.values.end();
             maxValue = qMax(maxValue, value);
             if (first) {
                 y1 = value * scale;
