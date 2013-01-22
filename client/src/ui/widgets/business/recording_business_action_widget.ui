@@ -39,9 +39,6 @@
    </item>
    <item>
     <widget class="QSpinBox" name="beforeSpinBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="suffix">
       <string>s</string>
      </property>
@@ -52,9 +49,6 @@
    </item>
    <item>
     <widget class="QLabel" name="beforeLabel">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="text">
       <string>before</string>
      </property>
@@ -62,9 +56,6 @@
    </item>
    <item>
     <widget class="QSpinBox" name="afterSpinBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="suffix">
       <string>s</string>
      </property>
@@ -75,9 +66,6 @@
    </item>
    <item>
     <widget class="QLabel" name="afterLabel">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="text">
       <string>after</string>
      </property>

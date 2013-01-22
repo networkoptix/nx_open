@@ -191,10 +191,10 @@ void LoginDialog::resetConnectionsModel() {
 
     int selectedIndex = -1;
 
-    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedName());
+    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedNameKey());
     if (lastUsed != QnConnectionData()) {
         QList<QStandardItem *> row;
-        row << new QStandardItem(lastUsed.name)
+        row << new QStandardItem(QnConnectionDataList::defaultLastUsedName())
             << new QStandardItem(lastUsed.url.host())
             << new QStandardItem(QString::number(lastUsed.url.port()))
             << new QStandardItem(lastUsed.url.userName());
@@ -207,7 +207,7 @@ void LoginDialog::resetConnectionsModel() {
     m_connectionsModel->appendRow(headerSavedItem);
 
     foreach (const QnConnectionData &connection, connections) {
-        if (connection.name == QnConnectionDataList::defaultLastUsedName())
+        if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
             continue;
 
         QList<QStandardItem *> row;
@@ -223,6 +223,21 @@ void LoginDialog::resetConnectionsModel() {
     QStandardItem* headerFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
     headerFoundItem->setFlags(Qt::ItemIsEnabled);
     m_connectionsModel->appendRow(headerFoundItem);
+    resetAutoFoundConnectionsModel();
+    ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
+    ui->passwordLineEdit->clear();
+
+}
+
+void LoginDialog::resetAutoFoundConnectionsModel() {
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    int baseCount = qMax(connections.size(), 1); //1 for default auto-created connection
+    baseCount += 2; //headers
+
+    int count = m_connectionsModel->rowCount() - baseCount;
+    if (count > 0)
+        m_connectionsModel->removeRows(baseCount, count);
 
     if (m_foundEcs.size() == 0) {
         QStandardItem* noLocalEcs = new QStandardItem(space + tr("<none>"));
@@ -238,8 +253,7 @@ void LoginDialog::resetConnectionsModel() {
             m_connectionsModel->appendRow(row);
         }
     }
-    ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
-    ui->passwordLineEdit->clear();
+
 }
 
 void LoginDialog::updateAcceptibility() {
@@ -391,7 +405,7 @@ void LoginDialog::at_saveButton_clicked() {
     resetConnectionsModel();
 
     int idx = 1;
-    if (connections.contains(QnConnectionDataList::defaultLastUsedName()))
+    if (connections.contains(QnConnectionDataList::defaultLastUsedNameKey()))
         idx++;
     ui->connectionsComboBox->setCurrentIndex(idx);
     ui->passwordLineEdit->setText(password);
@@ -437,7 +451,7 @@ void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, co
         ++i;
     }
     m_foundEcs.insert(seed, url);
-    resetConnectionsModel();
+    resetAutoFoundConnectionsModel();
 }
 
 void LoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed ) {
@@ -449,5 +463,5 @@ void LoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, con
         return;
     m_foundEcs.remove(seed);
 
-    resetConnectionsModel();
+    resetAutoFoundConnectionsModel();
 }

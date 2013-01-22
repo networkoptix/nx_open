@@ -44,6 +44,10 @@ protected:
      */
     void resetConnectionsModel();
 
+    /**
+     * Reset part of connections model containing auto-found controllers.
+     */
+    void resetAutoFoundConnectionsModel();
 private slots:
     void updateAcceptibility();
     void updateFocus();

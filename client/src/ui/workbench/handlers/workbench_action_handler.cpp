@@ -1353,7 +1353,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     qnSettings->setLastUsedConnection(connectionData);
 
     // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedName());
+    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
     QUrl clean_url(connectionData.url);
     clean_url.setPassword(QString());
@@ -1364,7 +1364,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     } else {
         // save "Last used connection"
         QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedName();
+        last.name = QnConnectionDataList::defaultLastUsedNameKey();
         last.url.setPassword(QString());
         connections.prepend(last);
     }
