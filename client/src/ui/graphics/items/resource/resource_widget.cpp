@@ -121,6 +121,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
+    m_glWidget(NULL),
     m_options(DisplaySelectionOverlay | DisplayButtons),
     m_localActive(false),
     m_channelsLayout(NULL),
@@ -720,17 +721,22 @@ void QnResourceWidget::updateOverlayWidgetsGeometry() {
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    if (painter->paintEngine() == NULL) {
-        qnWarning("No OpenGL-compatible paint engine was found.");
+void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) {
+    if(painter->device() == m_glWidget) {
+        paint(painter, option, m_glWidget);
         return;
     }
 
-    if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
-        qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
+    m_glWidget = dynamic_cast<QGLWidget *>(painter->device());
+    if(!m_glWidget) {
+        qnWarning("Painting on non-OpenGL widget is not supported.");
         return;
     }
 
+    paint(painter, option, m_glWidget);
+}
+
+void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QGLWidget *) {
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_resourceWidget_pausedPainterStorage()->get(QGLContext::currentContext());
         m_loadingProgressPainter = qn_resourceWidget_loadingProgressPainterStorage()->get(QGLContext::currentContext());

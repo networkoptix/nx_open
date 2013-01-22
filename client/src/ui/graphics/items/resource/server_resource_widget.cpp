@@ -99,7 +99,7 @@ namespace {
             qreal value = qMin(*pos, 1.0);
             //bool noData = value < 0;
             value = qMax(value, -0.005);
-            last = backPos == values.values.end();
+            last = pos == backPos;
             maxValue = qMax(maxValue, value);
             if (first) {
                 y1 = value * scale;

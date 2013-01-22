@@ -21,6 +21,7 @@
 #include <ui/graphics/items/shadow/shaded.h>
 
 class QGraphicsLinearLayout;
+class QGLWidget;
 
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
@@ -280,6 +281,7 @@ protected:
     virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QGLWidget *widget);
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
@@ -372,6 +374,10 @@ private:
 
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
+
+    /** Last OpenGL widget that this item was drawn on. 
+     * Not accessed in any way, so there is no need to store a smart pointer. */
+    QGLWidget *m_glWidget;
 
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;

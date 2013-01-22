@@ -96,6 +96,7 @@ public:
     int saveSync(const QnVirtualCameraResourcePtr&);
 
     int sendEmail(const QString& to, const QString& subject, const QString& message);
+    int sendEmail(const QStringList& to, const QString& subject, const QString& message);
     qint64 getCurrentTime();
 
     // Asynchronous API
