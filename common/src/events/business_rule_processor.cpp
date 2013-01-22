@@ -110,7 +110,7 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
 {
     for (int i = 0; i < resList.size(); ++i)
     {
-        if (resList.at(i)->getId() == resId)
+        if (resList.at(i) && resList.at(i)->getId() == resId)
             return true;
     }
     return false;
