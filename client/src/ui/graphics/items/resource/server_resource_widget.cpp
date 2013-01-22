@@ -35,7 +35,7 @@ namespace {
     QColor getColorByKey(const QString &key) {
         int id;
         // TODO: #gdm
-        // It seems that qHash is not needed here and actually harmful here.
+        // It seems that qHash is not needed and is actually harmful here.
         // Why don't we just use plain numbering?
         // CPU -> 0
         // RAM -> 1

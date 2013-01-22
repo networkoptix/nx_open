@@ -178,6 +178,8 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_needUpdateOnvifUrl(false),
     m_ptzController(0),
     m_timeDrift(0),
+    m_prevSoapCallResult(0),
+    m_eventCapabilities( NULL ),
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
