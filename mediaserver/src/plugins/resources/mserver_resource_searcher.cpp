@@ -7,6 +7,7 @@
 #include "events/business_event_connector.h"
 #include "settings.h"
 #include "core/resource_managment/resource_pool.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 static quint16 DISCOVERY_PORT = 54013;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
@@ -25,31 +26,109 @@ QByteArray localAppServerHost()
     return result;
 }
 
-struct DiscoveryPacket
+class DiscoveryPacket
 {
+    static QByteArray listToByteArray(const QList<QByteArray>& list)
+    {
+        QByteArray result;
+        for (int i = 0; i < list.size(); ++i) {
+            if (i > 0)
+                result.append('\0');
+            result.append(list[i]);
+        }
+        return result;
+    }
 
+    static bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
+    {
+        bool rez = false;
+        netRes->lockConsumers();
+        foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+        {
+            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+            if (lp)
+            {
+                QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
+                if (lr && lr->isRunning()) {
+                    rez = true;
+                    break;
+                }
+            }
+        }
+
+        netRes->unlockConsumers();
+        return rez;
+    }
+
+
+private:
+    QByteArray m_data;
+    QByteArray m_appServerGuid;
+    QByteArray m_appServerHost;
+    QByteArray m_guid;
+    QList<QByteArray> m_cameras;
+
+public:
     DiscoveryPacket(const QByteArray data)
     {
         m_data = data;
+        QList<QByteArray> lines = m_data.split((char) 0);
+        if (lines.size() >= 3) {
+            m_guid = lines[0];
+            m_appServerGuid = lines[1];
+            m_appServerHost = lines[2];
+            for (int i = 3; i < lines.size(); ++i)
+                m_cameras << lines[i];
+        }
+    }
+
+    static QList<QByteArray> getLocalUsingCameras()
+    {
+        QList<QByteArray> result;
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+        if (mediaServer) {
+            QnResourceList resList = qnResPool->getResourcesWithParentId(mediaServer->getId());
+            for (int i = 0; i < resList.size(); ++i) {
+                QnNetworkResourcePtr netRes = resList[i].dynamicCast<QnNetworkResource>();
+                if (netRes && hasRunningLiveProvider(netRes))
+                    result << netRes->getPhysicalId().toUtf8();
+            }
+        }
+        return result;
     }
 
     bool isValidPacket() const {
-        return m_data.startsWith(guidStr);
+        return m_guid == guidStr;
     }
 
     QByteArray appServerHost() const {
-        return m_data.mid(guidStr.length());
+        return m_appServerHost;
     }
 
-    static QByteArray getRequest()
-    {
-        QByteArray result;
-        result.append(guidStr);
-        result.append(localAppServerHost());
-        return result;
+    QByteArray appServerGuid() const {
+        return m_appServerGuid;
     }
-private:
-    QByteArray m_data;
+
+    static QByteArray getRequest(const QByteArray& appServerGuid)
+    {
+        QList<QByteArray> result;
+        result << guidStr;
+        result << appServerGuid;
+        result << localAppServerHost();
+        QList<QByteArray> cameras = getLocalUsingCameras();
+        result.append(cameras);
+
+        return listToByteArray(result);
+    }
+
+    bool isCameraConflict() const {
+        QList<QByteArray> localCameras = getLocalUsingCameras();
+        for (int i = 0; i < m_cameras.size(); ++i) {
+            if (localCameras.contains(m_cameras[i]))
+                return true;
+        }
+        return false;
+    }
 };
 
 
@@ -135,7 +214,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         UDPSocket* sock = m_socketList[i];
 
         // send request for next read
-        QByteArray datagram = DiscoveryPacket::getRequest();
+        QByteArray datagram = DiscoveryPacket::getRequest(m_appServerGuid);
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
@@ -163,8 +242,13 @@ void QnMServerResourceSearcher::readSocketInternal(UDPSocket* socket, QSet<QByte
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.appServerHost() != localAppServerHost())
+            if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid && packet.isCameraConflict())
                 conflictList.insert(packet.appServerHost());
         }
     }
+}
+
+void QnMServerResourceSearcher::setAppPServerGuid(const QByteArray& appServerGuid)
+{
+    m_appServerGuid = appServerGuid;
 }
