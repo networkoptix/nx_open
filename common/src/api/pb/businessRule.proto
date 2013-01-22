@@ -32,6 +32,9 @@ message BusinessRule {
     optional string actionParams           = 8;
 
     optional int32 aggregationPeriod       = 9; // msecs
+    optional bool disabled                 = 10;
+    optional string comments               = 11;
+    optional string schedule               = 12;
 }
 
 message BusinessRules {
