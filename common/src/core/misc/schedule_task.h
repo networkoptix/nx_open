@@ -80,7 +80,9 @@ public:
 
     Qn::RecordingType getRecordingType() const { return m_data.m_recordType; }
     int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
+    void setBeforeThreshold(int value)  { m_data.m_beforeThreshold = value; }
     int getAfterThreshold() const { return m_data.m_afterThreshold; }
+    void setAfterThreshold(int value) { m_data.m_afterThreshold= value; }
     QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
     void setStreamQuality(QnStreamQuality value) { m_data.m_streamQuality = value; }
     
