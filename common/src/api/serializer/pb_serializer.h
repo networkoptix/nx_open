@@ -32,7 +32,7 @@ public:
     void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) override;
     void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) override;
     void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
-    void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data) override;
+    void serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data) override;
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
     void serializeKvPair(const QnKvPair& kvPair, QByteArray& data);
     void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data);

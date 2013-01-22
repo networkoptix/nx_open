@@ -7,7 +7,10 @@
 
 #include <QGLContext>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#define WGL_WGLEXT_PROTOTYPES
+#include <gl/wglext.h>
+#else
 #include <QX11Info>
 #include <GL/glx.h>
 #include <X11/X.h>
@@ -243,23 +246,47 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
         }
     }
 #endif
-    m_handle = wglCreateContext( dc );
-    if( m_handle == NULL )
-        m_previousErrorCode = GetLastError();
+    //TODO/IMPL no need to request function address every time
+    PFNWGLCREATECONTEXTATTRIBSARBPROC my_wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress( "wglCreateContextAttribsARB" );
+    if( my_wglCreateContextAttribsARB )
+    {
+        //creating OpenGL 3.0 context
+        static const int contextAttribs[] =
+        {
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+            0
+        }; 
+        m_handle = my_wglCreateContextAttribsARB( dc, contextHandleToShareWith, contextAttribs );
+    }
+    else
+    {
+        //creating Opengl 1.0 context
+        m_handle = wglCreateContext( dc );
+        if( m_handle != NULL &&
+            contextHandleToShareWith != NULL &&
+            !wglShareLists( contextHandleToShareWith, m_handle ) )
+        {
+            m_previousErrorCode = GetLastError();
+            wglDeleteContext( m_handle );
+            m_handle = NULL;
+        }
+    }
+
     ReleaseDC( m_winID, dc );
     dc = NULL;
+
     if( m_handle == NULL )
-        return;
-
-    if( contextHandleToShareWith == NULL )
-        return;
-
-    if( !wglShareLists( contextHandleToShareWith, m_handle ) )
-    {
         m_previousErrorCode = GetLastError();
-        wglDeleteContext( m_handle );
-        m_handle = NULL;
-    }
+
+    //if( contextHandleToShareWith == NULL )
+    //    return;
+
+    //if( !wglShareLists( contextHandleToShareWith, m_handle ) )
+    //{
+    //    m_previousErrorCode = GetLastError();
+    //    wglDeleteContext( m_handle );
+    //    m_handle = NULL;
+    //}
 #else
     //creating OGL context shared with drawing context
     static int visualAttribList[] = {
