@@ -1,13 +1,15 @@
 #include "tool_tip_instrument.h"
 
+#include <QtCore/QAbstractItemModel>
 #include <QtGui/QHelpEvent>
 #include <QtGui/QGraphicsProxyWidget>
+#include <QtGui/QAbstractItemView>
 
 #include <ui/graphics/items/standard/graphics_tooltip.h>
 #include <ui/common/tool_tip_queryable.h>
 
 namespace {
-    QString widgetToolTip(QWidget *widget, const QPoint &pos) {
+    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: implement like in help topic accessor, with bubbleUp.
         QWidget *childWidget = widget->childAt(pos);
         if(!childWidget)
             childWidget = widget;
@@ -15,6 +17,14 @@ namespace {
         while(true) {
             if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(childWidget))
                 return queryable->toolTipAt(childWidget->mapFrom(widget, pos));
+
+            if(QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(childWidget)) {
+                if(QAbstractItemModel *model = view->model()) {
+                    QVariant toolTip = view->indexAt(childWidget->mapFrom(widget, pos)).data(Qt::ToolTipRole);
+                    if (toolTip.convert(QVariant::String))
+                        return toolTip.toString();
+                }
+            }
 
             if(!childWidget->toolTip().isEmpty() || childWidget == widget)
                 return childWidget->toolTip();

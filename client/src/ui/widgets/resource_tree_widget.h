@@ -38,6 +38,7 @@ class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
     
     typedef QWidget base_type;
+
 public:
     explicit QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
@@ -104,11 +105,13 @@ public:
      * @return                          True if editing is allowed.
      */
     bool isEditingEnabled() const;
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;
 
     void updateCheckboxesVisibility();
+
 signals:
     void activated(const QnResourcePtr &resource);
     void viewportSizeChanged();
@@ -122,6 +125,7 @@ private slots:
 
     void updateColumnsSize();
     void updateFilter();
+
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 

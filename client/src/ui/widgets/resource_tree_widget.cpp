@@ -20,8 +20,9 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
-// ------ Delegate class -----
-
+// -------------------------------------------------------------------------- //
+// QnResourceTreeItemDelegate
+// -------------------------------------------------------------------------- //
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
 
@@ -145,8 +146,10 @@ private:
     QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
 };
 
-// ------ Style class -----
 
+// -------------------------------------------------------------------------- //
+// QnResourceTreeStyle
+// -------------------------------------------------------------------------- //
 class QnResourceTreeStyle: public QnProxyStyle {
 public:
     explicit QnResourceTreeStyle(QStyle *baseStyle, QObject *parent = NULL): QnProxyStyle(baseStyle, parent) {}
@@ -169,8 +172,10 @@ public:
     }
 };
 
-// ------ Sort model class ------
 
+// -------------------------------------------------------------------------- //
+// QnResourceTreeSortProxyModel
+// -------------------------------------------------------------------------- //
 class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel {
     typedef QnResourceSearchProxyModel base_type;
 
@@ -244,8 +249,9 @@ private:
 };
 
 
-// ------ Widget class -----
-
+// -------------------------------------------------------------------------- //
+// QnResourceTreeWidget
+// -------------------------------------------------------------------------- //
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
@@ -315,13 +321,13 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
+
     emit viewportSizeChanged();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel() {
     return ui->resourcesTreeView->selectionModel();
 }
-
 
 void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
     m_itemDelegate->setWorkbench(workbench);
@@ -411,26 +417,11 @@ bool QnResourceTreeWidget::isEditingEnabled() const {
     return m_editingEnabled;
 }
 
-// ----------- Handlers -------------
-
-bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-            (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
-        emit viewportSizeChanged();
-    }
-    return base_type::eventFilter(obj, event);
-}
-
-void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
-    emit viewportSizeChanged();
-    base_type::resizeEvent(event);
-}
-
-void QnResourceTreeWidget::updateCheckboxesVisibility(){
+void QnResourceTreeWidget::updateCheckboxesVisibility() {
     ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
 }
 
-void QnResourceTreeWidget::updateColumnsSize(){
+void QnResourceTreeWidget::updateColumnsSize() {
     const int checkBoxSize = 16;
     const int offset = checkBoxSize * 1.5;
     ui->resourcesTreeView->setColumnWidth(1, checkBoxSize);
@@ -460,9 +451,23 @@ void QnResourceTreeWidget::updateFilter() {
         ui->resourcesTreeView->expandAll();
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
+    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
+        (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
+            emit viewportSizeChanged();
+    }
+    return base_type::eventFilter(obj, event);
+}
+
+void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
+    emit viewportSizeChanged();
+    base_type::resizeEvent(event);
+}
+
 void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
@@ -472,6 +477,7 @@ void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
 void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
+    // TODO: This is totally evil. This check belongs to the slot that handles activation.
     if (resource &&
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
         !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
