@@ -1021,12 +1021,14 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
     data = QByteArray(str.data(), str.length());
 }
 
-void QnApiPbSerializer::serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data)
 {
     pb::Emails pb_emails;
     pb::Email& email = *(pb_emails.add_email());
 
-    email.set_to(to.toUtf8().constData());
+    foreach (const QString& addr, to)
+        email.add_to(addr.toUtf8().constData());
+
     email.set_subject(subject.toUtf8().constData());
     email.set_body(message.toUtf8().constData());
 
