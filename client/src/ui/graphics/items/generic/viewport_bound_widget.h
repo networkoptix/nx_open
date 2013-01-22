@@ -1,10 +1,9 @@
 #ifndef QN_VIEWPORT_BOUND_WIDGET_H
 #define QN_VIEWPORT_BOUND_WIDGET_H
 
-#include <ui/common/fixed_rotation.h>
-
-#include <ui/common/fixed_rotation.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+
+class QGraphicsScale;
 
 class Instrument;
 
@@ -25,21 +24,14 @@ public:
     virtual ~QnViewportBoundWidget();
 
     /**
-     * \returns                         Desired size of this graphics widget, in parent coordinates. 
+     * \returns                         Fixed size of this graphics widget, in parent coordinates. 
      */
-    const QSizeF &desiredSize();
+    const QSizeF &fixedSize();
 
     /**
-     * \param desiredSize               Desired size of this graphics widget, in parent coordinates. 
+     * \param desiredSize               Fixed size of this graphics widget, in parent coordinates. 
      */
-    void setDesiredSize(const QSizeF &desiredSize);
-
-    /**
-     * Update desized rotation angle of the overlay widget. Allowed only some fixed angles.
-     *
-     * \param fixedRotation             Desired rotation angle, in enum values.
-     */
-    void setDesiredRotation(Qn::FixedRotation fixedRotation);
+    void setFixedSize(const QSizeF &fixedSize);
 
 protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
@@ -49,11 +41,11 @@ protected slots:
     void updateScale(QGraphicsView *view = NULL);
 
 private:
-    QSizeF m_desiredSize;
+    QSizeF m_fixedSize;
     bool m_inUpdateScale;
-    Qn::FixedRotation m_fixedRotation;
     QWeakPointer<QGraphicsView> m_lastView;
     QWeakPointer<Instrument> m_instrument;
+    QGraphicsScale *m_scale;
 };
 
 

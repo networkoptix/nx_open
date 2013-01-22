@@ -37,6 +37,14 @@ public:
         return qBound(m_min, m_function(value), m_max);
     }
 
+    qreal minimum() const {
+        return m_min;
+    }
+
+    qreal maximum() const {
+        return m_max;
+    }
+
 private:
     QnLinearFunction m_function;
     qreal m_min, m_max;

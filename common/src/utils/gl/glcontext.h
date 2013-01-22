@@ -9,17 +9,18 @@
 #ifdef _WIN32
 #include <Wingdi.h>
 #else
-#include <GL/glx.h>
+struct __GLXcontextRec;
 #endif
-#include <QString>
-#include <QWidget>
 
 #include <memory>
 
+#include <QString>
+#include <QWidget>
+
 #define USE_INTERNAL_WIDGET
 
-
 class QGLContext;
+
 
 //!Cross-platform GL context which can be used in any thread (not in GUI only) unlike QGLContext
 class GLContext
@@ -29,7 +30,7 @@ public:
     typedef HGLRC SYS_GL_CTX_HANDLE;
     typedef HDC SYS_PAINT_DEVICE_HANDLE;
 #else
-    typedef GLXContext SYS_GL_CTX_HANDLE;
+    typedef __GLXcontextRec *SYS_GL_CTX_HANDLE;
     typedef void* SYS_PAINT_DEVICE_HANDLE;
 #endif
 

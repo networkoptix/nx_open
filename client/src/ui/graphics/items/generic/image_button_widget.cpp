@@ -87,8 +87,8 @@ class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
     }
 };
 
-QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
-    base_type(parent),
+QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     m_pixmapCacheValid(false),
     m_state(0),
     m_checkable(false),
@@ -250,7 +250,7 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
     StateFlags hoverState = m_state | HOVERED;
     StateFlags normalState = m_state & ~HOVERED;
-    paint(painter, hoverState, normalState, m_hoverProgress, checked_cast<QGLWidget *>(widget));
+    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget));
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
@@ -266,9 +266,9 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     bool isOne = qFuzzyCompare(progress, 1.0);
     if (isOne || isZero) {
         if (isZero) {
-            widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
-        } else {
             widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
+        } else {
+            widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
 
         glDrawTexturedRect(rect);

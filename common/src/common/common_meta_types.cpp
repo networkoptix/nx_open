@@ -51,6 +51,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
+    
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
     qRegisterMetaType<QnMediaServerResourcePtr>();
