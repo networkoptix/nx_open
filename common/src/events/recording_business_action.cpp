@@ -5,6 +5,8 @@ namespace BusinessActionParameters {
     static QLatin1String fps("fps");
     static QLatin1String quality("quality");
     static QLatin1String duration("duration");
+    static QLatin1String before("before");
+    static QLatin1String after("after");
 
     int getFps(const QnBusinessParams &params) {
         return params.value(fps, 10).toInt();
@@ -30,6 +32,22 @@ namespace BusinessActionParameters {
         (*params)[duration] = value;
     }
 
+    int getRecordBefore(const QnBusinessParams &params) {
+        return params.value(before, 0).toInt();
+    }
+
+    void setRecordBefore(QnBusinessParams* params, int value) {
+        (*params)[before] = value;
+    }
+
+    int getRecordAfter(const QnBusinessParams &params) {
+        return params.value(after, 0).toInt();
+    }
+
+    void setRecordAfter(QnBusinessParams* params, int value)  {
+        (*params)[after] = value;
+    }
+
 }
 
 QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessParams &runtimeParams):
@@ -47,4 +65,12 @@ QnStreamQuality QnRecordingBusinessAction::getStreamQuality() const {
 
 int QnRecordingBusinessAction::getRecordDuration() const {
     return BusinessActionParameters::getRecordDuration(getParams());
+}
+
+int QnRecordingBusinessAction::getRecordBefore() const {
+    return BusinessActionParameters::getRecordBefore(getParams());
+}
+
+int QnRecordingBusinessAction::getRecordAfter() const {
+    return BusinessActionParameters::getRecordAfter(getParams());
 }

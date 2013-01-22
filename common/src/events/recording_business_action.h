@@ -15,6 +15,12 @@ namespace BusinessActionParameters {
     int getRecordDuration(const QnBusinessParams &params);
     void setRecordDuration(QnBusinessParams* params, int value);
 
+    int getRecordBefore(const QnBusinessParams &params);
+    void setRecordBefore(QnBusinessParams* params, int value);
+
+    int getRecordAfter(const QnBusinessParams &params);
+    void setRecordAfter(QnBusinessParams* params, int value);
+
 }
 
 class QnRecordingBusinessAction: public QnAbstractBusinessAction
@@ -26,6 +32,8 @@ public:
     int getFps() const;
     QnStreamQuality getStreamQuality() const;
     int getRecordDuration() const;
+    int getRecordBefore() const;
+    int getRecordAfter() const;
 };
 
 typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr;
