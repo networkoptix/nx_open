@@ -417,12 +417,12 @@ QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed)
                     if (resources.size() == 0)
                         return tr("<Any Server>");
                     else
-                        return tr("%1 Servers").arg(resources.size()); //TODO: fix tr to %n
+                        return tr("%n Server(s)", NULL, resources.size());
                 } else /*if (BusinessEventType::requiresCameraResource(eventType))*/ {
                     if (resources.size() == 0)
                         return tr("<Any Camera>");
                     else
-                        return tr("%1 Cameras").arg(resources.size()); //TODO: fix tr to %n
+                        return tr("%n Camera(s)", NULL, resources.size());
                 }
             }
         case QnBusiness::SpacerColumn:
@@ -516,21 +516,25 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
 
     } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
         if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
-            return tr("Show popup for administrators");
+            return tr("Administrators only");
         else
-            return tr("Show popup for all users");
+            return tr("All users");
     }
 
-    QnResourceList resources = m_actionResources; //TODO: filtered by type
+    QnResourceList resources = m_actionResources;
     if (!BusinessActionType::isResourceRequired(m_actionType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
         QnResourcePtr resource = resources.first();
         return getResourceName(resource);
     } else if (resources.isEmpty()) {
-        return tr("Select at least one camera");
+
+        if (detailed)
+            return tr("No cameras");
+        else
+            return tr("Select at least one camera");
     } else {
-        return tr("%1 Cameras").arg(resources.size()); //TODO: fix tr to %n
+        return tr("%n Camera(s)", NULL, resources.size());
     }
 
 }
