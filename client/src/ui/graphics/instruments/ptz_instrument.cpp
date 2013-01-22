@@ -1,4 +1,4 @@
-#include "absolute_ptz_instrument.h"
+#include "ptz_instrument.h"
 
 #include <cmath>
 #include <cassert>
