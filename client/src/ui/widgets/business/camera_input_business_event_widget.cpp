@@ -11,7 +11,7 @@ QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *pare
 {
     ui->setupUi(this);
 
-    connect(ui->inputIdLineEdit, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
+    connect(ui->inputIdLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
 }
 
 QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
@@ -26,8 +26,11 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
-    if (fields & QnBusiness::EventParamsField)
-        ui->inputIdLineEdit->setText(BusinessEventParameters::getInputPortId(model->eventParams()));
+    if (fields & QnBusiness::EventParamsField) {
+        QString text = BusinessEventParameters::getInputPortId(model->eventParams());
+        if (ui->inputIdLineEdit->text() != text)
+            ui->inputIdLineEdit->setText(text);
+    }
     //TODO: #GDM update on resource change
 }
 

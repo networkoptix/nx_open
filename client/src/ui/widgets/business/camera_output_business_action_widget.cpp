@@ -13,9 +13,9 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 
     connect(ui->autoResetCheckBox, SIGNAL(toggled(bool)), ui->autoResetSpinBox, SLOT(setEnabled(bool)));
 
-    connect(ui->relayIdLineEdit, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
+    connect(ui->relayIdLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
     connect(ui->autoResetCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
-    connect(ui->autoResetSpinBox, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
+    connect(ui->autoResetSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));
 
 }
 
@@ -34,7 +34,9 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     if (fields & QnBusiness::ActionParamsField) {
         QnBusinessParams params = model->actionParams();
 
-        ui->relayIdLineEdit->setText(BusinessActionParameters::getRelayOutputId(params));
+        QString text = BusinessActionParameters::getRelayOutputId(params);
+        if (ui->relayIdLineEdit->text() != text)
+            ui->relayIdLineEdit->setText(text);
         int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params);
         ui->autoResetCheckBox->setChecked(autoReset > 0);
         if (autoReset > 0)

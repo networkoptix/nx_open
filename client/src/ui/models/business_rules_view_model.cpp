@@ -641,6 +641,16 @@ void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
     emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
+void QnBusinessRulesViewModel::updateRule(QnBusinessEventRulePtr rule) {
+    foreach (QnBusinessRuleViewModel* ruleModel, m_rules) {
+        if (ruleModel->id() == rule->getId()) {
+            ruleModel->loadFromRule(rule);
+            return;
+        }
+    }
+    addRule(rule);
+}
+
 void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     int row = m_rules.indexOf(ruleModel);
     if (row < 0)
@@ -651,6 +661,15 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
 
     //TODO: check if dataChanged is required, check row
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
+}
+
+void QnBusinessRulesViewModel::deleteRule(QnId id) {
+    foreach (QnBusinessRuleViewModel* rule, m_rules) {
+        if (rule->id() == id) {
+            deleteRule(rule);
+            return;
+        }
+    }
 }
 
 bool QnBusinessRulesViewModel::hasModifiedItems() const {
