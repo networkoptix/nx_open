@@ -3,8 +3,6 @@
 
 #include <QtGui/QWidget>
 
-#include <core/misc/schedule_task.h>
-
 class QnWorkbenchContext;
 
 namespace Ui {
@@ -18,7 +16,6 @@ public:
     QnWeekTimeScheduleWidget(QWidget *parent = 0);
     virtual ~QnWeekTimeScheduleWidget();
 
-
     /**
      * @Return binary data witch schedule. Each hour in a week represented as single bit. Data is converted to HEX string
      */
@@ -26,7 +23,6 @@ public:
     void setScheduleTasks(const QString& schedule);
 signals:
     void scheduleTasksChanged();
-    void scheduleEnabledChanged();
     void gridParamsChanged();
 
 private slots:

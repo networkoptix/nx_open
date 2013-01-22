@@ -3,19 +3,9 @@
 
 #include <QtGui/QMessageBox>
 
-
 #include <core/resource_managment/resource_pool.h>
-
 #include <ui/common/color_transformations.h>
-#include <ui/common/read_only.h>
 #include <ui/style/globals.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <ui/workbench/watchers/workbench_panic_watcher.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
-
-#include <utils/common/event_processors.h>
 #include "utils/media/bitStream.h"
 
 QnWeekTimeScheduleWidget::QnWeekTimeScheduleWidget(QWidget *parent):
@@ -27,23 +17,16 @@ QnWeekTimeScheduleWidget::QnWeekTimeScheduleWidget(QWidget *parent):
     ui->setupUi(this);
 
     // init buttons
-    ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->recordAlwaysButton->setCheckedColor(shiftColor(qnGlobals->recordAlwaysColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->valueOnButton->setColor(qnGlobals->recordAlwaysColor());
+    ui->valueOnButton->setCheckedColor(shiftColor(qnGlobals->recordAlwaysColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
 
-    ui->noRecordButton->setColor(qnGlobals->noRecordColor());
-    ui->noRecordButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->valueOffButton->setColor(qnGlobals->noRecordColor());
+    ui->valueOffButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
 
-    connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
-    connect(ui->noRecordButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
+    connect(ui->valueOnButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
+    connect(ui->valueOffButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
-    QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
-    releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
-
-    QnSingleEventSignalizer* gridMouseReleaseSignalizer = new QnSingleEventSignalizer(this);
-    gridMouseReleaseSignalizer->setEventType(QEvent::MouseButtonRelease);
-    ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
-    
     connectToGridWidget();
     
     ui->gridWidget->setShowSecondParam(false);
@@ -57,7 +40,6 @@ QnWeekTimeScheduleWidget::~QnWeekTimeScheduleWidget() {
 void QnWeekTimeScheduleWidget::connectToGridWidget() 
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
-
 }
 
 void QnWeekTimeScheduleWidget::disconnectFromGridWidget() 
@@ -73,11 +55,10 @@ QString QnWeekTimeScheduleWidget::scheduleTasks() const
     try {
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
         {
-            for (int col = 0; col < ui->gridWidget->columnCount();) {
+            for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                 const QPoint cell(col, row);
 
                 Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
-                QnStreamQuality streamQuality = QnQualityHighest;
                 writer.putBit(recordType != Qn::RecordingType_Never);
             }
         }
@@ -98,11 +79,10 @@ void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
     try {
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
         {
-            for (int col = 0; col < ui->gridWidget->columnCount();) {
+            for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                 const QPoint cell(col, row);
 
                 Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
-                QnStreamQuality streamQuality = QnQualityHighest;
                 ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RecordingType_Run : Qn::RecordingType_Never);
             }
         }
@@ -123,9 +103,9 @@ void QnWeekTimeScheduleWidget::updateGridParams(bool fromUserInput)
         return;
 
     Qn::RecordingType recordType = Qn::RecordingType_Never;
-    if (ui->recordAlwaysButton->isChecked())
+    if (ui->valueOnButton->isChecked())
         recordType = Qn::RecordingType_Run;
-    else if (ui->noRecordButton->isChecked())
+    else if (ui->valueOffButton->isChecked())
         recordType = Qn::RecordingType_Never;
     else
         qWarning() << "QnWeekTimeScheduleWidget::No record type is selected!";
@@ -139,6 +119,7 @@ void QnWeekTimeScheduleWidget::updateGridParams(bool fromUserInput)
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+
 void QnWeekTimeScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
@@ -147,10 +128,10 @@ void QnWeekTimeScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 
     switch (recordType) {
         case Qn::RecordingType_Run:
-            ui->recordAlwaysButton->setChecked(true);
+            ui->valueOnButton->setChecked(true);
             break;
         default:
-            ui->noRecordButton->setChecked(true);
+            ui->valueOffButton->setChecked(true);
             break;
     }
 
