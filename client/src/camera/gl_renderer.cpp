@@ -134,6 +134,8 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
         return Qn::NothingRendered;
     }
 
+    m_lastDisplayedFlags = picLock->flags();
+
     Qn::RenderStatus result = picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
     const bool draw = picLock->width() <= maxTextureSize() && picLock->height() <= maxTextureSize();
     if( !draw )

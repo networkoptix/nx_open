@@ -133,7 +133,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
     bool actionInProgress = action && action->getToggleState() == ToggleState::On;
     if (actionInProgress)
-        m_rulesInProgress.insert(rule->getUniqueId());
+        m_rulesInProgress.insert(rule->getUniqueId(), bEvent);
     else
         m_rulesInProgress.remove(rule->getUniqueId());
 
@@ -150,7 +150,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
         if (m_rulesInProgress.contains(rule->getUniqueId()))
             return QnAbstractBusinessActionPtr(); // rule already in progress. ingore repeated event
         else
-            m_rulesInProgress << rule->getUniqueId();
+            m_rulesInProgress.insert(rule->getUniqueId(), bEvent);
     }
     else {
         m_rulesInProgress.remove(rule->getUniqueId());
@@ -320,12 +320,25 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
         {
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             notifyResourcesAboutEventIfNeccessary( bRule, true );
+            terminateRunningRule(m_rules[i]);
             m_rules[i] = bRule;
             return;
         }
     }
     m_rules << bRule;
     notifyResourcesAboutEventIfNeccessary( bRule, true );
+}
+
+void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
+{
+    QString ruleId = rule->getUniqueId();
+    if (m_rulesInProgress.contains(ruleId)) {
+        QnAbstractBusinessEventPtr bEvent = m_rulesInProgress[ruleId];
+        QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
+        if (action)
+            executeAction(action);
+        m_rulesInProgress.remove(ruleId);
+    }
 }
 
 void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
@@ -336,6 +349,7 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
         if (m_rules[i]->getId() == id)
         {
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+            terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);
             break;
         }

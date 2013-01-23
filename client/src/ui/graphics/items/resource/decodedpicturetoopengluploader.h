@@ -81,6 +81,7 @@ public:
         //!Returns opengl texture holding plane \a index data. Index of a plane depends on color format (Y, U, V for YV12; Y, UV for NV12 and RGB for rgb format)
         QnGlRendererTexture* texture( int index ) const;
         GLuint pboID() const;
+        int flags() const;
 #ifdef GL_COPY_AGGREGATION
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
@@ -102,6 +103,7 @@ public:
 #ifdef GL_COPY_AGGREGATION
         QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
 #endif
+        int m_flags;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
