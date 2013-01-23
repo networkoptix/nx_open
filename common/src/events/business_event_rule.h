@@ -53,6 +53,9 @@ public:
 
     QString comments() const;
     void setComments(const QString value);
+
+    /* Check if current time allowed in schedule */
+    bool isScheduleMatchTime(const QDateTime& datetime) const;
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
@@ -68,6 +71,7 @@ private:
     int m_aggregationPeriod;
 
     QString m_schedule;
+    QByteArray m_binSchedule;
     QString m_comments;
 };
 

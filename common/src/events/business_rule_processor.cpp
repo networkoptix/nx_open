@@ -118,7 +118,7 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
+    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams()) && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
     QnAbstractBusinessActionPtr action;
     if (m_rulesInProgress.contains(rule->getUniqueId()))
     {
@@ -142,7 +142,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams());
+    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams()) && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
     if (!condOK)
         return QnAbstractBusinessActionPtr();
     

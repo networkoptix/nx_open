@@ -123,9 +123,27 @@ QString QnBusinessEventRule::schedule() const {
 
 void QnBusinessEventRule::setSchedule(const QString value) {
     m_schedule = value;
+    m_binSchedule = QByteArray::fromHex(m_schedule.toUtf8());
 }
 
 QString QnBusinessEventRule::getUniqueId() const
 {
     return QString(QLatin1String("QnBusinessEventRule_")) + getId().toString();
+}
+
+bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
+{
+    if (m_binSchedule.isEmpty())
+        return true; // if no schedule at all do not filter anything
+
+    int currentWeekHour = (datetime.date().dayOfWeek()-1)*24 + datetime.time().hour();
+
+    int byteOffset = currentWeekHour/8;
+    if (byteOffset >= m_binSchedule.size())
+        return false;
+    int bitNum = 7 - (currentWeekHour % 8);
+    quint8 mask = 1 << bitNum;
+
+    bool rez = bool(m_binSchedule.at(byteOffset) & mask);
+    return rez;
 }
