@@ -1,5 +1,5 @@
-#ifndef QN_DESKTOP_FILE_ENCODER_H
-#define QN_DESKTOP_FILE_ENCODER_H
+#ifndef QN_DESKTOP_STREAM_READER_H
+#define QN_DESKTOP_STREAM_READER_H
 
 #include <QtCore/QtGlobal>
 
@@ -42,4 +42,4 @@ private:
 
 #endif // Q_OS_WIN
 
-#endif //QN_DESKTOP_FILE_ENCODER_H
+#endif //QN_DESKTOP_STREAM_READER_H
