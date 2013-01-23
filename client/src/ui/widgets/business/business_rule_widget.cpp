@@ -82,6 +82,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
+
+    connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
+
     setVisible(false);
 }
 
@@ -193,6 +196,12 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
             ui->aggregationPeriodComboBox->setCurrentIndex(idx);
             ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
         }
+    }
+
+    if (fields & QnBusiness::CommentsField) {
+        QString text = model->comments();
+        if (ui->commentsLineEdit->text() != text)
+            ui->commentsLineEdit->setText(text);
     }
 }
 
@@ -321,6 +330,13 @@ void QnBusinessRuleWidget::at_aggregationPeriodChanged() {
     int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
     int idx = ui->aggregationPeriodComboBox->currentIndex();
     m_model->setAggregationPeriod(val * aggregationSteps[idx]);
+}
+
+void QnBusinessRuleWidget::at_commentsLineEdit_textChanged(const QString &value) {
+    if (!m_model || m_updating)
+        return;
+
+    m_model->setComments(value);
 }
 
 void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {

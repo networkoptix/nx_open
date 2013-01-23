@@ -148,8 +148,21 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
-        if (role == Qt::CheckStateRole)
-            return (m_disabled ? Qt::Unchecked : Qt::Checked);
+
+        switch (role) {
+            case Qt::CheckStateRole:
+                return (m_disabled ? Qt::Unchecked : Qt::Checked);
+
+            case Qt::ToolTipRole:
+            case Qt::StatusTipRole:
+            case Qt::WhatsThisRole:
+            case Qt::AccessibleDescriptionRole:
+                return m_comments.isEmpty() ? QVariant() : m_comments;
+
+            default:
+                break;
+        }
+
         return QVariant();
     }
 
@@ -162,13 +175,16 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
-            return tr("Here the comment will be displayed");//m_comments;
+            return m_comments.isEmpty() ? getText(column) : m_comments;
+
         case Qt::DecorationRole:
             return getIcon(column);
 
         case Qt::EditRole:
             if (column == QnBusiness::EventColumn)
                 return m_eventType;
+            else if (column == QnBusiness::ActionColumn)
+                return m_actionType;
             break;
 
         case QnBusiness::ModifiedRole:
@@ -192,6 +208,9 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
     switch (column) {
         case QnBusiness::EventColumn:
             setEventType((BusinessEventType::Value)value.toInt());
+            return true;
+        case QnBusiness::ActionColumn:
+            setActionType((BusinessActionType::Value)value.toInt());
             return true;
         default:
             break;
@@ -714,6 +733,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             flags |= Qt::ItemIsUserCheckable;
             break;
         case QnBusiness::EventColumn:
+        case QnBusiness::ActionColumn:
             flags |= Qt::ItemIsEditable;
             break;
         default:

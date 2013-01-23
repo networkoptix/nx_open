@@ -21,19 +21,15 @@
 #include <client_message_processor.h>
 
 namespace {
-    class QnBusinessEventTypeEditorFactory: public QItemEditorFactory {
+    class QnAbstractComboBoxEditorFactory: public QItemEditorFactory {
 
+    protected:
+        virtual void populateComboBox(QComboBox* comboBox) const = 0;
     public:
         virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
             Q_UNUSED(type)
             QComboBox* result = new QComboBox(parent);
-
-            for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-                BusinessEventType::Value val = (BusinessEventType::Value)i;
-
-                result->insertItem(i, BusinessEventType::toString(val));
-                result->setItemData(i, val);
-            }
+            populateComboBox(result);
             return result;
         }
 
@@ -41,9 +37,30 @@ namespace {
             Q_UNUSED(type)
             return QByteArray("currentIndex");
         }
+    };
 
-    private:
-        QStandardItemModel* m_model;
+    class QnBusinessEventTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
+    protected:
+        virtual void populateComboBox(QComboBox *comboBox) const override {
+            for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+                BusinessEventType::Value val = (BusinessEventType::Value)i;
+
+                comboBox->insertItem(i, BusinessEventType::toString(val));
+                comboBox->setItemData(i, val);
+            }
+        }
+    };
+
+    class QnBusinessActionTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
+    protected:
+        virtual void populateComboBox(QComboBox *comboBox) const override {
+            for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+                BusinessActionType::Value val = (BusinessActionType::Value)i;
+
+                comboBox->insertItem(i, BusinessActionType::toString(val));
+                comboBox->setItemData(i, val);
+            }
+        }
     };
 
 }
@@ -64,12 +81,16 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
     ui->tableView->installEventFilter(this);
 
     QStyledItemDelegate *eventTypeItemDelegate = new QStyledItemDelegate(this);
     eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
     ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
+
+    QStyledItemDelegate *actionTypeItemDelegate = new QStyledItemDelegate(this);
+    actionTypeItemDelegate->setItemEditorFactory(new QnBusinessActionTypeEditorFactory());
+    ui->tableView->setItemDelegateForColumn(QnBusiness::ActionColumn, actionTypeItemDelegate);
 
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));
