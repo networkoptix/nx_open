@@ -2,6 +2,9 @@
 #include "ui_business_rules_dialog.h"
 
 #include <QtGui/QMessageBox>
+#include <QtGui/QStyledItemDelegate>
+#include <QtGui/QItemEditorFactory>
+#include <QtGui/QComboBox>
 
 #include <api/app_server_connection.h>
 
@@ -16,6 +19,34 @@
 #include <utils/settings.h>
 
 #include <client_message_processor.h>
+
+namespace {
+    class QnBusinessEventTypeEditorFactory: public QItemEditorFactory {
+
+    public:
+        virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
+            Q_UNUSED(type)
+            QComboBox* result = new QComboBox(parent);
+
+            for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+                BusinessEventType::Value val = (BusinessEventType::Value)i;
+
+                result->insertItem(i, BusinessEventType::toString(val));
+                result->setItemData(i, val);
+            }
+            return result;
+        }
+
+        virtual QByteArray valuePropertyName(QVariant::Type type) const override {
+            Q_UNUSED(type)
+            return QByteArray("currentIndex");
+        }
+
+    private:
+        QStandardItemModel* m_model;
+    };
+
+}
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
@@ -35,6 +66,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->installEventFilter(this);
+
+    QStyledItemDelegate *eventTypeItemDelegate = new QStyledItemDelegate(this);
+    eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
+    ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
 
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));

@@ -166,6 +166,11 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         case Qt::DecorationRole:
             return getIcon(column);
 
+        case Qt::EditRole:
+            if (column == QnBusiness::EventColumn)
+                return m_eventType;
+            break;
+
         case QnBusiness::ModifiedRole:
             return m_modified;
         default:
@@ -175,13 +180,23 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
 }
 
 bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role) {
-    if (column == QnBusiness::DisabledColumn) {
-        if (role == Qt::CheckStateRole) {
-            Qt::CheckState checked = (Qt::CheckState)value.toInt();
-            setDisabled(checked == Qt::Unchecked);
-            return true;
-        }
+    if (column == QnBusiness::DisabledColumn && role == Qt::CheckStateRole) {
+        Qt::CheckState checked = (Qt::CheckState)value.toInt();
+        setDisabled(checked == Qt::Unchecked);
+        return true;
     }
+
+    if (role != Qt::EditRole)
+        return false;
+
+    switch (column) {
+        case QnBusiness::EventColumn:
+            setEventType((BusinessEventType::Value)value.toInt());
+            return true;
+        default:
+            break;
+    }
+
     return false;
 }
 
@@ -499,7 +514,7 @@ QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed)
                 }
             }
         case QnBusiness::SpacerColumn:
-            return tr("->");
+            return QString();
         case QnBusiness::ActionColumn:
             return BusinessActionType::toString(m_actionType);
         case QnBusiness::TargetColumn:
@@ -693,8 +708,17 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
 
 Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = base_type::flags(index);
-    if (index.column() == QnBusiness::DisabledColumn)
-        flags |= Qt::ItemIsUserCheckable;
+
+    switch (index.column()) {
+        case QnBusiness::DisabledColumn:
+            flags |= Qt::ItemIsUserCheckable;
+            break;
+        case QnBusiness::EventColumn:
+            flags |= Qt::ItemIsEditable;
+            break;
+        default:
+            break;
+    }
     return flags;
 }
 
