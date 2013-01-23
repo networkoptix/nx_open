@@ -78,6 +78,7 @@
 #include "core/resource_managment/mserver_resource_discovery_manager.h"
 #include "plugins/resources/mserver_resource_searcher.h"
 #include "rest/handlers/log_handler.h"
+#include "rest/handlers/favico_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -649,6 +650,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
+    QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
