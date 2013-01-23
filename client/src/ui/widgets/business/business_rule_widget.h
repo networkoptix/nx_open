@@ -48,6 +48,7 @@ private slots:
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
     void at_aggregationPeriodChanged();
+    void at_commentsLineEdit_textChanged(const QString &value);
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();

@@ -148,8 +148,21 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
-        if (role == Qt::CheckStateRole)
-            return (m_disabled ? Qt::Unchecked : Qt::Checked);
+
+        switch (role) {
+            case Qt::CheckStateRole:
+                return (m_disabled ? Qt::Unchecked : Qt::Checked);
+
+            case Qt::ToolTipRole:
+            case Qt::StatusTipRole:
+            case Qt::WhatsThisRole:
+            case Qt::AccessibleDescriptionRole:
+                return m_comments.isEmpty() ? QVariant() : m_comments;
+
+            default:
+                break;
+        }
+
         return QVariant();
     }
 
@@ -162,7 +175,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
-            return tr("Here the comment will be displayed");//m_comments;
+            return m_comments.isEmpty() ? getText(column) : m_comments;
+
         case Qt::DecorationRole:
             return getIcon(column);
 
