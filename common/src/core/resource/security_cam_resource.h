@@ -104,8 +104,8 @@ public:
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
 public slots:
-    void inputPortListenerAttached();
-    void inputPortListenerDetached();
+    virtual void inputPortListenerAttached();
+    virtual void inputPortListenerDetached();
 
 signals:
     /** 
@@ -116,8 +116,8 @@ signals:
     
     virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
-private slots:
-    void at_disabledChanged();
+protected slots:
+    virtual void at_disabledChanged();
 
 protected:
     void updateInner(QnResourcePtr other) override;

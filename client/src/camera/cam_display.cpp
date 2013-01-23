@@ -1393,7 +1393,7 @@ qint64 QnCamDisplay::getDisplayedMin() const
 
 qint64 QnCamDisplay::getCurrentTime() const 
 {
-    if (m_display[0]->isTimeBlocked())
+    if (m_display[0] && m_display[0]->isTimeBlocked())
         return m_display[0]->getLastDisplayedTime();
     else if (m_speed >= 0)
         return getDisplayedMax();
@@ -1414,11 +1414,16 @@ qint64 QnCamDisplay::getMinReverseTime() const
 
 qint64 QnCamDisplay::getNextTime() const
 {
-    if (m_display[0]->isTimeBlocked())
+    if( m_display[0] && m_display[0]->isTimeBlocked() )
+    {
         return m_display[0]->getLastDisplayedTime();
-    else {
+    }
+    else
+    {
         qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
-        return (quint64)rez != AV_NOPTS_VALUE ? rez : m_display[0]->getLastDisplayedTime();
+        return m_display[0] == NULL || (quint64)rez != AV_NOPTS_VALUE
+            ? rez
+            : m_display[0]->getLastDisplayedTime();
     }
 }
 

@@ -289,7 +289,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
     QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
-            emailAddress,
+            emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts),
             action->getSubject(),
             action->getMessageBody()))
     {
