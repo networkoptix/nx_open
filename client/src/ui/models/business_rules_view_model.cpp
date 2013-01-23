@@ -183,6 +183,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         case Qt::EditRole:
             if (column == QnBusiness::EventColumn)
                 return m_eventType;
+            else if (column == QnBusiness::ActionColumn)
+                return m_actionType;
             break;
 
         case QnBusiness::ModifiedRole:
@@ -206,6 +208,9 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
     switch (column) {
         case QnBusiness::EventColumn:
             setEventType((BusinessEventType::Value)value.toInt());
+            return true;
+        case QnBusiness::ActionColumn:
+            setActionType((BusinessActionType::Value)value.toInt());
             return true;
         default:
             break;
@@ -728,6 +733,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             flags |= Qt::ItemIsUserCheckable;
             break;
         case QnBusiness::EventColumn:
+        case QnBusiness::ActionColumn:
             flags |= Qt::ItemIsEditable;
             break;
         default:
