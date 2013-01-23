@@ -179,8 +179,8 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 Q_ASSERT( false );
         }
 
-        //glFlush();
-        //glFinish();
+        glFlush();
+        glFinish();
 
         m_prevFrameSequence = picLock->sequence();
         if( picLock->pts() != AV_NOPTS_VALUE )
