@@ -93,8 +93,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
     glFormat.setSwapInterval(1); /* Turn vsync on. */
     m_glWindow = new QnSignDialogGlWidget(glFormat);
-    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_glWindow );
     m_layout->addWidget(m_glWindow);
+    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_glWindow );
     
     m_srcVideoInfo = new QnSignInfo();
 
