@@ -88,6 +88,7 @@ private:
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
+    bool checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
 
     /**
      * @brief m_rulesInProgress         Stores actions that are toggled and state is On

@@ -116,9 +116,19 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
     return false;
 }
 
+bool QnBusinessRuleProcessor::checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const
+{
+    if (!bEvent->checkCondition(rule->eventState(), rule->eventParams()))
+        return false;
+    if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
+        return false;
+    // TODO: check if rule is disabled
+    return true;
+}
+
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams()) && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
+    bool condOK = checkCondition(bEvent, rule);
     QnAbstractBusinessActionPtr action;
     if (m_rulesInProgress.contains(rule->getUniqueId()))
     {
@@ -142,7 +152,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool condOK = bEvent->checkCondition(rule->eventState(), rule->eventParams()) && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
+    bool condOK = checkCondition(bEvent, rule);
     if (!condOK)
         return QnAbstractBusinessActionPtr();
     
