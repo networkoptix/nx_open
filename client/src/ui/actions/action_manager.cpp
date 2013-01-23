@@ -571,17 +571,17 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
 
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Business Events...")).
+        autoRepeat(false);
+
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
-        autoRepeat(false);
-
-    factory(Qn::BusinessEventsAction).
-        flags(Qn::Main).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Business Events...")).
         autoRepeat(false);
 
     factory().
