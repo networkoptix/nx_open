@@ -18,7 +18,7 @@ QString QnMServerConflictBusinessEvent::toString() const
     if (!m_conflictList.isEmpty()) {
         text += QObject::tr("  several media servers are running on different EC! current EC connection %1 conflict with EC(s): ").arg(QString::fromUtf8(m_conflictList[0]));
         for (int i = 1; i < m_conflictList.size(); ++i) {
-            if (i > 0)
+            if (i > 1)
                 text += QLatin1String(", ");
             text += QString::fromLocal8Bit(m_conflictList[i]);
         }

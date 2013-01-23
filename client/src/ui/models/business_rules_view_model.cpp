@@ -105,6 +105,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_eventState(ToggleState::NotDefined),
     m_actionType(BusinessActionType::BA_ShowPopup),
     m_aggregationPeriod(60),
+    m_disabled(false),
     m_eventTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
@@ -146,16 +147,26 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
 }
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
+    if (column == QnBusiness::DisabledColumn) {
+        if (role == Qt::CheckStateRole || role == Qt::EditRole)
+            return (m_disabled ? Qt::Unchecked : Qt::Checked);
+    }
+
     switch (role) {
         case Qt::DisplayRole:
+        case Qt::AccessibleTextRole:
+            return getText(column);
+
         case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
-        case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return getText(column);
+            return tr("Here the comment will be displayed");//m_comments;
         case Qt::DecorationRole:
             return getIcon(column);
+
+        case QnBusiness::ModifiedRole:
+            return m_modified;
         default:
             break;
     }
@@ -186,6 +197,10 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
+    m_disabled = businessRule->isDisabled();
+    m_comments = businessRule->comments();
+    m_schedule = businessRule->schedule();
+
     updateActionTypesModel();//TODO: connect on dataChanged?
 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
@@ -207,6 +222,9 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     rule->setActionResources(m_actionResources);
     rule->setActionParams(m_actionParams);
     rule->setAggregationPeriod(m_aggregationPeriod);
+    rule->setDisabled(m_disabled);
+    rule->setComments(m_comments);
+    rule->setSchedule(m_schedule);
     return rule;
 }
 
@@ -380,6 +398,48 @@ void QnBusinessRuleViewModel::setAggregationPeriod(int msecs) {
     emit dataChanged(this, QnBusiness::AggregationField | QnBusiness::ModifiedField);
 }
 
+bool QnBusinessRuleViewModel::disabled() const {
+    return m_disabled;
+}
+
+void QnBusinessRuleViewModel::setDisabled(const bool value) {
+    if (m_disabled == value)
+        return;
+
+    m_disabled = value;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::AllFieldsMask); // all fields should be redrawn
+}
+
+QString QnBusinessRuleViewModel::comments() const {
+    return m_comments;
+}
+
+void QnBusinessRuleViewModel::setComments(const QString value) {
+    if (m_comments == value)
+        return;
+
+    m_comments = value;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::CommentsField | QnBusiness::ModifiedField);
+}
+
+QString QnBusinessRuleViewModel::schedule() const {
+    return m_schedule;
+}
+
+void QnBusinessRuleViewModel::setSchedule(const QString value) {
+    if (m_schedule == value)
+        return;
+
+    m_schedule = value;
+    m_modified = true;
+
+    emit dataChanged(this, QnBusiness::ScheduleField | QnBusiness::ModifiedField);
+}
+
 QStandardItemModel* QnBusinessRuleViewModel::eventTypesModel() {
     return m_eventTypesModel;
 }
@@ -550,6 +610,7 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchC
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent)
 {
     m_fieldsByColumn[QnBusiness::ModifiedColumn] = QnBusiness::ModifiedField;
+    m_fieldsByColumn[QnBusiness::DisabledColumn] = QnBusiness::DisabledField;
     m_fieldsByColumn[QnBusiness::EventColumn] = QnBusiness::EventTypeField | QnBusiness::EventStateField | QnBusiness::ActionTypeField;
     m_fieldsByColumn[QnBusiness::SourceColumn] = QnBusiness::EventTypeField | QnBusiness::EventResourcesField;
     m_fieldsByColumn[QnBusiness::SpacerColumn] = 0;
@@ -601,6 +662,7 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
 
     switch (section) {
         case QnBusiness::ModifiedColumn:    return tr("#");
+        case QnBusiness::DisabledColumn:    return tr("Enabled");
         case QnBusiness::EventColumn:       return tr("Event");
         case QnBusiness::SourceColumn:      return tr("Source");
         case QnBusiness::SpacerColumn:      return tr("->");
@@ -611,6 +673,13 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
     }
 
     return QVariant();
+}
+
+Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags flags = base_type::flags(index);
+    if (index.column() == QnBusiness::DisabledColumn)
+        flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+    return flags;
 }
 
 void QnBusinessRulesViewModel::clear() {
@@ -670,14 +739,6 @@ void QnBusinessRulesViewModel::deleteRule(QnId id) {
             return;
         }
     }
-}
-
-bool QnBusinessRulesViewModel::hasModifiedItems() const {
-    foreach (QnBusinessRuleViewModel* rule, m_rules) {
-        if (rule->isModified())
-            return true;
-    }
-    return false;
 }
 
 QnBusinessRuleViewModel* QnBusinessRulesViewModel::getRuleModel(int row) {
