@@ -26,7 +26,7 @@
 
 //#define RENDERER_SUPPORTS_NV12
 #ifdef _WIN32
-#define USE_PBO
+//#define USE_PBO
 #endif
 
 #ifdef USE_PBO
@@ -433,7 +433,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_pboID( (GLuint)-1 ),
     m_pboSizeBytes( 0 ),
-    m_flags( 0 )
+    m_flags( 0 ),
+    m_skippingForbidden( false )
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
     for( size_t i = 0; i < TEXTURE_COUNT; ++i )
@@ -1135,8 +1136,9 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 NX_LOG( QString::fromAscii( "Taking rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
-            else if( (!useAsyncUpload && !m_picturesWaitingRendering.empty())
-                  || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1 : 0))) )
+            else if( ((!useAsyncUpload && !m_picturesWaitingRendering.empty())
+                       || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1 : 0))))
+                      && !m_picturesWaitingRendering.front()->m_skippingForbidden )
             {
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
                 emptyPictureBuf = m_picturesWaitingRendering.front();
@@ -1182,6 +1184,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
     emptyPictureBuf->m_height = decodedPicture->height;
     emptyPictureBuf->m_metadata = decodedPicture->metadata;
     emptyPictureBuf->m_flags = decodedPicture->flags;
+    emptyPictureBuf->m_skippingForbidden = false;
 
     if( useAsyncUpload )
     {
@@ -1274,6 +1277,22 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 #endif  //UPLOAD_TO_GL_IN_GUI_THREAD
 #endif  //GL_COPY_AGGREGATION
     return pic;
+}
+
+void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
+{
+    QMutexLocker lk( &m_mutex );
+    //while( !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() )
+    //    m_cond.wait( lk.mutex() );
+
+    //marking, that skipping frames currently in queue is forbbidden and exiting...
+    for( std::deque<UploadedPicture*>::iterator
+        it = m_picturesWaitingRendering.begin();
+        it != m_picturesWaitingRendering.end();
+        ++it )
+    {
+        (*it)->m_skippingForbidden = true;
+    }
 }
 
 #ifdef GL_COPY_AGGREGATION
@@ -1681,8 +1700,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         // TODO: free memory immediately for still images
     }
 
-    glFlush();
-    glFinish();
+    //glFlush();
+    //glFinish();
 
     return true;
 }

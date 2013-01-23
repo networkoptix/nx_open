@@ -103,6 +103,7 @@ public:
 #ifdef GL_COPY_AGGREGATION
         QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
 #endif
+        bool m_skippingForbidden;
         int m_flags;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
@@ -156,6 +157,8 @@ public:
         \return Uploaded picture data, NULL if no picture. Returned object memory is managed by \a DecodedPictureToOpenGLUploader, and MUST NOT be deleted
     */
     UploadedPicture* getUploadedPicture() const;
+    //!Blocks until all submitted frames have been rendered
+    void waitForAllFramesDisplayed();
     //!Marks \a picture as empty
     /*!
         Renderer MUST call this method to signal that \a picture can be used for uploading next decoded frame
