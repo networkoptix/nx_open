@@ -9,6 +9,7 @@
 #include "camera/cam_display.h"
 #include "camera/sync_dialog_display.h"
 
+#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/help/help_topic_accessor.h"
 #include "ui/help/help_topics.h"
@@ -92,6 +93,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
     glFormat.setSwapInterval(1); /* Turn vsync on. */
     m_glWindow = new QnSignDialogGlWidget(glFormat);
+    DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_glWindow );
     m_layout->addWidget(m_glWindow);
     
     m_srcVideoInfo = new QnSignInfo();
