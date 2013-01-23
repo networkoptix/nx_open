@@ -172,8 +172,16 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     aggInfo.count++;
     aggInfo.bEvent = bEvent;
     aggInfo.bRule = rule;
-    if (aggInfo.timeStamp == 0)
+
+    if (aggInfo.timeStamp + rule->aggregationPeriod() < currentTime)
+    {
+        QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
+        action->setAggregationCount(aggInfo.count);
+        executeAction(action);
+        aggInfo.count = 0;
         aggInfo.timeStamp = currentTime;
+    }
+
     return QnAbstractBusinessActionPtr();
 }
 
@@ -186,16 +194,15 @@ void QnBusinessRuleProcessor::at_timer()
     {
         QAggregationInfo& aggInfo = itr.value();
         qint64 period = aggInfo.bRule->aggregationPeriod()*1000ll*1000ll;
-        if (aggInfo.timeStamp + period < currentTime)
+        if (aggInfo.count > 0 && aggInfo.timeStamp + period < currentTime)
         {
             QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
             action->setAggregationCount(aggInfo.count);
             executeAction(action);
-            itr = m_aggregateActions.erase(itr);
+            aggInfo.count = 0;
+            aggInfo.timeStamp = currentTime;
         }
-        else {
-            ++itr;
-        }
+        ++itr;
     }
 }
 
@@ -338,6 +345,15 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
         if (action)
             executeAction(action);
         m_rulesInProgress.remove(ruleId);
+    }
+
+    QString aggKey = rule->getUniqueId();
+    QMap<QString, QAggregationInfo>::iterator itr = m_aggregateActions.lowerBound(aggKey);
+    while (itr != m_aggregateActions.end())
+    {
+        itr = m_aggregateActions.erase(itr);
+        if (itr == m_aggregateActions.end() || !itr.key().startsWith(aggKey))
+            break;
     }
 }
 
