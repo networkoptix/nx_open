@@ -148,8 +148,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
-        if (role == Qt::CheckStateRole || role == Qt::EditRole)
+        if (role == Qt::CheckStateRole)
             return (m_disabled ? Qt::Unchecked : Qt::Checked);
+        return QVariant();
     }
 
     switch (role) {
@@ -171,6 +172,17 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             break;
     }
     return QVariant();
+}
+
+bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role) {
+    if (column == QnBusiness::DisabledColumn) {
+        if (role == Qt::CheckStateRole) {
+            Qt::CheckState checked = (Qt::CheckState)value.toInt();
+            setDisabled(checked == Qt::Unchecked);
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -644,6 +656,10 @@ QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) cons
     return m_rules[index.row()]->data(index.column(), role);
 }
 
+bool QnBusinessRulesViewModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    return m_rules[index.row()]->setData(index.column(), value, role);
+}
+
 QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation != Qt::Horizontal)
         return QVariant();
@@ -678,7 +694,7 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
 Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = base_type::flags(index);
     if (index.column() == QnBusiness::DisabledColumn)
-        flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+        flags |= Qt::ItemIsUserCheckable;
     return flags;
 }
 
