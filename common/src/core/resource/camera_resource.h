@@ -50,6 +50,13 @@ signals:
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
     virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource) override;
 
+public slots:
+    virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
+    virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
+
+protected slots:
+    virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
+
 private:
     bool m_scheduleDisabled;
     bool m_audioEnabled;
