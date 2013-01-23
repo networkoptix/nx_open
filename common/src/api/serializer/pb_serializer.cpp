@@ -617,6 +617,9 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 
     pb_businessRule.set_aggregationperiod(businessRulePtr->aggregationPeriod());
+    pb_businessRule.set_disabled(businessRulePtr->isDisabled());
+    pb_businessRule.set_comments(businessRulePtr->comments().toUtf8());
+    pb_businessRule.set_schedule(businessRulePtr->schedule().toUtf8());
 }
 
 void serializeKvPair_i(pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
@@ -1156,6 +1159,9 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setActionParams(deserializeBusinessParams(pb_businessRule.actionparams().c_str()));
 
     businessRule->setAggregationPeriod(pb_businessRule.aggregationperiod());
+    businessRule->setDisabled(pb_businessRule.disabled());
+    businessRule->setComments(QString::fromStdString(pb_businessRule.comments()));
+    businessRule->setSchedule(QString::fromStdString(pb_businessRule.schedule()));
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)
