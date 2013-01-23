@@ -404,6 +404,11 @@ GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID() const
     return m_pboID;
 }
 
+int DecodedPictureToOpenGLUploader::UploadedPicture::flags() const
+{
+    return m_flags;
+}
+
 #ifdef GL_COPY_AGGREGATION
 void DecodedPictureToOpenGLUploader::UploadedPicture::setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect )
 {
@@ -427,7 +432,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_sequence( 0 ),
     m_pts( 0 ),
     m_pboID( (GLuint)-1 ),
-    m_pboSizeBytes( 0 )
+    m_pboSizeBytes( 0 ),
+    m_flags( 0 )
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
     for( size_t i = 0; i < TEXTURE_COUNT; ++i )
@@ -1135,8 +1141,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
                 emptyPictureBuf = m_picturesWaitingRendering.front();
                 m_picturesWaitingRendering.pop_front();
-                NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Playback does not catch up with decoding. (%2, %3)..." ).
-                    arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logINFO );
+                NX_LOG( QString::fromAscii( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
+                    arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
             }
             else
             {
@@ -1156,7 +1162,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                     }
 
                     //ignoring decoded picture so that not to stop decoder
-                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logINFO );
+                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
                     decodedPicture->picData.clear();
                     return;
                 }
@@ -1175,6 +1181,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
     emptyPictureBuf->m_width = decodedPicture->width;
     emptyPictureBuf->m_height = decodedPicture->height;
     emptyPictureBuf->m_metadata = decodedPicture->metadata;
+    emptyPictureBuf->m_flags = decodedPicture->flags;
 
     if( useAsyncUpload )
     {

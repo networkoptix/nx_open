@@ -966,7 +966,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
     else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 
     {
-        if (vd)
+        if (vd && m_display[vd->channelNumber] )
             m_display[vd->channelNumber]->waitForFramesDisplaed();
         if (vd || ad)
             afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
@@ -998,7 +998,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                m_display[i]->setLastDisplayedTime(emptyData->timestamp);
+                if( m_display[i] )
+                    m_display[i]->setLastDisplayedTime(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
 
