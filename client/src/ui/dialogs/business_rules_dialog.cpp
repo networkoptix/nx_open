@@ -2,6 +2,9 @@
 #include "ui_business_rules_dialog.h"
 
 #include <QtGui/QMessageBox>
+#include <QtGui/QStyledItemDelegate>
+#include <QtGui/QItemEditorFactory>
+#include <QtGui/QComboBox>
 
 #include <api/app_server_connection.h>
 
@@ -17,11 +20,55 @@
 
 #include <client_message_processor.h>
 
+namespace {
+    class QnAbstractComboBoxEditorFactory: public QItemEditorFactory {
+
+    protected:
+        virtual void populateComboBox(QComboBox* comboBox) const = 0;
+    public:
+        virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
+            Q_UNUSED(type)
+            QComboBox* result = new QComboBox(parent);
+            populateComboBox(result);
+            return result;
+        }
+
+        virtual QByteArray valuePropertyName(QVariant::Type type) const override {
+            Q_UNUSED(type)
+            return QByteArray("currentIndex");
+        }
+    };
+
+    class QnBusinessEventTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
+    protected:
+        virtual void populateComboBox(QComboBox *comboBox) const override {
+            for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+                BusinessEventType::Value val = (BusinessEventType::Value)i;
+
+                comboBox->insertItem(i, BusinessEventType::toString(val));
+                comboBox->setItemData(i, val);
+            }
+        }
+    };
+
+    class QnBusinessActionTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
+    protected:
+        virtual void populateComboBox(QComboBox *comboBox) const override {
+            for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+                BusinessActionType::Value val = (BusinessActionType::Value)i;
+
+                comboBox->insertItem(i, BusinessActionType::toString(val));
+                comboBox->setItemData(i, val);
+            }
+        }
+    };
+
+}
+
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::BusinessRulesDialog()),
-    m_currentDetailsWidget(NULL),
     m_loadingHandle(-1)
 {
     ui->setupUi(this);
@@ -29,10 +76,21 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
 
+    m_currentDetailsWidget = new QnBusinessRuleWidget(this, this->context());
+    ui->detailsLayout->addWidget(m_currentDetailsWidget);
+
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
     ui->tableView->installEventFilter(this);
+
+    QStyledItemDelegate *eventTypeItemDelegate = new QStyledItemDelegate(this);
+    eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
+    ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
+
+    QStyledItemDelegate *actionTypeItemDelegate = new QStyledItemDelegate(this);
+    actionTypeItemDelegate->setItemEditorFactory(new QnBusinessActionTypeEditorFactory());
+    ui->tableView->setItemDelegateForColumn(QnBusiness::ActionColumn, actionTypeItemDelegate);
 
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));
@@ -47,6 +105,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     connect(ui->buttonBox,                                  SIGNAL(accepted()),this, SLOT(at_saveAllButton_clicked()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
+    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(at_advancedButton_clicked()));
 
     connect(context,  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
 
@@ -79,12 +138,7 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
 
 void QnBusinessRulesDialog::at_context_userChanged() {
    // bool enabled = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-
-    if (m_currentDetailsWidget) {
-        ui->detailsLayout->removeWidget(m_currentDetailsWidget);
-        m_currentDetailsWidget->setVisible(false);
-        m_currentDetailsWidget = NULL;
-    }
+    m_currentDetailsWidget->setModel(NULL);
 
     m_rulesViewModel->clear();
     m_loadingHandle = -1;
@@ -99,15 +153,11 @@ void QnBusinessRulesDialog::at_context_userChanged() {
 
 void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
     m_rulesViewModel->updateRule(rule);
-    //widget by rule, item by widget - already written
-    qDebug() << "rule changed" << rule->getId();
     //TODO: ask user
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
     m_rulesViewModel->deleteRule(id);
-    //widget by rule, item by widget - already written
-    qDebug() << "rule deleted" << id;
     //TODO: ask user
 }
 
@@ -117,18 +167,13 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
-    for (int i = 0; i < m_rulesViewModel->rowCount(); i++) {
-        QnBusinessRuleViewModel* rule = m_rulesViewModel->getRuleModel(i);
-        if (!rule->isModified())
-            continue;
-        saveRule(rule);
+    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, -1, Qt::MatchExactly);
+    foreach (QModelIndex idx, modified) {
+        saveRule(m_rulesViewModel->getRuleModel(idx.row()));
     }
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
-    if (!m_currentDetailsWidget)
-        return;
-
     QnBusinessRuleViewModel* model = m_currentDetailsWidget->model();
     if (!model)
         return;
@@ -142,6 +187,10 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
         return;
 
     deleteRule(model);
+}
+
+void QnBusinessRulesDialog::at_advancedButton_clicked() {
+    ui->detailsGroupBox->setVisible(!ui->detailsGroupBox->isVisible());
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
@@ -176,7 +225,7 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
     }
 
     QnBusinessEventRulePtr rule = rules.first();
-    model->loadFromRule(rule);
+    model->loadFromRule(rule); //here ID is set and modified flag is cleared
     updateControlButtons();
 }
 
@@ -201,10 +250,6 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
     Q_UNUSED(previous)
 
     QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->getRuleModel(current.row());
-    if (!m_currentDetailsWidget) {
-        m_currentDetailsWidget = new QnBusinessRuleWidget(this, context());
-        ui->detailsLayout->addWidget(m_currentDetailsWidget);
-    }
     m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
@@ -212,7 +257,7 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
 
 void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
     Q_UNUSED(bottomRight)
-    if (topLeft.column() <= QnBusiness::ModifiedColumn)
+    if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
         updateControlButtons();
 }
 
@@ -249,8 +294,14 @@ void QnBusinessRulesDialog::updateControlButtons() {
     bool loaded = m_loadingHandle < 0;
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights && loaded);
-    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && loaded && m_rulesViewModel->hasModifiedItems());
 
-    ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasRights && loaded &&
+       !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty());
+
+    ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
+
+    ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
+    ui->detailsGroupBox->setVisible(ui->detailsGroupBox->isVisible() & loaded && m_currentDetailsWidget->model());
+
     ui->addRuleButton->setEnabled(hasRights && loaded);
 }

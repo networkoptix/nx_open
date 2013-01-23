@@ -107,6 +107,7 @@ private:
     int m_aggregationCount;
 };
 
+Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 
 

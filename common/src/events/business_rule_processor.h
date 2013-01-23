@@ -71,6 +71,7 @@ protected:
     */
     QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 
+    void terminateRunningRule(QnBusinessEventRulePtr rule);
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
@@ -87,11 +88,12 @@ private:
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
+    bool checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
 
     /**
      * @brief m_rulesInProgress         Stores actions that are toggled and state is On
      */
-    QSet<QString> m_rulesInProgress;
+    QMap<QString, QnAbstractBusinessEventPtr> m_rulesInProgress;
 
     struct QAggregationInfo 
     {

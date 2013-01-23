@@ -26,20 +26,6 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
 
     Q_ASSERT( context != NULL );
 
-    //GLContext::SYS_PAINT_DEVICE_HANDLE curDeviceHandle = NULL;
-    //GLContext::SYS_GL_CTX_HANDLE contextSysID = GLContext::getSysHandleOfQtContext( context, &curDeviceHandle );
-
-    //if context has changed, we need to share existing contexts with this one
-    //if( !DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-    //        contextSysID,
-    //        DecodedPictureToOpenGLUploaderContextPool::instance()->paintWindowHandle(),
-    //        1 ) )
-    //{
-    //    cl_log.log( QString::fromAscii("QnResourceWidgetRenderer. Failed to create auxiliary opengl context shared with GUI thread context. "
-    //        "Rendering of stream is impossible" ), cl_logERROR );
-    //    return;
-    //}
-
     const QGLContext* currentContextBak = QGLContext::currentContext();
     if( context && (currentContextBak != context) )
         const_cast<QGLContext*>(context)->makeCurrent();
@@ -133,11 +119,11 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 }
 
-void QnResourceWidgetRenderer::waitForFrameDisplayed(int /*channel*/) {
-    //RenderingTools& ctx = m_channelRenderers[channel];
-    //if( !ctx.uploader )
-    //    return;
-    //ctx.uploader->waitForCurrentDecodedPictureRendered();
+void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->waitForAllFramesDisplayed();
 }
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {

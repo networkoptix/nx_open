@@ -91,6 +91,7 @@ unix {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
   DEFINES += ${linux.defines}
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
+  DEFINES += override=
 }
 
 mac {

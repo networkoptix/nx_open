@@ -162,7 +162,7 @@ bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Q
     startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 
     // return true if recording started. if camera is not accessible e.t.c return false
-    return recorders.recorderHiRes->isRunning() || recorders.recorderLowRes->isRunning();
+    return true;
 }
 
 bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck)

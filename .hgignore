@@ -158,4 +158,3 @@ launcher/x64
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
-mvnc.sh

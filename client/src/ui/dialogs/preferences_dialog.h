@@ -50,6 +50,7 @@ private slots:
     void at_extraMediaFoldersList_selectionChanged();
     void at_context_userChanged();
     void at_timeModeComboBox_activated();
+    void at_onDecoderPluginsListChanged();
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)

@@ -81,6 +81,7 @@ public:
         //!Returns opengl texture holding plane \a index data. Index of a plane depends on color format (Y, U, V for YV12; Y, UV for NV12 and RGB for rgb format)
         QnGlRendererTexture* texture( int index ) const;
         GLuint pboID() const;
+        int flags() const;
 #ifdef GL_COPY_AGGREGATION
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
         const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
@@ -102,6 +103,8 @@ public:
 #ifdef GL_COPY_AGGREGATION
         QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
 #endif
+        bool m_skippingForbidden;
+        int m_flags;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -154,6 +157,8 @@ public:
         \return Uploaded picture data, NULL if no picture. Returned object memory is managed by \a DecodedPictureToOpenGLUploader, and MUST NOT be deleted
     */
     UploadedPicture* getUploadedPicture() const;
+    //!Blocks until all submitted frames have been rendered
+    void waitForAllFramesDisplayed();
     //!Marks \a picture as empty
     /*!
         Renderer MUST call this method to signal that \a picture can be used for uploading next decoded frame

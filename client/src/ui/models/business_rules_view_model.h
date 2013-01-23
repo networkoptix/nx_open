@@ -19,6 +19,7 @@
 namespace QnBusiness {
     enum Columns {
         ModifiedColumn,
+        DisabledColumn,
         EventColumn,
         SourceColumn,
         SpacerColumn,
@@ -37,9 +38,16 @@ namespace QnBusiness {
         ActionResourcesField    = 0x00000040,
         ActionParamsField       = 0x00000080,
         AggregationField        = 0x00000100,
+        DisabledField           = 0x00000200,
+        CommentsField           = 0x00000400,
+        ScheduleField           = 0x00000800,
         AllFieldsMask           = 0x0000FFFF
     };
     Q_DECLARE_FLAGS(Fields, Field)
+
+    enum ItemDataRole {
+        ModifiedRole   = Qt::UserRole + 1
+    };
 
 }
 
@@ -53,6 +61,7 @@ public:
     QnBusinessRuleViewModel(QObject *parent = 0);
 
     QVariant data(const int column, const int role = Qt::DisplayRole) const;
+    bool setData(const int column, const QVariant &value, int role);
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
     bool actionTypeShouldBeInstant();
@@ -90,6 +99,15 @@ public:
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
 
+    bool disabled() const;
+    void setDisabled(const bool value);
+
+    QString schedule() const;
+    void setSchedule(const QString value);
+
+    QString comments() const;
+    void setComments(const QString value);
+
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
@@ -115,6 +133,9 @@ private:
     QnBusinessParams m_actionParams;
 
     int m_aggregationPeriod;
+    bool m_disabled;
+    QString m_comments;
+    QString m_schedule;
 
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
@@ -135,6 +156,8 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -146,8 +169,6 @@ public:
 
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(QnId id);
-
-    bool hasModifiedItems() const;
 
     QnBusinessRuleViewModel* getRuleModel(int row);
 private slots:

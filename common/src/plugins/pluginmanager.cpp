@@ -66,6 +66,7 @@ PluginManager::~PluginManager()
         it != m_loadedPlugins.end();
         ++it )
     {
+        emit pluginUnloaded();
         (*it)->unload();
     }
 }
@@ -138,4 +139,6 @@ void PluginManager::loadPlugin( const QString& fullFilePath )
 
     cl_log.log( QString::fromAscii("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
     m_loadedPlugins.push_back( plugin );
+
+    emit pluginLoaded();
 }
