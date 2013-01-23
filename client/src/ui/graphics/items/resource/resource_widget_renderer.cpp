@@ -26,6 +26,10 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
 
     Q_ASSERT( context != NULL );
 
+    const QGLContext* currentContextBak = QGLContext::currentContext();
+    if( context && (currentContextBak != context) )
+        const_cast<QGLContext*>(context)->makeCurrent();
+
     m_channelRenderers.resize( channelCount );
     for( int i = 0; i < channelCount; ++i )
     {
@@ -37,6 +41,12 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
         renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
         m_channelRenderers[i] = renderingTools;
     }
+
+    if( context && currentContextBak != context )
+        if( currentContextBak )
+            const_cast<QGLContext*>(currentContextBak)->makeCurrent();
+        else
+            const_cast<QGLContext*>(context)->doneCurrent();
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {
@@ -109,11 +119,11 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 }
 
-void QnResourceWidgetRenderer::waitForFrameDisplayed(int /*channel*/) {
-    //RenderingTools& ctx = m_channelRenderers[channel];
-    //if( !ctx.uploader )
-    //    return;
-    //ctx.uploader->waitForCurrentDecodedPictureRendered();
+void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->waitForAllFramesDisplayed();
 }
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
