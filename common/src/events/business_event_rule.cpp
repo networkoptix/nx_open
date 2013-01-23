@@ -17,7 +17,6 @@ QnBusinessEventRule::QnBusinessEventRule()
     m_actionType(BusinessActionType::BA_NotDefined),
     m_aggregationPeriod(0)
 {
-
 }
 
 QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
@@ -108,6 +107,22 @@ int QnBusinessEventRule::aggregationPeriod() const {
 
 void QnBusinessEventRule::setAggregationPeriod(int msecs) {
     m_aggregationPeriod = msecs;
+}
+
+QString QnBusinessEventRule::comments() const {
+    return m_comments;
+}
+
+void QnBusinessEventRule::setComments(const QString value) {
+    m_comments = value;
+}
+
+QString QnBusinessEventRule::schedule() const {
+    return m_schedule;
+}
+
+void QnBusinessEventRule::setSchedule(const QString value) {
+    m_schedule = value;
 }
 
 QString QnBusinessEventRule::getUniqueId() const

@@ -47,6 +47,12 @@ public:
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
+
+    QString schedule() const;
+    void setSchedule(const QString value);
+
+    QString comments() const;
+    void setComments(const QString value);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
@@ -60,6 +66,9 @@ private:
     QnBusinessParams m_actionParams;
 
     int m_aggregationPeriod;
+
+    QString m_schedule;
+    QString m_comments;
 };
 
 typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;
