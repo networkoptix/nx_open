@@ -1281,6 +1281,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 
 void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
+    return; //temporary fix for quicksync testing
+
     QMutexLocker lk( &m_mutex );
     //while( !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() )
     //    m_cond.wait( lk.mutex() );
