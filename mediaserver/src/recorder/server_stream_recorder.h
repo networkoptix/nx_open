@@ -85,6 +85,7 @@ private:
     bool m_lastMotionState; // true if motion in progress
     qint64 m_queuedSize;
     QMutex m_queueSizeMutex;
+    qint64 m_lastMediaTime;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

@@ -27,7 +27,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_usedPanicMode(false),
     m_usedSpecialRecordingMode(false),
     m_lastMotionState(false),
-    m_queuedSize(0)
+    m_queuedSize(0),
+    m_lastMediaTime(AV_NOPTS_VALUE)
 {
     QnCommonMetaTypes::initilize();
 
@@ -204,6 +205,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
+    m_lastMediaTime = media->timestamp;
     qint64 afterThreshold = 5 * 1000000ll;
     if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionOnly)
         afterThreshold = m_currentScheduleTask.getAfterThreshold()*1000000ll;
@@ -453,6 +455,8 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
 
 void QnServerStreamRecorder::endOfRun()
 {
+    updateMotionStateInternal(false, m_lastMediaTime, QnMetaDataV1Ptr());
+
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
         m_device->setStatus(QnResource::Online);
