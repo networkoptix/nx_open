@@ -71,6 +71,7 @@ public:
     virtual void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
     virtual void deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data) = 0;
+    virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
@@ -83,6 +84,7 @@ public:
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
     virtual void serializeKvPair(const QnKvPair& kvPair, QByteArray& data) = 0;
     virtual void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data) = 0;
+    virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
