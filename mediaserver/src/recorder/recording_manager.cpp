@@ -165,7 +165,7 @@ bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Q
     return true;
 }
 
-bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck)
+bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes)
 {
     updateCamera(camRes); // ensure recorders are created
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
@@ -179,13 +179,15 @@ bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bo
     const Recorders& recorders = itrRec.value();
     if (!recorders.recorderHiRes && !recorders.recorderLowRes)
         return false;
+
+    /*
     int afterThreshold = recorders.recorderHiRes ? recorders.recorderHiRes->getFRAfterThreshold() : recorders.recorderLowRes->getFRAfterThreshold();
     if (afterThreshold > 0 && afterThresholdCheck) {
         m_delayedStop.insert(camRes, qnSyncTime->currentUSecsSinceEpoch() + afterThreshold*1000000ll);
         return true;
     }
-
     m_delayedStop.remove(camRes);
+    */
 
     // update current schedule task
     if (recorders.recorderHiRes)
@@ -221,7 +223,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
+            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
 
             if (runSecondStream)
             {
@@ -458,6 +460,7 @@ void QnRecordingManager::onTimer()
         startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
     }
 
+    /*
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
     for (QMap<QnSecurityCamResourcePtr, qint64>::iterator itrDelayedStop = stopList.begin(); itrDelayedStop != stopList.end(); ++itrDelayedStop)
     {
@@ -465,6 +468,7 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
+    */
 }
 
 

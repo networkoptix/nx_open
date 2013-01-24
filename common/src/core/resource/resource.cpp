@@ -226,7 +226,11 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    return m_resourcePool->getResourceById(getParentId());
+    QMutexLocker mutexLocker(&m_mutex);
+    if (m_resourcePool)
+        return m_resourcePool->getResourceById(getParentId());
+    else
+        return QnResourcePtr();
 }
 
 

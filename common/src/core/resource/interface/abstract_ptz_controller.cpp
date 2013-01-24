@@ -1,15 +1,21 @@
 #include "abstract_ptz_controller.h"
 
-#include "core/resource/network_resource.h"
-#include "api/app_server_connection.h"
-#include "core/resource/camera_resource.h"
-#include "api/api_fwd.h"
-#include "core/resource/param.h"
+#include <utils/common/warnings.h>
 
-QnAbstractPtzController::QnAbstractPtzController(QnResourcePtr netRes)
+#include <api/api_fwd.h>
+#include <api/app_server_connection.h>
+
+#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/param.h>
+
+
+QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource, QObject *parent):
+    QObject(parent)
 {
-    m_resource = qSharedPointerDynamicCast<QnVirtualCameraResource>(netRes);
-
+    m_resource = resource.dynamicCast<QnVirtualCameraResource>();
+    if(!m_resource)
+        qnWarning("Invalid non-camera resource '%1' provided to ptz controller.", resource ? resource->getName() : QLatin1String("NULL"));
 }
 
 void QnAbstractPtzController::getCalibrate(QnVirtualCameraResourcePtr res, qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff)

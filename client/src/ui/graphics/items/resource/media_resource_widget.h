@@ -113,7 +113,7 @@ protected:
     virtual Buttons calculateButtonsVisibility() const override;
     virtual Overlay calculateChannelOverlay(int channel) const override;
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QGLWidget *widget) override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
@@ -160,7 +160,6 @@ private:
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRadassButton();
     Q_SLOT void updateServerResource();
-    Q_SLOT void updateRendererChannelScreenSize();
 
 private:
     /** Media resource. */

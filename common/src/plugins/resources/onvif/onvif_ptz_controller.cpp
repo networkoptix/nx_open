@@ -73,6 +73,9 @@ QnOnvifPtzController::QnOnvifPtzController(QnResourcePtr res): QnAbstractPtzCont
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
+    m_capabilities = Qn::ContinuousPtzCapability | Qn::AbsolutePtzCapability; // TODO
+
+
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
 
@@ -229,3 +232,13 @@ int QnOnvifPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
 
     return rez;
 }
+
+Qn::CameraCapabilities QnOnvifPtzController::getCapabilities() 
+{
+    return m_capabilities;
+}
+
+
+
+
+

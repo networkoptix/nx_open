@@ -13,7 +13,11 @@ class QGLContext;
 class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
 
-class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
+class QnResourceWidgetRenderer
+:
+    public QObject,
+    public QnAbstractRenderer
+{
     Q_OBJECT;
 
 public:
@@ -45,6 +49,7 @@ public:
     virtual qint64 lastDisplayedTime(int channel) const override;
 
     qint64 isLowQualityImage(int channel) const;
+    bool isHardwareDecoderUsed(int channel) const;
 
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
 

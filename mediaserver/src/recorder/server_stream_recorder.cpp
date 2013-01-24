@@ -250,7 +250,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-    if (camera->streamFpsSharingMethod()==shareFps)
+    if (camera->streamFpsSharingMethod() == Qn::shareFps)
     {
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
@@ -271,7 +271,7 @@ void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int f
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;
-    scheduleData.m_beforeThreshold = beforeThreshold;
+    scheduleData.m_beforeThreshold = 0; // beforeThreshold not used now
     scheduleData.m_afterThreshold = afterThreshold;
     scheduleData.m_fps = getFpsForValue(fps);
     if (maxDuration) {
@@ -295,17 +295,22 @@ void QnServerStreamRecorder::stopForcedRecording()
 
 void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleTask)
 {
+    /*
     QString msg;
     QTextStream str(&msg);
     str << "Update recording params for camera " << m_device->getUniqueId() << "  " << scheduleTask;
     str.flush();
     cl_log.log(msg, cl_logINFO);
+    */
 
     if (!isMotionRec(scheduleTask.getRecordingType()))
     {
         // switch from motion to non-motion recording
-        flushPrebuffer();
-        setPrebufferingUsec(0);
+        QnSecurityCamResourcePtr camRes = getResource().dynamicCast<QnSecurityCamResource>();
+        bool isNoRec = scheduleTask.getRecordingType() == Qn::RecordingType_Never;
+        bool usedInRecordAction = camRes && camRes->isRecordingEventAttached();
+        int prebuffer = usedInRecordAction && isNoRec ? 1 : 0; // prebuffer 1 usec if camera used in recording action (for keeping last GOP)
+        setPrebufferingUsec(prebuffer);
     }
     else if (getPrebufferingUsec() != 0 || !isMotionRec(m_currentScheduleTask.getRecordingType())) {
         // do not change prebuffer if previous recording is motion and motion in progress
@@ -353,6 +358,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
+    QnScheduleTask noRecordTask(0, m_device->getId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {
@@ -373,16 +379,14 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
                 updateStreamParams();
             }
             else {
-                QnScheduleTask noRecordTask(QnId::generateSpecialId(), m_device->getId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
                 updateRecordingType(noRecordTask);
             }
             static const qint64 SCHEDULE_AGGREGATION = 1000*60*15;
             m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION); // check period each 15 min
         }
     }
-    else if (m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never) 
-    {
-        updateRecordingType(QnScheduleTask());
+    else {
+        updateRecordingType(noRecordTask);
     }
 }
 

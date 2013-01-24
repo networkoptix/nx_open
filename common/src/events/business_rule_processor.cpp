@@ -6,6 +6,7 @@
 #include "events/business_event_rule.h"
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
+#include "core/resource_managment/resource_pool.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -31,7 +32,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
-    return res->getParentResource().dynamicCast<QnMediaServerResource>();
+    return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
@@ -118,11 +119,12 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
 
 bool QnBusinessRuleProcessor::checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const
 {
+    if (rule->isDisabled())
+        return false;
     if (!bEvent->checkCondition(rule->eventState(), rule->eventParams()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
-    // TODO: check if rule is disabled
     return true;
 }
 
@@ -153,8 +155,10 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
     bool condOK = checkCondition(bEvent, rule);
-    if (!condOK)
+    if (!condOK) {
+        m_rulesInProgress.remove(rule->getUniqueId());
         return QnAbstractBusinessActionPtr();
+    }
     
     if (bEvent->getToggleState() == ToggleState::On) {
         if (m_rulesInProgress.contains(rule->getUniqueId()))
@@ -384,23 +388,39 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
 
 void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessEventRulePtr businessRule, bool isRuleAdded )
 {
-    const QnResourceList& resList = businessRule->eventResources();
-    if( businessRule->eventType() == BusinessEventType::BE_Camera_Input &&
-        !resList.empty() )
+    //notifying resources to start input monitoring
     {
-        //notifying resources to start input monitoring
-        for( QnResourceList::const_iterator
-            it = resList.begin();
-            it != resList.end();
-            ++it )
+        const QnResourceList& resList = businessRule->eventResources();
+        if( businessRule->eventType() == BusinessEventType::BE_Camera_Input)
         {
-            QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
-            if( !securityCam )
-                continue;
-            if( isRuleAdded )
-                securityCam->inputPortListenerAttached();
-            else
-                securityCam->inputPortListenerDetached();
+            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            {
+                QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
+                if( !securityCam )
+                    continue;
+                if( isRuleAdded )
+                    securityCam->inputPortListenerAttached();
+                else
+                    securityCam->inputPortListenerDetached();
+            }
+        }
+    }
+
+    //notifying resources about recording action
+    {
+        const QnResourceList& resList = businessRule->actionResources();
+        if( businessRule->actionType() == BusinessActionType::BA_CameraRecording)
+        {
+            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            {
+                QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
+                if( !securityCam )
+                    continue;
+                if( isRuleAdded )
+                    securityCam->recordingEventAttached();
+                else
+                    securityCam->recordingEventDetached();
+            }
         }
     }
 }
