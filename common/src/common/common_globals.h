@@ -3,7 +3,29 @@
 
 #include <QtCore/QtGlobal>
 
-namespace Qn {
+#include <utils/common/gadget.h>
+
+#ifdef Q_MOC_RUN
+class QnCommonGlobals
+#else
+namespace QnCommonGlobals
+#endif
+{
+#ifdef Q_MOC_RUN
+    Q_GADGET
+    Q_ENUMS(ExtrapolationMode MotionType StreamFpsSharingMethod)
+    Q_FLAGS(CameraCapabilities)
+public:
+#else
+    QN_GADGET
+#endif
+
+    enum ExtrapolationMode {
+        ConstantExtrapolation,
+        LinearExtrapolation,
+        PeriodicExtrapolation
+    };
+
     enum CameraCapability { 
         NoCapabilities                      = 0x0, 
         ContinuousPtzCapability             = 0x01, 
@@ -30,14 +52,12 @@ namespace Qn {
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
-} // namespace Qn
+} // namespace QnCommonGlobals
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::CameraCapabilities);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnCommonGlobals::CameraCapabilities);
 
-
-
-
-
-
+namespace Qn {
+    using namespace QnCommonGlobals;
+}
 
 #endif // QN_COMMON_GLOBALS_H

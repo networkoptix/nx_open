@@ -1,4 +1,5 @@
 #include "business_logic_common.h"
+
 #include <qjson/serializer.h>
 #include <qjson/parser.h>
 
