@@ -187,9 +187,13 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return m_actionType;
             break;
 
-//        case Qt::BackgroundRole:
-//            if (m_disabled)
-//                return QBrush(Qt::lightGray); //TODO: #GDM palette or even skin
+     /*   case Qt::TextColorRole:
+            return QBrush(Qt::red);
+
+
+        case Qt::BackgroundRole:
+            if (m_disabled)
+                return QBrush(Qt::lightGray); //TODO: #GDM palette or even skin*/
 
         case QnBusiness::ModifiedRole:
             return m_modified;
@@ -718,7 +722,7 @@ QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orien
 
     switch (section) {
         case QnBusiness::ModifiedColumn:    return tr("#");
-        case QnBusiness::DisabledColumn:    return tr("Enabled");
+        case QnBusiness::DisabledColumn:    return tr("On");
         case QnBusiness::EventColumn:       return tr("Event");
         case QnBusiness::SourceColumn:      return tr("Source");
         case QnBusiness::SpacerColumn:      return tr("->");
@@ -740,7 +744,8 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             break;
         case QnBusiness::EventColumn:
         case QnBusiness::ActionColumn:
-            flags |= Qt::ItemIsEditable;
+            if (!m_rules[index.row()]->disabled())
+                flags |= Qt::ItemIsEditable;
             break;
         default:
             break;

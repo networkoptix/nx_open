@@ -90,6 +90,21 @@ namespace {
             return sh;
         }
 
+        virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            return base_type::createEditor(parent, option, index);
+        }
+
+        virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
+            base_type::initStyleOption(option, index);
+            if (index.data(QnBusiness::DisabledRole).toBool()) {
+                if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
+                    vopt->state = QStyle::State_None;
+                    vopt->features |= QStyleOptionViewItemV2::Alternate;
+                }
+            }
+
+        }
+
     };
 
 }
@@ -111,6 +126,12 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
+
+    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);
 
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
@@ -238,6 +259,8 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& 
     m_rulesViewModel->addRules(rules);
     m_loadingHandle = -1;
 
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
     updateControlButtons();
 }
 
