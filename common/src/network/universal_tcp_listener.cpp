@@ -13,8 +13,9 @@ protected:
     virtual void pleaseStop() override;
 };
 
-struct QnUniversalRequestProcessor::QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnUniversalRequestProcessor::QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
+public:
     QnTCPConnectionProcessor* processor;
     QMutex mutex;
 };

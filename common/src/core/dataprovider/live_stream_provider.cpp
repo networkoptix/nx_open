@@ -8,10 +8,10 @@ m_livemutex(QMutex::Recursive),
 m_quality(QnQualityNormal),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
-m_role(QnResource::Role_LiveVideo),
 m_softMotionRole(QnResource::Role_Default),
 m_softMotionLastChannel(0)
 {
+    m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
     m_layout = 0;
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
@@ -28,10 +28,9 @@ QnLiveStreamProvider::~QnLiveStreamProvider()
 void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
 {
     bool needUpdate = false;
-    
+    QnAbstractMediaStreamDataProvider::setRole(role);
     {
         QMutexLocker mtx(&m_livemutex);
-        m_role = role;
         updateSoftwareMotion();
 
         if (role == QnResource::Role_SecondaryLiveVideo)

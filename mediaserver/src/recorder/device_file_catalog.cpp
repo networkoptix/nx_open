@@ -243,8 +243,8 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     recorder.close();
     delete reader;
 
-    qint64 oldSize = storage->getFileSize(fileName);
-    qint64 newSize = storage->getFileSize(fileName + ".new.mkv");
+    //qint64 oldSize = storage->getFileSize(fileName);
+    //qint64 newSize = storage->getFileSize(fileName + ".new.mkv");
 
     if (storage->removeFile(fileName)) {
         storage->renameFile(fileName+".new.mkv", fileName);

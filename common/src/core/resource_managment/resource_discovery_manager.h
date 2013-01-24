@@ -66,7 +66,6 @@ protected:
 protected:
 
     virtual void run();
-    virtual bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
 signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr);
@@ -74,6 +73,7 @@ private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
 private:
+    bool processDiscoveredResources(QnResourceList& resources);
 
     void updateLocalNetworkInterfaces();
 

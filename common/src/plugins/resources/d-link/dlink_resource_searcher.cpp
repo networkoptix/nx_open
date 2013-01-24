@@ -165,6 +165,7 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())

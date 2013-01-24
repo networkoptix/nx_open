@@ -342,7 +342,7 @@ void QnStorageManager::updateStorageStatistics()
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
     QnStorageResourcePtr result;
-    float minBitrate = INT_MAX;
+    float minBitrate = (float) INT_MAX;
 
     {
         QMutexLocker lock(&m_mutexStorages);

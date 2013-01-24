@@ -749,7 +749,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
         nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
             nx_http::ConstBufferRefType(msgBodyBuf, offset),
             &bytesProcessed );
-        offset += bytesProcessed;
+        offset += (int) bytesProcessed;
         switch( resultCode )
         {
             case nx_http::MultipartContentParser::partDataDone:
@@ -761,7 +761,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
                 {
                     m_currentMonitorData.append(
                         m_multipartContentParser.prevFoundData().data(),
-                        m_multipartContentParser.prevFoundData().size() );
+                        (int) m_multipartContentParser.prevFoundData().size() );
                     notificationReceived( m_currentMonitorData );
                     m_currentMonitorData.clear();
                 }
@@ -770,7 +770,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
             case nx_http::MultipartContentParser::someDataAvailable:
                 m_currentMonitorData.append(
                     m_multipartContentParser.prevFoundData().data(),
-                    m_multipartContentParser.prevFoundData().size() );
+                    (int) m_multipartContentParser.prevFoundData().size() );
                 break;
 
             case nx_http::MultipartContentParser::eof:

@@ -462,8 +462,6 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 
 QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution)
 {
-    Q_D(QnRtspConnectionProcessor);
-
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = CODEC_ID_H263P;

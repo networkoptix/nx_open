@@ -118,7 +118,6 @@ qint64 QnFile::size() const
 {
     QnFile* nonConstThis = const_cast<QnFile*>(this);
     nonConstThis->sync();
-    qint64 fileSize;
 	DWORD highDw;
 	DWORD lowDw = GetFileSize( m_impl, &highDw );
 	if( (lowDw == INVALID_FILE_SIZE) && (GetLastError() != NO_ERROR) )

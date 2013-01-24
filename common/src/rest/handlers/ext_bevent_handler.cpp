@@ -18,6 +18,7 @@ QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
     QString eventType;
     QString resourceId;
     QString errStr;

@@ -151,6 +151,7 @@ QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const QUrl& url, c
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 

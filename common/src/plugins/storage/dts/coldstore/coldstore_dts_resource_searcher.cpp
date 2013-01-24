@@ -60,7 +60,7 @@ QString macFromString(QString str)
 QnColdStoreDTSSearcher::QnColdStoreDTSSearcher()
 {
 
-    char databuf[100];
+    quint8 databuf[100];
 
 
     databuf[0] = 0x03;
@@ -75,7 +75,7 @@ QnColdStoreDTSSearcher::QnColdStoreDTSSearcher()
     databuf[91] = 0xf6;
 
 
-    m_request = new QByteArray(databuf, sizeof(databuf));
+    m_request = new QByteArray((const char*) databuf, sizeof(databuf));
 
 }
 

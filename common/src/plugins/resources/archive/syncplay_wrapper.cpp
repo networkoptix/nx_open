@@ -460,6 +460,8 @@ void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
+    Q_UNUSED(mksec)
+
     Q_D(QnArchiveSyncPlayWrapper);
 
     QMutexLocker lock(&d->timeMutex);

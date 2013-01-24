@@ -77,6 +77,7 @@ QList<QnResourcePtr> QnPlPulseSearcher::checkHostAddr(const QUrl& url, const QAu
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 

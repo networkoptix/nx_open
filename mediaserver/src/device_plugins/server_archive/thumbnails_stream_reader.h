@@ -26,7 +26,6 @@ public:
     void setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq);
 
     void setQuality(MediaQuality q);
-    virtual void setRole(QnResource::ConnectionRole role) {}
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run();

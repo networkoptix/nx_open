@@ -115,11 +115,11 @@ public:
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
     int square1 = 0;
-    for (uint i = 0; i < s1.resolutions.size(); ++i)
+    for (int i = 0; i < s1.resolutions.size(); ++i)
         square1 = qMax(square1, s1.resolutions[i].width() * s1.resolutions[i].height());
     
     int square2 = 0;
-    for (uint i = 0; i < s2.resolutions.size(); ++i)
+    for (int i = 0; i < s2.resolutions.size(); ++i)
         square2 = qMax(square2, s2.resolutions[i].width() * s2.resolutions[i].height());
 
     if (square1 != square2)
@@ -780,7 +780,7 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     QBuffer srcDataBuffer;
     srcDataBuffer.setData(
         notification.Message.__any,
-        strlen(notification.Message.__any) );
+        (int) strlen(notification.Message.__any) );
     QXmlInputSource xmlSrc( &srcDataBuffer );
     if( !reader.parse( &xmlSrc ) )
         return;
@@ -1313,7 +1313,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
 
     int confRangeStart = 0;
-    int confRangeEnd = confResponse.Configurations.size();
+    int confRangeEnd = (int) confResponse.Configurations.size();
     if (m_maxChannels > 1)
     {
         // determine amount encoder configurations per each video source
@@ -1705,7 +1705,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
             << ". " << soapWrapper.getLastError();
         return false;
     }
-    m_maxChannels = response.VideoSources.size();
+    m_maxChannels = (int) response.VideoSources.size();
     return true;
 }
 
@@ -1728,7 +1728,7 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
 
     }
 
-    m_maxChannels = response.VideoSources.size();
+    m_maxChannels = (int) response.VideoSources.size();
 
     if (m_maxChannels <= m_channelNumer) {
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
@@ -2390,7 +2390,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         QBuffer srcDataBuffer;
         srcDataBuffer.setData(
             response.SubscriptionReference->ns1__ReferenceParameters->__item,
-            strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
         QXmlInputSource xmlSrc( &srcDataBuffer );
         if( reader.parse( &xmlSrc ) )
             m_onvifNotificationSubscriptionID = handler.subscriptionID;
@@ -2453,7 +2453,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
         QBuffer srcDataBuffer;
         srcDataBuffer.setData(
             response.SubscriptionReference->ns1__ReferenceParameters->__item,
-            strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
         QXmlInputSource xmlSrc( &srcDataBuffer );
         if( reader.parse( &xmlSrc ) )
             m_onvifNotificationSubscriptionID = handler.subscriptionID;

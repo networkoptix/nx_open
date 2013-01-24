@@ -339,6 +339,8 @@ void QnRecordingManager::at_camera_initAsyncFinished(const QnResourcePtr &resour
 
 void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
 {
+    Q_UNUSED(resource)
+
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
         if (!camera->isInitialized() && !camera->isDisabled()) {

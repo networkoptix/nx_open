@@ -18,6 +18,8 @@ QnFileSystemHandler::QnFileSystemHandler(bool detectAvailableOnly):
 int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
+
     QString pathStr;
     QString errStr;
 

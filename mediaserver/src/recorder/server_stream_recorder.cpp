@@ -236,7 +236,6 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     // write motion only
     // if prebuffering mode and all buffer is full - drop data
 
-    bool rez = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll;
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
     if (!isMotionContinue && m_endDateTime != AV_NOPTS_VALUE) 
     {
@@ -270,6 +269,8 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
 
 void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
+    Q_UNUSED(beforeThreshold)
+
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;
