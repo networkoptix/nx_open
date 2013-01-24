@@ -2,6 +2,7 @@
 #define QN_WEEKTIME_SCHEDULE_WIDGET_H
 
 #include <QtGui/QWidget>
+#include <QtGui/QDialog>
 
 class QnWorkbenchContext;
 
@@ -9,7 +10,7 @@ namespace Ui {
     class WeekTimeScheduleWidget;
 }
 
-class QnWeekTimeScheduleWidget: public QWidget
+class QnWeekTimeScheduleWidget: public QDialog
 {
     Q_OBJECT
 public:

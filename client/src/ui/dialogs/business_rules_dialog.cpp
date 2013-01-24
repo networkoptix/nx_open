@@ -81,7 +81,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->installEventFilter(this);
 
     QStyledItemDelegate *eventTypeItemDelegate = new QStyledItemDelegate(this);

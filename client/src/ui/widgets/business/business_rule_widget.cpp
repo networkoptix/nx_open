@@ -18,6 +18,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
+#include <ui/widgets/properties/weektime_schedule_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
@@ -73,6 +74,7 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
     connect(ui->eventResourcesHolder,       SIGNAL(clicked()),                  this, SLOT(at_eventResourcesHolder_clicked()));
     connect(ui->actionResourcesHolder,      SIGNAL(clicked()),                  this, SLOT(at_actionResourcesHolder_clicked()));
+    connect(ui->scheduleButton,             SIGNAL(clicked()),                  this, SLOT(at_scheduleButton_clicked()));
 
     connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
 
@@ -359,6 +361,17 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (dialog.exec() != QDialog::Accepted)
         return;
     m_model->setActionResources(dialog.getSelectedResources());
+}
+
+void QnBusinessRuleWidget::at_scheduleButton_clicked() {
+    if (!m_model)
+        return;
+
+    QnWeekTimeScheduleWidget dialog(this);
+    dialog.setScheduleTasks(m_model->schedule());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_model->setSchedule(dialog.scheduleTasks());
 }
 
 
