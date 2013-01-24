@@ -1,19 +1,20 @@
-#ifndef __QNABSTRACT_PTZ_CONTROLLER_H__
-#define __QNABSTRACT_PTZ_CONTROLLER_H__
+#ifndef QN_ABSTRACT_PTZ_CONTROLLER_H
+#define QN_ABSTRACT_PTZ_CONTROLLER_H
 
 #include <QObject>
-#include <QSize>
-#include "core/resource/resource_fwd.h"
 
-class QnAbstractPtzController: public QObject
-{
+#include <core/resource/resource_fwd.h>
+
+class QnAbstractPtzController: public QObject {
+    Q_OBJECT
 public:
-    QnAbstractPtzController(QnResourcePtr netRes);
+    QnAbstractPtzController(const QnResourcePtr &netRes, QObject *parent = NULL);
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) = 0;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) = 0;
     virtual int stopMove() = 0;
+    //virtual Qn::CameraCapabilities getCapabilities() { return Qn::ContinuousPtzCapability; } // TODO
 
     bool calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
     void getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);
@@ -24,8 +25,9 @@ public:
     qreal getXVelocityCoeff() const;
     qreal getYVelocityCoeff() const;
     qreal getZoomVelocityCoeff() const;
+
 private:
-    QnVirtualCameraResourcePtr m_resource;
+    QnVirtualCameraResourcePtr m_resource; // TODO: #VASILENKO why not QnSecurityCamResource?
 };
 
-#endif //__QNABSTRACT_PTZ_CONTROLLER_H__
+#endif // QN_ABSTRACT_PTZ_CONTROLLER_H

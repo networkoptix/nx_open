@@ -15,21 +15,9 @@ public:
 };
 
 enum MotionType {MT_Default = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4, MT_NoMotion = 8};
-
-enum StreamFpsSharingMethod 
-{
-    shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-    sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-    noSharing // second stream does not subtract first stream fps 
-};
-
 Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
 
-class QnSecurityCamResource : virtual public QnMediaResource
-{
-    Q_OBJECT
-
-public:
+namespace Qn {
     enum CameraCapability { 
         NoCapabilities                      = 0x0, 
         ContinuousPtzCapability             = 0x01, 
@@ -39,8 +27,25 @@ public:
         relayOutput                         = 0x10,
         AbsolutePtzCapability               = 0x20
     };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
 
+    enum StreamFpsSharingMethod 
+    {
+        shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
+        sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+        noSharing // second stream does not subtract first stream fps 
+    };
+
+} // namespace Qn
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::CameraCapabilities);
+
+
+class QnSecurityCamResource : virtual public QnMediaResource
+{
+    Q_OBJECT
+
+public:
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
     MotionType getCameraBasedMotionType() const;
@@ -86,15 +91,15 @@ public:
 
     virtual bool hasDualStreaming() const;
 
-    virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
+    virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
 
     virtual QStringList getRelayOutputList() const;
     virtual QStringList getInputPortList() const;
 
 
-    CameraCapabilities getCameraCapabilities() const;
-    void setCameraCapabilities(CameraCapabilities capabilities);
-    void setCameraCapability(CameraCapability capability, bool value);
+    Qn::CameraCapabilities getCameraCapabilities() const;
+    void setCameraCapabilities(Qn::CameraCapabilities capabilities);
+    void setCameraCapability(Qn::CameraCapability capability, bool value);
 
 
     /*!

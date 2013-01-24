@@ -637,7 +637,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
     if (((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked()) || 
         ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
-        && m_camera->streamFpsSharingMethod() == shareFps )
+        && m_camera->streamFpsSharingMethod() == Qn::shareFps )
     {
         maxDualStreamingFps -= MIN_SECOND_STREAM_FPS;
     }

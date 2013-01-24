@@ -250,7 +250,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-    if (camera->streamFpsSharingMethod()==shareFps)
+    if (camera->streamFpsSharingMethod() == Qn::shareFps)
     {
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;

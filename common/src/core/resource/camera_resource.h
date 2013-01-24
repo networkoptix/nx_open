@@ -45,6 +45,7 @@ public:
     QString getFirmware() const;
     void setFirmware(QString firmware);
 
+    // TODO: make sure ordering is right
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
@@ -68,7 +69,6 @@ private:
 
     QnAbstractDTSFactory* m_dtsFactory;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
 
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource

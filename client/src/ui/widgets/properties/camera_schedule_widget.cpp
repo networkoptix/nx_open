@@ -715,11 +715,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
             // or just use camera->reservedSecondStreamFps();
 
             int decreaseAlways = 0;
-            if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
+            if (camera->streamFpsSharingMethod() == Qn::shareFps && camera->getMotionType() == MT_SoftwareGrid)
                 decreaseAlways = MIN_SECOND_STREAM_FPS;
 
             int decreaseIfMotionPlusLQ = 0;
-            if (camera->streamFpsSharingMethod() == shareFps)
+            if (camera->streamFpsSharingMethod() == Qn::shareFps)
                 decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
 
             QnScheduleTaskList tasks;

@@ -94,7 +94,7 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
 QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
     if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & QnSecurityCamResource::PrimaryStreamSoftMotionCapability))
+        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
             m_softMotionRole = QnResource::Role_LiveVideo;
         else
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
@@ -214,17 +214,17 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     int maxFps = m_cameraRes->getMaxFps();
 
-    StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
+    Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     int newSecFps;
 
-    if (sharingMethod == sharePixels)
+    if (sharingMethod == Qn::sharePixels)
     {
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
         if (maxFps - newFps < 2 )
             newSecFps = qMin(DESIRED_SECOND_STREAM_FPS/2,MIN_SECOND_STREAM_FPS);
 
     }
-    else if (sharingMethod == shareFps)
+    else if (sharingMethod == Qn::shareFps)
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps - newFps); //ss; minimum between 5 and what is left;
     else// noSharing
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps);
