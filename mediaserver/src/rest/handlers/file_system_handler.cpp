@@ -67,9 +67,9 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
             rezStr.append("<freeSpace>\n");
             rezStr.append(QByteArray::number(storage->getFreeSpace()));
             rezStr.append("</freeSpace>\n");
-            rezStr.append("<usedSpace>\n");
-            rezStr.append(QByteArray::number(storage->getWritedSpace()));
-            rezStr.append("</usedSpace>\n");
+            rezStr.append("<totalSpace>\n");
+            rezStr.append(QByteArray::number(storage->getTotalSpace()));
+            rezStr.append("</totalSpace>\n");
         }
     }
     else {
