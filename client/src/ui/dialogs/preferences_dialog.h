@@ -32,6 +32,7 @@ public:
 
     void openLicensesPage();
     void openServerSettingsPage();
+    void openPopupSettingsPage();
 
     virtual void accept() override;
 

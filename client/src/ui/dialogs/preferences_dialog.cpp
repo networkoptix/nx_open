@@ -231,6 +231,10 @@ void QnPreferencesDialog::openServerSettingsPage() {
     ui->tabWidget->setCurrentIndex(m_serverSettingsTabIndex);
 }
 
+void QnPreferencesDialog::openPopupSettingsPage() {
+    ui->tabWidget->setCurrentIndex(m_popupSettingsTabIndex);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
