@@ -347,6 +347,11 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
     return m_lastDisplayedMetadata;
 }
 
+bool QnGLRenderer::isHardwareDecoderUsed() const
+{
+    return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
+}
+
 bool QnGLRenderer::isYV12ToRgbShaderUsed() const
 {
     return (features() & QnGlFunctions::ArbPrograms)

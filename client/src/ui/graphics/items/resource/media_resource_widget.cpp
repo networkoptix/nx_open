@@ -553,14 +553,14 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
     if(!m_connection)
         return;
 
-    QnVirtualCameraResource::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
-    if(capabilities & QnVirtualCameraResource::ContinuousPtzCapability) {
+    Qn::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
+    if(capabilities & Qn::ContinuousPtzCapability) {
         if(qFuzzyIsNull(zoomSpeed)) {
             m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
         } else {
             m_connection->asyncPtzMove(m_camera, 0.0, 0.0, zoomSpeed, this, SLOT(at_replyReceived(int, int)));
         }
-    } else if(capabilities & QnVirtualCameraResource::ZoomCapability) {
+    } else if(capabilities & Qn::ZoomCapability) {
         CameraSetting setting(
             QLatin1String("%%Lens%%Zoom"),
             QLatin1String("Zoom"),
@@ -773,8 +773,19 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
         );
     }
-    
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(hqLqString).arg(timeString);
+
+#ifdef _DEBUG
+    QString decoderType = m_renderer->isHardwareDecoderUsed(0) ? tr(" HW") : tr(" SW");
+#endif
+
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2)
+        .arg(codecString).arg(hqLqString)
+#ifdef _DEBUG
+        .arg(decoderType)
+#else
+        .arg(QString())
+#endif
+        .arg(timeString);
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
@@ -788,7 +799,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if(m_camera) {
         if(
-            (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::ContinuousPtzCapability | QnVirtualCameraResource::ZoomCapability)) && 
+            (m_camera->getCameraCapabilities() & (Qn::ContinuousPtzCapability | Qn::ZoomCapability)) && 
             accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;
@@ -851,7 +862,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::ContinuousPtzCapability);
+    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & Qn::ContinuousPtzCapability);
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

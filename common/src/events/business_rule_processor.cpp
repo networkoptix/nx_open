@@ -155,8 +155,10 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
     bool condOK = checkCondition(bEvent, rule);
-    if (!condOK)
+    if (!condOK) {
+        m_rulesInProgress.remove(rule->getUniqueId());
         return QnAbstractBusinessActionPtr();
+    }
     
     if (bEvent->getToggleState() == ToggleState::On) {
         if (m_rulesInProgress.contains(rule->getUniqueId()))

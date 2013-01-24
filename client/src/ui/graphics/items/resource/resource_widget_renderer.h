@@ -49,6 +49,7 @@ public:
     virtual qint64 lastDisplayedTime(int channel) const override;
 
     qint64 isLowQualityImage(int channel) const;
+    bool isHardwareDecoderUsed(int channel) const;
 
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
 
