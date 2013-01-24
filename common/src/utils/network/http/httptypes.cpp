@@ -149,6 +149,8 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case badRequest:
                     return StringType("Bad Request");
+                case forbidden:
+                    return StringType("Forbidden");
                 case notFound:
                     return StringType("Not Found");
                 case internalServerError:

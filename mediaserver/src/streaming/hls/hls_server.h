@@ -9,6 +9,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include <core/resource/media_resource.h>
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
 
@@ -16,6 +17,14 @@
 #include "../streaming_chunk_cache_key.h"
 
 
+/*!
+    HLS request url has following format:\n
+    - /hls/unique-resource-id.m3u?format-parameters  - for playlist
+    - /hls/unique-resource-id?format-parameters  - for chunks
+
+    Parameters:\n
+
+*/
 class QnHttpLiveStreamingProcessor
 :
     virtual public QnTCPConnectionProcessor
@@ -65,11 +74,20 @@ private:
         \return false, if no more data to send (reached end of file)
     */
     bool prepareDataToSend();
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
+    nx_http::StatusCode::Value getHLSPlaylist(
         const QStringRef& uniqueResourceID,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response );
-    nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
+    nx_http::StatusCode::Value getLivePlaylist(
+        QnMediaResourcePtr mediaResource,
+        const std::multimap<QString, QString>& requestParams,
+        nx_http::Response* const response );
+    nx_http::StatusCode::Value getArchivePlaylist(
+        const QnMediaResourcePtr& mediaResource,
+        const QDateTime& startTimestamp,
+        const std::multimap<QString, QString>& requestParams,
+        nx_http::Response* const response );
+    nx_http::StatusCode::Value getResourceChunk(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
         const std::multimap<QString, QString>& requestParams,

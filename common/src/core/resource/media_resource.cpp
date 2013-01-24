@@ -25,7 +25,8 @@ QString QnStreamQualityToString(QnStreamQuality value) {
 
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
-QnMediaResource::QnMediaResource():
+QnMediaResource::QnMediaResource()
+:
     QnResource()
 {
     addFlags(QnResource::media);

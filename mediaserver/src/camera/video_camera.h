@@ -1,15 +1,22 @@
 #ifndef __VIDEO_CAMERA_H__
 #define __VIDEO_CAMERA_H__
 
+#include <QScopedPointer>
+
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/resource/resource_consumer.h>
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "utils/media/media_stream_cache.h"
+#include "utils/media/mediaindex.h"
+
 
 class QnVideoCameraGopKeeper;
+class MediaStreamCache;
 
 class QnVideoCamera: public QObject
 {
     Q_OBJECT
+
 public:
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
@@ -33,8 +40,25 @@ public:
 
     /* Unmark some camera activity (RTSP client connection for example) */
     void notInUse(void* user);
+
+    /*!
+        \return Can be NULL
+    */
+    const MediaStreamCache* liveCache() const;
+    MediaStreamCache* liveCache();
+
+    const MediaIndex* mediaIndex() const;
+    MediaIndex* mediaIndex();
+
+    //!Starts caching live stream, if not started
+    /*!
+        \return true, if started, false if failed to start
+    */
+    bool ensureLiveCacheStarted();
+
 private:
     void createReader(QnResource::ConnectionRole role);
+
 private:
     QMutex m_readersMutex;
     QMutex m_getReaderMutex;
@@ -46,6 +70,8 @@ private:
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
+    std::auto_ptr<MediaStreamCache> m_liveCache;
+    MediaIndex m_mediaIndex;
 };
 
 #endif // __VIDEO_CAMERA_H__

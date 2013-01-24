@@ -16,6 +16,9 @@
 #include "ondemand_media_data_provider.h"
 #include "live_media_cache_reader.h"
 #include "streaming_chunk_cache_key.h"
+#include "streaming_chunk_transcoder_thread.h"
+#include "streaming_chunk.h"
+#include "../camera/camera_pool.h"
 
 
 using namespace std;
@@ -24,12 +27,35 @@ using namespace std;
 static const double MAX_CHUNK_TIMESTAMP_ADVANCE = 30;
 static const int TRANSCODE_THREAD_COUNT = 4;
 
+
+StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
+:
+    chunk( NULL ),
+    transcoder( NULL )
+{
+}
+
+
 StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
 :
     m_flags( flags ),
     m_newTranscodeID( 1 )
 {
-    //TODO/IMPL
+    m_transcodeThreads.resize( TRANSCODE_THREAD_COUNT );
+    for( int i = 0; i < m_transcodeThreads.size(); ++i )
+        m_transcodeThreads[i] = new StreamingChunkTranscoderThread();
+}
+
+StreamingChunkTranscoder::~StreamingChunkTranscoder()
+{
+    for( std::vector<StreamingChunkTranscoderThread*>::size_type
+        i = 0;
+        i < m_transcodeThreads.size();
+        ++i )
+    {
+        delete m_transcodeThreads[i];
+    }
+    m_transcodeThreads.clear();
 }
 
 bool StreamingChunkTranscoder::transcodeAsync(
@@ -53,6 +79,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
     }
 
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
+    Q_ASSERT( camera );
+
     //validating transcoding parameters
     if( !validateTranscodingParameters( transcodeParams ) )
         return false;
@@ -66,11 +95,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     //checking requested time region:
         //whether data is present (in archive or cache)
-    if( mediaResource->liveCache() )
+    if( camera->liveCache() )
     {
-        const QDateTime& cacheStartTimestamp = mediaResource->liveCache()->startTime();
-        const QDateTime& cacheEndTimestamp = mediaResource->liveCache()->endTime();
-        QSharedPointer<LiveMediaCacheReader> liveMediaCacheReader( new LiveMediaCacheReader( mediaResource->liveCache() ) );
+        const QDateTime& cacheStartTimestamp = camera->liveCache()->startTime();
+        const QDateTime& cacheEndTimestamp = camera->liveCache()->endTime();
+        QSharedPointer<LiveMediaCacheReader> liveMediaCacheReader( new LiveMediaCacheReader( camera->liveCache() ) );
         if( transcodeParams.startTimestamp() < cacheEndTimestamp &&
             transcodeParams.endTimestamp() > cacheStartTimestamp )
         {
@@ -185,6 +214,7 @@ void StreamingChunkTranscoder::onTimer( const quint64& timerID )
 
     //starting transcoding
     if( !startTranscoding(
+            transcodeID,
             transcodeIter->second.mediaResource,
             transcodeIter->second.dataSource,
             transcodeIter->second.transcodeParams,
@@ -229,8 +259,8 @@ bool StreamingChunkTranscoder::startTranscoding(
         return false;
     }
 
-    //selecting least used transcoding thread from pool
-    StreamingChunkTranscoderThread* transcoderThread = NULL;
+    //TODO/IMPL selecting least used transcoding thread from pool
+    StreamingChunkTranscoderThread* transcoderThread = m_transcodeThreads[rand() % m_transcodeThreads.size()];
 
     //adding transcoder to transcoding thread
     transcoderThread->startTranscoding(
@@ -261,9 +291,4 @@ bool StreamingChunkTranscoder::validateTranscodingParameters( const StreamingChu
 {
     //TODO/IMPL
     return true;
-}
-
-void StreamingChunkTranscoder::threadFunc()
-{
-    //TODO/IMPL
 }

@@ -724,7 +724,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     }
             
     return true;
-    }
+}
 
 void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification )
 {

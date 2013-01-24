@@ -2,13 +2,17 @@
 #define QN_MEDIA_RESOURCE_H
 
 #include <QMap>
+#include <QScopedPointer>
 #include <QSize>
 #include "resource.h"
 #include "resource_media_layout.h"
 
+
 class QnAbstractMediaStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
+class MediaStreamCache;
+class MediaIndex;
 
 enum QnStreamQuality {
     QnQualityLowest,
@@ -39,6 +43,7 @@ public:
     // resource can use DataProvider for addition info (optional)
     virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
+
 protected:
     QnCustomResourceVideoLayout* m_customVideoLayout;
 };

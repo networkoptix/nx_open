@@ -5,4 +5,13 @@
 #include "ondemand_media_data_provider.h"
 
 
-//TODO/IMPL
+OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbstractStreamDataProvider>& dataProvider ) throw()
+{
+}
+
+//!Implementation of AbstractOnDemandDataProvider::tryRead
+bool OnDemandMediaDataProvider::tryRead( QnAbstractDataPacketPtr* const data )
+{
+    //TODO/IMPL
+    return false;
+}

@@ -7,6 +7,7 @@
 
 StreamingChunkCacheKey::StreamingChunkCacheKey()
 {
+    Q_ASSERT( false );
 }
 
 /*!
@@ -21,7 +22,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     int channel,
     const QString& containerFormat,
     const QDateTime& startTimestamp,
-    const QDateTime& endTimestamp,
+    quint64 duration,
     const std::multimap<QString, QString>& auxiliaryParams )
 {
 }
@@ -43,10 +44,10 @@ unsigned int StreamingChunkCacheKey::channel() const
 /*!
     \return millis since 1970/1/1 00:00, UTC
 */
-quint64 StreamingChunkCacheKey::startTimestamp() const
+QDateTime StreamingChunkCacheKey::startTimestamp() const
 {
     //TODO/IMPL
-    return 0;
+    return QDateTime();
 }
 
 //!Duration in millis
@@ -54,6 +55,13 @@ quint64 StreamingChunkCacheKey::duration() const
 {
     //TODO/IMPL
     return 0;
+}
+
+//!startTimestamp() + duration
+QDateTime StreamingChunkCacheKey::endTimestamp() const
+{
+    //TODO/IMPL
+    return QDateTime();
 }
 
 //!Video resolution

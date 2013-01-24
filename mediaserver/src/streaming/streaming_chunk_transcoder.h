@@ -21,6 +21,8 @@
 class AbstractOnDemandDataProvider;
 class StreamingChunkCacheKey;
 class StreamingChunk;
+class StreamingChunkTranscoderThread;
+class QnTranscoder;
 
 //!Reads source stream (from archive or media cache) and transcodes it to required format
 /*!
@@ -52,6 +54,7 @@ public:
         \param flags Combination of input flags
     */
     StreamingChunkTranscoder( Flags flags );
+    ~StreamingChunkTranscoder();
 
     //!Starts transcoding of resource \a transcodeParams.srcResourceUniqueID
     /*!
@@ -77,6 +80,7 @@ private:
         QSharedPointer<AbstractOnDemandDataProvider> dataSource;
         StreamingChunkCacheKey transcodeParams;
         StreamingChunk* const chunk;
+        QnTranscoder* transcoder;
 
         TranscodeContext();
     };
@@ -88,7 +92,7 @@ private:
     //!map<task id, transcoding id>
     std::map<quint64, int> m_taskIDToTranscode;
     QAtomicInt m_newTranscodeID;
-    std::vector<QThread> m_transcodeThreads;
+    std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
 
     bool startTranscoding(
         int transcodingID,
@@ -100,7 +104,6 @@ private:
         const int transcodeID,
         const QDateTime& startTimeUTC );
     bool validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams );
-    void threadFunc();
 };
 
 #endif  //STREAMINGCHUNKTRANSCODER_H

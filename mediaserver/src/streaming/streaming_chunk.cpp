@@ -7,6 +7,7 @@
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext()
 {
+    Q_ASSERT( false );
 }
 
 
@@ -14,6 +15,7 @@ StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
 :
     m_params( params )
 {
+    Q_ASSERT( false );
 }
 
 const StreamingChunkCacheKey& StreamingChunk::params() const

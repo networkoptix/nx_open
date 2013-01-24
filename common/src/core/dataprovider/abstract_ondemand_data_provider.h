@@ -1,0 +1,40 @@
+////////////////////////////////////////////////////////////
+// 25 dec 2012    Andrey Kolesnikov
+////////////////////////////////////////////////////////////
+
+#ifndef ABSTRACTONDEMANDDATAPROVIDER_H
+#define ABSTRACTONDEMANDDATAPROVIDER_H
+
+#include <QObject>
+
+#include "../datapacket/abstract_data_packet.h"
+#include "../../utils/network/aio/selfremovable.h"
+
+
+//!Interface of class, providing data on demand (pull mode)
+class AbstractOnDemandDataProvider
+:
+    public QObject,
+    public SelfRemovable
+{
+    Q_OBJECT
+
+public:
+    virtual ~AbstractOnDemandDataProvider() {}
+
+    /*!
+        \return true, if packet is returned, false otherwise
+        \note End-of-data signalled by returning NULL packet and returning \a true
+    */
+    virtual bool tryRead( QnAbstractDataPacketPtr* const data ) = 0;
+
+signals:
+    //!
+    /*!
+        It is recommended to connect to this signal directly
+        \note 
+    */
+    void dataAvailable( AbstractOnDemandDataProvider* pThis );
+};
+
+#endif  //ABSTRACTONDEMANDDATAPROVIDER_H

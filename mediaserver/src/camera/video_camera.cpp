@@ -334,3 +334,46 @@ void QnVideoCamera::stopIfNoActivity()
     if (needStopSecondary)
         m_secondaryReader->stop();
 }
+
+const MediaStreamCache* QnVideoCamera::liveCache() const
+{
+    return m_liveCache.get();
+}
+
+MediaStreamCache* QnVideoCamera::liveCache()
+{
+    return m_liveCache.get();
+}
+
+const MediaIndex* QnVideoCamera::mediaIndex() const
+{
+    return &m_mediaIndex;
+}
+
+MediaIndex* QnVideoCamera::mediaIndex()
+{
+    return &m_mediaIndex;
+}
+
+static unsigned int MEDIA_CACHE_SIZE_MILLIS = 30000;
+
+//!Starts caching live stream, if not started
+/*!
+    \return true, if started, false if failed to start
+*/
+bool QnVideoCamera::ensureLiveCacheStarted()
+{
+    if( m_liveCache.get() )
+        return true;
+
+    QnAbstractMediaStreamDataProviderPtr reader = getLiveReader(QnResource::Role_LiveVideo);
+    if( !reader )
+        return false;
+
+    m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
+
+    //connecting live cache to reader
+    reader->addDataProcessor( m_liveCache.get() );
+
+    return true;
+}

@@ -8,6 +8,8 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 
+class MediaIndex;
+
 //!Caches specified duration of media stream for later use
 /*!
     \note Class is thread-safe (concurrent threads can read and write to class instance)
@@ -17,13 +19,17 @@ class MediaStreamCache
     public QnAbstractDataReceptor
 {
 public:
-    MediaStreamCache( unsigned int cacheSizeMillis );
+    MediaStreamCache(
+        unsigned int cacheSizeMillis,
+        MediaIndex* const mediaIndex );
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
     //!Implementation of QnAbstractDataReceptor::putData
     virtual void putData( QnAbstractDataPacketPtr data ) override;
 
+    QDateTime startTime() const;
+    QDateTime endTime() const;
     /*!
         \return pair<start timestamp, stop timestamp>
     */
@@ -44,6 +50,7 @@ public:
 
 private:
     unsigned int m_cacheSizeMillis;
+    MediaIndex* const m_mediaIndex;
 };
 
 #endif  //MEDIASTREAMCACHE_H

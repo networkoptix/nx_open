@@ -151,6 +151,7 @@ namespace nx_http
             ok = 200,
             multipleChoices = 300,
             badRequest = 400,
+            forbidden = 403,
             notFound = 404,
             internalServerError = 500,
             notImplemented = 501

@@ -37,7 +37,7 @@ public:
         int channel,
         const QString& containerFormat,
         const QDateTime& startTimestamp,
-        const QDateTime& endTimestamp,
+        quint64 duration,
         const std::multimap<QString, QString>& auxiliaryParams );
 
     //!data source (camera id, stream id)
