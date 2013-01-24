@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 class QnAbstractPtzController: public QObject {
@@ -14,7 +16,7 @@ public:
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) = 0;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) = 0;
     virtual int stopMove() = 0;
-    //virtual Qn::CameraCapabilities getCapabilities() { return Qn::ContinuousPtzCapability; } // TODO
+    virtual Qn::CameraCapabilities getCapabilities() = 0;
 
     bool calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
     void getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);

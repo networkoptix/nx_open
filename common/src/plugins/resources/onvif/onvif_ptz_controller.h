@@ -1,12 +1,14 @@
-#ifndef __ONVIF_PTZ_CONTROLLER_H__
-#define __ONVIF_PTZ_CONTROLLER_H__
+#ifndef QN_ONVIF_PTZ_CONTROLLER_H
+#define QN_ONVIF_PTZ_CONTROLLER_H
 
-#include <QMutex>
+#include <QtCore/QMutex>
+#include <QtCore/QPair>
+
 #include "core/resource/resource_fwd.h"
 #include "core/resource/interface/abstract_ptz_controller.h"
 
-class QnOnvifPtzController: public QnAbstractPtzController
-{
+class QnOnvifPtzController: public QnAbstractPtzController {
+    Q_OBJECT
 public:
     QnOnvifPtzController(QnResourcePtr res);
 
@@ -14,15 +16,17 @@ public:
     virtual int stopMove() override;
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
+    virtual Qn::CameraCapabilities getCapabilities() override;
 
-    //QString getPtzNodeToken() const;
     QString getPtzConfigurationToken();
     void setMediaProfileToken(const QString& value);
+
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
+
 private:
     QnPlOnvifResourcePtr m_res;
-    //QString m_ptzToken;
+    Qn::CameraCapabilities m_capabilities;
     QString m_mediaProfile;
     QString m_ptzConfigurationToken;
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
@@ -31,4 +35,4 @@ private:
     mutable QMutex m_mutex;
 };
 
-#endif // __ONVIF_PTZ_CONTROLLER_H__
+#endif // QN_ONVIF_PTZ_CONTROLLER_H
