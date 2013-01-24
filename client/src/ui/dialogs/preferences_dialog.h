@@ -14,6 +14,7 @@ class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
 class QnRecordingSettingsWidget;
 class QnYouTubeSettingsWidget;
+class QnSmtpSettingsWidget; //TODO: temporary, until we have wider server settings widget
 
 namespace Ui {
     class PreferencesDialog;
@@ -29,6 +30,7 @@ public:
     ~QnPreferencesDialog();
 
     void openLicensesPage();
+    void openServerSettingsPage();
 
     virtual void accept() override;
 
@@ -48,6 +50,7 @@ private slots:
     void at_extraMediaFoldersList_selectionChanged();
     void at_context_userChanged();
     void at_timeModeComboBox_activated();
+    void at_onDecoderPluginsListChanged();
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
@@ -56,11 +59,15 @@ private:
     QnRecordingSettingsWidget *m_recordingSettingsWidget;
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
     QnLicenseManagerWidget *m_licenseManagerWidget;
+    QnSmtpSettingsWidget *m_smtpSettingsWidget;
 
     QnSettings *m_settings;
 
     /** Index of "Licenses" tab to open it from outside */
     int m_licenseTabIndex;
+
+    /** Index of "Server Settings" tab to open it from outside */
+    int m_serverSettingsTabIndex;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

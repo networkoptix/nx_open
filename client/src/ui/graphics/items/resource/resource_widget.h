@@ -21,6 +21,7 @@
 #include <ui/graphics/items/shadow/shaded.h>
 
 class QGraphicsLinearLayout;
+class QGLWidget;
 
 class QnViewportBoundWidget;
 class QnResourceVideoLayout;
@@ -249,6 +250,9 @@ public:
 
     using base_type::mapRectToScene;
 
+    void addOverlayWidget(QGraphicsWidget *widget, bool autoRotate = false, bool bindToViewport = false);
+    void removeOverlayWidget(QGraphicsWidget *widget);
+
 signals:
     void aspectRatioChanged();
     void aboutToBeDestroyed();
@@ -277,6 +281,7 @@ protected:
     virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QGLWidget *widget);
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
@@ -304,12 +309,7 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
-    /**
-     * Updates overlay widget's rotation.
-     *
-     * \param rotation                  Target rotation angle in degrees.
-     */
-    void updateOverlayRotation(qreal rotation);
+    void updateOverlayWidgetsGeometry();
 
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
@@ -359,6 +359,12 @@ private:
         Qn::RenderStatus renderStatus;
     };
 
+    struct OverlayWidget {
+        QGraphicsWidget *widget;
+        QnViewportBoundWidget *boundWidget;
+        QnFixedRotationTransform *rotationTransform;
+    };
+
 private:
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
@@ -368,6 +374,10 @@ private:
 
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
+
+    /** Last OpenGL widget that this item was drawn on. 
+     * Not accessed in any way, so there is no need to store a smart pointer. */
+    QGLWidget *m_glWidget;
 
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;
@@ -399,6 +409,9 @@ private:
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
 
+    /** List of overlay widgets. */
+    QList<OverlayWidget> m_overlayWidgets;
+
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
     QGraphicsLinearLayout *m_headerLayout;
@@ -429,7 +442,7 @@ private:
     bool m_mouseInWidget;
 
     /** Fixed rotation angle in degrees. Used to rotate static text and images. */
-    Qn::FixedRotation m_desiredRotation;
+    Qn::FixedRotation m_overlayRotation;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

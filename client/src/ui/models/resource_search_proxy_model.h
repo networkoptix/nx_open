@@ -48,6 +48,7 @@ public slots:
 
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+
 private:
     QnResourceCriterionGroup m_criterionGroup;
     bool m_invalidating;

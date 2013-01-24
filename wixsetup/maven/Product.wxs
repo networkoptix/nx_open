@@ -712,6 +712,11 @@
 								<File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
 								<File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
 							</Component>
+
+							<Component Id="ProxyQjson" Guid="{1b6fc91f-7a75-4802-b648-5482eaf50584}">
+								<File Id="ProxyQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+							</Component>						
+							
 							<Component Id="ProxyOpenSSL" Guid="{B2CFCF46-4618-44a9-9BB5-7C832AA10652}">
 								<File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 								<File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
@@ -784,6 +789,10 @@
 								<File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 								<File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 							</Component>
+							
+							<Component Id="ServerQjson" Guid="{4e3f101f-3a9b-4447-afd2-61dd8cbe51b0}">
+								<File Id="ServerQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+							</Component>						
 
 							<Component Id="ServerSigar" Guid="{15E53052-24D8-4c7f-ACBB-2D404BE06A03}">
 								<File Id="ServerSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
@@ -873,6 +882,10 @@
 								<File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 								<File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 							</Component>
+							
+							<Component Id="ClientQjson" Guid="{2e2bfc05-4e12-4e4e-93f1-97afae6c15e3}">
+								<File Id="ClientQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+							</Component>							
 
 							<Component Id="ClientSigar" Guid="{B2CBBF7C-55F2-4c8a-89A6-2F9053BC4E7B}">
 								<File Id="ClientSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
@@ -946,6 +959,7 @@
 
 			<ComponentRef Id="ProxyExecutable" />
 			<ComponentRef Id="ProxyQTLibraries" />
+			<ComponentRef Id="ProxyQjson" />			
 			<ComponentRef Id="ProxyOpenSSL" />
 		</Feature>
 
@@ -976,6 +990,7 @@
 			<ComponentRef Id="ServerQTLibraries" />
 			<ComponentRef Id="ServerOpenSSL"/>
 			<ComponentRef Id="ServerSigar"/>
+			<ComponentRef Id="ServerQjson"/>
 			<ComponentRef Id="sysfomediaservercomponent"/>
 		</Feature>
 
@@ -995,7 +1010,8 @@
 			<ComponentRef Id="ImageFormats" />
 			<ComponentRef Id="ClientOpenAL" />
 			<ComponentRef Id="ClientOpenSSL" />
-			<ComponentRef Id="ClientSigar"/>			
+			<ComponentRef Id="ClientSigar"/>	
+			<ComponentRef Id="ClientQjson"/>			
 			<ComponentRef Id="ClientQtColorPicker"/>
 			<ComponentRef Id="ClientVsRedistributable"/>
 			<ComponentRef Id="bespin" />

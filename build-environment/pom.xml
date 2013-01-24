@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.0</version>
+		<version>1.4.1</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.0</version>
+	<version>1.4.1</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>build-environment</artifactId>
 	<packaging>pom</packaging>
@@ -195,7 +195,7 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>   
-        		<dependency>
+				<dependency>
 					<groupId>com.intel</groupId>
 					<artifactId>mfx</artifactId>
 					<version>2012-R2-SNAPSHOT</version>
@@ -211,7 +211,6 @@
 				</dependency>		
 			</dependencies>			
 			<properties>
-				<qtlib9>multimedia</qtlib9>
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
@@ -380,6 +379,6 @@
 					</plugin>					
 				</plugins>	
 			</build>			
-		</profile>	
+		</profile>		
 	</profiles>	
 </project>

@@ -31,7 +31,6 @@ public:
     void addDataProcessor(QnAbstractDataReceptor* dp);
     void removeDataProcessor(QnAbstractDataReceptor* dp);
 
-    virtual void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE) { Q_UNUSED(value); Q_UNUSED(currentTimeHint); }
     virtual bool isReverseMode() const { return false;}
 
     bool isConnectedToTheResource() const;
@@ -42,6 +41,7 @@ public:
 
     void disconnectFromResource();
 
+    virtual void setRole(QnResource::ConnectionRole role) = 0;
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();

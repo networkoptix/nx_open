@@ -51,8 +51,8 @@ const QString& QnCameraInputEvent::inputPortID() const
     return m_inputPortID;
 }
 
-bool QnCameraInputEvent::checkCondition(const QnBusinessParams &params) const {
-    if (!base_type::checkCondition(params))
+bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusinessParams &params) const {
+    if (!base_type::checkCondition(state, params))
         return false;
 
     QString inputPort = BusinessEventParameters::getInputPortId(params);

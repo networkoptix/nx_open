@@ -11,6 +11,8 @@
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
 
+#include <api/serializer/pb_serializer.h>
+
 /*
 * High level business message transport.
 * Business event should be sended to this class as standard QT signal.
@@ -48,6 +50,7 @@ private:
     typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
     ActionMap m_actionsInProgress;
     mutable QMutex m_mutex;
+    QnApiPbSerializer m_serializer;
 };
 
 #define qnBusinessMessageBus QnBusinessMessageBus::instance()

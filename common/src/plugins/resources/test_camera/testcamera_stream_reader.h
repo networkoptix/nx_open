@@ -3,13 +3,12 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "testcamera_resource.h"
 #include "utils/network/socket.h"
 #include "utils/network/rtpsession.h"
 #include "utils/network/h264_rtp_parser.h"
 
-class QnTestCameraStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnTestCameraStreamReader: public CLServerPushStreamreader
 {
 public:
     QnTestCameraStreamReader(QnResourcePtr res);

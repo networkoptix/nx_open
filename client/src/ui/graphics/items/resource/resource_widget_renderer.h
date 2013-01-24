@@ -13,11 +13,7 @@ class QGLContext;
 class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
 
-class QnResourceWidgetRenderer
-:
-    public QObject,
-    public QnAbstractRenderer
-{
+class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
     Q_OBJECT;
 
 public:

@@ -339,7 +339,7 @@ private:
     // for grow only
     void reallocateBuffer(int newSize)
     {
-        int oldSize = m_buffer.size();
+        int oldSize = (int) m_buffer.size();
         m_buffer.resize(newSize);
 
         if (m_headIndex > 0 && m_bufferLen > 0 && newSize > oldSize)

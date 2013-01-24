@@ -22,6 +22,14 @@ namespace BusinessEventType
                 return QObject::tr("Camera Disconnected");
             case BE_Storage_Failure:
                 return QObject::tr("Storage Failure");
+            case BE_Network_Issue:
+                return QObject::tr("Network Issue");
+            case BE_Camera_Ip_Conflict:
+                return QObject::tr("Camera IP Conflict");
+            case BE_MediaServer_Failure:
+                return QObject::tr("Mediaserver connection lost");
+            case BE_MediaServer_Conflict:
+                return QObject::tr("Mediaservers conflict");
             case BE_UserDefined:
                 return QObject::tr("User Defined");
             //warning should be raised on unknown enumeration values
@@ -30,26 +38,7 @@ namespace BusinessEventType
     }
 
     bool isResourceRequired(Value val) {
-        if (val > BE_UserDefined)
-            return false;
-
-        switch( val )
-        {
-            case BE_NotDefined:
-                return false;
-            case BE_Camera_Motion:
-                return true;
-            case BE_Camera_Input:
-                return true;
-            case BE_Camera_Disconnect:
-                return false;
-            case BE_Storage_Failure:
-                return true;
-            case BE_UserDefined:
-                return false;
-            //warning should be raised on unknown enumeration values
-        }
-        return false;
+        return requiresCameraResource(val) || requiresServerResource(val);
     }
 
     bool hasToggleState(Value val) {
@@ -67,6 +56,14 @@ namespace BusinessEventType
             case BE_Camera_Disconnect:
                 return false;
             case BE_Storage_Failure:
+                return false;
+            case BE_Network_Issue:
+                return false;
+            case BE_Camera_Ip_Conflict:
+                return false;
+            case BE_MediaServer_Failure:
+                return false;
+            case BE_MediaServer_Conflict:
                 return false;
             case BE_UserDefined:
                 return false;
@@ -91,6 +88,14 @@ namespace BusinessEventType
                 return true;
             case BE_Storage_Failure:
                 return false;
+            case BE_Network_Issue:
+                return false;
+            case BE_Camera_Ip_Conflict:
+                return false;
+            case BE_MediaServer_Failure:
+                return false;
+            case BE_MediaServer_Conflict:
+                return false;
             case BE_UserDefined:
                 return false;
             //warning should be raised on unknown enumeration values
@@ -113,27 +118,21 @@ namespace BusinessEventType
             case BE_Camera_Disconnect:
                 return false;
             case BE_Storage_Failure:
-                return true;
+                return false; //TODO: #GDM restore when will work fine
+            case BE_Network_Issue:
+                return false;
+            case BE_Camera_Ip_Conflict:
+                return false;
+            case BE_MediaServer_Failure:
+                return false;
+            case BE_MediaServer_Conflict:
+                return false;
             case BE_UserDefined:
                 return false;
             //warning should be raised on unknown enumeration values
         }
         return false;
     }
-}
-
-namespace BusinessEventParameters {
-
-    static QLatin1String toggleState("toggleState");
-
-    ToggleState::Value getToggleState(const QnBusinessParams &params) {
-        return (ToggleState::Value) params.value(toggleState, ToggleState::NotDefined).toInt();
-    }
-
-    void setToggleState(QnBusinessParams *params, ToggleState::Value value) {
-        (*params)[toggleState] = (int)value;
-    }
-
 }
 
 namespace QnBusinessEventRuntime {

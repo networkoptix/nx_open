@@ -2,7 +2,7 @@
 #define QN_MEDIA_SERVER_RESOURCE_H
 
 #include "core/resource/resource.h"
-#include "core/resource/storage_resource.h"
+#include "core/resource/abstract_storage_resource.h"
 #include "core/resource/media_resource.h"
 #include "api/media_server_connection.h"
 
@@ -58,7 +58,7 @@ public:
     bool isPanicMode() const;
     void setPanicMode(bool panicMode);
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     QString getProxyHost() const;
     int getProxyPort() const;

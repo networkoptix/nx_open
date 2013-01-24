@@ -46,7 +46,8 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0),
-    ssrc(0)
+    ssrc(0),
+    m_rtpTrackNum(0)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode) 
@@ -226,7 +227,7 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
     } while (m_timer.elapsed() != elapsed);
     qint64 expectedLocalTime = elapsed + m_localStartTime;
     bool timeChanged = qAbs(expectedLocalTime - ct) > LOCAL_TIME_RESYNC_THRESHOLD;
-    if (!timeChanged && elapsed > 3600) {
+    if (timeChanged || elapsed > 3600) {
         m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
         m_timer.restart();
     }
@@ -317,6 +318,8 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
                 m_lastWarnTime = currentUsecTime;
             }
             reset();
+            if (localTimeChanged)
+                m_lastTime = AV_NOPTS_VALUE;
             return getUsecTime(rtpTime, statistics, frequency, false);
         }
         else {

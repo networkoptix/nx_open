@@ -31,7 +31,7 @@ QnCameraSettingsHandler::QnCameraSettingsHandler()
 {
 }
 
-int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType )
+int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
 {
     enum CmdType
     {
@@ -185,7 +185,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
     return HttpStatusCode::ok;
 }
 
-int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/ )
+int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/)
 {
     //TODO/IMPL
     return 0;

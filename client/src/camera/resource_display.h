@@ -52,6 +52,11 @@ public:
     virtual ~QnResourceDisplay();
 
     /**
+     * Called while corresponding QGLWidget and QGLContext are still alive to OGL resources to be properly removed
+     */
+    void beforeDestroy();
+
+    /**
      * \returns                         Resource associated with this display.
      */
     const QnResourcePtr &resource() const {

@@ -6,6 +6,9 @@
 #include "utils/common/sleep.h"
 #include "session_manager.h"
 #include "utils/common/synctime.h"
+#include "message.pb.h"
+
+#include <events/abstract_business_action.h>
 
 namespace {
     const QLatin1String cameraObject("camera");
@@ -21,6 +24,11 @@ namespace {
     const QLatin1String statusObject("status");
     const QLatin1String disabledObject("disabled");
     const QLatin1String panicObject("panic");
+    const QLatin1String bbaObject("businessAction");
+    const QLatin1String kvPairObject("kvPair");
+    const QLatin1String dumpdbObject("dumpdb");
+    const QLatin1String restoredbObject("restoredb");
+    const QLatin1String settingObject("setting");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -123,6 +131,19 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedConnect(status, errorString, connectInfo, handle);
+    } else if (m_objectName == kvPairObject)
+    {
+        QnKvPairList kvPairs;
+
+        if(status == 0) {
+            try {
+                m_serializer.deserializeKvPairs(kvPairs, result);
+            } catch (const QnSerializeException& e) {
+                errorString += e.errorString();
+            }
+        }
+
+        emit finishedKvPair(status, errorString, kvPairs, handle);
     } else if (m_objectName == businessRuleObject) {
         QnBusinessEventRules rules;
 
@@ -134,7 +155,20 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
             }
         }
 
-        emit finished(status, errorString, QnResourceList(rules), handle);
+        emit finishedBusinessRule(status, errorString, rules, handle);
+    } else if (m_objectName == settingObject)
+    {
+        QnKvPairList settings;
+
+        if(status == 0) {
+            try {
+                m_serializer.deserializeKvPairs(settings, result);
+            } catch (const QnSerializeException& e) {
+                errorString += e.errorString();
+            }
+        }
+
+        emit finishedSetting(status, errorString, settings, handle);
     }
 }
 
@@ -415,6 +449,29 @@ int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject 
     return addObjectAsync(licenseObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
+int QnAppServerConnection::saveAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, kvPairObject);
+    QObject::connect(processor, SIGNAL(finishedKvPair(int, const QByteArray&, const QnKvPairList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeKvPairs(kvPairs, data);
+
+    return addObjectAsync(kvPairObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs/*, QObject *target, const char *slot*/)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, settingObject);
+  //  QObject::connect(processor, SIGNAL(finishedSetting(int,QByteArray,QnKvPairList,int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeKvPairs(kvPairs, data);
+
+    return addObjectAsync(settingObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+
 int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, objectName);
@@ -426,9 +483,25 @@ int QnAppServerConnection::getResourcesAsync(const QString& args, const QString&
 int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, licenseObject);
-    QObject::connect(processor, SIGNAL(finished(int,QByteArray,QnLicenseList,int)), target, slot);
+    QObject::connect(processor, SIGNAL(finishedLicense(int,QByteArray,QnLicenseList,int)), target, slot);
 
     return getObjectsAsync(licenseObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, businessRuleObject);
+    QObject::connect(processor, SIGNAL(finishedBusinessRule(int,QByteArray,QnBusinessEventRules,int)), target, slot);
+
+    return getObjectsAsync(businessRuleObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, settingObject);
+    QObject::connect(processor, SIGNAL(finishedSetting(int, QByteArray, QnKvPairList, int)), target, slot);
+
+    return getObjectsAsync(settingObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
@@ -478,7 +551,7 @@ int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject*
 int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, businessRuleObject);
-    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+    QObject::connect(processor, SIGNAL(finishedBusinessRule(int,QByteArray,QnBusinessEventRules,int)), target, slot);
 
     QByteArray data;
     m_serializer.serializeBusinessRule(rule, data);
@@ -879,7 +952,12 @@ qint64 QnAppServerConnection::getCurrentTime()
     return response.data.toLongLong();
 }
 
-int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, const QString& message)
+int QnAppServerConnection::sendEmail(const QString& addr, const QString& subject, const QString& message)
+{
+    return sendEmail(QStringList() << addr, subject, message);
+}
+
+int QnAppServerConnection::sendEmail(const QStringList& to, const QString& subject, const QString& message)
 {
     QnRequestParamList requestParams(m_requestParams);
 
@@ -966,6 +1044,53 @@ bool QnAppServerConnection::setPanicMode(bool value)
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, panicObject, requestHeaders, requestParams, "", response);
+
+    if (result)
+        m_lastError = response.errorString;
+
+    return result;
+}
+
+bool QnAppServerConnection::dumpDatabase(QByteArray& data)
+{
+    m_lastError.clear();
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendGetRequest(m_url, dumpdbObject, m_requestHeaders, m_requestParams, response);
+
+    if (result)
+        m_lastError = response.errorString;
+    else
+        data = response.data;
+
+    return result;
+}
+
+bool QnAppServerConnection::restoreDatabase(const QByteArray& data)
+{
+    m_lastError.clear();
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, restoredbObject, m_requestHeaders, m_requestParams, data, response);
+
+    if (result)
+        m_lastError = response.errorString;
+
+    return result;
+}
+
+bool QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
+{
+    m_lastError.clear();
+
+    QnRequestHeaderList requestHeaders(m_requestHeaders);
+    QnRequestParamList requestParams(m_requestParams);
+
+    QByteArray body;
+    m_serializer.serializeBusinessAction(businessAction, body);
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, bbaObject, requestHeaders, requestParams, body, response);
 
     if (result)
         m_lastError = response.errorString;

@@ -187,9 +187,14 @@ public:
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
     virtual void setUrl(const QString &url) override;
-    int getChannel() const;
+    virtual int getChannel() const override;
     int getMaxChannels() const;
 
+    void updateToChannel(int value);
+
+    bool detectVideoSourceCount();
+
+    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -251,13 +256,14 @@ private:
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
-    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
 
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
     bool sendVideoSourceToCamera(VideoSource* source) const;
 
     QRect getVideoSourceMaxSize(const QString& configToken);
+
+    bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
@@ -388,6 +394,7 @@ private:
     QMutex m_subscriptionMutex;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
+    quint64 m_renewSubscriptionTaskID;
     int m_channelNumer; // video/audio source number
     int m_maxChannels;
 	

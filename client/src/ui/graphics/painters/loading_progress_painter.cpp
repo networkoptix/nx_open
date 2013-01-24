@@ -26,12 +26,11 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         qreal r0 = innerRadius;
         qreal r1 = 1;
 
-
         vertexStream 
-            << polar<QVector2D>(a0, r0)
-            << polar<QVector2D>(a1, r0)
-            << polar<QVector2D>(a1, r1)
-            << polar<QVector2D>(a0, r1);
+            << polarToCartesian<QVector2D>(r0, a0)
+            << polarToCartesian<QVector2D>(r0, a1)
+            << polarToCartesian<QVector2D>(r1, a1)
+            << polarToCartesian<QVector2D>(r1, a0);
     }
     m_vertexCount = sectorCount * 4;
 
@@ -68,7 +67,8 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableVertexAttribArray(m_shader->colorLocation());
-
+    
+    // TODO: #1.5 if buffers are not supported, this code will crash
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glVertexPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid *>(m_vertexOffset));
     glVertexAttribPointer(m_shader->colorLocation(), 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid *>(m_colorOffset));

@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_HELPER_H
 #define __FFMPEG_HELPER_H
 
+#include "core/resource/resource_fwd.h"
+
 QString codecIDToString(CodecID codecID);
 QString getAudioCodecDescription(AVCodecContext* codecContext);
 
@@ -17,6 +19,7 @@ public:
 
     AVCodecContext* getContext() const { return m_context; }
     CodecID getCodec() const { return m_context->codec_id; }
+
 private:
 
     FrameType getH264FrameType(const quint8* data, int size);
@@ -41,6 +44,11 @@ private:
 public:
     static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);
     static AVCodecContext *deserializeCodecContext(const char *data, int dataLen);
+
+    static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE = 32768);
+    static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE = 32768);
+    static void closeFfmpegIOContext(AVIOContext* ioContext);
+    static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
 };
 
 #endif // __FFMPEG_HELPER_H

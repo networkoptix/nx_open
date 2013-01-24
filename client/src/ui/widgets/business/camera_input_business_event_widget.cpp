@@ -3,11 +3,15 @@
 
 #include <events/camera_input_business_event.h>
 
+#include <utils/common/scoped_value_rollback.h>
+
 QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnCameraInputBusinessEventWidget)
 {
     ui->setupUi(this);
+
+    connect(ui->inputIdLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
 }
 
 QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
@@ -15,20 +19,26 @@ QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
     delete ui;
 }
 
-void QnCameraInputBusinessEventWidget::loadParameters(const QnBusinessParams &params) {
-    ui->inputIdLineEdit->setText(BusinessEventParameters::getInputPortId(params));
+void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
+    if (!model)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
+
+    if (fields & QnBusiness::EventParamsField) {
+        QString text = BusinessEventParameters::getInputPortId(model->eventParams());
+        if (ui->inputIdLineEdit->text() != text)
+            ui->inputIdLineEdit->setText(text);
+    }
+    //TODO: #GDM update on resource change
 }
 
-QnBusinessParams QnCameraInputBusinessEventWidget::parameters() const {
+void QnCameraInputBusinessEventWidget::paramsChanged() {
+    if (!model() || m_updating)
+        return;
+
     QnBusinessParams params;
     BusinessEventParameters::setInputPortId(&params, ui->inputIdLineEdit->text());
-    return params;
-}
-
-QString QnCameraInputBusinessEventWidget::description() const {
-    QString fmt = QLatin1String("%1 <span style=\"font-weight:600;\">%2</span>");
-    QString recordStr = QObject::tr("On input");
-    return fmt
-            .arg(recordStr)
-            .arg(ui->inputIdLineEdit->text());
+    model()->setActionParams(params);
 }

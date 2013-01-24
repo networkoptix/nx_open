@@ -6,25 +6,32 @@
 #ifndef GLCONTEXT_H
 #define GLCONTEXT_H
 
-#ifdef _WIN32
-#include <Wingdi.h>
-#else
-#include <GL/glx.h>
-#endif
-#include <QString>
+#include <memory>
 
+#include <QString>
+#include <QWidget>
+
+#ifdef Q_OS_WIN
+#include <WinGDI.h>
+#else
+struct __GLXcontextRec;
+#endif
+
+// TODO: #AK document this define?
+#define USE_INTERNAL_WIDGET
 
 class QGLContext;
+
 
 //!Cross-platform GL context which can be used in any thread (not in GUI only) unlike QGLContext
 class GLContext
 {
 public:
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     typedef HGLRC SYS_GL_CTX_HANDLE;
     typedef HDC SYS_PAINT_DEVICE_HANDLE;
 #else
-    typedef GLXContext SYS_GL_CTX_HANDLE;
+    typedef __GLXcontextRec *SYS_GL_CTX_HANDLE;
     typedef void* SYS_PAINT_DEVICE_HANDLE;
 #endif
 
@@ -64,6 +71,11 @@ public:
         \note This method MUST be called from GUI thread only
     */
     GLContext( WId wnd = 0, SYS_GL_CTX_HANDLE contextHandleToShareWith = NULL );
+    //!Create context, shared with \a shareWidget context 
+    /*!
+        \note This constructor can be called from GUI thread only, since it uses \a getSysHandleOfQtContext method
+    */
+    GLContext( const QGLWidget* shareWidget );
     ~GLContext();
 
     /*!
@@ -78,7 +90,7 @@ public:
     QString getLastErrorString() const;
     //void* getProcAddress( const char* procName ) const;
     //bool shareWith( SYS_GL_CTX_HANDLE ctxID );
-    //!Returns window ID, gl context has been reated with
+    //!Returns window ID, gl context has been created with
     WId wnd() const;
 
     //!Returns system-dependent handle of qt context \a ctx
@@ -86,14 +98,23 @@ public:
         This method can be relied on as long as \a QGLContext is not thread-safe
         \param paintDeviceHandle if not NULL, will be filled with handle of paint device of context \a ctx
         \note This method can be called from GUI thread only
+        \note This method can perform gl context switching, so it can be performance-heavy
     */
     static SYS_GL_CTX_HANDLE getSysHandleOfQtContext( const QGLContext* ctx, SYS_PAINT_DEVICE_HANDLE* const paintDeviceHandle = NULL );
 
 private:
     SYS_GL_CTX_HANDLE m_handle;
     SYS_PAINT_DEVICE_HANDLE m_dc;
+#ifdef USE_INTERNAL_WIDGET
+    std::auto_ptr<QWidget> m_widget;
+#endif
     WId m_winID;
     unsigned int m_previousErrorCode;
+#if defined(USE_INTERNAL_WIDGET) && defined(Q_OS_WIN)
+    PIXELFORMATDESCRIPTOR m_pfd;
+#endif
+
+    void initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith );
 };
 
 #endif  //GLCONTEXT_H

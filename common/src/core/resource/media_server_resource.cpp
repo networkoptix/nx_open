@@ -2,7 +2,6 @@
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
-#include "core/dataprovider/media_streamdataprovider.h"
 #include "api/session_manager.h"
 
 QnLocalMediaServerResource::QnLocalMediaServerResource()
@@ -114,20 +113,6 @@ QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
 void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
 {
     m_storages = storages;
-}
-
-class QnEmptyDataProvider: public QnAbstractMediaStreamDataProvider{
-public:
-    QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
-
-protected:
-    virtual QnAbstractMediaDataPtr getNextData() override {
-        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1U));
-    }
-};
-
-QnAbstractStreamDataProvider* QnMediaServerResource::createDataProviderInternal(ConnectionRole ){
-    return new QnEmptyDataProvider(toSharedPointer());
 }
 
 // --------------------------------------------------

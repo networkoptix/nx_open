@@ -209,7 +209,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, bool displayDebug)
+void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
@@ -222,6 +222,8 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     {
         //d->responseHeaders.setContentLength(d->responseBody.length());
         //d->responseHeaders.setContentType(QLatin1String(contentType));
+        if (!contentEncoding.isEmpty())
+            d->responseHeaders.setValue(QLatin1String("Content-Encoding"), QLatin1String(contentEncoding));
         d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
         d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
     }

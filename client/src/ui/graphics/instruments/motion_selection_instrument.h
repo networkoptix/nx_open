@@ -6,7 +6,7 @@
 #include <QtCore/QWeakPointer>
 
 class QnMediaResourceWidget;
-class MotionSelectionItem;
+class SelectionItem;
 
 class MotionSelectionInstrument: public DragProcessingInstrument {
     Q_OBJECT;
@@ -14,18 +14,14 @@ class MotionSelectionInstrument: public DragProcessingInstrument {
     typedef DragProcessingInstrument base_type;
 
 public:
-    enum ColorRole {
-        Base,       /**< Color of the selection rect. */
-        Border,     /**< Color of the selection rect's border. */
-        MouseBorder,/**< Color of the mouse rect's border. */
-        RoleCount
-    };
-
     MotionSelectionInstrument(QObject *parent = NULL);
     virtual ~MotionSelectionInstrument();
 
-    void setColor(ColorRole role, const QColor &color);
-    QColor color(ColorRole role) const;
+    void setPen(const QPen &pen);
+    QPen pen() const;
+
+    void setBrush(const QBrush &brush);
+    QBrush brush() const;
 
     /**
      * \param selectionModifiers        Keyboard modifiers that must be pressed for the 
@@ -64,7 +60,7 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
-    MotionSelectionItem *selectionItem() const {
+    SelectionItem *selectionItem() const {
         return m_selectionItem.data();
     }
 
@@ -77,8 +73,9 @@ protected:
     void ensureSelectionItem();
 
 private:
-    QColor m_colors[RoleCount];
-    QWeakPointer<MotionSelectionItem> m_selectionItem;
+    QBrush m_brush;
+    QPen m_pen;
+    QWeakPointer<SelectionItem> m_selectionItem;
     QWeakPointer<QnMediaResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_isClick;

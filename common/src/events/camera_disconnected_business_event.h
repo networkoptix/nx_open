@@ -8,17 +8,15 @@ class QnCameraDisconnectedBusinessEvent: public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
 public:
-    QnCameraDisconnectedBusinessEvent(const QnResourcePtr& mediaServerResource, const QnResourcePtr& cameraResource, qint64 timeStamp);
+    QnCameraDisconnectedBusinessEvent(const QnResourcePtr& cameraResource, qint64 timeStamp);
 
     /**
      * @brief checkCondition
      * @params params 'camera' - optional camera unique ID
      */
-    bool checkCondition(const QnBusinessParams& params) const override;
+    bool checkCondition(ToggleState::Value state, const QnBusinessParams& params) const override;
 
     virtual QString toString() const override;
-private:
-    QnResourcePtr m_cameraResource;
 };
 
 typedef QSharedPointer<QnCameraDisconnectedBusinessEvent> QnCameraDisconnectedBusinessEventPtr;

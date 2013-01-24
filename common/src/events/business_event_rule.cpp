@@ -12,16 +12,17 @@
 
 QnBusinessEventRule::QnBusinessEventRule()
 :
-    m_eventType( BusinessEventType::BE_NotDefined ),
-    m_actionType( BusinessActionType::BA_NotDefined )
+    m_eventType(BusinessEventType::BE_NotDefined),
+    m_eventState(ToggleState::On), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
+    m_actionType(BusinessActionType::BA_NotDefined),
+    m_aggregationPeriod(0)
 {
-    //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
-    BusinessEventParameters::setToggleState(&m_eventParams, ToggleState::On);
 }
 
 QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
-    if (BusinessActionType::isResourceRequired(m_actionType) && !m_actionResource)
+    if (BusinessActionType::isResourceRequired(m_actionType) && m_actionResources.isEmpty())
         return QnAbstractBusinessActionPtr(); //resource is not exists anymore
+    //TODO: #GDM check resource type?
 
     QnBusinessParams runtimeParams = bEvent->getRuntimeParams();
 
@@ -29,7 +30,7 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
 
     if (!m_actionParams.isEmpty())
         result->setParams(m_actionParams);
-    result->setResource(m_actionResource);
+    result->setResources(m_actionResources);
 
     if (BusinessEventType::hasToggleState(bEvent->getEventType()) && BusinessActionType::hasToggleState(m_actionType)) {
         ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
@@ -44,17 +45,17 @@ BusinessEventType::Value QnBusinessEventRule::eventType() const {
     return m_eventType;
 }
 
-void QnBusinessEventRule::setEventType(BusinessEventType::Value value) {
+void QnBusinessEventRule::setEventType(const BusinessEventType::Value value) {
     m_eventType = value;
 }
 
 
-QnResourcePtr QnBusinessEventRule::eventResource() const {
-    return m_eventResource;
+QnResourceList QnBusinessEventRule::eventResources() const {
+    return m_eventResources;
 }
 
-void QnBusinessEventRule::setEventResource(QnResourcePtr value) {
-    m_eventResource = value;
+void QnBusinessEventRule::setEventResources(const QnResourceList &value) {
+    m_eventResources = value;
 }
 
 QnBusinessParams QnBusinessEventRule::eventParams() const {
@@ -66,20 +67,28 @@ void QnBusinessEventRule::setEventParams(const QnBusinessParams &params)
     m_eventParams = params;
 }
 
+ToggleState::Value QnBusinessEventRule::eventState() const {
+    return m_eventState;
+}
+
+void QnBusinessEventRule::setEventState(ToggleState::Value state) {
+    m_eventState = state;
+}
+
 BusinessActionType::Value QnBusinessEventRule::actionType() const {
     return m_actionType;
 }
 
-void QnBusinessEventRule::setActionType(BusinessActionType::Value value) {
+void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
     m_actionType = value;
 }
 
-QnResourcePtr QnBusinessEventRule::actionResource() const {
-    return m_actionResource;
+QnResourceList QnBusinessEventRule::actionResources() const {
+    return m_actionResources;
 }
 
-void QnBusinessEventRule::setActionResource(QnResourcePtr value) {
-    m_actionResource = value;
+void QnBusinessEventRule::setActionResources(const QnResourceList &value) {
+    m_actionResources = value;
 }
 
 QnBusinessParams QnBusinessEventRule::actionParams() const
@@ -92,7 +101,49 @@ void QnBusinessEventRule::setActionParams(const QnBusinessParams &params)
     m_actionParams = params;
 }
 
+int QnBusinessEventRule::aggregationPeriod() const {
+    return m_aggregationPeriod;
+}
+
+void QnBusinessEventRule::setAggregationPeriod(int msecs) {
+    m_aggregationPeriod = msecs;
+}
+
+QString QnBusinessEventRule::comments() const {
+    return m_comments;
+}
+
+void QnBusinessEventRule::setComments(const QString value) {
+    m_comments = value;
+}
+
+QString QnBusinessEventRule::schedule() const {
+    return m_schedule;
+}
+
+void QnBusinessEventRule::setSchedule(const QString value) {
+    m_schedule = value;
+    m_binSchedule = QByteArray::fromHex(m_schedule.toUtf8());
+}
+
 QString QnBusinessEventRule::getUniqueId() const
 {
     return QString(QLatin1String("QnBusinessEventRule_")) + getId().toString();
+}
+
+bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
+{
+    if (m_binSchedule.isEmpty())
+        return true; // if no schedule at all do not filter anything
+
+    int currentWeekHour = (datetime.date().dayOfWeek()-1)*24 + datetime.time().hour();
+
+    int byteOffset = currentWeekHour/8;
+    if (byteOffset >= m_binSchedule.size())
+        return false;
+    int bitNum = 7 - (currentWeekHour % 8);
+    quint8 mask = 1 << bitNum;
+
+    bool rez = bool(m_binSchedule.at(byteOffset) & mask);
+    return rez;
 }

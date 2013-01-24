@@ -3,8 +3,6 @@
 
 #include <QtGui/QMessageBox>
 
-#include <utils/common/event_processors.h>
-
 //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 
@@ -23,6 +21,8 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include <utils/common/event_processors.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -84,6 +84,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
     ui->recordMotionButton->installEventFilter(releaseSignalizer);
     ui->recordMotionPlusLQButton->installEventFilter(releaseSignalizer);
+
+    QnSingleEventSignalizer* gridMouseReleaseSignalizer = new QnSingleEventSignalizer(this);
+    gridMouseReleaseSignalizer->setEventType(QEvent::MouseButtonRelease);
+    connect(gridMouseReleaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SIGNAL(controlsChangesApplied()));
+    ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
     
     connectToGridWidget();
     
@@ -99,13 +104,12 @@ QnCameraScheduleWidget::~QnCameraScheduleWidget() {
 void QnCameraScheduleWidget::connectToGridWidget() 
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
-    connect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
+
 }
 
 void QnCameraScheduleWidget::disconnectFromGridWidget() 
 {
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
-    disconnect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
 }
 
 void QnCameraScheduleWidget::beginUpdate() {
@@ -681,7 +685,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
         QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras' motion setup page to ensure it is supported and enabled."));
     } else {
         if(!(hasMotion && hasDualStreaming)) {
-            QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
+            QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection are not available for this camera."));
         } else {
             QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled. Please go to the motion setup page to setup the camera's motion area and sensitivity."));
         }

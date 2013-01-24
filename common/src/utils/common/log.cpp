@@ -4,6 +4,7 @@
 #include <QDateTime>
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
+const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
     QString str = value.toUpper().trimmed();
@@ -39,7 +40,10 @@ public:
 
         m_file.setFileName(currFileName());
 
-        return m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        if (rez)
+            m_file.write(UTF8_BOM);
+        return rez;
     }
 
     void setLogLevel(QnLogLevel logLevel) 
@@ -59,6 +63,7 @@ public:
 
         QByteArray th;
         QTextStream textStream(&th);
+        textStream.setCodec("UTF-8");
         textStream << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz"))
             << QLatin1String(" Thread ") << QString::number((qint64)QThread::currentThread()->currentThreadId(), 16)
             << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
@@ -71,6 +76,12 @@ public:
         m_file.flush();
         if (m_file.size() >= m_maxFileSize)
             openNextFile();
+    }
+
+    QString syncCurrFileName() const
+    {
+        QMutexLocker lock(&m_mutex);
+        return m_baseName + QLatin1String(".log");
     }
 
 private:
@@ -101,7 +112,8 @@ private:
         }
 
         m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-
+        if (m_file.size() == 0)
+            m_file.write(UTF8_BOM);
     }
 
     QString currFileName() const
@@ -135,7 +147,7 @@ private:
 
     QFile m_file;
 
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
 };
 
 Q_GLOBAL_STATIC(QnLogPrivate, qn_logPrivateInstance);
@@ -237,6 +249,10 @@ void qnLogMsgHandler(QtMsgType type, const char *msg) {
     cl_log.log(QString::fromLocal8Bit(msg), logLevel);
 }
 
+QString QnLog::logFileName()
+{
+    return instance()->d->syncCurrFileName();
+}
 
 void QnLog::initLog(const QString& logLevelStr) {
     bool needWarnLogLevel = false;

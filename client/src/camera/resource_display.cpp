@@ -60,6 +60,12 @@ QnResourceDisplay::~QnResourceDisplay() {
     disconnectFromResource();
 }
 
+void QnResourceDisplay::beforeDestroy()
+{
+    foreach(detail::QnRendererGuard *guard, m_guards)
+        guard->renderer()->beforeDestroy();
+}
+
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
@@ -98,9 +104,6 @@ void QnResourceDisplay::disconnectFromResource() {
     cleanUp(m_dataProvider);
     if(m_camera != NULL)
         m_camera->beforeStopDisplay();
-
-    foreach(detail::QnRendererGuard *guard, m_guards)
-        guard->renderer()->beforeDestroy();
 
 #if 0
     if(!m_started)

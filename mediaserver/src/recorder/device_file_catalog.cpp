@@ -288,7 +288,8 @@ void DeviceFileCatalog::deserializeTitleFile()
             if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
             {
                 needRewriteCatalog = true;
-                chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
+                //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
+                storage->removeFile(fullFileName(chunk));
             }
             else {
                 chunk.durationMs = 0;

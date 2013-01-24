@@ -7,6 +7,8 @@
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
+void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
 
 namespace Qn
 {
@@ -34,6 +36,8 @@ namespace Qn
                 return QLatin1String("BusinessRuleInsertOrUpdate");
             case Message_Type_BusinessRuleDelete:
                 return QLatin1String("BusinessRuleDelete");
+            case Message_Type_BroadcastBusinessAction:
+                return QLatin1String("BroadcastBusinessAction");
             default:
                 return QString::fromAscii("Unknown %1").arg((int)val);
         }
@@ -93,6 +97,24 @@ bool QnMessage::load(const pb::Message &message)
             break;
         case pb::Message_Type_Ping:
             break;
+        case pb::Message_Type_BusinessRuleChange:
+        {
+            const pb::BusinessRuleMessage& businessRuleMessage = message.GetExtension(pb::BusinessRuleMessage::message);
+            parseBusinessRule(businessRule, businessRuleMessage.businessrule());
+            break;
+        }
+        case pb::Message_Type_BusinessRuleDelete:
+        {
+            const pb::BusinessRuleMessage& businessRuleMessage = message.GetExtension(pb::BusinessRuleMessage::message);
+            resourceId = businessRuleMessage.businessrule().id();
+            break;
+        }
+        case pb::Message_Type_BroadcastBusinessAction:
+        {
+            const pb::BroadcastBusinessActionMessage& businessActionMessage = message.GetExtension(pb::BroadcastBusinessActionMessage::message);
+            parseBusinessAction(businessAction, businessActionMessage.businessaction());
+            break;
+        }
     }
 
     return true;

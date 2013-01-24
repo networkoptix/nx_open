@@ -2,8 +2,6 @@
 
 #include "common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "core/dataprovider/live_stream_provider.h"
-
 
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
@@ -110,10 +108,13 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
+        result->setRole(role);
+        /*
         if (QnLiveStreamProvider* lsp = dynamic_cast<QnLiveStreamProvider*>(result))
         {
                 lsp->setRole(role);
         }
+        */
         return result;
 
     }
@@ -202,20 +203,19 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
     }
 }
 
-
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
-    // TODO: #VASILENKO needs synchronization. Currently it is not used from multiple threads, but things may change.
-
-    m_scheduleTasks = scheduleTasks;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_scheduleTasks = scheduleTasks;
+    }
 
     emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
-const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
+const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 {
-    // TODO: #VASILENKO needs synchronization
-
+    QMutexLocker lock(&m_mutex);
     return m_scheduleTasks;
 }
 
@@ -272,6 +272,24 @@ bool QnSecurityCamResource::setRelayOutputState(
     unsigned int /*autoResetTimeout*/ )
 {
     return false;
+}
+
+void QnSecurityCamResource::inputPortListenerAttached()
+{
+    if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
+        startInputPortMonitoring();
+}
+
+void QnSecurityCamResource::inputPortListenerDetached()
+{
+    if( m_inputPortListenerCount <= 0 )
+        return;
+
+    int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );
+    if( result == 1 )
+        stopInputPortMonitoring();
+    else if( result <= 0 )
+        m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
 MotionType QnSecurityCamResource::getCameraBasedMotionType() const
@@ -371,7 +389,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
             else if (s1 == QLatin1String("motionwindow"))
                 result |= MT_MotionWindow;
         }
-        if (!hasDualStreaming() && !checkCameraCapability(primaryStreamSoftMotion))
+        if (!hasDualStreaming() && !(getCameraCapabilities() &  PrimaryStreamSoftMotionCapability))
             result &= ~MT_SoftwareGrid;
     }
     else {
@@ -394,11 +412,8 @@ void QnSecurityCamResource::setMotionType(MotionType value)
 
 void QnSecurityCamResource::at_disabledChanged()
 {
-    /*if( oldValue == newValue )
-        return;*/
-
     if(hasFlags(QnResource::foreigner))
-        return;     //we do not own camera
+        return; // we do not own camera
 
     if(isDisabled())
         stopInputPortMonitoring();
@@ -406,28 +421,22 @@ void QnSecurityCamResource::at_disabledChanged()
         startInputPortMonitoring();
 }
 
-bool QnSecurityCamResource::checkCameraCapability(CameraCapabilities value) const
-{
-    return getCameraCapabilities() & value;
-}
-
 QnSecurityCamResource::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
-    const_cast<QnSecurityCamResource*>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
-    return (CameraCapabilities) mediaVariant.toInt();
+    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: const_cast? get rid of it!
+    return static_cast<CameraCapabilities>(mediaVariant.toInt());
 }
 
-void QnSecurityCamResource::addCameraCapabilities(CameraCapabilities value)
-{
-    value |= getCameraCapabilities();
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+void QnSecurityCamResource::setCameraCapabilities(CameraCapabilities capabilities) {
+    setParam(QLatin1String("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+
+    // TODO: #1.5 this signal won't be emitted if parameter was changed directly (e.g. as a result of resource update).
+
+    // TODO: we don't check whether they have actually changed. This better be fixed.
+    emit cameraCapabilitiesChanged(::toSharedPointer(this));
 }
 
-void QnSecurityCamResource::removeCameraCapabilities(CameraCapabilities value)
-{
-    value = getCameraCapabilities() & ~value;
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+void QnSecurityCamResource::setCameraCapability(CameraCapability capability, bool value) {
+    setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
 }

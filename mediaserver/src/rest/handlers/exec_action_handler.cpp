@@ -2,6 +2,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "events/abstract_business_action.h"
 #include "events/business_message_bus.h"
+#include <api/serializer/pb_serializer.h>
 
 int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
@@ -17,7 +18,10 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
 
 int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
-    QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray(body);
+    QnAbstractBusinessActionPtr action;
+
+    QnApiPbSerializer serializer;
+    serializer.deserializeBusinessAction(action, body);
     if (action) {
         action->setReceivedFromRemoteHost(true);
         qnBusinessMessageBus->at_actionReceived(action);

@@ -15,6 +15,9 @@
 #include <events/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>
+
+#include <ui/models/business_rules_view_model.h>
+
 #include <ui/widgets/business/business_rule_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -31,48 +34,45 @@ class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContex
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRulesDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     virtual ~QnBusinessRulesDialog();
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 
 private slots:
+    void at_context_userChanged();
+
+    void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
+    void at_message_ruleDeleted(QnId id);
+
     void at_newRuleButton_clicked();
-    void at_saveButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
+    void at_advancedButton_clicked();
 
-    void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+    void at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
+    void at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
-    /* Widget changes handlers */
-    void at_ruleHasChangesChanged(QnBusinessRuleWidget* source, bool value);
-    void at_ruleEventTypeChanged(QnBusinessRuleWidget* source, BusinessEventType::Value value);
-    void at_ruleEventResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
-    void at_ruleEventStateChanged(QnBusinessRuleWidget* source, ToggleState::Value value);
-    void at_ruleActionTypeChanged(QnBusinessRuleWidget* source, BusinessActionType::Value value);
-    void at_ruleActionResourceChanged(QnBusinessRuleWidget* source, const QnResourcePtr &resource);
-
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+    void at_model_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 private:
-    QList<QStandardItem *> createRow(QnBusinessRuleWidget* widget);
-    QnBusinessRuleWidget* createWidget(QnBusinessEventRulePtr rule);
+    Q_DISABLE_COPY(QnBusinessRulesDialog)
 
-    void saveRule(QnBusinessRuleWidget* widget);
-    void deleteRule(QnBusinessRuleWidget* widget);
-
-    QStandardItem *tableItem(QnBusinessRuleWidget* widget, int column) const;
+    void saveRule(QnBusinessRuleViewModel* ruleModel);
+    void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
     void updateControlButtons();
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
-    QStandardItemModel* m_listModel;
+    QnBusinessRulesViewModel* m_rulesViewModel;
+
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
-    QMap<int, QnBusinessRuleWidget*> m_processingWidgets;
-    QnAppServerConnectionPtr m_connection;
+    QMap<int, QnBusinessRuleViewModel*> m_processing;
+    int m_loadingHandle;
 };
 
 #endif // QN_BUSINESS_RULES_DIALOG_H

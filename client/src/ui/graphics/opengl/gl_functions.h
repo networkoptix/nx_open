@@ -4,6 +4,8 @@
 #include <cstddef> /* For std::ptrdiff_t. */
 
 #include <QtOpenGL/QGLContext>
+//#define GL_GLEXT_PROTOTYPES
+//#include <GL/glext.h>
 
 class QnGlFunctionsPrivate;
 
@@ -16,6 +18,9 @@ typedef std::ptrdiff_t GLsizeiptrARB;
 typedef char GLchar;
 #endif
 
+typedef struct __GLsync *GLsync;
+typedef uint64_t GLuint64;
+
 
 class QnGlFunctions {
 public:
@@ -24,6 +29,7 @@ public:
         OpenGL1_3 = 0x02,               /**< Implements OpenGL1.3 spec. */
         OpenGL1_5 = 0x04,               /**< Implements OpenGL1.5 spec. */
         OpenGL2_0 = 0x08,               /**< Implements OpenGL2.0 spec. */
+        OpenGL3_2 = 0x10,
         
         ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
         NoOpenGLFullScreen = 0x0002000  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
@@ -45,7 +51,7 @@ public:
     /**
      * \returns                         OpenGL context that this functions instance works with.
      */
-    QGLContext *context() const;
+    const QGLContext *context() const;
 
     /**
      * \returns                         Set of features supported by the current OpenGL context.
@@ -101,6 +107,10 @@ public:
     void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
     void glEnableVertexAttribArray(GLuint index);
     void glDisableVertexAttribArray(GLuint index);
+
+    GLsync glFenceSync(	GLenum condition, GLbitfield flags );
+    void glDeleteSync( GLsync sync );
+    void glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout );
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;

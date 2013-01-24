@@ -1,11 +1,9 @@
 #include "live_stream_provider.h"
-#include "media_streamdataprovider.h"
-#include "cpull_media_stream_provider.h"
 #include "core/resource/camera_resource.h"
 
 
-
 QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
+QnAbstractMediaStreamDataProvider(res),
 m_livemutex(QMutex::Recursive),
 m_quality(QnQualityNormal),
 m_fps(-1.0),
@@ -96,7 +94,7 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
 QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
     if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && m_cameraRes->checkCameraCapability(QnPhysicalCameraResource::primaryStreamSoftMotion))
+        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & QnSecurityCamResource::PrimaryStreamSoftMotionCapability))
             m_softMotionRole = QnResource::Role_LiveVideo;
         else
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
@@ -134,18 +132,18 @@ void QnLiveStreamProvider::setFps(float f)
     if (getRole() != QnResource::Role_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        m_cameraRes->onPrimaryFpsUpdated(f);
+        m_cameraRes->lockConsumers();
+        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        {
+            QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+            if (lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+                lp->onPrimaryFpsUpdated(f);
+        }
+        m_cameraRes->unlockConsumers();
     }
 
 
-
-    if (QnClientPullMediaStreamProvider* cpdp = dynamic_cast<QnClientPullMediaStreamProvider*>(this))
-    {
-        // all client pull stream providers use the same mechanism 
-        cpdp->setFps(f);
-    }
-    else
-        updateStreamParamsBasedOnFps();
+    updateStreamParamsBasedOnFps();
 }
 
 float QnLiveStreamProvider::getFps() const
@@ -164,7 +162,7 @@ float QnLiveStreamProvider::getFps() const
 bool QnLiveStreamProvider::isMaxFps() const
 {
     QMutexLocker mtx(&m_livemutex);
-    return abs( m_fps - MAX_LIVE_FPS)< .1;
+    return m_fps >= m_cameraRes->getMaxFps()-0.1;
 }
 
 bool QnLiveStreamProvider::needMetaData() 
@@ -214,15 +212,9 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
     // this is secondary stream
     // need to adjust fps 
 
-    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-    Q_ASSERT(ap);
+    int maxFps = m_cameraRes->getMaxFps();
 
-    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(res);
-
-    int maxFps = res->getMaxFps();
-
-    StreamFpsSharingMethod sharingMethod = res->streamFpsSharingMethod();
+    StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     int newSecFps;
 
     if (sharingMethod == sharePixels)

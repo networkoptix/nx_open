@@ -40,6 +40,12 @@ namespace Qn {
          */
         GetMoreLicensesAction,
 
+
+        /**
+         * Opens server settings preferences tab.
+         */
+        OpenServerSettingsAction,
+
         /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.

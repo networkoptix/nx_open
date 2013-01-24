@@ -48,8 +48,13 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
-    qDeleteAll(m_instanceByTypeName);
-    m_instanceByTypeName.clear();
+    /* Destroy typed subobjects in reverse order to how they were constructed. */
+    while(!m_instances.empty()) {
+        QObject *instance = m_instances.back();
+        m_instances.pop_back();
+        m_instanceByTypeName.remove(typeid(*instance).name());
+        delete instance;
+    }
     m_userWatcher = NULL;
 
     /* Destruction order of these objects is important. */

@@ -30,8 +30,15 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
-    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+    enum CameraCapability { 
+        NoCapabilities = 0, 
+        PtzCapability = 1, 
+        ZoomCapability = 2, 
+        PrimaryStreamSoftMotionCapability = 4,
+        relayInput = 0x08,
+        relayOutput = 0x10
+    };
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
 
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
@@ -74,7 +81,7 @@ public:
     QList<QnMotionRegion> getMotionRegionList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
-    const QnScheduleTaskList &getScheduleTasks() const;
+    const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 
@@ -85,9 +92,8 @@ public:
 
 
     CameraCapabilities getCameraCapabilities() const;
-    bool checkCameraCapability(CameraCapabilities value) const;
-    void addCameraCapabilities(CameraCapabilities value);
-    void removeCameraCapabilities(CameraCapabilities value);
+    void setCameraCapabilities(CameraCapabilities capabilities);
+    void setCameraCapability(CameraCapability capability, bool value);
 
 
     /*!
@@ -97,15 +103,21 @@ public:
     */
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
+public slots:
+    virtual void inputPortListenerAttached();
+    virtual void inputPortListenerDetached();
+
 signals:
     /** 
      * This signal is virtual to work around a problem with inheritance from
      * two <tt>QObject</tt>s. 
      */
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
-private slots:
-    void at_disabledChanged();
+protected slots:
+    virtual void at_disabledChanged();
 
 protected:
     void updateInner(QnResourcePtr other) override;
@@ -124,10 +136,11 @@ protected:
     QList<QnMotionRegion> m_motionMaskList;
 
 private:
-    QnDataProviderFactory* m_dpFactory;
+    QnDataProviderFactory *m_dpFactory;
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
+    QAtomicInt m_inputPortListenerCount;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

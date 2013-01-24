@@ -59,25 +59,3 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
     QTreeView::timerEvent(event);
 }
 
-QString QnTreeView::toolTipAt(const QPointF &pos) const {
-    QVariant toolTip = indexAt(pos.toPoint()).data(Qt::ToolTipRole);
-    if (toolTip.convert(QVariant::String)) {
-        return toolTip.toString();
-    } else {
-        return QString();
-    }
-}
-
-int QnTreeView::helpTopicAt(const QPointF &pos) const {
-    int result = -1;
-
-    QModelIndex index = indexAt(pos.toPoint());
-    if(index.isValid())
-        result = qvariant_cast<int>(index.data(Qn::HelpTopicIdRole), -1);
-
-    /* Get model's help topic if it is not set on the item. */
-    if(result == -1 && model())
-        result = helpTopic(model());
-
-    return result;
-}

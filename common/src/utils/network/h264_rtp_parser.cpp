@@ -233,21 +233,22 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         return true; // skip data
 
 
-    bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
+    bool isPacketLost = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
     
     if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
     {
         qWarning() << "Too large RTP/H.264 frame. Truncate video buffer";
         clearInternalBuffer();
-        packetLostDetected = true;
+        isPacketLost = true;
     }
 
-    if (packetLostDetected) {
+    if (isPacketLost) {
         if (m_timeHelper)
             qWarning() << "RTP Packet lost detected for camera " << m_timeHelper->getResID() << ".old seq=" << m_prevSequenceNum << "new seq=" << sequenceNum;
         else
             qWarning() << "RTP Packet lost detected!!!!";
         clearInternalBuffer();
+        emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     }
     m_prevSequenceNum = sequenceNum;
 
@@ -301,7 +302,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 	        else {
 	            // if packet lost occured in the middle of FU packet, reset flag.
 	            // packet lost will be reported on the last FU packet. So, do not report problem twice
-	            packetLostDetected = false;
+	            isPacketLost = false;
 	        }
 
 	        if (*curPtr  & 0x40) // FU_A last packet
@@ -342,7 +343,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 	        break; // ignore unknown data
     }
 
-    if (packetLostDetected && !m_keyDataExists)
+    if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
     if (rtpHeader->marker && m_frameExists)

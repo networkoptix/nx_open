@@ -1,5 +1,7 @@
 #include "server_resource_widget.h"
 
+#include <iterator> /* For std::advance. */
+
 #include <utils/common/math.h> /* For M_PI. */
 
 #include <utils/common/warnings.h>
@@ -33,7 +35,7 @@ namespace {
     QColor getColorByKey(const QString &key) {
         int id;
         // TODO: #gdm
-        // It seems that qHash is not needed here and actually harmful here.
+        // It seems that qHash is not needed and is actually harmful here.
         // Why don't we just use plain numbering?
         // CPU -> 0
         // RAM -> 1
@@ -86,18 +88,18 @@ namespace {
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
-        bool first(true);
-
-        QnStatisticsDataIterator iter(values.values);
-        bool last = !iter.hasNext();
+        bool first = true;
+        bool last = false;
         *currentValue = -1;
+        
+        QLinkedList<qreal>::const_iterator backPos = values.values.end();
+        backPos--;
 
-        while (iter.hasNext()) {
-            qreal value = qMin(iter.next(), 1.0);
+        for(QLinkedList<qreal>::const_iterator pos = values.values.begin(); pos != values.values.end(); pos++) {
+            qreal value = qMin(*pos, 1.0);
             //bool noData = value < 0;
             value = qMax(value, -0.005);
-
-            last = !iter.hasNext();
+            last = pos == backPos;
             maxValue = qMax(maxValue, value);
             if (first) {
                 y1 = value * scale;

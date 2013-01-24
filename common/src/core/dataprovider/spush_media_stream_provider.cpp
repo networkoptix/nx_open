@@ -3,11 +3,9 @@
 #include "spush_media_stream_provider.h"
 #include "../resource/camera_resource.h"
 #include "utils/common/util.h"
-#include "live_stream_provider.h"
-
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
-QnAbstractMediaStreamDataProvider(dev),
+QnLiveStreamProvider(dev),
 m_needReopen(false),
 m_cameraAudioEnabled(false)
 {

@@ -1,5 +1,5 @@
-#ifndef QN_DESKTOP_FILE_ENCODER_H
-#define QN_DESKTOP_FILE_ENCODER_H
+#ifndef QN_DESKTOP_STREAM_READER_H
+#define QN_DESKTOP_STREAM_READER_H
 
 #include <QtCore/QtGlobal>
 
@@ -23,6 +23,9 @@ protected:
     virtual void openStream();
     virtual void closeStream();
     virtual bool isStreamOpened() const;
+    
+    virtual void updateStreamParamsBasedOnQuality() override {}
+    virtual void updateStreamParamsBasedOnFps() override {}
 
 private:
     bool init();
@@ -39,4 +42,4 @@ private:
 
 #endif // Q_OS_WIN
 
-#endif //QN_DESKTOP_FILE_ENCODER_H
+#endif //QN_DESKTOP_STREAM_READER_H

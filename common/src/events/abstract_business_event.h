@@ -11,14 +11,8 @@ namespace BusinessEventType
 {
     enum Value
     {
-        /** Event type is not defined. Used in rules. */
-        BE_NotDefined,
-
         /** Motion has occured on a camera. */
         BE_Camera_Motion,
-
-        /** Camera input signal is received. */
-        BE_Camera_Input,
 
         /** Camera was disconnected. */
         BE_Camera_Disconnect,
@@ -26,12 +20,33 @@ namespace BusinessEventType
         /** Storage read error has occured. */
         BE_Storage_Failure,
 
-        /** Aliases for the convinient lists building */
-        BE_FirstType = BE_Camera_Motion,
-        BE_LastType = BE_Storage_Failure,
+        /** Network issue: packet lost, RTP timeout, etc. */
+        BE_Network_Issue,
+
+        /** Found some cameras with same IP address. */
+        BE_Camera_Ip_Conflict,
+
+        /** Camera input signal is received. */
+        BE_Camera_Input,
+
+        /** Connection to mediaserver lost. */
+        BE_MediaServer_Failure,
+
+        /** Two or more mediaservers are running. */
+        BE_MediaServer_Conflict,
+
+        /** Event type is not defined. Used in rules. */
+        BE_NotDefined,
+
+        /**
+         * Used when enumerating to build GUI lists, this and followed actions
+         * should not be displayed.
+         */
+        BE_Count = BE_NotDefined,
 
         /** Base index for the user defined events. */
         BE_UserDefined = 1000
+
     };
 
     QString toString( Value val );
@@ -43,11 +58,6 @@ namespace BusinessEventType
     bool requiresCameraResource(Value val);
 
     bool requiresServerResource(Value val);
-}
-
-namespace BusinessEventParameters {
-    ToggleState::Value getToggleState(const QnBusinessParams &params);
-    void setToggleState(QnBusinessParams* params, ToggleState::Value value);
 }
 
 namespace QnBusinessEventRuntime {
@@ -117,7 +127,7 @@ public:
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(const QnBusinessParams& params) const = 0;
+    virtual bool checkCondition (ToggleState::Value state, const QnBusinessParams& params) const = 0;
 
     virtual QnBusinessParams getRuntimeParams() const;
 
@@ -145,6 +155,7 @@ private:
 
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
 
+Q_DECLARE_METATYPE(BusinessEventType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessEventPtr)
 
 

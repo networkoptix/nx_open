@@ -28,7 +28,10 @@ int QnBusinessMessageBus::deliveryBusinessAction(QnAbstractBusinessActionPtr bAc
     QNetworkRequest request;
     request.setUrl(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));
-    QNetworkReply* reply = m_transport.post(request, bAction->serialize());
+
+    QByteArray data;
+    m_serializer.serializeBusinessAction(bAction, data);
+    QNetworkReply* reply = m_transport.post(request, data);
     m_actionsInProgress.insert(reply, bAction);
 
     return 0;

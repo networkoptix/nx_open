@@ -2,27 +2,23 @@
 #include "core/resource/resource.h"
 
 QnCameraDisconnectedBusinessEvent::QnCameraDisconnectedBusinessEvent(
-        const QnResourcePtr& mediaServerResource,
         const QnResourcePtr& cameraResource,
         qint64 timeStamp):
     base_type(BusinessEventType::BE_Camera_Disconnect,
-                            mediaServerResource,
-                            timeStamp),
-    m_cameraResource(cameraResource)
+                            cameraResource,
+                            timeStamp)
 {
 }
 
-bool QnCameraDisconnectedBusinessEvent::checkCondition(const QnBusinessParams& params) const
+bool QnCameraDisconnectedBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessParams& params) const
 {
-    if (!base_type::checkCondition(params))
+    if (!base_type::checkCondition(state, params))
         return false;
-    QString cameraUniqId = params.value(QLatin1String("camera")).toString();
-    return cameraUniqId.isEmpty() || m_cameraResource->getUniqueId() == cameraUniqId;
+    return true;
 }
 
 QString QnCameraDisconnectedBusinessEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
-    text += QString::fromLatin1("  camera %1\n").arg(m_cameraResource->getUniqueId());
     return text;
 }

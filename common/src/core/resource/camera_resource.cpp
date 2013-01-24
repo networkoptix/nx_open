@@ -1,5 +1,4 @@
 #include "camera_resource.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 #include "common/common_meta_types.h"
 
@@ -16,35 +15,6 @@ QnVirtualCameraResource::QnVirtualCameraResource()
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
 {
     setFlags(local_live_cam);
-}
-
-int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const
-{
-#ifdef _DEBUG
-    debugCheck();
-#endif
-
-    QMutexLocker mutex(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (!lp)
-            continue;
-
-        if (lp->getRole() != QnResource::Role_SecondaryLiveVideo)
-        {
-            // must be a primary source 
-            return lp->getFps();
-        }
-    }
-
-    return 0;
-}
-
-int QnPhysicalCameraResource::getPrimaryStreamRealFps() const
-{
-    // will be implemented one day
-    return getPrimaryStreamDesiredFps();
 }
 
 int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
@@ -65,57 +35,6 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
 
     return qMax(128,result);
 }
-
-void QnPhysicalCameraResource::onPrimaryFpsUpdated(int newFps)
-{
-#ifdef _DEBUG
-    debugCheck();
-#endif
-
-    QMutexLocker mutex(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (!lp)
-            continue;
-
-        if (lp->getRole() == QnResource::Role_SecondaryLiveVideo)
-        {
-            lp->onPrimaryFpsUpdated(newFps);
-            return;
-        }
-    }
-
-        
-}
-
-#ifdef _DEBUG
-void QnPhysicalCameraResource::debugCheck() const
-{
-    int countTotal = 0;
-    int countPrimary = 0;
-
-    QMutexLocker mutex(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (!lp)
-            continue;
-
-        ++countTotal;
-
-        if (lp->getRole() != QnResource::Role_SecondaryLiveVideo)
-        {
-            // must be a primary source 
-            ++countPrimary;
-        }
-    }
-
-    Q_ASSERT(countTotal<=2); // more than 2 stream readers connected ?
-    Q_ASSERT(countPrimary<=1); // more than 1 primary source ? 
-
-}
-#endif
 
 void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {

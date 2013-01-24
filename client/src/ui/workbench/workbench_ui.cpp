@@ -58,7 +58,6 @@
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/system_menu_event.h>
@@ -476,7 +475,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_helpBackgroundItem->setFrameWidth(0.5);
 
-    m_helpWidget = new QnHelpWidget(new QnHelpHandler(this));
+    m_helpWidget = new QWidget();
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_helpWidget->palette();
@@ -708,8 +707,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
     connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
     connect(m_motionDisplayWatcher,     SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
-    connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
-    connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
     updateHelpContext();
 }
 
@@ -1901,20 +1898,6 @@ void QnWorkbenchUi::at_helpItem_paintGeometryChanged() {
     m_helpPinButton->setPos(paintGeometry.topLeft());
 
     updateViewportMargins();
-}
-
-void QnWorkbenchUi::at_helpWidget_showRequested() {
-    m_helpHidingProcessor->forceHoverEnter();
-    m_helpShowingProcessor->forceHoverEnter();
-
-    setHelpOpened(true);
-}
-
-void QnWorkbenchUi::at_helpWidget_hideRequested() {
-    m_helpHidingProcessor->forceHoverLeave();
-    m_helpShowingProcessor->forceHoverLeave();
-
-    setHelpOpened(false);
 }
 
 void QnWorkbenchUi::at_calendarShowButton_toggled(bool checked) {

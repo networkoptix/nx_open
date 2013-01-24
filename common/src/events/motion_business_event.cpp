@@ -5,7 +5,7 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(
         const QnResourcePtr& resource,
         ToggleState::Value toggleState,
         qint64 timeStamp,
-        QnMetaDataV1Ptr metadata):
+        QnAbstractDataPacketPtr metadata):
     base_type(BusinessEventType::BE_Camera_Motion,
                             resource,
                             toggleState,

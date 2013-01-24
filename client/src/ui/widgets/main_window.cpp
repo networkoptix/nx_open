@@ -480,9 +480,6 @@ bool QnMainWindow::event(QEvent *event) {
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
     Q_UNUSED(event)
-    //Informing DecodedPictureToOpenGLUploaderContextPool that window is about to destroy so that it can destroy its gl contexts 
-        //before destroying window (destroying gl context after window destruction is bad and causes access violation on catalyst drivers)
-    DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindow( NULL );
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {

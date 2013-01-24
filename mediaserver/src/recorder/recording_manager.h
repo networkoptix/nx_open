@@ -38,8 +38,9 @@ public:
 
     Recorders findRecorders(QnResourcePtr res) const;
 
-    bool startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int maxDuration);
-    bool stopForcedRecording(QnSecurityCamResourcePtr camRes);
+    bool startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+
+    bool stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck = true);
 
 signals:
     void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
@@ -68,6 +69,7 @@ private:
     QSet<QnResourcePtr> m_onlineCameras;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
+    QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory

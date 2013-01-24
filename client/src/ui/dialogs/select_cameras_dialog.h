@@ -23,12 +23,10 @@ public:
     explicit QnSelectCamerasDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnSelectCamerasDialog();
 
-    QnVirtualCameraResourceList getSelectedCameras() const;
+    QnResourceList getSelectedResources() const;
+    void setSelectedResources(const QnResourceList &selected);
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
-private slots:
-    void at_resourceModel_dataChanged();
-
 private:
     Ui::QnSelectCamerasDialog *ui;
 

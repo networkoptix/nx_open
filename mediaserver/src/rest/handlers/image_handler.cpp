@@ -70,7 +70,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             if (params[i].second.toLower().trimmed() == "latest")
                 time = LATEST_IMAGE;
             else
-                time = parseDateTime(params[i].second);
+                time = parseDateTime(params[i].second.toUtf8());
         }
         else if (params[i].first == "precise") {
             QString val = params[i].second.toLower().trimmed(); 
@@ -223,7 +223,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
 int QnImageHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-        return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnImageHandler::description(TCPSocket* tcpSocket) const

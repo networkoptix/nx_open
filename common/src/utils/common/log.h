@@ -55,6 +55,7 @@ public:
         Introduced to allow logging in dynamically loaded plugins
     */
     static void initLog(QnLog* externalInstance);
+    static QString logFileName();
     static QnLog* instance();
     
     static QnLogLevel logLevelFromString(const QString &value);

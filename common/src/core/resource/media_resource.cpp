@@ -44,7 +44,7 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, QnStreamQu
 }
 
 static QnDefaultResourceVideoLayout defaultVideoLayout;
-const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
     getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
@@ -65,7 +65,7 @@ const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractMed
 }
 
 static QnEmptyResourceAudioLayout audioLayout;
-const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
+const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return &audioLayout;
 }

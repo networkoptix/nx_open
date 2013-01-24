@@ -1,15 +1,18 @@
 #include "help_topic_accessor.h"
 
 #include <QtCore/QObject>
+#include <QtCore/QAbstractItemModel>
 #include <QtGui/QWidget>
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsProxyWidget>
+#include <QtGui/QAbstractItemView>
 
 #include <utils/common/warnings.h>
 #include <utils/common/variant.h>
 
 #include <ui/common/help_topic_queryable.h>
+#include <client/client_globals.h>
 
 namespace {
     const char *qn_helpTopicPropertyName = "_qn_contextHelpId";
@@ -57,6 +60,14 @@ int QnHelpTopicAccessor::helpTopicAt(QWidget *widget, const QPoint &pos, bool bu
 
             if(view->scene()) {
                 topicId = qvariant_cast<int>(view->scene()->property(qn_helpTopicPropertyName), -1);
+                if(topicId != -1)
+                    return topicId;
+            }
+        }
+
+        if(QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(widget)) {
+            if(QAbstractItemModel *model = view->model()) {
+                topicId = qvariant_cast<int>(view->model()->data(view->indexAt(widgetPos), Qn::HelpTopicIdRole), -1);
                 if(topicId != -1)
                     return topicId;
             }

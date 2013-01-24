@@ -11,14 +11,6 @@ namespace BusinessActionType
 {
     enum Value
     {
-        //!change camera output state
-        /*!
-            parameters:\n
-                - relayOutputID (string, required)          - id of output to trigger
-                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
-        */
-        BA_CameraOutput,
-        BA_Bookmark,           // mark part of camera archive as undeleted
         BA_CameraRecording,    // start camera recording
         BA_PanicRecording,     // activate panic recording mode
         // these actions can be executed from any endpoint. actually these actions call specified function at ec
@@ -27,13 +19,30 @@ namespace BusinessActionType
                 - emailAddress (string, required)
         */
         BA_SendMail,
-        BA_Alert,
+
+        //TODO: #gdm make!
         BA_ShowPopup,
+
+        //!change camera output state
+        /*!
+            parameters:\n
+                - relayOutputID (string, required)          - id of output to trigger
+                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
+        */
+        BA_CameraOutput,
+
+        BA_Alert,              // write a record to the server's log
+        BA_Bookmark,           // mark part of camera archive as undeleted
+
         // media server based actions
         BA_NotDefined,
 
-        BA_FirstType = BA_CameraOutput,
-        BA_LastType = BA_ShowPopup
+        /**
+         * Used when enumerating to build GUI lists, this and followed actions
+         * should not be displayed.
+         */
+        BA_Count = BA_Alert
+
     };
 
     QString toString( Value val );
@@ -54,26 +63,26 @@ typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 class QnAbstractBusinessAction
 {
 protected:
-    explicit QnAbstractBusinessAction(BusinessActionType::Value actionType);
+    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams);
 
 public:
     virtual ~QnAbstractBusinessAction();
     BusinessActionType::Value actionType() const { return m_actionType; }
-
-    QByteArray serialize();
-    static QnAbstractBusinessActionPtr fromByteArray(const QByteArray&);
 
     /*
     * Resource depend of action type.
     * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
     * For actions: BA_SendMail, BA_Alert, BA_ShowPopup resource is not used
     */
-    void setResource(const QnResourcePtr& resource);
+    void setResources(const QnResourceList& resources);
 
-    const QnResourcePtr& getResource();
+    const QnResourceList& getResources();
 
     void setParams(const QnBusinessParams& params);
     const QnBusinessParams& getParams() const;
+
+    void setRuntimeParams(const QnBusinessParams& params);
+    const QnBusinessParams& getRuntimeParams() const;
 
     void setBusinessRuleId(const QnId& value);
     QnId getBusinessRuleId() const;
@@ -84,15 +93,21 @@ public:
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
 
+    void setAggregationCount(int value);
+    int getAggregationCount() const;
+
 private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;
     bool m_receivedFromRemoteHost;
-    QnResourcePtr m_resource;
+    QnResourceList m_resources;
     QnBusinessParams m_params;
+    QnBusinessParams m_runtimeParams;
     QnId m_businessRuleId; // business rule, that generated this action
+    int m_aggregationCount;
 };
 
+Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 
 

@@ -66,6 +66,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/widgets/popup_collection_widget.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -175,6 +177,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -194,6 +197,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
+    connect(action(Qn::OpenServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_openServerSettingsAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
@@ -308,6 +312,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (businessRulesDialog())
         delete businessRulesDialog();
+
+    if (popupCollectionWidget())
+        delete popupCollectionWidget();
 
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
@@ -829,6 +836,20 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
 }
 
+void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
+    qDebug() << "action received" << businessAction;
+
+    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+        return;
+
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+
+    popupCollectionWidget()->addBusinessAction(businessAction);
+    popupCollectionWidget()->show();
+}
+
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
@@ -1239,6 +1260,13 @@ void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
     dialog->exec();
 }
 
+void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->openServerSettingsPage();
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -1249,7 +1277,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 //    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(connection(), widget(), context());
+        m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
         newlyCreated = true;
 /*
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
@@ -1281,8 +1309,14 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     businessRulesDialog()->show();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
+}
 
-
+// can be used for test purposes or for displaying an example for user
+void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->addExample();
+    popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
@@ -1319,7 +1353,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     qnSettings->setLastUsedConnection(connectionData);
 
     // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedName());
+    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
     QUrl clean_url(connectionData.url);
     clean_url.setPassword(QString());
@@ -1330,7 +1364,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     } else {
         // save "Last used connection"
         QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedName();
+        last.name = QnConnectionDataList::defaultLastUsedNameKey();
         last.url.setPassword(QString());
         connections.prepend(last);
     }
@@ -1376,13 +1410,13 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     // repopulate the resource pool
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
 #ifndef STANDALONE_MODE
     static const char *appserverAddedPropertyName = "_qn_appserverAdded";
-    if(!QnResourceDiscoveryManager::instance().property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
+    if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnAppServerResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
     }
 #endif
 
@@ -1402,8 +1436,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnClientMessageProcessor::instance()->run();
 
     QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
-    QnResourceDiscoveryManager::instance().start();
-    QnResourceDiscoveryManager::instance().setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
+    QnResourceDiscoveryManager::instance()->setReady(true);
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
@@ -1422,7 +1456,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
+    QnResourceDiscoveryManager::instance()->stop();
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);

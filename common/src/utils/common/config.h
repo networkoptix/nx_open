@@ -5,8 +5,12 @@
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
-// TODO: #VASILENKO add doxy-comments for these defines
+/* 
+ * Media data alignment. We use 32 for compatibility with AVX instruction set */
 #define CL_MEDIA_ALIGNMENT 32
+
+/* 
+ * Addition free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
 
 
@@ -24,7 +28,7 @@
 //#define QT_USE_FAST_OPERATOR_PLUS
 
 
-/* Define override specifier for MSVC. */
+/* Define override specifier. */
 #ifdef _MSC_VER
 #   define override override
 #elif defined(__GNUC__)
@@ -59,19 +63,30 @@
 /* Some windows-specific defines. */
 #ifdef _WIN32
 #   undef NOMINMAX
-#   define NOMINMAX 
+#   define NOMINMAX /* We don't want min & max as macros. */
 #endif
 
 
 /* Some MSVC-specific defines. */
 #ifdef _MSC_VER
 #   undef __STDC_CONSTANT_MACROS
-#   define __STDC_CONSTANT_MACROS
+#   define __STDC_CONSTANT_MACROS /* We want M_PI and other math defines defined. */
 #endif
 
 
-/* I'm really tired of fixing warnings introduced by Vasilenko, so from now on
- * he'll have to fix them himself. Mwahahahaha!!! 
+/* Get rid of useless MSVC warnings. */
+#ifdef _MSC_VER
+#   define _CRT_SECURE_NO_WARNINGS /* Don't warn for deprecated 'unsecure' CRT functions. */
+#   define _CRT_NONSTDC_NO_DEPRECATE /* Don't warn for deprecated POSIX functions. */
+#
+#   /* 'Derived' : inherits 'Base::method' via dominance. 
+#    * It is buggy as described here:
+#    * http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function */
+#   pragma warning(disable: 4250) 
+#endif
+
+
+/* Turn some useful MSVC warnings into errors.
  * 
  * Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
 #ifdef _MSC_VER

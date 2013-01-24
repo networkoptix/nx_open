@@ -26,31 +26,27 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
 
     Q_ASSERT( context != NULL );
 
-    GLContext::SYS_PAINT_DEVICE_HANDLE curDeviceHandle = NULL;
-    GLContext::SYS_GL_CTX_HANDLE contextSysID = GLContext::getSysHandleOfQtContext( context, &curDeviceHandle );
-
-    //if context has changed, we need to share existing contexts with this one
-    if( !DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-            contextSysID,
-            DecodedPictureToOpenGLUploaderContextPool::instance()->paintWindowHandle(),
-            1 ) )
-    {
-        cl_log.log( QString::fromAscii("QnResourceWidgetRenderer. Failed to create auxiliary opengl context shared with GUI thread context. "
-            "Rendering of stream is impossible" ), cl_logERROR );
-        return;
-    }
+    const QGLContext* currentContextBak = QGLContext::currentContext();
+    if( context && (currentContextBak != context) )
+        const_cast<QGLContext*>(context)->makeCurrent();
 
     m_channelRenderers.resize( channelCount );
     for( int i = 0; i < channelCount; ++i )
     {
         RenderingTools renderingTools;
-        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context, contextSysID );
+        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context );
         renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
         renderingTools.renderer = new QnGLRenderer( context, *renderingTools.uploader );
         renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
         renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
         m_channelRenderers[i] = renderingTools;
     }
+
+    if( context && currentContextBak != context )
+        if( currentContextBak )
+            const_cast<QGLContext*>(currentContextBak)->makeCurrent();
+        else
+            const_cast<QGLContext*>(context)->doneCurrent();
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {
@@ -123,11 +119,11 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 }
 
-void QnResourceWidgetRenderer::waitForFrameDisplayed(int /*channel*/) {
-    //RenderingTools& ctx = m_channelRenderers[channel];
-    //if( !ctx.uploader )
-    //    return;
-    //ctx.uploader->waitForCurrentDecodedPictureRendered();
+void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->waitForAllFramesDisplayed();
 }
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {

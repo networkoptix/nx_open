@@ -8,8 +8,8 @@ QnInstantBusinessEvent::QnInstantBusinessEvent(BusinessEventType::Value eventTyp
     Q_ASSERT(!BusinessEventType::hasToggleState(eventType));
 }
 
-bool QnInstantBusinessEvent::checkCondition(const QnBusinessParams &params) const {
+bool QnInstantBusinessEvent::checkCondition(ToggleState::Value state, const QnBusinessParams &params) const {
     // Rule MUST contain 'Not Defined' event state filter
-    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(params);
-    return (toggleState == ToggleState::NotDefined);
+    Q_UNUSED(params)
+    return (state == ToggleState::NotDefined);
 }

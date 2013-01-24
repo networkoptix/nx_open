@@ -7,9 +7,11 @@
 
 #include <QGLContext>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#define WGL_WGLEXT_PROTOTYPES
+#include <gl/wglext.h>
+#else
 #include <QX11Info>
-
 #include <GL/glx.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -31,48 +33,15 @@
 //}
 
 GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
-:
-    m_handle( NULL ),
-    m_dc( NULL ),
-    m_winID( wnd ),
-    m_previousErrorCode( 0 )
 {
-#ifdef _WIN32
-    HDC dc = GetDC( m_winID );
-    m_handle = wglCreateContext( dc );
-    ReleaseDC( m_winID, dc );
-    dc = NULL;
-    if( m_handle == NULL )
-    {
-        m_previousErrorCode = GetLastError();
-        return;
-    }
+    initialize( wnd, contextHandleToShareWith );
+}
 
-    if( contextHandleToShareWith == NULL )
-        return;
-
-    if( !wglShareLists( contextHandleToShareWith, m_handle ) )
-    {
-        m_previousErrorCode = GetLastError();
-        wglDeleteContext( m_handle );
-        m_handle = NULL;
-    }
-#else
-    //creating OGL context shared with drawing context
-    static int visualAttribList[] = {
-        GLX_RGBA,
-        GLX_RED_SIZE, 4,
-        GLX_GREEN_SIZE, 4,
-        GLX_BLUE_SIZE, 4,
-        None };
-    XVisualInfo* visualInfo = glXChooseVisual( QX11Info::display(), QX11Info::appScreen(), visualAttribList );
-    m_handle = glXCreateContext(
-        QX11Info::display(),
-        visualInfo,
-        contextHandleToShareWith,
-        true );
-	m_previousErrorCode = errno;
-#endif
+GLContext::GLContext( const QGLWidget* shareWidget )
+{
+    initialize(
+        shareWidget->winId(),
+        getSysHandleOfQtContext( shareWidget->context() ) );
 }
 
 GLContext::~GLContext()
@@ -102,6 +71,10 @@ GLContext::~GLContext()
 
 bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
 {
+    //qDebug()<<"GLContext::makeCurrent. "<<m_handle;
+
+    //return true;
+
 #ifdef _WIN32
     if( paintDevToUse != NULL )
     {
@@ -135,12 +108,11 @@ void GLContext::doneCurrent()
         ReleaseDC( m_winID, m_dc );
     m_dc = NULL;
 #else
-    bool res = glXMakeCurrent(
+    glXMakeCurrent(
         QX11Info::display(),
         None,
         NULL );
     m_previousErrorCode = glGetError();
-    return res;
 #endif
 }
 
@@ -234,4 +206,101 @@ GLContext::SYS_GL_CTX_HANDLE GLContext::getSysHandleOfQtContext( const QGLContex
     }
 
     return sysContextHandle;
+}
+
+void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
+{
+    m_handle = NULL;
+    m_dc = NULL;
+    m_winID = wnd;
+    m_previousErrorCode = 0;
+#ifdef USE_INTERNAL_WIDGET
+    m_widget.reset( new QWidget() );
+#endif
+
+#ifdef USE_INTERNAL_WIDGET
+    m_winID = m_widget->winId();
+#endif
+
+#ifdef _WIN32
+    Q_ASSERT( IsWindow( m_winID ) );
+
+    HDC dc = GetDC( m_winID );
+#ifdef USE_INTERNAL_WIDGET
+    //reading pixel format of src window
+    {
+        HDC hdc = GetDC( wnd );
+        // get the current pixel format index  
+        int iPixelFormat = GetPixelFormat(hdc); 
+
+        memset( &m_pfd, 0, sizeof(m_pfd) );
+        // obtain a detailed description of that pixel format  
+        DescribePixelFormat( hdc, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &m_pfd );
+        ReleaseDC( wnd, hdc );
+
+        if( !SetPixelFormat( dc, iPixelFormat, &m_pfd ) )
+        {
+            m_previousErrorCode = GetLastError();
+            ReleaseDC( m_winID, dc );
+            return;
+        }
+    }
+#endif
+    //TODO/IMPL no need to request function address every time
+    PFNWGLCREATECONTEXTATTRIBSARBPROC my_wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress( "wglCreateContextAttribsARB" );
+    if( my_wglCreateContextAttribsARB )
+    {
+        //creating OpenGL 3.0 context
+        static const int contextAttribs[] =
+        {
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+            0
+        }; 
+        m_handle = my_wglCreateContextAttribsARB( dc, contextHandleToShareWith, contextAttribs );
+    }
+    else
+    {
+        //creating Opengl 1.0 context
+        m_handle = wglCreateContext( dc );
+        if( m_handle != NULL &&
+            contextHandleToShareWith != NULL &&
+            !wglShareLists( contextHandleToShareWith, m_handle ) )
+        {
+            m_previousErrorCode = GetLastError();
+            wglDeleteContext( m_handle );
+            m_handle = NULL;
+        }
+    }
+
+    ReleaseDC( m_winID, dc );
+    dc = NULL;
+
+    if( m_handle == NULL )
+        m_previousErrorCode = GetLastError();
+
+    //if( contextHandleToShareWith == NULL )
+    //    return;
+
+    //if( !wglShareLists( contextHandleToShareWith, m_handle ) )
+    //{
+    //    m_previousErrorCode = GetLastError();
+    //    wglDeleteContext( m_handle );
+    //    m_handle = NULL;
+    //}
+#else
+    //creating OGL context shared with drawing context
+    static int visualAttribList[] = {
+        GLX_RGBA,
+        GLX_RED_SIZE, 4,
+        GLX_GREEN_SIZE, 4,
+        GLX_BLUE_SIZE, 4,
+        None };
+    XVisualInfo* visualInfo = glXChooseVisual( QX11Info::display(), QX11Info::appScreen(), visualAttribList );
+    m_handle = glXCreateContext(
+        QX11Info::display(),
+        visualInfo,
+        contextHandleToShareWith,
+        true );
+	m_previousErrorCode = errno;
+#endif
 }

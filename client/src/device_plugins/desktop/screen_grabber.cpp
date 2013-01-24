@@ -58,7 +58,8 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, CaptureMode mo
     m_tmpFrameBuffer(0),
     m_widget(widget),
     m_tmpFrameWidth(0),
-    m_tmpFrameHeight(0)
+    m_tmpFrameHeight(0),
+    m_colorBitsCapacity(0)
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
@@ -345,7 +346,6 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                 yPos = height - yPos;
 
             quint8 maskBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*2/8 * 16];
-            quint8 colorBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*4]; // max cursor size: 64x64
             quint8 lpbiData[sizeof(BITMAPINFO) + 4]; // 2 additional colors
             quint8 lpbiColorData[sizeof(BITMAPINFO) + 3*4]; // 4 additional colors
 
@@ -425,16 +425,21 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                     return;
                 }
 
-                if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, lpbiColor->bmiHeader.biHeight, colorBits, lpbiColor, 0) == 0)
+                if( m_colorBitsCapacity < lpbiColor->bmiHeader.biSizeImage )
+                {
+                    m_colorBitsCapacity = lpbiColor->bmiHeader.biSizeImage;
+                    m_colorBits.reset( new quint8[lpbiColor->bmiHeader.biSizeImage] );
+                }
+
+                if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, lpbiColor->bmiHeader.biHeight, m_colorBits.get(), lpbiColor, 0) == 0)
                 {
                     DeleteObject(icInfo.hbmMask);
                     DeleteObject(icInfo.hbmColor);
                     return;
                 }
 
-                quint32* colorBitsPtr = (quint32*) colorBits;
+                quint32* colorBitsPtr = (quint32*) m_colorBits.get();
                 int colorStride = lpbiColor->bmiHeader.biSizeImage / lpbiColor->bmiHeader.biHeight;
-
 
                 // draw xor colored cursor
                 if (!flip)

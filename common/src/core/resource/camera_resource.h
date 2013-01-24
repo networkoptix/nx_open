@@ -48,6 +48,14 @@ public:
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource) override;
+
+public slots:
+    virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
+    virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
+
+protected slots:
+    virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
 
 private:
     bool m_scheduleDisabled;
@@ -69,19 +77,11 @@ class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResourc
 public:
     QnPhysicalCameraResource();
 
-    // returns 0 if primary stream does not exist
-    int getPrimaryStreamDesiredFps() const;
-
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    void onPrimaryFpsUpdated(int newFps);
-
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
-#ifdef _DEBUG
-    void debugCheck() const;
-#endif
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);

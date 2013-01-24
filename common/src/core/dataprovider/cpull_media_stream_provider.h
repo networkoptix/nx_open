@@ -2,13 +2,13 @@
 #define client_pull_stream_reader_h1226
 
 
-#include "core/datapacket/media_data_packet.h"
 #include "media_streamdataprovider.h"
 #include "utils/common/adaptive_sleep.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 struct QnAbstractMediaData;
 
-class QnClientPullMediaStreamProvider : public QnAbstractMediaStreamDataProvider
+class QnClientPullMediaStreamProvider : public QnLiveStreamProvider
 {
     Q_OBJECT;
 
@@ -16,9 +16,6 @@ public:
     QnClientPullMediaStreamProvider(QnResourcePtr dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
-    void setFps(float f);
-    float getFps() const;
-    bool isMaxFps() const;
 protected:
     bool canChangeStatus() const;
 
@@ -27,8 +24,6 @@ private:
     virtual void beforeRun() override;
 
     QnAdaptiveSleep m_fpsSleep;
-
-    float m_fps; //used only for live providers
 };
 
 #endif // client_pull_stream_reader_h1226

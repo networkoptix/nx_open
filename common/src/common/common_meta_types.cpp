@@ -51,6 +51,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
+    
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
     qRegisterMetaType<QnMediaServerResourcePtr>();
@@ -90,6 +91,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
+    qRegisterMetaType<QnBusinessEventRulePtr>();
+    qRegisterMetaType<QnAbstractDataPacketPtr>();
     
 
     qn_commonMetaTypes_initialized = true;

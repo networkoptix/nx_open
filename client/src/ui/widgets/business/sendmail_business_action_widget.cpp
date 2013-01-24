@@ -3,11 +3,20 @@
 
 #include <events/sendmail_business_action.h>
 
-QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) :
+#include <ui/actions/action_manager.h>
+#include <ui/workbench/workbench_context.h>
+
+#include <utils/common/scoped_value_rollback.h>
+
+QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnSendmailBusinessActionWidget)
 {
     ui->setupUi(this);
+
+    connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
@@ -15,20 +24,30 @@ QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
     delete ui;
 }
 
-void QnSendmailBusinessActionWidget::loadParameters(const QnBusinessParams &params) {
-    ui->emailLineEdit->setText(BusinessActionParameters::getEmailAddress(params));
+void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
+    if (!model)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
+
+    if (fields & QnBusiness::ActionParamsField) {
+        QString email = BusinessActionParameters::getEmailAddress(model->actionParams());
+        if (ui->emailLineEdit->text() != email)
+            ui->emailLineEdit->setText(email);
+    }
 }
 
-QnBusinessParams QnSendmailBusinessActionWidget::parameters() const {
+void QnSendmailBusinessActionWidget::paramsChanged() {
+    if (!model() || m_updating)
+        return;
+
     QnBusinessParams params;
     BusinessActionParameters::setEmailAddress(&params, ui->emailLineEdit->text());
-    return params;
+    model()->setActionParams(params);
 }
 
-QString QnSendmailBusinessActionWidget::description() const {
-    QString fmt = QLatin1String("%1 <span style=\"font-style:italic;\">%2</span>");
-    QString recordStr = QObject::tr("E-mail to");
-    return fmt
-            .arg(recordStr)
-            .arg(ui->emailLineEdit->text());
+
+void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
+    menu()->trigger(Qn::OpenServerSettingsAction);
 }

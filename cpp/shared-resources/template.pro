@@ -23,10 +23,10 @@ CONFIG(debug, debug|release) {
 	} else {
     DESTDIR = ../../build-environment/${arch}/build/bin/debug
   }  
-  OBJECTS_DIR  = ./build/debug
-  MOC_DIR = ./build/debug/generated
-  UI_DIR = ./build/debug/generated
-  RCC_DIR = ./build/debug/generated
+  OBJECTS_DIR = ../${arch}/build/debug
+  MOC_DIR = ../${arch}/build/debug/generated
+  UI_DIR = ../${arch}/build/debug/generated
+  RCC_DIR = ../${arch}/build/debug/generated
   LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
 }
 
@@ -37,10 +37,10 @@ CONFIG(release, debug|release) {
   } else {
     DESTDIR = ../../build-environment/${arch}/build/bin/release
   }  
-  OBJECTS_DIR  = ./build/release
-  MOC_DIR = ./build/release/generated
-  UI_DIR = ./build/release/generated
-  RCC_DIR = ./build/release/generated
+  OBJECTS_DIR  = ../${arch}/build/release
+  MOC_DIR = ../${arch}/build/release/generated
+  UI_DIR = ../${arch}/build/release/generated
+  RCC_DIR = ../${arch}/build/release/generated
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
@@ -60,11 +60,6 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
-# Define override specifier.
-OVERRIDE_DEFINITION = "override="
-win32-msvc*:OVERRIDE_DEFINITION = "override=override"
-DEFINES += $$OVERRIDE_DEFINITION
-
 win* {
   isEmpty(BUILDLIB) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
@@ -76,16 +71,6 @@ win* {
   DEFINES += ${windows.defines}  
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
-
-    # Don't warn for deprecated 'unsecure' CRT functions.
-    DEFINES += _CRT_SECURE_NO_WARNINGS
-
-    # Don't warn for deprecated POSIX functions.
-    DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
-
-    # Disable warning C4250: 'Derived' : inherits 'Base::method' via dominance.
-    # It is buggy, as described in http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function
-    QMAKE_CXXFLAGS += /wd4250
   }
   
   !staticlib {
@@ -95,6 +80,8 @@ win* {
   staticlib {
     DEFINES += QN_EXPORT=
   }
+  
+  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
 }
 
 unix {
@@ -104,6 +91,7 @@ unix {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
   DEFINES += ${linux.defines}
   QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
+  DEFINES += override=
 }
 
 mac {

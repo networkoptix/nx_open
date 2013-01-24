@@ -109,6 +109,9 @@ QnGLRenderer::~QnGLRenderer()
 
 void QnGLRenderer::beforeDestroy()
 {
+    m_yuy2ToRgbShaderProgram.reset();
+    m_yv12ToRgbShaderProgram.reset();
+    m_nv12ToRgbShaderProgram.reset();
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -122,9 +125,16 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 
 Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
 {
+    NX_LOG( QString::fromLatin1("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
+
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
+    {
+        NX_LOG( QString::fromLatin1("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2 );
         return Qn::NothingRendered;
+    }
+
+    m_lastDisplayedFlags = picLock->flags();
 
     Qn::RenderStatus result = picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
     const bool draw = picLock->width() <= maxTextureSize() && picLock->height() <= maxTextureSize();
@@ -147,6 +157,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
             case PIX_FMT_YUV420P:
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
         	    drawYV12VideoTexture(
+                    picLock,
                     picLock->textureRect(),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
@@ -168,6 +179,9 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 Q_ASSERT( false );
         }
 
+        glFlush();
+        glFinish();
+
         m_prevFrameSequence = picLock->sequence();
         if( picLock->pts() != AV_NOPTS_VALUE )
             m_lastDisplayedTime = picLock->pts();
@@ -177,6 +191,8 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
     {
         result = Qn::NothingRendered;
     }
+
+    NX_LOG( QString::fromLatin1("Exiting QnGLRenderer::paint (2)"), cl_logDEBUG2 );
 
     return result;
 }
@@ -214,6 +230,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
 }
 
 void QnGLRenderer::drawYV12VideoTexture(
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
 	const QRectF& tex0Coords,
 	unsigned int tex0ID,
 	unsigned int tex1ID,
@@ -227,12 +244,8 @@ void QnGLRenderer::drawYV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    //float tx_array[8] = {
-    //    0.0f, 0.0f,
-    //    tex0Coords.x(), 0.0f,
-    //    tex0Coords.x(), tex0Coords.y(),
-    //    0.0f, tex0Coords.y()
-    //};
+    NX_LOG( QString::fromLatin1("Rendering YUV420 textures %1, %2, %3").
+        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     glEnable(GL_TEXTURE_2D);
     glCheckError("glEnable");
@@ -300,6 +313,7 @@ void QnGLRenderer::drawNV12VideoTexture(
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
 {
+    glCheckError("glBindBuffer");
     glVertexPointer(2, GL_FLOAT, 0, v_array);
     glCheckError("glVertexPointer");
     glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
@@ -339,6 +353,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_yv12ToRgbShaderProgram.get()
         && m_yv12ToRgbShaderProgram->isValid();
 }
 
@@ -347,6 +362,7 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
     return (features() & QnGlFunctions::ArbPrograms)
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
-        && !m_decodedPictureProvider.isForcedSoftYUV();
+        && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_nv12ToRgbShaderProgram.get();
         //&& m_nv12ToRgbShaderProgram->isValid();
 }

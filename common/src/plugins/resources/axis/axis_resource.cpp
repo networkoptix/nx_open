@@ -524,7 +524,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
     }
 }
 
-const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
@@ -795,11 +795,16 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     if( status != CL_HTTP_SUCCESS )
         cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+    else if( inputPortCount > 0 )
+        setCameraCapability(QnSecurityCamResource::relayInput, true);
+
     unsigned int outputPortCount = 0;
     status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
     if( status != CL_HTTP_SUCCESS )
         cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+    else if( outputPortCount > 0 )
+        setCameraCapability(QnSecurityCamResource::relayOutput, true);
 
     //reading port direction and names
     for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )
@@ -828,9 +833,8 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
             m_outputPortNameToIndex[portName] = i;
     }
 
-    //TODO/IMPL periodically update port names in case some one changes it
-
-    startInputPortMonitoring();
+    //TODO/IMPL periodically update port names in case some one changes it via camera's webpage
+    //startInputPortMonitoring();
 }
 
 void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& notification )

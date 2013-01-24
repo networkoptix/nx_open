@@ -1,12 +1,7 @@
-#include "core/resource/resource.h"
-#include "core/resource_managment/resource_pool.h"
-
-#include "businessRule.pb.h"
-
-#include "api/serializer/serializer.h"
 #include "abstract_business_action.h"
-#include "business_action_factory.h"
+
 #include <core/resource/resource.h>
+#include <core/resource_managment/resource_pool.h>
 
 namespace BusinessActionType {
 
@@ -53,39 +48,14 @@ namespace BusinessActionType {
         }
         return false;
     }
-
-    pb::BusinessActionType toProtobuf(Value val) {
-        switch(val) {
-            case BA_NotDefined:         return pb::Alert;
-            case BA_CameraOutput:       return pb::CameraOutput;
-            case BA_Bookmark:           return pb::Bookmark;
-            case BA_CameraRecording:    return pb::CameraRecording;
-            case BA_PanicRecording:     return pb::PanicRecording;
-            case BA_SendMail:           return pb::SendMail;
-            case BA_Alert:              return pb::Alert;
-            case BA_ShowPopup:          return pb::ShowPopup;
-        }
-        return pb::Alert;        //TODO: think about adding undefined action to protobuf
-    }
-
-    Value fromProtobuf(pb::BusinessActionType actionType) {
-        switch (actionType) {
-            case pb::CameraOutput:      return BA_CameraOutput;
-            case pb::Bookmark:          return BA_Bookmark;
-            case pb::CameraRecording:   return BA_CameraRecording;
-            case pb::PanicRecording:    return BA_PanicRecording;
-            case pb::SendMail:          return BA_SendMail;
-            case pb::Alert:             return BA_Alert;
-            case pb::ShowPopup:         return BA_ShowPopup;
-        }
-        return BA_NotDefined;
-    }
 }
 
-QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value actionType):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
-    m_receivedFromRemoteHost(false)
+    m_receivedFromRemoteHost(false),
+    m_runtimeParams(runtimeParams),
+    m_aggregationCount(1)
 {
 }
 
@@ -93,54 +63,12 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
-QByteArray QnAbstractBusinessAction::serialize()
-{
-    pb::BusinessAction pb_businessAction;
-
-    pb_businessAction.set_actiontype(BusinessActionType::toProtobuf(m_actionType));
-    if( getResource() )
-        pb_businessAction.set_actionresource(getResource()->getId());
-    pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
-    pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
-    pb_businessAction.set_togglestate((pb::ToggleStateType) getToggleState());
-
-    std::string str;
-    pb_businessAction.SerializeToString(&str);
-    return QByteArray(str.data(), str.length());
+void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {
+    m_resources = resources;
 }
 
-QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
-{
-    pb::BusinessAction pb_businessAction;
-
-    if (!pb_businessAction.ParseFromArray(data.data(), data.size()))
-    {
-        QByteArray errorString;
-        errorString = "QnAbstractBusinessAction::fromByteArray(): Can't parse message";
-        throw QnSerializeException(errorString);
-    }
-
-    QnBusinessParams runtimeParams;
-    if (pb_businessAction.has_runtimeparams())
-        runtimeParams = deserializeBusinessParams(pb_businessAction.runtimeparams().c_str());
-    QnAbstractBusinessActionPtr businessAction = QnBusinessActionFactory::createAction(
-                BusinessActionType::fromProtobuf(pb_businessAction.actiontype()),
-                runtimeParams);
-
-    businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
-    businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
-    businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
-    businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
-
-    return businessAction;
-}
-
-void QnAbstractBusinessAction::setResource(const QnResourcePtr& resource) {
-    m_resource = resource;
-}
-
-const QnResourcePtr& QnAbstractBusinessAction::getResource() {
-    return m_resource;
+const QnResourceList& QnAbstractBusinessAction::getResources() {
+    return m_resources;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
@@ -149,6 +77,14 @@ void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
 
 const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
     return m_params;
+}
+
+void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessParams& params) {
+    m_runtimeParams = params;
+}
+
+const QnBusinessParams& QnAbstractBusinessAction::getRuntimeParams() const {
+    return m_runtimeParams;
 }
 
 void QnAbstractBusinessAction::setBusinessRuleId(const QnId& value) {
@@ -173,4 +109,14 @@ void QnAbstractBusinessAction::setReceivedFromRemoteHost(bool value) {
 
 bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
     return m_receivedFromRemoteHost;
+}
+
+int QnAbstractBusinessAction::getAggregationCount() const
+{
+    return m_aggregationCount;
+}
+
+void QnAbstractBusinessAction::setAggregationCount(int value)
+{
+    m_aggregationCount = value;
 }

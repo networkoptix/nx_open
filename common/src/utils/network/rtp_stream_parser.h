@@ -37,8 +37,9 @@ typedef struct
 } RtpHeader;
 #pragma pack(pop)
 
-class QnRtpStreamParser
+class QnRtpStreamParser: public QObject
 {
+    Q_OBJECT
 public:
     QnRtpStreamParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
@@ -47,6 +48,8 @@ public:
 
     // used for sync audio/video streams
     void setTimeHelper(QnRtspTimeHelper* timeHelper);
+signals:
+    void packetLostDetected(quint32 prev, quint32 next);
 protected:
     QnRtspTimeHelper* m_timeHelper;
 };

@@ -18,8 +18,8 @@ namespace BusinessActionParameters {
 
 }
 
-QnSendMailBusinessAction::QnSendMailBusinessAction(QnBusinessParams runtimeParams):
-    base_type(BusinessActionType::BA_SendMail)
+QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessParams &runtimeParams):
+    base_type(BusinessActionType::BA_SendMail, runtimeParams)
 {
     m_eventType =           QnBusinessEventRuntime::getEventType(runtimeParams);
     m_eventResourceName =   QnBusinessEventRuntime::getEventResourceName(runtimeParams);
@@ -65,6 +65,9 @@ QString QnSendMailBusinessAction::getMessageBody() const {
     {
         text += QLatin1String("  ") + it.key() + QLatin1String(" = ") + it.value().toString() + QLatin1String("\n");
     }
+
+    if (getAggregationCount() > 1)
+        text += QString(QLatin1String("  (repeated %1 times)")).arg(getAggregationCount());
 
     return text;
 }
