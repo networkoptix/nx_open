@@ -218,7 +218,7 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController();
+    virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
 signals:
     void parameterValueChanged(const QnParam &param);

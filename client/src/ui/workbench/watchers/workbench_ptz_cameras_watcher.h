@@ -26,7 +26,7 @@ private:
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_cameraResource_cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void at_resource_cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
 private:
     QSet<QnVirtualCameraResourcePtr> m_ptzCameras;

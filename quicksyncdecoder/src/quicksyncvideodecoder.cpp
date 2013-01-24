@@ -597,6 +597,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                     {
                         saveToAVFrame( outFrame->data(), decodedFrameCtx );
                         m_lastAVFrame = *outFrame;
+                        (*outFrame)->flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
                     }
                 }
                 else
