@@ -62,12 +62,14 @@ QnScalarSpaceMapper QnScalarSpaceMapper::deserialize(const QVariant &value, bool
     QString extrapolationModeName = map.value(lit("extrapolationMode")).toString();
     QVariantList logical = map.value(lit("logical")).toList();
     QVariantList physical = map.value(lit("physical")).toList();
+    
     QVector<QPointF> logicalToPhysical;
+    int extrapolationMode;
 
     if(map.isEmpty() || extrapolationModeName.isEmpty() || logical.size() != physical.size())
         goto error;
 
-    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName);
+    extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName);
     if(extrapolationMode == -1)
         goto error;
 
