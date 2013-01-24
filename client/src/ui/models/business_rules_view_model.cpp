@@ -187,13 +187,21 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return m_actionType;
             break;
 
-     /*   case Qt::TextColorRole:
-            return QBrush(Qt::red);
+        case Qt::TextColorRole:
+//            if (m_disabled || isValid())
+                break;
 
+//            if (!isValid(column))
+//                return QBrush(Qt::black);
+//            return QBrush(Qt::black); //test
 
         case Qt::BackgroundRole:
-            if (m_disabled)
-                return QBrush(Qt::lightGray); //TODO: #GDM palette or even skin*/
+            if (m_disabled || isValid())
+                break;
+
+            if (!isValid(column))
+                return QBrush(QColor(204, 0, 0)); //TODO: #GDM skin colors
+            return QBrush(QColor(150, 0, 0)); //test
 
         case QnBusiness::ModifiedRole:
             return m_modified;
@@ -605,6 +613,32 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
             break;
     }
     return QVariant();
+}
+
+bool QnBusinessRuleViewModel::isValid() const {
+    return isValid(QnBusiness::TargetColumn);
+}
+
+bool QnBusinessRuleViewModel::isValid(int column) const {
+    switch (column) {
+        case QnBusiness::TargetColumn:
+            {
+                if (m_actionType == BusinessActionType::BA_SendMail) {
+                    QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
+                    QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    if (receivers.isEmpty() || !isEmailValid(receivers))
+                        return false;
+                }
+
+                QnResourceList resources = m_actionResources; //TODO: filtered by type
+                if (BusinessActionType::isResourceRequired(m_actionType) && resources.isEmpty()) {
+                    return false;
+                }
+            }
+        default:
+            break;
+    }
+    return true;
 }
 
 void QnBusinessRuleViewModel::updateActionTypesModel() {
