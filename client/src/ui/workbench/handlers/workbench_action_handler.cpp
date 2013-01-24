@@ -198,6 +198,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::OpenServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_openServerSettingsAction_triggered()));
+    connect(action(Qn::OpenPopupSettingsAction),                SIGNAL(triggered()),    this,   SLOT(at_openPopupSettingsAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
@@ -1263,6 +1264,13 @@ void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
 void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->openServerSettingsPage();
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_openPopupSettingsAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->openPopupSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }

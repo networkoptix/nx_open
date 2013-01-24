@@ -1,11 +1,17 @@
 #include "popup_collection_widget.h"
 #include "ui_popup_collection_widget.h"
 
-#include <ui/widgets/popup_widget.h>
 #include <events/popup_business_action.h>
 
-QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent) :
-    QWidget(parent, Qt::Popup),
+#include <ui/widgets/popup_widget.h>
+#include <ui/workbench/workbench_context.h>
+#include "ui/workbench/workbench_access_controller.h"
+
+#include <utils/settings.h>
+
+QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
+    base_type(parent, Qt::Popup),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
@@ -34,17 +40,24 @@ void QnPopupCollectionWidget::addExample() {
 }
 
 void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    //TODO: #GDM check admins
+
+    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+        return;
+
+    //TODO: #GDM check if camera is visible to us
     int group = BusinessActionParameters::getUserGroup(businessAction->getParams());
+    if (group > 0 && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
+        return;
     // now 1 is Admins Only
 
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
-    if (m_ignore.contains(eventType) && m_ignore[eventType])
+    quint64 ignored = qnSettings->ignorePopupFlags();
+    quint64 flag = (quint64)1 << (quint64)eventType;
+    if (ignored & flag)
         return;
 
-    //TODO: get event type from runtime params
     if (QWidget* w = m_widgetsByType[eventType]) {
         QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w);
         pw->addBusinessAction(businessAction);
@@ -72,7 +85,13 @@ void QnPopupCollectionWidget::updatePosition() {
 }
 
 void QnPopupCollectionWidget::at_widget_closed(BusinessEventType::Value eventType, bool ignore) {
-    m_ignore[eventType] = ignore;
+
+    if (ignore) {
+        quint64 ignored = qnSettings->ignorePopupFlags();
+        quint64 flag = (quint64)1 << (quint64)eventType;
+        ignored |= flag;
+        qnSettings->setIgnorePopupFlags(ignored);
+    }
 
     if (!m_widgetsByType.contains(eventType))
         return;

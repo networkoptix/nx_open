@@ -64,10 +64,10 @@ QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
     */
 
     // TODO: make externally configurable.
-    QVector<QPair<qreal, qreal> > toCameraY;
-    toCameraY.push_back(qMakePair(-0.5, -90.0));
-    toCameraY.push_back(qMakePair(0.0, 0.0));
-    toCameraY.push_back(qMakePair(1.0, 20.0));
+    QVector<QPointF> toCameraY;
+    toCameraY.push_back(QPointF(-0.5, -90.0));
+    toCameraY.push_back(QPointF(0.0, 0.0));
+    toCameraY.push_back(QPointF(1.0, 20.0));
 
     const qreal cropFactor = 7.92;//6.92;
     m_mapperByModel[QLatin1String("Q6035-E")] = new QnPtzSpaceMapper(

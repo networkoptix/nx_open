@@ -47,6 +47,11 @@ namespace Qn {
         OpenServerSettingsAction,
 
         /**
+         * Opens popup settings preferences tab.
+         */
+        OpenPopupSettingsAction,
+
+        /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.
          * 
