@@ -554,7 +554,7 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
         return;
 
     QnVirtualCameraResource::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
-    if(capabilities & QnVirtualCameraResource::PtzCapability) {
+    if(capabilities & QnVirtualCameraResource::ContinuousPtzCapability) {
         if(qFuzzyIsNull(zoomSpeed)) {
             m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
         } else {
@@ -788,7 +788,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if(m_camera) {
         if(
-            (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::PtzCapability | QnVirtualCameraResource::ZoomCapability)) && 
+            (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::ContinuousPtzCapability | QnVirtualCameraResource::ZoomCapability)) && 
             accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;
@@ -851,7 +851,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::PtzCapability);
+    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::ContinuousPtzCapability);
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

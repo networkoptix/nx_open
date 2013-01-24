@@ -31,12 +31,13 @@ class QnSecurityCamResource : virtual public QnMediaResource
 
 public:
     enum CameraCapability { 
-        NoCapabilities = 0, 
-        PtzCapability = 1, 
-        ZoomCapability = 2, 
-        PrimaryStreamSoftMotionCapability = 4,
-        relayInput = 0x08,
-        relayOutput = 0x10
+        NoCapabilities                      = 0x0, 
+        ContinuousPtzCapability             = 0x01, 
+        ZoomCapability                      = 0x02, 
+        PrimaryStreamSoftMotionCapability   = 0x04,
+        relayInput                          = 0x08,
+        relayOutput                         = 0x10,
+        AbsolutePtzCapability               = 0x20
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
 
