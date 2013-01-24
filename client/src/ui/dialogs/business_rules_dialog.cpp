@@ -112,8 +112,10 @@ namespace {
                     vopt->state = QStyle::State_None;
                     vopt->features |= QStyleOptionViewItemV2::Alternate;
                 }
-            }
-
+            } else if (!index.data(QnBusiness::ValidRole).toBool()) {
+                option->palette.setColor(QPalette::Highlight, QColor(255, 0, 0, 127));
+            } else
+                option->palette.setColor(QPalette::Highlight, QColor(127, 127, 127, 127));
         }
 
     };

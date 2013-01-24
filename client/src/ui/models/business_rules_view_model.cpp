@@ -207,6 +207,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             return m_modified;
         case QnBusiness::DisabledRole:
             return m_disabled;
+        case QnBusiness::ValidRole:
+            return isValid();
         default:
             break;
     }
