@@ -1,8 +1,6 @@
 #include "business_logic_common.h"
-
-/** This modules are part of QJson package */
-#include <serializer.h>
-#include <parser.h>
+#include <qjson/serializer.h>
+#include <qjson/parser.h>
 
 QByteArray serializeBusinessParams(const QnBusinessParams& params)
 {
