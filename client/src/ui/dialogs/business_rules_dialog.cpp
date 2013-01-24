@@ -91,6 +91,17 @@ namespace {
         }
 
         virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            if (index.column() == QnBusiness::SourceColumn) {
+                QPushButton* btn = new QPushButton(parent);
+                btn->setText(index.data().toString());
+                return btn;
+            }
+            if (index.column() == QnBusiness::TargetColumn) {
+                QPushButton* btn = new QPushButton(parent);
+                btn->setText(index.data().toString());
+                return btn;
+            }
+
             return base_type::createEditor(parent, option, index);
         }
 

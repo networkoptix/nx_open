@@ -744,7 +744,14 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             break;
         case QnBusiness::EventColumn:
         case QnBusiness::ActionColumn:
-            if (!m_rules[index.row()]->disabled())
+            flags |= Qt::ItemIsEditable;
+            break;
+        case QnBusiness::SourceColumn:
+            if (BusinessEventType::isResourceRequired(m_rules[index.row()]->eventType()))
+                flags |= Qt::ItemIsEditable;
+            break;
+        case QnBusiness::TargetColumn:
+            if (BusinessActionType::isResourceRequired(m_rules[index.row()]->actionType()))
                 flags |= Qt::ItemIsEditable;
             break;
         default:
