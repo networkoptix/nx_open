@@ -398,7 +398,7 @@ bool QnPlOnvifResource::initInternal()
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming())
-        setMotionType(MT_NoMotion);
+        setMotionType(Qn::MT_NoMotion);
 
     
     if (addFlags != Qn::NoCapabilities)

@@ -198,7 +198,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
         bool isMotionAvailable = true;
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-            isMotionAvailable &= camera->getMotionType() != MT_NoMotion;
+            isMotionAvailable &= camera->getMotionType() != Qn::MT_NoMotion;
 
 
         /* Write camera parameters out. */
@@ -320,7 +320,7 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     {
         int cameraFps = camera->getMaxFps();
         int cameraDualStreamingFps = cameraFps;
-        if ((((camera->supportedMotionType() & MT_SoftwareGrid))
+        if ((((camera->supportedMotionType() & Qn::MT_SoftwareGrid))
             || ui->cameraScheduleWidget->isSecondaryStreamReserver()) && camera->streamFpsSharingMethod() == Qn::shareFps)
             cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
         maxFps = qMin(maxFps, cameraFps);
