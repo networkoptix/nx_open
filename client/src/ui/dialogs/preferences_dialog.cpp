@@ -25,6 +25,7 @@
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/smtp_settings_widget.h>
+#include <ui/widgets/settings/popup_settings_widget.h>
 
 #include <youtube/youtubesettingswidget.h>
 
@@ -36,8 +37,12 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
     m_licenseManagerWidget(NULL),
+    m_smtpSettingsWidget(NULL),
+    m_popupSettingsWidget(NULL),
     m_settings(qnSettings),
-    m_licenseTabIndex(0)
+    m_licenseTabIndex(0),
+    m_serverSettingsTabIndex(0),
+    m_popupSettingsTabIndex(0)
 {
     ui->setupUi(this);
 
@@ -74,6 +79,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     m_smtpSettingsWidget = new QnSmtpSettingsWidget(this);
     m_serverSettingsTabIndex = ui->tabWidget->addTab(m_smtpSettingsWidget, tr("Server Settings"));
+
+    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
+    m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Popup settings"));
 
     resize(1, 1); // set widget size to minimal possible
 
@@ -179,6 +187,8 @@ void QnPreferencesDialog::submitToSettings() {
         m_recordingSettingsWidget->submitToSettings();
     if (m_smtpSettingsWidget)
         m_smtpSettingsWidget->submit();
+    if (m_popupSettingsWidget)
+        m_popupSettingsWidget->submitToSettings(m_settings);
 
     m_settings->save();
 }
@@ -204,6 +214,9 @@ void QnPreferencesDialog::updateFromSettings() {
 
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
+
+    if (m_popupSettingsWidget)
+        m_popupSettingsWidget->updateFromSettings(m_settings);
 
     int id = ui->languageComboBox->findData(m_settings->translationPath());
     if (id >= 0)

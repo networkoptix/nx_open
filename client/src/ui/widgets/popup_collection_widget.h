@@ -34,7 +34,6 @@ private:
     Ui::QnPopupCollectionWidget *ui;
 
     QMap<BusinessEventType::Value, QWidget*> m_widgetsByType;
-    QMap<BusinessEventType::Value, bool> m_ignore;
     bool m_adding;
 };
 
