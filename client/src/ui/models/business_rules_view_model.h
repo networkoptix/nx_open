@@ -46,7 +46,8 @@ namespace QnBusiness {
     Q_DECLARE_FLAGS(Fields, Field)
 
     enum ItemDataRole {
-        ModifiedRole   = Qt::UserRole + 1
+        ModifiedRole   = Qt::UserRole + 1,
+        DisabledRole
     };
 
 }

@@ -5,6 +5,7 @@
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QItemEditorFactory>
 #include <QtGui/QComboBox>
+#include <QtGui/QPainter>
 
 #include <api/app_server_connection.h>
 
@@ -63,6 +64,34 @@ namespace {
         }
     };
 
+
+    class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
+        typedef QStyledItemDelegate base_type;
+
+    protected:
+        virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            bool disabled = index.data(QnBusiness::DisabledRole).toBool();
+
+       /*     QStyleOptionViewItemV4 opt = option;
+            initStyleOption(&opt, index);
+
+            QWidget *widget = opt.widget;
+            widget->setEnabled(!disabled);
+            QStyle *style = widget ? widget->style() : QApplication::style();
+            style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);*/
+
+            base_type::paint(painter, option, index);
+        }
+
+        virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            QSize sh = base_type::sizeHint(option, index);
+            if (index.column() == QnBusiness::EventColumn || index.column() == QnBusiness::ActionColumn)
+                sh.setWidth(sh.width() * 1.5);
+            return sh;
+        }
+
+    };
+
 }
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
@@ -84,11 +113,13 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->installEventFilter(this);
 
-    QStyledItemDelegate *eventTypeItemDelegate = new QStyledItemDelegate(this);
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
+
+    QStyledItemDelegate *eventTypeItemDelegate = new QnBusinessRuleItemDelegate();
     eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
     ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
 
-    QStyledItemDelegate *actionTypeItemDelegate = new QStyledItemDelegate(this);
+    QStyledItemDelegate *actionTypeItemDelegate = new QnBusinessRuleItemDelegate();
     actionTypeItemDelegate->setItemEditorFactory(new QnBusinessActionTypeEditorFactory());
     ui->tableView->setItemDelegateForColumn(QnBusiness::ActionColumn, actionTypeItemDelegate);
 

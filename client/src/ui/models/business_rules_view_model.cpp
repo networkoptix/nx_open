@@ -163,7 +163,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 break;
         }
 
-        return QVariant();
+//        return QVariant();
     }
 
     switch (role) {
@@ -187,8 +187,14 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return m_actionType;
             break;
 
+//        case Qt::BackgroundRole:
+//            if (m_disabled)
+//                return QBrush(Qt::lightGray); //TODO: #GDM palette or even skin
+
         case QnBusiness::ModifiedRole:
             return m_modified;
+        case QnBusiness::DisabledRole:
+            return m_disabled;
         default:
             break;
     }
