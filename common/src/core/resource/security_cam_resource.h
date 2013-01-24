@@ -104,10 +104,14 @@ public:
     */
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
+    bool isRecordingEventAttached() const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
 
+    virtual void recordingEventAttached();
+    virtual void recordingEventDetached();
 signals:
     /** 
      * This signal is virtual to work around a problem with inheritance from
@@ -142,6 +146,7 @@ private:
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
+    int m_recActionCnt;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
