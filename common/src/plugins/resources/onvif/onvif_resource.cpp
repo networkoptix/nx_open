@@ -768,7 +768,8 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     if( strcmp(notification.oasisWsnB2__Topic->__item, "tns:Device/tnsw4n:IO/Port") != 0 )
 #endif
     {
-        NX_LOG( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
+        cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
+            arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
         return;
     }
 
