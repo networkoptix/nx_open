@@ -118,11 +118,12 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
 
 bool QnBusinessRuleProcessor::checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const
 {
+    if (rule->isDisabled())
+        return false;
     if (!bEvent->checkCondition(rule->eventState(), rule->eventParams()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
-    // TODO: check if rule is disabled
     return true;
 }
 
