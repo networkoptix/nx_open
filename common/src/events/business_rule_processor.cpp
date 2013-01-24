@@ -6,6 +6,7 @@
 #include "events/business_event_rule.h"
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
+#include "core/resource_managment/resource_pool.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -31,7 +32,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
-    return res->getParentResource().dynamicCast<QnMediaServerResource>();
+    return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
