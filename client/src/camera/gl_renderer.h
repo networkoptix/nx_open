@@ -42,6 +42,7 @@ public:
     bool isLowQualityImage() const;
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata() const; 
+    bool isHardwareDecoderUsed() const;
 
     bool isYV12ToRgbShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;

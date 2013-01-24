@@ -89,6 +89,12 @@ qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const {
     return ctx.renderer ? ctx.renderer->isLowQualityImage() : 0;
 }
 
+bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
+{
+    const RenderingTools& ctx = m_channelRenderers[channel];
+    return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
+}
+
 QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const 
 { 
     const RenderingTools& ctx = m_channelRenderers[channel];
