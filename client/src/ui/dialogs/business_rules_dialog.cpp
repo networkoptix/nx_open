@@ -70,7 +70,7 @@ namespace {
 
     protected:
         virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-            bool disabled = index.data(QnBusiness::DisabledRole).toBool();
+          //  bool disabled = index.data(QnBusiness::DisabledRole).toBool();
 
        /*     QStyleOptionViewItemV4 opt = option;
             initStyleOption(&opt, index);

@@ -2,11 +2,16 @@
 #include "ui_popup_collection_widget.h"
 
 #include <events/popup_business_action.h>
+
 #include <ui/widgets/popup_widget.h>
+#include <ui/workbench/workbench_context.h>
+#include "ui/workbench/workbench_access_controller.h"
+
 #include <utils/settings.h>
 
-QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent) :
-    QWidget(parent, Qt::Popup),
+QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
+    base_type(parent, Qt::Popup),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
@@ -39,9 +44,10 @@ void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
 
-    //TODO: #GDM check admins
     //TODO: #GDM check if camera is visible to us
     int group = BusinessActionParameters::getUserGroup(businessAction->getParams());
+    if (group > 0 && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
+        return;
     // now 1 is Admins Only
 
     QnBusinessParams params = businessAction->getRuntimeParams();
