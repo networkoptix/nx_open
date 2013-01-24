@@ -6,8 +6,8 @@
 QnSecurityCamResource::QnSecurityCamResource(): 
     QnMediaResource(),
     m_dpFactory(0),
-      m_motionType(MT_Default),
-      m_recActionCnt(0)
+    m_motionType(Qn::MT_Default),
+    m_recActionCnt(0)
 {
     QnCommonMetaTypes::initilize();
 

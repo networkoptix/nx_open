@@ -6,6 +6,7 @@
 
 #include "media_resource.h"
 #include "motion_window.h"
+#include "core/misc/schedule_task.h"
 
 class QnDataProviderFactory {
 public:
