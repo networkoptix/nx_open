@@ -9,7 +9,7 @@
 #include "utils/media/bitStream.h"
 
 QnWeekTimeScheduleWidget::QnWeekTimeScheduleWidget(QWidget *parent):
-    QWidget(parent), 
+    QDialog(parent),
     ui(new Ui::WeekTimeScheduleWidget),
     m_disableUpdateGridParams(false),
     m_inUpdate(0)
@@ -26,6 +26,9 @@ QnWeekTimeScheduleWidget::QnWeekTimeScheduleWidget(QWidget *parent):
     connect(ui->valueOnButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->valueOffButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
+
+    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     connectToGridWidget();
     
@@ -75,8 +78,8 @@ void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
     QByteArray schedule = QByteArray::fromHex(value.toUtf8());
     disconnectFromGridWidget(); /* We don't want to get 100500 notifications. */
 
-    BitStreamReader reader((quint8*) schedule.data(), schedule.size());
     try {
+        BitStreamReader reader((quint8*) schedule.data(), schedule.size());
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
         {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {

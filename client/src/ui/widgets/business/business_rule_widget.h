@@ -52,6 +52,7 @@ private slots:
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
+    void at_scheduleButton_clicked();
 private:
     Ui::QnBusinessRuleWidget *ui;
 
