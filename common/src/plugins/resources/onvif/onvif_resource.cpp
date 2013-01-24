@@ -394,7 +394,7 @@ bool QnPlOnvifResource::initInternal()
 
     CameraCapabilities addFlags = NoCapabilities;
     if (m_ptzController)
-        addFlags |= PtzCapability;
+        addFlags |= ContinuousPtzCapability;
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming())
