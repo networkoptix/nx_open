@@ -84,12 +84,11 @@ void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
         {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                 const QPoint cell(col, row);
-
-                Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
                 ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RecordingType_Run : Qn::RecordingType_Never);
             }
         }
     } catch(...) {
+        // we are here if value is empty
         // it is never happened if grid size is correct
     }
     connectToGridWidget();

@@ -15,6 +15,7 @@ class QnLicenseManagerWidget;
 class QnRecordingSettingsWidget;
 class QnYouTubeSettingsWidget;
 class QnSmtpSettingsWidget; //TODO: temporary, until we have wider server settings widget
+class QnPopupSettingsWidget;
 
 namespace Ui {
     class PreferencesDialog;
@@ -31,6 +32,7 @@ public:
 
     void openLicensesPage();
     void openServerSettingsPage();
+    void openPopupSettingsPage();
 
     virtual void accept() override;
 
@@ -60,6 +62,7 @@ private:
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
     QnLicenseManagerWidget *m_licenseManagerWidget;
     QnSmtpSettingsWidget *m_smtpSettingsWidget;
+    QnPopupSettingsWidget *m_popupSettingsWidget;
 
     QnSettings *m_settings;
 
@@ -68,6 +71,8 @@ private:
 
     /** Index of "Server Settings" tab to open it from outside */
     int m_serverSettingsTabIndex;
+
+    int m_popupSettingsTabIndex;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

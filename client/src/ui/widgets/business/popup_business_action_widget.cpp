@@ -3,6 +3,7 @@
 
 #include <events/popup_business_action.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -15,6 +16,7 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent, QnWork
     ui->setupUi(this);
 
     connect(ui->adminsCheckBox, SIGNAL(toggled(bool)), this, SLOT(paramsChanged()));
+    connect(ui->settingsButton, SIGNAL(clicked()), this, SLOT(at_settingsButton_clicked()));
 }
 
 QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
@@ -40,4 +42,8 @@ void QnPopupBusinessActionWidget::paramsChanged() {
     QnBusinessParams params;
     BusinessActionParameters::setUserGroup(&params, ui->adminsCheckBox->isChecked() ? 1 : 0);
     model()->setActionParams(params);
+}
+
+void QnPopupBusinessActionWidget::at_settingsButton_clicked() {
+    menu()->trigger(Qn::OpenPopupSettingsAction);
 }

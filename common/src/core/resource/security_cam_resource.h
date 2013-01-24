@@ -1,14 +1,12 @@
 #ifndef sequrity_cam_resource_h_1239
 #define sequrity_cam_resource_h_1239
 
-#include <QtGui/QRegion>
+#include <QRegion>
 
-#include <common/common_globals.h>
-
-#include <core/misc/schedule_task.h>
 
 #include "media_resource.h"
 #include "motion_window.h"
+#include "core/misc/schedule_task.h"
 
 class QnDataProviderFactory {
 public:
@@ -85,6 +83,8 @@ public:
     */
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
+    bool isRecordingEventAttached() const;
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
@@ -94,6 +94,9 @@ public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
 
+    virtual void recordingEventAttached();
+    virtual void recordingEventDetached();
+
 signals:
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
@@ -101,7 +104,7 @@ signals:
 protected slots:
     virtual void at_disabledChanged();
 // -------------------------------------------------------------------------- //
-// Begin QnSecurityCamResource signals/slots
+// End QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
 
 protected:
@@ -126,6 +129,7 @@ private:
     QnScheduleTaskList m_scheduleTasks;
     Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
+    int m_recActionCnt;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

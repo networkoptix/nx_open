@@ -5,17 +5,19 @@
 #include <events/abstract_business_action.h>
 #include <events/abstract_business_event.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 namespace Ui {
     class QnPopupCollectionWidget;
 }
 
-class QnPopupCollectionWidget : public QWidget
+class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QWidget base_type;
     
 public:
-    explicit QnPopupCollectionWidget(QWidget *parent);
+    explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
     ~QnPopupCollectionWidget();
 
     void addExample();
@@ -34,7 +36,6 @@ private:
     Ui::QnPopupCollectionWidget *ui;
 
     QMap<BusinessEventType::Value, QWidget*> m_widgetsByType;
-    QMap<BusinessEventType::Value, bool> m_ignore;
     bool m_adding;
 };
 

@@ -6,7 +6,8 @@
 QnSecurityCamResource::QnSecurityCamResource(): 
     QnMediaResource(),
     m_dpFactory(0),
-    m_motionType(Qn::MT_Default)
+    m_motionType(Qn::MT_Default),
+    m_recActionCnt(0)
 {
     QnCommonMetaTypes::initilize();
 
@@ -439,4 +440,19 @@ void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabil
 
 void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability, bool value) {
     setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
+}
+
+bool QnSecurityCamResource::isRecordingEventAttached() const
+{
+    return m_recActionCnt > 0;
+}
+
+void QnSecurityCamResource::recordingEventAttached()
+{
+    m_recActionCnt++;
+}
+
+void QnSecurityCamResource::recordingEventDetached()
+{
+    m_recActionCnt = qMax(0, m_recActionCnt-1);
 }

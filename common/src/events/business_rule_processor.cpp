@@ -155,8 +155,10 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
     bool condOK = checkCondition(bEvent, rule);
-    if (!condOK)
+    if (!condOK) {
+        m_rulesInProgress.remove(rule->getUniqueId());
         return QnAbstractBusinessActionPtr();
+    }
     
     if (bEvent->getToggleState() == ToggleState::On) {
         if (m_rulesInProgress.contains(rule->getUniqueId()))
@@ -386,23 +388,39 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
 
 void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessEventRulePtr businessRule, bool isRuleAdded )
 {
-    const QnResourceList& resList = businessRule->eventResources();
-    if( businessRule->eventType() == BusinessEventType::BE_Camera_Input &&
-        !resList.empty() )
+    //notifying resources to start input monitoring
     {
-        //notifying resources to start input monitoring
-        for( QnResourceList::const_iterator
-            it = resList.begin();
-            it != resList.end();
-            ++it )
+        const QnResourceList& resList = businessRule->eventResources();
+        if( businessRule->eventType() == BusinessEventType::BE_Camera_Input)
         {
-            QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
-            if( !securityCam )
-                continue;
-            if( isRuleAdded )
-                securityCam->inputPortListenerAttached();
-            else
-                securityCam->inputPortListenerDetached();
+            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            {
+                QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
+                if( !securityCam )
+                    continue;
+                if( isRuleAdded )
+                    securityCam->inputPortListenerAttached();
+                else
+                    securityCam->inputPortListenerDetached();
+            }
+        }
+    }
+
+    //notifying resources about recording action
+    {
+        const QnResourceList& resList = businessRule->actionResources();
+        if( businessRule->actionType() == BusinessActionType::BA_CameraRecording)
+        {
+            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            {
+                QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
+                if( !securityCam )
+                    continue;
+                if( isRuleAdded )
+                    securityCam->recordingEventAttached();
+                else
+                    securityCam->recordingEventDetached();
+            }
         }
     }
 }

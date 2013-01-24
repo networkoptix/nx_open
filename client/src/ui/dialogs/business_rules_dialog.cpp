@@ -5,6 +5,7 @@
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QItemEditorFactory>
 #include <QtGui/QComboBox>
+#include <QtGui/QPainter>
 
 #include <api/app_server_connection.h>
 
@@ -63,6 +64,62 @@ namespace {
         }
     };
 
+
+    class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
+        typedef QStyledItemDelegate base_type;
+
+    protected:
+        virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+          //  bool disabled = index.data(QnBusiness::DisabledRole).toBool();
+
+       /*     QStyleOptionViewItemV4 opt = option;
+            initStyleOption(&opt, index);
+
+            QWidget *widget = opt.widget;
+            widget->setEnabled(!disabled);
+            QStyle *style = widget ? widget->style() : QApplication::style();
+            style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);*/
+
+            base_type::paint(painter, option, index);
+        }
+
+        virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            QSize sh = base_type::sizeHint(option, index);
+            if (index.column() == QnBusiness::EventColumn || index.column() == QnBusiness::ActionColumn)
+                sh.setWidth(sh.width() * 1.5);
+            return sh;
+        }
+
+        virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            if (index.column() == QnBusiness::SourceColumn) {
+                QPushButton* btn = new QPushButton(parent);
+                btn->setText(index.data().toString());
+                return btn;
+            }
+            if (index.column() == QnBusiness::TargetColumn) {
+                QPushButton* btn = new QPushButton(parent);
+                btn->setText(index.data().toString());
+                return btn;
+            }
+
+            return base_type::createEditor(parent, option, index);
+        }
+
+        virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
+            base_type::initStyleOption(option, index);
+            if (index.data(QnBusiness::DisabledRole).toBool()) {
+                if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
+                    vopt->state = QStyle::State_None;
+                    vopt->features |= QStyleOptionViewItemV2::Alternate;
+                }
+            } else if (!index.data(QnBusiness::ValidRole).toBool()) {
+                option->palette.setColor(QPalette::Highlight, QColor(255, 0, 0, 127));
+            } else
+                option->palette.setColor(QPalette::Highlight, QColor(127, 127, 127, 127));
+        }
+
+    };
+
 }
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
@@ -82,13 +139,21 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
+
+    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);
 
-    QStyledItemDelegate *eventTypeItemDelegate = new QStyledItemDelegate(this);
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
+
+    QStyledItemDelegate *eventTypeItemDelegate = new QnBusinessRuleItemDelegate();
     eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
     ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
 
-    QStyledItemDelegate *actionTypeItemDelegate = new QStyledItemDelegate(this);
+    QStyledItemDelegate *actionTypeItemDelegate = new QnBusinessRuleItemDelegate();
     actionTypeItemDelegate->setItemEditorFactory(new QnBusinessActionTypeEditorFactory());
     ui->tableView->setItemDelegateForColumn(QnBusiness::ActionColumn, actionTypeItemDelegate);
 
@@ -207,6 +272,8 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& 
     m_rulesViewModel->addRules(rules);
     m_loadingHandle = -1;
 
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
     updateControlButtons();
 }
 

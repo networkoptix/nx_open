@@ -54,6 +54,9 @@ public slots:
     virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
     virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
 
+    virtual void recordingEventAttached() override { QnSecurityCamResource::recordingEventAttached(); }
+    virtual void recordingEventDetached() override { QnSecurityCamResource::recordingEventDetached(); }
+
 signals:
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);

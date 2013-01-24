@@ -46,7 +46,9 @@ namespace QnBusiness {
     Q_DECLARE_FLAGS(Fields, Field)
 
     enum ItemDataRole {
-        ModifiedRole   = Qt::UserRole + 1
+        ModifiedRole   = Qt::UserRole + 1,
+        DisabledRole,
+        ValidRole
     };
 
 }
@@ -69,6 +71,9 @@ public:
 
     QVariant getText(const int column, const bool detailed = true) const;
     QVariant getIcon(const int column) const;
+
+    bool isValid(int column) const;
+    bool isValid() const; //checks validity for all row
 
     QnId id() const;
 
