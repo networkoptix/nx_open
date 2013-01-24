@@ -102,7 +102,7 @@ bool DeviceFileCatalog::lastFileDuplicateName() const
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
-    for (int j = 0; j < i; ++j)
+    for (int j = 0; j <= i; ++j)
         result += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
     return result;
 }
@@ -171,7 +171,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
                 prevParts[j].first = currentParts[j];
                 prevParts[j].second = true;
             }
-            for (int j = 4; j >= i && !storage->isDirExists(getDirName(prefix, currentParts, j)); --j)
+            for (int j = 3; j >= i && !storage->isDirExists(getDirName(prefix, currentParts, j)); --j)
                 prevParts[j].second = false;
 
             break;
