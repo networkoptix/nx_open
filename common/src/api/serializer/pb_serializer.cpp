@@ -99,7 +99,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     camera->setFirmware(QString::fromStdString(pb_camera.firmware()));
 
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
-    camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
+    camera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
     if (pb_camera.has_region())
     {

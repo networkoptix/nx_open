@@ -104,7 +104,7 @@ QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    if (m_cameraRes->getMotionType() == MT_SoftwareGrid && getRole() == roleForMotionEstimation())
+    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
@@ -169,7 +169,7 @@ bool QnLiveStreamProvider::needMetaData()
 {
     // I assume this function is called once per video frame 
 
-    if (m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
         if (getRole() == roleForMotionEstimation()) {
             for (int i = 0; i < m_layout->numberOfChannels(); ++i)
@@ -183,7 +183,7 @@ bool QnLiveStreamProvider::needMetaData()
         }
         return false;
     }
-    else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == MT_HardwareGrid || m_cameraRes->getMotionType() == MT_MotionWindow))
+    else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
     {
         bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
         if (result)
@@ -201,7 +201,7 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
 {
     m_framesSinceLastMetaData++;
 
-    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         m_motionEstimation[videoData->channelNumber].analizeFrame(videoData);
 }
 
@@ -239,7 +239,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 {
-    if (m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
         return getCameraMetadata();

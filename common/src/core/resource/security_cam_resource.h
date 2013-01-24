@@ -1,62 +1,38 @@
 #ifndef sequrity_cam_resource_h_1239
 #define sequrity_cam_resource_h_1239
 
-#include <QRegion>
+#include <QtGui/QRegion>
+
+#include <common/common_globals.h>
+
+#include <core/misc/schedule_task.h>
+
 #include "media_resource.h"
-#include "core/misc/schedule_task.h"
 #include "motion_window.h"
 
-class QnDataProviderFactory
-{
+class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
 };
 
-enum MotionType {MT_Default = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4, MT_NoMotion = 8};
-Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
 
-namespace Qn {
-    enum CameraCapability { 
-        NoCapabilities                      = 0x0, 
-        ContinuousPtzCapability             = 0x01, 
-        ZoomCapability                      = 0x02, 
-        PrimaryStreamSoftMotionCapability   = 0x04,
-        relayInput                          = 0x08,
-        relayOutput                         = 0x10,
-        AbsolutePtzCapability               = 0x20
-    };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
-
-    enum StreamFpsSharingMethod 
-    {
-        shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-        sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-        noSharing // second stream does not subtract first stream fps 
-    };
-
-} // namespace Qn
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::CameraCapabilities);
-
-
-class QnSecurityCamResource : virtual public QnMediaResource
-{
+class QnSecurityCamResource : virtual public QnMediaResource {
     Q_OBJECT
 
 public:
-    MotionTypeFlags supportedMotionType() const;
+    Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
-    MotionType getCameraBasedMotionType() const;
-    MotionType getDefaultMotionType() const;
+    Qn::MotionType getCameraBasedMotionType() const;
+    Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
 
 
-    MotionType getMotionType();
-    void setMotionType(MotionType value);
+    Qn::MotionType getMotionType();
+    void setMotionType(Qn::MotionType value);
 
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
@@ -145,7 +121,7 @@ private:
     QnDataProviderFactory *m_dpFactory;
     
     QnScheduleTaskList m_scheduleTasks;
-    MotionType m_motionType;
+    Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
 };
 
