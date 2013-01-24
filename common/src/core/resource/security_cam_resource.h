@@ -85,21 +85,24 @@ public:
     */
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
+// -------------------------------------------------------------------------- //
+// Begin QnSecurityCamResource signals/slots
+// -------------------------------------------------------------------------- //
+    /* For metaobject system to work correctly, this block must be in sync with
+     * the one in QnVirtualCameraResource. */
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
 
 signals:
-    /** 
-     * This signal is virtual to work around a problem with inheritance from
-     * two <tt>QObject</tt>s. 
-     */
     virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    
     virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
 
 protected slots:
     virtual void at_disabledChanged();
+// -------------------------------------------------------------------------- //
+// Begin QnSecurityCamResource signals/slots
+// -------------------------------------------------------------------------- //
 
 protected:
     void updateInner(QnResourcePtr other) override;

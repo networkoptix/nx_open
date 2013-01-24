@@ -45,18 +45,27 @@ public:
     QString getFirmware() const;
     void setFirmware(QString firmware);
 
-    // TODO: make sure ordering is right
-signals:
-    void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource) override;
-
+// -------------------------------------------------------------------------- //
+// Begin QnSecurityCamResource metaobject support
+// -------------------------------------------------------------------------- //
+    /* These are copied from QnSecurityCamResource. For metaobject system to work
+     * correctly, no signals/slots must be declared before these ones. */
 public slots:
     virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
     virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
 
+signals:
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+
 protected slots:
     virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
+// -------------------------------------------------------------------------- //
+// End QnSecurityCamResource metaobject support
+// -------------------------------------------------------------------------- //
+
+signals:
+    void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
 
 private:
     bool m_scheduleDisabled;
