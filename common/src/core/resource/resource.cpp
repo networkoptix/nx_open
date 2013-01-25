@@ -737,6 +737,10 @@ QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionR
     return 0;
 }
 
+void QnResource::initializationDone()
+{
+}
+
 // -----------------------------------------------------------------------------
 // Temporary until real ResourceFactory is implemented
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)
@@ -792,6 +796,8 @@ void QnResource::init()
     if (!m_initialized) 
     {
         m_initialized = initInternal();
+        if( m_initialized )
+            initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }

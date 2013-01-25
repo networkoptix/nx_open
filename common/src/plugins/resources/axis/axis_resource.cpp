@@ -602,7 +602,9 @@ bool QnPlAxisResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    std::map<QString, unsigned int>::const_iterator it = m_outputPortNameToIndex.find( outputID );
+    std::map<QString, unsigned int>::const_iterator it = outputID.isEmpty()
+        ? m_outputPortNameToIndex.begin()
+        : m_outputPortNameToIndex.find( outputID );
     if( it == m_outputPortNameToIndex.end() )
         return false;
 
@@ -626,7 +628,7 @@ bool QnPlAxisResource::setRelayOutputState(
     if( status / 100 != 2 )
     {
         cl_log.log( QString::fromLatin1("Failed to set camera %1 port %2 output state to %3. Result: %4").
-            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+            arg(getHostAddress()).arg(it->first).arg(activate).arg(::toString(status)), cl_logWARNING );
         return false;
     }
 

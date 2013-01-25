@@ -78,8 +78,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
 
-    m_currentDetailsWidget = new QnBusinessRuleWidget(this, this->context());
-    ui->detailsLayout->addWidget(m_currentDetailsWidget);
+    m_currentDetailsWidget = ui->detailsWidget;
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -200,7 +199,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_advancedButton_clicked() {
-    ui->detailsGroupBox->setVisible(!ui->detailsGroupBox->isVisible());
+    m_currentDetailsWidget->setVisible(!m_currentDetailsWidget->isVisible());
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
@@ -313,7 +312,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
-    ui->detailsGroupBox->setVisible(ui->detailsGroupBox->isVisible() & loaded && m_currentDetailsWidget->model());
+    m_currentDetailsWidget->setVisible(m_currentDetailsWidget->isVisible() & loaded && m_currentDetailsWidget->model());
 
     ui->addRuleButton->setEnabled(hasRights && loaded);
 }
