@@ -78,13 +78,13 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
+    m_currentDetailsWidget = ui->detailsWidget;
+
     disconnect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
-
-    m_currentDetailsWidget = ui->detailsWidget;
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -244,7 +244,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_advancedButton_clicked() {
-    m_currentDetailsWidget->setVisible(!m_currentDetailsWidget->isVisible());
+    m_currentDetailsWidget->setVisible(!m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model());
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
@@ -325,10 +325,14 @@ void QnBusinessRulesDialog::createActions() {
     QAction* advAct = new QAction(tr("&Advanced"), this);
     connect(advAct, SIGNAL(triggered()), this, SLOT(at_advancedButton_clicked()));
 
+    QAction* scheduleAct = new QAction(tr("&Schedule"), this);
+    connect(scheduleAct, SIGNAL(triggered()), m_currentDetailsWidget, SLOT(at_scheduleButton_clicked()));
+
     m_popupMenu->addAction(newAct);
     m_popupMenu->addAction(deleteAct);
     m_popupMenu->addSeparator();
     m_popupMenu->addAction(advAct);
+    m_popupMenu->addAction(scheduleAct);
 }
 
 void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {

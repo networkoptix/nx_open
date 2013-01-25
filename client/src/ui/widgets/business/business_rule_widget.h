@@ -31,6 +31,9 @@ public:
     QnBusinessRuleViewModel* model() const;
     void setModel(QnBusinessRuleViewModel* model);
 
+public slots:
+    void at_scheduleButton_clicked();
+
 protected:
     /**
      * @brief initEventParameters   Display widget with current event paramenters.
@@ -51,7 +54,7 @@ private slots:
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
-    void at_scheduleButton_clicked();
+
 private:
     Ui::QnBusinessRuleWidget *ui;
 
