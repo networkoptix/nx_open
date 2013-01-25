@@ -210,7 +210,12 @@ void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr 
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
     m_rulesViewModel->deleteRule(id);
-    //TODO: remove from pending to delete
+    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
+        if (rule->getId() == id) {
+            m_pendingDeleteRules.removeOne(rule);
+            return;
+        }
+    }
     //TODO: ask user
 }
 

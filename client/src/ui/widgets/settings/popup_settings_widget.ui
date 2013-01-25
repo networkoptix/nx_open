@@ -17,7 +17,7 @@
    <item>
     <widget class="QCheckBox" name="ignoreAllCheckBox">
      <property name="text">
-      <string>Ignore all popups</string>
+      <string>Ignore all notifications</string>
      </property>
     </widget>
    </item>

@@ -78,10 +78,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 #endif
 
     m_smtpSettingsWidget = new QnSmtpSettingsWidget(this);
-    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_smtpSettingsWidget, tr("Server Settings"));
+    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_smtpSettingsWidget, tr("Mail Server"));
 
     m_popupSettingsWidget = new QnPopupSettingsWidget(this);
-    m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Popup settings"));
+    m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
 
     resize(1, 1); // set widget size to minimal possible
 
