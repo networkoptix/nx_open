@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Server Management Rules</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
    <item>
     <widget class="QGroupBox" name="rulesGroupBox">
      <property name="title">
@@ -108,10 +108,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="detailsGroupBox">
-     <property name="title">
-      <string>Advanced</string>
-     </property>
+    <widget class="QFrame" name="detailsFrame">
      <layout class="QVBoxLayout" name="detailsLayout">
       <property name="rightMargin">
        <number>0</number>

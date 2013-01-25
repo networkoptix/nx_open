@@ -63,8 +63,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 {
     ui->setupUi(this);
 
-    ui->eventDefinitionFrame->installEventFilter(this);
-    ui->actionDefinitionFrame->installEventFilter(this);
+    ui->eventDefinitionGroupBox->installEventFilter(this);
+    ui->actionDefinitionGroupBox->installEventFilter(this);
 
     QPalette pal = this->palette();
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
@@ -143,9 +143,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventStatesComboBox->setVisible(prolonged);
 
         bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
-        ui->eventResourcesHolder->setVisible(isResourceRequired);
-        ui->eventAtLabel->setVisible(isResourceRequired);
-        ui->eventDropLabel->setVisible(isResourceRequired);
+        ui->eventResourcesFrame->setVisible(isResourceRequired);
 
         initEventParameters();
     }
@@ -167,16 +165,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
         bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
-        ui->actionResourcesHolder->setVisible(isResourceRequired);
-        ui->actionAtLabel->setVisible(isResourceRequired);
-        ui->actionDropLabel->setVisible(isResourceRequired);
+        ui->actionResourcesFrame->setVisible(isResourceRequired);
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
 
-        ui->aggregationCheckBox->setVisible(actionIsInstant);
-        ui->aggregationValueSpinBox->setVisible(actionIsInstant);
-        ui->aggregationPeriodComboBox->setVisible(actionIsInstant);
-
+        ui->actionAggregationFrame->setVisible(actionIsInstant);
         initActionParameters();
     }
 
@@ -267,7 +260,7 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
     } else if (event->type() == QEvent::Drop) {
         QDropEvent* de = static_cast<QDropEvent*>(event);
         if (!m_dropResources.empty()) {
-            if (object == ui->eventDefinitionFrame) {
+            if (object == ui->eventDefinitionGroupBox) {
                 QnResourceList resources = m_model->eventResources();
                 foreach(QnResourcePtr res, m_dropResources) {
                     if (resources.contains(res))
@@ -275,7 +268,7 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
                     resources.append(res);
                 }
                 m_model->setEventResources(resources);
-            } else if (object == ui->actionDefinitionFrame) {
+            } else if (object == ui->actionDefinitionGroupBox) {
                 QnResourceList resources = m_model->actionResources();
                 foreach(QnResourcePtr res, m_dropResources) {
                     if (resources.contains(res))

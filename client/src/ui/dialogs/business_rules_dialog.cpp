@@ -200,7 +200,7 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_advancedButton_clicked() {
-    ui->detailsGroupBox->setVisible(!ui->detailsGroupBox->isVisible());
+    ui->detailsFrame->setVisible(!ui->detailsFrame->isVisible());
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
@@ -313,7 +313,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
-    ui->detailsGroupBox->setVisible(ui->detailsGroupBox->isVisible() & loaded && m_currentDetailsWidget->model());
+    ui->detailsFrame->setVisible(ui->detailsFrame->isVisible() & loaded && m_currentDetailsWidget->model());
 
     ui->addRuleButton->setEnabled(hasRights && loaded);
 }
