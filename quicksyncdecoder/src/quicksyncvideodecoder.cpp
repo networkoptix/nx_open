@@ -327,7 +327,18 @@ static const int MICROS_IN_SECOND = 1000*1000;
 
 bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    //::Sleep( 60 );
+    if( !data )
+    {
+        if( m_state < decoding )
+            return false;
+
+        mfxBitstream inputStream;
+        memset( &inputStream, 0, sizeof(inputStream) );
+        const bool decoderProducedFrame = decode( &inputStream, outFrame );
+        if( decoderProducedFrame )
+            ++m_totalOutputFrames;
+        return decoderProducedFrame;
+    }
 
     Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
@@ -360,7 +371,6 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 
     mfxBitstream inputStream;
     memset( &inputStream, 0, sizeof(inputStream) );
-    //inputStream->TimeStamp = av_rescale_q( data->timestamp, SRC_DATA_TIMESTAMP_RESOLUTION, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION );
     inputStream.TimeStamp = data->timestamp;
 
 #ifndef XVBA_TEST
