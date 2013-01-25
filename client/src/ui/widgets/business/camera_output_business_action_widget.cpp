@@ -66,8 +66,6 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
         if (autoReset > 0)
             ui->autoResetSpinBox->setValue(autoReset);
     }
-
-    //TODO: #GDM update on resource change
 }
 
 void QnCameraOutputBusinessActionWidget::paramsChanged() {
