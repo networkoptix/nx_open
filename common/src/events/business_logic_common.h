@@ -1,9 +1,10 @@
-#ifndef __BUSINESS_LOGIC_COMMON_H__
-#define __BUSINESS_LOGIC_COMMON_H__
+#ifndef QN_BUSINESS_LOGIC_COMMON_H
+#define QN_BUSINESS_LOGIC_COMMON_H
 
-#include <QString>
-#include <QVariant>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
+#include <utils/common/json.h>
 
 namespace ToggleState
 {
@@ -18,7 +19,17 @@ namespace ToggleState
 }
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 
-QByteArray serializeBusinessParams(const QnBusinessParams& value);
-QnBusinessParams deserializeBusinessParams(const QByteArray& value);
 
-#endif // __BUSINESS_LOGIC_COMMON_H__
+inline QByteArray serializeBusinessParams(const QnBusinessParams& value) {
+    QByteArray result;
+    QJson::serialize(value, &result);
+    return result;
+}
+
+inline QnBusinessParams deserializeBusinessParams(const QByteArray& value) {
+    QnBusinessParams result;
+    QJson::deserialize(value, &result);
+    return result; /* Returns empty map in case of deserialization error. */
+}
+
+#endif // QN_BUSINESS_LOGIC_COMMON_H
