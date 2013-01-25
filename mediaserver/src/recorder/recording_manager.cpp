@@ -165,7 +165,7 @@ bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Q
     return true;
 }
 
-bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes)
+bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck)
 {
     updateCamera(camRes); // ensure recorders are created
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
@@ -180,14 +180,12 @@ bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes)
     if (!recorders.recorderHiRes && !recorders.recorderLowRes)
         return false;
 
-    /*
     int afterThreshold = recorders.recorderHiRes ? recorders.recorderHiRes->getFRAfterThreshold() : recorders.recorderLowRes->getFRAfterThreshold();
     if (afterThreshold > 0 && afterThresholdCheck) {
         m_delayedStop.insert(camRes, qnSyncTime->currentUSecsSinceEpoch() + afterThreshold*1000000ll);
         return true;
     }
     m_delayedStop.remove(camRes);
-    */
 
     // update current schedule task
     if (recorders.recorderHiRes)
@@ -462,7 +460,6 @@ void QnRecordingManager::onTimer()
         startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
     }
 
-    /*
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
     for (QMap<QnSecurityCamResourcePtr, qint64>::iterator itrDelayedStop = stopList.begin(); itrDelayedStop != stopList.end(); ++itrDelayedStop)
     {
@@ -470,7 +467,6 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
-    */
 }
 
 

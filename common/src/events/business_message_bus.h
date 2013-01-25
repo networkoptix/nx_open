@@ -30,7 +30,7 @@ public:
     //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
 
     /** Delivery action to other module */
-    int deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, const QUrl& url);
+    int deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, QnResourcePtr res, const QUrl& url);
 signals:
     /** Action successfully delivered to other module*/
     void actionDelivered(QnAbstractBusinessActionPtr action);
@@ -39,10 +39,10 @@ signals:
     void actionDeliveryFail(QnAbstractBusinessActionPtr action);
 
     /** Action received from other module */
-    void actionReceived(QnAbstractBusinessActionPtr action);
+    void actionReceived(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 public slots:
     /** Action received from other module */
-    void at_actionReceived(QnAbstractBusinessActionPtr action);
+    void at_actionReceived(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
     void at_replyFinished(QNetworkReply* reply);
 private:

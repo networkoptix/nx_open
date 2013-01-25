@@ -1,11 +1,17 @@
 #include "space_mapper.h"
 
+#include <cassert>
+
 #include <utils/common/enum_name_mapper.h>
+#include <utils/common/json.h>
 
 namespace {
     Q_GLOBAL_STATIC_WITH_ARGS(QnEnumNameMapper, qn_extrapolationMode_enumNameMapper, (qnEnumNameMapper(QnCommonGlobals, ExtrapolationMode)));
 }
 
+// -------------------------------------------------------------------------- //
+// QnScalarSpaceMapper
+// -------------------------------------------------------------------------- //
 QnScalarSpaceMapper::QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal physical0, qreal physical1, Qn::ExtrapolationMode extrapolationMode) {
     QVector<QPointF> logicalToPhysical;
     logicalToPhysical.push_back(QPointF(logical0, physical0));
@@ -40,11 +46,13 @@ void QnScalarSpaceMapper::init(const QVector<QPointF> &logicalToPhysical, Qn::Ex
     m_physicalMaximum = qMax(physicalA, physicalB);
 }
 
-QVariant QnScalarSpaceMapper::serialize(const QnScalarSpaceMapper &value) {
-    QString extrapolationMode = qn_extrapolationMode_enumNameMapper()->name(value.m_logicalToPhysical.extrapolationMode());
+void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
+    assert(target);
+
+    QString extrapolationMode = qn_extrapolationMode_enumNameMapper()->name(value.logicalToPhysical().extrapolationMode());
 
     QVariantList logical, physical;
-    foreach(const QPointF &point, value.m_logicalToPhysical.points()) {
+    foreach(const QPointF &point, value.logicalToPhysical().points()) {
         logical.push_back(point.x());
         physical.push_back(point.y());
     }
@@ -53,43 +61,99 @@ QVariant QnScalarSpaceMapper::serialize(const QnScalarSpaceMapper &value) {
     result[lit("extrapolationMode")] = extrapolationMode;
     result[lit("logical")] = logical;
     result[lit("physical")] = physical;
-
-    return result;
+    *target = result;
 }
 
-QnScalarSpaceMapper QnScalarSpaceMapper::deserialize(const QVariant &value, bool *ok) {
+bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
+    assert(target);
+
     QVariantMap map = value.toMap();
     QString extrapolationModeName = map.value(lit("extrapolationMode")).toString();
     QVariantList logical = map.value(lit("logical")).toList();
     QVariantList physical = map.value(lit("physical")).toList();
     
-    QVector<QPointF> logicalToPhysical;
-    int extrapolationMode;
-
     if(map.isEmpty() || extrapolationModeName.isEmpty() || logical.size() != physical.size())
-        goto error;
+        return false;
 
-    extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName);
+    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName);
     if(extrapolationMode == -1)
-        goto error;
+        return false;
 
+    QVector<QPointF> logicalToPhysical;
     for(int i = 0; i < logical.size(); i++) {
         bool success = true;
         qreal x = logical[i].toReal(&success);
         qreal y = physical[i].toReal(&success);
         if(!success)
-            goto error;
+            return false;
         logicalToPhysical.push_back(QPointF(x, y));
     }
 
-    if(ok)
-        *ok = true;
-    return QnScalarSpaceMapper(logicalToPhysical, static_cast<Qn::ExtrapolationMode>(extrapolationMode));
-
-error:
-    if(ok)
-        *ok = false;
-    return QnScalarSpaceMapper();
+    *target = QnScalarSpaceMapper(logicalToPhysical, static_cast<Qn::ExtrapolationMode>(extrapolationMode));
+    return true;
 }
 
 
+// -------------------------------------------------------------------------- //
+// QnVectorSpaceMapper
+// -------------------------------------------------------------------------- //
+void serialize(const QnVectorSpaceMapper &value, QVariant *target) {
+    assert(target);
+
+    QVariantMap result;
+    serialize(value.mapper(QnVectorSpaceMapper::X), &result[lit("x")]);
+    serialize(value.mapper(QnVectorSpaceMapper::Y), &result[lit("y")]);
+    serialize(value.mapper(QnVectorSpaceMapper::Z), &result[lit("z")]);
+    *target = result;
+}
+
+bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
+    assert(target);
+
+    QVariantMap map = value.toMap();
+    
+    QnScalarSpaceMapper xMapper, yMapper, zMapper;
+    if(
+        !deserialize(map.value(lit("x")), &xMapper) || 
+        !deserialize(map.value(lit("y")), &yMapper) ||
+        !deserialize(map.value(lit("z")), &zMapper)
+    ) {
+        return false;
+    }
+
+    *target = QnVectorSpaceMapper(xMapper, yMapper, zMapper);
+    return true;
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnPtzSpaceMapper
+// -------------------------------------------------------------------------- //
+void serialize(const QnPtzSpaceMapper &value, QVariant *target) {
+    assert(target);
+
+    QVariantMap result;
+    serialize(value.models(), &result[lit("models")]);
+    serialize(value.fromCamera(), &result[lit("fromCamera")]);
+    serialize(value.toCamera(), &result[lit("toCamera")]);
+    *target = result;
+}
+
+bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
+    assert(target);
+
+    QVariantMap map = value.toMap();
+
+    QStringList models;
+    QnVectorSpaceMapper toCamera, fromCamera;
+    if(
+        !deserialize(map.value(lit("models")), &models) || 
+        !deserialize(map.value(lit("fromCamera")), &fromCamera) ||
+        !deserialize(map.value(lit("toCamera")), &toCamera)
+    ) {
+        return false;
+    }
+
+    *target = QnPtzSpaceMapper(fromCamera, toCamera, models);
+    return true;
+}

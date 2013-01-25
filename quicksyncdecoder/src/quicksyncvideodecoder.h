@@ -256,6 +256,8 @@ private:
         T* m_ptr;
     };
 
+    typedef std::map<qint64, QnMetaDataV1Ptr> MotionInfoContainerType;
+
     MFXVideoSession* const m_parentSession;
     PluginUsageWatcher* const m_pluginUsageWatcher;
     MyMFXVideoSession m_mfxSession;
@@ -304,6 +306,7 @@ private:
     std::auto_ptr<PPSUnit> m_pps;
     DWORD m_prevOutPictureClock;
     int m_recursionDepth;
+    MotionInfoContainerType m_srcMotionInfo;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;

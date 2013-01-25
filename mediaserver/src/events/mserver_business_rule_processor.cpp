@@ -7,9 +7,9 @@
 #include "api/app_server_connection.h"
 #include "core/resource_managment/resource_pool.h"
 
-bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
+bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (QnBusinessRuleProcessor::executeActionInternal(action))
+    if (QnBusinessRuleProcessor::executeActionInternal(action, res))
         return true;
 
     switch(action->actionType())
@@ -19,7 +19,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     case BusinessActionType::BA_Bookmark:
         break;
     case BusinessActionType::BA_CameraRecording:
-        return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>());
+        return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
     case BusinessActionType::BA_PanicRecording:
         return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
     default:
@@ -39,24 +39,20 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
     return true;
 }
 
-bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessActionPtr action)
+bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res)
 {
     Q_ASSERT(action);
-    QnResourceList resources = action->getResources();
-    bool rez = true;
-    for (int i = 0; i < resources.size(); ++i)
-    {
-        QnSecurityCamResourcePtr camera = resources[i].dynamicCast<QnSecurityCamResource>();
-        //Q_ASSERT(camera);
-        if (camera) {
-            // todo: if camera is offline function return false. Need some tries on timer event
-            if (action->getToggleState() == ToggleState::On)
-                rez &= qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
-                                                                action->getRecordBefore(), action->getRecordAfter(), 
-                                                                action->getRecordDuration());
-            else
-                rez &= qnRecordingManager->stopForcedRecording(camera);
-        }
+    QnSecurityCamResourcePtr camera = res.dynamicCast<QnSecurityCamResource>();
+    //Q_ASSERT(camera);
+    bool rez = false;
+    if (camera) {
+        // todo: if camera is offline function return false. Need some tries on timer event
+        if (action->getToggleState() == ToggleState::On)
+            rez = qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
+                                                            action->getRecordBefore(), action->getRecordAfter(), 
+                                                            action->getRecordDuration());
+        else
+            rez = qnRecordingManager->stopForcedRecording(camera);
     }
     return rez;
 }

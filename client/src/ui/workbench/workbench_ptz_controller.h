@@ -11,16 +11,7 @@
 
 #include "workbench_context_aware.h"
 
-class QnPtzSpaceMapper {
-public:
-    QnPtzSpaceMapper() {}
-    QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper): fromCamera(mapper), toCamera(mapper) {}
-    QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera): fromCamera(fromCamera), toCamera(toCamera) {}
-
-    QnVectorSpaceMapper fromCamera;
-    QnVectorSpaceMapper toCamera;
-};
-
+class QnPtzSpaceMapper;
 
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;

@@ -620,8 +620,8 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     qreal zoom = widget->rect().width() / rect.width(); /* For 2x zoom we'll get 2.0 here. */
     
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z() * zoom);
-    QVector3D newLogicalPosition = mapper->toCamera.physicalToLogical(newPhysicalPosition);
-    newPhysicalPosition = mapper->toCamera.logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
+    QVector3D newLogicalPosition = mapper->toCamera().physicalToLogical(newPhysicalPosition);
+    newPhysicalPosition = mapper->toCamera().logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
 
     TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
 

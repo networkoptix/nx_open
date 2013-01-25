@@ -110,7 +110,8 @@ protected slots:
 protected:
     void updateInner(QnResourcePtr other) override;
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
+    virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
