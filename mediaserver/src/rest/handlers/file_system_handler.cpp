@@ -18,6 +18,8 @@ QnFileSystemHandler::QnFileSystemHandler(bool detectAvailableOnly):
 int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
+
     QString pathStr;
     QString errStr;
 
@@ -67,9 +69,9 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
             rezStr.append("<freeSpace>\n");
             rezStr.append(QByteArray::number(storage->getFreeSpace()));
             rezStr.append("</freeSpace>\n");
-            rezStr.append("<usedSpace>\n");
-            rezStr.append(QByteArray::number(storage->getWritedSpace()));
-            rezStr.append("</usedSpace>\n");
+            rezStr.append("<totalSpace>\n");
+            rezStr.append(QByteArray::number(storage->getTotalSpace()));
+            rezStr.append("</totalSpace>\n");
         }
     }
     else {

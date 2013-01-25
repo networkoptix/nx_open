@@ -49,6 +49,8 @@ int QnImageHandler::noVideoError(QByteArray& result, qint64 time)
 
 int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(path)
+
     QnVirtualCameraResourcePtr res;
     QString errStr;
     bool resParamFound = false;

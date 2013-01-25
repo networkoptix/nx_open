@@ -14,6 +14,8 @@ QnPtzHandler::QnPtzHandler()
 
 int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(contentType)
+
     QnVirtualCameraResourcePtr res;
     QnAbstractPtzController* ptz = 0;
     QString errStr;

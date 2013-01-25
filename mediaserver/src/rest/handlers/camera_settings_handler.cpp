@@ -33,6 +33,7 @@ QnCameraSettingsHandler::QnCameraSettingsHandler()
 
 int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
 {
+    Q_UNUSED(contentType)
     enum CmdType
     {
         ctSetParam,

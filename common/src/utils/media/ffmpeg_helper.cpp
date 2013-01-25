@@ -581,7 +581,7 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
     data->append((const char*) &ctx->codec_id, 4);
     
     if (ctx->rc_eq) 
-        appendCtxField(data, Field_RC_EQ, ctx->rc_eq, strlen(ctx->rc_eq)+1); // +1 because of include \0 byte
+        appendCtxField(data, Field_RC_EQ, ctx->rc_eq, (int) strlen(ctx->rc_eq)+1); // +1 because of include \0 byte
     if (ctx->extradata) 
         appendCtxField(data, Field_EXTRADATA, (const char*) ctx->extradata, ctx->extradata_size);
     if (ctx->intra_matrix) 

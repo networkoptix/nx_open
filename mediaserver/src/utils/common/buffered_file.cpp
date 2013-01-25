@@ -287,7 +287,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
 
 bool QBufferedFile::prepareBuffer(int bufOffset)
 {
-    if (m_filePos == 0 && m_cachedBuffer.size() > bufOffset)
+    if (m_filePos == 0 && (int) m_cachedBuffer.size() > bufOffset)
     {
         memcpy(m_buffer, m_cachedBuffer.data(), m_cachedBuffer.size());
         m_bufferLen = m_cachedBuffer.size();

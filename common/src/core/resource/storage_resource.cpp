@@ -5,8 +5,8 @@
 
 // ------------------------------ QnStorageResource -------------------------------
 
-QnStorageResource::QnStorageResource():
-    m_writedSpace(0)
+QnStorageResource::QnStorageResource()
+    //m_writedSpace(0)
 {
 }
 
@@ -20,6 +20,7 @@ void QnStorageResource::setUrl(const QString& value)
     QnResource::setUrl(value);
 }
 
+/*
 qint64 QnStorageResource::getWritedSpace() const
 {
     QMutexLocker lock(&m_writedSpaceMtx);
@@ -31,6 +32,7 @@ void QnStorageResource::addWritedSpace(qint64 value)
     QMutexLocker lock(&m_writedSpaceMtx);
     m_writedSpace += value;
 }
+*/
 
 // ---------------------------- QnStoragePluginFactory ------------------------------
 

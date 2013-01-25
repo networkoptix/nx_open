@@ -13,6 +13,8 @@ QnRestLogHandler::QnRestLogHandler()
 
 int QnRestLogHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(path)
+
     qint64 linesToRead = 100;
     for (int i = 0; i < params.size(); ++i)
     {

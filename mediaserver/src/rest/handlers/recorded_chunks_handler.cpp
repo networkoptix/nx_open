@@ -170,6 +170,7 @@ QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
 int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
+    Q_UNUSED(contentType)
     //QString method = path.mid(path.lastIndexOf('/')+1);
     QString method = QFileInfo(path).baseName();
 

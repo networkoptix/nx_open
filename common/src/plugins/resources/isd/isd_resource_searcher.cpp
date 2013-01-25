@@ -51,6 +51,7 @@ QString QnPlISDResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
 
     QString host = url.host();
     int port = url.port();

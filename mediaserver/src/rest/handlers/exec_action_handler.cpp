@@ -8,6 +8,7 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
 
     resultByteArray.append("<root>\n");
     resultByteArray.append("Invalid method 'GET'. You should use 'POST' instead\n");
@@ -18,6 +19,10 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
 
 int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(params)
+    Q_UNUSED(path)
+    Q_UNUSED(contentType)
+
     QnAbstractBusinessActionPtr action;
 
     QnApiPbSerializer serializer;

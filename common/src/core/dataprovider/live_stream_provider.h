@@ -62,7 +62,6 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
-    QnResource::ConnectionRole m_role;
     QnResource::ConnectionRole m_softMotionRole;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;

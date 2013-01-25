@@ -914,7 +914,7 @@ void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& came
 
     std::string str;
     pb_cameras.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray& data)
@@ -930,7 +930,7 @@ void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray
 
     std::string str;
     pb_licenses.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPtr, QByteArray& data)
@@ -968,7 +968,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
 
     std::string str;
     pb_servers.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArray& data)
@@ -990,7 +990,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     std::string str;
     pb_users.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& cameraPtr, QByteArray& data)
@@ -1000,7 +1000,7 @@ void QnApiPbSerializer::serializeCamera(const QnVirtualCameraResourcePtr& camera
 
     std::string str;
     pb_cameras.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeLayout(const QnLayoutResourcePtr& layout, QByteArray& data)
@@ -1010,7 +1010,7 @@ void QnApiPbSerializer::serializeLayout(const QnLayoutResourcePtr& layout, QByte
 
     std::string str;
     pb_layouts.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data)
@@ -1022,7 +1022,7 @@ void QnApiPbSerializer::serializeLayouts(const QnLayoutResourceList& layouts, QB
 
     std::string str;
     pb_layouts.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cameraServerItem, QByteArray &data)
@@ -1032,7 +1032,7 @@ void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cam
 
     std::string str;
     pb_cameraServerItems.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeBusinessRules(const QnBusinessEventRules &businessRules, QByteArray &data)
@@ -1044,7 +1044,7 @@ void QnApiPbSerializer::serializeBusinessRules(const QnBusinessEventRules &busin
 
     std::string str;
     pb_businessRules.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &businessRule, QByteArray &data)
@@ -1055,7 +1055,7 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
 
     std::string str;
     pb_businessRules.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data)
@@ -1071,7 +1071,7 @@ void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& sub
 
     std::string str;
     pb_emails.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPtr &action, QByteArray &data)
@@ -1089,7 +1089,7 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
 
     std::string str;
     pb_businessAction.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeKvPair(const QnKvPair& kvPair, QByteArray& data)
@@ -1099,7 +1099,7 @@ void QnApiPbSerializer::serializeKvPair(const QnKvPair& kvPair, QByteArray& data
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data)
@@ -1111,7 +1111,7 @@ void QnApiPbSerializer::serializeKvPairs(const QnKvPairList& kvPairs, QByteArray
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void QnApiPbSerializer::serializeSettings(const QnKvPairList& kvPairs, QByteArray& data)
@@ -1123,7 +1123,7 @@ void QnApiPbSerializer::serializeSettings(const QnKvPairList& kvPairs, QByteArra
 
     std::string str;
     pb_settings.SerializeToString(&str);
-    data = QByteArray(str.data(), str.length());
+    data = QByteArray(str.data(), (int) str.length());
 }
 
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory)

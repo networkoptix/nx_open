@@ -120,7 +120,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     if (m_lastLiveTime == AV_NOPTS_VALUE)
         return false;
     Q_ASSERT(m_firstLiveTime != AV_NOPTS_VALUE);
-    qint64 elapsed = m_liveTimer.elapsed()*1000;
+    //qint64 elapsed = m_liveTimer.elapsed()*1000;
     bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
 
     return rez;
@@ -179,7 +179,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
     // quality control
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
 
     if (/*(media->flags & AV_PKT_FLAG_KEY) &&*/ m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {

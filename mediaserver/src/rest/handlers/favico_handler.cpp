@@ -13,6 +13,10 @@ QnRestFavicoHandler::QnRestFavicoHandler()
 
 int QnRestFavicoHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(params)
+    Q_UNUSED(path)
+    Q_UNUSED(contentType)
+
     QFile f(":/hdw_logo.ico");
     if (f.open(QFile::ReadOnly)) 
     {

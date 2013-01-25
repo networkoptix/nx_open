@@ -33,6 +33,11 @@ public:
     virtual qint64 getFreeSpace() = 0;
 
     /*
+    *   Return storage total space. if isNeedControlFreeSpace returns false, this function is not used
+    */
+    virtual qint64 getTotalSpace() = 0;
+
+    /*
     *   Returns true if storage physically acccesible right now (ready only check)
     */
     virtual bool isStorageAvailable() = 0;
@@ -82,14 +87,14 @@ public:
 
     virtual bool isRealFiles() const{return true;};
 
-    qint64 getWritedSpace() const;
-    void addWritedSpace(qint64 value);
+    //qint64 getWritedSpace() const;
+    //void addWritedSpace(qint64 value);
 
     virtual qint64 getFileSize(const QString& fillName) const = 0;
 public:
     virtual void setUrl(const QString& value);
 protected:
-    qint64 m_writedSpace;
+    //qint64 m_writedSpace;
 private:
     mutable QMutex m_writedSpaceMtx;
 };

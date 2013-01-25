@@ -199,7 +199,7 @@ public:
         if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, item) != ERROR_SUCCESS))
             return;
 
-        for(int i = 0; i < itemCount; i++) {
+        for(int i = 0; i < (int) itemCount; i++) {
             int id;
             LPCWSTR partitions;
             if(!parseDiskDescription(item[i].szName, &id, &partitions))
