@@ -82,7 +82,7 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
         QnCameraInputEventPtr( new QnCameraInputEvent(
                                    resource->toSharedPointer(),
                                    value ? ToggleState::On : ToggleState::Off,
-                                   timeStamp,
+                                   timeStamp*1000,
                                    inputPortID)));
 }
 
