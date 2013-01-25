@@ -8,7 +8,7 @@
 #include <QtCore/QBuffer>
 
 /* Free-standing (de)serialization functions are picked up via ADL by
- * the actual implementation. Feel free to add them to your own types. */
+ * the actual implementation. Feel free to add them for your own types. */
 
 void serialize(const QStringList &value, QVariant *target);
 bool deserialize(const QVariant &value, QStringList *target);
@@ -35,7 +35,7 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(const QByteArray &value, const T *target) {
+    bool deserialize(const QByteArray &value, T *target) {
         using ::deserialize; /* Let ADL kick in. */
 
         assert(target);
