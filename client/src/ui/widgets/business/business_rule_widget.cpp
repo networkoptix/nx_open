@@ -86,8 +86,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
     connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
 
     connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
-
-    setVisible(false);
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
@@ -104,7 +102,6 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         disconnect(m_model, 0, this, 0);
 
     m_model = model;
-    setVisible(m_model);
     if (!m_model) {
 /*        ui->eventTypeComboBox->setModel(NULL);
         ui->eventStatesComboBox->setModel(NULL);

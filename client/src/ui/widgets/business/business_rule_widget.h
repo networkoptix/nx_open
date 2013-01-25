@@ -40,7 +40,6 @@ protected:
     void initActionParameters();
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
-
 private slots:
     void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
