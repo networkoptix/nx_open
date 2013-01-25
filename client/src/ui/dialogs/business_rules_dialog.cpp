@@ -173,6 +173,11 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     m_rulesViewModel->addRule(QnBusinessEventRulePtr());
     ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
+    if (m_rulesViewModel->rowCount() == 1) {
+        ui->tableView->resizeColumnsToContents();
+        ui->tableView->horizontalHeader()->setStretchLastSection(true);
+        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+    }
 }
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
@@ -218,6 +223,7 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& 
 
     ui->tableView->resizeColumnsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     updateControlButtons();
 }
 
