@@ -7,8 +7,9 @@ class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 {
 public:
     QnMServerResourceDiscoveryManager();
+protected:
+    virtual bool processDiscoveredResources(QnResourceList& resources) override;
 private:
-    bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
 
     void check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState);
 

@@ -133,6 +133,11 @@ void QnSecurityCamResource::stopInputPortMonitoring()
 {
 }
 
+bool QnSecurityCamResource::isInputPortMonitored() const
+{
+    return false;
+}
+
 void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
 {
     m_dpFactory = dpFactory;
@@ -279,6 +284,10 @@ void QnSecurityCamResource::inputPortListenerAttached()
 {
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
         startInputPortMonitoring();
+    else
+    {
+        Q_ASSERT( isInputPortMonitored() );
+    }
 }
 
 void QnSecurityCamResource::inputPortListenerDetached()

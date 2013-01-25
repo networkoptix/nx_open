@@ -274,6 +274,7 @@ protected:
 
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
+    virtual bool isInputPortMonitored() const override;
 
 private slots:
     void onRenewSubscriptionTimer();

@@ -261,6 +261,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
+/*
 QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
 {
     QnResourceList resources;
@@ -270,7 +271,7 @@ QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
     else
         return QnResourceList();
 }
-
+*/
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {

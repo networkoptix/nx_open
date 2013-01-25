@@ -83,6 +83,7 @@ protected:
     virtual void setCropingPhysical(QRect croping);
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
+    virtual bool isInputPortMonitored() const override;
 
 private:
     void clear();
@@ -105,6 +106,7 @@ private:
     std::map<QString, unsigned int> m_inputPortNameToIndex;
     std::map<QString, unsigned int> m_outputPortNameToIndex;
     mutable QMutex m_inputPortMutex;
+    //!map<input port index (1-based), http client>
     std::map<unsigned int, nx_http::AsyncHttpClient*> m_inputPortHttpMonitor;
     nx_http::MultipartContentParser m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
