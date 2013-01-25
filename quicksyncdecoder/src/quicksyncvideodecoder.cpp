@@ -480,6 +480,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                     }
                     Q_ASSERT( workingSurface.data() );
                     Q_ASSERT( workingSurface->mfxSurface.Data.Locked == 0 );
+                    //workingSurface->mfxSurface.Data.TimeStamp = inputStream ? inputStream->TimeStamp : 0;
                     opStatus = m_decoder->DecodeFrameAsync(
                         (inputStream && inputStream->DataLength > 0) ? inputStream : NULL,
                         &workingSurface->mfxSurface,
@@ -1325,6 +1326,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
     //NX_LOG( QString::fromAscii("mark02 %1 ms").arg(GetTickCount()), cl_logERROR );
 
     //decoder uses allocator to create necessary surfaces
+    m_srcStreamParam.mfx.TimeStampCalc = MFX_TIMESTAMPCALC_UNKNOWN;
     status = m_decoder->Init( &m_srcStreamParam );
     if( status < MFX_ERR_NONE )  //ignoring warnings
     {
@@ -2629,7 +2631,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
     NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Scaling decoded frame to %1x%2...").
         arg(m_outPictureSize.width()).arg(m_outPictureSize.height()), cl_logDEBUG1 );
 
-    const DWORD t1 = GetTickCount();
+    //const DWORD t1 = GetTickCount();
     IDirect3DDevice9* d3d9Device = NULL;
     for( ;; )
     {
@@ -2650,7 +2652,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
         return MFX_ERR_UNKNOWN;
     }
 
-    const DWORD t2 = GetTickCount();
+    //const DWORD t2 = GetTickCount();
 
     res = d3d9Device->StretchRect( surfFrom, &srcRect, surfTo, &dstRect, D3DTEXF_LINEAR );
     d3d9Device->Release();
@@ -2662,10 +2664,12 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
         return MFX_ERR_UNKNOWN;
     }
 
-    const DWORD t3 = GetTickCount();
+    to->Data.TimeStamp = from.Data.TimeStamp;
 
-    NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
-        arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1), cl_logDEBUG1 );
+    //const DWORD t3 = GetTickCount();
+
+    //NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
+    //    arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1), cl_logDEBUG1 );
 
     return MFX_ERR_NONE;
 }
