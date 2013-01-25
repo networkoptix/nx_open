@@ -699,7 +699,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
 
 QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent)
+    QnWorkbenchContextAware(parent, context)
 {
     m_fieldsByColumn[QnBusiness::ModifiedColumn] = QnBusiness::ModifiedField;
     m_fieldsByColumn[QnBusiness::DisabledColumn] = QnBusiness::DisabledField;

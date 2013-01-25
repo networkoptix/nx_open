@@ -71,7 +71,7 @@ namespace {
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
     m_loadingHandle(-1)

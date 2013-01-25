@@ -10,7 +10,7 @@
 
 QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnSelectCamerasDialog)
 {
     ui->setupUi(this);

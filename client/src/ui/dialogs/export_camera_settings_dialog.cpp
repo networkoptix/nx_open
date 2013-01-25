@@ -13,7 +13,7 @@
 
 QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnExportCameraSettingsDialog()),
     m_recordingEnabled(true),
     m_motionUsed(false),

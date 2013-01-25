@@ -11,7 +11,7 @@
 
 QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent, Qt::Popup),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
