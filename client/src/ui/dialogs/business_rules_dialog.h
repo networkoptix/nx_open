@@ -41,6 +41,7 @@ public:
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 private slots:
+    void at_rejected();
     void at_context_userChanged();
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
@@ -70,10 +71,12 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesViewModel* m_rulesViewModel;
+    QnBusinessEventRules m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     QMap<int, QnBusinessRuleViewModel*> m_processing;
+    QMap<int, QnBusinessEventRulePtr> m_deleting;
 
     QMenu* m_popupMenu;
     int m_loadingHandle;
