@@ -33,7 +33,7 @@
    <item>
     <widget class="QCheckBox" name="autoResetCheckBox">
      <property name="text">
-      <string>&amp;Auto-reset in (msec):</string>
+      <string>&amp;Auto-reset in (sec):</string>
      </property>
     </widget>
    </item>
@@ -45,11 +45,14 @@
      <property name="correctionMode">
       <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
      </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
      <property name="maximum">
-      <number>120000</number>
+      <number>60000</number>
      </property>
      <property name="value">
-      <number>1000</number>
+      <number>5</number>
      </property>
     </widget>
    </item>

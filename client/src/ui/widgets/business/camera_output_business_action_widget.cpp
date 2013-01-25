@@ -37,7 +37,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
         QString text = BusinessActionParameters::getRelayOutputId(params);
         if (ui->relayIdLineEdit->text() != text)
             ui->relayIdLineEdit->setText(text);
-        int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params);
+        int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params) / 1000;
         ui->autoResetCheckBox->setChecked(autoReset > 0);
         if (autoReset > 0)
             ui->autoResetSpinBox->setValue(autoReset);
@@ -53,7 +53,7 @@ void QnCameraOutputBusinessActionWidget::paramsChanged() {
     QnBusinessParams params;
     BusinessActionParameters::setRelayOutputId(&params, ui->relayIdLineEdit->text());
     BusinessActionParameters::setRelayAutoResetTimeout(&params, ui->autoResetCheckBox->isChecked()
-                                                       ? ui->autoResetSpinBox->value()
+                                                       ? ui->autoResetSpinBox->value() * 1000
                                                        : 0);
     model()->setActionParams(params);
 

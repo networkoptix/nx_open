@@ -580,7 +580,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::BusinessEventsAction).
         flags(Qn::Main).
         requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Advanced Server Rules...")).
+        text(tr("Advanced Event Rules...")).
         autoRepeat(false);
 
     factory(Qn::SystemSettingsAction).
