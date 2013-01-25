@@ -461,6 +461,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
     QSharedPointer<CLVideoDecoderOutput> decodeToFrame = useTmpFrame ? m_tmpFrame : outFrame;
+    decodeToFrame->flags = 0;
     if (!dec || !dec->decode(data, &decodeToFrame))
     {
         m_mtx.unlock();
