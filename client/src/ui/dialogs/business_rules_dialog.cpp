@@ -1,6 +1,8 @@
 #include "business_rules_dialog.h"
 #include "ui_business_rules_dialog.h"
 
+#include <QtCore/QEvent>
+
 #include <QtGui/QMessageBox>
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QItemEditorFactory>
@@ -71,10 +73,12 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::BusinessRulesDialog()),
+    m_popupMenu(new QMenu(this)),
     m_loadingHandle(-1)
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
+    createActions();
 
     m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
 
@@ -141,6 +145,10 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
             at_deleteButton_clicked();
             return true;
         }
+    } else if (event->type() == QEvent::ContextMenu) {
+        QContextMenuEvent *pContextEvent = static_cast<QContextMenuEvent*>(event);
+        m_popupMenu->exec(pContextEvent->globalPos());
+        return true;
     }
     return base_type::eventFilter(object, event);
 }
@@ -278,6 +286,22 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
         updateControlButtons();
 }
 
+void QnBusinessRulesDialog::createActions() {
+    QAction* newAct = new QAction(tr("&New"), this);
+    connect(newAct, SIGNAL(triggered()), this, SLOT(at_newRuleButton_clicked()));
+
+    QAction* deleteAct = new QAction(tr("&Delete"), this);
+    connect(deleteAct, SIGNAL(triggered()), this, SLOT(at_deleteButton_clicked()));
+
+    QAction* advAct = new QAction(tr("&Advanced"), this);
+    connect(advAct, SIGNAL(triggered()), this, SLOT(at_advancedButton_clicked()));
+
+    m_popupMenu->addAction(newAct);
+    m_popupMenu->addAction(deleteAct);
+    m_popupMenu->addSeparator();
+    m_popupMenu->addAction(advAct);
+}
+
 void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
     if (m_processing.values().contains(ruleModel))
         return;
@@ -295,6 +319,7 @@ void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
 
     if (!ruleModel->id()) {
         m_rulesViewModel->deleteRule(ruleModel);
+        updateControlButtons();
         return;
     }
 
