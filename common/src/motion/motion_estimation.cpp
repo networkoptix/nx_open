@@ -1053,7 +1053,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 bool QnMotionEstimation::existsMetadata() const
 {
-    return m_lastFrameTime - m_firstFrameTime >= 300 * 1000; // 30 ms agg period
+    return m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD; // 30 ms agg period
 }
 
 void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)

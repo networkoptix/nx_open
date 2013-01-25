@@ -85,6 +85,7 @@ public:
     * Server time zone. Used for export to avi/mkv files
     */
     void setServerTimeZoneMs(int value);
+
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -112,8 +113,7 @@ protected:
 
     bool addSignatureFrame(QString& errorString);
     void markNeedKeyData();
-private:
-    bool saveData(QnAbstractMediaDataPtr md);
+    virtual bool saveData(QnAbstractMediaDataPtr md);
 private:
     void writeData(QnAbstractMediaDataPtr md, int streamIndex);
     void updateSignatureAttr();
