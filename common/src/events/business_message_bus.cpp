@@ -22,11 +22,16 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 }
 */
 
-int QnBusinessMessageBus::deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, const QUrl& url)
+int QnBusinessMessageBus::deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, QnResourcePtr res, const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
     QNetworkRequest request;
-    request.setUrl(url);
+
+    QUrl u(url);
+    if (res)
+        u.addQueryItem(QLatin1String("resource"), res->getId().toString()); // execute action for 1 resource only
+
+    request.setUrl(u);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));
 
     QByteArray data;
@@ -56,7 +61,7 @@ void QnBusinessMessageBus::at_replyFinished(QNetworkReply* reply)
         emit actionDeliveryFail(action);
 }
 
-void QnBusinessMessageBus::at_actionReceived(QnAbstractBusinessActionPtr action)
+void QnBusinessMessageBus::at_actionReceived(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    emit actionReceived(action);
+    emit actionReceived(action, res);
 }

@@ -96,6 +96,12 @@ public:
     void setAggregationCount(int value);
     int getAggregationCount() const;
 
+    /** Return action unique key for external outfit (port number for output action e.t.c). Do not count resourceId 
+    * This function help to share physical resources between actions
+    * Do not used for instant actions
+    */
+    virtual QString getExternalUniqKey() const;
+
 private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;
