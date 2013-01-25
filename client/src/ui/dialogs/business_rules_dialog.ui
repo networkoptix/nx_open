@@ -22,7 +22,7 @@
         <string>Add</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../x86/build/client-custom.qrc">
+        <iconset>
          <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
        </property>
       </widget>
@@ -134,12 +134,10 @@
   <customwidget>
    <class>QnBusinessRuleWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/business_rule_widget.h</header>
+   <header location="global">ui/widgets/business/business_rule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../x86/build/client-custom.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
