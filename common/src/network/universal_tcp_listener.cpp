@@ -2,18 +2,23 @@
 #include "utils/network/tcp_connection_priv.h"
 #include <QUrl>
 
+class QnUniversalRequestProcessorPrivate;
+
 class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
 {
-    QN_DECLARE_PRIVATE_DERIVED(QnUniversalRequestProcessor);
 public:
     QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnUniversalRequestProcessor();
+
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
+
+private:
+    Q_DECLARE_PRIVATE(QnUniversalRequestProcessor);
 };
 
-class QnUniversalRequestProcessor::QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     QnTCPConnectionProcessor* processor;

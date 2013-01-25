@@ -17,6 +17,7 @@
 #include "serverutil.h"
 
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
+static const int MOTION_PREBUFFER_SIZE = 8;
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
@@ -155,6 +156,8 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 {
+    m_lastMediaTime = media->timestamp;
+
     Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (metaData) {
@@ -205,7 +208,6 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
-    m_lastMediaTime = media->timestamp;
     qint64 afterThreshold = 5 * 1000000ll;
     if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionOnly)
         afterThreshold = m_currentScheduleTask.getAfterThreshold()*1000000ll;
@@ -226,6 +228,8 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     else if (task.getRecordingType() == Qn::RecordingType_Never)
     {
         close();
+        if (media->dataType == QnAbstractMediaData::META_V1)
+            keepRecentlyMotion(media);
         return false;
     }
     
@@ -475,4 +479,28 @@ void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr hel
 int QnServerStreamRecorder::getFRAfterThreshold() const
 {
     return m_forcedSchedileRecord.getAfterThreshold();
+}
+
+void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
+{
+    writeAfterTime -= QnMotionEstimation::MOTION_AGGREGATION_PERIOD;
+    for (int i = 0; i < m_recentlyMotion.size(); ++i)
+    {
+        if (m_recentlyMotion[i]->timestamp > writeAfterTime)
+            QnStreamRecorder::saveData(m_recentlyMotion[i]);
+    }
+    m_recentlyMotion.clear();
+}
+
+void QnServerStreamRecorder::keepRecentlyMotion(QnAbstractMediaDataPtr md)
+{
+    if (m_recentlyMotion.size() == MOTION_PREBUFFER_SIZE)
+        m_recentlyMotion.dequeue();
+    m_recentlyMotion.enqueue(md);
+}
+
+bool QnServerStreamRecorder::saveData(QnAbstractMediaDataPtr md)
+{
+    writeRecentlyMotion(md->timestamp);
+    return QnStreamRecorder::saveData(md);
 }

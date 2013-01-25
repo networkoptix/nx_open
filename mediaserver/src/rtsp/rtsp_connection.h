@@ -41,6 +41,8 @@ struct RtspServerTrackInfo
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
+class QnRtspConnectionProcessorPrivate;
+
 class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
@@ -106,7 +108,7 @@ private:
     void createPredefinedTracks();
 
 private:
-    QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
+    Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;
 };
 

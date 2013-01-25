@@ -39,7 +39,7 @@ struct ReaderInfo
 };
 
 
-class QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
+class QnArchiveSyncPlayWrapperPrivate
 {
 public:
     void initValues()

@@ -84,13 +84,13 @@ bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
     return opened;
 }
 
-class QnRtspConnectionProcessor::QnRtspConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnRtspConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnRtspConnectionProcessorPrivate():
-        QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate(),
+        QnTCPConnectionProcessorPrivate(),
         dataProcessor(0),
         startTime(0),
         endTime(0),

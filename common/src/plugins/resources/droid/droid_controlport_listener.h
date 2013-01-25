@@ -11,6 +11,8 @@ protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) override;
 };
 
+class QnDroidControlPortProcessorPrivate;
+
 class QnDroidControlPortProcessor: public QnTCPConnectionProcessor
 {
 public:
@@ -18,5 +20,5 @@ public:
 protected:
     virtual void run() override;
 
-    QN_DECLARE_PRIVATE_DERIVED(QnDroidControlPortProcessor);
+    Q_DECLARE_PRIVATE(QnDroidControlPortProcessor);
 };

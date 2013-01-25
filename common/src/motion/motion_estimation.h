@@ -23,6 +23,8 @@ public:
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;
 
+    static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
+
 private:
     void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);

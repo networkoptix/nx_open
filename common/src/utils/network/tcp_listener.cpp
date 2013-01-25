@@ -6,7 +6,7 @@
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
-class QnTcpListener::QnTcpListenerPrivate
+class QnTcpListenerPrivate
 {
 public:
     QnTcpListenerPrivate() {
