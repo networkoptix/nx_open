@@ -41,7 +41,7 @@ void printInLogNetResources(const QnResourceList& resources)
 }
 
 
-bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck)
+bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
     QMutexLocker lock(&m_discoveryMutex);
 
@@ -153,8 +153,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
-    if (doOfflineCheck)
-        markOfflineIfNeeded(discoveredResources);
+    markOfflineIfNeeded(discoveredResources);
     //======================
 
     if (resources.size())
