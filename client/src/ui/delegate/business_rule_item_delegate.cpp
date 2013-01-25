@@ -1,8 +1,30 @@
 #include "business_rule_item_delegate.h"
 
-#include <QtGui/QPushButton>
-
+#include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/models/business_rules_view_model.h>
+
+
+QnIndexedDialogButton::QnIndexedDialogButton(QWidget *parent):
+    QPushButton(parent)
+{
+    connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
+}
+
+QnResourceList QnIndexedDialogButton::resources() {
+    return m_resources;
+}
+
+void QnIndexedDialogButton::setResources(QnResourceList resources) {
+    m_resources = resources;
+}
+
+void QnIndexedDialogButton::at_clicked() {
+    QnSelectCamerasDialog dialog(this); //TODO: #GDM servers dialog?
+    dialog.setSelectedResources(m_resources);
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_resources = dialog.getSelectedResources();
+}
 
 void QnBusinessRuleItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     //  bool disabled = index.data(QnBusiness::DisabledRole).toBool();
@@ -27,14 +49,14 @@ QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, c
 
 QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
     if (index.column() == QnBusiness::SourceColumn) {
-        qDebug() << "editor for index" << index.row() << index.column();
-        QPushButton* btn = new QPushButton(parent);
+        QnIndexedDialogButton* btn = new QnIndexedDialogButton(parent);
+        btn->setFlat(true);
         btn->setText(index.data().toString());
-        connect(btn, SIGNAL(clicked()), this, SLOT(at_sourceButton_clicked()));
         return btn;
     }
     if (index.column() == QnBusiness::TargetColumn) {
-        QPushButton* btn = new QPushButton(parent);
+        QnIndexedDialogButton* btn = new QnIndexedDialogButton(parent);
+        btn->setFlat(true);
         btn->setText(index.data().toString());
         return btn;
     }
@@ -59,20 +81,25 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
 }
 
 void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+    if (QnIndexedDialogButton* btn = dynamic_cast<QnIndexedDialogButton *>(editor)){
+        int role = index.column() == QnBusiness::SourceColumn
+                ? QnBusiness::EventResourcesRole
+                : QnBusiness::ActionResourcesRole;
+
+        btn->setResources(index.data(role).value<QnResourceList>());
+        return;
+    }
+
     base_type::setEditorData(editor, index);
 }
 
 void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+    if (QnIndexedDialogButton* btn = dynamic_cast<QnIndexedDialogButton *>(editor)){
+        model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+        return;
+    }
+
     base_type::setModelData(editor, model, index);
 }
 
-void QnBusinessRuleItemDelegate::at_sourceButton_clicked() {
-    qDebug() << "clicked";
-    /*
-QnSelectCamerasDialog dialog(this, context()); //TODO: #GDM or servers?
-dialog.setSelectedResources(m_model->eventResources());
-if (dialog.exec() != QDialog::Accepted)
-return;
-m_model->setEventResources(dialog.getSelectedResources());
-     */
-}
+

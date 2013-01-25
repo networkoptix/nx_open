@@ -838,11 +838,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    qDebug() << "action received" << businessAction;
-
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
-
 
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());

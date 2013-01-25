@@ -48,7 +48,9 @@ namespace QnBusiness {
     enum ItemDataRole {
         ModifiedRole   = Qt::UserRole + 1,
         DisabledRole,
-        ValidRole
+        ValidRole,
+        EventResourcesRole,
+        ActionResourcesRole
     };
 
 }

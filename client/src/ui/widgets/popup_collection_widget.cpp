@@ -40,7 +40,6 @@ void QnPopupCollectionWidget::addExample() {
 }
 
 void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
 
