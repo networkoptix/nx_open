@@ -16,6 +16,7 @@ protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) override;
 };
 
+class QnProgressiveDownloadingConsumerPrivate;
 
 class QnProgressiveDownloadingConsumer: virtual public QnTCPConnectionProcessor
 {
@@ -31,7 +32,7 @@ private:
     static QByteArray getMimeType(const QByteArray& streamingFormat);
     void updateCodecByFormat(const QByteArray& streamingFormat);
 private:
-    QN_DECLARE_PRIVATE_DERIVED(QnProgressiveDownloadingConsumer);
+    Q_DECLARE_PRIVATE(QnProgressiveDownloadingConsumer);
 };
 
 #endif // __PROGRESSIVE_DOWNLOADING_SERVER_H__

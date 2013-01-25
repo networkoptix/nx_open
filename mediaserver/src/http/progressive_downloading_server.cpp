@@ -104,7 +104,7 @@ private:
 
 // -------------- QnProgressiveDownloadingConsumer -------------------
 
-class QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     QnFfmpegTranscoder transcoder;

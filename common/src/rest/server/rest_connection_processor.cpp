@@ -16,7 +16,7 @@ static const int CONNECTION_TIMEOUT = 60 * 1000;
 
 QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
 
-class QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 

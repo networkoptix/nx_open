@@ -22,7 +22,7 @@ qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime)
         return dateTime.toLongLong();
 }
 
-class QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate {
+class QnRestGUIRequestHandlerPrivate {
 public:
     QnRestGUIRequestHandlerPrivate(): result(0), body(0), code(0) {}
 

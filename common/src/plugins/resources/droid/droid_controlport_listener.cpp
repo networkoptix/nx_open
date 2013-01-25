@@ -16,7 +16,7 @@ QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(TCP
 
 // ----------------- QnDroidControlPortProcessor --------------------
 
-class QnDroidControlPortProcessor::QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 

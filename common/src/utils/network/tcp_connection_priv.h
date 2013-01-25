@@ -28,7 +28,7 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 #include "ssl.h"
 
-class QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnTCPConnectionProcessorPrivate
 {
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
