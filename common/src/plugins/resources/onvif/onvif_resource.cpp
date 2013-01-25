@@ -1253,7 +1253,7 @@ bool QnPlOnvifResource::setRelayOutputState(
 
         cl_log.log( QString::fromAscii("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
             arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING );
-}
+    }
 
     //modifing output
     const QAuthenticator& auth = getAuth();
@@ -1269,7 +1269,7 @@ bool QnPlOnvifResource::setRelayOutputState(
     _onvifDevice__SetRelayOutputStateResponse response;
     m_prevSoapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
-{
+    {
         cl_log.log( QString::fromAscii("Failed to set relay %1 output state to %2. endpoint %3").
             arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
@@ -1280,7 +1280,7 @@ bool QnPlOnvifResource::setRelayOutputState(
     return true;
 }
 
-int  QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
+int QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
 {
     if (videoOptionsLocal.h264Profiles.isEmpty())
         return -1;
@@ -2566,7 +2566,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
          i < m_relayOutputInfo.size();
         ++i )
     {
-        if( m_relayOutputInfo[i].token == outputID )
+        if( m_relayOutputInfo[i].token == outputID || outputID.empty() )
         {
             *relayOutputInfo = m_relayOutputInfo[i];
             return true;
