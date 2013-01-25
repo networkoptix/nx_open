@@ -2,9 +2,10 @@
 #define QN_BUSINESS_RULES_DIALOG_H
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QModelIndex>
 
 #include <QtGui/QDialog>
-#include <QtCore/QModelIndex>
+#include <QtGui/QMenu>
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
@@ -39,8 +40,8 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
-
 private slots:
+    void at_rejected();
     void at_context_userChanged();
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
@@ -60,6 +61,8 @@ private slots:
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
 
+    void createActions();
+
     void saveRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
@@ -68,10 +71,14 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesViewModel* m_rulesViewModel;
+    QnBusinessEventRules m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     QMap<int, QnBusinessRuleViewModel*> m_processing;
+    QMap<int, QnBusinessEventRulePtr> m_deleting;
+
+    QMenu* m_popupMenu;
     int m_loadingHandle;
 };
 

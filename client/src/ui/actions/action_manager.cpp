@@ -548,7 +548,7 @@ QnActionManager::QnActionManager(QObject *parent):
     }
 
     factory(Qn::FullscreenAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
         autoRepeat(false).
@@ -568,17 +568,19 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Minimize")).
         icon(qnSkin->icon("titlebar/minimize.png"));
 
+
     factory(Qn::MaximizeAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
 
+
     factory(Qn::BusinessEventsAction).
         flags(Qn::Main).
         requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Business Events...")).
+        text(tr("Advanced Event Rules...")).
         autoRepeat(false);
 
     factory(Qn::SystemSettingsAction).

@@ -16,7 +16,7 @@ namespace BusinessActionType {
             case BA_PanicRecording:     return QObject::tr("Panic recording");
             case BA_SendMail:           return QObject::tr("Send mail");
             case BA_Alert:              return QObject::tr("Alert");
-            case BA_ShowPopup:          return QObject::tr("Show popup");
+            case BA_ShowPopup:          return QObject::tr("Show notification");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);
     }

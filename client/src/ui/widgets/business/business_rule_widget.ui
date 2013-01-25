@@ -42,7 +42,7 @@
              </size>
             </property>
             <property name="text">
-             <string>When</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -144,6 +144,23 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="scheduleButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Schedule...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../../../x86/build/client-custom.qrc">
+            <normaloff>:/skin/tree/servers.png</normaloff>:/skin/tree/servers.png</iconset>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -183,7 +200,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Do</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -360,7 +377,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <property name="leftMargin">
       <number>9</number>
      </property>
@@ -377,17 +394,12 @@
      <item>
       <widget class="QLineEdit" name="commentsLineEdit"/>
      </item>
-     <item>
-      <widget class="QPushButton" name="scheduleButton">
-       <property name="text">
-        <string>Schedule...</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../x86/build/client-custom.qrc"/>
+ </resources>
  <connections/>
 </ui>

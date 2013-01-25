@@ -46,13 +46,16 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
     base_type::initStyleOption(option, index);
     if (index.data(QnBusiness::DisabledRole).toBool()) {
         if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
-            vopt->state = QStyle::State_None;
-            vopt->features |= QStyleOptionViewItemV2::Alternate;
+            vopt->state &= ~QStyle::State_Enabled;
+         //   vopt->features |= QStyleOptionViewItemV2::Alternate;
         }
+        option->palette.setColor(QPalette::Highlight, QColor(64, 64, 64)); //TODO: #GDM skin colors
     } else if (!index.data(QnBusiness::ValidRole).toBool()) {
-        option->palette.setColor(QPalette::Highlight, QColor(255, 0, 0, 127)); //TODO: #GDM skin colors
-    } else
-        option->palette.setColor(QPalette::Highlight, QColor(127, 127, 127, 127));
+        QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
+        option->palette.setColor(QPalette::Highlight, clr.lighter()); //TODO: #GDM skin colors
+        //option->palette.setColor(QPalette::Highlight, QColor(127, 0, 0, 127)); //TODO: #GDM skin colors
+    } /*else
+        option->palette.setColor(QPalette::Highlight, QColor(127, 127, 127, 255));*/
 }
 
 void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {

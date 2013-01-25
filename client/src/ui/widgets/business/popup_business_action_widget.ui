@@ -42,10 +42,16 @@
      <property name="text">
       <string>Settings...</string>
      </property>
+     <property name="icon">
+      <iconset resource="../../../../x86/build/client-custom.qrc">
+       <normaloff>:/skin/titlebar/recording_hovered.png</normaloff>:/skin/titlebar/recording_hovered.png</iconset>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../x86/build/client-custom.qrc"/>
+ </resources>
  <connections/>
 </ui>
