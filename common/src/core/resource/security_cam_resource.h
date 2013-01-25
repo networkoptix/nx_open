@@ -119,6 +119,7 @@ protected:
     virtual bool startInputPortMonitoring();
     //!MUST be overridden for camera with input port. Default implementation does noting
     virtual void stopInputPortMonitoring();
+    virtual bool isInputPortMonitored() const;
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;

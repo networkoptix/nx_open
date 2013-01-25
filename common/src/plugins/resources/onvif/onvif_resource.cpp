@@ -2167,7 +2167,9 @@ void QnPlOnvifResource::stopInputPortMonitoring()
 {
     //removing timer
     TimerManager::instance()->deleteTimer( m_timerID );
+    m_timerID = 0;
     TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
+    m_renewSubscriptionTaskID = 0;
     //TODO/IMPL removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -2420,9 +2422,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {
-    //return false;   //not implemented yet
-
-
     const QAuthenticator& auth = getAuth();
     EventSoapWrapper soapWrapper(
         m_eventCapabilities->XAddr,
@@ -2471,6 +2470,11 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
+}
+
+bool QnPlOnvifResource::isInputPortMonitored() const
+{
+    return m_timerID != 0;
 }
 
 bool QnPlOnvifResource::pullMessages()
