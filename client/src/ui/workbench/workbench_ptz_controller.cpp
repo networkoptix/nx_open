@@ -80,7 +80,8 @@ QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
             QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
             QnScalarSpaceMapper(toCameraY, Qn::ConstantExtrapolation),
             QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
-        )
+        ),
+        QStringList()
     );
 }
 
@@ -141,7 +142,7 @@ void QnWorkbenchPtzController::setPhysicalPosition(const QnVirtualCameraResource
         return;
     }
 
-    setPosition(camera, mapper->toCamera.physicalToLogical(physicalPosition));
+    setPosition(camera, mapper->toCamera().physicalToLogical(physicalPosition));
 }
 
 QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) const {
@@ -267,7 +268,7 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
             positionChanged = !qFuzzyCompare(position, data.position);
             data.position = position;
             if(const QnPtzSpaceMapper *mapper = this->mapper(camera))
-                data.physicalPosition = mapper->fromCamera.logicalToPhysical(data.position);
+                data.physicalPosition = mapper->fromCamera().logicalToPhysical(data.position);
         }
         data.attemptCount[GetPositionRequest] = 0;
 
@@ -295,7 +296,7 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
         bool positionChanged = !qFuzzyCompare(data.position, position);
         data.position = position;
         if(const QnPtzSpaceMapper *mapper = this->mapper(camera))
-            data.physicalPosition = mapper->toCamera.logicalToPhysical(data.position);
+            data.physicalPosition = mapper->toCamera().logicalToPhysical(data.position);
 
         bool movementChanged = qFuzzyCompare(data.movement, QVector3D());
         data.movement = QVector3D();

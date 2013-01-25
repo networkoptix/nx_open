@@ -3,8 +3,8 @@
 
 #include <boost/array.hpp>
 
-#include <QtCore/QPair>
 #include <QtCore/QVariant>
+#include <QtCore/QStringList>
 
 #include "interpolator.h"
 
@@ -31,8 +31,8 @@ public:
     qreal logicalToPhysical(qreal logicalValue) const { return m_logicalToPhysical(logicalValue); }
     qreal physicalToLogical(qreal physicalValue) const { return m_physicalToLogical(physicalValue); }
 
-    static QVariant serialize(const QnScalarSpaceMapper &value);
-    static QnScalarSpaceMapper deserialize(const QVariant &value, bool *ok = NULL);
+    const QnInterpolator &logicalToPhysical() const { return m_logicalToPhysical; }
+    const QnInterpolator &physicalToLogical() const { return m_physicalToLogical; }
 
 private:
     void init(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode);
@@ -41,6 +41,9 @@ private:
     QnInterpolator m_physicalToLogical, m_logicalToPhysical;
     qreal m_logicalMinimum, m_logicalMaximum, m_physicalMinimum, m_physicalMaximum;
 };
+
+void serialize(const QnScalarSpaceMapper &value, QVariant *target);
+bool deserialize(const QVariant &value, QnScalarSpaceMapper *target);
 
 
 // -------------------------------------------------------------------------- //
@@ -86,6 +89,39 @@ public:
 private:
     boost::array<QnScalarSpaceMapper, CoordinateCount> m_mappers;
 };
+
+void serialize(const QnVectorSpaceMapper &value, QVariant *target);
+bool deserialize(const QVariant &value, QnVectorSpaceMapper *target);
+
+
+// -------------------------------------------------------------------------- //
+// QnPtzSpaceMapper
+// -------------------------------------------------------------------------- //
+class QnPtzSpaceMapper {
+public:
+    QnPtzSpaceMapper() {}
+    QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper, const QStringList &models): m_fromCamera(mapper), m_toCamera(mapper), m_models(models) {}
+    QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera, const QStringList &models): m_fromCamera(fromCamera), m_toCamera(toCamera), m_models(models) {}
+
+    const QnVectorSpaceMapper &fromCamera() const {
+        return m_fromCamera;
+    }
+
+    const QnVectorSpaceMapper &toCamera() const {
+        return m_toCamera;
+    }
+
+    const QStringList &models() const {
+        return m_models;
+    }
+
+private:
+    QStringList m_models;
+    QnVectorSpaceMapper m_fromCamera, m_toCamera;
+};
+
+void serialize(const QnPtzSpaceMapper &value, QVariant *target);
+bool deserialize(const QVariant &value, QnPtzSpaceMapper *target);
 
 
 #endif // QN_SPACE_MAPPER_H
