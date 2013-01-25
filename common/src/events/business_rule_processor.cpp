@@ -55,21 +55,24 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
-    QString actionKey = action->getExternalUniqKey();
-    if (res)
-        actionKey += QString(L'_') + res->getUniqueId();
+    if (BusinessActionType::hasToggleState(action->actionType()))
+    {
+        // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
+        QString actionKey = action->getExternalUniqKey();
+        if (res)
+            actionKey += QString(L'_') + res->getUniqueId();
 
-    if (action->getToggleState() == ToggleState::On)
-    {
-        if (++m_actionInProgress[actionKey] > 1)
-            return true; // ignore duplicated start
-    }
-    else if (action->getToggleState() == ToggleState::Off)
-    {
-        m_actionInProgress[actionKey] = qMax(0, m_actionInProgress[actionKey]-1);
-        if (m_actionInProgress[actionKey] > 0)
-            return true; // ignore duplicated stop
+        if (action->getToggleState() == ToggleState::On)
+        {
+            if (++m_actionInProgress[actionKey] > 1)
+                return true; // ignore duplicated start
+        }
+        else if (action->getToggleState() == ToggleState::Off)
+        {
+            m_actionInProgress[actionKey] = qMax(0, m_actionInProgress[actionKey]-1);
+            if (m_actionInProgress[actionKey] > 0)
+                return true; // ignore duplicated stop
+        }
     }
 
     switch( action->actionType() )
