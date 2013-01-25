@@ -35,3 +35,8 @@ QString QnCameraOutputBusinessAction::getRelayOutputId() const {
 int QnCameraOutputBusinessAction::getRelayAutoResetTimeout() const {
     return BusinessActionParameters::getRelayAutoResetTimeout(getParams());
 }
+
+QString QnCameraOutputBusinessAction::getExternalUniqKey() const
+{
+    return QnAbstractBusinessAction::getExternalUniqKey() + QString(L'_') + getRelayOutputId();
+}

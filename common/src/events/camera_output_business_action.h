@@ -20,6 +20,8 @@ public:
 
     QString getRelayOutputId() const;
     int getRelayAutoResetTimeout() const;
+
+    QString getExternalUniqKey() const;
 };
 
 typedef QSharedPointer<QnCameraOutputBusinessAction> QnCameraOutputBusinessActionPtr;

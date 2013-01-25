@@ -13,10 +13,10 @@ class QnMServerBusinessRuleProcessor: public QnBusinessRuleProcessor
 {
 public:
     virtual QString getGuid() const override;
-protected:
-    virtual bool executeActionInternal(QnAbstractBusinessActionPtr action) override;
+protected slots:
+    virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res) override;
 private:
-    bool executeRecordingAction(QnRecordingBusinessActionPtr action);
+    bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
     bool executePanicAction(QnPanicBusinessActionPtr action);
 };
 

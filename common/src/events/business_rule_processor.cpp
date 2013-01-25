@@ -15,7 +15,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()));
     m_timer.start(1000);
@@ -39,26 +39,43 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnResourceList resList = action->getResources();
     if (resList.isEmpty()) {
-        executeActionInternal(action);
+        executeActionInternal(action, QnResourcePtr());
     }
     else {
         for (int i = 0; i < resList.size(); ++i)
         {
             QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
-            if (routeToServer && !action->isReceivedFromRemoteHost() /*&& routeToServer->getGuid() != getGuid()*/)
-                qnBusinessMessageBus->deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
+            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getGuid() != getGuid())
+                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
             else
-                executeActionInternal(action);
+                executeActionInternal(action, resList[i]);
         }
     }
 }
 
-bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
+bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
+    // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
+    QString actionKey = action->getExternalUniqKey();
+    if (res)
+        actionKey += QString(L'_') + res->getUniqueId();
+
+    if (action->getToggleState() == ToggleState::On)
+    {
+        if (++m_actionInProgress[actionKey] > 1)
+            return true; // ignore duplicated start
+    }
+    else if (action->getToggleState() == ToggleState::Off)
+    {
+        m_actionInProgress[actionKey] = qMax(0, m_actionInProgress[actionKey]-1);
+        if (m_actionInProgress[actionKey] > 0)
+            return true; // ignore duplicated stop
+    }
+
     switch( action->actionType() )
     {
         case BusinessActionType::BA_CameraOutput:
-            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
+            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
 
         case BusinessActionType::BA_SendMail:
             return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
@@ -135,10 +152,12 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
     if (m_rulesInProgress.contains(rule->getUniqueId()))
     {
         // Toggle event repeated with some interval with state 'on'.
-        if (!condOK)
-            action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
-        else if (bEvent->getToggleState() == ToggleState::Off)
-            action = rule->instantiateAction(bEvent); // Toggle event goes to 'off'. stop action
+        // if toggled action is used and condition is no longer valid - stop action
+        // Or toggle event goes to 'off'. stop action
+        if (!condOK || bEvent->getToggleState() == ToggleState::Off)
+            action = rule->instantiateAction(bEvent, ToggleState::Off); 
+        else
+            return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
         action = rule->instantiateAction(bEvent);
@@ -254,14 +273,6 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
 {
     Q_UNUSED(action)
     //TODO: implement me
-}
-
-bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action )
-{
-    bool rez = true;
-    foreach(const QnResourcePtr& resource, action->getResources())
-        rez &= triggerCameraOutput(action, resource);
-    return rez;
 }
 
 bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )

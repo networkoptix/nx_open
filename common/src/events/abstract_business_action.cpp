@@ -120,3 +120,8 @@ void QnAbstractBusinessAction::setAggregationCount(int value)
 {
     m_aggregationCount = value;
 }
+
+QString QnAbstractBusinessAction::getExternalUniqKey() const
+{
+    return BusinessActionType::toString(m_actionType);
+}
