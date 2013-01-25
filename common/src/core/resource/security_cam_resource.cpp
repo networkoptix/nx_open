@@ -124,6 +124,12 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     return 0;
 }
 
+void QnSecurityCamResource::initializationDone()
+{
+    if( m_inputPortListenerCount > 0 )
+        startInputPortMonitoring();
+}
+
 bool QnSecurityCamResource::startInputPortMonitoring()
 {
     return false;
@@ -282,12 +288,9 @@ bool QnSecurityCamResource::setRelayOutputState(
 
 void QnSecurityCamResource::inputPortListenerAttached()
 {
+    //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
         startInputPortMonitoring();
-    else
-    {
-        Q_ASSERT( isInputPortMonitored() );
-    }
 }
 
 void QnSecurityCamResource::inputPortListenerDetached()
