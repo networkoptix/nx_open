@@ -25,6 +25,8 @@
 		C71D5B2116ADBB9600C764B5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71D5AF616ADBB9600C764B5 /* Foundation.framework */; };
 		C71D5B2916ADBB9600C764B5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B2716ADBB9600C764B5 /* InfoPlist.strings */; };
 		C71D5B2C16ADBB9600C764B5 /* HDWitnessTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */; };
+		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
+		C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +65,10 @@
 		C71D5B2816ADBB9600C764B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C71D5B2A16ADBB9600C764B5 /* HDWitnessTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDWitnessTests.h; sourceTree = "<group>"; };
 		C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HDWitnessTests.m; sourceTree = "<group>"; };
+		C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWECSViewController.h; sourceTree = "<group>"; };
+		C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWECSViewController.m; sourceTree = "<group>"; };
+		C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWEcsConfig.h; sourceTree = "<group>"; };
+		C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWEcsConfig.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,10 +133,14 @@
 				C71D5B0C16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard */,
 				C71D5B0F16ADBB9600C764B5 /* MainStoryboard_iPad.storyboard */,
 				C71D5B1216ADBB9600C764B5 /* HDWMasterViewController.h */,
+				C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */,
+				C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */,
 				C71D5B1316ADBB9600C764B5 /* HDWMasterViewController.m */,
 				C71D5B1516ADBB9600C764B5 /* HDWDetailViewController.h */,
 				C71D5B1616ADBB9600C764B5 /* HDWDetailViewController.m */,
 				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
+				C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */,
+				C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */,
 			);
 			path = HDWitness;
 			sourceTree = "<group>";
@@ -284,6 +294,8 @@
 				C71D5B0516ADBB9600C764B5 /* HDWAppDelegate.m in Sources */,
 				C71D5B1416ADBB9600C764B5 /* HDWMasterViewController.m in Sources */,
 				C71D5B1716ADBB9600C764B5 /* HDWDetailViewController.m in Sources */,
+				C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */,
+				C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,6 +362,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Ivan Vigasin (3GLXZP7XXF)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -365,6 +378,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -379,6 +393,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Ivan Vigasin (3GLXZP7XXF)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -387,6 +402,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -468,6 +484,7 @@
 				C71D5B3116ADBB9600C764B5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C71D5B3216ADBB9600C764B5 /* Build configuration list for PBXNativeTarget "HDWitnessTests" */ = {
 			isa = XCConfigurationList;
@@ -476,6 +493,7 @@
 				C71D5B3416ADBB9600C764B5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

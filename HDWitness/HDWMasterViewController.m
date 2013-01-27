@@ -45,6 +45,7 @@
 
 - (void)insertNewObject:(id)sender
 {
+    
     if (!_objects) {
         _objects = [[NSMutableArray alloc] init];
     }
