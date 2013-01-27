@@ -47,6 +47,10 @@ public:
     Qn::RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
 
     virtual qint64 lastDisplayedTime(int channel) const override;
+    virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;
+    virtual void unblockTimeValue(int channelNumber) const  override;
+    virtual bool isTimeBlocked(int channelNumber) const override;
+
 
     qint64 isLowQualityImage(int channel) const;
     bool isHardwareDecoderUsed(int channel) const;

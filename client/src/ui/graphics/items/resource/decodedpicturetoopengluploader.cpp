@@ -83,8 +83,8 @@ public:
         const unsigned int currentTick = GetTickCount();
         if( currentTick - m_startCalcTick > 5000 )
         {
-            NX_LOG( QString::fromAscii("In previous %1 ms to video mem moved %2 bytes. Transfer rate %3 byte/second").
-                arg(currentTick - m_startCalcTick).arg(m_bytes).arg(m_bytes * 1000 / (currentTick - m_startCalcTick)), cl_logDEBUG1 );
+            NX_LOG( QString::fromAscii("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second").
+                arg(currentTick - m_startCalcTick).arg(m_bytes/1000000.0).arg(m_bytes /1000.0 / (currentTick - m_startCalcTick)), cl_logDEBUG1 );
             m_startCalcTick = currentTick;
             m_bytes = 0;
         }
@@ -1281,11 +1281,11 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 
 void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
-    return; //temporary fix for quicksync testing
+    //return; //temporary fix for quicksync testing
 
     QMutexLocker lk( &m_mutex );
-    //while( !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() )
-    //    m_cond.wait( lk.mutex() );
+    while( !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() )
+        m_cond.wait( lk.mutex() );
 
     //marking, that skipping frames currently in queue is forbbidden and exiting...
     for( std::deque<UploadedPicture*>::iterator

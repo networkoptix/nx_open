@@ -81,8 +81,29 @@ void QnResourceWidgetRenderer::update() {
 
 qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const { 
     const RenderingTools& ctx = m_channelRenderers[channel];
-    return ctx.renderer ? ctx.renderer->lastDisplayedTime() : 0;
+    return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
 }
+
+void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const 
+{
+    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    if (ctx.renderer) 
+        ctx.renderer->blockTimeValue(timestamp);
+}
+
+void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const 
+{  
+    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    if (ctx.renderer) 
+        ctx.renderer->unblockTimeValue();
+}
+
+bool QnResourceWidgetRenderer::isTimeBlocked(int channelNumber) const
+{
+    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    return ctx.renderer && ctx.renderer->isTimeBlocked();
+}
+
 
 qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const { 
     const RenderingTools& ctx = m_channelRenderers[channel];

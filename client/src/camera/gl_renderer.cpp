@@ -89,7 +89,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_saturation( 0 ),
     m_lastDisplayedTime( AV_NOPTS_VALUE ),
     m_lastDisplayedFlags( 0 ),
-    m_prevFrameSequence( 0 )
+    m_prevFrameSequence( 0 ),
+    m_timeChangeEnabled(true)
 {
     Q_ASSERT( context );
 
@@ -182,9 +183,15 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
         glFlush();
         glFinish();
 
+        if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence()) 
+        {
+            QMutexLocker lock(&m_timeMutex);
+            if (m_timeChangeEnabled) {
+                m_lastDisplayedTime = picLock->pts();
+                //qDebug() << "new displayTime=" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
+            }
+        }
         m_prevFrameSequence = picLock->sequence();
-        if( picLock->pts() != AV_NOPTS_VALUE )
-            m_lastDisplayedTime = picLock->pts();
         m_lastDisplayedMetadata = picLock->metadata();
     }
     else
@@ -332,8 +339,28 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
 
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
-    QMutexLocker locker(&m_displaySync);
+    QMutexLocker locker(&m_timeMutex);
     return m_lastDisplayedTime;
+}
+
+void QnGLRenderer::blockTimeValue(qint64  timestamp )
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lastDisplayedTime = timestamp;
+    m_timeChangeEnabled = false;
+    //qDebug() << "blockTimeValue" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
+}
+
+void QnGLRenderer::unblockTimeValue()
+{  
+    QMutexLocker lock(&m_timeMutex);
+    //qDebug() << "unblockTimeValue";
+    m_timeChangeEnabled = true;
+}
+
+bool QnGLRenderer::isTimeBlocked() const
+{
+    return !m_timeChangeEnabled;
 }
 
 bool QnGLRenderer::isLowQualityImage() const

@@ -62,7 +62,6 @@ public:
     bool selfSyncUsed() const;
 private:
     mutable QMutex m_mtx;
-    mutable QMutex m_timeMutex;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
 
     QnAbstractRenderer* m_drawer;
@@ -92,7 +91,6 @@ private:
     bool m_prevReverseMode;
     QQueue<QSharedPointer<CLVideoDecoderOutput> > m_reverseQueue;
     bool m_flushedBeforeReverseStart;
-    qint64 m_lastDisplayedTime;
     qint64 m_reverseSizeInBytes;
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;

@@ -85,8 +85,10 @@ public:
     /**
      * Returns last displayed time
      */
-    virtual qint64 lastDisplayedTime(int /*channelNumber*/) const { return AV_NOPTS_VALUE; }
-
+    virtual qint64 lastDisplayedTime(int channelNumber) const  = 0;
+    virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
+    virtual void unblockTimeValue(int channelNumber) const = 0;
+    virtual bool isTimeBlocked(int channelNumber) const  = 0;
 
 protected:
     virtual void doFrameDisplayed() {} // Not used for now.
