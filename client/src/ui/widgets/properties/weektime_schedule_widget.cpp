@@ -65,6 +65,7 @@ QString QnWeekTimeScheduleWidget::scheduleTasks() const
                 writer.putBit(recordType != Qn::RecordingType_Never);
             }
         }
+        writer.flushBits();
     } catch(...)
     {
         // it is never happened if grid size is correct
@@ -75,22 +76,32 @@ QString QnWeekTimeScheduleWidget::scheduleTasks() const
 
 void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
 {
-    QByteArray schedule = QByteArray::fromHex(value.toUtf8());
     disconnectFromGridWidget(); /* We don't want to get 100500 notifications. */
 
-    try {
-        BitStreamReader reader((quint8*) schedule.data(), schedule.size());
+    if (value.isEmpty()) {
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
         {
-            for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
-                const QPoint cell(col, row);
-                ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RecordingType_Run : Qn::RecordingType_Never);
-            }
+            for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
+                ui->gridWidget->setCellRecordingType(QPoint(col, row), Qn::RecordingType_Run);
         }
-    } catch(...) {
-        // we are here if value is empty
-        // it is never happened if grid size is correct
     }
+    else {
+        QByteArray schedule = QByteArray::fromHex(value.toUtf8());
+        try {
+            BitStreamReader reader((quint8*) schedule.data(), schedule.size());
+            for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
+            {
+                for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+                    const QPoint cell(col, row);
+                    ui->gridWidget->setCellRecordingType(cell, reader.getBit() ? Qn::RecordingType_Run : Qn::RecordingType_Never);
+                }
+            }
+        } catch(...) {
+            // we are here if value is empty
+            // it is never happened if grid size is correct
+        }
+    }
+
     connectToGridWidget();
 
     emit scheduleTasksChanged();
