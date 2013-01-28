@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>762</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -380,7 +380,7 @@
           <item>
            <widget class="QCheckBox" name="isHardwareDecodingCheckBox">
             <property name="text">
-             <string>Use hardware decoding</string>
+             <string>Use advanced hardware acceleration</string>
             </property>
            </widget>
           </item>
