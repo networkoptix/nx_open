@@ -8,7 +8,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 
 #define GL_GLEXT_PROTOTYPES
-#include <gl/glext.h>
+#include <GL/glext.h>
 
 
 GLFence::GLFence( QnGlFunctions* const glFunctions )
