@@ -147,6 +147,8 @@ bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Q
     if (!camera)
         return false;
 
+    QMutexLocker lock(&m_mutex);
+
     QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
     if (itrRec == m_recordMap.end())
         return false;
@@ -171,6 +173,8 @@ bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bo
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
     if (!camera)
         return false;
+
+    QMutexLocker lock(&m_mutex);
 
     QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
     if (itrRec == m_recordMap.end())
@@ -347,6 +351,8 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
 
         updateCamera(camera);
 
+        QMutexLocker lock(&m_mutex);
+
         QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
         if (itr != m_recordMap.end()) 
         {
@@ -445,6 +451,9 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 void QnRecordingManager::onTimer()
 {
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
+
+    QMutexLocker lock(&m_mutex);
+
     for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
     {
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(itrRec.key());
