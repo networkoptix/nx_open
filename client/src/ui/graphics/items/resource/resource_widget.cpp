@@ -572,8 +572,8 @@ const QSize &QnResourceWidget::channelScreenSize() const {
 }
 
 void QnResourceWidget::setChannelScreenSize(const QSize &size) {
-    //if(size == m_channelScreenSize)
-    //    return;
+    if(size == m_channelScreenSize)
+        return;
 
     m_channelScreenSize = size;
 
