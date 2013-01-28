@@ -521,7 +521,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0) 
+            if (m_buffering && m_executingJump == 0 && !m_afterJump)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
@@ -967,7 +967,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 
     {
         if (vd && m_display[vd->channelNumber] )
-            m_display[vd->channelNumber]->waitForFramesDisplaed();
+            m_display[vd->channelNumber]->waitForFramesDisplayed();
         if (vd || ad)
             afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
@@ -1187,6 +1187,14 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
 
     return true;
+}
+
+void QnCamDisplay::pleaseStop()
+{
+    QnAbstractDataConsumer::pleaseStop();
+    for( int i = 0; i < CL_MAX_CHANNELS; ++i )
+        if( m_display[i] )
+            m_display[i]->pleaseStop();
 }
 
 void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)

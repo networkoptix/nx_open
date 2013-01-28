@@ -9,8 +9,8 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
     base_type(BusinessEventType::BE_Storage_Failure,
                             resource,
                             timeStamp),
-    m_storageResource(storageResource),
-    m_reason(reason)
+    m_reason(reason),
+    m_storageResource(storageResource)
 {
 }
 

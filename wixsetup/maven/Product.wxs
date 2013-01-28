@@ -864,6 +864,11 @@
 								<File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
 							</Component>
 
+							<Component Id="ClientQuickSync" Guid="{c1f9bf19-496f-45a2-b732-28459afd3156}">
+								<File Id="ClientQuickSyncDll" Name="quicksyncdecoder1.dll" Source="${libdir}/bin/${build.configuration}/quicksyncdecoder1.dll"/>
+								<File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="${libdir}/bin/${build.configuration}/hw_decoding_conf.xml"/>                               
+							</Component>							
+							
 							<Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
 								<File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
 								<File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
@@ -1005,6 +1010,7 @@
 			<ComponentGroupRef Id="ClientHelpComponent"/>
 			<ComponentRef Id="ClientConfiguration" />
 			<ComponentRef Id="ClientConfigurationPassword" />
+			<ComponentRef Id="ClientQuickSync"/>
 			<ComponentRef Id="ClientFFmpegLibraries"/>
 			<ComponentRef Id="ClientQTLibraries" />
 			<ComponentRef Id="ImageFormats" />

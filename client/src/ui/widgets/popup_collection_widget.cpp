@@ -11,7 +11,7 @@
 
 QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent, Qt::Popup),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
@@ -40,7 +40,6 @@ void QnPopupCollectionWidget::addExample() {
 }
 
 void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
 
@@ -61,13 +60,13 @@ void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     if (QWidget* w = m_widgetsByType[eventType]) {
         QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w);
         pw->addBusinessAction(businessAction);
-        return;
+    } else {
+        QnPopupWidget* pw = new QnPopupWidget(this);
+        ui->verticalLayout->addWidget(pw);
+        m_widgetsByType[eventType] = pw;
+        pw->addBusinessAction(businessAction);
+        connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_widget_closed(BusinessEventType::Value, bool)));
     }
-    QnPopupWidget* pw = new QnPopupWidget(this);
-    ui->verticalLayout->addWidget(pw);
-    m_widgetsByType[eventType] = pw;
-    pw->addBusinessAction(businessAction);
-    connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_widget_closed(BusinessEventType::Value, bool)));
 
     if (isVisible())
         updatePosition();
@@ -99,4 +98,7 @@ void QnPopupCollectionWidget::at_widget_closed(BusinessEventType::Value eventTyp
     QWidget* w = m_widgetsByType[eventType];
     ui->verticalLayout->removeWidget(w);
     m_widgetsByType.remove(eventType);
+
+    if (ui->verticalLayout->count() == 0)
+        hide();
 }

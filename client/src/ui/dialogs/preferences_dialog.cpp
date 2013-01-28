@@ -298,6 +298,9 @@ void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &co
 void QnPreferencesDialog::at_context_userChanged() {
     ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
     ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
+        m_smtpSettingsWidget->update();
+    }
 }
 
 void QnPreferencesDialog::at_timeModeComboBox_activated() {

@@ -5,6 +5,8 @@
 #include "utils/network/tcp_connection_processor.h"
 #include "request_handler.h"
 
+class QnRestConnectionProcessorPrivate;
+
 class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
     Q_OBJECT
 public:
@@ -21,7 +23,7 @@ protected:
 
 private:
     static Handlers m_handlers;
-    QN_DECLARE_PRIVATE_DERIVED(QnRestConnectionProcessor);
+    Q_DECLARE_PRIVATE(QnRestConnectionProcessor);
 };
 
 #endif // _REST_CONNECTION_PROCESSOR_H__

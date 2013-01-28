@@ -85,9 +85,9 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QTableView" name="tableView">
+       <widget class="QnTableView" name="tableView">
         <property name="editTriggers">
-         <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+         <set>QAbstractItemView::AllEditTriggers</set>
         </property>
         <property name="showDropIndicator" stdset="0">
          <bool>false</bool>
@@ -136,6 +136,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/business_rule_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources>

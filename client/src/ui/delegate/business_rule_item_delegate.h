@@ -2,6 +2,35 @@
 #define BUSINESS_RULE_ITEM_DELEGATE_H
 
 #include <QStyledItemDelegate>
+#include <QtGui/QPushButton>
+
+#include <core/resource/resource_fwd.h>
+
+#include <ui/dialogs/select_cameras_dialog.h>
+
+class QnSelectResourcesDialogButton: public QPushButton {
+    Q_OBJECT
+
+    typedef QPushButton base_type;
+
+public:
+    explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
+
+    QnResourceList resources();
+    void setResources(QnResourceList resources);
+
+    QnSelectCamerasDialogDelegate* dialogDelegate();
+    void setDialogDelegate(QnSelectCamerasDialogDelegate* delegate);
+protected:
+    void initStyleOption(QStyleOptionButton *option) const;
+    void paintEvent(QPaintEvent *event);
+
+private slots:
+    void at_clicked();
+private:
+    QnResourceList m_resources;
+    QnSelectCamerasDialogDelegate* m_dialogDelegate;
+};
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
     Q_OBJECT
@@ -15,10 +44,6 @@ protected:
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-
-private slots:
-    void at_sourceButton_clicked();
-
 private:
     int m_editingRow;
     int m_editingColumn;

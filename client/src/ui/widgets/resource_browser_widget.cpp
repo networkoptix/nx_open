@@ -50,7 +50,7 @@ namespace {
 
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
     m_filterTimerId(0)

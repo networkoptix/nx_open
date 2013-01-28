@@ -28,6 +28,9 @@ public:
 
     virtual ~QnResourceWidgetRenderer();
 
+    //!Implementation of QnStoppable::pleaseStop()
+    virtual void pleaseStop() override;
+
     void update();
     /*!
         \note This method is not thread-safe and must be called from decoder thread only
@@ -47,6 +50,10 @@ public:
     Qn::RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
 
     virtual qint64 lastDisplayedTime(int channel) const override;
+    virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;
+    virtual void unblockTimeValue(int channelNumber) const  override;
+    virtual bool isTimeBlocked(int channelNumber) const override;
+
 
     qint64 isLowQualityImage(int channel) const;
     bool isHardwareDecoderUsed(int channel) const;

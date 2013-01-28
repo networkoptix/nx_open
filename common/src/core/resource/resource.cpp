@@ -614,7 +614,7 @@ void QnResource::setId(QnId id) {
     if(m_id == id)
         return;
 
-    QnId oldId = m_id;
+    //QnId oldId = m_id;
     m_id = id;
 }
 

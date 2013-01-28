@@ -15,7 +15,7 @@
 
 QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     m_emptyTab(Qn::GeneralSettingsTab)
 {
     /* Create per-mode widgets. */

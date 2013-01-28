@@ -4,8 +4,6 @@
 #include <cstddef> /* For std::ptrdiff_t. */
 
 #include <QtOpenGL/QGLContext>
-//#define GL_GLEXT_PROTOTYPES
-//#include <GL/glext.h>
 
 class QnGlFunctionsPrivate;
 
@@ -32,7 +30,8 @@ public:
         OpenGL3_2 = 0x10,
         
         ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
-        NoOpenGLFullScreen = 0x0002000  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
+        NoOpenGLFullScreen = 0x0002000,  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
+        ARB_Sync = 0x00004000            /**< ARB_Sync extension is present */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -111,6 +110,7 @@ public:
     GLsync glFenceSync(	GLenum condition, GLbitfield flags );
     void glDeleteSync( GLsync sync );
     void glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout );
+    GLenum glClientWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout );
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;

@@ -209,6 +209,12 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             return m_disabled;
         case QnBusiness::ValidRole:
             return isValid();
+        case QnBusiness::EventResourcesRole:
+            return QVariant::fromValue<QnResourceList>(m_eventResources);
+        case QnBusiness::ActionResourcesRole:
+            return QVariant::fromValue<QnResourceList>(m_actionResources);
+        case QnBusiness::ActionTypeRole:
+            return m_actionType;
         default:
             break;
     }
@@ -231,6 +237,12 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             return true;
         case QnBusiness::ActionColumn:
             setActionType((BusinessActionType::Value)value.toInt());
+            return true;
+        case QnBusiness::SourceColumn:
+            setEventResources(value.value<QnResourceList>());
+            return true;
+        case QnBusiness::TargetColumn:
+            setActionResources(value.value<QnResourceList>());
             return true;
         default:
             break;
@@ -630,6 +642,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
                     if (receivers.isEmpty() || !isEmailValid(receivers))
                         return false;
+                    return true;
                 }
 
                 QnResourceList resources = m_actionResources; //TODO: filtered by type
@@ -699,7 +712,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
 
 QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent)
+    QnWorkbenchContextAware(parent, context)
 {
     m_fieldsByColumn[QnBusiness::ModifiedColumn] = QnBusiness::ModifiedField;
     m_fieldsByColumn[QnBusiness::DisabledColumn] = QnBusiness::DisabledField;

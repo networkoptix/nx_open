@@ -3,6 +3,8 @@
 
 #include "utils/network/tcp_connection_processor.h"
 
+class QnTestCameraProcessorPrivate;
+
 class QnTestCameraProcessor: public QnTCPConnectionProcessor
 {
 public:
@@ -10,7 +12,7 @@ public:
     virtual ~QnTestCameraProcessor();
     virtual void run() override;
 private:
-    QN_DECLARE_PRIVATE_DERIVED(QnTestCameraProcessor);
+    Q_DECLARE_PRIVATE(QnTestCameraProcessor);
 };
 
 #endif // __TEST_CAMERA_CONNECTION_PROCESSOR_H__

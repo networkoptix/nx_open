@@ -7,7 +7,6 @@
 #include <QList>
 #include <QByteArray>
 #include "utils/common/request_param.h"
-#include "utils/common/pimpl.h"
 #include <QSharedPointer>
 
 class TCPSocket;
@@ -28,7 +27,7 @@ public:
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType) = 0;
 
     // incoming connection socket
-    virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket) return QString(); }
+    virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket); return QString(); }
     
     friend class QnRestConnectionProcessor;
 
@@ -40,6 +39,8 @@ protected:
 };
 
 typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
+
+class QnRestGUIRequestHandlerPrivate;
 
 class QnRestGUIRequestHandler: public QnRestRequestHandler {
     Q_OBJECT
@@ -54,7 +55,9 @@ protected:
 private:
     Q_INVOKABLE void methodExecutor();
 protected:
-    QN_DECLARE_PRIVATE(QnRestGUIRequestHandler);
+    Q_DECLARE_PRIVATE(QnRestGUIRequestHandler);
+
+    QnRestGUIRequestHandlerPrivate *d_ptr;
 };
 
 #endif // __REQUEST_HANDLER_H__

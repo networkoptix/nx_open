@@ -18,7 +18,9 @@
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
+#include <utils/common/stoppable.h>
 #include <utils/gl/glcontext.h>
+#include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 
 //#define GL_COPY_AGGREGATION
@@ -49,6 +51,8 @@ class QnGlRendererTexture;
         Calling \a uploadDecodedPicture with pictures of different types may lead to undefined behavour
 */
 class DecodedPictureToOpenGLUploader
+:
+    public QnStoppable
 {
 public:
     //!Represents picture, ready to be displayed. It is opengl texture(s)
@@ -105,6 +109,7 @@ public:
 #endif
         bool m_skippingForbidden;
         int m_flags;
+        GLFence m_glFence;
 
         UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
@@ -142,7 +147,10 @@ public:
     DecodedPictureToOpenGLUploader(
         const QGLContext* const mainContext,
         unsigned int asyncDepth = 1 );
-    ~DecodedPictureToOpenGLUploader();
+    virtual ~DecodedPictureToOpenGLUploader();
+
+    //!Implementation of QnStoppable::pleaseStop()
+    virtual void pleaseStop() override;
 
     //!Uploads \a decodedPicture to opengl texture(s). Used by decoder thread
     /*!
@@ -151,9 +159,8 @@ public:
             As soon as uploader is done with \a decodedPicture->picData it releases reference to it
     */
     void uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture );
-    //!Returns uploaded picture. Used by GUI thread
+    //!Returns latest uploaded picture. Used by GUI thread
     /*!
-        This method calls UploadedPicture::AddRef, so renderer must call only releaseRef when it's done rendering.
         \return Uploaded picture data, NULL if no picture. Returned object memory is managed by \a DecodedPictureToOpenGLUploader, and MUST NOT be deleted
     */
     UploadedPicture* getUploadedPicture() const;
@@ -237,6 +244,7 @@ private:
     QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
     quint8* m_rgbaBuf;
     int m_fileNumber;
+    bool m_hardwareDecoderUsed;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;

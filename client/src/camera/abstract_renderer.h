@@ -2,6 +2,8 @@
 #define QN_ABSTRACT_RENDERER_H
 
 #include "utils/media/frame_info.h"
+#include "utils/common/stoppable.h"
+
 
 class CLVideoDecoderOutput;
 
@@ -14,6 +16,8 @@ class CLVideoDecoderOutput;
  * Note that it is owned by the rendering thread.
  */
 class QnAbstractRenderer
+:
+    public QnStoppable
 {
 public:
     QnAbstractRenderer(): m_displayCounter(0) {}
@@ -85,8 +89,10 @@ public:
     /**
      * Returns last displayed time
      */
-    virtual qint64 lastDisplayedTime(int /*channelNumber*/) const { return AV_NOPTS_VALUE; }
-
+    virtual qint64 lastDisplayedTime(int channelNumber) const  = 0;
+    virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
+    virtual void unblockTimeValue(int channelNumber) const = 0;
+    virtual bool isTimeBlocked(int channelNumber) const  = 0;
 
 protected:
     virtual void doFrameDisplayed() {} // Not used for now.

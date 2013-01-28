@@ -40,7 +40,12 @@ public:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 
     bool isLowQualityImage() const;
+    
     qint64 lastDisplayedTime() const;
+    void blockTimeValue(qint64  timestamp );
+    void unblockTimeValue();
+    bool isTimeBlocked() const;
+
     QnMetaDataV1Ptr lastFrameMetadata() const; 
     bool isHardwareDecoderUsed() const;
 
@@ -49,7 +54,6 @@ public:
 
 private:
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
-    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     qreal m_brightness;
     qreal m_contrast;
     qreal m_hue;
@@ -61,6 +65,8 @@ private:
     std::auto_ptr<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     std::auto_ptr<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
     std::auto_ptr<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
+    bool m_timeChangeEnabled;
+    mutable QMutex m_mutex;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

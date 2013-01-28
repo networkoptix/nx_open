@@ -1,6 +1,8 @@
 #include "recording_business_action_widget.h"
 #include "ui_recording_business_action_widget.h"
 
+#include <core/resource/camera_resource.h>
+
 #include <events/recording_business_action.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -40,6 +42,21 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
+    int maxFps = 0;
+
+    if (fields & QnBusiness::ActionResourcesField) {
+        QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();
+        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+            maxFps = maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps());
+        }
+
+        ui->fpsSpinBox->setEnabled(maxFps > 0);
+        ui->fpsSpinBox->setMaximum(maxFps);
+        if (ui->fpsSpinBox->value() == 0 && maxFps > 0)
+            ui->fpsSpinBox->setValue(maxFps);
+        ui->fpsSpinBox->setMinimum(maxFps > 0 ? 1 : 0);
+    }
+
     if (fields & QnBusiness::ActionParamsField) {
 
         QnBusinessParams params = model->actionParams();
@@ -53,8 +70,6 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 //        ui->beforeSpinBox->setValue(BusinessActionParameters::getRecordBefore(params));
         ui->afterSpinBox->setValue(BusinessActionParameters::getRecordAfter(params));
     }
-
-    //TODO: #GDM update on resource change
 }
 
 void QnRecordingBusinessActionWidget::paramsChanged() {
