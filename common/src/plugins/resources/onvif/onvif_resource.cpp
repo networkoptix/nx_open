@@ -1246,7 +1246,7 @@ bool QnPlOnvifResource::setRelayOutputState(
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
             cl_log.log( QString::fromAscii("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5. %6").
-                arg(QString()).arg(outputID).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
+                arg(QString()).arg(QString::fromStdString(relayOutputInfo.token)).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
                 arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")).arg(m_prevSoapCallResult), cl_logWARNING );
             return false;
         }
@@ -1255,7 +1255,7 @@ bool QnPlOnvifResource::setRelayOutputState(
             arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING );
     }
 
-    //modifing output
+    //modifying output
     const QAuthenticator& auth = getAuth();
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
@@ -1264,19 +1264,19 @@ bool QnPlOnvifResource::setRelayOutputState(
         m_timeDrift );
 
     _onvifDevice__SetRelayOutputState request;
-    request.RelayOutputToken = outputID.toStdString();
+    request.RelayOutputToken = relayOutputInfo.token;
     request.LogicalState = active ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
     _onvifDevice__SetRelayOutputStateResponse response;
     m_prevSoapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
         cl_log.log( QString::fromAscii("Failed to set relay %1 output state to %2. endpoint %3").
-            arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+            arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
 
     cl_log.log( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
-        arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
     return true;
 }
 
