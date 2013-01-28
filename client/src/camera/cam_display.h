@@ -46,6 +46,8 @@ public:
     void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
     virtual bool processData(QnAbstractDataPacketPtr data);
 
+    virtual void pleaseStop() override;
+
     void pause();
     void resume();
 
@@ -90,6 +92,7 @@ public:
     void setFullScreen(bool fullScreen);
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);

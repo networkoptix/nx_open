@@ -165,7 +165,7 @@ public:
         RESOLVE( PFNGLCLIENTWAITSYNCPROC, glClientWaitSync );
         RESOLVE( PFNGLWAITSYNCPROC, glWaitSync );
         if(status)
-            m_features |= QnGlFunctions::OpenGL3_2;
+            m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ARB_Sync;
 
 #undef RESOLVE
 
@@ -353,6 +353,11 @@ void QnGlFunctions::glDeleteSync( GLsync sync )
 void QnGlFunctions::glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout )
 {
     d->glWaitSync( sync, flags, timeout );
+}
+
+GLenum QnGlFunctions::glClientWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout )
+{
+    return d->glClientWaitSync( sync, flags, timeout );
 }
 
 #ifdef Q_OS_WIN

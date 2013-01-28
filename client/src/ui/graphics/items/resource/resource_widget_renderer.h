@@ -28,6 +28,9 @@ public:
 
     virtual ~QnResourceWidgetRenderer();
 
+    //!Implementation of QnStoppable::pleaseStop()
+    virtual void pleaseStop() override;
+
     void update();
     /*!
         \note This method is not thread-safe and must be called from decoder thread only

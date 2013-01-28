@@ -69,6 +69,15 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
+void QnResourceWidgetRenderer::pleaseStop()
+{
+    foreach(RenderingTools ctx, m_channelRenderers)
+    {
+        if( ctx.uploader )
+            ctx.uploader->pleaseStop();
+    }
+}
+
 void QnResourceWidgetRenderer::update() {
     //renderer->update() is not needed anymore since during paint renderer takes newest decoded picture
 
