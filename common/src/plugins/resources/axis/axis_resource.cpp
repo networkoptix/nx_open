@@ -19,7 +19,8 @@ static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 static const quint16 DEFAULT_AXIS_API_PORT = 80;
 
-QnPlAxisResource::QnPlAxisResource()
+QnPlAxisResource::QnPlAxisResource():
+    m_ptzController(NULL)
 {
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
@@ -348,6 +349,8 @@ bool QnPlAxisResource::initInternal()
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
 
     initializeIOPorts( &http );
+
+    initializePtz(&http);
 
     return true;
 }
@@ -905,4 +908,20 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
             return;
         }
     }
+}
+
+void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
+    QString ptzString;
+    CLHttpStatus status = readAxisParameter(http, lit("Properties.PTZ.PTZ"), &ptzString);
+    if(status != CL_HTTP_SUCCESS)
+        return;
+
+    if(ptzString != lit("yes"))
+        return;
+
+    m_ptzController = new QnAxisPtzController(::toSharedPointer(this), this);
+}
+
+virtual QnPlAxisResource::QnAbstractPtzController* getPtzController() {
+    return m_ptzController;
 }

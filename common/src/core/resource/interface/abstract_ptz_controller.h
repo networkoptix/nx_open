@@ -10,7 +10,7 @@
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
-    QnAbstractPtzController(const QnResourcePtr &netRes, QObject *parent = NULL);
+    QnAbstractPtzController(const QnResourcePtr &resource, QObject *parent = NULL);
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) = 0;

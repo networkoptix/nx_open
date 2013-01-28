@@ -1986,7 +1986,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     if (m_ptzController == 0) 
     {
-        QnOnvifPtzController* controller = new QnOnvifPtzController(toSharedPointer());
+        QnOnvifPtzController* controller = new QnOnvifPtzController(::toSharedPointer(this));
         if (!controller->getPtzConfigurationToken().isEmpty())
             m_ptzController = controller;
         else

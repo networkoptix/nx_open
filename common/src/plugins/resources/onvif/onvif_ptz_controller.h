@@ -10,7 +10,7 @@
 class QnOnvifPtzController: public QnAbstractPtzController {
     Q_OBJECT
 public:
-    QnOnvifPtzController(QnResourcePtr res);
+    QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
     virtual int stopMove() override;
@@ -25,7 +25,7 @@ private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
 
 private:
-    QnPlOnvifResourcePtr m_res;
+    QnPlOnvifResourcePtr m_resource;
     Qn::CameraCapabilities m_capabilities;
     QString m_mediaProfile;
     QString m_ptzConfigurationToken;
