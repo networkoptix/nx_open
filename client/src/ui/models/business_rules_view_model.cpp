@@ -212,12 +212,17 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             return m_disabled;
         case QnBusiness::ValidRole:
             return isValid();
+        case QnBusiness::InstantActionRole:
+            return actionTypeShouldBeInstant();
+
+        case QnBusiness::EventTypeRole:
+            return m_eventType;
         case QnBusiness::EventResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_eventResources);
-        case QnBusiness::ActionResourcesRole:
-            return QVariant::fromValue<QnResourceList>(m_actionResources);
         case QnBusiness::ActionTypeRole:
             return m_actionType;
+        case QnBusiness::ActionResourcesRole:
+            return QVariant::fromValue<QnResourceList>(m_actionResources);
         default:
             break;
     }
@@ -287,8 +292,8 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
 
-bool QnBusinessRuleViewModel::actionTypeShouldBeInstant() {
-    return (m_eventState == ToggleState::On || m_eventState == ToggleState::Off)
+bool QnBusinessRuleViewModel::actionTypeShouldBeInstant() const {
+    return (m_eventState != ToggleState::NotDefined)
                 || (!BusinessEventType::hasToggleState(m_eventType));
 }
 

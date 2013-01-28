@@ -20,7 +20,6 @@ namespace BusinessActionType
         */
         BA_SendMail,
 
-        //TODO: #gdm make!
         BA_ShowPopup,
 
         //!change camera output state

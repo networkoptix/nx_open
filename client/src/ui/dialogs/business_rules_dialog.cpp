@@ -24,51 +24,6 @@
 
 #include <client_message_processor.h>
 
-namespace {
-    class QnAbstractComboBoxEditorFactory: public QItemEditorFactory {
-
-    protected:
-        virtual void populateComboBox(QComboBox* comboBox) const = 0;
-    public:
-        virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
-            Q_UNUSED(type)
-            QComboBox* result = new QComboBox(parent);
-            populateComboBox(result);
-            return result;
-        }
-
-        virtual QByteArray valuePropertyName(QVariant::Type type) const override {
-            Q_UNUSED(type)
-            return QByteArray("currentIndex");
-        }
-    };
-
-    class QnBusinessEventTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
-    protected:
-        virtual void populateComboBox(QComboBox *comboBox) const override {
-            for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-                BusinessEventType::Value val = (BusinessEventType::Value)i;
-
-                comboBox->insertItem(i, BusinessEventType::toString(val));
-                comboBox->setItemData(i, val);
-            }
-        }
-    };
-
-    class QnBusinessActionTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
-    protected:
-        virtual void populateComboBox(QComboBox *comboBox) const override {
-            for (int i = 0; i < BusinessActionType::BA_Count; i++) {
-                BusinessActionType::Value val = (BusinessActionType::Value)i;
-
-                comboBox->insertItem(i, BusinessActionType::toString(val));
-                comboBox->setItemData(i, val);
-            }
-        }
-    };
-
-}
-
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
@@ -98,14 +53,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     ui->tableView->installEventFilter(this);
 
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
-
-    QStyledItemDelegate *eventTypeItemDelegate = new QnBusinessRuleItemDelegate();
-    eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
-    ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
-
-    QStyledItemDelegate *actionTypeItemDelegate = new QnBusinessRuleItemDelegate();
-    actionTypeItemDelegate->setItemEditorFactory(new QnBusinessActionTypeEditorFactory());
-    ui->tableView->setItemDelegateForColumn(QnBusiness::ActionColumn, actionTypeItemDelegate);
 
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));

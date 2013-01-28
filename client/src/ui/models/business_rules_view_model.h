@@ -49,9 +49,12 @@ namespace QnBusiness {
         ModifiedRole   = Qt::UserRole + 1,
         DisabledRole,
         ValidRole,
+        InstantActionRole,
+
+        EventTypeRole,
         EventResourcesRole,
-        ActionResourcesRole,
-        ActionTypeRole
+        ActionTypeRole,
+        ActionResourcesRole
     };
 
 }
@@ -69,7 +72,7 @@ public:
     bool setData(const int column, const QVariant &value, int role);
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
-    bool actionTypeShouldBeInstant();
+    bool actionTypeShouldBeInstant() const;
     QnBusinessEventRulePtr createRule() const;
 
     QVariant getText(const int column, const bool detailed = true) const;
