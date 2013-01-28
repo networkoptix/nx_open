@@ -191,6 +191,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             else if (column == QnBusiness::TargetColumn) {
                 if (m_actionType == BusinessActionType::BA_SendMail)
                     return BusinessActionParameters::getEmailAddress(m_actionParams);
+                if (m_actionType == BusinessActionType::BA_ShowPopup)
+                    return BusinessActionParameters::getUserGroup(m_actionParams);
             }
             break;
 
@@ -257,6 +259,10 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             if (m_actionType == BusinessActionType::BA_SendMail) {
                 QnBusinessParams params = m_actionParams;
                 BusinessActionParameters::setEmailAddress(&params, value.toString());
+                setActionParams(params);
+            } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
+                QnBusinessParams params = m_actionParams;
+                BusinessActionParameters::setUserGroup(&params, value.toInt());
                 setActionParams(params);
             }
             else
@@ -851,7 +857,8 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             {
                 BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
                 if (BusinessActionType::isResourceRequired(actionType)
-                        || actionType == BusinessActionType::BA_SendMail)
+                        || actionType == BusinessActionType::BA_SendMail
+                        || actionType == BusinessActionType::BA_ShowPopup)
                     flags |= Qt::ItemIsEditable;
             }
             break;
