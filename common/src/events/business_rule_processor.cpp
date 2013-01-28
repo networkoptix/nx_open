@@ -294,11 +294,11 @@ bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessA
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
-    if( relayOutputId.isEmpty() )
-    {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
-        return false;
-    }
+    //if( relayOutputId.isEmpty() )
+    //{
+    //    cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
+    //    return false;
+    //}
 
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     return securityCam->setRelayOutputState(
