@@ -17,6 +17,7 @@ public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
 
+    void update();
     void submit();
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
