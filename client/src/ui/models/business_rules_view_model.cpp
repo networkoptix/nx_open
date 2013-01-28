@@ -638,7 +638,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
 }
 
 bool QnBusinessRuleViewModel::isValid() const {
-    return isValid(QnBusiness::SourceColumn) && isValid(QnBusiness::TargetColumn);
+    return m_disabled || (isValid(QnBusiness::SourceColumn) && isValid(QnBusiness::TargetColumn));
 }
 
 bool QnBusinessRuleViewModel::isValid(int column) const {
