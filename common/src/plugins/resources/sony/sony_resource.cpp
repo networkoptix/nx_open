@@ -122,7 +122,7 @@ bool QnPlSonyResource::initInternal()
         getNetworkTimeout(),
         getAuth() );
     //turning on input monitoring
-    CLHttpStatus status = http.doGET( "/command/system.cgi?AlarmData=on" );
+    CLHttpStatus status = http.doGET( QLatin1String("/command/system.cgi?AlarmData=on") );
     if( status % 100 != 2 )
     {
         NX_LOG( QString::fromLatin1("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
