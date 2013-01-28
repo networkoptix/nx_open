@@ -180,12 +180,13 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 Q_ASSERT( false );
         }
 
-        glFlush();
-        glFinish();
+        //glFlush();
+        //glFinish();
+
+        QMutexLocker lock(&m_mutex);
 
         if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence()) 
         {
-            QMutexLocker lock(&m_timeMutex);
             if (m_timeChangeEnabled) {
                 m_lastDisplayedTime = picLock->pts();
                 //qDebug() << "new displayTime=" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
@@ -205,7 +206,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
 }
 
 void QnGLRenderer::drawVideoTextureDirectly(
-	const QRectF& tex0Coords,
+	const QRectF& /*tex0Coords*/,
 	unsigned int tex0ID,
 	const float* v_array )
 {
@@ -237,7 +238,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
 }
 
 void QnGLRenderer::drawYV12VideoTexture(
-    const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
 	const QRectF& tex0Coords,
 	unsigned int tex0ID,
 	unsigned int tex1ID,
@@ -339,13 +340,13 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
 
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
-    QMutexLocker locker(&m_timeMutex);
+    QMutexLocker locker(&m_mutex);
     return m_lastDisplayedTime;
 }
 
 void QnGLRenderer::blockTimeValue(qint64  timestamp )
 {
-    QMutexLocker lock(&m_timeMutex);
+    QMutexLocker lock(&m_mutex);
     m_lastDisplayedTime = timestamp;
     m_timeChangeEnabled = false;
     //qDebug() << "blockTimeValue" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
@@ -353,7 +354,7 @@ void QnGLRenderer::blockTimeValue(qint64  timestamp )
 
 void QnGLRenderer::unblockTimeValue()
 {  
-    QMutexLocker lock(&m_timeMutex);
+    QMutexLocker lock(&m_mutex);
     //qDebug() << "unblockTimeValue";
     m_timeChangeEnabled = true;
 }
@@ -370,7 +371,7 @@ bool QnGLRenderer::isLowQualityImage() const
 
 QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 {
-    QMutexLocker locker(&m_displaySync);
+    QMutexLocker locker(&m_mutex);
     return m_lastDisplayedMetadata;
 }
 

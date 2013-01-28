@@ -341,9 +341,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #endif
 
-            int res = 0;
-            if( res = glCheckError("glTexSubImage2D") )
-                int x = 0;
+            glCheckError("glTexSubImage2D");
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             glCheckError("glPixelStorei");
         }

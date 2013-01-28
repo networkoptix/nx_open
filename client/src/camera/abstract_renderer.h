@@ -2,6 +2,8 @@
 #define QN_ABSTRACT_RENDERER_H
 
 #include "utils/media/frame_info.h"
+#include "utils/common/stoppable.h"
+
 
 class CLVideoDecoderOutput;
 
@@ -14,6 +16,8 @@ class CLVideoDecoderOutput;
  * Note that it is owned by the rendering thread.
  */
 class QnAbstractRenderer
+:
+    public QnStoppable
 {
 public:
     QnAbstractRenderer(): m_displayCounter(0) {}

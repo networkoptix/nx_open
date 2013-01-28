@@ -434,7 +434,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pboID( (GLuint)-1 ),
     m_pboSizeBytes( 0 ),
     m_flags( 0 ),
-    m_skippingForbidden( false )
+    m_skippingForbidden( false ),
+    m_glFence( uploader->d.data() )
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
     for( size_t i = 0; i < TEXTURE_COUNT; ++i )
@@ -1047,7 +1048,8 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_nv12SharedUsed( false ),
     m_uploadThread( NULL ),
     m_rgbaBuf( NULL ),
-    m_fileNumber( 0 )
+    m_fileNumber( 0 ),
+    m_hardwareDecoderUsed( false )
 {
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& 
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
@@ -1107,9 +1109,19 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
     delete[] m_rgbaBuf;
 }
 
+void DecodedPictureToOpenGLUploader::pleaseStop()
+{
+    QMutexLocker lk( &m_mutex );
+
+    m_terminated = true;
+    m_cond.wakeAll();
+}
+
 void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<CLVideoDecoderOutput>& decodedPicture )
 {
     NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
+
+    m_hardwareDecoderUsed = decodedPicture->flags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 
     const bool useAsyncUpload = decodedPicture->picData.data() && (decodedPicture->picData->type() == QnAbstractPictureDataRef::pstD3DSurface);
     m_format = decodedPicture->format;
@@ -1266,35 +1278,35 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     }
 
     m_picturesBeingRendered.push_back( pic );
-#ifdef GL_COPY_AGGREGATION
     lk.unlock();
 
-#ifdef UPLOAD_TO_GL_IN_GUI_THREAD
-#ifndef DISABLE_FRAME_UPLOAD
+#if defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD) && !defined(DISABLE_FRAME_UPLOAD)
     //if needed, uploading aggregation surface to ogl texture(s)
     pic->aggregationSurfaceRect()->ensureUploadedToOGL( opacity() );
-#endif  //DISABLE_FRAME_UPLOAD
-#endif  //UPLOAD_TO_GL_IN_GUI_THREAD
-#endif  //GL_COPY_AGGREGATION
+#endif
+
+    //waiting for all gl operations, submitted by uploader are completed by ogl device
     return pic;
 }
 
 void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
-    //return; //temporary fix for quicksync testing
+    if( m_hardwareDecoderUsed )
+        return; //if hardware decoder is used, waiting can result in bad playback experience
 
     QMutexLocker lk( &m_mutex );
-    while( !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() )
+
+    while( !m_terminated && (!m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
         m_cond.wait( lk.mutex() );
 
-    //marking, that skipping frames currently in queue is forbbidden and exiting...
-    for( std::deque<UploadedPicture*>::iterator
-        it = m_picturesWaitingRendering.begin();
-        it != m_picturesWaitingRendering.end();
-        ++it )
-    {
-        (*it)->m_skippingForbidden = true;
-    }
+    ////marking, that skipping frames currently in queue is forbidden and exiting...
+    //for( std::deque<UploadedPicture*>::iterator
+    //    it = m_picturesWaitingRendering.begin();
+    //    it != m_picturesWaitingRendering.end();
+    //    ++it )
+    //{
+    //    (*it)->m_skippingForbidden = true;
+    //}
 }
 
 #ifdef GL_COPY_AGGREGATION
@@ -1307,6 +1319,8 @@ static DecodedPictureToOpenGLUploader::UploadedPicture* resetAggregationSurfaceR
 
 void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* const picture ) const
 {
+    picture->m_glFence.placeFence();
+
     QMutexLocker lk( &m_mutex );
 
     NX_LOG( QString::fromAscii( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
@@ -1351,8 +1365,7 @@ void DecodedPictureToOpenGLUploader::setOpacity( qreal opacity )
 
 void DecodedPictureToOpenGLUploader::beforeDestroy()
 {
-    QMutexLocker lk( &m_uploadMutex );
-    m_terminated = true;
+    pleaseStop();
 }
 
 void DecodedPictureToOpenGLUploader::setYV12ToRgbShaderUsed( bool yv12SharedUsed )
@@ -1467,6 +1480,9 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     int lineSizes[],
     bool /*isVideoMemory*/ )
 {
+    //waiting for all operations with textures (submitted by renderer) are finished
+    emptyPictureBuf->m_glFence.sync();
+
 #ifdef DISABLE_FRAME_UPLOAD
     emptyPictureBuf->setColorFormat( PIX_FMT_YUV420P );
     return true;
@@ -1550,19 +1566,13 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 #ifdef USE_PBO
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
-#endif
+            //have to synchronize every time, since single PBO buffer used
             glFlush();
             glFinish();
+#endif
         }
 
         glBindTexture( GL_TEXTURE_2D, 0 );
-
-        //if( d->features() & QnGlFunctions::OpenGL3_2 )
-        //{
-        //    GLsync syncObj = d->glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
-        //    d->glWaitSync( syncObj, 0, GL_TIMEOUT_IGNORED );
-        //    d->glDeleteSync( syncObj );
-        //}
 
         emptyPictureBuf->setColorFormat( PIX_FMT_YUV420P );
     }
@@ -1702,8 +1712,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         // TODO: free memory immediately for still images
     }
 
-    //glFlush();
-    //glFinish();
+    //TODO/IMPL should place fence here and in getUploadedPicture should take only that picture, whose m_glFence is signaled
+    //emptyPictureBuf->m_glFence.placeFence();
+    glFlush();
+    glFinish();
 
     return true;
 }

@@ -141,6 +141,7 @@ QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int min
 
     if (m_bufferSize > 0) {
         m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
+		Q_ASSERT_X(m_buffer, Q_FUNC_INFO, "not enough memory");
         m_sectorBuffer = (quint8*) qMallocAligned(SECTOR_SIZE, SECTOR_SIZE);
     }
 }

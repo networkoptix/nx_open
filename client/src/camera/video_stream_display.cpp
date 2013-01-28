@@ -61,6 +61,12 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
     freeScaleContext();
 }
 
+void QnVideoStreamDisplay::pleaseStop()
+{
+    if( m_drawer )
+        m_drawer->pleaseStop();
+}
+
 void QnVideoStreamDisplay::setDrawer(QnAbstractRenderer* draw)
 {
     m_drawer = draw;
@@ -223,7 +229,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
     }
 }
 
-void QnVideoStreamDisplay::waitForFramesDisplaed()
+void QnVideoStreamDisplay::waitForFramesDisplayed()
 {
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->waitForFramesDisplayed();
