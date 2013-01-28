@@ -209,7 +209,8 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     aggInfo.bEvent = bEvent;
     aggInfo.bRule = rule;
 
-    if (aggInfo.timeStamp + rule->aggregationPeriod() < currentTime)
+    qint64 period = aggInfo.bRule->aggregationPeriod()*1000ll*1000ll;
+    if (aggInfo.timeStamp + period < currentTime)
     {
         QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
         action->setAggregationCount(aggInfo.count);
