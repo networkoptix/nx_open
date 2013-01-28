@@ -26,8 +26,9 @@ private slots:
     void at_okButton_clicked();
 
 private:
-    void showSingleAction(const QnAbstractBusinessActionPtr& businessAction);
-    void showMultipleActions(const QnAbstractBusinessActionPtr& businessAction);
+    void initAction(const QnAbstractBusinessActionPtr& businessAction);
+    void showSingle();
+    void showMultiple();
 
 private:
     Ui::QnPopupWidget *ui;

@@ -39,12 +39,18 @@ void QnPopupWidget::at_okButton_clicked() {
 
 void QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (m_eventCount == 0) //not initialized
-        showSingleAction(businessAction);
+        initAction(businessAction);
+
+    int count = qMin(businessAction->getAggregationCount(), 1);
+    m_eventCount += count;
+
+    if (m_eventCount == 1)
+        showSingle();
     else
-        showMultipleActions(businessAction);
+        showMultiple();
 }
 
-void QnPopupWidget::showSingleAction(const QnAbstractBusinessActionPtr &businessAction) {
+void QnPopupWidget::initAction(const QnAbstractBusinessActionPtr &businessAction) {
     foreach (QWidget* w, m_headerLabels)
         w->setVisible(false);
 
@@ -75,21 +81,16 @@ void QnPopupWidget::showSingleAction(const QnAbstractBusinessActionPtr &business
             ui->notificationLabel->setVisible(true);
             break;
     }
-
-    m_eventCount = 1;
     m_eventTime = qnSyncTime->currentDateTime().toString(QLatin1String("hh:mm:ss"));
+}
 
+void QnPopupWidget::showSingle() {
     QString eventString = BusinessEventType::toString(m_eventType);
-//    QString eventResource = QString(cameraResource).arg(tr("Test camera"));
-
     QString description = QString(singleEvent).arg(eventString).arg(m_eventTime);
     ui->eventLabel->setText(description);
 }
 
-void QnPopupWidget::showMultipleActions(const QnAbstractBusinessActionPtr &businessAction) {
-    Q_UNUSED(businessAction)
-
-    m_eventCount++;
+void QnPopupWidget::showMultiple() {
     QString eventString = BusinessEventType::toString(m_eventType);
     QString description = QString(multipleEvents).arg(eventString).arg(m_eventCount).arg(m_eventTime);
     ui->eventLabel->setText(description);
