@@ -35,7 +35,9 @@ namespace {
                     disabled++;
                 }
             }
-            m_recordingLabel->setText(tr("Recording is disabled for %1 of selected cameras").arg(disabled));
+            m_recordingLabel->setText(tr("Recording is disabled for %1 of %2 selected cameras")
+                                      .arg(disabled)
+                                      .arg(cameras.size()));
             m_recordingLabel->setVisible(disabled > 0);
         }
     private:
@@ -118,14 +120,14 @@ QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, c
 QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
     if (index.column() == QnBusiness::SourceColumn) {
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-        btn->setFlat(true);
-        btn->setText(index.data().toString());
+//        btn->setFlat(true);
+        btn->setText(tr("Select cameras...")); //TODO: target type
         return btn;
     }
     if (index.column() == QnBusiness::TargetColumn) {
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-        btn->setFlat(true);
-        btn->setText(index.data().toString());
+//        btn->setFlat(true);
+        btn->setText(tr("Select cameras...")); //TODO: target type
         if (index.data(QnBusiness::ActionTypeRole).toInt() == BusinessActionType::BA_CameraRecording)
             btn->setDialogDelegate(new QnRecordingEnabledDelegate(parent));
         return btn;
