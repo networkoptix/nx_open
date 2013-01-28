@@ -74,8 +74,8 @@ void QnWorkbenchPtzMapperManager::removeMapper(QnPtzSpaceMapper *mapper) {
 void QnWorkbenchPtzMapperManager::loadMappers() {
     QList<QString> mappingFileNames;
     mappingFileNames 
-        << lit(":/ptz_mappings.json") 
-        << QCoreApplication::applicationDirPath() + lit("/ptz_mappings.json")
+        << lit(":/ptz_mappers.json") 
+        << QCoreApplication::applicationDirPath() + lit("/ptz_mappers.json")
         << qnSettings->extraPtzMappingsPath();
 
     foreach(const QString &fileName, mappingFileNames)
