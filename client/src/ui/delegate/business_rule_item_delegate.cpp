@@ -115,9 +115,7 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
     } else if (!index.data(QnBusiness::ValidRole).toBool()) {
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
         option->palette.setColor(QPalette::Highlight, clr.lighter()); //TODO: #GDM skin colors
-        //option->palette.setColor(QPalette::Highlight, QColor(127, 0, 0, 127)); //TODO: #GDM skin colors
-    } /*else
-        option->palette.setColor(QPalette::Highlight, QColor(127, 127, 127, 255));*/
+    }
 }
 
 QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
@@ -125,8 +123,14 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case QnBusiness::SourceColumn:
             {
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-                btn->setText(tr("Select cameras...")); //TODO: target type
+                //TODO: #GDM server selection dialog?
+                btn->setText(index.data(QnBusiness::ShortTextRole).toString());
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+
+                BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(QnBusiness::EventTypeRole).toInt();
+                if (eventType == BusinessEventType::BE_Camera_Motion)
+                    btn->setDialogDelegate(new QnRecordingEnabledDelegate(parent));
+
                 return btn;
             }
         case QnBusiness::TargetColumn:
@@ -144,7 +148,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 }
 
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-                btn->setText(tr("Select cameras...")); //TODO: target type
+                btn->setText(index.data(QnBusiness::ShortTextRole).toString());
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
                 if (actionType == BusinessActionType::BA_CameraRecording)

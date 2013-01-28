@@ -50,6 +50,7 @@ namespace QnBusiness {
         DisabledRole,
         ValidRole,
         InstantActionRole,
+        ShortTextRole,
 
         EventTypeRole,
         EventResourcesRole,
@@ -128,6 +129,7 @@ signals:
 private:
     void updateActionTypesModel();
 
+    QString getSourceText(const bool detailed) const;
     QString getTargetText(const bool detailed) const;
 
 private:

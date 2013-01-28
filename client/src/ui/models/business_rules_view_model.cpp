@@ -209,8 +209,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 break;
 
             if (!isValid(column))
-                return QBrush(QColor(204, 0, 0)); //TODO: #GDM skin colors
-            return QBrush(QColor(150, 0, 0)); //test
+                return QBrush(QColor(204, 0, 0));   //TODO: #GDM skin colors
+            return QBrush(QColor(150, 0, 0));       //TODO: #GDM skin colors
 
         case QnBusiness::ModifiedRole:
             return m_modified;
@@ -220,6 +220,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             return isValid();
         case QnBusiness::InstantActionRole:
             return actionTypeShouldBeInstant();
+        case QnBusiness::ShortTextRole:
+            return getText(column, false);
 
         case QnBusiness::EventTypeRole:
             return m_eventType;
@@ -569,25 +571,7 @@ QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed)
                                        m_actionType);
             }
         case QnBusiness::SourceColumn:
-            {
-                QnResourceList resources = m_eventResources; //TODO: filtered by type
-                if (!BusinessEventType::isResourceRequired(m_eventType)) {
-                    return tr("<System>");
-                } else if (resources.size() == 1) {
-                    QnResourcePtr resource = resources.first();
-                    return getResourceName(resource);
-                } else if (BusinessEventType::requiresServerResource(m_eventType)){
-                    if (resources.size() == 0)
-                        return tr("<Any Server>");
-                    else
-                        return tr("%n Server(s)", NULL, resources.size());
-                } else /*if (BusinessEventType::requiresCameraResource(eventType))*/ {
-                    if (resources.size() == 0)
-                        return tr("<Any Camera>");
-                    else
-                        return tr("%n Camera(s)", NULL, resources.size());
-                }
-            }
+            return getSourceText(detailed);
         case QnBusiness::SpacerColumn:
             return QString();
         case QnBusiness::ActionColumn:
@@ -654,11 +638,29 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
 }
 
 bool QnBusinessRuleViewModel::isValid() const {
-    return isValid(QnBusiness::TargetColumn);
+    return isValid(QnBusiness::SourceColumn) && isValid(QnBusiness::TargetColumn);
 }
 
 bool QnBusinessRuleViewModel::isValid(int column) const {
     switch (column) {
+        case QnBusiness::SourceColumn:
+            {
+                if (m_eventType != BusinessEventType::BE_Camera_Motion)
+                    return true;
+
+                QnVirtualCameraResourceList cameras = m_eventResources.filtered<QnVirtualCameraResource>();
+                if (cameras.isEmpty())
+                    return true; // should no check if any camera is selected
+
+                bool valid = true;
+                foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+                    if (camera->isScheduleDisabled()) {
+                        valid = false;
+                        break;
+                    }
+                }
+                return valid;
+            }
         case QnBusiness::TargetColumn:
             {
                 if (m_actionType == BusinessActionType::BA_SendMail) {
@@ -704,6 +706,47 @@ void QnBusinessRuleViewModel::updateActionTypesModel() {
     }
 }
 
+QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
+    if (m_eventType == BusinessEventType::BE_Camera_Motion) {
+        QnVirtualCameraResourceList cameras = m_eventResources.filtered<QnVirtualCameraResource>();
+        if (cameras.isEmpty())
+            return tr("<Any Camera>");
+
+        int disabled = 0;
+        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+            if (camera->isScheduleDisabled()) {
+                disabled++;
+            }
+        }
+        if (detailed && disabled > 0)
+            return tr("Recording is disabled for %1")
+                    .arg((cameras.size() == 1)
+                         ? getResourceName(cameras.first())
+                         : tr("%1 of %2 cameras").arg(disabled).arg(cameras.size()));
+        if (cameras.size() == 1)
+            return getResourceName(cameras.first());
+        return tr("%n Camera(s)", NULL, cameras.size());
+    }
+
+    QnResourceList resources = m_eventResources; //TODO: filtered by type
+    if (!BusinessEventType::isResourceRequired(m_eventType)) {
+        return tr("<System>");
+    } else if (resources.size() == 1) {
+        QnResourcePtr resource = resources.first();
+        return getResourceName(resource);
+    } else if (BusinessEventType::requiresServerResource(m_eventType)){
+        if (resources.size() == 0)
+            return tr("<Any Server>");
+        else
+            return tr("%n Server(s)", NULL, resources.size());
+    } else /*if (BusinessEventType::requiresCameraResource(eventType))*/ {
+        if (resources.size() == 0)
+            return tr("<Any Camera>");
+        else
+            return tr("%n Camera(s)", NULL, resources.size());
+    }
+}
+
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     if (m_actionType == BusinessActionType::BA_SendMail) {
         QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
@@ -732,7 +775,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
                 disabled++;
             }
         }
-        if (disabled > 0)
+        if (detailed && disabled > 0)
             return tr("Recording is disabled for %1")
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
@@ -749,10 +792,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         QnResourcePtr resource = resources.first();
         return getResourceName(resource);
     } else if (resources.isEmpty()) {
-        if (detailed)
-            return tr("No cameras");
-        else
-            return tr("Select at least one camera");
+        return tr("Select at least one camera");
     } else {
         return tr("%n Camera(s)", NULL, resources.size());
     }
