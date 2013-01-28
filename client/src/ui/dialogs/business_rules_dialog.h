@@ -40,6 +40,7 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
 private slots:
     void at_rejected();
     void at_context_userChanged();

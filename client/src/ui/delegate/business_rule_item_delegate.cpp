@@ -123,14 +123,23 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
 QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
     switch (index.column()) {
         case QnBusiness::SourceColumn:
-        case QnBusiness::TargetColumn:
             {
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
                 btn->setText(tr("Select cameras...")); //TODO: target type
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+                return btn;
+            }
+        case QnBusiness::TargetColumn:
+            {
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                if (actionType == BusinessActionType::BA_SendMail)
+                    break;
 
-                if (index.column() == QnBusiness::TargetColumn
-                        && index.data(QnBusiness::ActionTypeRole).toInt() == BusinessActionType::BA_CameraRecording)
+                QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
+                btn->setText(tr("Select cameras...")); //TODO: target type
+                connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+
+                if (actionType == BusinessActionType::BA_CameraRecording)
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(parent));
                 return btn;
             }
@@ -176,8 +185,9 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                             : QnBusiness::ActionResourcesRole;
 
                     btn->setResources(index.data(role).value<QnResourceList>());
+                    return;
             }
-            return;
+            break; //not-resource types
         case QnBusiness::EventColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::EventTypeRole)));
@@ -201,8 +211,9 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
         case QnBusiness::TargetColumn:
             if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
                 model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+                return;
             }
-            return;
+            break; //not-resource types
         case QnBusiness::EventColumn:
         case QnBusiness::ActionColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {

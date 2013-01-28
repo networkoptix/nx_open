@@ -100,6 +100,18 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
     return base_type::eventFilter(object, event);
 }
 
+void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
+    switch (event->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            event->ignore();
+            return;
+        default:
+            break;
+    }
+    base_type::keyPressEvent(event);
+}
+
 void QnBusinessRulesDialog::at_rejected() {
 
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
@@ -290,7 +302,6 @@ void QnBusinessRulesDialog::createActions() {
 void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
     if (m_processing.values().contains(ruleModel))
         return;
-    //TODO: set rule status to "Saving"
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
     int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(

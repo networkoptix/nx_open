@@ -188,6 +188,10 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return m_eventType;
             else if (column == QnBusiness::ActionColumn)
                 return m_actionType;
+            else if (column == QnBusiness::TargetColumn) {
+                if (m_actionType == BusinessActionType::BA_SendMail)
+                    return BusinessActionParameters::getEmailAddress(m_actionParams);
+            }
             break;
 
         case Qt::TextColorRole:
@@ -250,7 +254,13 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             setEventResources(value.value<QnResourceList>());
             return true;
         case QnBusiness::TargetColumn:
-            setActionResources(value.value<QnResourceList>());
+            if (m_actionType == BusinessActionType::BA_SendMail) {
+                QnBusinessParams params = m_actionParams;
+                BusinessActionParameters::setEmailAddress(&params, value.toString());
+                setActionParams(params);
+            }
+            else
+                setActionResources(value.value<QnResourceList>());
             return true;
         default:
             break;
@@ -838,8 +848,12 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                 flags |= Qt::ItemIsEditable;
             break;
         case QnBusiness::TargetColumn:
-            if (BusinessActionType::isResourceRequired(m_rules[index.row()]->actionType()))
-                flags |= Qt::ItemIsEditable;
+            {
+                BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
+                if (BusinessActionType::isResourceRequired(actionType)
+                        || actionType == BusinessActionType::BA_SendMail)
+                    flags |= Qt::ItemIsEditable;
+            }
             break;
         default:
             break;
