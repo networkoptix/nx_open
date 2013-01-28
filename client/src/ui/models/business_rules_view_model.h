@@ -50,7 +50,8 @@ namespace QnBusiness {
         DisabledRole,
         ValidRole,
         EventResourcesRole,
-        ActionResourcesRole
+        ActionResourcesRole,
+        ActionTypeRole
     };
 
 }

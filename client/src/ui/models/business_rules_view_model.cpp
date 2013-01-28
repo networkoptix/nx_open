@@ -213,6 +213,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             return QVariant::fromValue<QnResourceList>(m_eventResources);
         case QnBusiness::ActionResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_actionResources);
+        case QnBusiness::ActionTypeRole:
+            return m_actionType;
         default:
             break;
     }

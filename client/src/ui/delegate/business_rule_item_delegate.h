@@ -6,19 +6,30 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QnIndexedDialogButton: public QPushButton {
+#include <ui/dialogs/select_cameras_dialog.h>
+
+class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
 
+    typedef QPushButton base_type;
+
 public:
-    explicit QnIndexedDialogButton(QWidget *parent=0);
+    explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
 
     QnResourceList resources();
     void setResources(QnResourceList resources);
+
+    QnSelectCamerasDialogDelegate* dialogDelegate();
+    void setDialogDelegate(QnSelectCamerasDialogDelegate* delegate);
+protected:
+    void initStyleOption(QStyleOptionButton *option) const;
+    void paintEvent(QPaintEvent *event);
 
 private slots:
     void at_clicked();
 private:
     QnResourceList m_resources;
+    QnSelectCamerasDialogDelegate* m_dialogDelegate;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
