@@ -2,7 +2,7 @@
 #include "ui_popup_settings_widget.h"
 
 #include <utils/settings.h>
-#include <events/abstract_business_event.h>
+#include <business/events/abstract_business_event.h>
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     QWidget(parent),

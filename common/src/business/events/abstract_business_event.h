@@ -4,7 +4,7 @@
 #include <QByteArray>
 #include <QSharedPointer>
 #include "core/resource/resource_fwd.h"
-#include "business_logic_common.h"
+#include <business/business_logic_common.h>
 
 
 namespace BusinessEventType

@@ -234,7 +234,7 @@ bool QBufferedFile::updatePos()
 
 qint64 QBufferedFile::readData (char * data, qint64 len )
 {
-    if (m_lastSeekPos != AV_NOPTS_VALUE) {
+    if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE) {
         if (!updatePos())
             return -1;
     }
@@ -247,7 +247,7 @@ qint64 QBufferedFile::readData (char * data, qint64 len )
 
 qint64 QBufferedFile::writeData ( const char * data, qint64 len )
 {
-    if (m_lastSeekPos != AV_NOPTS_VALUE) {
+    if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE) {
         if (!updatePos())
             return -1;
     }
@@ -258,7 +258,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
     int rez = len;
     while (len > 0)
     {
-        if (m_cachedBuffer.size() < SECTOR_SIZE && m_cachedBuffer.size() == m_filePos + m_bufferPos)
+        if (m_cachedBuffer.size() < (uint)SECTOR_SIZE && m_cachedBuffer.size() == m_filePos + m_bufferPos)
         {
             int copyLen = qMin((int) len, (int) (SECTOR_SIZE - m_cachedBuffer.size()));
             m_cachedBuffer.write(data, copyLen);
@@ -372,7 +372,7 @@ bool QBufferedFile::isWritable() const
 
 qint64 QBufferedFile::pos() const
 {
-    if (m_lastSeekPos != AV_NOPTS_VALUE)
+    if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE)
         return m_lastSeekPos;
     else
         return m_filePos + m_bufferPos;

@@ -20,7 +20,7 @@
 #include "utils/common/math.h"
 #include "utils/common/timermanager.h"
 #include "api/app_server_connection.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "soap/soapserver.h"
 #include "soapStub.h"
 

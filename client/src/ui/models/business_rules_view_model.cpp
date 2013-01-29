@@ -5,10 +5,10 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-#include <events/abstract_business_event.h>
-#include <events/abstract_business_action.h>
-#include <events/sendmail_business_action.h>
-#include <events/popup_business_action.h>
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/actions/sendmail_business_action.h>
+#include <business/actions/popup_business_action.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>

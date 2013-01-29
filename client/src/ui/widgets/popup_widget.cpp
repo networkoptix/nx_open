@@ -82,6 +82,7 @@ void QnPopupWidget::initAction(const QnAbstractBusinessActionPtr &businessAction
             break;
     }
     m_eventTime = qnSyncTime->currentDateTime().toString(QLatin1String("hh:mm:ss"));
+
 }
 
 void QnPopupWidget::showSingle() {

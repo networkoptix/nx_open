@@ -49,8 +49,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_fastChannelZappingSize(0),
   m_firstLiveTime(AV_NOPTS_VALUE),
   m_lastLiveTime(AV_NOPTS_VALUE),
-  m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
   m_allowAdaptiveStreaming(true),
+  m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
   m_someDataIsDropped(false)
 {
     m_timer.start();
@@ -117,9 +117,9 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
 bool QnRtspDataConsumer::isMediaTimingsSlow() const
 {
     QMutexLocker lock(&m_liveTimingControlMtx);
-    if (m_lastLiveTime == AV_NOPTS_VALUE)
+    if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
         return false;
-    Q_ASSERT(m_firstLiveTime != AV_NOPTS_VALUE);
+    Q_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
     //qint64 elapsed = m_liveTimer.elapsed()*1000;
     bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
 
@@ -154,12 +154,12 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
     qint64 firstVTime = AV_NOPTS_VALUE;
     qint64 lastVTime = AV_NOPTS_VALUE;
     getEdgePackets(firstVTime, lastVTime, false);
-    if (firstVTime == AV_NOPTS_VALUE || lastVTime == AV_NOPTS_VALUE)
+    if (firstVTime == (qint64)AV_NOPTS_VALUE || lastVTime == (qint64)AV_NOPTS_VALUE)
         getEdgePackets(firstVTime, lastVTime, true);
 
     m_dataQueue.unlock();
 
-    if (firstVTime != AV_NOPTS_VALUE && lastVTime != AV_NOPTS_VALUE)
+    if (firstVTime != (qint64)AV_NOPTS_VALUE && lastVTime != (qint64)AV_NOPTS_VALUE)
         return lastVTime - firstVTime;
     else
         return 0;
@@ -402,7 +402,7 @@ void QnRtspDataConsumer::setUseRealTimeStreamingMode(bool value)
 
 void QnRtspDataConsumer::doRealtimeDelay(QnAbstractMediaDataPtr media)
 {
-    if (m_rtStartTime == AV_NOPTS_VALUE) {
+    if (m_rtStartTime == (qint64)AV_NOPTS_VALUE) {
         m_rtStartTime = media->timestamp;
     }
     else {
@@ -514,7 +514,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
     {
         QMutexLocker lock(&m_liveTimingControlMtx);
-        if (m_firstLiveTime == AV_NOPTS_VALUE) {
+        if (m_firstLiveTime == (qint64)AV_NOPTS_VALUE) {
             m_liveTimer.restart();
             m_lastLiveTime = m_firstLiveTime = media->timestamp;
         }
@@ -590,7 +590,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_singleShotMode = false;
 
     QMutexLocker lock(&m_liveTimingControlMtx);
-    if (media->dataType == QnAbstractMediaData::VIDEO && m_lastLiveTime != AV_NOPTS_VALUE)
+    if (media->dataType == QnAbstractMediaData::VIDEO && m_lastLiveTime != (qint64)AV_NOPTS_VALUE)
         m_lastLiveTime = media->timestamp;
 
     return true;

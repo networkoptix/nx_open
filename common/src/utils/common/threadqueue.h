@@ -115,7 +115,7 @@ public:
         for (int i = 0; i < count; ++i)
         {
             m_buffer[m_headIndex++] = T();
-            if (m_headIndex >= m_buffer.size())
+            if (m_headIndex >= (int)m_buffer.size())
                 m_headIndex = 0;
         }
         m_bufferLen -= count;

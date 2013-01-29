@@ -9,7 +9,7 @@
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "utils/common/synctime.h"
 
 extern QSettings qSettings;

@@ -8,7 +8,7 @@
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 
 QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 {

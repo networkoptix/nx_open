@@ -266,7 +266,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
             for (FileCatalogMap::const_iterator itr = m_devFileCatalogHi.constBegin(); itr != m_devFileCatalogHi.constEnd(); ++itr)
             {
                 qint64 firstTime = itr.value()->firstTime();
-                if (firstTime != AV_NOPTS_VALUE && firstTime < minTime)
+                if (firstTime != (qint64)AV_NOPTS_VALUE && firstTime < minTime)
                 {
                     minTime = itr.value()->firstTime();
                     mac = itr.key();
@@ -283,7 +283,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
             if (catalogLowRes != 0) 
             {
                 qint64 minTime = catalog->minTime();
-                if (minTime != AV_NOPTS_VALUE) {
+                if (minTime != (qint64)AV_NOPTS_VALUE) {
                     int idx = catalogLowRes->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
                     if (idx != -1)
                         toDelete -= catalogLowRes->deleteRecordsBefore(idx);

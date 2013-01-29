@@ -1,7 +1,7 @@
 #include "popup_collection_widget.h"
 #include "ui_popup_collection_widget.h"
 
-#include <events/popup_business_action.h>
+#include <business/actions/popup_business_action.h>
 
 #include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context.h>

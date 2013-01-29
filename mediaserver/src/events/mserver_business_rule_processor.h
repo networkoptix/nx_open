@@ -1,9 +1,9 @@
 #ifndef __MSERVER_BUSINESS_RULE_PROCESSOR_H_
 #define __MSERVER_BUSINESS_RULE_PROCESSOR_H_
 
-#include "events/business_rule_processor.h"
-#include "events/recording_business_action.h"
-#include "events/panic_business_action.h"
+#include <business/business_rule_processor.h>
+#include <business/actions/recording_business_action.h>
+#include <business/actions/panic_business_action.h>
 
 /*
 * QnMServerBusinessRuleProcessor can execute business actions
