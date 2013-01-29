@@ -4,14 +4,17 @@
 #include <QTimer>
 #include <QThread>
 #include <QMultiMap>
-#include "core/resource/resource_fwd.h"
-#include "abstract_business_event.h"
-#include "abstract_business_action.h"
+
+#include <core/resource/resource_fwd.h>
+
 #include "business_message_bus.h"
 #include "business_event_rule.h"
-#include "sendmail_business_action.h"
-#include "camera_output_business_action.h"
-#include "popup_business_action.h"
+
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/actions/sendmail_business_action.h>
+#include <business/actions/camera_output_business_action.h>
+#include <business/actions/popup_business_action.h>
 
 /*
 * This class route business event and generate business action

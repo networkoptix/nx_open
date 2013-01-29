@@ -8,7 +8,7 @@
 #include "utils/common/synctime.h"
 #include "message.pb.h"
 
-#include <events/abstract_business_action.h>
+#include <business/actions/abstract_business_action.h>
 
 namespace {
     const QLatin1String cameraObject("camera");

@@ -521,7 +521,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (!draw || !m_drawer)
         return Status_Skipped;
-    else if (m_lastIgnoreTime != AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
+    else if (m_lastIgnoreTime != (qint64)AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
         return Status_Skipped;
 
     if (useTmpFrame)
@@ -622,6 +622,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
 
 bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode)
 {
+    Q_UNUSED(reverseMode)
     //if (quint64(outFrame->pkt_dts) != AV_NOPTS_VALUE)
     //    setLastDisplayedTime(outFrame->pkt_dts);
 

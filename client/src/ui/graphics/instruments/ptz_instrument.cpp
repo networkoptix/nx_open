@@ -368,13 +368,17 @@ public:
     {}
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
+        Q_UNUSED(option)
+        Q_UNUSED(widget)
         QRectF rect = this->rect();
         qreal penWidth = qMin(rect.width(), rect.height()) / 16;
         QPointF center = rect.center();
         QPointF centralStep = QPointF(penWidth, penWidth);
 
         QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor, penWidth));
+        Q_UNUSED(penRollback)
         QnScopedPainterBrushRollback brushRollback(painter, ptzItemBaseColor);
+        Q_UNUSED(brushRollback)
 
         painter->drawEllipse(rect);
         painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
@@ -430,6 +434,8 @@ public:
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */) {
+        Q_UNUSED(option)
+        Q_UNUSED(widget)
         QRectF rect = this->rect();
 
         QVector<QPointF> crosshairLines; // TODO: cache these?
@@ -469,6 +475,7 @@ public:
 
         QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor));
         painter->drawLines(crosshairLines);
+        Q_UNUSED(penRollback)
     }
 
 private:

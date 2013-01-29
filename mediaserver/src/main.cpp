@@ -64,15 +64,15 @@
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
 #include "events/mserver_business_rule_processor.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
 #include "rest/handlers/exec_action_handler.h"
 #include "rest/handlers/time_handler.h"
 #include "rest/handlers/ping_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "utils/common/synctime.h"
 #include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
 #include "core/resource_managment/mserver_resource_discovery_manager.h"
@@ -728,10 +728,15 @@ void QnMain::run()
     QThread *thread = new QThread();
     sm->moveToThread(thread);
 
+    QThread *connectorThread = new QThread();
+    qnBusinessRuleConnector->moveToThread(connectorThread);
+
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+    QObject::connect(connectorThread , SIGNAL(finished()), thread, SLOT(deleteLater()));
 
     thread->start();
+    connectorThread->start();
     sm->start();
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);

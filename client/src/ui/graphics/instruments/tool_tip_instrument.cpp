@@ -19,7 +19,7 @@ namespace {
                 return queryable->toolTipAt(childWidget->mapFrom(widget, pos));
 
             if(QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(childWidget)) {
-                if(QAbstractItemModel *model = view->model()) {
+                if(/*QAbstractItemModel *model = */view->model()) {
                     QVariant toolTip = view->indexAt(childWidget->mapFrom(widget, pos)).data(Qt::ToolTipRole);
                     if (toolTip.convert(QVariant::String))
                         return toolTip.toString();

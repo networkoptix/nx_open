@@ -2,8 +2,8 @@
 #define POPUP_WIDGET_H
 
 #include <QWidget>
-#include <events/abstract_business_event.h>
-#include <events/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
 
 namespace Ui {
     class QnPopupWidget;
@@ -27,8 +27,12 @@ private slots:
 
 private:
     void initAction(const QnAbstractBusinessActionPtr& businessAction);
+    void updateDetails(const QnAbstractBusinessActionPtr& businessAction);
     void showSingle();
     void showMultiple();
+
+    void updateCameraDetails(const QnAbstractBusinessActionPtr& businessAction);
+    void updateConflictECDetails(const QnAbstractBusinessActionPtr& businessAction);
 
 private:
     Ui::QnPopupWidget *ui;
@@ -37,6 +41,7 @@ private:
     int m_eventCount;
     QString m_eventTime;
     QList<QWidget*> m_headerLabels;
+    QMap<QString, int> m_resourcesCount;
 };
 
 #endif // POPUP_WIDGET_H

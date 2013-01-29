@@ -13,7 +13,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <events/business_event_rule.h>
+#include <business/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>
 
@@ -87,6 +87,7 @@ private:
     QMap<int, QnBusinessEventRulePtr> m_deleting;
 
     QMenu* m_popupMenu;
+    QAction* m_advancedAction;
     int m_loadingHandle;
 };
 

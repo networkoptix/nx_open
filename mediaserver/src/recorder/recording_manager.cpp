@@ -16,11 +16,12 @@
 #include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
+#include <business/business_event_connector.h>
+#include "serverutil.h"
 
-QnRecordingManager::QnRecordingManager()
+QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
 }
 
@@ -121,12 +122,12 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     QString physicalId = netRes->getPhysicalId();
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == AV_NOPTS_VALUE)
+    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
     {
         // it is first record for camera
         DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId, QnResource::Role_LiveVideo);
         qint64 archiveMinTime = catalogHi->minTime();
-        if (archiveMinTime != AV_NOPTS_VALUE)
+        if (archiveMinTime != (qint64)AV_NOPTS_VALUE)
             currentTime = qMin(currentTime,  archiveMinTime);
     }
 
@@ -348,6 +349,10 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
         if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->initAsync();
         }
+
+		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
+		if (!mServer || mServer->getGuid() != serverGuid())
+			return; // it is camera from other server
 
         updateCamera(camera);
 

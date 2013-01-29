@@ -104,11 +104,8 @@ void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
 }
 
 void QnSelectCamerasDialog::setDelegate(QnSelectCamerasDialogDelegate *delegate) {
-    if (m_delegate == delegate)
-        return;
+    Q_ASSERT(!m_delegate);
     m_delegate = delegate;
-    while(ui->delegateLayout->count() > 0)
-        ui->delegateLayout->removeItem(ui->delegateLayout->itemAt(0));
     if (m_delegate) {
         m_delegate->setWidgetLayout(ui->delegateLayout);
     }

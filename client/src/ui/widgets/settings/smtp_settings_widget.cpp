@@ -67,6 +67,7 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 }
 
 void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
+    Q_UNUSED(errorString)
     if (handle != m_requestHandle)
         return;
 

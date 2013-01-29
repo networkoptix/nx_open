@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include <events/business_logic_common.h>
+#include <business/business_logic_common.h>
 #include <ui/models/business_rules_view_model.h>
 
 class QnAbstractBusinessParamsWidget : public QWidget

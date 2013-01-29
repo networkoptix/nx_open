@@ -1,8 +1,8 @@
 #ifndef __ABSTRACT_BUSINESS_EVENT_RULE_H__
 #define __ABSTRACT_BUSINESS_EVENT_RULE_H__
 
-#include "abstract_business_event.h"
-#include "abstract_business_action.h"
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
 #include "business_logic_common.h"
 
 #include "core/resource/resource.h"

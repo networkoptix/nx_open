@@ -29,6 +29,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
+    m_advancedAction(NULL),
     m_loadingHandle(-1)
 {
     ui->setupUi(this);
@@ -206,7 +207,10 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_advancedButton_clicked() {
-    m_currentDetailsWidget->setVisible(!m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model());
+    bool isAdvancedVisible = !m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model();
+    m_currentDetailsWidget->setVisible(isAdvancedVisible);
+    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
+    //TODO: #GDM remove duplicate code
 }
 
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
@@ -278,22 +282,22 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
 }
 
 void QnBusinessRulesDialog::createActions() {
-    QAction* newAct = new QAction(tr("&New"), this);
+    QAction* newAct = new QAction(tr("&New..."), this);
     connect(newAct, SIGNAL(triggered()), this, SLOT(at_newRuleButton_clicked()));
 
     QAction* deleteAct = new QAction(tr("&Delete"), this);
     connect(deleteAct, SIGNAL(triggered()), this, SLOT(at_deleteButton_clicked()));
 
-    QAction* advAct = new QAction(tr("&Advanced"), this);
-    connect(advAct, SIGNAL(triggered()), this, SLOT(at_advancedButton_clicked()));
+    m_advancedAction = new QAction(this);
+    connect(m_advancedAction, SIGNAL(triggered()), this, SLOT(at_advancedButton_clicked()));
 
-    QAction* scheduleAct = new QAction(tr("&Schedule"), this);
+    QAction* scheduleAct = new QAction(tr("&Schedule..."), this);
     connect(scheduleAct, SIGNAL(triggered()), m_currentDetailsWidget, SLOT(at_scheduleButton_clicked()));
 
     m_popupMenu->addAction(newAct);
     m_popupMenu->addAction(deleteAct);
     m_popupMenu->addSeparator();
-    m_popupMenu->addAction(advAct);
+    m_popupMenu->addAction(m_advancedAction);
     m_popupMenu->addAction(scheduleAct);
 }
 
@@ -367,7 +371,11 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->deleteRuleButton->setEnabled(hasRights && loaded && m_currentDetailsWidget->model());
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
-    m_currentDetailsWidget->setVisible(m_currentDetailsWidget->isVisible() & loaded && m_currentDetailsWidget->model());
+    m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
+
+    bool isAdvancedVisible = m_currentDetailsWidget->isVisible() & loaded && m_currentDetailsWidget->model();
+    m_currentDetailsWidget->setVisible(isAdvancedVisible);
+    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
 
     ui->addRuleButton->setEnabled(hasRights && loaded);
 }

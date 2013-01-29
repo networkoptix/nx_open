@@ -12,7 +12,11 @@ static QnMediaServerResourcePtr m_server;
 QString defaultStoragePath()
 {
 #ifdef Q_OS_WIN
-    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString());
+    QString value = qSettings.value("mediaDir", "c:/records").toString();
+    if (value.startsWith("\\\\"))
+        return value;
+    else
+        return QDir::fromNativeSeparators(value);
 #else
     return QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString());
 #endif

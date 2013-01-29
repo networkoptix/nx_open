@@ -375,8 +375,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
         ui->cameraScheduleWidget->endUpdate();
 
-        updateMaxFPS();
-
         // TODO: wrong, need to get camera-specific web page
         ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
@@ -393,6 +391,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     setHasDbChanges(false);
     setHasCameraChanges(false);
     m_hasControlsChanges = false;
+
+    if (m_camera)
+        updateMaxFPS();
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {

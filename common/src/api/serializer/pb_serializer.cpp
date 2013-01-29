@@ -15,7 +15,7 @@
 #include "pb_serializer.h"
 
 #include "core/resource_managment/resource_pool.h"
-#include <events/business_action_factory.h>
+#include <business/business_action_factory.h>
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);

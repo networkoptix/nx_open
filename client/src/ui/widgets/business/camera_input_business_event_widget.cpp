@@ -3,7 +3,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <events/camera_input_business_event.h>
+#include <business/events/camera_input_business_event.h>
 
 #include <utils/common/scoped_value_rollback.h>
 

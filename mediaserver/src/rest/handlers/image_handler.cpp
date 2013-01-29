@@ -92,7 +92,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     }
     if (!resParamFound)
         errStr = QLatin1String("parameter 'physicalId' is absent");
-    else if (time == AV_NOPTS_VALUE)
+    else if (time == (qint64)AV_NOPTS_VALUE)
         errStr = QLatin1String("parameter 'time' is absent");
     else if (dstSize.height() >= 0 && dstSize.height() < 8)
         errStr = QLatin1String("Parameter height must be >= 8");
@@ -107,7 +107,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     }
 
     bool useHQ = true;
-    if (dstSize.width() > 0 && dstSize.width() <= 480 || dstSize.height() > 0 && dstSize.height() <= 316)
+    if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
         useHQ = false;
 
     QnServerArchiveDelegate serverDelegate;

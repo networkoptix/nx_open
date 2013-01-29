@@ -155,9 +155,9 @@ QMap<QString, QnRtspTimeHelper::CamSyncInfo*> QnRtspTimeHelper::m_camClock;
 
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     m_lastTime(AV_NOPTS_VALUE),
-    m_resId(resId),
     m_localStartTime(0),
-    m_rtcpReportTimeDiff(INT_MAX)
+    m_rtcpReportTimeDiff(INT_MAX),
+    m_resId(resId)
 {
     {
         QMutexLocker lock(&m_camClockMutex);
@@ -328,7 +328,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
             //m_lastResultInSec = resultInSecs;
             qint64 rez = resultInSecs * 1000000ll;
             // check for negative time if camera timings is inaccurate
-            if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)
+            if (m_lastTime != (qint64)AV_NOPTS_VALUE && rez <= m_lastTime)
                 rez = m_lastTime + MIN_FRAME_DURATION;
             m_lastTime = rez;
 

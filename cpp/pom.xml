@@ -182,24 +182,6 @@
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
 
-								<!--<if>
-									<not>
-										<available file="${libdir}/build/bin/debug/common.lib"/>
-									</not>
-									<then>
-										<echo file="${libdir}/build/bin/debug/common.lib" append="false"/>
-									</then>
-								</if>
-
-								<if>
-									<not>
-										<available file="${libdir}/build/bin/release/common.lib"/>
-									</not>
-									<then>
-										<echo file="${libdir}/build/bin/release/common.lib" append="false"/>
-									</then>
-								</if> -->
-
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
 								</concat>	
@@ -263,20 +245,12 @@
 									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
-								
-								<!--<fileset id="linux_release_link_libs_path" dir="${libdir}/build/bin/release" erroronmissingdir="false">
-									<include name="**/*.so" />
-									<include name="**/*.a" />									
-								</fileset>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
-								<pathconvert pathsep="${line.separator}" property="linux_release_link_libs" refid="linux_release_link_libs_path">
-									<map from="" to="    QMAKE_LFLAGS += "/>									
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_link_libs}${line.separator}}</echo>	-->							
 
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
 									<exclude name="**/version.h" />
+									<exclude name="**/**_${exclude_platform}_only/**" />		
+									<exclude name="youtube/**" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
 									<map from="" to="HEADERS += "/>
@@ -295,60 +269,23 @@
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
+									<exclude name="youtube/**" />									
+									<exclude name="**/**_${exclude_platform}_only/**" />								
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${sources}</echo>
 
-								<!-- <fileset id="add_sources_path" dir="${libdir}/build/include" erroronmissingdir="false">
-									<include name="**/*.cpp" />
-									<include name="**/*.cc" />
-									<include name="**/*.c" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
-									<map from="" to="SOURCES += "/>
-								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>
-
-								<fileset id="qrc_path" dir="${project.build.directory}" erroronmissingdir="false">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo> 
-
-								<fileset id="lang_path" dir="${basedir}/resource" erroronmissingdir="false">
-									<include name="**/*.ts" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="lang" refid="lang_path">
-									<map from="" to="TRANSLATIONS += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${lang}</echo> -->
-
 								<fileset id="forms_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.ui" />
+									<exclude name="youtube/**" />
+									<exclude name="**/**_${exclude_platform}_only/**" />										
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="forms" refid="forms_path">
 									<map from="" to="FORMS += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${forms}</echo>
-
-								<!-- <dirset id="includes_pri_path" dir="${libdir}/build/pri" includes="*" erroronmissingdir="false"/>
-								<pathconvert pathsep="${line.separator}" property="includes_pri" refid="includes_pri_path">
-									<map from="" to="INCLUDEPATH += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
-
-								<fileset id="pri_path" dir="${libdir}/build/pri" erroronmissingdir="false">
-									<include name="**/*/*.pri" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="pri" refid="pri_path">
-									<map from="" to="include("/>
-									<globmapper from="*.pri" to="*.pri)"/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri}</echo> -->
 
 								<fileset id="proto_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.proto" />
@@ -377,6 +314,7 @@
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
+				<exclude_platform>linux</exclude_platform>
 			</properties>
 			<build>
 				<plugins>					
@@ -458,6 +396,7 @@
 			<properties>
 				<compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
+				<exclude_platform>win</exclude_platform>				
 			</properties>
 			<build>	
 				<plugins>

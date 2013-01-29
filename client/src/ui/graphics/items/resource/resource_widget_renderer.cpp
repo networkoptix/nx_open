@@ -42,11 +42,12 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
         m_channelRenderers[i] = renderingTools;
     }
 
-    if( context && currentContextBak != context )
+    if( context && currentContextBak != context ) {
         if( currentContextBak )
             const_cast<QGLContext*>(currentContextBak)->makeCurrent();
         else
             const_cast<QGLContext*>(context)->doneCurrent();
+    }
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {
