@@ -21,7 +21,7 @@ public:
     ~QnPopupCollectionWidget();
 
     void addExample();
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;

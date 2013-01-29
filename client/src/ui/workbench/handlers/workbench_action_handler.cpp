@@ -844,8 +844,8 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 
-    popupCollectionWidget()->addBusinessAction(businessAction);
-    popupCollectionWidget()->show();
+    if (popupCollectionWidget()->addBusinessAction(businessAction))
+        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
