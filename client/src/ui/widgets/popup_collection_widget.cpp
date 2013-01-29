@@ -1,7 +1,7 @@
 #include "popup_collection_widget.h"
 #include "ui_popup_collection_widget.h"
 
-#include <events/popup_business_action.h>
+#include <business/actions/popup_business_action.h>
 
 #include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context.h>
@@ -39,14 +39,14 @@ void QnPopupCollectionWidget::addExample() {
     }
 }
 
-void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
-        return;
+        return false;
 
     //TODO: #GDM check if camera is visible to us
     int group = BusinessActionParameters::getUserGroup(businessAction->getParams());
     if (group > 0 && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
-        return;
+        return false;
     // now 1 is Admins Only
 
     QnBusinessParams params = businessAction->getRuntimeParams();
@@ -55,7 +55,7 @@ void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     quint64 ignored = qnSettings->ignorePopupFlags();
     quint64 flag = (quint64)1 << (quint64)eventType;
     if (ignored & flag)
-        return;
+        return false;
 
     if (QWidget* w = m_widgetsByType[eventType]) {
         QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w);
@@ -70,6 +70,7 @@ void QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
 
     if (isVisible())
         updatePosition();
+    return true;
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {

@@ -3,7 +3,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <events/recording_business_action.h>
+#include <business/actions/recording_business_action.h>
 
 #include <utils/common/scoped_value_rollback.h>
 

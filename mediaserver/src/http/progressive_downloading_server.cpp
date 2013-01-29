@@ -37,8 +37,9 @@ QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor
 class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 {
 public:
-    QnProgressiveDownloadingDataConsumer (QnProgressiveDownloadingConsumer* owner): m_owner(owner), 
+    QnProgressiveDownloadingDataConsumer (QnProgressiveDownloadingConsumer* owner):
         QnAbstractDataConsumer(50),
+        m_owner(owner),
         m_lastMediaTime(AV_NOPTS_VALUE),
         m_utcShift(0)
 
@@ -76,8 +77,8 @@ protected:
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
-            if (m_lastMediaTime != AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 && 
-                media->timestamp != AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
+            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
+                media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
             {
                 m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
             }
@@ -286,7 +287,7 @@ void QnProgressiveDownloadingConsumer::run()
 
                 QByteArray ts("\"now\"");
                 QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
-                if (timestamp != AV_NOPTS_VALUE) 
+                if (timestamp != (qint64)AV_NOPTS_VALUE)
                 {
                     if (utcFormatOK)
                         ts = QByteArray::number(timestamp/1000);

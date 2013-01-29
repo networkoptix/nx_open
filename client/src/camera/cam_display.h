@@ -87,7 +87,7 @@ public:
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;
-    QnArchiveStreamReader* getArchiveReader();
+    QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;
     void setFullScreen(bool fullScreen);
     int getAvarageFps() const;

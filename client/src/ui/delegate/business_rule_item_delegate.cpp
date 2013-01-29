@@ -2,6 +2,7 @@
 
 #include <QtGui/QLabel>
 #include <QtGui/QLayout>
+#include <QtGui/QComboBox>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -16,14 +17,17 @@ namespace {
     public:
         QnRecordingEnabledDelegate(QWidget* parent):
             QnSelectCamerasDialogDelegate(parent),
-            m_recordingLabel(new QLabel(parent))
+            m_recordingLabel(NULL)
         {
-            QPalette palette = parent->palette();
-            palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-            m_recordingLabel->setPalette(palette);
+
         }
 
         virtual void setWidgetLayout(QLayout *layout) override {
+            m_recordingLabel = new QLabel(layout->parentWidget());
+            QPalette palette = layout->parentWidget()->palette();
+            palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+            m_recordingLabel->setPalette(palette);
+
             layout->addWidget(m_recordingLabel);
         }
 
@@ -35,12 +39,15 @@ namespace {
                     disabled++;
                 }
             }
-            m_recordingLabel->setText(tr("Recording is disabled for %1 of selected cameras").arg(disabled));
+            if (!m_recordingLabel)
+                return;
+            m_recordingLabel->setText(tr("Recording is disabled for %1 of %2 selected cameras")
+                                      .arg(disabled)
+                                      .arg(cameras.size()));
             m_recordingLabel->setVisible(disabled > 0);
         }
     private:
         QLabel* m_recordingLabel;
-
     };
 
 }
@@ -76,9 +83,11 @@ void QnSelectResourcesDialogButton::at_clicked() {
     QnSelectCamerasDialog dialog(this); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
-    if (dialog.exec() != QDialog::Accepted)
+    int result = dialog.exec();
+    if (result != QDialog::Accepted)
         return;
     m_resources = dialog.getSelectedResources();
+    emit commit();
 }
 
 void QnSelectResourcesDialogButton::initStyleOption(QStyleOptionButton *option) const {
@@ -93,45 +102,11 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event) {
 //---------------- QnBusinessRuleItemDelegate ---------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
 
-
-void QnBusinessRuleItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    //  bool disabled = index.data(QnBusiness::DisabledRole).toBool();
-
-    /*     QStyleOptionViewItemV4 opt = option;
-           initStyleOption(&opt, index);
-
-           QWidget *widget = opt.widget;
-           widget->setEnabled(!disabled);
-           QStyle *style = widget ? widget->style() : QApplication::style();
-           style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);*/
-
-    base_type::paint(painter, option, index);
-}
-
 QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QSize sh = base_type::sizeHint(option, index);
     if (index.column() == QnBusiness::EventColumn || index.column() == QnBusiness::ActionColumn)
         sh.setWidth(sh.width() * 1.5);
     return sh;
-}
-
-QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
-    if (index.column() == QnBusiness::SourceColumn) {
-        QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-        btn->setFlat(true);
-        btn->setText(index.data().toString());
-        return btn;
-    }
-    if (index.column() == QnBusiness::TargetColumn) {
-        QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-        btn->setFlat(true);
-        btn->setText(index.data().toString());
-        if (index.data(QnBusiness::ActionTypeRole).toInt() == BusinessActionType::BA_CameraRecording)
-            btn->setDialogDelegate(new QnRecordingEnabledDelegate(parent));
-        return btn;
-    }
-
-    return base_type::createEditor(parent, option, index);
 }
 
 void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
@@ -145,31 +120,168 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
     } else if (!index.data(QnBusiness::ValidRole).toBool()) {
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
         option->palette.setColor(QPalette::Highlight, clr.lighter()); //TODO: #GDM skin colors
-        //option->palette.setColor(QPalette::Highlight, QColor(127, 0, 0, 127)); //TODO: #GDM skin colors
-    } /*else
-        option->palette.setColor(QPalette::Highlight, QColor(127, 127, 127, 255));*/
+    }
 }
 
-void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-        int role = index.column() == QnBusiness::SourceColumn
-                ? QnBusiness::EventResourcesRole
-                : QnBusiness::ActionResourcesRole;
+QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
+    switch (index.column()) {
+        case QnBusiness::SourceColumn:
+            {
+                QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
+                //TODO: #GDM server selection dialog?
+                connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        btn->setResources(index.data(role).value<QnResourceList>());
-        return;
+                BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(QnBusiness::EventTypeRole).toInt();
+                if (eventType == BusinessEventType::BE_Camera_Motion)
+                    btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
+
+                return btn;
+            }
+        case QnBusiness::TargetColumn:
+            {
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                if (actionType == BusinessActionType::BA_SendMail)
+                    break;
+
+                if (actionType == BusinessActionType::BA_ShowPopup) {
+                    QComboBox* comboBox = new QComboBox(parent);
+                    comboBox->addItem(tr("For All Users"), 0);
+                    comboBox->addItem(tr("For Administrators Only"), 1);
+                    connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+                    return comboBox;
+                }
+
+                QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
+                connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
+
+                if (actionType == BusinessActionType::BA_CameraRecording)
+                    btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
+                return btn;
+            }
+        case QnBusiness::EventColumn:
+            {
+                QComboBox* comboBox = new QComboBox(parent);
+                for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+                    BusinessEventType::Value val = (BusinessEventType::Value)i;
+                    comboBox->addItem(BusinessEventType::toString(val), val);
+                }
+                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+                return comboBox;
+            }
+        case QnBusiness::ActionColumn:
+            {
+                bool instant = index.data(QnBusiness::InstantActionRole).toBool();
+                QComboBox* comboBox = new QComboBox(parent);
+                for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+                    BusinessActionType::Value val = (BusinessActionType::Value)i;
+                    if (instant && BusinessActionType::hasToggleState(val))
+                        continue;
+                    comboBox->addItem(BusinessActionType::toString(val), val);
+                }
+                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+                return comboBox;
+            }
+        default:
+            break;
+    }
+
+
+    return base_type::createEditor(parent, option, index);
+}
+
+
+void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
+    switch (index.column()) {
+        case QnBusiness::SourceColumn:
+            {
+                if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
+                    btn->setResources(index.data(QnBusiness::EventResourcesRole).value<QnResourceList>());
+                    btn->setText(index.data(QnBusiness::ShortTextRole).toString());
+                    return;
+                }
+                break;
+            }
+        case QnBusiness::TargetColumn:
+            {
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                if (actionType == BusinessActionType::BA_SendMail)
+                    break;
+
+                if (actionType == BusinessActionType::BA_ShowPopup) {
+                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                        comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
+                    }
+                    return;
+                }
+
+                if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
+                    btn->setResources(index.data(QnBusiness::ActionResourcesRole).value<QnResourceList>());
+                    btn->setText(index.data(QnBusiness::ShortTextRole).toString());
+                    return;
+                }
+                break;
+            }
+        case QnBusiness::EventColumn:
+            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::EventTypeRole)));
+            }
+            return;
+        case QnBusiness::ActionColumn:
+            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::ActionTypeRole)));
+            }
+            return;
+        default:
+            break;
     }
 
     base_type::setEditorData(editor, index);
 }
 
 void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
-    if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-        model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
-        return;
-    }
+    switch (index.column()) {
+        case QnBusiness::SourceColumn:
+            {
+                if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
+                    model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+                    return;
+                }
 
+                break;
+            }
+        case QnBusiness::TargetColumn:
+            {
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                if (actionType == BusinessActionType::BA_SendMail)
+                    break;
+
+                if (actionType == BusinessActionType::BA_ShowPopup) {
+                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                        model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+                    }
+                    return;
+                }
+
+                if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
+                    model->setData(index, QVariant::fromValue<QnResourceList>(btn->resources()));
+                    return;
+                }
+
+                break;
+            }
+        case QnBusiness::EventColumn:
+        case QnBusiness::ActionColumn:
+            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+            }
+            return;
+        default:
+            break;
+    }
     base_type::setModelData(editor, model, index);
 }
 
-
+void QnBusinessRuleItemDelegate::at_editor_commit() {
+    if (QWidget* w = dynamic_cast<QWidget*> (sender()))
+        emit commitData(w);
+}

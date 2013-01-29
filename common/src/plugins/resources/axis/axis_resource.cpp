@@ -6,9 +6,9 @@
 
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
-#include "events/business_event_connector.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
+#include <business/business_event_connector.h>
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
 
 

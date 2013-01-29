@@ -20,7 +20,7 @@
 #include "utils/common/math.h"
 #include "utils/common/timermanager.h"
 #include "api/app_server_connection.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "soap/soapserver.h"
 #include "soapStub.h"
 
@@ -76,12 +76,12 @@ public:
         else if (resp.Options->JPEG)
             srcVector = &resp.Options->JPEG->ResolutionsAvailable;
         if (srcVector) {
-            for (int i = 0; i < srcVector->size(); ++i)
+            for (uint i = 0; i < srcVector->size(); ++i)
                 resolutions << QSize(srcVector->at(i)->Width, srcVector->at(i)->Height);
         }
         isH264 = resp.Options->H264 && isH264Allowed;
         if (isH264) {
-            for (int i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
+            for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
                 h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
             qSort(h264Profiles);
 
@@ -1630,7 +1630,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        if (response.Configurations.size() > m_channelNumer) 
+        if ((int)response.Configurations.size() > m_channelNumer)
         {
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(m_channelNumer);
         if (conf) {
@@ -1797,7 +1797,7 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
     }
 
     std::string srcToken = m_videoSourceToken.toStdString();
-    for (int i = 0; i < response.Configurations.size(); ++i)
+    for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(i);
         if (!conf || conf->SourceToken != srcToken)
@@ -1843,7 +1843,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
 
     }
 
-    if (response.Configurations.size() <= m_channelNumer) {
+    if ((int)response.Configurations.size() <= m_channelNumer) {
         qWarning() << "QnPlOnvifResource::fetchAndSetAudioSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
@@ -2355,7 +2355,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
     std::string initialTerminationTime( buf );
     request.InitialTerminationTime = &initialTerminationTime;
-    time_t utcTerminationTime = ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
 
     //creating filter
     //oasisWsnB2__FilterType topicFilter;

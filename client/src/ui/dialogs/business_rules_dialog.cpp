@@ -24,51 +24,6 @@
 
 #include <client_message_processor.h>
 
-namespace {
-    class QnAbstractComboBoxEditorFactory: public QItemEditorFactory {
-
-    protected:
-        virtual void populateComboBox(QComboBox* comboBox) const = 0;
-    public:
-        virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
-            Q_UNUSED(type)
-            QComboBox* result = new QComboBox(parent);
-            populateComboBox(result);
-            return result;
-        }
-
-        virtual QByteArray valuePropertyName(QVariant::Type type) const override {
-            Q_UNUSED(type)
-            return QByteArray("currentIndex");
-        }
-    };
-
-    class QnBusinessEventTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
-    protected:
-        virtual void populateComboBox(QComboBox *comboBox) const override {
-            for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-                BusinessEventType::Value val = (BusinessEventType::Value)i;
-
-                comboBox->insertItem(i, BusinessEventType::toString(val));
-                comboBox->setItemData(i, val);
-            }
-        }
-    };
-
-    class QnBusinessActionTypeEditorFactory: public QnAbstractComboBoxEditorFactory {
-    protected:
-        virtual void populateComboBox(QComboBox *comboBox) const override {
-            for (int i = 0; i < BusinessActionType::BA_Count; i++) {
-                BusinessActionType::Value val = (BusinessActionType::Value)i;
-
-                comboBox->insertItem(i, BusinessActionType::toString(val));
-                comboBox->setItemData(i, val);
-            }
-        }
-    };
-
-}
-
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
@@ -79,8 +34,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
     m_currentDetailsWidget = ui->detailsWidget;
-
-    disconnect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     createActions();
 
@@ -99,14 +52,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate());
 
-    QStyledItemDelegate *eventTypeItemDelegate = new QnBusinessRuleItemDelegate();
-    eventTypeItemDelegate->setItemEditorFactory(new QnBusinessEventTypeEditorFactory());
-    ui->tableView->setItemDelegateForColumn(QnBusiness::EventColumn, eventTypeItemDelegate);
-
-    QStyledItemDelegate *actionTypeItemDelegate = new QnBusinessRuleItemDelegate();
-    actionTypeItemDelegate->setItemEditorFactory(new QnBusinessActionTypeEditorFactory());
-    ui->tableView->setItemDelegateForColumn(QnBusiness::ActionColumn, actionTypeItemDelegate);
-
     connect(m_rulesViewModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(at_model_dataChanged(QModelIndex,QModelIndex)));
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),
@@ -117,8 +62,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     //TODO: show description label if no rules are loaded
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
-    connect(ui->buttonBox,                                  SIGNAL(accepted()),this, SLOT(at_saveAllButton_clicked()));
-    connect(ui->buttonBox,                                  SIGNAL(rejected()),this, SLOT(at_rejected()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
     connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(at_advancedButton_clicked()));
@@ -138,6 +81,47 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog()
 {
 }
 
+void QnBusinessRulesDialog::accept()
+{
+    if (!saveAll())
+        return;
+
+    base_type::accept();
+}
+
+void QnBusinessRulesDialog::reject() {
+
+    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    bool loaded = m_loadingHandle < 0;
+    bool hasChanges = hasRights && loaded && (
+                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
+             || !m_pendingDeleteRules.isEmpty()
+                ); //TODO: calculate once and use anywhere
+    if (!hasChanges) {
+        base_type::reject();
+        return;
+    }
+
+    QMessageBox::StandardButton btn =  QMessageBox::question(this,
+                      tr("Confirm exit"),
+                      tr("Unsaved changes will be lost. Save?"),
+                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                      QMessageBox::Cancel);
+
+    switch (btn) {
+        case QMessageBox::Yes:
+            if (!saveAll())
+                return;
+            break;
+        case QMessageBox::No:
+            at_context_userChanged();
+            break;
+        default:
+            return;
+    }
+    base_type::reject();
+}
+
 bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
@@ -153,36 +137,16 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
     return base_type::eventFilter(object, event);
 }
 
-void QnBusinessRulesDialog::at_rejected() {
-
-    bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    bool loaded = m_loadingHandle < 0;
-    bool hasChanges = hasRights && loaded && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
-             || !m_pendingDeleteRules.isEmpty()
-                ); //TODO: calculate once and use anywhere
-    if (!hasChanges) {
-        reject();
-        return;
-    }
-
-    QMessageBox::StandardButton btn =  QMessageBox::question(this,
-                      tr("Confirm exit"),
-                      tr("Unsaved changes will be lost. Save?"),
-                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                      QMessageBox::Cancel);
-
-    switch (btn) {
-        case QMessageBox::Yes:
-            at_saveAllButton_clicked();
-            break;
-        case QMessageBox::No:
-            at_context_userChanged();
-            break;
-        default:
+void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
+    switch (event->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            event->ignore();
             return;
+        default:
+            break;
     }
-    reject();
+    base_type::keyPressEvent(event);
 }
 
 void QnBusinessRulesDialog::at_context_userChanged() {
@@ -230,15 +194,8 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_saveAllButton_clicked() {
-    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, -1, Qt::MatchExactly);
-    foreach (QModelIndex idx, modified) {
-        saveRule(m_rulesViewModel->getRuleModel(idx.row()));
-    }
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection()->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
-        m_deleting[handle] = rule;
-    }
-    m_pendingDeleteRules.clear();
+    saveAll();
+
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
@@ -340,10 +297,46 @@ void QnBusinessRulesDialog::createActions() {
     m_popupMenu->addAction(scheduleAct);
 }
 
+bool QnBusinessRulesDialog::saveAll() {
+    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, -1, Qt::MatchExactly);
+    QModelIndexList invalid = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ValidRole, false, -1, Qt::MatchExactly);
+    QSet<QModelIndex> invalid_modified = invalid.toSet().intersect(modified.toSet());
+
+    if (!invalid_modified.isEmpty()) {
+        QMessageBox::StandardButton btn =  QMessageBox::question(this,
+                          tr("Confirm save invalid rules"),
+                          tr("Some rules are not valid. Should we disable them?"),
+                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                          QMessageBox::Cancel);
+
+        switch (btn) {
+            case QMessageBox::Yes:
+                foreach (QModelIndex idx, invalid_modified) {
+                    m_rulesViewModel->getRuleModel(idx.row())->setDisabled(true);
+                }
+                break;
+            case QMessageBox::No:
+                break;
+            default:
+                return false;
+        }
+    }
+
+
+    foreach (QModelIndex idx, modified) {
+        saveRule(m_rulesViewModel->getRuleModel(idx.row()));
+    }
+    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
+        int handle = QnAppServerConnectionFactory::createConnection()->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+        m_deleting[handle] = rule;
+    }
+    m_pendingDeleteRules.clear();
+    return true;
+}
+
 void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
     if (m_processing.values().contains(ruleModel))
         return;
-    //TODO: set rule status to "Saving"
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
     int handle = QnAppServerConnectionFactory::createConnection()->saveAsync(

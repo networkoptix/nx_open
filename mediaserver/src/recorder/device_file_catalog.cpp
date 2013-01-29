@@ -57,9 +57,9 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
 }
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
+    m_mutex(QMutex::Recursive),
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
-    m_mutex(QMutex::Recursive),
     //m_duplicateName(false),
     m_role(role),
     m_lastAddIndex(-1)
@@ -131,7 +131,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
 
-    bool sameDir = true;
+   // bool sameDir = true;
 
     IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
     if (itr == m_prevPartsMap->end()) {
@@ -149,7 +149,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         }
         else 
         {
-            sameDir = false;
+          //  sameDir = false;
             // new folder. check it
 
             /*

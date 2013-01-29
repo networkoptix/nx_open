@@ -9,7 +9,7 @@
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "utils/common/synctime.h"
 
 extern QSettings qSettings;
@@ -22,8 +22,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_audioIO(0),
     m_videoParser(0),
     m_audioParser(0),
-    m_pleaseStop(false),
-    m_timeHelper(res->getUniqueId())
+    m_timeHelper(res->getUniqueId()),
+    m_pleaseStop(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)

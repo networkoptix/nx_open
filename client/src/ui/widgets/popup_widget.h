@@ -2,8 +2,8 @@
 #define POPUP_WIDGET_H
 
 #include <QWidget>
-#include <events/abstract_business_event.h>
-#include <events/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
 
 namespace Ui {
     class QnPopupWidget;
@@ -26,8 +26,9 @@ private slots:
     void at_okButton_clicked();
 
 private:
-    void showSingleAction(const QnAbstractBusinessActionPtr& businessAction);
-    void showMultipleActions(const QnAbstractBusinessActionPtr& businessAction);
+    void initAction(const QnAbstractBusinessActionPtr& businessAction);
+    void showSingle();
+    void showMultiple();
 
 private:
     Ui::QnPopupWidget *ui;

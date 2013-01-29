@@ -502,7 +502,7 @@ void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], i
         m_invalidatedRegion += destRect;
     }
 
-    for( int i = 0; i < m_planeCount; ++i )
+    for( size_t i = 0; i < m_planeCount; ++i )
     {
         int horizontalResolution = i == 0 ? 1 : (m_format == PIX_FMT_YUV420P ? 2 : 1);
         int verticalResolution = i == 0 ? 1 : 2;

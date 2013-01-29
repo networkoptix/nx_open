@@ -26,6 +26,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_endDateTime(AV_NOPTS_VALUE),
     m_startDateTime(AV_NOPTS_VALUE),
     m_stopOnWriteError(true),
+    m_currentTimeZone(-1),
     m_waitEOF(false),
     m_forceDefaultCtx(true),
     m_formatCtx(0),
@@ -48,7 +49,6 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
     m_role(Role_ServerRecording),
-    m_currentTimeZone(-1),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0)
@@ -217,10 +217,10 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         else 
         {
             bool isKeyFrame = md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY);
-            if (m_nextIFrameTime == AV_NOPTS_VALUE && isKeyFrame)
+            if (m_nextIFrameTime == (qint64)AV_NOPTS_VALUE && isKeyFrame)
                 m_nextIFrameTime = md->timestamp;
 
-            if (m_nextIFrameTime != AV_NOPTS_VALUE && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
+            if (m_nextIFrameTime != (qint64)AV_NOPTS_VALUE && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
             {
                 while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
                 {

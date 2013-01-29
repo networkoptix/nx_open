@@ -1,7 +1,7 @@
 #include "exec_action_handler.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "events/abstract_business_action.h"
-#include "events/business_message_bus.h"
+#include <business/actions/abstract_business_action.h>
+#include <business/business_message_bus.h>
 #include <api/serializer/pb_serializer.h>
 #include "core/resource_managment/resource_pool.h"
 
