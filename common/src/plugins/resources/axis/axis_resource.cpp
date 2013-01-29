@@ -920,6 +920,8 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         return;
 
     m_ptzController = new QnAxisPtzController(::toSharedPointer(this), this);
+
+    setCameraCapabilities(getCameraCapabilities() | m_ptzController->getCapabilities());
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {

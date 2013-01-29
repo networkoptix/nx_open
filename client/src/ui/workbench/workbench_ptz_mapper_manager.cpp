@@ -25,24 +25,28 @@ QnWorkbenchPtzMapperManager::~QnWorkbenchPtzMapperManager() {
     m_mapperByModel.clear();
 }
 
-QnPtzSpaceMapper *QnWorkbenchPtzMapperManager::mapper(const QString &model) const {
+const QnPtzSpaceMapper *QnWorkbenchPtzMapperManager::mapper(const QString &model) const {
     return m_mapperByModel.value(model.toLower());
 }
 
-QnPtzSpaceMapper *QnWorkbenchPtzMapperManager::mapper(const QnVirtualCameraResourcePtr &resource) const {
+const QnPtzSpaceMapper *QnWorkbenchPtzMapperManager::mapper(const QnVirtualCameraResourcePtr &resource) const {
     if(!resource) {
         qnNullWarning(resource);
         return NULL;
     }
 
-    return mapper(resource->getModel());
+    QnAbstractPtzController *ptzController = resource->getPtzController();
+    const QnPtzSpaceMapper *result = ptzController ? ptzController->getSpaceMapper() : NULL;
+    if(!result)
+        result = mapper(resource->getModel());
+    return result;
 }
 
-const QList<QnPtzSpaceMapper *> &QnWorkbenchPtzMapperManager::mappers() const {
+const QList<const QnPtzSpaceMapper *> &QnWorkbenchPtzMapperManager::mappers() const {
     return m_mappers;
 }
 
-void QnWorkbenchPtzMapperManager::addMapper(QnPtzSpaceMapper *mapper) {
+void QnWorkbenchPtzMapperManager::addMapper(const QnPtzSpaceMapper *mapper) {
     if(!mapper) {
         qnNullWarning(mapper);
         return;
@@ -58,7 +62,7 @@ void QnWorkbenchPtzMapperManager::addMapper(QnPtzSpaceMapper *mapper) {
         m_mapperByModel[model.toLower()] = mapper;
 }
 
-void QnWorkbenchPtzMapperManager::removeMapper(QnPtzSpaceMapper *mapper) {
+void QnWorkbenchPtzMapperManager::removeMapper(const QnPtzSpaceMapper *mapper) {
     if(!mapper) {
         qnNullWarning(mapper);
         return;
@@ -119,3 +123,4 @@ bool QnWorkbenchPtzMapperManager::loadMappersInternal(const QString &fileName) {
         addMapper(new QnPtzSpaceMapper(mapper));
     return true;
 }
+

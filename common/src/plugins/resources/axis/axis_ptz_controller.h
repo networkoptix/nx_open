@@ -22,8 +22,11 @@ public:
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
 private:
+    void init(const QnAxisParameterMap &params);
+
     CLSimpleHTTPClient *newHttpClient() const;
-    QnAxisParameterMap queryParameters(const QString &group) const;
+    bool query(const QString &request, QByteArray *body = NULL) const;
+    bool query(const QString &request, QnAxisParameterMap *params) const;
 
 private:
     QnPlAxisResourcePtr m_resource;

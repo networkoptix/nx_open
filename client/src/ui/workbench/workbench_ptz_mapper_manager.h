@@ -14,14 +14,14 @@ public:
     QnWorkbenchPtzMapperManager(QObject *parent = NULL);
     virtual ~QnWorkbenchPtzMapperManager();
 
-    QnPtzSpaceMapper *mapper(const QString &model) const;
-    QnPtzSpaceMapper *mapper(const QnVirtualCameraResourcePtr &resource) const;
+    const QnPtzSpaceMapper *mapper(const QString &model) const;
+    const QnPtzSpaceMapper *mapper(const QnVirtualCameraResourcePtr &resource) const;
 
-    const QList<QnPtzSpaceMapper *> &mappers() const;
+    const QList<const QnPtzSpaceMapper *> &mappers() const;
 
 protected:
-    void addMapper(QnPtzSpaceMapper *mapper);
-    void removeMapper(QnPtzSpaceMapper *mapper);
+    void addMapper(const QnPtzSpaceMapper *mapper);
+    void removeMapper(const QnPtzSpaceMapper *mapper);
 
 private:
     void loadMappers();
@@ -29,8 +29,8 @@ private:
     bool loadMappersInternal(const QString &fileName);
 
 private:
-    QList<QnPtzSpaceMapper *> m_mappers;
-    QHash<QString, QnPtzSpaceMapper *> m_mapperByModel;
+    QList<const QnPtzSpaceMapper *> m_mappers;
+    QHash<QString, const QnPtzSpaceMapper *> m_mapperByModel;
 };
 
 
