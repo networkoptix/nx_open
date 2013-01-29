@@ -19,6 +19,7 @@
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
 #include "events/business_event_connector.h"
+#include "serverutil.h"
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -348,6 +349,10 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
         if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->initAsync();
         }
+
+		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
+		if (!mServer || mServer->getGuid() != serverGuid())
+			return; // it is camera from other server
 
         updateCamera(camera);
 
