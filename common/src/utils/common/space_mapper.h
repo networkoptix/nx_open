@@ -5,6 +5,7 @@
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
+#include <QtCore/QMetaType>
 
 #include "interpolator.h"
 
@@ -136,6 +137,8 @@ private:
 
 void serialize(const QnPtzSpaceMapper &value, QVariant *target);
 bool deserialize(const QVariant &value, QnPtzSpaceMapper *target);
+
+Q_DECLARE_METATYPE(QnPtzSpaceMapper);
 
 
 #endif // QN_SPACE_MAPPER_H
