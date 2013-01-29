@@ -34,10 +34,15 @@ public:
     void update();
     /*!
         \note This method is not thread-safe and must be called from decoder thread only
+        \note Renderer is not required to draw \a image immediately. It is allowed to add frame to some internal render queue and draw when appropriate
     */
     virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image ) override;
-
+    //!Ignore frames currently in render queue
+    virtual void discardAllFramesPostedToDisplay(int channel) override;
+    //!Blocks till last frame passed to \a draw method is displayed on screen
     virtual void waitForFrameDisplayed(int channel) override;
+    //!Implementation of finishPostedFramesRender QnAbstractRenderer::finishPostedFramesRender
+    virtual void finishPostedFramesRender(int channel) override;
 
     virtual void beforeDestroy() override;
 

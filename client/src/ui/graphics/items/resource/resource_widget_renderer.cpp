@@ -156,7 +156,25 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 }
 
+void QnResourceWidgetRenderer::discardAllFramesPostedToDisplay(int channel)
+{
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->discardAllFramesPostedToDisplay();
+    ctx.uploader->waitForCurrentFrameDisplayed();
+}
+
 void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->ensureAllFramesWillBeDisplayed();
+    //ctx.uploader->waitForAllFramesDisplayed();
+}
+
+void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
+{
     RenderingTools& ctx = m_channelRenderers[channel];
     if( !ctx.uploader )
         return;

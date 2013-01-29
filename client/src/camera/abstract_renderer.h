@@ -33,6 +33,21 @@ public:
     virtual void waitForFrameDisplayed(int channel) = 0;
 
     /**
+     * Upon return there is no frames to display and renderer has finished displaying current frame
+    */
+    virtual void discardAllFramesPostedToDisplay(int channel) = 0;
+
+    /**
+     * Blocks until all frames passed to \a draw are surely displayed on screen.
+     * Difference from \a waitForFrameDisplayed is that waitForFrameDisplayed may not wait for frames displayed, but only ensure, 
+     * they will be displayed sometimes. This is required to take advantage of async frame uploading and for effective usage of hardware decoder: 
+     * it should spend as much time as possible in \a decode method, but not waiting for frame to be rendered.
+     *
+     * \todo refactoring (some renaming?) is required when it all works as expected
+     */
+    virtual void finishPostedFramesRender(int channel) = 0;
+
+    /**
      * This function is supposed to be called from <i>rendering</i> thread.
      * It notifies the <i>decoding</i> thread that the current frame was rendered.
      */
