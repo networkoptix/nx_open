@@ -239,7 +239,10 @@ Qn::CameraCapabilities QnOnvifPtzController::getCapabilities()
     return m_capabilities;
 }
 
-
+const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper() 
+{
+    return NULL; /* Let the user decide. */
+}
 
 
 

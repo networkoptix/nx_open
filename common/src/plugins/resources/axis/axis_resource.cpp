@@ -10,7 +10,7 @@
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
 #include "utils/common/synctime.h"
-
+#include "axis_ptz_controller.h"
 
 using namespace std;
 
@@ -922,6 +922,6 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     m_ptzController = new QnAxisPtzController(::toSharedPointer(this), this);
 }
 
-virtual QnPlAxisResource::QnAbstractPtzController* getPtzController() {
+QnAbstractPtzController* QnPlAxisResource::getPtzController() {
     return m_ptzController;
 }
