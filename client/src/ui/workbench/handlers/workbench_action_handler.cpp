@@ -1751,13 +1751,13 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
     QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    dialog->exec(); */
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
