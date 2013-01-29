@@ -15,8 +15,7 @@ GLFence::GLFence( QnGlFunctions* const glFunctions )
 :
     m_glFunctions( glFunctions ),
     m_fenceSyncName( 0 ),
-    //m_arbSyncPresent( glFunctions->features() & QnGlFunctions::ARB_Sync ),
-    m_arbSyncPresent( false )  //TODO/IMPL need to enable this, but before testing on different video cards is needed
+    m_arbSyncPresent( glFunctions->features() & QnGlFunctions::ARB_Sync )
 {
 }
 
@@ -65,6 +64,34 @@ void GLFence::sync()
             default:
                 Q_ASSERT( false );
                 return;
+        }
+    }
+}
+
+bool GLFence::trySync()
+{
+    if( !m_arbSyncPresent || !m_fenceSyncName )
+        return false;
+
+    for( ;; )
+    {
+        switch( m_glFunctions->glClientWaitSync( (GLsync)m_fenceSyncName, GL_SYNC_FLUSH_COMMANDS_BIT, 0 ) )
+        {
+            case GL_ALREADY_SIGNALED:
+            case GL_CONDITION_SATISFIED:
+                m_glFunctions->glDeleteSync( (GLsync)m_fenceSyncName );
+                m_fenceSyncName = 0;
+                return true;
+
+            case GL_TIMEOUT_EXPIRED:
+                return false;
+
+            case GL_WAIT_FAILED:
+                return false;
+
+            default:
+                Q_ASSERT( false );
+                return false;
         }
     }
 }

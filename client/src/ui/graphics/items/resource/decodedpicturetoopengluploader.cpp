@@ -26,7 +26,7 @@
 
 //#define RENDERER_SUPPORTS_NV12
 #ifdef _WIN32
-//#define USE_PBO
+#define USE_PBO
 #endif
 
 #ifdef USE_PBO
@@ -1296,7 +1296,7 @@ void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 
     QMutexLocker lk( &m_mutex );
 
-    while( !m_terminated && (!m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
+    while( !m_terminated && (!m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() /*|| !m_picturesBeingRendered.empty()*/) )
         m_cond.wait( lk.mutex() );
 
     ////marking, that skipping frames currently in queue is forbidden and exiting...
