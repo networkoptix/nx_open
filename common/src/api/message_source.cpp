@@ -113,7 +113,7 @@ void QnMessageSource::startRequest()
     m_timeoutFlag = false;
 
     QNetworkRequest request(m_url);
-    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    request.setRawHeader("Authorization", "Basic " + m_url.userInfo().toLatin1().toBase64());
     m_reply = m_manager.post(request, "");
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));
