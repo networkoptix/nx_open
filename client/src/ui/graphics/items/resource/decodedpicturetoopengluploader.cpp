@@ -168,7 +168,7 @@ typedef QnGlContextData<
     QnGlContextDataForwardingFactory<DecodedPictureToOpenGLUploaderPrivate>
 > DecodedPictureToOpenGLUploaderPrivateStorage;
 Q_GLOBAL_STATIC(DecodedPictureToOpenGLUploaderPrivateStorage, qn_decodedPictureToOpenGLUploaderPrivateStorage);
-
+//TODO: #ak unused qn_decodedPictureToOpenGLUploaderPrivateStorage - is it really required?
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererTexture
@@ -433,8 +433,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_pboID( (GLuint)-1 ),
     m_pboSizeBytes( 0 ),
-    m_flags( 0 ),
     m_skippingForbidden( false ),
+    m_flags( 0 ),
     m_glFence( uploader->d.data() )
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
@@ -1542,7 +1542,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
             glCheckError("glPixelStorei");
-            Q_ASSERT( lineSizes[i] >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+            Q_ASSERT( (quint64)lineSizes[i] >= qPower2Ceil(r_w[i],ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             qPower2Ceil(r_w[i],ROUND_COEFF),
@@ -1804,7 +1804,7 @@ unsigned int DecodedPictureToOpenGLUploader::nextPicSequenceValue()
 
 void DecodedPictureToOpenGLUploader::ensurePBOInitialized( DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf, size_t sizeInBytes )
 {
-    if( picBuf->m_pboID == -1 )
+    if( picBuf->m_pboID == (GLuint)-1 )
     {
         d->glGenBuffers( 1, &picBuf->m_pboID );
         glCheckError("glGenBuffers");
@@ -1886,6 +1886,7 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
 		pic->height,
         QImage::Format_ARGB32_Premultiplied );	//QImage::Format_ARGB4444_Premultiplied );
     const QString& fileName = QString::fromAscii("C:\\temp\\%1_%2.bmp").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
-	if( !img.save( fileName, "bmp" ) )
-		int x = 0;
+    img.save(fileName, "bmp");
+    /*if( !img.save( fileName, "bmp" ) )
+        int x = 0;*/
 }

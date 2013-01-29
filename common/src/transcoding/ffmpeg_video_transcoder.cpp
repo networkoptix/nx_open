@@ -122,7 +122,7 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
     m_timeFont.setBold(true);
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
     QFontMetrics metric(m_timeFont);
-    m_bufYOffs;
+    //m_bufYOffs;
 
     switch(m_dateTextPos)
     {

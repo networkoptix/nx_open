@@ -13,10 +13,10 @@
 
 GLFence::GLFence( QnGlFunctions* const glFunctions )
 :
+    m_glFunctions( glFunctions ),
     m_fenceSyncName( 0 ),
     //m_arbSyncPresent( glFunctions->features() & QnGlFunctions::ARB_Sync ),
-    m_arbSyncPresent( false ),  //TODO/IMPL need to enable this, but before testing on different video cards is needed
-    m_glFunctions( glFunctions )
+    m_arbSyncPresent( false )  //TODO/IMPL need to enable this, but before testing on different video cards is needed
 {
 }
 

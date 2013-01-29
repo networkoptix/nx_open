@@ -22,8 +22,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_audioIO(0),
     m_videoParser(0),
     m_audioParser(0),
-    m_pleaseStop(false),
-    m_timeHelper(res->getUniqueId())
+    m_timeHelper(res->getUniqueId()),
+    m_pleaseStop(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)

@@ -115,8 +115,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_resource(resource),
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
 	m_receivedInterval(0),
-    m_fullScreen(false),
     m_archiveReader(reader),
+    m_fullScreen(false),
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false)
 {
@@ -238,16 +238,16 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 			}
 		}
 	}
-};
+}
 
-QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
-{
+QnArchiveStreamReader* QnCamDisplay::getArchiveReader() const {
     return m_archiveReader;
 }
 
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
     Q_UNUSED(needToSleep)
+    Q_UNUSED(speed)
 
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         return;
@@ -1534,7 +1534,7 @@ void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)
         m_lastTime = AV_NOPTS_VALUE;
         return;
     }
-    if (m_lastTime != AV_NOPTS_VALUE)
+    if (m_lastTime != (qint64)AV_NOPTS_VALUE)
     {
         qint64 diff = qAbs(vd->timestamp - m_lastTime);
         if (m_queue.size() >= MAX_QUEUE_SIZE) {
