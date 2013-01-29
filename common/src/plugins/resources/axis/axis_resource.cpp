@@ -4,12 +4,14 @@
 #include <functional>
 #include <memory>
 
+#include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
 #include "events/business_event_connector.h"
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
 #include "utils/common/synctime.h"
+#include "utils/common/warnings.h"
 #include "axis_ptz_controller.h"
 
 using namespace std;
@@ -351,6 +353,13 @@ bool QnPlAxisResource::initInternal()
     initializeIOPorts( &http );
 
     initializePtz(&http);
+
+    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
+    {
+        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
+    }
 
     return true;
 }
