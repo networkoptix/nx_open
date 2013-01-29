@@ -31,6 +31,7 @@ public:
     bool placeFence();
     //!Blocks until all OGL operations, submitted up to previous \a placeFence() call, have been processed
     void sync();
+    bool trySync();
 
 private:
     QnGlFunctions* const m_glFunctions;
