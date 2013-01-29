@@ -87,6 +87,7 @@ private:
     QMap<int, QnBusinessEventRulePtr> m_deleting;
 
     QMenu* m_popupMenu;
+    QAction* m_advancedAction;
     int m_loadingHandle;
 };
 

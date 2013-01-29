@@ -17,6 +17,7 @@
 
 namespace {
 
+    //TODO: #GDM tr()
     static QLatin1String prolongedEvent("While %1");
     static QLatin1String instantEvent("On %1 %2");
 
