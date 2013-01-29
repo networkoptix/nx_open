@@ -57,7 +57,7 @@ QByteArray compressData(const QByteArray& data)
     result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
     result.append((const char*) GZIP_HEADER, GZIP_HEADER_SIZE);
     result.append(cleanData);
-    quint32 tmp = crc32(0, (const char*) data.data(), data.size());
+    quint32 tmp = crc32(0, (char*) data.data(), data.size());
     result.append((const char*) &tmp, sizeof(quint32));
     tmp = (quint32)data.size();
     result.append((const char*) &tmp, sizeof(quint32));
