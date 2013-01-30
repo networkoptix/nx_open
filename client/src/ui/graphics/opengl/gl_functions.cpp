@@ -47,13 +47,13 @@ namespace QnGl {
     GLboolean APIENTRY glUnmapBuffer(GLenum) { WARN(); return false; }
 
     void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
-    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
+    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); }
+    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); }
 
-    GLsync APIENTRY glFenceSync( GLenum condition, GLbitfield flags ) { WARN(); return NULL; };
-    void APIENTRY glDeleteSync( GLsync sync ) { WARN(); };
-    void APIENTRY glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout ) { WARN(); };
-    GLAPI GLenum APIENTRY glClientWaitSync (GLsync sync, GLbitfield flags, GLuint64 timeout) { WARN(); return 0; };
+    GLsync APIENTRY glFenceSync( GLenum condition, GLbitfield flags ) { WARN(); Q_UNUSED(condition) Q_UNUSED(flags) return NULL; }
+    void APIENTRY glDeleteSync( GLsync sync ) { WARN(); Q_UNUSED(sync) }
+    void APIENTRY glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout ) { WARN(); Q_UNUSED(sync) Q_UNUSED(flags) Q_UNUSED(timeout) }
+    GLAPI GLenum APIENTRY glClientWaitSync (GLsync sync, GLbitfield flags, GLuint64 timeout) { WARN(); Q_UNUSED(sync) Q_UNUSED(flags) Q_UNUSED(timeout) return 0; }
 
 #undef WARN
 
@@ -165,7 +165,7 @@ public:
         RESOLVE( PFNGLCLIENTWAITSYNCPROC, glClientWaitSync );
         RESOLVE( PFNGLWAITSYNCPROC, glWaitSync );
         if(status)
-            m_features |= QnGlFunctions::OpenGL3_2;
+            m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ARB_Sync;
 
 #undef RESOLVE
 
@@ -353,6 +353,11 @@ void QnGlFunctions::glDeleteSync( GLsync sync )
 void QnGlFunctions::glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout )
 {
     d->glWaitSync( sync, flags, timeout );
+}
+
+GLenum QnGlFunctions::glClientWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout )
+{
+    return d->glClientWaitSync( sync, flags, timeout );
 }
 
 #ifdef Q_OS_WIN

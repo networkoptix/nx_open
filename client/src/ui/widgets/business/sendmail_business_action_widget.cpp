@@ -1,7 +1,7 @@
 #include "sendmail_business_action_widget.h"
 #include "ui_sendmail_business_action_widget.h"
 
-#include <events/sendmail_business_action.h>
+#include <business/actions/sendmail_business_action.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>

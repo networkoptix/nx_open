@@ -13,7 +13,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <events/business_event_rule.h>
+#include <business/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>
 
@@ -40,8 +40,14 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
+
+public Q_SLOTS:
+    virtual void accept() override;
+    virtual void reject() override;
+
 private slots:
-    void at_rejected();
+
     void at_context_userChanged();
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
@@ -63,6 +69,8 @@ private:
 
     void createActions();
 
+    bool saveAll();
+
     void saveRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
@@ -79,6 +87,7 @@ private:
     QMap<int, QnBusinessEventRulePtr> m_deleting;
 
     QMenu* m_popupMenu;
+    QAction* m_advancedAction;
     int m_loadingHandle;
 };
 

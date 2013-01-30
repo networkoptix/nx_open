@@ -61,6 +61,12 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
     freeScaleContext();
 }
 
+void QnVideoStreamDisplay::pleaseStop()
+{
+    if( m_drawer )
+        m_drawer->pleaseStop();
+}
+
 void QnVideoStreamDisplay::setDrawer(QnAbstractRenderer* draw)
 {
     m_drawer = draw;
@@ -223,7 +229,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
     }
 }
 
-void QnVideoStreamDisplay::waitForFramesDisplaed()
+void QnVideoStreamDisplay::waitForFramesDisplayed()
 {
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->waitForFramesDisplayed();
@@ -248,7 +254,7 @@ qint64 QnVideoStreamDisplay::nextReverseTime() const
 
 QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum)
 {
-    m_drawer->waitForFrameDisplayed(channelNum);
+    m_drawer->finishPostedFramesRender(channelNum);
 
     QSharedPointer<CLVideoDecoderOutput> tmpFrame(new CLVideoDecoderOutput());
     tmpFrame->setUseExternalData(false);
@@ -267,7 +273,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     outFrame->channel = channelNum;
 
     if (outFrame->isDisplaying()) 
-        m_drawer->waitForFrameDisplayed(channelNum);
+        m_drawer->finishPostedFramesRender(channelNum);
 
     outFrame->channel = channelNum;
 
@@ -289,7 +295,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
             }
         }
         m_drawer->draw(outFrame);
-        m_drawer->waitForFrameDisplayed(channelNum);
+        m_drawer->finishPostedFramesRender(channelNum);
     }
 
     if (tmpFrame->width == 0) {
@@ -334,9 +340,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (!enableFrameQueue && m_queueUsed)
     {
-        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(0). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         m_drawer->waitForFrameDisplayed(data->channelNumber);
-        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(0). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         m_frameQueueIndex = 0;
         for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
         {
@@ -418,9 +422,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (data->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
     {
-        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(2). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         m_drawer->waitForFrameDisplayed(0);
-        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(2). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         dec->resetDecoder(data);
     }
 
@@ -451,11 +453,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_flushedBeforeReverseStart = true;
         reorderPrevFrames();
         if (!m_queueUsed)
-        {
-            //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(3). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
             m_drawer->waitForFrameDisplayed(0); // codec frame may be displayed now
-            //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(3). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
-        }
         dec->resetDecoder(data);
     }
 
@@ -515,7 +513,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (!draw || !m_drawer)
         return Status_Skipped;
-    else if (m_lastIgnoreTime != AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
+    else if (m_lastIgnoreTime != (qint64)AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
         return Status_Skipped;
 
     if (useTmpFrame)
@@ -583,7 +581,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = channel;
 
-    m_drawer->waitForFrameDisplayed(channel);
+    m_drawer->finishPostedFramesRender(channel);
     
     m_mtx.lock();
 
@@ -616,6 +614,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
 
 bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode)
 {
+    Q_UNUSED(reverseMode)
     //if (quint64(outFrame->pkt_dts) != AV_NOPTS_VALUE)
     //    setLastDisplayedTime(outFrame->pkt_dts);
 
@@ -749,7 +748,7 @@ void QnVideoStreamDisplay::setLastDisplayedTime(qint64 value)
     m_drawer->blockTimeValue(m_channelNumber, value);
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->clear();
-    m_drawer->waitForFrameDisplayed(m_channelNumber);
+    m_drawer->finishPostedFramesRender(m_channelNumber);
     m_drawer->unblockTimeValue(m_channelNumber);
 }
 
@@ -791,7 +790,7 @@ void QnVideoStreamDisplay::afterJump()
     clearReverseQueue();
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->clear();
-    m_drawer->waitForFrameDisplayed(m_channelNumber);
+    m_drawer->finishPostedFramesRender(m_channelNumber);
     m_needResetDecoder = true;
     //qDebug() << "after jump, clear all frames";
 
@@ -808,7 +807,7 @@ void QnVideoStreamDisplay::onNoVideo()
 
 void QnVideoStreamDisplay::clearReverseQueue()
 {
-    m_drawer->waitForFrameDisplayed(0);
+    m_drawer->finishPostedFramesRender(0);
     QMutexLocker lock(&m_mtx);
     m_reverseQueue.clear();
     m_reverseSizeInBytes = 0;

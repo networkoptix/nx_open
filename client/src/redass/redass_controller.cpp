@@ -71,7 +71,7 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
     if (method == Find_Biggest)
         itr.toBack();
 
-    while (method == Find_Least && itr.hasNext() || method == Find_Biggest && itr.hasPrevious())
+    while ((method == Find_Least && itr.hasNext()) || (method == Find_Biggest && itr.hasPrevious()))
     {
         if (method == Find_Least)
             itr.next();
@@ -121,7 +121,7 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
     // switch to LQ min item
     display = findDisplay(Find_Least, MEDIA_Quality_High);
     if (display) {
-        QnArchiveStreamReader* reader = display->getArchiveReader();
+//        QnArchiveStreamReader* reader = display->getArchiveReader();
         gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
         m_lastSwitchTimer.restart();
     }

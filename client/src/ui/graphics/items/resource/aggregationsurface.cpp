@@ -341,9 +341,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #endif
 
-            int res = 0;
-            if( res = glCheckError("glTexSubImage2D") )
-                int x = 0;
+            glCheckError("glTexSubImage2D");
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             glCheckError("glPixelStorei");
         }
@@ -504,7 +502,7 @@ void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], i
         m_invalidatedRegion += destRect;
     }
 
-    for( int i = 0; i < m_planeCount; ++i )
+    for( size_t i = 0; i < m_planeCount; ++i )
     {
         int horizontalResolution = i == 0 ? 1 : (m_format == PIX_FMT_YUV420P ? 2 : 1);
         int verticalResolution = i == 0 ? 1 : 2;

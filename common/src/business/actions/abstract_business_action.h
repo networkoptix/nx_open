@@ -3,7 +3,7 @@
 
 #include <QSharedPointer>
 
-#include "business_logic_common.h"
+#include <business/business_logic_common.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
 
@@ -20,7 +20,6 @@ namespace BusinessActionType
         */
         BA_SendMail,
 
-        //TODO: #gdm make!
         BA_ShowPopup,
 
         //!change camera output state

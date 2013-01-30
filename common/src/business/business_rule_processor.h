@@ -4,14 +4,17 @@
 #include <QTimer>
 #include <QThread>
 #include <QMultiMap>
-#include "core/resource/resource_fwd.h"
-#include "abstract_business_event.h"
-#include "abstract_business_action.h"
+
+#include <core/resource/resource_fwd.h>
+
 #include "business_message_bus.h"
 #include "business_event_rule.h"
-#include "sendmail_business_action.h"
-#include "camera_output_business_action.h"
-#include "popup_business_action.h"
+
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/actions/sendmail_business_action.h>
+#include <business/actions/camera_output_business_action.h>
+#include <business/actions/popup_business_action.h>
 
 /*
 * This class route business event and generate business action
@@ -88,12 +91,27 @@ private:
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
-    bool checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
+    bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
+
+    struct RunningRuleInfo
+    {
+        RunningRuleInfo(): isActionRunning(false) {}
+        QnAbstractBusinessEventPtr rule;
+        QSet<QnId> resources;
+        bool isActionRunning;
+    };
+    typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 
     /**
-     * @brief m_rulesInProgress         Stores actions that are toggled and state is On
+     * @brief m_eventsInProgress         Stores events that are toggled and state is On
      */
-    QMap<QString, QnAbstractBusinessEventPtr> m_rulesInProgress;
+    RunningRuleMap m_rulesInProgress;
+
+
+    /**
+     * @brief match resources between event and rule
+     */
+    bool checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
 
     struct QAggregationInfo 
     {

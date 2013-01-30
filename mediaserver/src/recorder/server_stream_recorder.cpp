@@ -10,7 +10,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "common/common_meta_types.h"
@@ -21,9 +21,9 @@ static const int MOTION_PREBUFFER_SIZE = 8;
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
+    m_scheduleMutex(QMutex::Recursive),
     m_role(role),
     m_mediaProvider(mediaProvider),
-    m_scheduleMutex(QMutex::Recursive),
     m_dualStreamingHelper(0),
     m_usedPanicMode(false),
     m_usedSpecialRecordingMode(false),
@@ -62,9 +62,11 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 void QnServerStreamRecorder::at_recordingFailed(QString msg)
 {
-    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
-    if (mediaServer)
-        emit storageFailure(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), m_storage, QLatin1String("IO error occured."));
+    Q_UNUSED(msg)
+	Q_ASSERT(m_mediaServer);
+	Q_ASSERT(m_storage);
+    if (m_mediaServer)
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), m_storage, QLatin1String("IO error occured."));
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -151,7 +153,7 @@ void QnServerStreamRecorder::updateStreamParams()
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
     return recType == Qn::RecordingType_MotionOnly || 
-           m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ;
+           (m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ);
 }
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
@@ -187,7 +189,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         return;
 
     qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
-    if (motionTime == AV_NOPTS_VALUE) 
+    if (motionTime == (qint64)AV_NOPTS_VALUE)
     {
         setPrebufferingUsec(task.getBeforeThreshold()*1000000ll); // no more motion, set prebuffer again
     }
@@ -211,10 +213,10 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     qint64 afterThreshold = 5 * 1000000ll;
     if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionOnly)
         afterThreshold = m_currentScheduleTask.getAfterThreshold()*1000000ll;
-    bool isMotionContinue = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
+    bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
     {
-        if (m_endDateTime == AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+        if (m_endDateTime == (qint64)AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
             updateMotionStateInternal(false, media->timestamp, QnMetaDataV1Ptr());
         else
             updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
@@ -241,7 +243,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     // if prebuffering mode and all buffer is full - drop data
 
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
-    if (!isMotionContinue && m_endDateTime != AV_NOPTS_VALUE) 
+    if (!isMotionContinue && m_endDateTime != (qint64)AV_NOPTS_VALUE)
     {
         if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
             m_endDateTime = media->timestamp;

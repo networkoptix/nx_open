@@ -6,8 +6,8 @@
 #ifndef PANICBUSINESSACTION_H
 #define PANICMAILBUSINESSACTION_H
 
-#include "abstract_business_action.h"
-#include "abstract_business_event.h"
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
 
 #include <core/resource/resource_fwd.h>
 

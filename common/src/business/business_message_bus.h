@@ -8,8 +8,9 @@
 #include <QMap>
 #include <QUrl>
 #include <QThread>
-#include "abstract_business_event.h"
-#include "abstract_business_action.h"
+
+#include <business/events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
 
 #include <api/serializer/pb_serializer.h>
 

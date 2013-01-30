@@ -1,11 +1,11 @@
 #include "business_action_factory.h"
 
-#include <events/camera_output_business_action.h>
-#include <events/panic_business_action.h>
-#include <events/recording_business_action.h>
-#include <events/sendmail_business_action.h>
-#include <events/popup_business_action.h>
-#include <events/common_business_action.h>
+#include <business/actions/camera_output_business_action.h>
+#include <business/actions/panic_business_action.h>
+#include <business/actions/recording_business_action.h>
+#include <business/actions/sendmail_business_action.h>
+#include <business/actions/popup_business_action.h>
+#include <business/actions/common_business_action.h>
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const BusinessActionType::Value actionType, const QnBusinessParams &runtimeParams) {
     switch(actionType)

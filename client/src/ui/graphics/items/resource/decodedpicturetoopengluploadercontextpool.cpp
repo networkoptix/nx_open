@@ -19,20 +19,24 @@ DecodedPictureToOpenGLUploadThread::DecodedPictureToOpenGLUploadThread( GLContex
 :
     m_glContext( glContextToUse )
 {
+    setObjectName( QString::fromLatin1("DecodedPictureToOpenGLUploadThread") );
 }
 
 DecodedPictureToOpenGLUploadThread::~DecodedPictureToOpenGLUploadThread()
 {
-    m_queue.push( NULL );
+    push( NULL );
     wait();
 
     delete m_glContext;
     m_glContext = NULL;
 }
 
-void DecodedPictureToOpenGLUploadThread::push( QRunnable* toRun )
+void DecodedPictureToOpenGLUploadThread::push( UploadFrameRunnable* toRun )
 {
-    m_queue.push( toRun );
+    //m_taskQueue.push( toRun );
+    QMutexLocker lk( &m_mutex );
+    m_taskQueue.push_back( toRun );
+    m_cond.wakeAll();
 }
 
 const GLContext* DecodedPictureToOpenGLUploadThread::glContext() const
@@ -50,15 +54,24 @@ void DecodedPictureToOpenGLUploadThread::run()
 
     for( ;; )
     {
-        QRunnable* toRun = NULL;
-        bool get = m_queue.pop( toRun, 200 );
-        if( !get )
-            continue;
+        UploadFrameRunnable* toRun = NULL;
+        //bool get = m_taskQueue.pop( toRun, 200 );
+        //if( !get )
+        //    continue;
+        {
+            QMutexLocker lk( &m_mutex );
+            while( m_taskQueue.empty() )
+                m_cond.wait( lk.mutex() );
+            toRun = m_taskQueue.front();
+            m_taskQueue.pop_front();
+        }
 
         if( !toRun )
             break;
 
-        std::auto_ptr<QRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
+        NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread::run. m_taskQueue.size()=%1").arg(m_taskQueue.size()), cl_logDEBUG1 );
+
+        std::auto_ptr<UploadFrameRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
         toRun->run();
     }
 

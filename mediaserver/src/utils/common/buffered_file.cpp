@@ -141,6 +141,7 @@ QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int min
 
     if (m_bufferSize > 0) {
         m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
+		Q_ASSERT_X(m_buffer, Q_FUNC_INFO, "not enough memory");
         m_sectorBuffer = (quint8*) qMallocAligned(SECTOR_SIZE, SECTOR_SIZE);
     }
 }
@@ -197,14 +198,38 @@ void QBufferedFile::close()
 {
     if (m_fileEngine.isOpen())
     {
+        int bufferingWriteSize = 0;
+        if (m_bufferLen > SECTOR_SIZE) 
+        {
+            // do not perform buffering write if data rest is small
+            if (m_isDirectIO) {
+                if (m_filePos % SECTOR_SIZE == 0)
+                    bufferingWriteSize = qPower2Floor((quint32) m_bufferLen, SECTOR_SIZE);
+            }
+            else {
+                bufferingWriteSize = m_bufferLen; 
+            }
+        }
+
+        if (bufferingWriteSize) {
+            int dataRestLen = m_bufferLen - bufferingWriteSize;
+            m_fileEngine.seek(m_filePos);
+            m_queueWriter->write(this, (char*) m_buffer, bufferingWriteSize);
+            memcpy(m_buffer, m_buffer + bufferingWriteSize, dataRestLen);
+            m_filePos += bufferingWriteSize;
+            m_bufferLen -= bufferingWriteSize;
+        }
+
         if (m_isDirectIO) {
             m_fileEngine.close();
             m_fileEngine.open(QIODevice::ReadWrite, 0);
         }
-        if (m_bufferLen) {
+
+        if (m_bufferLen > 0) {
             m_fileEngine.seek(m_filePos);
             m_fileEngine.write((char*) m_buffer, m_bufferLen);
         }
+        
         if (m_isDirectIO)
             m_fileEngine.truncate(m_actualFileSize);
         m_fileEngine.close();
@@ -233,7 +258,7 @@ bool QBufferedFile::updatePos()
 
 qint64 QBufferedFile::readData (char * data, qint64 len )
 {
-    if (m_lastSeekPos != AV_NOPTS_VALUE) {
+    if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE) {
         if (!updatePos())
             return -1;
     }
@@ -246,7 +271,7 @@ qint64 QBufferedFile::readData (char * data, qint64 len )
 
 qint64 QBufferedFile::writeData ( const char * data, qint64 len )
 {
-    if (m_lastSeekPos != AV_NOPTS_VALUE) {
+    if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE) {
         if (!updatePos())
             return -1;
     }
@@ -257,7 +282,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
     int rez = len;
     while (len > 0)
     {
-        if (m_cachedBuffer.size() < SECTOR_SIZE && m_cachedBuffer.size() == m_filePos + m_bufferPos)
+        if (m_cachedBuffer.size() < (uint)SECTOR_SIZE && m_cachedBuffer.size() == m_filePos + m_bufferPos)
         {
             int copyLen = qMin((int) len, (int) (SECTOR_SIZE - m_cachedBuffer.size()));
             m_cachedBuffer.write(data, copyLen);
@@ -371,7 +396,7 @@ bool QBufferedFile::isWritable() const
 
 qint64 QBufferedFile::pos() const
 {
-    if (m_lastSeekPos != AV_NOPTS_VALUE)
+    if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE)
         return m_lastSeekPos;
     else
         return m_filePos + m_bufferPos;

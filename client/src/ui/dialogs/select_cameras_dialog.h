@@ -13,24 +13,40 @@ namespace Ui {
 
 class QnResourcePoolModel;
 
+class QnSelectCamerasDialogDelegate: public QObject
+{
+    Q_OBJECT
+public:
+    explicit QnSelectCamerasDialogDelegate(QObject* parent = NULL);
+    ~QnSelectCamerasDialogDelegate();
+
+    virtual void setWidgetLayout(QLayout* layout);
+    virtual void modelDataChanged(const QnResourceList &selected);
+    virtual bool isApplyAllowed();
+};
+
 class QnSelectCamerasDialog : public QDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     typedef QDialog base_type;
-    
 public:
     explicit QnSelectCamerasDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnSelectCamerasDialog();
 
     QnResourceList getSelectedResources() const;
     void setSelectedResources(const QnResourceList &selected);
+
+    QnSelectCamerasDialogDelegate* delegate();
+    void setDelegate(QnSelectCamerasDialogDelegate* delegate);
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
+private slots:
+    void at_resourceModel_dataChanged();
 private:
-    Ui::QnSelectCamerasDialog *ui;
+    QScopedPointer<Ui::QnSelectCamerasDialog> ui;
 
     QnResourcePoolModel *m_resourceModel;
+    QnSelectCamerasDialogDelegate* m_delegate;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H

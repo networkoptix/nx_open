@@ -9,7 +9,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_history.h"
-#include "events/business_event_rule.h"
+#include <business/business_event_rule.h>
 #include "api/model/kvpair.h"
 #include "licensing/license.h"
 #include "connectinfo.h"

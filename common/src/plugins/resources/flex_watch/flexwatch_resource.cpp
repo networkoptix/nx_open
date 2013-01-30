@@ -37,7 +37,7 @@ bool QnFlexWatchResource::fetchUpdateVideoEncoder()
     }
 
     bool needReboot = false;
-    for (int i = 0; i < response.Configurations.size(); ++i)
+    for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding__H264)
         {

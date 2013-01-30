@@ -2,8 +2,8 @@
 #define POPUP_COLLECTION_WIDGET_H
 
 #include <QWidget>
-#include <events/abstract_business_action.h>
-#include <events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -21,7 +21,7 @@ public:
     ~QnPopupCollectionWidget();
 
     void addExample();
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;

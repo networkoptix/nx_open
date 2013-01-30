@@ -366,7 +366,7 @@ bool QnLayoutFileStorageResource::readIndexHeader()
     
     file.seek(m_novFileOffset);
     file.read((char*) &m_index, sizeof(m_index));
-    if (m_index.magic != MAGIC_STATIC) {
+    if ((quint64)m_index.magic != MAGIC_STATIC) {
         qWarning() << "Invalid Nov index detected! Disk write error or antivirus activty. Ignoring";
         m_index = QnLayoutFileIndex();
         return false;

@@ -28,6 +28,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
+#include <ui/workbench/workbench_ptz_mapper_manager.h>
 #include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
 
 #include "selection_item.h"
@@ -367,13 +368,17 @@ public:
     {}
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
+        Q_UNUSED(option)
+        Q_UNUSED(widget)
         QRectF rect = this->rect();
         qreal penWidth = qMin(rect.width(), rect.height()) / 16;
         QPointF center = rect.center();
         QPointF centralStep = QPointF(penWidth, penWidth);
 
         QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor, penWidth));
+        Q_UNUSED(penRollback)
         QnScopedPainterBrushRollback brushRollback(painter, ptzItemBaseColor);
+        Q_UNUSED(brushRollback)
 
         painter->drawEllipse(rect);
         painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
@@ -429,6 +434,8 @@ public:
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */) {
+        Q_UNUSED(option)
+        Q_UNUSED(widget)
         QRectF rect = this->rect();
 
         QVector<QPointF> crosshairLines; // TODO: cache these?
@@ -468,6 +475,7 @@ public:
 
         QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor));
         painter->drawLines(crosshairLines);
+        Q_UNUSED(penRollback)
     }
 
 private:
@@ -509,6 +517,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent),
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
+    m_mapperManager(context()->instance<QnWorkbenchPtzMapperManager>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
@@ -590,10 +599,9 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
 }
 
-
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    const QnPtzSpaceMapper *mapper = m_ptzController->mapper(camera);
+    const QnPtzSpaceMapper *mapper = m_mapperManager->mapper(camera);
     if(!mapper)
         return;
 
@@ -695,7 +703,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             updateOverlayWidget(widget);
 
             PtzData &data = m_dataByWidget[widget];
-            if(m_ptzController->mapper(camera))
+            if(m_mapperManager->mapper(camera))
                 data.hasAbsoluteMove = true;
             data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
 

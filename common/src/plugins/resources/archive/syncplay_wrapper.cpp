@@ -700,7 +700,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     if (nextTime != qint64(AV_NOPTS_VALUE) && qAbs(nextTime - expectTime) > MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
-        if (nextTime > expectTime && d->speed >= 0 || nextTime < expectTime && d->speed < 0)
+        if ((nextTime > expectTime && d->speed >= 0) || (nextTime < expectTime && d->speed < 0))
             nonConstThis->reinitTime(nextTime); // data hole
         else
             nonConstThis->reinitTime(nextTime + MAX_FRAME_DURATION/2*1000ll * sign(d->speed)); // stream is playing slower than need. do not release expected time too far away

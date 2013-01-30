@@ -440,12 +440,14 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2").arg(currentMaxFps).arg(value));
+		emit scheduleTasksChanged();
     }
     if (currentMaxDualStreamingFps > dualStreamValue)
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2")
                              .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
+		emit scheduleTasksChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());

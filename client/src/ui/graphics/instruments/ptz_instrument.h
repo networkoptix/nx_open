@@ -19,6 +19,7 @@ class PtzOverlayWidget;
 class PtzManipulatorWidget;
 
 class QnWorkbenchPtzController;
+class QnWorkbenchPtzMapperManager;
 class QnMediaResourceWidget;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
@@ -109,6 +110,7 @@ private:
     };
 
     QnWorkbenchPtzController *m_ptzController;
+    QnWorkbenchPtzMapperManager *m_mapperManager;
 
     int m_clickDelayMSec;
     qreal m_expansionSpeed;

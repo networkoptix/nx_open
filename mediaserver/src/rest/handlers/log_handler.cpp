@@ -25,6 +25,9 @@ int QnRestLogHandler::executeGet(const QString& path, const QnRequestParamList& 
         }
     }
 
+    if (linesToRead == 0ll)
+        linesToRead = 1000000ll;
+
     QString fileName = QnLog::instance()->logFileName();
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly))

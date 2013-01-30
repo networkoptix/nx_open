@@ -1,11 +1,6 @@
 #include "business_event_rule.h"
 
-#include "recording_business_action.h"
-#include "sendmail_business_action.h"
-#include "common_business_action.h"
-#include "camera_output_business_action.h"
-
-#include <events/business_action_factory.h>
+#include <business/business_action_factory.h>
 
 #include <core/resource/resource.h>
 

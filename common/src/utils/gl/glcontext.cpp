@@ -91,6 +91,7 @@ bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
         m_dc = NULL;    //no need to release device context at doneCurrent
     return res;
 #else
+    Q_UNUSED(paintDevToUse)
     bool res = glXMakeCurrent(
         QX11Info::display(),
         QX11Info::appRootWindow(QX11Info::appScreen()),
