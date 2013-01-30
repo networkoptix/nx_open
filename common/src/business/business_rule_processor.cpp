@@ -77,9 +77,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-        case BusinessActionType::BA_CameraOutput:
-            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
-
         case BusinessActionType::BA_SendMail:
             return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
@@ -308,34 +305,6 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
 {
     Q_UNUSED(action)
     //TODO: implement me
-}
-
-bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )
-{
-    if( !resource )
-    {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
-        return false;
-    }
-    QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
-    if( !securityCam )
-    {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId()), cl_logWARNING );
-        return false;
-    }
-    QString relayOutputId = action->getRelayOutputId();
-    //if( relayOutputId.isEmpty() )
-    //{
-    //    cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
-    //    return false;
-    //}
-
-    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
-    return securityCam->setRelayOutputState(
-        relayOutputId,
-        action->getToggleState() == ToggleState::On,
-        autoResetTimeout );
 }
 
 bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& action )

@@ -81,9 +81,6 @@ private:
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
-    //TODO: move to mserver_business_rule_processor
-    bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
-
     bool sendMail( const QnSendMailBusinessActionPtr& action );
 
     bool showPopup(QnPopupBusinessActionPtr action);
