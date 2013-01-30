@@ -390,12 +390,8 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
-    if (camera) 
+    if (camera && !camera->hasFlags(QnResource::foreigner)) 
     {
-        QnResourcePtr cameraServer = qnResPool->getResourceById(camera->getParentId());
-        if (!cameraServer || cameraServer->getGuid() != serverGuid())
-            return;
-
         QnResource::Status status = camera->getStatus();
         if(status == QnResource::Online || status == QnResource::Recording)
             m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
