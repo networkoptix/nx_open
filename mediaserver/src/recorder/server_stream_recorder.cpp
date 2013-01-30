@@ -64,7 +64,6 @@ void QnServerStreamRecorder::at_recordingFailed(QString msg)
 {
     Q_UNUSED(msg)
 	Q_ASSERT(m_mediaServer);
-	Q_ASSERT(m_storage);
     if (m_mediaServer)
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), m_storage, QLatin1String("IO error occured."));
 }
