@@ -4,7 +4,9 @@
 ***********************************************************/
 
 #include "camera_input_business_event.h"
-#include "core/resource/resource_fwd.h"
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+
 
 namespace BusinessEventParameters {
 
@@ -57,4 +59,20 @@ bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusine
 
     QString inputPort = BusinessEventParameters::getInputPortId(params);
     return inputPort.isEmpty() || inputPort == m_inputPortID;
+}
+
+bool QnCameraInputEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return camera->getCameraCapabilities() & Qn::relayInput;
+}
+
+bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.isEmpty())
+        return true; // should no check if any camera is selected
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (!isResourceValid(camera)) {
+            return false;
+        }
+    }
+    return true;
 }

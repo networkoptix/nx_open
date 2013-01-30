@@ -6,7 +6,9 @@
 #ifndef CAMERA_INPUT_BUSINESS_EVENT_H
 #define CAMERA_INPUT_BUSINESS_EVENT_H
 
-#include "prolonged_business_event.h"
+#include <business/events/prolonged_business_event.h>
+
+#include <core/resource/resource_fwd.h>
 
 namespace BusinessEventParameters
 {
@@ -30,6 +32,8 @@ public:
 
     virtual bool checkCondition(ToggleState::Value state, const QnBusinessParams &params) const override;
 
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static bool isResourcesListValid(const QnResourceList &resources);
 private:
     const QString m_inputPortID;
 };

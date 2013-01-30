@@ -1,5 +1,8 @@
 #include "camera_output_business_action.h"
 
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+
 namespace BusinessActionParameters {
     static QLatin1String relayOutputId("relayOutputID");
     static QLatin1String relayAutoResetTimeout("relayAutoResetTimeout");
@@ -39,4 +42,31 @@ int QnCameraOutputBusinessAction::getRelayAutoResetTimeout() const {
 QString QnCameraOutputBusinessAction::getExternalUniqKey() const
 {
     return QnAbstractBusinessAction::getExternalUniqKey() + QString(L'_') + getRelayOutputId();
+}
+
+bool QnCameraOutputBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return camera->getCameraCapabilities() & Qn::relayOutput;
+}
+
+bool QnCameraOutputBusinessAction::isResourcesListValid(const QnResourceList &resources) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.isEmpty())
+        return false;
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (!isResourceValid(camera)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int QnCameraOutputBusinessAction::invalidResourcesCount(const QnResourceList &resources) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    int invalid = 0;
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (!isResourceValid(camera)) {
+            invalid++;
+        }
+    }
+    return invalid;
 }

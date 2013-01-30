@@ -7,48 +7,87 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
+#include <business/events/camera_input_business_event.h>
+#include <business/events/motion_business_event.h>
+#include <business/actions/camera_output_business_action.h>
+
 #include <ui/models/business_rules_view_model.h>
 #include <ui/style/globals.h>
 
 namespace {
 
-    class QnRecordingEnabledDelegate: public QnSelectCamerasDialogDelegate {
+    class QnCheckCameraAndWarnDelegate: public QnSelectCamerasDialogDelegate {
 
     public:
-        QnRecordingEnabledDelegate(QWidget* parent):
+        QnCheckCameraAndWarnDelegate(QWidget* parent):
             QnSelectCamerasDialogDelegate(parent),
-            m_recordingLabel(NULL)
-        {
-
-        }
+            m_warningLabel(NULL){}
 
         virtual void setWidgetLayout(QLayout *layout) override {
-            m_recordingLabel = new QLabel(layout->parentWidget());
+            m_warningLabel = new QLabel(layout->parentWidget());
             QPalette palette = layout->parentWidget()->palette();
             palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-            m_recordingLabel->setPalette(palette);
+            m_warningLabel->setPalette(palette);
 
-            layout->addWidget(m_recordingLabel);
+            layout->addWidget(m_warningLabel);
         }
 
         virtual void modelDataChanged(const QnResourceList &selected) override {
-            int disabled = 0;
+            if (!m_warningLabel)
+                return;
+            int invalid = 0;
             QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
             foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-                if (camera->isScheduleDisabled()) {
-                    disabled++;
+                if (isCameraInvalid(camera)) {
+                    invalid++;
                 }
             }
-            if (!m_recordingLabel)
-                return;
-            m_recordingLabel->setText(tr("Recording is disabled for %1 of %2 selected cameras")
-                                      .arg(disabled)
-                                      .arg(cameras.size()));
-            m_recordingLabel->setVisible(disabled > 0);
+            m_warningLabel->setText(getText(invalid, cameras.size()));
+            m_warningLabel->setVisible(invalid > 0);
         }
+    protected:
+        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const = 0;
+        virtual QString getText(int invalid, int total) const = 0;
     private:
-        QLabel* m_recordingLabel;
+        QLabel* m_warningLabel;
     };
+
+    class QnRecordingEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    public:
+        QnRecordingEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+    protected:
+        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
+            return !QnMotionBusinessEvent::isResourceValid(camera);
+        }
+        virtual QString getText(int invalid, int total) const override {
+            return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
+        }
+    };
+
+    class QnInputEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    public:
+        QnInputEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+    protected:
+        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
+            return !QnCameraInputEvent::isResourceValid(camera);
+        }
+        virtual QString getText(int invalid, int total) const override {
+            return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
+        }
+    };
+
+    class QnOutputEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    public:
+        QnOutputEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+    protected:
+        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
+            return !QnCameraOutputBusinessAction::isResourceValid(camera);
+        }
+        virtual QString getText(int invalid, int total) const override {
+            return tr("%1 of %2 selected cameras have not output relays.").arg(invalid).arg(total);
+        }
+    };
+
 
 }
 
@@ -134,6 +173,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(QnBusiness::EventTypeRole).toInt();
                 if (eventType == BusinessEventType::BE_Camera_Motion)
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
+                else if (eventType == BusinessEventType::BE_Camera_Input)
+                    btn->setDialogDelegate(new QnInputEnabledDelegate(btn));
 
                 return btn;
             }
@@ -156,6 +197,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 
                 if (actionType == BusinessActionType::BA_CameraRecording)
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
+                else if (actionType == BusinessActionType::BA_CameraOutput)
+                    btn->setDialogDelegate(new QnOutputEnabledDelegate(btn));
                 return btn;
             }
         case QnBusiness::EventColumn:

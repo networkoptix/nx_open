@@ -6,9 +6,13 @@
 #include <core/resource/camera_resource.h>
 
 #include <business/events/abstract_business_event.h>
+#include <business/events/camera_input_business_event.h>
+#include <business/events/motion_business_event.h>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/popup_business_action.h>
+#include <business/actions/recording_business_action.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -646,21 +650,14 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     switch (column) {
         case QnBusiness::SourceColumn:
             {
-                if (m_eventType != BusinessEventType::BE_Camera_Motion)
-                    return true;
-
-                QnVirtualCameraResourceList cameras = m_eventResources.filtered<QnVirtualCameraResource>();
-                if (cameras.isEmpty())
-                    return true; // should no check if any camera is selected
-
-                bool valid = true;
-                foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-                    if (camera->isScheduleDisabled()) {
-                        valid = false;
-                        break;
-                    }
+                switch (m_eventType) {
+                    case BusinessEventType::BE_Camera_Motion:
+                        return QnMotionBusinessEvent::isResourcesListValid(m_eventResources);
+                    case BusinessEventType::BE_Camera_Input:
+                        return QnCameraInputEvent::isResourcesListValid(m_eventResources);
+                    default:
+                        return true;
                 }
-                return valid;
             }
         case QnBusiness::TargetColumn:
             {
@@ -671,17 +668,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                         return false;
                     return true;
                 } else if (m_actionType == BusinessActionType::BA_CameraRecording) {
-                    QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
-                    bool valid = cameras.size() > 0;
-                    if (valid) {
-                        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-                            if (camera->isScheduleDisabled()) {
-                                valid = false;
-                                break;
-                            }
-                        }
-                    }
-                    return valid;
+                    return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 }
 
                 QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>(); //TODO: filtered by type
@@ -713,17 +700,12 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
         if (cameras.isEmpty())
             return tr("<Any Camera>");
 
-        int disabled = 0;
-        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            if (camera->isScheduleDisabled()) {
-                disabled++;
-            }
-        }
-        if (detailed && disabled > 0)
+        int invalid = QnMotionBusinessEvent::invalidResourcesCount(m_eventResources);
+        if (detailed && invalid > 0)
             return tr("Recording is disabled for %1")
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
-                         : tr("%1 of %2 cameras").arg(disabled).arg(cameras.size()));
+                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", NULL, cameras.size());
@@ -770,17 +752,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.isEmpty())
             return tr("Select at least one camera");
 
-        int disabled = 0;
-        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            if (camera->isScheduleDisabled()) {
-                disabled++;
-            }
-        }
-        if (detailed && disabled > 0)
+        int invalid = QnRecordingBusinessAction::invalidResourcesCount(m_actionResources);
+        if (detailed && invalid > 0)
             return tr("Recording is disabled for %1")
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
-                         : tr("%1 of %2 cameras").arg(disabled).arg(cameras.size()));
+                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", NULL, cameras.size());

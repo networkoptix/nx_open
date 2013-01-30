@@ -1,8 +1,10 @@
 #ifndef __RECORDING_BUSINESS_ACTION_H__
 #define __RECORDING_BUSINESS_ACTION_H__
 
-#include "core/resource/media_resource.h"
 #include "abstract_business_action.h"
+
+#include <core/resource/media_resource.h>
+#include <core/resource/resource_fwd.h>
 
 namespace BusinessActionParameters {
 
@@ -34,6 +36,10 @@ public:
     int getRecordDuration() const;
     int getRecordBefore() const;
     int getRecordAfter() const;
+
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static bool isResourcesListValid(const QnResourceList &resources);
+    static int  invalidResourcesCount(const QnResourceList &resources);
 };
 
 typedef QSharedPointer<QnRecordingBusinessAction> QnRecordingBusinessActionPtr;

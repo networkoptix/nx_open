@@ -2,7 +2,9 @@
 #define __MOTION_BUSINESS_EVENT_H__
 
 #include "prolonged_business_event.h"
-#include "core/datapacket/abstract_data_packet.h"
+
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/resource/resource_fwd.h>
 
 class QnMotionBusinessEvent: public QnProlongedBusinessEvent
 {
@@ -12,6 +14,10 @@ public:
                           ToggleState::Value toggleState,
                           qint64 timeStamp,
                           QnAbstractDataPacketPtr metadata);
+
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static bool isResourcesListValid(const QnResourceList &resources);
+    static int  invalidResourcesCount(const QnResourceList &resources);
 private:
     QnAbstractDataPacketPtr m_metadata;
 };
