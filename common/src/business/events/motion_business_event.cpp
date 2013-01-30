@@ -17,7 +17,9 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(
 }
 
 bool QnMotionBusinessEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled();
+    return !camera->isScheduleDisabled()
+            && camera->getMotionType() != Qn::MT_NoMotion;
+
 }
 
 bool QnMotionBusinessEvent::isResourcesListValid(const QnResourceList &resources) {

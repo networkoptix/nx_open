@@ -10,6 +10,7 @@
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
 #include <business/actions/camera_output_business_action.h>
+#include <business/actions/recording_business_action.h>
 
 #include <ui/models/business_rules_view_model.h>
 #include <ui/style/globals.h>
@@ -52,12 +53,24 @@ namespace {
         QLabel* m_warningLabel;
     };
 
+    class QnMotionEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    public:
+        QnMotionEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+    protected:
+        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
+            return !QnMotionBusinessEvent::isResourceValid(camera);
+        }
+        virtual QString getText(int invalid, int total) const override {
+            return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
+        }
+    };
+
     class QnRecordingEnabledDelegate: public QnCheckCameraAndWarnDelegate {
     public:
         QnRecordingEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
     protected:
         virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
-            return !QnMotionBusinessEvent::isResourceValid(camera);
+            return !QnRecordingBusinessAction::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
             return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
@@ -172,7 +185,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 
                 BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(QnBusiness::EventTypeRole).toInt();
                 if (eventType == BusinessEventType::BE_Camera_Motion)
-                    btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
+                    btn->setDialogDelegate(new QnMotionEnabledDelegate(btn));
                 else if (eventType == BusinessEventType::BE_Camera_Input)
                     btn->setDialogDelegate(new QnInputEnabledDelegate(btn));
 
