@@ -1079,8 +1079,10 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
     pb::BusinessAction pb_businessAction;
 
     pb_businessAction.set_actiontype((pb::BusinessActionType) serializeBusinessActionType(action->actionType()));
-    foreach(QnResourcePtr res, action->getResources())
-        pb_businessAction.add_actionresource(res->getId());
+    foreach(QnResourcePtr res, action->getResources()) {
+        if (res)
+            pb_businessAction.add_actionresource(res->getId());
+    }
     pb_businessAction.set_actionparams(serializeBusinessParams(action->getParams()));
     pb_businessAction.set_runtimeparams(serializeBusinessParams(action->getRuntimeParams()));
     pb_businessAction.set_businessruleid(action->getBusinessRuleId().toInt());
