@@ -10,33 +10,18 @@
 #include <utils/settings.h>
 
 QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent, Qt::Popup),
+    base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
-
-    m_adding = true; //debug variable
+    setAttribute(Qt::WA_ShowWithoutActivating);
+    setFocusPolicy(Qt::NoFocus);
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
 {
     delete ui;
-}
-
-void QnPopupCollectionWidget::addExample() {
-    if (m_adding) {
-        QnPopupWidget* w = new QnPopupWidget(this);
-        ui->verticalLayout->addWidget(w);
-        w = new QnPopupWidget(this);
-        ui->verticalLayout->addWidget(w);
-        w = new QnPopupWidget(this);
-        ui->verticalLayout->addWidget(w);
-        m_adding = false;
-    } else {
-        ui->verticalLayout->removeItem(ui->verticalLayout->itemAt(0));
-        m_adding = ui->verticalLayout->count() == 0;
-    }
 }
 
 bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -81,6 +66,7 @@ void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
 void QnPopupCollectionWidget::updatePosition() {
     QRect pgeom = static_cast<QWidget *>(parent())->geometry();
     QRect geom = geometry();
+    qDebug() << "update position" << pgeom << geom;
     setGeometry(pgeom.left() + pgeom.width() - geom.width(), pgeom.top() + pgeom.height() - geom.height(), geom.width(), geom.height());
 }
 

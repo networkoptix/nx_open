@@ -20,7 +20,6 @@ public:
     explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
     ~QnPopupCollectionWidget();
 
-    void addExample();
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
 protected:
@@ -36,7 +35,6 @@ private:
     Ui::QnPopupCollectionWidget *ui;
 
     QMap<BusinessEventType::Value, QWidget*> m_widgetsByType;
-    bool m_adding;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H
