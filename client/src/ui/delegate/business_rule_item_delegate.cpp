@@ -61,7 +61,7 @@ namespace {
             return !QnMotionBusinessEvent::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
-            return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
+            return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
         }
     };
 

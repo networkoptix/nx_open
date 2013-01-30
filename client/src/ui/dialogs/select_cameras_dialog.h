@@ -13,6 +13,22 @@ namespace Ui {
 
 class QnResourcePoolModel;
 
+// TODO: #GDM enable with QIdentityProxyModel in QT 4.8
+/*class QnColoringProxyModel: public QIdentityProxyModel {
+    Q_OBJECT
+
+public:
+    QnColoringProxyModel(QObject *parent = 0): QIdentityProxyModel(parent){}
+
+    QVariant data(const QModelIndex &proxyIndex, int role) const override {
+        if (role == Qt::TextColorRole)
+            return QBrush(QColor(Qt::red));
+            //todo: use delegate
+        return QIdentityProxyModel::data(proxyIndex, role);
+    }
+
+};*/
+
 class QnSelectCamerasDialogDelegate: public QObject
 {
     Q_OBJECT

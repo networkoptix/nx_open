@@ -680,7 +680,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 }
 
-                QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>(); //TODO: filtered by type
+                QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
                 if (BusinessActionType::isResourceRequired(m_actionType) && resources.isEmpty()) {
                     return false;
                 }
@@ -711,7 +711,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
 
         int invalid = QnMotionBusinessEvent::invalidResourcesCount(m_eventResources);
         if (detailed && invalid > 0)
-            return tr("Recording is disabled for %1")
+            return tr("Recording or motion detection is disabled for %1")
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
                          : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));

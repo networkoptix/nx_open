@@ -129,6 +129,12 @@ signals:
 private:
     void updateActionTypesModel();
 
+    /**
+     * @brief getSourceText     Get text for the Source field.
+     * @param detailed          Detailed text is used in the table cell.
+     *                          Not detailed - as the button caption and in the advanced view.
+     * @return                  Formatted text.
+     */
     QString getSourceText(const bool detailed) const;
     QString getTargetText(const bool detailed) const;
 

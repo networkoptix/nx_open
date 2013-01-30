@@ -8,6 +8,9 @@
 
 #include <ui/workbench/workbench_context.h>
 
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnSelectCamerasDialogDelegate ------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +51,13 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext
 
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
+
+    /*
+    QnColoringProxyModel* proxy = new QnColoringProxyModel(this);
+    proxy->setSourceModel(m_resourceModel);
+    ui->resourcesWidget->setModel(proxy);
+    */
+
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
 
