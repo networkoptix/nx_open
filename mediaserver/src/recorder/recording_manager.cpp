@@ -19,6 +19,7 @@
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
 #include "events/business_event_connector.h"
+#include "serverutil.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -379,7 +380,12 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
-    if (camera) {
+    if (camera) 
+    {
+        QnResourcePtr cameraServer = qnResPool->getResourceById(camera->getParentId());
+        if (!cameraServer || cameraServer->getGuid() != serverGuid())
+            return;
+
         QnResource::Status status = camera->getStatus();
         if(status == QnResource::Online || status == QnResource::Recording)
             m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
@@ -392,7 +398,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
-    if (server)
+    if (server && server->getGuid() == serverGuid())
         connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 }
 
