@@ -18,17 +18,16 @@ public:
         m_ready(false) 
     {}
 
+    bool isNull() const {
+        return m_points.isEmpty() && m_extrapolationMode == Qn::ConstantExtrapolation;
+    }
+
     void addPoint(qreal x, qreal y) {
         addPoint(QPointF(x, y));
     }
 
     void addPoint(const QPointF &point) {
         m_points.push_back(point);
-        m_ready = false;
-    }
-
-    void clear() {
-        m_points.clear();
         m_ready = false;
     }
 

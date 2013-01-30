@@ -36,6 +36,7 @@ class DecodedPictureToOpenGLUploaderPrivate;
 class DecodedPictureToOpenGLUploadThread;
 class GLContext;
 class QnGlRendererTexture;
+class AVPacketUploader;
 
 //!Used by decoding thread to load decoded picture from system memory to opengl texture(s)
 /*!
@@ -84,7 +85,7 @@ public:
         QnMetaDataV1Ptr metadata() const;
         //!Returns opengl texture holding plane \a index data. Index of a plane depends on color format (Y, U, V for YV12; Y, UV for NV12 and RGB for rgb format)
         QnGlRendererTexture* texture( int index ) const;
-        GLuint pboID() const;
+        GLuint pboID( int index ) const;
         int flags() const;
 #ifdef GL_COPY_AGGREGATION
         void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
@@ -92,6 +93,19 @@ public:
 #endif
 
     private:
+        struct PBOData
+        {
+            GLuint id;
+            size_t sizeBytes;
+
+            PBOData()
+            :
+                id( (GLuint)-1 ),
+                sizeBytes( 0 )
+            {
+            }
+        };
+
         static const size_t TEXTURE_COUNT = 3;
 
         PixelFormat m_colorFormat;
@@ -102,8 +116,7 @@ public:
         unsigned int m_sequence;
         quint64 m_pts;
         QnMetaDataV1Ptr m_metadata;
-        GLuint m_pboID;
-        size_t m_pboSizeBytes;
+        std::vector<PBOData> m_pbo;
 #ifdef GL_COPY_AGGREGATION
         QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
 #endif
@@ -166,6 +179,10 @@ public:
     UploadedPicture* getUploadedPicture() const;
     //!Blocks until all submitted frames have been rendered
     void waitForAllFramesDisplayed();
+    void ensureAllFramesWillBeDisplayed();
+    void discardAllFramesPostedToDisplay();
+    //!Blocks till frame currently being rendered is done
+    void waitForCurrentFrameDisplayed();
     //!Marks \a picture as empty
     /*!
         Renderer MUST call this method to signal that \a picture can be used for uploading next decoded frame
@@ -236,6 +253,7 @@ private:
     mutable std::deque<UploadedPicture*> m_renderedPictures;
     mutable std::deque<UploadedPicture*> m_picturesWaitingRendering;
     mutable std::deque<UploadedPicture*> m_picturesBeingRendered;
+    mutable std::deque<AVPacketUploader*> m_framesWaitingUploadInGUIThread;
     bool m_terminated;
     bool m_yv12SharedUsed;
     bool m_nv12SharedUsed;
@@ -251,7 +269,10 @@ private:
     void releaseDecodedPicturePool( std::deque<UploadedPicture*>* const pool );
     //!Method is not thread-safe
     unsigned int nextPicSequenceValue();
-    void ensurePBOInitialized( DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf, size_t sizeInBytes );
+    void ensurePBOInitialized(
+        DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf,
+        int pboIndex,
+        size_t sizeInBytes );
     void releasePictureBuffers();
     void savePicToFile( AVFrame* const pic, int pts );
 };
