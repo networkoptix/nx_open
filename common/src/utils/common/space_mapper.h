@@ -14,12 +14,18 @@
 // -------------------------------------------------------------------------- //
 class QnScalarSpaceMapper {
 public:
-    QnScalarSpaceMapper() {}
+    QnScalarSpaceMapper() {
+        init(QVector<QPointF>(), m_logicalToPhysical.extrapolationMode());
+    }
 
     QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal physical0, qreal physical1, Qn::ExtrapolationMode extrapolationMode);
 
     QnScalarSpaceMapper(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
         init(logicalToPhysical, extrapolationMode);
+    }
+
+    bool isNull() const {
+        return m_logicalToPhysical.isNull();
     }
 
     qreal logicalMinimum() const { return m_logicalMinimum; }
@@ -66,8 +72,16 @@ public:
         m_mappers[Z] = zMapper;
     }
 
+    bool isNull() const {
+        return m_mappers[X].isNull() && m_mappers[Y].isNull() && m_mappers[Z].isNull();
+    }
+
     const QnScalarSpaceMapper &mapper(Coordinate coordinate) const {
         return m_mappers[coordinate];
+    }
+
+    void setMapper(Coordinate coordinate, const QnScalarSpaceMapper &mapper) {
+        m_mappers[coordinate] = mapper;
     }
 
     QVector3D logicalToPhysical(const QVector3D &logicalValue) const { 

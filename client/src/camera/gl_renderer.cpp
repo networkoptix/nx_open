@@ -180,9 +180,6 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 Q_ASSERT( false );
         }
 
-        //glFlush();
-        //glFinish();
-
         QMutexLocker lock(&m_mutex);
 
         if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence()) 
@@ -229,10 +226,10 @@ void QnGLRenderer::drawVideoTextureDirectly(
     };
 
     glEnable(GL_TEXTURE_2D);
-    glCheckError("glEnable");
+    DEBUG_CODE(glCheckError("glEnable"));
 
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    glCheckError("glBindTexture");
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 }
@@ -256,25 +253,25 @@ void QnGLRenderer::drawYV12VideoTexture(
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     glEnable(GL_TEXTURE_2D);
-    glCheckError("glEnable");
+    DEBUG_CODE(glCheckError("glEnable"));
 
 	m_yv12ToRgbShaderProgram->bind();
     m_yv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
 
 	glActiveTexture(GL_TEXTURE2);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, tex2ID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
 	glActiveTexture(GL_TEXTURE1);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, tex1ID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
 	glActiveTexture(GL_TEXTURE0);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, tex0ID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
@@ -295,7 +292,7 @@ void QnGLRenderer::drawNV12VideoTexture(
     };
 
     glEnable(GL_TEXTURE_2D);
-    glCheckError("glEnable");
+    DEBUG_CODE(glCheckError("glEnable"));
 
 	m_nv12ToRgbShaderProgram->bind();
 	//m_nv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
@@ -305,14 +302,14 @@ void QnGLRenderer::drawNV12VideoTexture(
     m_nv12ToRgbShaderProgram->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
 	glActiveTexture(GL_TEXTURE1);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
 	glActiveTexture(GL_TEXTURE0);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
@@ -321,21 +318,21 @@ void QnGLRenderer::drawNV12VideoTexture(
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
 {
-    glCheckError("glBindBuffer");
+    DEBUG_CODE(glCheckError("glBindBuffer"));
     glVertexPointer(2, GL_FLOAT, 0, v_array);
-    glCheckError("glVertexPointer");
+    DEBUG_CODE(glCheckError("glVertexPointer"));
     glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
-    glCheckError("glTexCoordPointer");
+    DEBUG_CODE(glCheckError("glTexCoordPointer"));
     glEnableClientState(GL_VERTEX_ARRAY);
-    glCheckError("glEnableClientState");
+    DEBUG_CODE(glCheckError("glEnableClientState"));
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glCheckError("glEnableClientState");
+    DEBUG_CODE(glCheckError("glEnableClientState"));
     glDrawArrays(GL_QUADS, 0, 4);
-    glCheckError("glDrawArrays");
+    DEBUG_CODE(glCheckError("glDrawArrays"));
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glCheckError("glDisableClientState");
+    DEBUG_CODE(glCheckError("glDisableClientState"));
     glDisableClientState(GL_VERTEX_ARRAY);
-    glCheckError("glDisableClientState");
+    DEBUG_CODE(glCheckError("glDisableClientState"));
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const

@@ -198,14 +198,38 @@ void QBufferedFile::close()
 {
     if (m_fileEngine.isOpen())
     {
+        int bufferingWriteSize = 0;
+        if (m_bufferLen > SECTOR_SIZE) 
+        {
+            // do not perform buffering write if data rest is small
+            if (m_isDirectIO) {
+                if (m_filePos % SECTOR_SIZE == 0)
+                    bufferingWriteSize = qPower2Floor((quint32) m_bufferLen, SECTOR_SIZE);
+            }
+            else {
+                bufferingWriteSize = m_bufferLen; 
+            }
+        }
+
+        if (bufferingWriteSize) {
+            int dataRestLen = m_bufferLen - bufferingWriteSize;
+            m_fileEngine.seek(m_filePos);
+            m_queueWriter->write(this, (char*) m_buffer, bufferingWriteSize);
+            memcpy(m_buffer, m_buffer + bufferingWriteSize, dataRestLen);
+            m_filePos += bufferingWriteSize;
+            m_bufferLen -= bufferingWriteSize;
+        }
+
         if (m_isDirectIO) {
             m_fileEngine.close();
             m_fileEngine.open(QIODevice::ReadWrite, 0);
         }
-        if (m_bufferLen) {
+
+        if (m_bufferLen > 0) {
             m_fileEngine.seek(m_filePos);
             m_fileEngine.write((char*) m_buffer, m_bufferLen);
         }
+        
         if (m_isDirectIO)
             m_fileEngine.truncate(m_actualFileSize);
         m_fileEngine.close();

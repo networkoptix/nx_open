@@ -67,7 +67,16 @@ void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
 bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
     assert(target);
 
+    if(value.type() == QVariant::Invalid) {
+        /* That's null mapper. */
+        *target = QnScalarSpaceMapper();
+        return true;
+    }
+
+    if(value.type() != QVariant::Map)
+        return false;
     QVariantMap map = value.toMap();
+
     QString extrapolationModeName = map.value(lit("extrapolationMode")).toString();
     QVariantList logical = map.value(lit("logical")).toList();
     QVariantList physical = map.value(lit("physical")).toList();
@@ -101,22 +110,30 @@ void serialize(const QnVectorSpaceMapper &value, QVariant *target) {
     assert(target);
 
     QVariantMap result;
-    serialize(value.mapper(QnVectorSpaceMapper::X), &result[lit("x")]);
-    serialize(value.mapper(QnVectorSpaceMapper::Y), &result[lit("y")]);
-    serialize(value.mapper(QnVectorSpaceMapper::Z), &result[lit("z")]);
+    QJson::serialize(value.mapper(QnVectorSpaceMapper::X), "x", &result);
+    QJson::serialize(value.mapper(QnVectorSpaceMapper::Y), "y", &result);
+    QJson::serialize(value.mapper(QnVectorSpaceMapper::Z), "z", &result);
     *target = result;
 }
 
 bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
     assert(target);
+    
+    if(value.type() == QVariant::Invalid) {
+        /* That's null mapper. */
+        *target = QnVectorSpaceMapper();
+        return true;
+    }
 
+    if(value.type() != QVariant::Map)
+        return false;
     QVariantMap map = value.toMap();
     
     QnScalarSpaceMapper xMapper, yMapper, zMapper;
     if(
-        !deserialize(map.value(lit("x")), &xMapper) || 
-        !deserialize(map.value(lit("y")), &yMapper) ||
-        !deserialize(map.value(lit("z")), &zMapper)
+        !QJson::deserialize(map, "x", &xMapper) || 
+        !QJson::deserialize(map, "y", &yMapper) ||
+        !QJson::deserialize(map, "z", &zMapper)
     ) {
         return false;
     }
@@ -133,25 +150,40 @@ void serialize(const QnPtzSpaceMapper &value, QVariant *target) {
     assert(target);
 
     QVariantMap result;
-    serialize(value.models(), &result[lit("models")]);
-    serialize(value.fromCamera(), &result[lit("fromCamera")]);
-    serialize(value.toCamera(), &result[lit("toCamera")]);
+    QJson::serialize(value.models(), "models", &result);
+    QJson::serialize(value.fromCamera(), "fromCamera", &result);
+    QJson::serialize(value.toCamera(), "toCamera", &result);
     *target = result;
 }
 
 bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
     assert(target);
 
+    if(value.type() != QVariant::Map)
+        return false;
     QVariantMap map = value.toMap();
 
     QStringList models;
     QnVectorSpaceMapper toCamera, fromCamera;
     if(
-        !deserialize(map.value(lit("models")), &models) || 
-        !deserialize(map.value(lit("fromCamera")), &fromCamera) ||
-        !deserialize(map.value(lit("toCamera")), &toCamera)
+        !QJson::deserialize(map, "models", &models) || 
+        !QJson::deserialize(map, "fromCamera", &fromCamera) ||
+        !QJson::deserialize(map, "toCamera", &toCamera)
     ) {
         return false;
+    }
+
+    /* Null means "take this one from the other mapper". */
+    if(fromCamera.isNull())
+        fromCamera = toCamera;
+    if(toCamera.isNull())
+        toCamera = fromCamera;
+    for(int i = 0; i < QnVectorSpaceMapper::CoordinateCount; i++) {
+        QnVectorSpaceMapper::Coordinate coordinate = static_cast<QnVectorSpaceMapper::Coordinate>(i);
+        if(fromCamera.mapper(coordinate).isNull())
+            fromCamera.setMapper(coordinate, toCamera.mapper(coordinate));
+        if(toCamera.mapper(coordinate).isNull())
+            toCamera.setMapper(coordinate, fromCamera.mapper(coordinate));
     }
 
     *target = QnPtzSpaceMapper(fromCamera, toCamera, models);

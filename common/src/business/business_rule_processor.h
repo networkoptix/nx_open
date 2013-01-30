@@ -81,9 +81,6 @@ private:
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
-    //TODO: move to mserver_business_rule_processor
-    bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
-
     bool sendMail( const QnSendMailBusinessActionPtr& action );
 
     bool showPopup(QnPopupBusinessActionPtr action);
@@ -91,12 +88,27 @@ private:
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
-    bool checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
+    bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
+
+    struct RunningRuleInfo
+    {
+        RunningRuleInfo(): isActionRunning(false) {}
+        QnAbstractBusinessEventPtr rule;
+        QSet<QnId> resources;
+        bool isActionRunning;
+    };
+    typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 
     /**
-     * @brief m_rulesInProgress         Stores actions that are toggled and state is On
+     * @brief m_eventsInProgress         Stores events that are toggled and state is On
      */
-    QMap<QString, QnAbstractBusinessEventPtr> m_rulesInProgress;
+    RunningRuleMap m_rulesInProgress;
+
+
+    /**
+     * @brief match resources between event and rule
+     */
+    bool checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
 
     struct QAggregationInfo 
     {

@@ -28,6 +28,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
+#include <ui/workbench/workbench_ptz_mapper_manager.h>
 #include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
 
 #include "selection_item.h"
@@ -516,6 +517,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent),
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
+    m_mapperManager(context()->instance<QnWorkbenchPtzMapperManager>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
@@ -597,10 +599,9 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
 }
 
-
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    const QnPtzSpaceMapper *mapper = m_ptzController->mapper(camera);
+    const QnPtzSpaceMapper *mapper = m_mapperManager->mapper(camera);
     if(!mapper)
         return;
 
@@ -702,7 +703,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             updateOverlayWidget(widget);
 
             PtzData &data = m_dataByWidget[widget];
-            if(m_ptzController->mapper(camera))
+            if(m_mapperManager->mapper(camera))
                 data.hasAbsoluteMove = true;
             data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
 
