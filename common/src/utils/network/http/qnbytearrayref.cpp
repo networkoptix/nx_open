@@ -82,6 +82,11 @@ QnByteArrayConstRef::operator QByteArray() const
     return m_src->mid( m_offset, (int) m_count );
 }
 
+QByteArray QnByteArrayConstRef::toByteArrayWithRawData() const
+{
+    return QByteArray::fromRawData( constData(), m_count );
+}
+
 
 
 //////////////////////////////////////////////////////////
