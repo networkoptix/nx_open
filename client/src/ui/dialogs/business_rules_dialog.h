@@ -11,8 +11,6 @@
 
 #include <api/api_fwd.h>
 
-#include <core/resource/resource_fwd.h>
-
 #include <business/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>

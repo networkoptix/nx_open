@@ -4,6 +4,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
@@ -324,12 +325,20 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     QnBusinessEventRulePtr rule(new QnBusinessEventRule());
     rule->setId(m_id);
     rule->setEventType(m_eventType);
-    rule->setEventResources(m_eventResources); //TODO: #GDM filtered
-    rule->setEventState(m_eventState);
-    rule->setEventParams(m_eventParams);
+    if (BusinessEventType::requiresCameraResource(m_eventType))
+        rule->setEventResources(m_eventResources.filtered<QnVirtualCameraResource>());
+    else if (BusinessEventType::requiresServerResource(m_eventType))
+        rule->setEventResources(m_eventResources.filtered<QnMediaServerResource>());
+    else
+        rule->setEventResources(QnResourceList());
+    rule->setEventState(m_eventState);   //TODO: #GDM check
+    rule->setEventParams(m_eventParams); //TODO: #GDM filtered
     rule->setActionType(m_actionType);
-    rule->setActionResources(m_actionResources);
-    rule->setActionParams(m_actionParams);
+    if (BusinessActionType::isResourceRequired(m_actionType))
+        rule->setActionResources(m_actionResources.filtered<QnVirtualCameraResource>());
+    else
+        rule->setActionResources(QnResourceList());
+    rule->setActionParams(m_actionParams); //TODO: #GDM filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
     rule->setComments(m_comments);
