@@ -6,8 +6,9 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UICollectionViewCell.h>
 
-@interface HDWCollectionViewCell : NSObject
+@interface HDWCollectionViewCell : UICollectionViewCell
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
 
 @end

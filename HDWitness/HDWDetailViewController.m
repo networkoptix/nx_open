@@ -6,7 +6,10 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
+#define _AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES_
+
 #import "HDWDetailViewController.h"
+#import "AFJSONRequestOperation.h"
 
 @interface HDWDetailViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
@@ -17,10 +20,10 @@
 
 #pragma mark - Managing the detail item
 
-- (void)setDetailItem:(id)newDetailItem
+- (void)setEcsConfig:(id)newEcsConfig
 {
-    if (_detailItem != newDetailItem) {
-        _detailItem = newDetailItem;
+    if (_ecsConfig != newEcsConfig) {
+        _ecsConfig = newEcsConfig;
         
         // Update the view.
         [self configureView];
@@ -33,10 +36,18 @@
 
 - (void)configureView
 {
-    // Update the user interface for the detail item.
-
-    if (self.detailItem) {
-        self.detailDescriptionLabel.text = [self.detailItem description];
+    NSLog(@"configuring view");
+    NSURL *url = [NSURL URLWithString:@"https://admin:123@10.0.2.179:7001/api/camera/"];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        NSLog(@"Stream: %@", JSON[0][@"mac"]);
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        NSLog(@"Error: %@", error);
+    }];
+    [operation start];
+    
+    if (self.ecsConfig) {
+        self.detailDescriptionLabel.text = [self.ecsConfig description];
     }
 }
 

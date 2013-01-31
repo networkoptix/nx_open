@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface HDWEcsConfig : NSObject {
+@interface HDWECSConfig : NSObject {
 }
 
 @property NSString *name;
@@ -17,4 +17,5 @@
 @property NSString *login;
 @property NSString *password;
 
++ (HDWECSConfig*) initDefault;
 @end

@@ -8,6 +8,19 @@
 
 #import <Foundation/Foundation.h>
 
-@interface HDWCameraModel : NSObject
+@interface HDWServerModel : NSObject {
+}
+
+@property NSString* name;
+@property NSString* url;
+@property NSMutableArray* cameras;
+
+@end
+
+@interface HDWCameraModel : NSObject {
+}
+
+@property NSString* name;
+@property NSString* url;
 
 @end

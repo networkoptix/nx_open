@@ -6,8 +6,17 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
-#import "HDWEcsConfig.h"
+#import "HDWECSConfig.h"
 
-@implementation HDWEcsConfig
-
+@implementation HDWECSConfig
++ (HDWECSConfig*) initDefault {
+    HDWECSConfig* instance = [[HDWECSConfig alloc] init];
+    instance.name = @"Mono";
+    instance.host = @"10.0.2.103";
+    instance.port = @"7000";
+    instance.login = @"admin";
+    instance.password = @"123";
+    
+    return instance;
+}
 @end

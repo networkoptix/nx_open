@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "HDWEcsConfig.h"
 
-@interface HDWDetailViewController : UIViewController <UISplitViewControllerDelegate>
+@interface HDWDetailViewController : UICollectionViewController <UISplitViewControllerDelegate>
 
-@property (strong, nonatomic) id detailItem;
+@property (strong, nonatomic) HDWECSConfig* ecsConfig;
 
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
 @end

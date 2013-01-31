@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B06EA63F6EA34C03AB9C9B6A /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1381EE06ED874D8C96CB5F42 /* libPods.a */; };
 		C71D5AF516ADBB9600C764B5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71D5AF416ADBB9600C764B5 /* UIKit.framework */; };
 		C71D5AF716ADBB9600C764B5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71D5AF616ADBB9600C764B5 /* Foundation.framework */; };
 		C71D5AF916ADBB9600C764B5 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71D5AF816ADBB9600C764B5 /* CoreGraphics.framework */; };
@@ -25,6 +26,8 @@
 		C71D5B2116ADBB9600C764B5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71D5AF616ADBB9600C764B5 /* Foundation.framework */; };
 		C71D5B2916ADBB9600C764B5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B2716ADBB9600C764B5 /* InfoPlist.strings */; };
 		C71D5B2C16ADBB9600C764B5 /* HDWitnessTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */; };
+		C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */; };
+		C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */; };
 		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
 		C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */; };
 /* End PBXBuildFile section */
@@ -40,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		018DC436ACF84B178179263A /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+		1381EE06ED874D8C96CB5F42 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C71D5AF016ADBB9600C764B5 /* HDWitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HDWitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C71D5AF416ADBB9600C764B5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		C71D5AF616ADBB9600C764B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -65,6 +70,10 @@
 		C71D5B2816ADBB9600C764B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C71D5B2A16ADBB9600C764B5 /* HDWitnessTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDWitnessTests.h; sourceTree = "<group>"; };
 		C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HDWitnessTests.m; sourceTree = "<group>"; };
+		C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCameraModel.h; sourceTree = "<group>"; };
+		C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCameraModel.m; sourceTree = "<group>"; };
+		C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCollectionViewCell.h; sourceTree = "<group>"; };
+		C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCollectionViewCell.m; sourceTree = "<group>"; };
 		C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWECSViewController.h; sourceTree = "<group>"; };
 		C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWECSViewController.m; sourceTree = "<group>"; };
 		C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWEcsConfig.h; sourceTree = "<group>"; };
@@ -79,6 +88,7 @@
 				C71D5AF516ADBB9600C764B5 /* UIKit.framework in Frameworks */,
 				C71D5AF716ADBB9600C764B5 /* Foundation.framework in Frameworks */,
 				C71D5AF916ADBB9600C764B5 /* CoreGraphics.framework in Frameworks */,
+				B06EA63F6EA34C03AB9C9B6A /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +112,7 @@
 				C71D5B2416ADBB9600C764B5 /* HDWitnessTests */,
 				C71D5AF316ADBB9600C764B5 /* Frameworks */,
 				C71D5AF116ADBB9600C764B5 /* Products */,
+				018DC436ACF84B178179263A /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,6 +132,7 @@
 				C71D5AF616ADBB9600C764B5 /* Foundation.framework */,
 				C71D5AF816ADBB9600C764B5 /* CoreGraphics.framework */,
 				C71D5B1E16ADBB9600C764B5 /* SenTestingKit.framework */,
+				1381EE06ED874D8C96CB5F42 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -132,14 +144,18 @@
 				C71D5B0416ADBB9600C764B5 /* HDWAppDelegate.m */,
 				C71D5B0C16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard */,
 				C71D5B0F16ADBB9600C764B5 /* MainStoryboard_iPad.storyboard */,
-				C71D5B1216ADBB9600C764B5 /* HDWMasterViewController.h */,
 				C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */,
 				C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */,
+				C71D5B1216ADBB9600C764B5 /* HDWMasterViewController.h */,
 				C71D5B1316ADBB9600C764B5 /* HDWMasterViewController.m */,
 				C71D5B1516ADBB9600C764B5 /* HDWDetailViewController.h */,
 				C71D5B1616ADBB9600C764B5 /* HDWDetailViewController.m */,
+				C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */,
+				C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */,
 				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 				C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */,
+				C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */,
+				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
 				C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */,
 			);
 			path = HDWitness;
@@ -188,6 +204,7 @@
 				C71D5AEC16ADBB9600C764B5 /* Sources */,
 				C71D5AED16ADBB9600C764B5 /* Frameworks */,
 				C71D5AEE16ADBB9600C764B5 /* Resources */,
+				AE62E7FD64E64EFF95E8EAA5 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -270,6 +287,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		AE62E7FD64E64EFF95E8EAA5 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+		};
 		C71D5B1B16ADBB9600C764B5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -296,6 +327,8 @@
 				C71D5B1716ADBB9600C764B5 /* HDWDetailViewController.m in Sources */,
 				C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */,
 				C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */,
+				C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */,
+				C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,6 +444,7 @@
 		};
 		C71D5B3016ADBB9600C764B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 018DC436ACF84B178179263A /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HDWitness/HDWitness-Prefix.pch";
@@ -422,6 +456,7 @@
 		};
 		C71D5B3116ADBB9600C764B5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 018DC436ACF84B178179263A /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HDWitness/HDWitness-Prefix.pch";

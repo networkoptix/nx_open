@@ -9,6 +9,7 @@
 #import "HDWMasterViewController.h"
 
 #import "HDWDetailViewController.h"
+#import "HDWECSConfig.h"
 
 @interface HDWMasterViewController () {
     NSMutableArray *_objects;
@@ -49,7 +50,7 @@
     if (!_objects) {
         _objects = [[NSMutableArray alloc] init];
     }
-    [_objects insertObject:[NSDate date] atIndex:0];
+    [_objects insertObject:[HDWECSConfig initDefault] atIndex:0];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
@@ -70,8 +71,8 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
-    NSDate *object = _objects[indexPath.row];
-    cell.textLabel.text = [object description];
+    HDWECSConfig *object = _objects[indexPath.row];
+    cell.textLabel.text = [object name];
     return cell;
 }
 
@@ -111,7 +112,7 @@
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         NSDate *object = _objects[indexPath.row];
-        self.detailViewController.detailItem = object;
+        self.detailViewController.ecsConfig = object;
     }
 }
 
@@ -120,7 +121,7 @@
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         NSDate *object = _objects[indexPath.row];
-        [[segue destinationViewController] setDetailItem:object];
+        [[segue destinationViewController] setEcsConfig:object];
     }
 }
 

@@ -7,7 +7,7 @@
 //
 
 #import "HDWECSViewController.h"
-#include "HDWEcsConfig.h"
+#include "HDWECSConfig.h"
 
 @interface HDWECSViewController ()
 
@@ -37,9 +37,7 @@
 {
     [super viewDidLoad];
 
-    item = [[HDWEcsConfig alloc] init];
-    item.name = @"ECS1";
-    item.login = @"login1";
+    item = [HDWECSConfig initDefault];
 
     self.dataSourceArray = @[
         @{

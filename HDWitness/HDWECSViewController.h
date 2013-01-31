@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@class HDWEcsConfig;
+@class HDWECSConfig;
 
 @interface HDWECSViewController : UITableViewController {
-    HDWEcsConfig *item;
+    HDWECSConfig *item;
 }
 
 @property (nonatomic, retain) NSArray *dataSourceArray;
