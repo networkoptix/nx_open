@@ -253,6 +253,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     // for continue event put information to m_eventsInProgress
     QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
+	runtimeRule.bEvent = bEvent;
     if (bEvent->getToggleState() == ToggleState::On)
     {
         runtimeRule.resources.insert(resId);
@@ -370,7 +371,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     QString ruleId = rule->getUniqueId();
     RunningRuleInfo runtimeRule = m_rulesInProgress.value(ruleId);
     if (runtimeRule.isActionRunning) {
-        QnAbstractBusinessEventPtr bEvent = runtimeRule.rule;
+        QnAbstractBusinessEventPtr bEvent = runtimeRule.bEvent;
         QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
         if (action)
             executeAction(action);

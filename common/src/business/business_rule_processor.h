@@ -93,7 +93,7 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo(): isActionRunning(false) {}
-        QnAbstractBusinessEventPtr rule;
+        QnAbstractBusinessEventPtr bEvent;
         QSet<QnId> resources;
         bool isActionRunning;
     };
