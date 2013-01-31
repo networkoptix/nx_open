@@ -408,11 +408,13 @@ bool QnPlOnvifResource::initInternal()
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs( &relayOutputs );
     if( !relayOutputs.empty() )
-        setCameraCapability(Qn::relayOutput, true);
+    {
+        setCameraCapability( Qn::relayOutput, true );
+        setCameraCapability( Qn::relayInput, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+    }
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )
     //    setCameraCapability( Qn::relayInput, true );
-    //startInputPortMonitoring();
 
     save();
 
@@ -827,7 +829,8 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
             toSharedPointer(),
             portSourceIter->value,
             newPortState,
-            handler.utcTime.toMSecsSinceEpoch() );
+            QDateTime::currentMSecsSinceEpoch() );  //it is not absolutely correct, but better than de-synchronized timestamp from camera
+            //handler.utcTime.toMSecsSinceEpoch() );
     }
 }
 
@@ -1238,11 +1241,14 @@ bool QnPlOnvifResource::setRelayOutputState(
         ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
         requiredDelayTime = ss.str();
     }
-    if( (relayOutputInfo.isBistable != isBistableModeRequired) || (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) )
+    if( (relayOutputInfo.isBistable != isBistableModeRequired) || 
+        (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) ||
+        relayOutputInfo.activeByDefault )
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
         relayOutputInfo.delayTime = requiredDelayTime;
+        relayOutputInfo.activeByDefault = false;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
             cl_log.log( QString::fromAscii("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5. %6").
@@ -2155,10 +2161,10 @@ bool QnPlOnvifResource::startInputPortMonitoring()
     if( !m_eventCapabilities )
         return false;
 
-    /*if( QnSoapServer::instance()->initialized() )
-        return registerNotificationConsumer();
-    else*/ if( m_eventCapabilities->WSPullPointSupport )
+    if( m_eventCapabilities->WSPullPointSupport )
         return createPullPointSubscription();
+    else if( QnSoapServer::instance()->initialized() )
+        return registerNotificationConsumer();
     else
         return false;
 }
@@ -2315,6 +2321,8 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
 // QnPlOnvifResource
 //////////////////////////////////////////////////////////
 
+static const int DEFAULT_HTTP_PORT = 80;
+
 bool QnPlOnvifResource::registerNotificationConsumer()
 {
     QMutexLocker lk( &m_subscriptionMutex );
@@ -2322,17 +2330,14 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
     QString localAddress;
-    try
-    {
-        TCPSocket sock( eventServiceURL.host(), eventServiceURL.port() );
-        localAddress = sock.getLocalAddress();
-    }
-    catch( const SocketException& e )
+    TCPSocket sock( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) );
+    if( !sock.isConnected() )
     {
         cl_log.log( QString::fromLatin1("Failed to connect to %1:%2 to determine local address. %3").
-            arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(QLatin1String(e.what())), cl_logWARNING );
+            arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
         return false;
     }
+    localAddress = sock.getLocalAddress();
 
     const QAuthenticator& auth = getAuth();
     NotificationProducerSoapWrapper soapWrapper(
@@ -2546,7 +2551,7 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
             response.RelayOutputs[i]->token,
             response.RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode__Bistable,
             response.RelayOutputs[i]->Properties->DelayTime,
-            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState__open ) );
+            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState__closed ) );
     }
 
     if( relayOutputs )
@@ -2594,7 +2599,7 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
     onvifXsd__RelayOutputSettings relayOutputSettings;
     relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode__Bistable : onvifXsd__RelayMode__Monostable;
     relayOutputSettings.DelayTime = !relayOutputInfo.delayTime.empty() ? relayOutputInfo.delayTime : "PT1S";
-    relayOutputSettings.IdleState = onvifXsd__RelayIdleState__closed;
+    relayOutputSettings.IdleState = relayOutputInfo.activeByDefault ? onvifXsd__RelayIdleState__closed : onvifXsd__RelayIdleState__open;
     setOutputSettingsRequest.Properties = &relayOutputSettings;
     _onvifDevice__SetRelayOutputSettingsResponse setOutputSettingsResponse;
     m_prevSoapCallResult = soapWrapper.setRelayOutputSettings( setOutputSettingsRequest, setOutputSettingsResponse );
