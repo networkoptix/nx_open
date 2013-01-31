@@ -22,6 +22,7 @@
 #include <decoders/abstractvideodecoderplugin.h>
 
 #include "d3dgraphicsadapterdescription.h"
+#include "intelcpudescription.h"
 
 
 //!Plugin of Intel Media SDK (Quicksync) based h.264 decoder
@@ -77,6 +78,7 @@ private:
     mutable std::auto_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
     mutable std::auto_ptr<MFXVideoSession> m_mfxSession;
     mutable std::auto_ptr<D3DGraphicsAdapterDescription> m_graphicsDesc;
+    mutable std::auto_ptr<IntelCPUDescription> m_cpuDesc;
     //!Graphics adapter number, quicksync is present on
     mutable unsigned int m_adapterNumber;
     mutable bool m_hardwareAccelerationEnabled;
@@ -84,7 +86,6 @@ private:
     mutable QString m_sdkVersionStr;
     mutable bool m_initialized;
     QString m_osName;
-    QString m_cpuString;
     mutable HRESULT m_prevD3DOperationResult;
     mutable QMutex m_mutex;
     mutable std::vector<D3D9DeviceContext> m_d3dDevices;
@@ -94,7 +95,6 @@ private:
     bool openD3D9Device() const;
     void closeD3D9Device();
     QString winVersionToName( const OSVERSIONINFOEX& osVersionInfo ) const;
-    void readCPUInfo();
 };
 
 #endif  //QUICKSYNCDECODERPLUGIN_H
