@@ -577,8 +577,6 @@ void QnMain::loadResourcesFromECS()
         foreach( const QnVirtualCameraResourcePtr &camera, cameras )
         {
             camera->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
-            camera->setDisabled( true );
-            camera->setStatus( QnResource::Offline );
             qnResPool->addResource( camera );
         }
     }
