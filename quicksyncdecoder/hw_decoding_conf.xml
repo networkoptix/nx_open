@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence>
-  <set value=""resName="simultaneousStreamCount" resValue="0"/>      <!-- default value -->
+  <set value="" resName="simultaneousStreamCount" resValue="0"/>      <!-- default value -->
   <condition resName="gpuDeviceString" matchType="wildcard">
     <set value="*AMD*" resName="simultaneousStreamCount" resValue="1"/>
     <sequence value="*Intel*">
@@ -16,6 +16,34 @@
       </condition>
 -->
     </sequence>
+  </condition>
+
+  <!-- Sandy Bridge maximum supported resolution 1920x1088 -->
+  <condition resName="cpuFamily" matchType="equal">
+		<condition value="6" resName="cpuModel" matchType="equal">
+			<sequence value="42">
+				<condition resName="framePictureWidth" matchType="greater">
+					<set value="1920" resName="simultaneousStreamCount" resValue="0"/>
+				</condition>
+				<condition resName="framePictureHeight" matchType="greater">
+					<set value="1088" resName="simultaneousStreamCount" resValue="0"/>
+				</condition>
+			</sequence>
+		</condition>
+  </condition>
+
+  <!-- Ivy Bridge maximum supported resolution 4096x3520 -->
+  <condition resName="cpuFamily" matchType="equal">
+		<condition value="6" resName="cpuModel" matchType="equal">
+			<sequence value="58">
+				<condition resName="framePictureWidth" matchType="greater">
+					<set value="4096" resName="simultaneousStreamCount" resValue="0"/>
+				</condition>
+				<condition resName="framePictureHeight" matchType="greater">
+					<set value="3520" resName="simultaneousStreamCount" resValue="0"/>
+				</condition>
+			</sequence>
+		</condition>
   </condition>
 
   <!-- splash screen always uses ffmpeg -->

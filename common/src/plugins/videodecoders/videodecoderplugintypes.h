@@ -23,6 +23,12 @@ namespace DecoderParameter
         architecture,
         //string. CPU brand and name
         cpuString,
+        //unsigned int. Received with cpuid instruction
+        cpuFamily,
+        //unsigned int. Received with cpuid instruction
+        cpuModel,
+        //unsigned int. Received with cpuid instruction
+        cpuStepping,
         //string. Device string of graphics adapter, application is using to display
         displayAdapterDeviceString,
         //string. Info of adapter, hardware acceleration is available on
