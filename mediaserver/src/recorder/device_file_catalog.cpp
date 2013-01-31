@@ -493,7 +493,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 	{
 		QMutexLocker lock(&m_mutex);
 		if (m_chunks.isEmpty())
-			return deletedSize;
+			return -1;
 
 		static const int DELETE_COEFF = 1000;
 

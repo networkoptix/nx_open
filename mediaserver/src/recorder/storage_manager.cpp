@@ -278,7 +278,8 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         if (catalog != 0) 
         {
             qint64 fileSize = catalog->deleteFirstRecord();
-            toDelete -= fileSize;
+            if (fileSize > 0)
+                toDelete -= fileSize;
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
             if (catalogLowRes != 0) 
             {
@@ -292,7 +293,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                     catalogLowRes->clear();
                 }
             }
-            if (fileSize == 0)
+            if (fileSize == -1)
                 break; // nothing to delete
         }
         else
