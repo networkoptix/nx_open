@@ -163,18 +163,21 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         } else {
             result = "{ \"mapper\": null }";
         }
+        contentType = "application/json";
     }
     else 
     {
         errStr = QByteArray("Unknown ptz command ").append(action.toUtf8()).append("\n");
     } 
 
-    result.append("<root>\n");
-    if (errStr.isEmpty())
-        result.append("SUCCESS");
-    else
-        result.append(errStr);
-    result.append("</root>\n");
+    if(contentType.isEmpty()) { // TODO: hack!
+        result.append("<root>\n");
+        if (errStr.isEmpty())
+            result.append("SUCCESS");
+        else
+            result.append(errStr);
+        result.append("</root>\n");
+    }
 
     return errStr.isEmpty() ? CODE_OK : CODE_INVALID_PARAMETER;
 

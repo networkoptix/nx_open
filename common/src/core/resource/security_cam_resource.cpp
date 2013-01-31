@@ -1,6 +1,5 @@
 #include "security_cam_resource.h"
 
-#include "common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSecurityCamResource::QnSecurityCamResource(): 
@@ -9,8 +8,6 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_motionType(Qn::MT_Default),
     m_recActionCnt(0)
 {
-    QnCommonMetaTypes::initilize();
-
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
 

@@ -9,7 +9,6 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
-#include "common/common_meta_types.h"
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
@@ -30,9 +29,7 @@ QnResource::QnResource():
     m_status(Offline),
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
-{
-    QnCommonMetaTypes::initilize();
-}
+{}
 
 QnResource::~QnResource()
 {

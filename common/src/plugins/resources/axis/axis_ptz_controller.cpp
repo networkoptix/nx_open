@@ -203,6 +203,6 @@ Qn::CameraCapabilities QnAxisPtzController::getCapabilities() {
 }
 
 const QnPtzSpaceMapper *QnAxisPtzController::getSpaceMapper() {
-    return NULL;
+    return m_spaceMapper;
 }
 

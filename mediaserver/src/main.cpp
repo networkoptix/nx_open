@@ -12,7 +12,7 @@
 
 #include "version.h"
 #include "utils/common/util.h"
-#include "utils/common/module_resources.h"
+#include "media_server/media_server_module.h"
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"
@@ -936,9 +936,11 @@ void QnMain::run()
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
 public:
-    QnVideoService(int argc, char **argv)
-        : QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
-        m_main(argc, argv)
+    QnVideoService(int argc, char **argv): 
+        QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
+        m_main(argc, argv),
+        m_argc(argc),
+        m_argv(argv)
     {
         setServiceDescription(SERVICE_NAME);
     }
@@ -946,11 +948,12 @@ public:
 protected:
     void start()
     {
-        QtSingleCoreApplication *app = application();
+        QtSingleCoreApplication *application = this->application();
+
+        new QnPlatformAbstraction(application);
+        new QnMediaServerModule(m_argc, m_argv, application);
+
         QString guid = serverGuid();
-
-        new QnPlatformAbstraction(app);
-
         if (guid.isEmpty())
         {
             cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
@@ -958,14 +961,14 @@ protected:
             return;
         }
 
-        if (app->isRunning())
+        if (application->isRunning())
         {
             cl_log.log("Server already started", cl_logERROR);
             qApp->quit();
             return;
         }
 
-        serverMain(app->argc(), app->argv());
+        serverMain(application->argc(), application->argv());
         m_main.start();
     }
 
@@ -978,6 +981,8 @@ protected:
 
 private:
     QnMain m_main;
+    int m_argc;
+    char **m_argv;
 };
 
 void stopServer(int signal)
@@ -1000,8 +1005,6 @@ void stopServer(int signal)
 int main(int argc, char* argv[])
 {
     QnVideoService service(argc, argv);
-
-    QnMediaServerModule mediaserver(argc, argv);
 
     int result = service.exec();
 

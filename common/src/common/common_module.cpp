@@ -4,12 +4,16 @@
 #include <utils/common/warnings.h>
 #include <utils/common/ptz_mapper_pool.h>
 
+#include <common/common_meta_types.h>
+
 #include "customization.h"
 
 QnCommonModule *QnCommonModule::s_instance = NULL;
 
-QnCommonModule::QnCommonModule(int &, char **QObject *parent): QObject(parent) {
+QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
     QN_INIT_MODULE_RESOURCES(common);
+
+    QnCommonMetaTypes::initilize();
     
     /* Init statics. */
     qnCustomization();

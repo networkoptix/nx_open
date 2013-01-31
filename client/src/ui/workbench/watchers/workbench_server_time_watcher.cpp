@@ -73,7 +73,7 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resou
     return utcOffset - utcDateTime.msecsTo(localDateTime);
 }
 
-void QnWorkbenchServerTimeWatcher::updateServerTime(const QnMediaServerResourcePtr &server) {
+void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server) {
     if(server->getStatus() == QnResource::Offline)
         return;
 
@@ -88,7 +88,7 @@ void QnWorkbenchServerTimeWatcher::updateServerTime(const QnMediaServerResourceP
 void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_timer.timerId()) {
         foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources().filtered<QnMediaServerResource>())
-            updateServerTime(server);
+            sendRequest(server);
     } else {
         base_type::timerEvent(event);
     }
@@ -101,7 +101,7 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
 
     connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
     connect(server.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
-    updateServerTime(server);
+    sendRequest(server);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -114,12 +114,12 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
 }
 
 void QnWorkbenchServerTimeWatcher::at_server_serverIfFound(const QnMediaServerResourcePtr &resource) {
-    updateServerTime(resource);
+    sendRequest(resource);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resource_statusChanged(const QnResourcePtr &resource) {
     if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        updateServerTime(server);
+        sendRequest(server);
 }
 
 void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle) {

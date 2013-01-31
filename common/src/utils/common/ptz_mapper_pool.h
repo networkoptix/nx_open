@@ -17,7 +17,6 @@ public:
     virtual ~QnPtzMapperPool();
 
     const QnPtzSpaceMapper *mapper(const QString &model) const;
-    const QnPtzSpaceMapper *mapper(const QnVirtualCameraResourcePtr &resource) const;
 
     bool load(const QString &fileName);
 

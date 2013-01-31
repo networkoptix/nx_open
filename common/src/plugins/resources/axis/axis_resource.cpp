@@ -11,7 +11,6 @@
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
 #include "utils/common/synctime.h"
-#include "utils/common/war.h"
 #include "axis_ptz_controller.h"
 
 using namespace std;

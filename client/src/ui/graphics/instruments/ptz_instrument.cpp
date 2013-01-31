@@ -28,8 +28,8 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
-#include <ui/workbench/workbench_ptz_mapper_manager.h>
-#include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
+#include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
+#include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 
 #include "selection_item.h"
 #include "utils/settings.h"
@@ -510,7 +510,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent),
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
-    m_mapperManager(context()->instance<QnWorkbenchPtzMapperManager>()),
+    m_mapperWatcher(context()->instance<QnWorkbenchPtzMapperWatcher>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
@@ -594,7 +594,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    const QnPtzSpaceMapper *mapper = m_mapperManager->mapper(camera);
+    const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera);
     if(!mapper)
         return;
 
@@ -696,7 +696,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             updateOverlayWidget(widget);
 
             PtzData &data = m_dataByWidget[widget];
-            if(m_mapperManager->mapper(camera))
+            if(m_mapperWatcher->mapper(camera))
                 data.hasAbsoluteMove = true;
             data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
 

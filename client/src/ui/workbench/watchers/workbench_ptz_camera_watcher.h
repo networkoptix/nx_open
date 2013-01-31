@@ -1,5 +1,5 @@
-#ifndef QN_WORKBENCH_PTZ_CAMERAS_WATCHER_H
-#define QN_WORKBENCH_PTZ_CAMERAS_WATCHER_H
+#ifndef QN_WORKBENCH_PTZ_CAMERA_WATCHER_H
+#define QN_WORKBENCH_PTZ_CAMERA_WATCHER_H
 
 #include <QtCore/QObject>
 
@@ -7,11 +7,11 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchPtzCamerasWatcher: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchPtzCameraWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
-    QnWorkbenchPtzCamerasWatcher(QObject *parent = NULL);
-    virtual ~QnWorkbenchPtzCamerasWatcher();
+    QnWorkbenchPtzCameraWatcher(QObject *parent = NULL);
+    virtual ~QnWorkbenchPtzCameraWatcher();
 
     QList<QnVirtualCameraResourcePtr> ptzCameras() const;
 
@@ -35,4 +35,4 @@ private:
 
 
 
-#endif // QN_WORKBENCH_PTZ_CAMERAS_WATCHER_H
+#endif // QN_WORKBENCH_PTZ_CAMERA_WATCHER_H

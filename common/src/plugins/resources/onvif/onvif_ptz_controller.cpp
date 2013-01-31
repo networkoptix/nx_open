@@ -248,7 +248,7 @@ Qn::CameraCapabilities QnOnvifPtzController::getCapabilities()
 
 const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper() 
 {
-    return m_ptzMapper
+    return m_ptzMapper;
 }
 
 

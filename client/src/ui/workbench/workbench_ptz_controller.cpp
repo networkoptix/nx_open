@@ -10,8 +10,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
-#include <ui/workbench/workbench_ptz_mapper_manager.h>
+#include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
+#include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -46,9 +46,9 @@ QnWorkbenchPtzController::PtzData::PtzData():
 QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_mapperManager(context()->instance<QnWorkbenchPtzMapperManager>())
+    m_mapperWatcher(context()->instance<QnWorkbenchPtzMapperWatcher>())
 {
-    QnWorkbenchPtzCamerasWatcher *watcher = context()->instance<QnWorkbenchPtzCamerasWatcher>();
+    QnWorkbenchPtzCameraWatcher *watcher = context()->instance<QnWorkbenchPtzCameraWatcher>();
     connect(watcher, SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
     connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
@@ -56,7 +56,7 @@ QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
 }
 
 QnWorkbenchPtzController::~QnWorkbenchPtzController() {
-    QnWorkbenchPtzCamerasWatcher *watcher = context()->instance<QnWorkbenchPtzCamerasWatcher>();
+    QnWorkbenchPtzCameraWatcher *watcher = context()->instance<QnWorkbenchPtzCameraWatcher>();
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
         at_ptzCameraWatcher_ptzCameraRemoved(camera);
     disconnect(watcher, NULL, this, NULL);
@@ -103,7 +103,7 @@ void QnWorkbenchPtzController::setPhysicalPosition(const QnVirtualCameraResource
         return;
     }
 
-    const QnPtzSpaceMapper *mapper = m_mapperManager->mapper(camera);
+    const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera);
     if(!mapper) {
         qnWarning("Physical position is not supported for camera '%1'.", camera->getName());
         return;
@@ -230,7 +230,7 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
             QVector3D position(xPos, yPox, zoomPos);
             positionChanged = !qFuzzyCompare(position, data.position);
             data.position = position;
-            if(const QnPtzSpaceMapper *mapper = m_mapperManager->mapper(camera))
+            if(const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera))
                 data.physicalPosition = mapper->fromCamera().logicalToPhysical(data.position);
         }
         data.attemptCount[GetPositionRequest] = 0;
@@ -258,7 +258,7 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
     if(status == 0) {
         bool positionChanged = !qFuzzyCompare(data.position, position);
         data.position = position;
-        if(const QnPtzSpaceMapper *mapper = m_mapperManager->mapper(camera))
+        if(const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera))
             data.physicalPosition = mapper->toCamera().logicalToPhysical(data.position);
 
         bool movementChanged = qFuzzyCompare(data.movement, QVector3D());

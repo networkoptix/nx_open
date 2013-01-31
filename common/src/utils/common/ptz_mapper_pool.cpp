@@ -21,15 +21,6 @@ const QnPtzSpaceMapper *QnPtzMapperPool::mapper(const QString &model) const {
     return m_mapperByModel.value(model.toLower());    
 }
 
-const QnPtzSpaceMapper *QnPtzMapperPool::mapper(const QnVirtualCameraResourcePtr &resource) const {
-    if(!resource) {
-        qnNullWarning(resource);
-        return NULL;
-    }
-
-    return mapper(resource->getModel());
-}
-
 void QnPtzMapperPool::addMapper(const QnPtzSpaceMapper *mapper) {
     if(!mapper) {
         qnNullWarning(mapper);
@@ -65,7 +56,7 @@ bool QnPtzMapperPool::load(const QString &fileName) {
         return false;
     }
 
-    if(!loadMappersInternal(fileName)) {
+    if(!loadInternal(fileName)) {
         qnWarning("Error while loading PTZ mappings from file '%1'.", fileName);
         return false;
     }
@@ -73,7 +64,7 @@ bool QnPtzMapperPool::load(const QString &fileName) {
     return true;
 }
 
-bool QnWorkbenchPtzMapperManager::loadInternal(const QString &fileName) {
+bool QnPtzMapperPool::loadInternal(const QString &fileName) {
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;

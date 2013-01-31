@@ -4,7 +4,6 @@
 #include "api/app_server_connection.h"
 #include <utils/common/warnings.h>
 #include "message.pb.h"
-#include "common/common_meta_types.h"
 
 #define QN_EVENT_SOURCE_DEBUG
 
@@ -76,8 +75,6 @@ QnMessageSource::QnMessageSource(QUrl url, int retryTimeout):
     m_seqNumber(0),
     m_streamParser(new QnPbStreamParser())
 {
-    QnCommonMetaTypes::initilize();
-
     connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));

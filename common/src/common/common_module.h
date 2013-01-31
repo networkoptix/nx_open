@@ -24,10 +24,12 @@ public:
         return s_instance;
     }
 
-    QnPtzMapperPool *ptzMapperPool() const;
+    QnPtzMapperPool *ptzMapperPool() const {
+        return m_ptzMapperPool;
+    }
 
 private:
-    QnCommonModule *s_instance;
+    static QnCommonModule *s_instance;
     QnPtzMapperPool *m_ptzMapperPool;
 };
 

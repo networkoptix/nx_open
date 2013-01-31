@@ -161,6 +161,12 @@ void serialize(const QnPtzSpaceMapper &value, QVariant *target) {
 bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
     assert(target);
 
+    if(value.type() == QVariant::Invalid) {
+        /* That's null mapper. */
+        *target = QnPtzSpaceMapper();
+        return true;
+    }
+
     if(value.type() != QVariant::Map)
         return false;
     QVariantMap map = value.toMap();

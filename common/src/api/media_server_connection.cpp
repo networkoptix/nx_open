@@ -7,7 +7,6 @@
 #include "utils/common/request_param.h"
 #include "utils/common/space_mapper.h"
 #include "utils/common/json.h"
-#include "common/common_meta_types.h"
 
 #include "media_server_connection.h"
 #include "media_server_connection_p.h"
@@ -242,9 +241,7 @@ QnMediaServerConnection::QnMediaServerConnection(const QUrl &url, QObject *paren
     QObject(parent),
     m_url(url),
     m_proxyPort(0)
-{
-    QnCommonMetaTypes::initilize();
-}
+{}
 
 QnMediaServerConnection::~QnMediaServerConnection() {}
 
