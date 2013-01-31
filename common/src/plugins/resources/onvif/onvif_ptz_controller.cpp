@@ -2,10 +2,17 @@
 #include "plugins/resources/onvif/onvif_resource.h"
 #include "soap_wrapper.h"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "common/common_module.h"
+#include "utils/common/ptz_mapper_pool.h"
 
+
+// -------------------------------------------------------------------------- //
+// QnOnvifPtzController
+// -------------------------------------------------------------------------- //
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
     QnAbstractPtzController(resource),
-    m_resource(resource)
+    m_resource(resource),
+    m_ptzMapper(NULL)
 {
     m_xNativeVelocityCoeff.first = 1.0;
     m_yNativeVelocityCoeff.first = 1.0;
@@ -75,7 +82,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     }
 
     m_capabilities = Qn::ContinuousPtzCapability | Qn::AbsolutePtzCapability; // TODO
-
+    m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
@@ -241,7 +248,7 @@ Qn::CameraCapabilities QnOnvifPtzController::getCapabilities()
 
 const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper() 
 {
-    return NULL; /* Let the user decide. */
+    return m_ptzMapper
 }
 
 

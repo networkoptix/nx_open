@@ -30,6 +30,7 @@ private:
 private:
     QnPlOnvifResourcePtr m_resource;
     Qn::CameraCapabilities m_capabilities;
+    const QnPtzSpaceMapper *m_ptzMapper;
     QString m_mediaProfile;
     QString m_ptzConfigurationToken;
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative

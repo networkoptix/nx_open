@@ -999,9 +999,9 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
-
     QnVideoService service(argc, argv);
+
+    QnMediaServerModule mediaserver(argc, argv);
 
     int result = service.exec();
 
