@@ -48,8 +48,12 @@ QString authKey()
 
 QString serverGuid()
 {
-    QString guid = qSettings.value("serverGuid").toString();
+    static QString guid;
 
+    if (!guid.isEmpty())
+        return guid;
+
+    guid = qSettings.value("serverGuid").toString();
     if (guid.isEmpty())
     {
         if (!qSettings.isWritable())
