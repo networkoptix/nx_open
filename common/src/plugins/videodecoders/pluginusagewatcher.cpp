@@ -215,7 +215,7 @@ bool PluginUsageWatcher::readExternalUsage( UsageRecordArray* const recArray ) c
         return false;
     }
 
-    NX_LOG( QString::fromAscii("PluginUsageWatcher. Read %1 usage records").arg(recArray->records.size()), cl_logDEBUG1 );
+    NX_LOG( QString::fromAscii("PluginUsageWatcher. Read %1 usage records").arg(recArray->records.size()), cl_logDEBUG2 );
 
     return true;
 }
