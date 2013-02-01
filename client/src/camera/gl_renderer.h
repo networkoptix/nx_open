@@ -54,7 +54,6 @@ public:
 
 private:
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
-    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     qreal m_brightness;
     qreal m_contrast;
     qreal m_hue;
@@ -67,7 +66,7 @@ private:
     std::auto_ptr<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
     std::auto_ptr<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;
-    mutable QMutex m_timeMutex;
+    mutable QMutex m_mutex;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen

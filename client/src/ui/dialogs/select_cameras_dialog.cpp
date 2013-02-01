@@ -8,21 +8,64 @@
 
 #include <ui/workbench/workbench_context.h>
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+//---------------- QnSelectCamerasDialogDelegate ------------------------------------//
+///////////////////////////////////////////////////////////////////////////////////////
+
+QnSelectCamerasDialogDelegate::QnSelectCamerasDialogDelegate(QObject *parent):
+    QObject(parent)
+{
+
+}
+
+QnSelectCamerasDialogDelegate::~QnSelectCamerasDialogDelegate() {
+
+}
+
+void QnSelectCamerasDialogDelegate::setWidgetLayout(QLayout *layout) {
+    Q_UNUSED(layout)
+}
+
+void QnSelectCamerasDialogDelegate::modelDataChanged(const QnResourceList &selected) {
+    Q_UNUSED(selected)
+}
+
+bool QnSelectCamerasDialogDelegate::isApplyAllowed() {
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+//---------------- QnSelectCamerasDialog --------------------------------------------//
+///////////////////////////////////////////////////////////////////////////////////////
+
 QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
-    ui(new Ui::QnSelectCamerasDialog)
+    ui(new Ui::QnSelectCamerasDialog),
+    m_delegate(NULL)
 {
     ui->setupUi(this);
 
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
+    connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
+
+    /*
+    QnColoringProxyModel* proxy = new QnColoringProxyModel(this);
+    proxy->setSourceModel(m_resourceModel);
+    ui->resourcesWidget->setModel(proxy);
+    */
+
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
+
+    ui->delegateFrame->setVisible(false);
 }
 
 QnSelectCamerasDialog::~QnSelectCamerasDialog()
 {
-    delete ui;
 }
 
 QnResourceList QnSelectCamerasDialog::getSelectedResources() const {
@@ -69,3 +112,24 @@ void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
     }
     base_type::keyPressEvent(event);
 }
+
+void QnSelectCamerasDialog::setDelegate(QnSelectCamerasDialogDelegate *delegate) {
+    Q_ASSERT(!m_delegate);
+    m_delegate = delegate;
+    if (m_delegate) {
+        m_delegate->setWidgetLayout(ui->delegateLayout);
+    }
+    ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
+    at_resourceModel_dataChanged();
+}
+
+QnSelectCamerasDialogDelegate* QnSelectCamerasDialog::delegate() {
+    return m_delegate;
+}
+
+void QnSelectCamerasDialog::at_resourceModel_dataChanged() {
+    if (m_delegate)
+        m_delegate->modelDataChanged(getSelectedResources());
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->isApplyAllowed());
+}
+

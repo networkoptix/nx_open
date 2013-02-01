@@ -254,7 +254,7 @@ namespace nx_http
 
                 case readingChunkSize:
                     if( currentChar >= '0' && currentChar <= '9' && 
-                        (currentChar >= 'a' && currentChar <= 'f' || currentChar >= 'A' && currentChar <= 'F') )
+                        ((currentChar >= 'a' && currentChar <= 'f') || (currentChar >= 'A' && currentChar <= 'F')) )
                     {
                         m_currentChunkSize <<= 4;
                         m_currentChunkSize += hexCharToInt(currentChar);
@@ -362,7 +362,7 @@ namespace nx_http
 
     size_t HttpStreamReader::readIdentityStream( const BufferType& data, size_t offset, size_t count )
     {
-        Q_ASSERT( offset < data.size() );
+        Q_ASSERT( (int)offset < data.size() );
 
         if( count == BufferNpos )
             count = data.size() - offset;

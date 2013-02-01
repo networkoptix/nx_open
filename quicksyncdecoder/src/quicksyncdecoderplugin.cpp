@@ -44,8 +44,6 @@ QuicksyncDecoderPlugin::QuicksyncDecoderPlugin()
     osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
     GetVersionEx( (LPOSVERSIONINFO)&osVersionInfo );
     m_osName = winVersionToName( osVersionInfo );
-
-    readCPUInfo();
 }
 
 QuicksyncDecoderPlugin::~QuicksyncDecoderPlugin()
@@ -170,10 +168,10 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     desc.put( DecoderParameter::sdkVersion, m_sdkVersionStr );
     desc.put( DecoderParameter::decoderName, DECODER_NAME );
     desc.put( DecoderParameter::osName, m_osName );
-    desc.put( DecoderParameter::cpuString, m_cpuString );
     desc.put( DecoderParameter::totalCurrentNumberOfDecoders, currentSWDecoderCount+m_usageWatcher->currentSessionCount() );
 
-    stree::MultiSourceResourceReader mediaStreamParams( desc, *m_graphicsDesc.get() );
+    stree::MultiSourceResourceReader mediaStreamParams1( desc, *m_graphicsDesc.get() );
+    stree::MultiSourceResourceReader mediaStreamParams( mediaStreamParams1, *m_cpuDesc.get() );
 
     //locking shared memory region
     PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
@@ -287,6 +285,7 @@ bool QuicksyncDecoderPlugin::initialize() const
     m_hardwareAccelerationEnabled = true;
 
     m_graphicsDesc.reset( new D3DGraphicsAdapterDescription( m_direct3D9, m_adapterNumber ) );
+    m_cpuDesc.reset( new IntelCPUDescription() );
 
     NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin has been successfully initialized"), cl_logINFO );
 
@@ -457,38 +456,6 @@ QString QuicksyncDecoderPlugin::winVersionToName( const OSVERSIONINFOEX& osVersi
 
     return QString("%1 %2 (%3.%4)").arg(osName).arg(QString::fromWCharArray(osVersionInfo.szCSDVersion)).
         arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion);
-}
-
-void QuicksyncDecoderPlugin::readCPUInfo()
-{
-    char CPUBrandString[0x40];
-    int CPUInfo[4] = {-1};
-
-    // Calling __cpuid with 0x80000000 as the InfoType argument
-    // gets the number of valid extended IDs.
-    __cpuid(CPUInfo, 0x80000000);
-    unsigned int nExIds = CPUInfo[0];
-    memset(CPUBrandString, 0, sizeof(CPUBrandString));
-
-    // Get the information associated with each extended ID.
-    for( unsigned int i=0x80000000; i<=nExIds; ++i )
-    {
-        __cpuid(CPUInfo, i);
-
-        // Interpret CPU brand string and cache information.
-        if  (i == 0x80000002)
-            memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-        else if  (i == 0x80000003)
-            memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-        else if  (i == 0x80000004)
-            memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-    }
-
-    if( nExIds >= 0x80000004 )
-    {
-        //printf_s("\nCPU Brand String: %s\n", CPUBrandString);
-        m_cpuString = QString::fromAscii( CPUBrandString ).trimmed();
-    }
 }
 
 Q_EXPORT_PLUGIN2( quicksyncdecoderplugin, QuicksyncDecoderPlugin );

@@ -8,8 +8,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_history.h>
 
-#include <events/business_event_rule.h>
-#include <events/abstract_business_action.h>
+#include <business/business_event_rule.h>
+#include <business/actions/abstract_business_action.h>
 
 #include <licensing/license.h>
 

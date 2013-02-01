@@ -7,9 +7,9 @@
 #include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
-#include "events/business_event_connector.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
+#include <business/business_event_connector.h>
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
 #include "axis_ptz_controller.h"
 
@@ -707,6 +707,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
     {
         cl_log.log( QString::fromLatin1("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
             arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        forgetHttpClient( httpClient );
+        httpClient->scheduleForRemoval();
         return;
     }
 

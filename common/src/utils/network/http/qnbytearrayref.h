@@ -43,6 +43,8 @@ public:
     //!Constructs new \a QByteArray object by calling \a QByteArray::mid
     operator QByteArray() const;
 
+    QByteArray toByteArrayWithRawData() const;
+
 private:
     //!Using pointer here to allow operator= to be implemented
     const QByteArray* m_src;

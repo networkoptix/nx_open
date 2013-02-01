@@ -1014,7 +1014,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     QnMetaDataV1Ptr rez(new QnMetaDataV1());
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
     //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
-    rez->timestamp = m_lastFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
+    rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
 
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)

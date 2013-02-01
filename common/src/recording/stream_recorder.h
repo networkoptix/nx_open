@@ -149,7 +149,6 @@ private:
     bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
-    Role m_role;
     QnCryptographicHash m_mdctx;
     QPixmap m_logo;
     QString m_container;
@@ -165,6 +164,7 @@ private:
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     int m_onscreenDateOffset;
+    Role m_role;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;

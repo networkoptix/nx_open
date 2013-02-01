@@ -3,7 +3,7 @@
 #include "business_rule_processor.h"
 #include "core/resource/resource.h"
 #include "core/resource/media_server_resource.h"
-#include "events/business_event_rule.h"
+#include <business/business_event_rule.h>
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
 #include "core/resource_managment/resource_pool.h"
@@ -77,9 +77,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-        case BusinessActionType::BA_CameraOutput:
-            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
-
         case BusinessActionType::BA_SendMail:
             return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
@@ -137,10 +134,8 @@ bool QnBusinessRuleProcessor::containResource(QnResourceList resList, const QnId
     return false;
 }
 
-bool QnBusinessRuleProcessor::checkCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const
+bool QnBusinessRuleProcessor::checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const
 {
-    if (rule->isDisabled())
-        return false;
     if (!bEvent->checkCondition(rule->eventState(), rule->eventParams()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
@@ -150,9 +145,12 @@ bool QnBusinessRuleProcessor::checkCondition(QnAbstractBusinessEventPtr bEvent, 
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool condOK = checkCondition(bEvent, rule);
+    bool condOK = checkRuleCondition(bEvent, rule);
     QnAbstractBusinessActionPtr action;
-    if (m_rulesInProgress.contains(rule->getUniqueId()))
+
+    RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
+
+    if (runtimeRule.isActionRunning)
     {
         // Toggle event repeated with some interval with state 'on'.
         // if toggled action is used and condition is no longer valid - stop action
@@ -165,32 +163,31 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
     else if (condOK)
         action = rule->instantiateAction(bEvent);
 
-    bool actionInProgress = action && action->getToggleState() == ToggleState::On;
-    if (actionInProgress)
-        m_rulesInProgress.insert(rule->getUniqueId(), bEvent);
-    else
-        m_rulesInProgress.remove(rule->getUniqueId());
+    runtimeRule.isActionRunning = action && action->getToggleState() == ToggleState::On;
 
     return action;
 }
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool condOK = checkCondition(bEvent, rule);
-    if (!condOK) {
-        m_rulesInProgress.remove(rule->getUniqueId());
-        return QnAbstractBusinessActionPtr();
-    }
-    
-    if (bEvent->getToggleState() == ToggleState::On) {
-        if (m_rulesInProgress.contains(rule->getUniqueId()))
-            return QnAbstractBusinessActionPtr(); // rule already in progress. ingore repeated event
+    bool condOK = checkRuleCondition(bEvent, rule);
+    RunningRuleMap::iterator itr = m_rulesInProgress.find(rule->getUniqueId());
+    if (itr != m_rulesInProgress.end())
+    {
+        // instant action connected to continue event. update stats to prevent multiple action for repeation 'on' event state
+        RunningRuleInfo& runtimeRule = itr.value();
+        if (condOK && bEvent->getToggleState() == ToggleState::On) {
+            if (runtimeRule.isActionRunning)
+                return QnAbstractBusinessActionPtr(); // action by rule already was ran. ingore repeated event
+            else
+                runtimeRule.isActionRunning = true;
+        }
         else
-            m_rulesInProgress.insert(rule->getUniqueId(), bEvent);
+            runtimeRule.isActionRunning = false;
     }
-    else {
-        m_rulesInProgress.remove(rule->getUniqueId());
-    }
+
+    if (!condOK)
+        return QnAbstractBusinessActionPtr();
 
     if (rule->eventState() != ToggleState::NotDefined && rule->eventState() != bEvent->getToggleState())
         return QnAbstractBusinessActionPtr();
@@ -209,7 +206,8 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     aggInfo.bEvent = bEvent;
     aggInfo.bRule = rule;
 
-    if (aggInfo.timeStamp + rule->aggregationPeriod() < currentTime)
+    qint64 period = aggInfo.bRule->aggregationPeriod()*1000ll*1000ll;
+    if (aggInfo.timeStamp + period < currentTime)
     {
         QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
         action->setAggregationCount(aggInfo.count);
@@ -242,15 +240,44 @@ void QnBusinessRuleProcessor::at_timer()
     }
 }
 
+bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
+{
+    bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || containResource(rule->eventResources(), bEvent->getResource()->getId());
+    if (!resOK)
+        return false;
+
+
+    if (!BusinessEventType::hasToggleState(bEvent->getEventType()))
+        return true;
+    
+    // for continue event put information to m_eventsInProgress
+    QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
+    RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
+	runtimeRule.bEvent = bEvent;
+    if (bEvent->getToggleState() == ToggleState::On)
+    {
+        runtimeRule.resources.insert(resId);
+        return true;
+    }
+    else if (bEvent->getToggleState() == ToggleState::Off) {
+        runtimeRule.resources.remove(resId);
+        bool isFinished = runtimeRule.resources.isEmpty(); // true if no more running resources by event
+        return isFinished;
+    }
+
+    return false; // toggle event without state?
+}
+
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
     QMutexLocker lock(&m_mutex);
     QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
-        bool typeOK = rule->eventType() == bEvent->getEventType();
-        bool resOK = rule->eventResources().isEmpty() || !bEvent->getResource() || containResource(rule->eventResources(), bEvent->getResource()->getId());
-        if (typeOK && resOK)
+        if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
+            continue;
+        bool condOK = checkEventCondition(bEvent, rule);
+        if (condOK)
         {
             QnAbstractBusinessActionPtr action;
 
@@ -261,6 +288,9 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
 
             if (action)
                 result << action;
+
+            if (bEvent->getToggleState() == ToggleState::Off)
+                m_rulesInProgress.remove(rule->getUniqueId()); // clear running info if event is finished (all running event resources actually finished)
         }
     }
     return result;
@@ -276,34 +306,6 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
 {
     Q_UNUSED(action)
     //TODO: implement me
-}
-
-bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )
-{
-    if( !resource )
-    {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
-        return false;
-    }
-    QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
-    if( !securityCam )
-    {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId()), cl_logWARNING );
-        return false;
-    }
-    QString relayOutputId = action->getRelayOutputId();
-    if( relayOutputId.isEmpty() )
-    {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
-        return false;
-    }
-
-    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
-    return securityCam->setRelayOutputState(
-        relayOutputId,
-        action->getToggleState() == ToggleState::On,
-        autoResetTimeout );
 }
 
 bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& action )
@@ -367,13 +369,14 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
 void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 {
     QString ruleId = rule->getUniqueId();
-    if (m_rulesInProgress.contains(ruleId)) {
-        QnAbstractBusinessEventPtr bEvent = m_rulesInProgress[ruleId];
+    RunningRuleInfo runtimeRule = m_rulesInProgress.value(ruleId);
+    if (runtimeRule.isActionRunning) {
+        QnAbstractBusinessEventPtr bEvent = runtimeRule.bEvent;
         QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
         if (action)
             executeAction(action);
-        m_rulesInProgress.remove(ruleId);
     }
+    m_rulesInProgress.remove(ruleId);
 
     QString aggKey = rule->getUniqueId();
     QMap<QString, QAggregationInfo>::iterator itr = m_aggregateActions.lowerBound(aggKey);
@@ -404,10 +407,13 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
 {
     //notifying resources to start input monitoring
     {
-        const QnResourceList& resList = businessRule->eventResources();
         if( businessRule->eventType() == BusinessEventType::BE_Camera_Input)
         {
-            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            QnResourceList resList = businessRule->eventResources();
+            if (resList.isEmpty())
+                resList = qnResPool->getAllEnabledCameras();
+
+            for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
             {
                 QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
                 if( !securityCam )

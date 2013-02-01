@@ -26,9 +26,8 @@
 #include <core/resource/media_server_resource.h>
 
 #include <core/misc/schedule_task.h>
-#include <events/abstract_business_action.h>
-#include <events/abstract_business_event.h>
-
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -97,6 +96,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     
+    qRegisterMetaType<Qt::ConnectionType>();
 
     qn_commonMetaTypes_initialized = true;
 }

@@ -91,11 +91,13 @@ public:
 
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
+        liveMode(Mode_Live),
         dataProcessor(0),
+        sessionTimeOut(0),
+        useProprietaryFormat(false),
         startTime(0),
         endTime(0),
         rtspScale(1.0),
-        liveMode(Mode_Live),
         lastPlayCSeq(0),
         quality(MEDIA_Quality_High),
         qualityFastSwitch(true),
@@ -103,10 +105,8 @@ public:
         prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
-        useProprietaryFormat(false),
         tcpMode(true),
-        transcodedVideoSize(640, 480),
-        sessionTimeOut(0)
+        transcodedVideoSize(640, 480)
     {
     }
 
@@ -420,7 +420,7 @@ QString QnRtspConnectionProcessor::getRangeStr()
         {
             // range in usecs since UTC
             range = "npt=";
-            if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += "now";
             else
                 range += QString::number(d->archiveDP->startTime());
@@ -435,7 +435,7 @@ QString QnRtspConnectionProcessor::getRangeStr()
         {
             // use 'clock' attrubute. see RFC 2326
             range = "clock=";
-            if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+            if (d->archiveDP->startTime() == (qint64)AV_NOPTS_VALUE)
                 range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
             else
                 range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
@@ -1277,7 +1277,7 @@ void QnRtspConnectionProcessor::run()
             else {
                 // text request
                 int msgLen;
-                while (msgLen = isFullMessage(d->receiveBuffer))
+                while ((msgLen = isFullMessage(d->receiveBuffer)))
                 {
                     d->clientRequest = d->receiveBuffer.left(msgLen);
                     d->receiveBuffer.remove(0, msgLen);

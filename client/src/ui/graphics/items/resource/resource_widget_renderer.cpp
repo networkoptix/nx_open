@@ -42,11 +42,12 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
         m_channelRenderers[i] = renderingTools;
     }
 
-    if( context && currentContextBak != context )
+    if( context && currentContextBak != context ) {
         if( currentContextBak )
             const_cast<QGLContext*>(currentContextBak)->makeCurrent();
         else
             const_cast<QGLContext*>(context)->doneCurrent();
+    }
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {
@@ -67,6 +68,15 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     }
 
     m_channelRenderers.clear();
+}
+
+void QnResourceWidgetRenderer::pleaseStop()
+{
+    foreach(RenderingTools ctx, m_channelRenderers)
+    {
+        if( ctx.uploader )
+            ctx.uploader->pleaseStop();
+    }
 }
 
 void QnResourceWidgetRenderer::update() {
@@ -146,7 +156,25 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 }
 
+void QnResourceWidgetRenderer::discardAllFramesPostedToDisplay(int channel)
+{
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->discardAllFramesPostedToDisplay();
+    ctx.uploader->waitForCurrentFrameDisplayed();
+}
+
 void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->ensureAllFramesWillBeDisplayed();
+    //ctx.uploader->waitForAllFramesDisplayed();
+}
+
+void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
+{
     RenderingTools& ctx = m_channelRenderers[channel];
     if( !ctx.uploader )
         return;

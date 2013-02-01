@@ -15,7 +15,7 @@
 #include "pb_serializer.h"
 
 #include "core/resource_managment/resource_pool.h"
-#include <events/business_action_factory.h>
+#include <business/business_action_factory.h>
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
@@ -1079,8 +1079,10 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
     pb::BusinessAction pb_businessAction;
 
     pb_businessAction.set_actiontype((pb::BusinessActionType) serializeBusinessActionType(action->actionType()));
-    foreach(QnResourcePtr res, action->getResources())
-        pb_businessAction.add_actionresource(res->getId());
+    foreach(QnResourcePtr res, action->getResources()) {
+        if (res)
+            pb_businessAction.add_actionresource(res->getId());
+    }
     pb_businessAction.set_actionparams(serializeBusinessParams(action->getParams()));
     pb_businessAction.set_runtimeparams(serializeBusinessParams(action->getRuntimeParams()));
     pb_businessAction.set_businessruleid(action->getBusinessRuleId().toInt());

@@ -2,6 +2,7 @@
 #define CAMERA_OUTPUT_BUSINESS_ACTION_H
 
 #include "abstract_business_action.h"
+#include <core/resource/resource_fwd.h>
 
 namespace BusinessActionParameters {
 
@@ -22,6 +23,10 @@ public:
     int getRelayAutoResetTimeout() const;
 
     QString getExternalUniqKey() const;
+
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static bool isResourcesListValid(const QnResourceList &resources);
+    static int  invalidResourcesCount(const QnResourceList &resources);
 };
 
 typedef QSharedPointer<QnCameraOutputBusinessAction> QnCameraOutputBusinessActionPtr;

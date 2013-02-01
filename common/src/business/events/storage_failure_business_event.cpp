@@ -9,8 +9,8 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
     base_type(BusinessEventType::BE_Storage_Failure,
                             resource,
                             timeStamp),
-    m_storageResource(storageResource),
-    m_reason(reason)
+    m_reason(reason),
+    m_storageResource(storageResource)
 {
 }
 
@@ -18,6 +18,9 @@ QString QnStorageFailureBusinessEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
     text += QObject::tr("  reason%1\n").arg(m_reason);
-    text += QObject::tr("  storage%1\n").arg(m_storageResource->getUrl());
+    if (m_storageResource)
+        text += QObject::tr("  storage%1\n").arg(m_storageResource->getUrl());
+    else
+        text += QObject::tr("  no storage for writting\n");
     return text;
 }

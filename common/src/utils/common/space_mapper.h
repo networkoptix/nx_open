@@ -135,8 +135,8 @@ public:
     }
 
 private:
-    QStringList m_models;
     QnVectorSpaceMapper m_fromCamera, m_toCamera;
+    QStringList m_models;
 };
 
 void serialize(const QnPtzSpaceMapper &value, QVariant *target);

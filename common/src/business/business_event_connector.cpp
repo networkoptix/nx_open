@@ -1,15 +1,18 @@
 #include "business_event_connector.h"
-#include "motion_business_event.h"
-#include "camera_input_business_event.h"
-#include "core/resource/resource.h"
 #include "business_rule_processor.h"
-#include "camera_disconnected_business_event.h"
-#include "storage_failure_business_event.h"
-#include "network_issue_business_event.h"
-#include "mserver_failure_business_event.h"
-#include "ip_conflict_business_event.h"
-#include "core/resource_managment/resource_pool.h"
-#include "mserver_conflict_business_event.h"
+
+#include <business/events/motion_business_event.h>
+#include <business/events/camera_input_business_event.h>
+#include <business/events/camera_disconnected_business_event.h>
+#include <business/events/storage_failure_business_event.h>
+#include <business/events/network_issue_business_event.h>
+#include <business/events/mserver_failure_business_event.h>
+#include <business/events/ip_conflict_business_event.h>
+#include <business/events/mserver_conflict_business_event.h>
+
+#include "core/resource/resource.h"
+#include <core/resource_managment/resource_pool.h>
+
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 

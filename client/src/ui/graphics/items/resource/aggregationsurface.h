@@ -75,7 +75,7 @@ private:
         }
     };
 
-    static const int MAX_PLANE_COUNT = 3;
+    static const unsigned int MAX_PLANE_COUNT = 3;
 
     mutable QMutex m_mutex;
     mutable QMutex m_uploadMutex;

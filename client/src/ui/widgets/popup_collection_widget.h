@@ -2,8 +2,8 @@
 #define POPUP_COLLECTION_WIDGET_H
 
 #include <QWidget>
-#include <events/abstract_business_action.h>
-#include <events/abstract_business_event.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -20,8 +20,7 @@ public:
     explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
     ~QnPopupCollectionWidget();
 
-    void addExample();
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
@@ -36,7 +35,6 @@ private:
     Ui::QnPopupCollectionWidget *ui;
 
     QMap<BusinessEventType::Value, QWidget*> m_widgetsByType;
-    bool m_adding;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

@@ -85,7 +85,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QTableView" name="tableView">
+       <widget class="QnTableView" name="tableView">
         <property name="editTriggers">
          <set>QAbstractItemView::AllEditTriggers</set>
         </property>
@@ -136,6 +136,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/business_rule_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources>

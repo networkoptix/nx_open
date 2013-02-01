@@ -27,19 +27,16 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     connect(ui->portComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_portComboBox_currentIndexChanged(int)));
     at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
-
-    //TODO #GDM: at_contextUserChanged?
-    //if ((accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                    this, SLOT(at_settings_received(int,QByteArray,QnKvPairList,int)));
-    //}
-
-
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 {
     delete ui;
+}
+
+void QnSmtpSettingsWidget::update() {
+    m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
+                this, SLOT(at_settings_received(int,QByteArray,QnKvPairList,int)));
 }
 
 void QnSmtpSettingsWidget::submit() {
@@ -70,16 +67,18 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 }
 
 void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
+    Q_UNUSED(errorString)
     if (handle != m_requestHandle)
         return;
+
+    m_requestHandle = -1;
 
     bool success = (status == 0);
     if(!success) {
         //TODO: #GDM remove password from error message
-        QMessageBox::critical(this, tr("Error while receiving settings"), QString::fromLatin1(errorString));
+        //QMessageBox::critical(this, tr("Error while receiving settings"), QString::fromLatin1(errorString));
         return;
     }
-    m_requestHandle = -1;
 
     foreach (const QnKvPair &setting, settings) {
         if (setting.name() == nameHost) {

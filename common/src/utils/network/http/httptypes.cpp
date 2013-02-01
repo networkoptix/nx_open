@@ -350,7 +350,16 @@ namespace nx_http
 					return digest;
 				return none;
 			}
-		}
+
+			Value fromString( const ConstBufferRefType& str )
+            {
+				if( str == "Basic" )
+					return basic;
+				if( str == "Digest" )
+					return digest;
+				return none;
+            }
+        }
 
 		///////////////////////////////////////////////////////////////////
 		//  Authorization
@@ -378,12 +387,26 @@ namespace nx_http
             return false;
 		}
 
-		void DigestCredentials::serialize( BufferType* const /*dstBuffer*/ ) const
+		void DigestCredentials::serialize( BufferType* const dstBuffer ) const
 		{
-			//TODO/IMPL implementation
-            Q_ASSERT( false );
+            for( QMap<BufferType, BufferType>::const_iterator
+                it = params.begin();
+                it != params.end();
+                ++it )
+            {
+                if( it != params.begin() )
+                    dstBuffer->append( "," );
+                dstBuffer->append( it.key());
+                dstBuffer->append( "=\"" );
+                dstBuffer->append( it.value() );
+                dstBuffer->append( "\"" );
+            }
 		}
 
+
+        //////////////////////////////////////////////
+        //   Authorization
+        //////////////////////////////////////////////
 
         const StringType Authorization::NAME("Authorization");
 
@@ -463,6 +486,64 @@ namespace nx_http
         {
             basic->userid = userName;
             basic->password = userPassword;
+        }
+
+
+        DigestAuthorization::DigestAuthorization()
+        :
+            Authorization( AuthScheme::digest )
+        {
+        }
+
+        void DigestAuthorization::addParam( const BufferType& name, const BufferType& value )
+        {
+            if( name == "username" )
+                digest->userid = value;
+
+            digest->params.insert( name, value );
+        }
+
+
+        //////////////////////////////////////////////
+        //   WWWAuthenticate
+        //////////////////////////////////////////////
+
+        WWWAuthenticate::WWWAuthenticate()
+        :
+            authScheme( AuthScheme::none )
+        {
+        }
+
+        bool WWWAuthenticate::parse( const BufferType& str )
+        {
+            int authSchemeEndPos = str.indexOf( " " );
+            if( authSchemeEndPos == -1 )
+                return false;
+
+            authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
+
+            const BufferType& authenticateParamsStr = ConstBufferRefType(str, authSchemeEndPos+1).toByteArrayWithRawData();
+            const QList<BufferType>& paramsList = authenticateParamsStr.split(',');
+            for( QList<BufferType>::const_iterator
+                it = paramsList.begin();
+                it != paramsList.end();
+                ++it )
+            {
+                QList<BufferType> nameAndValue = it->trimmed().split('=');
+                if( nameAndValue.empty() )
+                    continue;
+                BufferType value = nameAndValue.size() > 1 ? nameAndValue[1] : BufferType();
+                if( value.size() >= 2 )
+                {
+                    if( value[0] == '\"' )
+                        value.remove( 0, 1 );
+                    if( value[value.size()-1] == '\"' )
+                        value.remove( value.size()-1, 1 );
+                }
+                params.insert( nameAndValue[0].trimmed(), value );
+            }
+
+            return true;
         }
     }
 }

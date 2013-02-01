@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>366</width>
-    <height>539</height>
+    <height>553</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Main Media Folder</string>
+      <string>Temporary Folder</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>

@@ -6,9 +6,13 @@
 #ifndef DECODEDPICTURETOOPENGLUPLOADERCONTEXTPOOL_H
 #define DECODEDPICTURETOOPENGLUPLOADERCONTEXTPOOL_H
 
+#include <deque>
+
+#include <QGLWidget>
+#include <QMutex>
 #include <QRunnable>
 #include <QThread>
-#include <QGLWidget>
+#include <QWaitCondition>
 
 #include <utils/common/safepool.h>
 #include <utils/common/threadqueue.h>
@@ -16,6 +20,15 @@
 
 
 class GLContext;
+
+class DecodedPictureToOpenGLUploader;
+class UploadFrameRunnable
+:
+    public QRunnable
+{
+public:
+    //DecodedPictureToOpenGLUploader* () const;
+};
 
 class DecodedPictureToOpenGLUploadThread
 :
@@ -28,15 +41,18 @@ public:
     DecodedPictureToOpenGLUploadThread( GLContext* glContextToUse );
     virtual ~DecodedPictureToOpenGLUploadThread();
 
-    void push( QRunnable* toRun );
+    void push( UploadFrameRunnable* toRun );
     const GLContext* glContext() const;
 
 protected:
     virtual void run();
 
 private:
-    CLThreadQueue<QRunnable*> m_queue;
+    //CLThreadQueue<QRunnable*> m_taskQueue;
     GLContext* m_glContext;
+    std::deque<UploadFrameRunnable*> m_taskQueue;
+    mutable QMutex m_mutex;
+    mutable QWaitCondition m_cond;
 };
 
 //!Pool of ogl contexts, used to upload decoded pictures to opengl textures

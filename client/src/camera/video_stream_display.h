@@ -5,6 +5,7 @@
 #include "decoders/video/abstractdecoder.h"
 #include "decoders/frame_scaler.h"
 #include "../ui/workbench/workbench_context_aware.h"
+#include <utils/common/stoppable.h>
 
 
 class QnAbstractVideoDecoder;
@@ -19,12 +20,17 @@ static const int MAX_QUEUE_TIME = 1000 * 200;
   * Display one video stream. Decode the video and pass it to video window.
   */
 class QnVideoStreamDisplay
+:
+    public QnStoppable
 {
 public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
     QnVideoStreamDisplay(bool can_downscale, int channelNumber);
     ~QnVideoStreamDisplay();
+
+    //!Implementation of QnStoppable::pleaseStop()
+    virtual void pleaseStop() override;
 
     void setDrawer(QnAbstractRenderer* draw);
     FrameDisplayStatus display(
@@ -47,7 +53,7 @@ public:
     void unblockTimeValue();
     bool isTimeBlocked() const;
     void setCurrentTime(qint64 time);
-    void waitForFramesDisplaed();
+    void waitForFramesDisplayed();
     void onNoVideo();
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
@@ -60,6 +66,7 @@ public:
     QSize getScreenSize() const;
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
     bool selfSyncUsed() const;
+
 private:
     mutable QMutex m_mtx;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;

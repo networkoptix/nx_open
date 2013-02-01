@@ -844,8 +844,8 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 
-    popupCollectionWidget()->addBusinessAction(businessAction);
-    popupCollectionWidget()->show();
+    if (popupCollectionWidget()->addBusinessAction(businessAction))
+        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1320,7 +1320,6 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->addExample();
     popupCollectionWidget()->show();
 }
 
@@ -1751,13 +1750,13 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
     QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    dialog->exec(); */
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {

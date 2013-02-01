@@ -90,7 +90,8 @@ void QnResource::update(QnResourcePtr other)
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 
     }
-    setStatus(other->m_status);
+	bool silenceMode = other->hasFlags(QnResource::foreigner);
+    setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
 
@@ -575,6 +576,9 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
+
+    Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
     emit statusChanged(toSharedPointer(this));
 
     QMutexLocker mutexLocker(&m_mutex);
@@ -611,7 +615,7 @@ void QnResource::setId(QnId id) {
     if(m_id == id)
         return;
 
-    QnId oldId = m_id;
+    //QnId oldId = m_id;
     m_id = id;
 }
 
