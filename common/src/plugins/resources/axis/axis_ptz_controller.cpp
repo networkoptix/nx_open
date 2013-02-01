@@ -65,7 +65,7 @@ private:
 QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource, QObject *parent):
     QnAbstractPtzController(resource, parent),
     m_resource(resource),
-    m_capabilities(Qn::ContinuousPtzCapability), // TODO: #Elric need to check for this?
+    m_capabilities(0),
     m_spaceMapper(NULL)
 {
     QnAxisParameterMap params;
@@ -78,6 +78,12 @@ QnAxisPtzController::~QnAxisPtzController() {
 }
 
 void QnAxisPtzController::init(const QnAxisParameterMap &params) {
+    if(params.value<bool>("root.PTZ.Support.S1.ContinuousPan") && params.value<bool>("root.PTZ.Support.S1.ContinuousTilt"))
+        m_capabilities |= Qn::ContinuousPanTiltCapability;
+
+    if(params.value<bool>("root.PTZ.Support.S1.ContinuousZoom"))
+        m_capabilities |= Qn::ContinuousZoomCapability;
+
     if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan") && params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt") && params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom"))
         m_capabilities |= Qn::AbsolutePtzCapability;
  

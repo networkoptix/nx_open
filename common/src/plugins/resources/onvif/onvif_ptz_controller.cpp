@@ -12,6 +12,7 @@
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
     QnAbstractPtzController(resource),
     m_resource(resource),
+    m_capabilities(0),
     m_ptzMapper(NULL)
 {
     m_xNativeVelocityCoeff.first = 1.0;
@@ -81,7 +82,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
-    m_capabilities = Qn::ContinuousPtzCapability | Qn::AbsolutePtzCapability; // TODO
+    m_capabilities = Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability; // TODO
     m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;

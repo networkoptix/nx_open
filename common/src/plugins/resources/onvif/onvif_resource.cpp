@@ -2134,7 +2134,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
-QnOnvifPtzController* QnPlOnvifResource::getPtzController()
+QnAbstractPtzController* QnPlOnvifResource::getPtzController()
 {
     return m_ptzController;
 }

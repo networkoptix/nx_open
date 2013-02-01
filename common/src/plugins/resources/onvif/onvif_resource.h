@@ -176,7 +176,7 @@ public:
     static int calcTimeDrift(const QString& deviceUrl);
 
 
-    virtual QnOnvifPtzController* getPtzController() override;
+    virtual QnAbstractPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
 
     //!Relay input with token \a relayToken has changed its state to \a active

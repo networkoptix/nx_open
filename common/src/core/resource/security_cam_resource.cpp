@@ -435,7 +435,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
     const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: const_cast? get rid of it!
-    return static_cast<Qn::CameraCapabilities>(mediaVariant.toInt());
+    return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
