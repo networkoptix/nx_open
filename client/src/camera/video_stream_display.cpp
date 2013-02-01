@@ -411,6 +411,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = data->channelNumber;
+    outFrame->flags = 0;
 
     if (outFrame->isDisplaying()) 
         m_drawer->waitForFrameDisplayed(data->channelNumber);
@@ -533,6 +534,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         }
         outFrame->pkt_dts = m_tmpFrame->pkt_dts;
         outFrame->metadata = m_tmpFrame->metadata;
+        outFrame->flags = m_tmpFrame->flags;
     }
     outFrame->flags |= data->flags;
     //outFrame->pts = data->timestamp;
