@@ -346,7 +346,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_mediaServer && m_mediaServer->isPanicMode())
+    if (m_mediaServer && m_mediaServer->getPanicMode() != QnMediaServerResource::PM_None)
     {
         if (!m_usedPanicMode)
         {

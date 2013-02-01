@@ -27,6 +27,8 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
+    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
+
     QnMediaServerResource();
     virtual ~QnMediaServerResource();
 
@@ -55,8 +57,8 @@ public:
     void setReserve(bool reserve = true);
     bool getReserve() const;
 
-    bool isPanicMode() const;
-    void setPanicMode(bool panicMode);
+    PanicMode getPanicMode() const;
+    void setPanicMode(PanicMode panicMode);
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
@@ -81,7 +83,7 @@ private:
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     bool m_reserve;
-    bool m_panicMode;
+    PanicMode m_panicMode;
     QString m_version;
     QMap<int, QUrl> m_runningIfRequests;
 };
