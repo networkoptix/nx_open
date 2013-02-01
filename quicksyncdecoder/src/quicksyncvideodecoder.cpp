@@ -2160,8 +2160,9 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 #endif  //CONVERT_NV12_TO_YV12
 #endif  //RETURN_D3D_SURFACE
 
-    outFrame->width = decodedFrame->Info.Width;
-    outFrame->height = decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual);
+    const QSize& originalPictureSize = getOriginalPictureSize();
+    outFrame->width = originalPictureSize.width();
+    outFrame->height = originalPictureSize.height();
 #ifndef CONVERT_NV12_TO_YV12
     outFrame->format = PIX_FMT_NV12;
 #else
