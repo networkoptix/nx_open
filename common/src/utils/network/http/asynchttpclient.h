@@ -142,7 +142,7 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequstWithAuthorization( const nx_http::HttpResponse& response );
+        bool resendRequstWithAuthorization( const nx_http::Response& response );
 
         static const char* toString( State state );
     };

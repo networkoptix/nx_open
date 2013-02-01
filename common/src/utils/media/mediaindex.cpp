@@ -76,7 +76,7 @@ unsigned int MediaIndex::generateChunkListForLivePlayback(
         return 0;
 
     return generateChunkListNonSafe(
-        getClosestChunkStartTimestamp( (*m_timestampIndex.rbegin()) - chunksToGenerate*targetDurationMSec*MICROS_IN_MS ),
+        getClosestChunkStartTimestamp( *(--m_timestampIndex.end()) - chunksToGenerate*targetDurationMSec*MICROS_IN_MS ),
         targetDurationMSec,
         chunksToGenerate,
         chunkList,
@@ -115,7 +115,7 @@ unsigned int MediaIndex::generateChunkListNonSafe(
             if( !allowSmallerLastChunk )
                 break;
             else
-                nextChunkIter = (m_timestampIndex.rbegin()+1).base();
+                nextChunkIter = (++m_timestampIndex.rbegin()).base();
         }
 
         if( *nextChunkIter <= currentChunkStart )   //< is an actually assert condition

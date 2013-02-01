@@ -145,7 +145,7 @@ namespace nx_http
                     //TODO/IMPL should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
                     aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
 
-                    const HttpResponse* response = m_httpStreamReader.message().response;
+                    const Response* response = m_httpStreamReader.message().response;
                     if( response->statusLine.statusCode == StatusCode::unauthorized
                         && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
                     {
@@ -410,10 +410,13 @@ namespace nx_http
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1() ) );
         }
         //adding user credentials
-        if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
+        if( (!m_userName.isEmpty() || !m_userPassword.isEmpty())
+            && (m_customHeaders.find(Header::Authorization::NAME) == m_customHeaders.end()) )
+        {
             m_request.headers.insert( std::make_pair(
                 Header::Authorization::NAME,
                 Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+        }
 
         //adding custom headers
         for( std::map<BufferType, BufferType>::const_iterator
@@ -421,7 +424,7 @@ namespace nx_http
             it != m_customHeaders.end();
             ++it )
         {
-            m_request.headers[it->first] = it->second;
+            m_request.headers.insert( *it );
         }
     }
 
@@ -448,7 +451,7 @@ namespace nx_http
         return false;
     }
 
-    bool AsyncHttpClient::resendRequstWithAuthorization( const nx_http::HttpResponse& response )
+    bool AsyncHttpClient::resendRequstWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
         Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
