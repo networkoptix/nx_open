@@ -12,6 +12,8 @@
 @interface HDWDetailViewController : UICollectionViewController <UISplitViewControllerDelegate>
 
 @property (strong, nonatomic) HDWECSConfig* ecsConfig;
+@property (strong, nonatomic) NSDictionary* servers;
+@property (strong, nonatomic) NSDictionary* cameras;
 
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
 @end

@@ -25,6 +25,8 @@
     if (_ecsConfig != newEcsConfig) {
         _ecsConfig = newEcsConfig;
         
+        _servers = nil;
+        _cameras = nil;
         // Update the view.
         [self configureView];
     }
@@ -36,11 +38,15 @@
 
 - (void)configureView
 {
-    NSLog(@"configuring view");
-    NSURL *url = [NSURL URLWithString:@"https://admin:123@10.0.2.179:7001/api/camera/"];
+    NSString* urlString = [NSString stringWithFormat:@"https://%@:%@@%@:%@/api/", _ecsConfig.login, _ecsConfig.password, _ecsConfig.host, _ecsConfig.port];
+    NSURL *baseUrl = [NSURL URLWithString:urlString];
+    
+    NSURL *url = [NSURL URLWithString:@"resource" relativeToURL:baseUrl];
+    
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        NSLog(@"Stream: %@", JSON[0][@"mac"]);
+        _servers = JSON[@"servers"];
+        _cameras = JSON[@"cameras"];
     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
         NSLog(@"Error: %@", error);
     }];
