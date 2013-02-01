@@ -6,6 +6,8 @@
 #ifndef ASYNCHTTPCLIENT_H
 #define ASYNCHTTPCLIENT_H
 
+#include <map>
+
 #include <QObject>
 #include <QUrl>
 #include <QSharedPointer>
@@ -118,7 +120,10 @@ namespace nx_http
         QString m_userAgent;
         QString m_userName;
         QString m_userPassword;
+        bool m_authorizationTried;
+        std::map<BufferType, BufferType> m_customHeaders;
 
+        bool doGetPrivate( const QUrl& url );
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
@@ -136,6 +141,8 @@ namespace nx_http
             \return true, if connected
         */
         bool reconnectIfAppropriate();
+        //!Composes request with authorization header based on \a response
+        bool resendRequstWithAuthorization( const nx_http::HttpResponse& response );
 
         static const char* toString( State state );
     };

@@ -5,10 +5,11 @@
 #include <QHttpRequestHeader>
 #include <QNetworkInterface>
 #include "utils/common/long_runnable.h"
-#include "utils/common/pimpl.h"
 
 class TCPSocket;
 class QnTCPConnectionProcessor;
+
+class QnTcpListenerPrivate;
 
 class QnTcpListener: public QnLongRunnable
 {
@@ -23,14 +24,19 @@ public:
     void updatePort(int newPort);
     void* getOpenSSLContext();
     bool enableSSLMode();
+
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
+
 private:
     void removeDisconnectedConnections();
     void removeAllConnections();
-private:
-    QN_DECLARE_PRIVATE(QnTcpListener);
+
+protected:
+    Q_DECLARE_PRIVATE(QnTcpListener);
+
+    QnTcpListenerPrivate *d_ptr;
 };
 
 

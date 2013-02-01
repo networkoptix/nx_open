@@ -9,8 +9,8 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <events/business_event_rule.h>
-#include <events/business_logic_common.h>
+#include <business/business_event_rule.h>
+#include <business/business_logic_common.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -46,7 +46,16 @@ namespace QnBusiness {
     Q_DECLARE_FLAGS(Fields, Field)
 
     enum ItemDataRole {
-        ModifiedRole   = Qt::UserRole + 1
+        ModifiedRole   = Qt::UserRole + 1,
+        DisabledRole,
+        ValidRole,
+        InstantActionRole,
+        ShortTextRole,
+
+        EventTypeRole,
+        EventResourcesRole,
+        ActionTypeRole,
+        ActionResourcesRole
     };
 
 }
@@ -64,11 +73,14 @@ public:
     bool setData(const int column, const QVariant &value, int role);
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
-    bool actionTypeShouldBeInstant();
+    bool actionTypeShouldBeInstant() const;
     QnBusinessEventRulePtr createRule() const;
 
     QVariant getText(const int column, const bool detailed = true) const;
     QVariant getIcon(const int column) const;
+
+    bool isValid(int column) const;
+    bool isValid() const; //checks validity for all row
 
     QnId id() const;
 
@@ -117,6 +129,13 @@ signals:
 private:
     void updateActionTypesModel();
 
+    /**
+     * @brief getSourceText     Get text for the Source field.
+     * @param detailed          Detailed text is used in the table cell.
+     *                          Not detailed - as the button caption and in the advanced view.
+     * @return                  Formatted text.
+     */
+    QString getSourceText(const bool detailed) const;
     QString getTargetText(const bool detailed) const;
 
 private:

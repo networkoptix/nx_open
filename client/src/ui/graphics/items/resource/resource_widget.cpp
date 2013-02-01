@@ -121,7 +121,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_glWidget(NULL),
     m_options(DisplaySelectionOverlay | DisplayButtons),
     m_localActive(false),
     m_channelsLayout(NULL),
@@ -721,22 +720,17 @@ void QnResourceWidget::updateOverlayWidgetsGeometry() {
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) {
-    if(painter->device() == m_glWidget) {
-        paint(painter, option, m_glWidget);
+void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
+    if (painter->paintEngine() == NULL) {
+        qnWarning("No OpenGL-compatible paint engine was found.");
         return;
     }
 
-    m_glWidget = dynamic_cast<QGLWidget *>(painter->device());
-    if(!m_glWidget) {
-        qnWarning("Painting on non-OpenGL widget is not supported.");
+    if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
+        qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
     }
 
-    paint(painter, option, m_glWidget);
-}
-
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QGLWidget *) {
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_resourceWidget_pausedPainterStorage()->get(QGLContext::currentContext());
         m_loadingProgressPainter = qn_resourceWidget_loadingProgressPainterStorage()->get(QGLContext::currentContext());
@@ -849,7 +843,6 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     painter->fillRect(rect, QColor(0, 0, 0, 128));
 
     if(overlay == LoadingOverlay || overlay == PausedOverlay || overlay == EmptyOverlay) {
-        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
         qreal unit = qnGlobals->workbenchUnitSize();
 
         painter->beginNativePainting();
@@ -867,6 +860,7 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
+            qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
                 painter->opacity()

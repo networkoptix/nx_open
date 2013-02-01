@@ -62,8 +62,6 @@ namespace {
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
     m_resolutionMode(Qn::AutoResolution),
-    m_display(NULL),
-    m_renderer(NULL),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false)
 {
@@ -79,6 +77,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
+
+    const QGLWidget *viewPortAsGLWidget = qobject_cast<const QGLWidget *>(QnWorkbenchContextAware::display()->view()->viewport());
+    m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL);
+    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
+    m_display->addRenderer(m_renderer);
 
     /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
@@ -381,15 +384,7 @@ void QnMediaResourceWidget::setResolutionMode(Qn::ResolutionMode resolutionMode)
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QGLWidget *widget) {
-    if(!m_renderer) {
-        m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, widget->context());
-        connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
-        m_display->addRenderer(m_renderer);
-
-        updateRendererChannelScreenSize();
-    }
-
+void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     base_type::paint(painter, option, widget);
 
     if(isDecorationsVisible() && isInfoVisible())
@@ -558,14 +553,14 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
     if(!m_connection)
         return;
 
-    QnVirtualCameraResource::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
-    if(capabilities & QnVirtualCameraResource::PtzCapability) {
+    Qn::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
+    if(capabilities & Qn::ContinuousPtzCapability) {
         if(qFuzzyIsNull(zoomSpeed)) {
             m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
         } else {
             m_connection->asyncPtzMove(m_camera, 0.0, 0.0, zoomSpeed, this, SLOT(at_replyReceived(int, int)));
         }
-    } else if(capabilities & QnVirtualCameraResource::ZoomCapability) {
+    } else if(capabilities & Qn::ZoomCapability) {
         CameraSetting setting(
             QLatin1String("%%Lens%%Zoom"),
             QLatin1String("Zoom"),
@@ -660,11 +655,6 @@ void QnMediaResourceWidget::updateServerResource() {
     updateIconButton();
 }
 
-void QnMediaResourceWidget::updateRendererChannelScreenSize() {
-    if(m_renderer)
-        m_renderer->setChannelScreenSize(channelScreenSize());
-}
-
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
         return Qn::RecordingType_Never;
@@ -718,7 +708,6 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
         qFreeAligned(m_binaryMotionMask.back());
         m_binaryMotionMask.pop_back();
     }
-
     while(m_binaryMotionMask.size() < channelCount()) {
         m_binaryMotionMask.push_back(static_cast<__m128i *>(qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, 32)));
         memset(m_binaryMotionMask.back(), 0, MD_WIDTH * MD_HEIGHT / 8);
@@ -728,7 +717,7 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
 void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
     base_type::channelScreenSizeChangedNotify();
 
-    updateRendererChannelScreenSize();
+    m_renderer->setChannelScreenSize(channelScreenSize());
 }
 
 void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
@@ -748,10 +737,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 }
 
 QString QnMediaResourceWidget::calculateInfoText() const {
-    /* Don't access display object unless renderer has been constructed. */
-    if(!m_renderer)
-        return QString();
-
     qreal fps = 0.0;
     qreal mbps = 0.0;
     for(int i = 0; i < channelCount(); i++) {
@@ -788,8 +773,19 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
         );
     }
-    
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(hqLqString).arg(timeString);
+
+//#ifdef _DEBUG
+    QString decoderType = m_renderer->isHardwareDecoderUsed(0) ? tr(" HW") : tr(" SW");
+//#endif
+
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2)
+        .arg(codecString).arg(hqLqString)
+//#ifdef _DEBUG
+        .arg(decoderType)
+//#else
+//        .arg(QString())
+//#endif
+        .arg(timeString);
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
@@ -803,7 +799,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if(m_camera) {
         if(
-            (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::PtzCapability | QnVirtualCameraResource::ZoomCapability)) && 
+            (m_camera->getCameraCapabilities() & (Qn::ContinuousPtzCapability | Qn::ZoomCapability)) && 
             accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;
@@ -866,7 +862,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::PtzCapability);
+    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & Qn::ContinuousPtzCapability);
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

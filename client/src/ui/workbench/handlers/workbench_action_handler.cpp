@@ -198,6 +198,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::OpenServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_openServerSettingsAction_triggered()));
+    connect(action(Qn::OpenPopupSettingsAction),                SIGNAL(triggered()),    this,   SLOT(at_openPopupSettingsAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
@@ -837,17 +838,14 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    qDebug() << "action received" << businessAction;
-
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
-
 
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 
-    popupCollectionWidget()->addBusinessAction(businessAction);
-    popupCollectionWidget()->show();
+    if (popupCollectionWidget()->addBusinessAction(businessAction))
+        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1267,6 +1265,13 @@ void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
     dialog->exec();
 }
 
+void QnWorkbenchActionHandler::at_openPopupSettingsAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->openPopupSettingsPage();
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -1315,7 +1320,6 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->addExample();
     popupCollectionWidget()->show();
 }
 
@@ -1746,13 +1750,13 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
     QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    dialog->exec(); */
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {

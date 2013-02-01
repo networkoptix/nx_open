@@ -353,6 +353,12 @@ qint64 QnPlColdStoreStorage::getFreeSpace()
     return 10*1024*1024*1024ll;
 }
 
+qint64 QnPlColdStoreStorage::getTotalSpace() 
+{
+    return 1000ll * 10*1024*1024*1024ll;
+}
+
+
 QnCSFileInfo QnPlColdStoreStorage::getFileInfo(const QString& fn)
 {
     QString nfn = normolizeFileName(fn);

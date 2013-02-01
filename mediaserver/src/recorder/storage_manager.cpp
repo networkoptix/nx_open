@@ -122,8 +122,8 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
     QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
-    if (oldStorage)
-        storage->addWritedSpace(oldStorage->getWritedSpace());
+    //if (oldStorage)
+    //    storage->addWritedSpace(oldStorage->getWritedSpace());
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);
@@ -266,7 +266,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
             for (FileCatalogMap::const_iterator itr = m_devFileCatalogHi.constBegin(); itr != m_devFileCatalogHi.constEnd(); ++itr)
             {
                 qint64 firstTime = itr.value()->firstTime();
-                if (firstTime != AV_NOPTS_VALUE && firstTime < minTime)
+                if (firstTime != (qint64)AV_NOPTS_VALUE && firstTime < minTime)
                 {
                     minTime = itr.value()->firstTime();
                     mac = itr.key();
@@ -278,12 +278,13 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         if (catalog != 0) 
         {
             qint64 fileSize = catalog->deleteFirstRecord();
-            toDelete -= fileSize;
+            if (fileSize > 0)
+                toDelete -= fileSize;
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
             if (catalogLowRes != 0) 
             {
                 qint64 minTime = catalog->minTime();
-                if (minTime != AV_NOPTS_VALUE) {
+                if (minTime != (qint64)AV_NOPTS_VALUE) {
                     int idx = catalogLowRes->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
                     if (idx != -1)
                         toDelete -= catalogLowRes->deleteRecordsBefore(idx);
@@ -292,7 +293,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                     catalogLowRes->clear();
                 }
             }
-            if (fileSize == 0)
+            if (fileSize == -1)
                 break; // nothing to delete
         }
         else
@@ -321,7 +322,8 @@ void QnStorageManager::updateStorageStatistics()
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
-        qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        qint64 storageSpace = fileStorage->getSpaceLimit();
         totalSpace += storageSpace;
     }
 
@@ -331,7 +333,8 @@ void QnStorageManager::updateStorageStatistics()
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
-        qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        qint64 storageSpace = fileStorage->getSpaceLimit();
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
@@ -340,7 +343,7 @@ void QnStorageManager::updateStorageStatistics()
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
     QnStorageResourcePtr result;
-    float minBitrate = INT_MAX;
+    float minBitrate = (float) INT_MAX;
 
     {
         QMutexLocker lock(&m_mutexStorages);
@@ -504,7 +507,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     if (storageIndex == -1)
         return false;
     storage->releaseBitrate(provider);
-    storage->addWritedSpace(fileSize);
+    //storage->addWritedSpace(fileSize);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)

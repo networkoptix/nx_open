@@ -55,6 +55,7 @@ protected:
     virtual void putData(QnAbstractDataPacketPtr data) override;
 
     virtual void endOfRun() override;
+    virtual bool saveData(QnAbstractMediaDataPtr md) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
@@ -62,6 +63,8 @@ private:
     void updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData);
     void setSpecialRecordingMode(QnScheduleTask& task);
     int getFpsForValue(int fps);
+    void writeRecentlyMotion(qint64 writeAfterTime);
+    void keepRecentlyMotion(QnAbstractMediaDataPtr md);
 private slots:
     void at_recordingFailed(QString msg);
 private:
@@ -85,6 +88,8 @@ private:
     bool m_lastMotionState; // true if motion in progress
     qint64 m_queuedSize;
     QMutex m_queueSizeMutex;
+    qint64 m_lastMediaTime;
+    QQueue<QnAbstractMediaDataPtr> m_recentlyMotion;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

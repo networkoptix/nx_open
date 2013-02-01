@@ -20,7 +20,7 @@
 #include "utils/common/math.h"
 #include "utils/common/timermanager.h"
 #include "api/app_server_connection.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 #include "soap/soapserver.h"
 #include "soapStub.h"
 
@@ -76,12 +76,12 @@ public:
         else if (resp.Options->JPEG)
             srcVector = &resp.Options->JPEG->ResolutionsAvailable;
         if (srcVector) {
-            for (int i = 0; i < srcVector->size(); ++i)
+            for (uint i = 0; i < srcVector->size(); ++i)
                 resolutions << QSize(srcVector->at(i)->Width, srcVector->at(i)->Height);
         }
         isH264 = resp.Options->H264 && isH264Allowed;
         if (isH264) {
-            for (int i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
+            for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
                 h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
             qSort(h264Profiles);
 
@@ -115,11 +115,11 @@ public:
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
     int square1 = 0;
-    for (uint i = 0; i < s1.resolutions.size(); ++i)
+    for (int i = 0; i < s1.resolutions.size(); ++i)
         square1 = qMax(square1, s1.resolutions[i].width() * s1.resolutions[i].height());
     
     int square2 = 0;
-    for (uint i = 0; i < s2.resolutions.size(); ++i)
+    for (int i = 0; i < s2.resolutions.size(); ++i)
         square2 = qMax(square2, s2.resolutions[i].width() * s2.resolutions[i].height());
 
     if (square1 != square2)
@@ -392,27 +392,29 @@ bool QnPlOnvifResource::initInternal()
     //Additional camera settings
     fetchAndSetCameraSettings();
 
-    CameraCapabilities addFlags = NoCapabilities;
+    Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
     if (m_ptzController)
-        addFlags |= PtzCapability;
+        addFlags |= m_ptzController->getCapabilities();
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
-        addFlags |= PrimaryStreamSoftMotionCapability;
+        addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming())
-        setMotionType(MT_NoMotion);
+        setMotionType(Qn::MT_NoMotion);
 
     
-    if (addFlags != NoCapabilities)
+    if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
 
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
     fetchRelayOutputs( &relayOutputs );
     if( !relayOutputs.empty() )
-        setCameraCapability(QnSecurityCamResource::relayOutput, true);
+    {
+        setCameraCapability( Qn::relayOutput, true );
+        setCameraCapability( Qn::relayInput, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+    }
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )
-    //    setCameraCapability( QnSecurityCamResource::relayInput, true );
-    //startInputPortMonitoring();
+    //    setCameraCapability( Qn::relayInput, true );
 
     save();
 
@@ -780,7 +782,7 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     QBuffer srcDataBuffer;
     srcDataBuffer.setData(
         notification.Message.__any,
-        strlen(notification.Message.__any) );
+        (int) strlen(notification.Message.__any) );
     QXmlInputSource xmlSrc( &srcDataBuffer );
     if( !reader.parse( &xmlSrc ) )
         return;
@@ -827,7 +829,8 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
             toSharedPointer(),
             portSourceIter->value,
             newPortState,
-            handler.utcTime.toMSecsSinceEpoch() );
+            QDateTime::currentMSecsSinceEpoch() );  //it is not absolutely correct, but better than de-synchronized timestamp from camera
+            //handler.utcTime.toMSecsSinceEpoch() );
     }
 }
 
@@ -1238,24 +1241,27 @@ bool QnPlOnvifResource::setRelayOutputState(
         ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
         requiredDelayTime = ss.str();
     }
-    if( (relayOutputInfo.isBistable != isBistableModeRequired) || (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) )
+    if( (relayOutputInfo.isBistable != isBistableModeRequired) || 
+        (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) ||
+        relayOutputInfo.activeByDefault )
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
         relayOutputInfo.delayTime = requiredDelayTime;
+        relayOutputInfo.activeByDefault = false;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
             NX_LOG( QString::fromAscii("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5. %6").
-                arg(QString()).arg(outputID).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
+                arg(QString()).arg(QString::fromStdString(relayOutputInfo.token)).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
                 arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")).arg(m_prevSoapCallResult), cl_logWARNING );
             return false;
         }
 
         NX_LOG( QString::fromAscii("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
             arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING );
-}
+    }
 
-    //modifing output
+    //modifying output
     const QAuthenticator& auth = getAuth();
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
@@ -1264,23 +1270,23 @@ bool QnPlOnvifResource::setRelayOutputState(
         m_timeDrift );
 
     _onvifDevice__SetRelayOutputState request;
-    request.RelayOutputToken = outputID.toStdString();
+    request.RelayOutputToken = relayOutputInfo.token;
     request.LogicalState = active ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
     _onvifDevice__SetRelayOutputStateResponse response;
     m_prevSoapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
-{
+    {
         NX_LOG( QString::fromAscii("Failed to set relay %1 output state to %2. endpoint %3").
-            arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+            arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
 
     NX_LOG( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
-        arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
     return true;
 }
 
-int  QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
+int QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
 {
     if (videoOptionsLocal.h264Profiles.isEmpty())
         return -1;
@@ -1313,7 +1319,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
 
     int confRangeStart = 0;
-    int confRangeEnd = confResponse.Configurations.size();
+    int confRangeEnd = (int) confResponse.Configurations.size();
     if (m_maxChannels > 1)
     {
         // determine amount encoder configurations per each video source
@@ -1630,7 +1636,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        if (response.Configurations.size() > m_channelNumer) 
+        if ((int)response.Configurations.size() > m_channelNumer)
         {
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(m_channelNumer);
         if (conf) {
@@ -1705,7 +1711,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
             << ". " << soapWrapper.getLastError();
         return false;
     }
-    m_maxChannels = response.VideoSources.size();
+    m_maxChannels = (int) response.VideoSources.size();
     return true;
 }
 
@@ -1728,7 +1734,7 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
 
     }
 
-    m_maxChannels = response.VideoSources.size();
+    m_maxChannels = (int) response.VideoSources.size();
 
     if (m_maxChannels <= m_channelNumer) {
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
@@ -1797,7 +1803,7 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
     }
 
     std::string srcToken = m_videoSourceToken.toStdString();
-    for (int i = 0; i < response.Configurations.size(); ++i)
+    for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(i);
         if (!conf || conf->SourceToken != srcToken)
@@ -1843,7 +1849,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
 
     }
 
-    if (response.Configurations.size() <= m_channelNumer) {
+    if ((int)response.Configurations.size() <= m_channelNumer) {
         qWarning() << "QnPlOnvifResource::fetchAndSetAudioSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
@@ -2155,10 +2161,10 @@ bool QnPlOnvifResource::startInputPortMonitoring()
     if( !m_eventCapabilities )
         return false;
 
-    /*if( QnSoapServer::instance()->initialized() )
-        return registerNotificationConsumer();
-    else*/ if( m_eventCapabilities->WSPullPointSupport )
+    if( m_eventCapabilities->WSPullPointSupport )
         return createPullPointSubscription();
+    else if( QnSoapServer::instance()->initialized() )
+        return registerNotificationConsumer();
     else
         return false;
 }
@@ -2167,7 +2173,9 @@ void QnPlOnvifResource::stopInputPortMonitoring()
 {
     //removing timer
     TimerManager::instance()->deleteTimer( m_timerID );
+    m_timerID = 0;
     TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
+    m_renewSubscriptionTaskID = 0;
     //TODO/IMPL removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -2313,6 +2321,8 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
 // QnPlOnvifResource
 //////////////////////////////////////////////////////////
 
+static const int DEFAULT_HTTP_PORT = 80;
+
 bool QnPlOnvifResource::registerNotificationConsumer()
 {
     QMutexLocker lk( &m_subscriptionMutex );
@@ -2320,17 +2330,14 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
     QString localAddress;
-    try
-    {
-        TCPSocket sock( eventServiceURL.host(), eventServiceURL.port() );
-        localAddress = sock.getLocalAddress();
-    }
-    catch( const SocketException& e )
+    TCPSocket sock( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) );
+    if( !sock.isConnected() )
     {
         NX_LOG( QString::fromLatin1("Failed to connect to %1:%2 to determine local address. %3").
-            arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(QLatin1String(e.what())), cl_logWARNING );
+            arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
         return false;
     }
+    localAddress = sock.getLocalAddress();
 
     const QAuthenticator& auth = getAuth();
     NotificationProducerSoapWrapper soapWrapper(
@@ -2353,7 +2360,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
     std::string initialTerminationTime( buf );
     request.InitialTerminationTime = &initialTerminationTime;
-    time_t utcTerminationTime = ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
 
     //creating filter
     //oasisWsnB2__FilterType topicFilter;
@@ -2390,7 +2397,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         QBuffer srcDataBuffer;
         srcDataBuffer.setData(
             response.SubscriptionReference->ns1__ReferenceParameters->__item,
-            strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
         QXmlInputSource xmlSrc( &srcDataBuffer );
         if( reader.parse( &xmlSrc ) )
             m_onvifNotificationSubscriptionID = handler.subscriptionID;
@@ -2420,9 +2427,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {
-    //return false;   //not implemented yet
-
-
     const QAuthenticator& auth = getAuth();
     EventSoapWrapper soapWrapper(
         m_eventCapabilities->XAddr,
@@ -2453,7 +2457,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
         QBuffer srcDataBuffer;
         srcDataBuffer.setData(
             response.SubscriptionReference->ns1__ReferenceParameters->__item,
-            strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
         QXmlInputSource xmlSrc( &srcDataBuffer );
         if( reader.parse( &xmlSrc ) )
             m_onvifNotificationSubscriptionID = handler.subscriptionID;
@@ -2471,6 +2475,11 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
+}
+
+bool QnPlOnvifResource::isInputPortMonitored() const
+{
+    return m_timerID != 0;
 }
 
 bool QnPlOnvifResource::pullMessages()
@@ -2542,7 +2551,7 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
             response.RelayOutputs[i]->token,
             response.RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode__Bistable,
             response.RelayOutputs[i]->Properties->DelayTime,
-            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState__open ) );
+            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState__closed ) );
     }
 
     if( relayOutputs )
@@ -2562,7 +2571,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
          i < m_relayOutputInfo.size();
         ++i )
     {
-        if( m_relayOutputInfo[i].token == outputID )
+        if( m_relayOutputInfo[i].token == outputID || outputID.empty() )
         {
             *relayOutputInfo = m_relayOutputInfo[i];
             return true;
@@ -2591,7 +2600,7 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
     onvifXsd__RelayOutputSettings relayOutputSettings;
     relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode__Bistable : onvifXsd__RelayMode__Monostable;
     relayOutputSettings.DelayTime = !relayOutputInfo.delayTime.empty() ? relayOutputInfo.delayTime : "PT1S";
-    relayOutputSettings.IdleState = onvifXsd__RelayIdleState__closed;
+    relayOutputSettings.IdleState = relayOutputInfo.activeByDefault ? onvifXsd__RelayIdleState__closed : onvifXsd__RelayIdleState__open;
     setOutputSettingsRequest.Properties = &relayOutputSettings;
     _onvifDevice__SetRelayOutputSettingsResponse setOutputSettingsResponse;
     m_prevSoapCallResult = soapWrapper.setRelayOutputSettings( setOutputSettingsRequest, setOutputSettingsResponse );

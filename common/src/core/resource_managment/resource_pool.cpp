@@ -150,8 +150,11 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
 
-        if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
-            resource->init();
+        if (!resource->hasFlags(QnResource::foreigner))
+        {
+            if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
+                resource->init();
+        }
 
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);

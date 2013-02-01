@@ -470,16 +470,16 @@ QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int
 void detail::QnMediaServerFreeSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle)
 {
     qint64 freeSpace = -1;
-    qint64 usedSpace = -1;
+    qint64 totalSpace = -1;
 
     if(response.status == 0)
     {
         QByteArray message = extractXmlBody(response.data, "root");
         freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
-        usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
+        totalSpace = extractXmlBody(message, "totalSpace").toLongLong();
     }
 
-    emit finished(response.status, freeSpace, usedSpace, handle);
+    emit finished(response.status, freeSpace, totalSpace, handle);
 
     deleteLater();
 }

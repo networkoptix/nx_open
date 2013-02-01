@@ -31,6 +31,7 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
+    virtual qint64 getTotalSpace() override;
 
 protected:
 private:

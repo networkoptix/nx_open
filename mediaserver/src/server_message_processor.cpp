@@ -8,7 +8,7 @@
 #include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
-#include "events/business_rule_processor.h"
+#include <business/business_rule_processor.h>
 
 Q_GLOBAL_STATIC(QnServerMessageProcessor, static_instance)
 

@@ -65,7 +65,7 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
 
 bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNumber)
 {
-    int ch = channelNumber.toInt();
+    quint32 ch = channelNumber.toUInt();
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     return media && media->channelNumber == ch;
 }

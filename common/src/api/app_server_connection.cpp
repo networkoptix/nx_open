@@ -8,7 +8,7 @@
 #include "utils/common/synctime.h"
 #include "message.pb.h"
 
-#include <events/abstract_business_action.h>
+#include <business/actions/abstract_business_action.h>
 
 namespace {
     const QLatin1String cameraObject("camera");
@@ -162,7 +162,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
 
         if(status == 0) {
             try {
-                m_serializer.deserializeKvPairs(settings, result);
+                m_serializer.deserializeSettings(settings, result);
             } catch (const QnSerializeException& e) {
                 errorString += e.errorString();
             }
@@ -466,7 +466,7 @@ int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs/*, QObj
   //  QObject::connect(processor, SIGNAL(finishedSetting(int,QByteArray,QnKvPairList,int)), target, slot);
 
     QByteArray data;
-    m_serializer.serializeKvPairs(kvPairs, data);
+    m_serializer.serializeSettings(kvPairs, data);
 
     return addObjectAsync(settingObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }

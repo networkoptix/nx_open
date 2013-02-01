@@ -151,6 +151,7 @@ namespace nx_http
             ok = 200,
             multipleChoices = 300,
             badRequest = 400,
+            unauthorized = 401,
             forbidden = 403,
             notFound = 404,
             internalServerError = 500,
@@ -268,6 +269,7 @@ namespace nx_http
 
 			const char* toString( Value val );
 			Value fromString( const char* str );
+			Value fromString( const ConstBufferRefType& str );
 		}
 
         //!Login/password to use in http authorization
@@ -294,7 +296,7 @@ namespace nx_http
             public UserCredentials
 		{
 		public:
-			//TODO
+			QMap<BufferType, BufferType> params;
 
 			bool parse( const BufferType& str );
 			void serialize( BufferType* const dstBuffer ) const;
@@ -333,6 +335,27 @@ namespace nx_http
         {
         public:
             BasicAuthorization( const StringType& userName, const StringType& userPassword );
+        };
+
+        class DigestAuthorization
+        :
+            public Authorization
+        {
+        public:
+            DigestAuthorization();
+
+            void addParam( const BufferType& name, const BufferType& value );
+        };
+
+        class WWWAuthenticate
+        {
+        public:
+            AuthScheme::Value authScheme;
+            QMap<BufferType, BufferType> params;
+
+            WWWAuthenticate();
+
+			bool parse( const BufferType& str );
         };
     }
 }

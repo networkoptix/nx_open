@@ -102,6 +102,7 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
+/*
 int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
 { 
     _wsse__Security *security = soap_wsse_add_Security(soap);
@@ -109,6 +110,7 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
     security->UsernameToken->Password->Type = (char*) wsse_PasswordTextURI;
     return SOAP_OK;
 }
+*/
 
 } // anonymous namespace
 

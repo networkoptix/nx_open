@@ -254,7 +254,7 @@ namespace nx_http
 
                 case readingChunkSize:
                     if( currentChar >= '0' && currentChar <= '9' && 
-                        (currentChar >= 'a' && currentChar <= 'f' || currentChar >= 'A' && currentChar <= 'F') )
+                        ((currentChar >= 'a' && currentChar <= 'f') || (currentChar >= 'A' && currentChar <= 'F')) )
                     {
                         m_currentChunkSize <<= 4;
                         m_currentChunkSize += hexCharToInt(currentChar);
@@ -304,7 +304,7 @@ namespace nx_http
                     }
 
                     const size_t bytesToCopy = std::min<>( m_currentChunkSize - m_currentChunkBytesRead, maxOffset - currentOffset );
-                    m_msgBodyBuffer.append( data.data()+currentOffset, bytesToCopy );
+                    m_msgBodyBuffer.append( data.data()+currentOffset, (int) bytesToCopy );
                     m_messageBodyBytesRead += bytesToCopy;
                     m_currentChunkBytesRead += bytesToCopy;
                     currentOffset += bytesToCopy;
@@ -362,14 +362,14 @@ namespace nx_http
 
     size_t HttpStreamReader::readIdentityStream( const BufferType& data, size_t offset, size_t count )
     {
-        Q_ASSERT( offset < data.size() );
+        Q_ASSERT( (int)offset < data.size() );
 
         if( count == BufferNpos )
             count = data.size() - offset;
         const size_t bytesToCopy = m_contentLength > 0
             ? std::min<size_t>( count, m_contentLength-m_messageBodyBytesRead )
             : count;    //Content-Length is unknown
-        m_msgBodyBuffer.append( data.data() + offset, bytesToCopy );
+        m_msgBodyBuffer.append( data.data() + offset, (int) bytesToCopy );
         m_messageBodyBytesRead += bytesToCopy;
         return bytesToCopy;
     }

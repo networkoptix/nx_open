@@ -6,10 +6,10 @@
 
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
-#include "utils/common/pimpl.h"
 #include "utils/common/byte_array.h"
 
 class QnTcpListener;
+class QnTCPConnectionProcessorPrivate;
 
 class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
@@ -61,8 +61,12 @@ protected:
     bool readRequest();
     QUrl getDecodedUrl() const;
 
-    QN_DECLARE_PRIVATE(QnTCPConnectionProcessor);
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
+
+protected:
+    Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
+
+    QnTCPConnectionProcessorPrivate *d_ptr;
 };
 
 #endif // __TCP_CONNECTION_PROCESSOR_H__

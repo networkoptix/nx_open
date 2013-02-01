@@ -45,17 +45,32 @@ public:
     QString getFirmware() const;
     void setFirmware(QString firmware);
 
-signals:
-    void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
-    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource) override;
+	virtual QString getUniqueId() const override;
 
+// -------------------------------------------------------------------------- //
+// Begin QnSecurityCamResource metaobject support
+// -------------------------------------------------------------------------- //
+    /* These are copied from QnSecurityCamResource. For metaobject system to work
+     * correctly, no signals/slots must be declared before these ones. */
 public slots:
     virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
     virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
 
+    virtual void recordingEventAttached() override { QnSecurityCamResource::recordingEventAttached(); }
+    virtual void recordingEventDetached() override { QnSecurityCamResource::recordingEventDetached(); }
+
+signals:
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+
 protected slots:
     virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
+// -------------------------------------------------------------------------- //
+// End QnSecurityCamResource metaobject support
+// -------------------------------------------------------------------------- //
+
+signals:
+    void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
 
 private:
     bool m_scheduleDisabled;
@@ -68,7 +83,6 @@ private:
 
     QnAbstractDTSFactory* m_dtsFactory;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
 
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource

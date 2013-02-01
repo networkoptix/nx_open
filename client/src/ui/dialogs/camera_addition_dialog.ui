@@ -466,19 +466,6 @@
    <item>
     <layout class="QHBoxLayout" name="buttonsLayout">
      <item>
-      <widget class="QPushButton" name="addButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>&amp;Add selected</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -490,6 +477,19 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="addButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>&amp;Add selected</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="closeButton">
@@ -532,7 +532,6 @@
   <tabstop>portAutoCheckBox</tabstop>
   <tabstop>scanButton</tabstop>
   <tabstop>stopScanButton</tabstop>
-  <tabstop>addButton</tabstop>
   <tabstop>closeButton</tabstop>
  </tabstops>
  <resources/>

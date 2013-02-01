@@ -115,8 +115,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_resource(resource),
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
 	m_receivedInterval(0),
-    m_fullScreen(false),
     m_archiveReader(reader),
+    m_fullScreen(false),
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false)
 {
@@ -238,16 +238,16 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 			}
 		}
 	}
-};
+}
 
-QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
-{
+QnArchiveStreamReader* QnCamDisplay::getArchiveReader() const {
     return m_archiveReader;
 }
 
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
     Q_UNUSED(needToSleep)
+    Q_UNUSED(speed)
 
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         return;
@@ -450,7 +450,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
-        else if (m_display[0] && !m_display[0]->selfSyncUsed()) {
+        else if (!m_display[0]->selfSyncUsed()) {
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed) {
                 if (m_isRealTimeSource)
                     realSleepTime = m_delay.terminatedSleep(needToSleep, needToSleep*qAbs(speed)*2);
@@ -521,7 +521,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0) 
+            if (m_buffering && m_executingJump == 0 && !m_afterJump)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
@@ -967,7 +967,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 
     {
         if (vd && m_display[vd->channelNumber] )
-            m_display[vd->channelNumber]->waitForFramesDisplaed();
+            m_display[vd->channelNumber]->waitForFramesDisplayed();
         if (vd || ad)
             afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
@@ -1187,6 +1187,14 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
 
     return true;
+}
+
+void QnCamDisplay::pleaseStop()
+{
+    QnAbstractDataConsumer::pleaseStop();
+    for( int i = 0; i < CL_MAX_CHANNELS; ++i )
+        if( m_display[i] )
+            m_display[i]->pleaseStop();
 }
 
 void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
@@ -1526,7 +1534,7 @@ void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)
         m_lastTime = AV_NOPTS_VALUE;
         return;
     }
-    if (m_lastTime != AV_NOPTS_VALUE)
+    if (m_lastTime != (qint64)AV_NOPTS_VALUE)
     {
         qint64 diff = qAbs(vd->timestamp - m_lastTime);
         if (m_queue.size() >= MAX_QUEUE_SIZE) {

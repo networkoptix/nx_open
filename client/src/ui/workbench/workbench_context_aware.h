@@ -36,6 +36,8 @@ public:
 
     QnWorkbenchContextAware(QnWorkbenchContext *context);
 
+    QnWorkbenchContextAware(QObject *parent, QnWorkbenchContext *context);
+
     /**
      * Virtual destructor.
      * 
@@ -69,6 +71,10 @@ protected:
     QnWorkbenchDisplay *display() const;
 
     QnWorkbenchNavigator *navigator() const;
+
+private:
+    void init(QObject *parent);
+    void init(QnWorkbenchContext *context);
 
 private:
     QnWorkbenchContext *m_context;

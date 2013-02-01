@@ -93,7 +93,8 @@ void QnResource::update(QnResourcePtr other)
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 
     }
-    setStatus(other->m_status);
+	bool silenceMode = other->hasFlags(QnResource::foreigner);
+    setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
 
@@ -226,7 +227,11 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    return m_resourcePool->getResourceById(getParentId());
+    QMutexLocker mutexLocker(&m_mutex);
+    if (m_resourcePool)
+        return m_resourcePool->getResourceById(getParentId());
+    else
+        return QnResourcePtr();
 }
 
 
@@ -574,6 +579,9 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
+
+    Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
     emit statusChanged(toSharedPointer(this));
 
     QMutexLocker mutexLocker(&m_mutex);
@@ -610,7 +618,7 @@ void QnResource::setId(QnId id) {
     if(m_id == id)
         return;
 
-    QnId oldId = m_id;
+    //QnId oldId = m_id;
     m_id = id;
 }
 
@@ -733,6 +741,10 @@ QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionR
     return 0;
 }
 
+void QnResource::initializationDone()
+{
+}
+
 // -----------------------------------------------------------------------------
 // Temporary until real ResourceFactory is implemented
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)
@@ -788,6 +800,8 @@ void QnResource::init()
     if (!m_initialized) 
     {
         m_initialized = initInternal();
+        if( m_initialized )
+            initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }

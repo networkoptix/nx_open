@@ -196,7 +196,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 
 QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
-
+    Q_UNUSED(doMultichannelCheck)
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())

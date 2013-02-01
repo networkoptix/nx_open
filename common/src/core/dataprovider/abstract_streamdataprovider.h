@@ -41,7 +41,8 @@ public:
 
     void disconnectFromResource();
 
-    virtual void setRole(QnResource::ConnectionRole role) = 0;
+    /* One resource may have several providers used with different roles*/
+    virtual void setRole(QnResource::ConnectionRole role);
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
@@ -49,11 +50,11 @@ signals:
 protected:
     virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
-
 protected:
     QList<QnAbstractDataReceptor*> m_dataprocessors;
     mutable QMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
+    QnResource::ConnectionRole m_role;
 };
 
 #endif //stream_reader_514

@@ -41,7 +41,7 @@ public:
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
 private:
-    double cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
     bool isLocalTimeChanged();
     bool isCameraTimeChanged(const RtspStatistic& statistics);
     void reset();

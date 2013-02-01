@@ -54,7 +54,7 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
-        void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
+        void finished(int status, qint64 freeSpace, qint64 totalSpace, int handle);
     };
 
     class QnMediaServerStatisticsReplyProcessor: public QObject

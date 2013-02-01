@@ -20,6 +20,12 @@ namespace DecoderParameter
                 return "architecture";
             case cpuString:
                 return "cpuString";
+            case cpuFamily:
+                return "cpuFamily";
+            case cpuModel:
+                return "cpuModel";
+            case cpuStepping:
+                return "cpuStepping";
             case displayAdapterDeviceString:
                 return "displayAdapterDeviceString";
             case gpuDeviceString:
@@ -69,6 +75,12 @@ namespace DecoderParameter
             return architecture;
         else if( name == "cpuString" )
             return cpuString;
+        else if( name == "cpuFamily" )
+            return cpuFamily;
+        else if( name == "cpuModel" )
+            return cpuModel;
+        else if( name == "cpuStepping" )
+            return cpuStepping;
         else if( name == "displayAdapterDeviceString" )
             return displayAdapterDeviceString;
         else if( name == "gpuDeviceString" )
@@ -114,6 +126,9 @@ DecoderResourcesNameset::DecoderResourcesNameset()
     registerResource( DecoderParameter::osName, QString::fromAscii("osName"), QVariant::String );
     registerResource( DecoderParameter::architecture, QString::fromAscii("architecture"), QVariant::String );
     registerResource( DecoderParameter::cpuString, QString::fromAscii("cpuString"), QVariant::String );
+    registerResource( DecoderParameter::cpuFamily, QString::fromAscii("cpuFamily"), QVariant::String );
+    registerResource( DecoderParameter::cpuModel, QString::fromAscii("cpuModel"), QVariant::String );
+    registerResource( DecoderParameter::cpuStepping, QString::fromAscii("cpuStepping"), QVariant::String );
     registerResource( DecoderParameter::displayAdapterDeviceString, QString::fromAscii("displayAdapterDeviceString"), QVariant::String );
     registerResource( DecoderParameter::gpuDeviceString, QString::fromAscii("gpuDeviceString"), QVariant::String );
     registerResource( DecoderParameter::driverVersion, QString::fromAscii("driverVersion"), QVariant::String );

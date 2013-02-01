@@ -116,14 +116,17 @@
      <item row="1" column="0">
       <widget class="QRadioButton" name="unsecuredRadioButton">
        <property name="text">
-        <string>Unsecured connection</string>
+        <string>Unsecure connection</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
       <widget class="QRadioButton" name="tlsRadioButton">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
        <property name="text">
-        <string>Secured connection using TLS</string>
+        <string>Secure connection using TLS</string>
        </property>
        <property name="checked">
         <bool>true</bool>

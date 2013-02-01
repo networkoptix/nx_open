@@ -1,25 +1,31 @@
 #ifndef QN_SPACE_MAPPER_H
 #define QN_SPACE_MAPPER_H
 
-#include <cassert>
+#include <boost/array.hpp>
 
-#include <QtCore/QPair>
+#include <QtCore/QVariant>
+#include <QtCore/QStringList>
 
 #include "interpolator.h"
 
+
+// -------------------------------------------------------------------------- //
+// QnScalarSpaceMapper
+// -------------------------------------------------------------------------- //
 class QnScalarSpaceMapper {
 public:
-    QnScalarSpaceMapper() {}
+    QnScalarSpaceMapper() {
+        init(QVector<QPointF>(), m_logicalToPhysical.extrapolationMode());
+    }
 
-    QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal physical0, qreal physical1, Qn::ExtrapolationMode extrapolationMode) {
-        QVector<QPair<qreal, qreal> > logicalToPhysical;
-        logicalToPhysical.push_back(qMakePair(logical0, physical0));
-        logicalToPhysical.push_back(qMakePair(logical1, physical1));
+    QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal physical0, qreal physical1, Qn::ExtrapolationMode extrapolationMode);
+
+    QnScalarSpaceMapper(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
         init(logicalToPhysical, extrapolationMode);
     }
 
-    QnScalarSpaceMapper(const QVector<QPair<qreal, qreal> > &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
-        init(logicalToPhysical, extrapolationMode);
+    bool isNull() const {
+        return m_logicalToPhysical.isNull();
     }
 
     qreal logicalMinimum() const { return m_logicalMinimum; }
@@ -31,41 +37,24 @@ public:
     qreal logicalToPhysical(qreal logicalValue) const { return m_logicalToPhysical(logicalValue); }
     qreal physicalToLogical(qreal physicalValue) const { return m_physicalToLogical(physicalValue); }
 
-private:
-    void init(const QVector<QPair<qreal, qreal> > &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
-        typedef QPair<qreal, qreal> Point; // TODO: #C++0x replace with auto
-        foreach(const Point &v, logicalToPhysical) {
-            m_logicalToPhysical.addPoint(v.first, v.second);
-            m_physicalToLogical.addPoint(v.second, v.first);
-        }
-        m_logicalToPhysical.setExtrapolationMode(extrapolationMode);
-        m_physicalToLogical.setExtrapolationMode(extrapolationMode);
-
-        qreal logicalA, logicalB, physicalA, physicalB;
-        if(m_logicalToPhysical.points().empty()) {
-            logicalA = logicalB = m_physicalToLogical(0.0);
-            physicalA = physicalB = m_logicalToPhysical(0.0);
-        } else {
-            int last = logicalToPhysical.size() - 1;
-
-            logicalA = m_logicalToPhysical.point(0).x;
-            logicalB = m_logicalToPhysical.point(last).x;
-            physicalA = m_physicalToLogical.point(0).x;
-            physicalB = m_physicalToLogical.point(last).x;
-        }
-
-        m_logicalMinimum = qMin(logicalA, logicalB);
-        m_logicalMaximum = qMax(logicalA, logicalB);
-        m_physicalMinimum = qMin(physicalA, physicalB);
-        m_physicalMaximum = qMax(physicalA, physicalB);
-    }
+    const QnInterpolator &logicalToPhysical() const { return m_logicalToPhysical; }
+    const QnInterpolator &physicalToLogical() const { return m_physicalToLogical; }
 
 private:
-    QnInterpolator<qreal> m_physicalToLogical, m_logicalToPhysical;
+    void init(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode);
+
+private:
+    QnInterpolator m_physicalToLogical, m_logicalToPhysical;
     qreal m_logicalMinimum, m_logicalMaximum, m_physicalMinimum, m_physicalMaximum;
 };
 
+void serialize(const QnScalarSpaceMapper &value, QVariant *target);
+bool deserialize(const QVariant &value, QnScalarSpaceMapper *target);
 
+
+// -------------------------------------------------------------------------- //
+// QnVectorSpaceMapper
+// -------------------------------------------------------------------------- //
 class QnVectorSpaceMapper {
 public:
     enum Coordinate {
@@ -83,22 +72,16 @@ public:
         m_mappers[Z] = zMapper;
     }
 
-    const QnScalarSpaceMapper &mapper(Coordinate coordinate) const {
-        assert(coordinate >= 0 && coordinate < CoordinateCount);
+    bool isNull() const {
+        return m_mappers[X].isNull() && m_mappers[Y].isNull() && m_mappers[Z].isNull();
+    }
 
+    const QnScalarSpaceMapper &mapper(Coordinate coordinate) const {
         return m_mappers[coordinate];
     }
 
-    const QnScalarSpaceMapper &xMapper() const {
-        return mapper(X);
-    }
-
-    const QnScalarSpaceMapper &yMapper() const {
-        return mapper(Y);
-    }
-
-    const QnScalarSpaceMapper &zMapper() const {
-        return mapper(Z);
+    void setMapper(Coordinate coordinate, const QnScalarSpaceMapper &mapper) {
+        m_mappers[coordinate] = mapper;
     }
 
     QVector3D logicalToPhysical(const QVector3D &logicalValue) const { 
@@ -118,8 +101,41 @@ public:
     }
 
 private:
-    QnScalarSpaceMapper m_mappers[CoordinateCount];
+    boost::array<QnScalarSpaceMapper, CoordinateCount> m_mappers;
 };
+
+void serialize(const QnVectorSpaceMapper &value, QVariant *target);
+bool deserialize(const QVariant &value, QnVectorSpaceMapper *target);
+
+
+// -------------------------------------------------------------------------- //
+// QnPtzSpaceMapper
+// -------------------------------------------------------------------------- //
+class QnPtzSpaceMapper {
+public:
+    QnPtzSpaceMapper() {}
+    QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper, const QStringList &models): m_fromCamera(mapper), m_toCamera(mapper), m_models(models) {}
+    QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera, const QStringList &models): m_fromCamera(fromCamera), m_toCamera(toCamera), m_models(models) {}
+
+    const QnVectorSpaceMapper &fromCamera() const {
+        return m_fromCamera;
+    }
+
+    const QnVectorSpaceMapper &toCamera() const {
+        return m_toCamera;
+    }
+
+    const QStringList &models() const {
+        return m_models;
+    }
+
+private:
+    QnVectorSpaceMapper m_fromCamera, m_toCamera;
+    QStringList m_models;
+};
+
+void serialize(const QnPtzSpaceMapper &value, QVariant *target);
+bool deserialize(const QVariant &value, QnPtzSpaceMapper *target);
 
 
 #endif // QN_SPACE_MAPPER_H

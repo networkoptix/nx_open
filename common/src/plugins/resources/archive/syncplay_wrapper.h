@@ -5,11 +5,11 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "abstract_archive_stream_reader.h"
 #include "recording/time_period.h"
-#include "utils/common/pimpl.h"
 
 class QnAbstractArchiveReader;
 class QnAbstractArchiveDelegate;
 class QnlTimeSource;
+class QnArchiveSyncPlayWrapperPrivate;
 
 class QnArchiveSyncPlayWrapper: public QObject, public QnlTimeSource, public QnAbstractNavigator
 {
@@ -68,6 +68,8 @@ private slots:
     void onJumpCanceled(qint64 time);
 
 private:
+    friend class QnSyncPlayArchiveDelegate;
+
     qint64 minTime() const;
     qint64 endTime() const;
     qint64 secondTime() const;
@@ -78,9 +80,11 @@ private:
     void setJumpTime(qint64 mksec);
     qint64 maxArchiveTime() const;
     qint64 getCurrentTimeInternal() const;
-private:
-    friend class QnSyncPlayArchiveDelegate;
-    QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);
+
+protected:
+    Q_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);
+
+    QnArchiveSyncPlayWrapperPrivate *d_ptr;
 };
 
 #endif // __SYNCPLAY_WRAPPER_H__

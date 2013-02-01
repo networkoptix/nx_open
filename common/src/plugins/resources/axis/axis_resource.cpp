@@ -6,9 +6,9 @@
 
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
-#include "events/business_event_connector.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
+#include <business/business_event_connector.h>
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
 
 
@@ -127,6 +127,12 @@ void QnPlAxisResource::stopInputPortMonitoring()
         httpClient->scheduleForRemoval();
         lk.relock();
     }
+}
+
+bool QnPlAxisResource::isInputPortMonitored() const
+{
+    QMutexLocker lk( &m_inputPortMutex );
+    return !m_inputPortHttpMonitor.empty();
 }
 
 bool QnPlAxisResource::isInitialized() const
@@ -596,7 +602,9 @@ bool QnPlAxisResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    std::map<QString, unsigned int>::const_iterator it = m_outputPortNameToIndex.find( outputID );
+    std::map<QString, unsigned int>::const_iterator it = outputID.isEmpty()
+        ? m_outputPortNameToIndex.begin()
+        : m_outputPortNameToIndex.find( outputID );
     if( it == m_outputPortNameToIndex.end() )
         return false;
 
@@ -620,7 +628,7 @@ bool QnPlAxisResource::setRelayOutputState(
     if( status / 100 != 2 )
     {
         cl_log.log( QString::fromLatin1("Failed to set camera %1 port %2 output state to %3. Result: %4").
-            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+            arg(getHostAddress()).arg(it->first).arg(activate).arg(::toString(status)), cl_logWARNING );
         return false;
     }
 
@@ -688,6 +696,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
     {
         cl_log.log( QString::fromLatin1("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
             arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        forgetHttpClient( httpClient );
+        httpClient->scheduleForRemoval();
         return;
     }
 
@@ -749,7 +759,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
         nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
             nx_http::ConstBufferRefType(msgBodyBuf, offset),
             &bytesProcessed );
-        offset += bytesProcessed;
+        offset += (int) bytesProcessed;
         switch( resultCode )
         {
             case nx_http::MultipartContentParser::partDataDone:
@@ -761,7 +771,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
                 {
                     m_currentMonitorData.append(
                         m_multipartContentParser.prevFoundData().data(),
-                        m_multipartContentParser.prevFoundData().size() );
+                        (int) m_multipartContentParser.prevFoundData().size() );
                     notificationReceived( m_currentMonitorData );
                     m_currentMonitorData.clear();
                 }
@@ -770,7 +780,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
             case nx_http::MultipartContentParser::someDataAvailable:
                 m_currentMonitorData.append(
                     m_multipartContentParser.prevFoundData().data(),
-                    m_multipartContentParser.prevFoundData().size() );
+                    (int) m_multipartContentParser.prevFoundData().size() );
                 break;
 
             case nx_http::MultipartContentParser::eof:
@@ -796,7 +806,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( inputPortCount > 0 )
-        setCameraCapability(QnSecurityCamResource::relayInput, true);
+        setCameraCapability(Qn::relayInput, true);
 
     unsigned int outputPortCount = 0;
     status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
@@ -804,7 +814,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( outputPortCount > 0 )
-        setCameraCapability(QnSecurityCamResource::relayOutput, true);
+        setCameraCapability(Qn::relayOutput, true);
 
     //reading port direction and names
     for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )

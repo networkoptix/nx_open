@@ -3,9 +3,9 @@
 
 #include <QWidget>
 
-#include <events/business_event_rule.h>
-#include <events/business_logic_common.h>
-#include <events/abstract_business_event.h>
+#include <business/business_event_rule.h>
+#include <business/business_logic_common.h>
+#include <business/events/abstract_business_event.h>
 
 #include <ui/models/business_rules_view_model.h>
 
@@ -31,6 +31,9 @@ public:
     QnBusinessRuleViewModel* model() const;
     void setModel(QnBusinessRuleViewModel* model);
 
+public slots:
+    void at_scheduleButton_clicked();
+
 protected:
     /**
      * @brief initEventParameters   Display widget with current event paramenters.
@@ -40,7 +43,6 @@ protected:
     void initActionParameters();
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
-
 private slots:
     void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
@@ -52,6 +54,7 @@ private slots:
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
+
 private:
     Ui::QnBusinessRuleWidget *ui;
 

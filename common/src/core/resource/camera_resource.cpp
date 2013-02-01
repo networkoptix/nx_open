@@ -140,3 +140,12 @@ void QnVirtualCameraResource::setFirmware(QString firmware)
     QMutexLocker locker(&m_mutex);
     m_firmware = firmware;
 }
+
+QString QnVirtualCameraResource::getUniqueId() const
+{
+	if (hasFlags(foreigner))
+		return getPhysicalId() + getParentId().toString();
+	else 
+		return getPhysicalId();
+
+}

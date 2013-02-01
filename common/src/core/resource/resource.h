@@ -218,7 +218,7 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController();
+    virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
 signals:
     void parameterValueChanged(const QnParam &param);
@@ -271,6 +271,11 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     virtual bool initInternal() {return true;};
+    //!Called just after successful \a initInternal()
+    /*!
+        Inherited class implementation MUST call base class method first
+    */
+    virtual void initializationDone();
 
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.

@@ -1,7 +1,7 @@
 #include "sendmail_business_action_widget.h"
 #include "ui_sendmail_business_action_widget.h"
 
-#include <events/sendmail_business_action.h>
+#include <business/actions/sendmail_business_action.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -10,7 +10,7 @@
 
 QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnSendmailBusinessActionWidget)
 {
     ui->setupUi(this);

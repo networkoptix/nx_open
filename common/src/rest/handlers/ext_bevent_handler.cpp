@@ -8,7 +8,7 @@
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_connector.h>
 
 QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 {
@@ -18,6 +18,7 @@ QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
     QString eventType;
     QString resourceId;
     QString errStr;

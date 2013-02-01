@@ -85,6 +85,8 @@ private:
     //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
+    qint64 m_rtStartTime; // used for realtime streaming mode
+    qint64 m_lastRtTime; // used for realtime streaming mode
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
     //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
     QMutex m_mutex;
@@ -105,8 +107,6 @@ private:
     static QSet<QnRtspDataConsumer*> m_allConsumers;
     static QMutex m_allConsumersMutex;
     bool m_realtimeMode;
-    qint64 m_rtStartTime; // used for realtime streaming mode
-    qint64 m_lastRtTime; // used for realtime streaming mode
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
     int m_fastChannelZappingSize;

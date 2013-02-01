@@ -168,7 +168,7 @@ void QnAxisStreamReader::openStream()
     else if (status != CL_HTTP_SUCCESS)
         return;
 
-    if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != MT_SoftwareGrid)
+    if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
     {
         res->setMotionMaskPhysical(0);
     }

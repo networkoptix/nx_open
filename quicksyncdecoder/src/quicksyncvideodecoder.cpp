@@ -327,90 +327,109 @@ static const int MICROS_IN_SECOND = 1000*1000;
 
 bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    //::Sleep( 60 );
-
-    Q_ASSERT( data->compressionType == CODEC_ID_H264 );
-
-    const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
-    const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;
-    NX_LOG( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4%5").
-        arg(data->data.size()).arg(m_sourceStreamFps).arg(getUsecTimer()/1000).arg(millisSincePrevInputFrame).
-        arg(QString::fromAscii(delayedInputFrame ? ". Delayed input frame" : "")), cl_logDEBUG1 );
-    if( delayedInputFrame )
-        int x = 0;
-
-    ++m_totalInputFrames;
-
-    static const size_t FRAME_COUNT_TO_CALC_FPS = 20;
-    static const size_t MIN_FRAME_COUNT_TO_CALC_FPS = FRAME_COUNT_TO_CALC_FPS / 2;
-
-    //calculating m_sourceStreamFps
-    const double fpsCalcTimestampDiff = m_fpsCalcFrameTimestamps.empty()
-        ? 0
-        : m_fpsCalcFrameTimestamps.back() - m_fpsCalcFrameTimestamps.front(); //TODO overflow?
-    if( (m_fpsCalcFrameTimestamps.size() >= MIN_FRAME_COUNT_TO_CALC_FPS) && (fpsCalcTimestampDiff > 0) )
-        m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() * MICROS_IN_SECOND / fpsCalcTimestampDiff;
-    m_fpsCalcFrameTimestamps.push_back( data->timestamp );
-    if( m_fpsCalcFrameTimestamps.size() > FRAME_COUNT_TO_CALC_FPS )
-        m_fpsCalcFrameTimestamps.pop_front();
-
-#ifdef WRITE_INPUT_STREAM_TO_FILE_1
-    m_inputStreamFile.write( data->data.data(), data->data.size() );
-#endif
+    const DWORD currentClock = GetTickCount();
 
     mfxBitstream inputStream;
     memset( &inputStream, 0, sizeof(inputStream) );
-    //inputStream->TimeStamp = av_rescale_q( data->timestamp, SRC_DATA_TIMESTAMP_RESOLUTION, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION );
-    inputStream.TimeStamp = data->timestamp;
-
-#ifndef XVBA_TEST
-    if( (m_state < decoding) && data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
+    if( data )
     {
-        std::basic_string<mfxU8> seqHeader;
-        //sps & pps is in the extradata, parsing it...
-        // prefix is unit len
-        int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
+        Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
-        const mfxU8* curNal = data->context->ctx()->extradata+5;
-        const mfxU8* dataEnd = data->context->ctx()->extradata + data->context->ctx()->extradata_size;
-        while( curNal < dataEnd - reqUnitSize )
+        const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
+        const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;
+        NX_LOG( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4%5").
+            arg(data->data.size()).arg(m_sourceStreamFps).arg(getUsecTimer()/1000).arg(millisSincePrevInputFrame).
+            arg(QString::fromAscii(delayedInputFrame ? ". Delayed input frame" : "")), cl_logDEBUG1 );
+
+        ++m_totalInputFrames;
+
+        static const size_t FRAME_COUNT_TO_CALC_FPS = 20;
+        static const size_t MIN_FRAME_COUNT_TO_CALC_FPS = FRAME_COUNT_TO_CALC_FPS / 2;
+
+        //calculating m_sourceStreamFps
+        const double fpsCalcTimestampDiff = m_fpsCalcFrameTimestamps.empty()
+            ? 0
+            : m_fpsCalcFrameTimestamps.back() - m_fpsCalcFrameTimestamps.front(); //TODO overflow?
+        if( (m_fpsCalcFrameTimestamps.size() >= MIN_FRAME_COUNT_TO_CALC_FPS) && (fpsCalcTimestampDiff > 0) )
+            m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() * MICROS_IN_SECOND / fpsCalcTimestampDiff;
+        m_fpsCalcFrameTimestamps.push_back( data->timestamp );
+        if( m_fpsCalcFrameTimestamps.size() > FRAME_COUNT_TO_CALC_FPS )
+            m_fpsCalcFrameTimestamps.pop_front();
+
+    #ifdef WRITE_INPUT_STREAM_TO_FILE_1
+        m_inputStreamFile.write( data->data.data(), data->data.size() );
+    #endif
+
+        inputStream.TimeStamp = data->timestamp;
+
+    #ifndef XVBA_TEST
+        if( (m_state < decoding) && data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
         {
-            unsigned int curSize = 0;
-            for( int i = 0; i < reqUnitSize; ++i ) 
-                curSize = (curSize << 8) + curNal[i];
-            curNal += reqUnitSize;
-            curSize = std::min<>(curSize, (unsigned int)(dataEnd - curNal));
-            seqHeader.append( curNal, curSize );
+            std::basic_string<mfxU8> seqHeader;
+            //sps & pps is in the extradata, parsing it...
+            // prefix is unit len
+            int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
 
-            curNal += curSize;
+            const mfxU8* curNal = data->context->ctx()->extradata+5;
+            const mfxU8* dataEnd = data->context->ctx()->extradata + data->context->ctx()->extradata_size;
+            while( curNal < dataEnd - reqUnitSize )
+            {
+                unsigned int curSize = 0;
+                for( int i = 0; i < reqUnitSize; ++i ) 
+                    curSize = (curSize << 8) + curNal[i];
+                curNal += reqUnitSize;
+                curSize = std::min<>(curSize, (unsigned int)(dataEnd - curNal));
+                seqHeader.append( curNal, curSize );
+
+                curNal += curSize;
+            }
+
+            seqHeader.append( (const quint8*)data->data.data(), data->data.size() );
+
+            inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
+            inputStream.DataLength = seqHeader.size();
+            inputStream.MaxLength = seqHeader.size();
+            return decode( &inputStream, outFrame );
         }
+    #endif
 
-        seqHeader.append( (const quint8*)data->data.data(), data->data.size() );
+        //qDebug()<<"Input timestamp: "<<inputStream.TimeStamp;
+        //if( m_prevTimestamp > inputStream.TimeStamp )
+        //    qDebug()<<"Warning! timestamp decreased by "<<(m_prevTimestamp - inputStream.TimeStamp);
+        //m_prevTimestamp = inputStream.TimeStamp;
 
-        inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
-        inputStream.DataLength = seqHeader.size();
-        inputStream.MaxLength = seqHeader.size();
-        return decode( &inputStream, outFrame );
+    #ifndef XVBA_TEST
+        inputStream.Data = reinterpret_cast<mfxU8*>(data->data.data());
+    #else
+        inputStream.Data = reinterpret_cast<mfxU8*>(const_cast<char*>(data->data.data()));
+    #endif
+        inputStream.DataLength = data->data.size();
+        inputStream.MaxLength = data->data.size();
+        //inputStream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
+
+        if( m_prevInputFrameMs == (DWORD)-1 )
+            m_prevOutPictureClock = GetTickCount();
+
+        //saving motion info
+        m_srcMotionInfo[data->timestamp] = data->motion;
+        if( m_srcMotionInfo.size() > m_decodingAllocResponse.NumFrameActual + m_vppAllocResponse.NumFrameActual + 1 )
+        {
+            //removing old motion info
+            for( MotionInfoContainerType::size_type
+                i = 0;
+                i < (m_srcMotionInfo.size() - (m_decodingAllocResponse.NumFrameActual + m_vppAllocResponse.NumFrameActual + 1));
+                ++i )
+            {
+                m_srcMotionInfo.erase( m_srcMotionInfo.begin() );
+            }
+        }
     }
-#endif
-
-    //qDebug()<<"Input timestamp: "<<inputStream.TimeStamp;
-    //if( m_prevTimestamp > inputStream.TimeStamp )
-    //    qDebug()<<"Warning! timestamp decreased by "<<(m_prevTimestamp - inputStream.TimeStamp);
-    //m_prevTimestamp = inputStream.TimeStamp;
-
-#ifndef XVBA_TEST
-    inputStream.Data = reinterpret_cast<mfxU8*>(data->data.data());
-#else
-    inputStream.Data = reinterpret_cast<mfxU8*>(const_cast<char*>(data->data.data()));
-#endif
-    inputStream.DataLength = data->data.size();
-    inputStream.MaxLength = data->data.size();
-    //inputStream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
-
-    if( m_prevInputFrameMs == (DWORD)-1 )
-        m_prevOutPictureClock = GetTickCount();
-    const DWORD currentClock = GetTickCount();
+    else
+    {
+        //NULL input data
+        if( m_state < decoding )
+            return false;
+    }
 
     const bool decoderProducedFrame = decode( &inputStream, outFrame );
     if( decoderProducedFrame )
@@ -421,6 +440,13 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
         if( currentClock - m_prevOutPictureClock > 1000 )
             NX_LOG( QString::fromAscii( "QuickSyncVideoDecoder. Warning! There was no out picture for %1 ms" ).arg(currentClock - m_prevOutPictureClock), cl_logDEBUG1 );
         m_prevOutPictureClock = currentClock;
+
+        if( *outFrame )
+        {
+            MotionInfoContainerType::const_iterator motionIter = m_srcMotionInfo.find( (*outFrame)->pkt_dts );
+            if( motionIter != m_srcMotionInfo.end() )
+                (*outFrame)->metadata = motionIter->second;
+        }
     }
 
     //NX_LOG( QString::fromAscii( "QuickSyncVideoDecoder::decode. exit. timer %1, lr-timer %2" ).arg(currentClock).arg(GetTickCount()), cl_logDEBUG1 );
@@ -480,6 +506,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                     }
                     Q_ASSERT( workingSurface.data() );
                     Q_ASSERT( workingSurface->mfxSurface.Data.Locked == 0 );
+                    //workingSurface->mfxSurface.Data.TimeStamp = inputStream ? inputStream->TimeStamp : 0;
                     opStatus = m_decoder->DecodeFrameAsync(
                         (inputStream && inputStream->DataLength > 0) ? inputStream : NULL,
                         &workingSurface->mfxSurface,
@@ -597,6 +624,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                     {
                         saveToAVFrame( outFrame->data(), decodedFrameCtx );
                         m_lastAVFrame = *outFrame;
+                        (*outFrame)->flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
                     }
                 }
                 else
@@ -1324,6 +1352,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
     //NX_LOG( QString::fromAscii("mark02 %1 ms").arg(GetTickCount()), cl_logERROR );
 
     //decoder uses allocator to create necessary surfaces
+    m_srcStreamParam.mfx.TimeStampCalc = MFX_TIMESTAMPCALC_UNKNOWN;
     status = m_decoder->Init( &m_srcStreamParam );
     if( status < MFX_ERR_NONE )  //ignoring warnings
     {
@@ -2628,7 +2657,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
     NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Scaling decoded frame to %1x%2...").
         arg(m_outPictureSize.width()).arg(m_outPictureSize.height()), cl_logDEBUG1 );
 
-    const DWORD t1 = GetTickCount();
+    //const DWORD t1 = GetTickCount();
     IDirect3DDevice9* d3d9Device = NULL;
     for( ;; )
     {
@@ -2649,7 +2678,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
         return MFX_ERR_UNKNOWN;
     }
 
-    const DWORD t2 = GetTickCount();
+    //const DWORD t2 = GetTickCount();
 
     res = d3d9Device->StretchRect( surfFrom, &srcRect, surfTo, &dstRect, D3DTEXF_LINEAR );
     d3d9Device->Release();
@@ -2661,10 +2690,12 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
         return MFX_ERR_UNKNOWN;
     }
 
-    const DWORD t3 = GetTickCount();
+    to->Data.TimeStamp = from.Data.TimeStamp;
 
-    NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
-        arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1), cl_logDEBUG1 );
+    //const DWORD t3 = GetTickCount();
+
+    //NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
+    //    arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1), cl_logDEBUG1 );
 
     return MFX_ERR_NONE;
 }

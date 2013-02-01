@@ -13,7 +13,6 @@ public:
     QnSingleShotFileStreamreader(QnResourcePtr resource);
     ~QnSingleShotFileStreamreader(){stop();}
     void setStorage(QnStorageResourcePtr storage);
-    virtual void setRole(QnResource::ConnectionRole role) override {}
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run() override;

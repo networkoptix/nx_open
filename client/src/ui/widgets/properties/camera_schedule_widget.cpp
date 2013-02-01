@@ -440,12 +440,14 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2").arg(currentMaxFps).arg(value));
+		emit scheduleTasksChanged();
     }
     if (currentMaxDualStreamingFps > dualStreamValue)
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2")
                              .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
+		emit scheduleTasksChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
@@ -564,7 +566,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming();
-        hasMotion &= camera->supportedMotionType() != MT_NoMotion;
+        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
     }
 
     bool enabled;
@@ -678,7 +680,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming();
-        hasMotion &= camera->supportedMotionType() != MT_NoMotion;
+        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
     }
 
     if(m_cameras.size() > 1) {
@@ -715,11 +717,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
             // or just use camera->reservedSecondStreamFps();
 
             int decreaseAlways = 0;
-            if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
+            if (camera->streamFpsSharingMethod() == Qn::shareFps && camera->getMotionType() == Qn::MT_SoftwareGrid)
                 decreaseAlways = MIN_SECOND_STREAM_FPS;
 
             int decreaseIfMotionPlusLQ = 0;
-            if (camera->streamFpsSharingMethod() == shareFps)
+            if (camera->streamFpsSharingMethod() == Qn::shareFps)
                 decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
 
             QnScheduleTaskList tasks;
