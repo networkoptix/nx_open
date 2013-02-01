@@ -119,6 +119,7 @@ void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &sto
 
 // --------------------------------------------------
 
+/*
 class TestConnectionTask: public QRunnable
 {
 public:
@@ -139,6 +140,20 @@ private:
     QnMediaServerResourcePtr m_owner;
     QUrl m_url;
 };
+*/
+
+void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
+{
+    QByteArray guid = getGuid().toUtf8();
+    if (response.data.contains("Requested method is absent") || response.data.contains(guid))
+    {
+        // server OK
+        QUrl url = m_runningIfRequests.value(responseNum);
+        if (!url.isEmpty())
+            setPrimaryIF(url.host());
+        m_runningIfRequests.remove(responseNum);
+    }
+}
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
@@ -201,8 +216,11 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
-        QThreadPool::globalInstance()->start(task);
+        //TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
+        //QThreadPool::globalInstance()->start(task);
+        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+        m_runningIfRequests.insert(requestNum, url);
+
     }
 }
 

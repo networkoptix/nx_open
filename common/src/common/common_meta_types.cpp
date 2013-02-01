@@ -93,6 +93,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     
+    qRegisterMetaType<Qt::ConnectionType>();
 
     qn_commonMetaTypes_initialized = true;
 }
