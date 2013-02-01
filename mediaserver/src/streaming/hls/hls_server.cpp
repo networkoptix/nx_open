@@ -27,8 +27,11 @@ static const double DEFAULT_TARGET_DURATION = 10;
 static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
 static const QLatin1String HLS_PREFIX( "/hls/" );
 static const QLatin1String CHANNEL_PARAM_NAME( "channel" );
+//!Internal timestamp (in micros). Not a calendar time
 static const QLatin1String START_TIMESTAMP_PARAM_NAME( "startTimestamp" );
-static const QLatin1String STOP_TIMESTAMP_PARAM_NAME( "endTimestamp" );
+//!Start calendar time
+static const QLatin1String START_DATETIME_PARAM_NAME( "startDatetime" );
+//static const QLatin1String STOP_TIMESTAMP_PARAM_NAME( "endTimestamp" );
 static const QLatin1String PICTURE_SIZE_PIXELS_PARAM_NAME( "pictureSizePixels" );
 static const QLatin1String CONTAINER_FORMAT_PARAM_NAME( "containerFormat" );
 static const QLatin1String VIDEO_CODEC_PARAM_NAME( "videoCodec" );
@@ -306,8 +309,8 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
         return nx_http::StatusCode::notFound;
     }
 
-    std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(QLatin1String(START_TIMESTAMP_PARAM_NAME));
-    if( startTimestampIter == requestParams.end() )
+    std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(START_DATETIME_PARAM_NAME));
+    if( startDatetimeIter == requestParams.end() )
         return getLivePlaylist(
             mediaResource,
             requestParams,
@@ -315,7 +318,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
     else
         return getArchivePlaylist(
             mediaResource,
-            QDateTime::fromMSecsSinceEpoch(startTimestampIter->second.toLongLong()),
+            QDateTime::fromString(startDatetimeIter->second, Qt::ISODate),
             requestParams,
             response );
 
@@ -408,7 +411,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getLivePlaylist(
 
 nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getArchivePlaylist(
     const QnMediaResourcePtr& mediaResource,
-    const QDateTime& startTimestamp,
+    const QDateTime& startDatetime,
     const std::multimap<QString, QString>& requestParams,
     nx_http::Response* const response )
 {
@@ -438,15 +441,28 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
     //std::multimap<QString, QString>::const_iterator audioCodecIter = requestParams.find(QLatin1String(AUDIO_CODEC_PARAM_NAME));
     //std::multimap<QString, QString>::const_iterator videoCodecIter = requestParams.find(QLatin1String(VIDEO_CODEC_PARAM_NAME));
 
+    quint64 startTimestamp = 0;
+    if( startTimestampIter != requestParams.end() )
+    {
+        startTimestamp = startTimestampIter->second.toULongLong();
+    }
+    else
+    {
+        std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(START_DATETIME_PARAM_NAME));
+        if( startDatetimeIter != requestParams.end() )
+        {
+            QDateTime startDatetime = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate);
+            //TODO/IMPL converting startDatetime to startTimestamp
+        }
+    }
+
     m_currentChunkKey = StreamingChunkCacheKey(
         uniqueResourceID.toString(),
         channelIter != requestParams.end()
             ? channelIter->second.toInt()
             : -1,   //any channel
         containerIter->second,
-        startTimestampIter != requestParams.end()
-            ? QDateTime::fromString(startTimestampIter->second, Qt::ISODate)
-            : QDateTime::fromMSecsSinceEpoch(0),
+        startTimestamp,
         durationIter != requestParams.end()
             ? durationIter->second.toLongLong()
             : std::numeric_limits<quint64>::max(),

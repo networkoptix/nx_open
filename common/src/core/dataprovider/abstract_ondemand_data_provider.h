@@ -27,6 +27,8 @@ public:
         \note End-of-data signalled by returning NULL packet and returning \a true
     */
     virtual bool tryRead( QnAbstractDataPacketPtr* const data ) = 0;
+    //!Returns current timestamp (in micros)
+    virtual quint64 currentPos() const = 0;
 
 signals:
     //!

@@ -168,7 +168,8 @@ void StreamingChunkTranscoderThread::run()
         if( resultStream.size() > 0 )
             transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );
 
-        if( transcodeIter->second->msTranscoded >= transcodeIter->second->transcodeParams.duration() )
+        //if( transcodeIter->second->msTranscoded >= transcodeIter->second->transcodeParams.duration() )
+        if( transcodeIter->second->dataSource->currentPos() >= transcodeIter->second->transcodeParams.endTimestamp() )
         {
             //neccessary source data has been processed, depleting transcoder buffer
             for( ;; )

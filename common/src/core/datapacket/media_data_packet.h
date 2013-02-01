@@ -45,7 +45,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 {
     enum MediaFlags {
         MediaFlags_None = 0, 
-        //MediaFlags_Key = 1,
+        MediaFlags_Key = 1,
         MediaFlags_AfterEOF = 2,
         MediaFlags_BOF = 4,
         MediaFlags_LIVE = 8,

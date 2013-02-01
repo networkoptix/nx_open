@@ -6,6 +6,7 @@
 #define LIVE_MEDIA_CACHE_READER_H
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <utils/media/media_stream_cache.h>
 
 
 class MediaStreamCache;
@@ -15,12 +16,14 @@ class LiveMediaCacheReader
     public AbstractOnDemandDataProvider
 {
 public:
-    LiveMediaCacheReader( const MediaStreamCache* mediaCache );
+    LiveMediaCacheReader( const MediaStreamCache* mediaCache, quint64 startTimestamp );
 
     virtual bool tryRead( QnAbstractDataPacketPtr* const data ) override;
+    virtual quint64 currentPos() const override;
 
 private:
     const MediaStreamCache* m_mediaCache;
+    MediaStreamCache::SequentialReadContext m_readCtx;
 };
 
 #endif  //LIVE_MEDIA_CACHE_READER_H

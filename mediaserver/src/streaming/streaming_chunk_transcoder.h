@@ -102,7 +102,7 @@ private:
         StreamingChunk* const chunk );
     bool scheduleTranscoding(
         const int transcodeID,
-        const QDateTime& startTimeUTC );
+        int delaySec );
     bool validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams );
 };
 

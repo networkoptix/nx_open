@@ -23,9 +23,10 @@
 
 using namespace std;
 
-//!Maximum time (in seconds) by which requested chunk start time may be in future
-static const double MAX_CHUNK_TIMESTAMP_ADVANCE = 30;
+//!Maximum time (in micros) by which requested chunk start time may be in future
+static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30000000;
 static const int TRANSCODE_THREAD_COUNT = 4;
+static const int MICROS_IN_SECOND = 1000000;
 
 
 StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
@@ -97,9 +98,10 @@ bool StreamingChunkTranscoder::transcodeAsync(
         //whether data is present (in archive or cache)
     if( camera->liveCache() )
     {
-        const QDateTime& cacheStartTimestamp = camera->liveCache()->startTime();
-        const QDateTime& cacheEndTimestamp = camera->liveCache()->endTime();
-        QSharedPointer<LiveMediaCacheReader> liveMediaCacheReader( new LiveMediaCacheReader( camera->liveCache() ) );
+        const quint64 cacheStartTimestamp = camera->liveCache()->startTimestamp();
+        const quint64 cacheEndTimestamp = camera->liveCache()->currentTimestamp();
+        const quint64 actualStartTimestamp = std::max<>( cacheStartTimestamp, transcodeParams.startTimestamp() );
+        QSharedPointer<LiveMediaCacheReader> liveMediaCacheReader( new LiveMediaCacheReader( camera->liveCache(), actualStartTimestamp ) );
         if( transcodeParams.startTimestamp() < cacheEndTimestamp &&
             transcodeParams.endTimestamp() > cacheStartTimestamp )
         {
@@ -119,12 +121,12 @@ bool StreamingChunkTranscoder::transcodeAsync(
         }
 
         if( transcodeParams.startTimestamp() > cacheEndTimestamp &&
-            cacheEndTimestamp.msecsTo(transcodeParams.startTimestamp()) < MAX_CHUNK_TIMESTAMP_ADVANCE )
+            transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS )
         {
-            //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE
+            //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS
             if( scheduleTranscoding(
                     p.first->first,
-                    transcodeParams.startTimestamp() ) )
+                    (transcodeParams.startTimestamp() - cacheEndTimestamp) / MICROS_IN_SECOND + 1 ) )
             {
                 chunk->openForModification();
                 return true;
@@ -134,8 +136,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
         }
     }
 
+#if 0
     //checking archive
-    QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->createDataProvider( QnResource::Role_LiveVideo ) );
+    QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->createDataProvider( QnResource::Role_Archive ) );
     if( !dp )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed (1) to create archive data provider (resource %1)").
@@ -171,10 +174,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
         m_transcodings.erase( p.first );
         return false;
     }
+#endif
 
     NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
         "Resource %1, statTime %2, duration %3").arg(mediaResource->getUniqueId()).
-        arg(transcodeParams.startTimestamp().toString()).arg(transcodeParams.endTimestamp().toString()), cl_logWARNING );
+        arg(transcodeParams.startTimestamp()).arg(transcodeParams.endTimestamp()), cl_logWARNING );
 
     m_transcodings.erase( p.first );
     return false;
@@ -239,23 +243,23 @@ bool StreamingChunkTranscoder::startTranscoding(
     if( transcoder->setContainer( transcodeParams.containerFormat() ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4").
-            arg(transcodeParams.containerFormat()).arg(transcodeParams.startTimestamp().toString()).
-            arg(transcodeParams.endTimestamp().toString()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
+            arg(transcodeParams.containerFormat()).arg(transcodeParams.startTimestamp()).
+            arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
     //TODO/IMPL set correct video parameters
     if( transcoder->setVideoCodec( CODEC_ID_H264, QnTranscoder::TM_DirectStreamCopy ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-            arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp().toString()).
-            arg(transcodeParams.endTimestamp().toString()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
+            arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).
+            arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
     if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-            arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp().toString()).
-            arg(transcodeParams.endTimestamp().toString()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
+            arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
+            arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
 
@@ -275,12 +279,11 @@ bool StreamingChunkTranscoder::startTranscoding(
 
 bool StreamingChunkTranscoder::scheduleTranscoding(
     const int transcodeID,
-    const QDateTime& startTimeUTC )
+    int delaySec )
 {
-    const time_t curTime = ::time(NULL);
     const quint64 taskID = TimerManager::instance()->addTimer(
         this,
-        startTimeUTC.toTime_t() > curTime ? startTimeUTC.toTime_t() - curTime : 0 );
+        delaySec );
 
     QMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;

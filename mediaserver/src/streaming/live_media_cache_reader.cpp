@@ -5,15 +5,24 @@
 #include "live_media_cache_reader.h"
 
 
-LiveMediaCacheReader::LiveMediaCacheReader( const MediaStreamCache* mediaCache )
+LiveMediaCacheReader::LiveMediaCacheReader( const MediaStreamCache* mediaCache, quint64 startTimestamp )
 :
-    m_mediaCache( mediaCache )
+    m_mediaCache( mediaCache ),
+    m_readCtx( mediaCache, startTimestamp )
 {
-    Q_ASSERT( false );
 }
 
 bool LiveMediaCacheReader::tryRead( QnAbstractDataPacketPtr* const data )
 {
-    //TODO/IMPL
-    return false;
+    QnAbstractDataPacketPtr packet = m_readCtx.getNextFrame();
+    if( !packet )
+        return false;
+
+    *data = packet;
+    return true;
+}
+
+quint64 LiveMediaCacheReader::currentPos() const
+{
+    return m_readCtx.currentPos();
 }

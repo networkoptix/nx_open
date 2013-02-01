@@ -28,30 +28,27 @@ public:
     /*!
         \param channel channel number or -1 for all channels
         \param containerFormat E.g., ts for mpeg2/ts
-        \param startTimestamp
-        \param endTimestamp
+        \param startTimestamp In micros
+        \param endTimestamp In micros
         \param auxiliaryParams
     */
     StreamingChunkCacheKey(
         const QString& uniqueResourceID,
         int channel,
         const QString& containerFormat,
-        const QDateTime& startTimestamp,
+        quint64 startTimestamp,
         quint64 duration,
         const std::multimap<QString, QString>& auxiliaryParams );
 
     //!data source (camera id, stream id)
     QString srcResourceUniqueID() const;
     unsigned int channel() const;
-    //start date
-    /*!
-        \return millis since 1970/1/1 00:00, UTC
-    */
-    QDateTime startTimestamp() const;
-    //!Duration in millis
+    //!Chunk start timestamp (micros). This is internal timestamp, not calendar time
+    quint64 startTimestamp() const;
+    //!Duration in micros
     quint64 duration() const;
     //!startTimestamp() + duration
-    QDateTime endTimestamp() const;
+    quint64 endTimestamp() const;
     //!Video resolution
     QSize pictureSizePixels() const;
     //media format (codec format, container format)
