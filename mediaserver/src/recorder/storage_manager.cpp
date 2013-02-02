@@ -504,10 +504,9 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     int storageIndex;
     QString quality, mac;
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
-    if (storageIndex == -1)
-        return false;
-    storage->releaseBitrate(provider);
-    //storage->addWritedSpace(fileSize);
+    if (storageIndex >= 0)
+        storage->releaseBitrate(provider);
+        //storage->addWritedSpace(fileSize);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
