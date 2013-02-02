@@ -136,6 +136,8 @@ void QnWorkbenchPtzController::setMovement(const QnVirtualCameraResourcePtr &cam
 
 void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr &camera) {
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    if(!server)
+        return; // TODO. This really does happen
 
     int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, qreal, qreal, qreal, int)));
     m_cameraByHandle[handle] = camera;
@@ -146,6 +148,8 @@ void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr 
 
 void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    if(!server)
+        return; // TODO. This really does happen
 
     int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
@@ -157,6 +161,8 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
 
 void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement) {
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    if(!server)
+        return; // TODO. This really does happen
 
     int handle;
     if(qFuzzyIsNull(movement)) {
