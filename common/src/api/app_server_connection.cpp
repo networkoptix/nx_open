@@ -1033,14 +1033,14 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     return result;
 }
 
-bool QnAppServerConnection::setPanicMode(bool value)
+bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
 {
     m_lastError.clear();
 
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);
 
-    requestParams.append(QnRequestParam("mode", value ? "on" : "off"));
+    requestParams.append(QnRequestParam("mode", QString::number(value)));
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, panicObject, requestHeaders, requestParams, "", response);

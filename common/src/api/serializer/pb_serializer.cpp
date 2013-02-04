@@ -188,7 +188,7 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
 
     if (pb_server.has_panicmode())
     {
-        server->setPanicMode(pb_server.panicmode());
+        server->setPanicMode(QnMediaServerResource::PanicMode(pb_server.panicmode()));
     }
 
     if (pb_server.storage_size() > 0)
@@ -953,7 +953,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());
 
     pb_server.set_reserve(serverPtr->getReserve());
-    pb_server.set_panicmode(serverPtr->isPanicMode());
+    pb_server.set_panicmode((int) serverPtr->getPanicMode());
 
     if (!serverPtr->getStorages().isEmpty()) {
         foreach (const QnAbstractStorageResourcePtr& storagePtr, serverPtr->getStorages()) {

@@ -25,7 +25,7 @@ QString QnLocalMediaServerResource::getUniqueId() const
 
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
-    m_panicMode(false)
+    m_panicMode(PM_None)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -191,11 +191,11 @@ bool QnMediaServerResource::getReserve() const
     return m_reserve;
 }
 
-bool QnMediaServerResource::isPanicMode() const {
+QnMediaServerResource::PanicMode QnMediaServerResource::getPanicMode() const {
     return m_panicMode;
 }
 
-void QnMediaServerResource::setPanicMode(bool panicMode) {
+void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
     if(m_panicMode == panicMode)
         return;
 
@@ -233,7 +233,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
     QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
-        setPanicMode(localOther->isPanicMode());
+        setPanicMode(localOther->getPanicMode());
 
         m_reserve = localOther->m_reserve;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
