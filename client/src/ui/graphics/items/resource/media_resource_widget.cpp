@@ -720,7 +720,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if(m_camera) {
         if(
-            (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::ZoomCapability)) && 
+            (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)) && 
             accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;

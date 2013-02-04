@@ -31,8 +31,6 @@ public:
 
     enum CameraCapability { 
         NoCapabilities                      = 0x0, 
-        //ContinuousPtzCapability             = 0x01, 
-        ZoomCapability                      = 0x02, 
         PrimaryStreamSoftMotionCapability   = 0x04,
         relayInput                          = 0x08,
         relayOutput                         = 0x10,
@@ -45,6 +43,7 @@ public:
 
         /* Deprecated capabilities. */
         DeprecatedContinuousPtzCapability   = 0x01,
+        DeprecatedZoomCapability            = 0x02
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
@@ -59,6 +58,11 @@ public:
         if(result & Qn::DeprecatedContinuousPtzCapability) {
             result &= ~Qn::DeprecatedContinuousPtzCapability;
             result |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability;
+        }
+
+        if(result & Qn::DeprecatedZoomCapability) {
+            result &= ~Qn::DeprecatedZoomCapability;
+            result |= Qn::ContinuousZoomCapability;
         }
 
         return result;
