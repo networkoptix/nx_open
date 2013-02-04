@@ -100,8 +100,9 @@ private:
 
 private:
     struct PtzData {
-        PtzData(): hasAbsoluteMove(false), overlayWidget(NULL) {}
+        PtzData(): hasPanTilt(false), hasAbsoluteMove(false), overlayWidget(NULL) {}
 
+        bool hasPanTilt;
         bool hasAbsoluteMove;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;

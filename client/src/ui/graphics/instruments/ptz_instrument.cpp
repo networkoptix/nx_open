@@ -549,7 +549,9 @@ PtzOverlayWidget *PtzInstrument::overlayWidget(QnMediaResourceWidget *widget) co
 }
 
 void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
-    PtzOverlayWidget *overlay = m_dataByWidget[widget].overlayWidget;
+    PtzData &data = m_dataByWidget[widget];
+
+    PtzOverlayWidget *overlay = data.overlayWidget;
     if(overlay)
         return;
 
@@ -558,7 +560,8 @@ void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
-    m_dataByWidget[widget].overlayWidget = overlay;
+    data.overlayWidget = overlay;
+    overlay->manipulatorWidget()->setVisible(data.hasPanTilt); // TODO: recheck if this is the right place for this call.
 
     connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
     connect(overlay->zoomInButton(),    SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
@@ -702,9 +705,13 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
             updateOverlayWidget(widget);
 
+            Qn::CameraCapabilities capabilities = camera->getCameraCapabilities();
+
             PtzData &data = m_dataByWidget[widget];
-            if(m_mapperWatcher->mapper(camera))
+            if((capabilities & Qn::AbsolutePtzCapability) && m_mapperWatcher->mapper(camera))
                 data.hasAbsoluteMove = true;
+            if(capabilities & Qn::ContinuousPanTiltCapability)
+                data.hasPanTilt = true;
             data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
 
             return true;
@@ -809,7 +816,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     PtzManipulatorWidget *manipulator = NULL;
     if(PtzOverlayWidget *overlay = overlayWidget(target)) {
         manipulator = overlay->manipulatorWidget();
-        if(!manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
+        if(!manipulator->isVisible() || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
             manipulator = NULL;
     }
 
