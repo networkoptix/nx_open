@@ -20,7 +20,6 @@ QString getIdSuffixByModel(const QString& cameraModel)
 
 QnPlWatchDogResource::QnPlWatchDogResource():
     QnPlOnvifResource(),
-    m_ptzController(NULL),
     m_additionalSettings()
 {
 
@@ -118,7 +117,7 @@ QnAbstractPtzController *QnPlWatchDogResource::getPtzController() {
     QnAbstractPtzController *result = base_type::getPtzController();
     if(result)
         return result; /* Use PTZ controller from ONVIF if one is present. */
-    return m_ptzController;
+    return m_ptzController.data();
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
@@ -136,7 +135,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
         if(hasFocus) {
             setCameraCapability(Qn::ContinuousZoomCapability, true);
-            m_ptzController = new QnDwZoomPtzController(::toSharedPointer(this), this);
+            m_ptzController.reset(new QnDwZoomPtzController(::toSharedPointer(this)));
         }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];

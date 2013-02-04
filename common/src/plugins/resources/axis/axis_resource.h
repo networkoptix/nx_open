@@ -113,7 +113,7 @@ private:
     std::map<unsigned int, nx_http::AsyncHttpClient*> m_inputPortHttpMonitor;
     nx_http::MultipartContentParser m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
-    QnAxisPtzController *m_ptzController;
+    QScopedPointer<QnAxisPtzController> m_ptzController;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

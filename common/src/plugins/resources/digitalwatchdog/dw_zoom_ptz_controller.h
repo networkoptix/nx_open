@@ -7,7 +7,7 @@
 class QnDwZoomPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
-    QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource, QObject *parent = NULL);
+    QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource);
     virtual ~QnDwZoomPtzController();
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;

@@ -176,7 +176,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
-    m_ptzController(0),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
     m_eventCapabilities( NULL ),
@@ -196,7 +195,6 @@ QnPlOnvifResource::~QnPlOnvifResource()
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
-    delete m_ptzController;
 }
 
 
@@ -1990,13 +1988,11 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
 
-    if (m_ptzController == 0) 
+    if (!m_ptzController) 
     {
-        QnOnvifPtzController* controller = new QnOnvifPtzController(::toSharedPointer(this));
+        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(::toSharedPointer(this)));
         if (!controller->getPtzConfigurationToken().isEmpty())
-            m_ptzController = controller;
-        else
-            delete controller;
+            m_ptzController.reset(controller.take());
     }
 
     QMutexLocker lock(&m_physicalParamsMutex);
@@ -2142,7 +2138,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
 
 QnAbstractPtzController* QnPlOnvifResource::getPtzController()
 {
-    return m_ptzController;
+    return m_ptzController.data();
 }
 
 int QnPlOnvifResource::getChannel() const

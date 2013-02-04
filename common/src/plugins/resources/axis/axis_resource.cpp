@@ -20,8 +20,7 @@ static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 static const quint16 DEFAULT_AXIS_API_PORT = 80;
 
-QnPlAxisResource::QnPlAxisResource():
-    m_ptzController(NULL)
+QnPlAxisResource::QnPlAxisResource()
 {
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
@@ -929,11 +928,11 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     if(ptzString != lit("yes"))
         return;
 
-    m_ptzController = new QnAxisPtzController(::toSharedPointer(this), this);
+    m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
 
     setCameraCapabilities(getCameraCapabilities() | m_ptzController->getCapabilities());
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
-    return m_ptzController;
+    return m_ptzController.data();
 }

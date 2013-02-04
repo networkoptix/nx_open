@@ -39,7 +39,7 @@ private:
 private:
     friend class QnWatchDogPtzController; // TODO: remove
 
-    QnAbstractPtzController *m_ptzController;
+    QScopedPointer<QnAbstractPtzController> m_ptzController;
 
     //The List contains hierarchy of DW models from child to parent "DIGITALWATCHDOG" (see in camera_settings.xml)
     //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method

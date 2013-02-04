@@ -11,7 +11,7 @@ class QnAxisParameterMap;
 class QnAxisPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
-    QnAxisPtzController(const QnPlAxisResourcePtr &resource, QObject *parent = NULL);
+    QnAxisPtzController(const QnPlAxisResourcePtr &resource);
     virtual ~QnAxisPtzController();
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;

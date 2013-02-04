@@ -12,7 +12,7 @@ class QnPtzSpaceMapper;
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
-    QnAbstractPtzController(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnAbstractPtzController(const QnResourcePtr &resource);
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
     virtual int stopMove() = 0;
