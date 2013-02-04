@@ -77,6 +77,9 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
     if(server->getStatus() == QnResource::Offline)
         return;
 
+    if(server->getPrimaryIF().isNull())
+        return;
+
     int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
     m_resourceByHandle[handle] = server;
 }

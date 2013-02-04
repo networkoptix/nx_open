@@ -170,7 +170,7 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         errStr = QByteArray("Unknown ptz command ").append(action.toUtf8()).append("\n");
     } 
 
-    if(contentType.isEmpty()) { // TODO: hack!
+    if(contentType != "application/json") { // TODO: hack!
         result.append("<root>\n");
         if (errStr.isEmpty())
             result.append("SUCCESS");

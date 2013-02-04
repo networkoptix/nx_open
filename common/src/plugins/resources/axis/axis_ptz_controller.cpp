@@ -109,7 +109,7 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
 
         QnScalarSpaceMapper xMapper(minPan, maxPan, minPan, maxPan, qFuzzyCompare(maxPan - minPan, 360.0) ? Qn::PeriodicExtrapolation : Qn::ConstantExtrapolation);
         QnScalarSpaceMapper yMapper(minTilt, maxTilt, minTilt, maxTilt, Qn::ConstantExtrapolation);
-        QnScalarSpaceMapper zMapper(fovTo35mmEquiv(maxAngle), fovTo35mmEquiv(minAngle), 1, 9999, Qn::ConstantExtrapolation);
+        QnScalarSpaceMapper zMapper(1, 9999, fovTo35mmEquiv(maxAngle), fovTo35mmEquiv(minAngle), Qn::ConstantExtrapolation);
         /* Note that we do not care about actual zoom limits on the camera. 
          * It's up to the camera to enforce them. */
         

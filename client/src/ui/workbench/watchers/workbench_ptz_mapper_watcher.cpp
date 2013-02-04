@@ -11,25 +11,22 @@
 
 QnWorkbenchPtzMapperWatcher::QnWorkbenchPtzMapperWatcher(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_ptzCamerasWatcher(context()->instance<QnWorkbenchPtzCameraWatcher>())
 {
-    QnWorkbenchPtzCameraWatcher *ptzCamerasWatcher = context()->instance<QnWorkbenchPtzCameraWatcher>();
-    
-    connect(ptzCamerasWatcher, SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
-    connect(ptzCamerasWatcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
+    connect(m_ptzCamerasWatcher, SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
+    connect(m_ptzCamerasWatcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
 
-    foreach(const QnVirtualCameraResourcePtr &resource, ptzCamerasWatcher->ptzCameras())
+    foreach(const QnVirtualCameraResourcePtr &resource, m_ptzCamerasWatcher->ptzCameras())
         at_ptzWatcher_ptzCameraAdded(resource);
 }
 
 QnWorkbenchPtzMapperWatcher::~QnWorkbenchPtzMapperWatcher() {
-    QnWorkbenchPtzCameraWatcher *ptzCamerasWatcher = context()->instance<QnWorkbenchPtzCameraWatcher>();
-
-    foreach(const QnVirtualCameraResourcePtr &resource, ptzCamerasWatcher->ptzCameras())
+    foreach(const QnVirtualCameraResourcePtr &resource, m_ptzCamerasWatcher->ptzCameras())
         at_ptzWatcher_ptzCameraRemoved(resource);
     assert(m_mapperByResource.isEmpty());
 
-    disconnect(ptzCamerasWatcher, NULL, this, NULL);
+    disconnect(m_ptzCamerasWatcher, NULL, this, NULL);
 }
 
 const QnPtzSpaceMapper *QnWorkbenchPtzMapperWatcher::mapper(const QnVirtualCameraResourcePtr &resource) const {
@@ -49,6 +46,15 @@ void QnWorkbenchPtzMapperWatcher::removeMapper(const QnVirtualCameraResourcePtr 
 }
 
 void QnWorkbenchPtzMapperWatcher::sendRequest(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera) {
+    if(camera->getStatus() != QnResource::Online && camera->getStatus() != QnResource::Recording)
+        return;
+
+    if(server->getStatus() != QnResource::Online || server->getPrimaryIF().isNull())
+        return;
+
+    if(m_requests.contains(camera))
+        return; /* No duplicate requests. */
+
     int handle = server->apiConnection()->asyncPtzGetSpaceMapper(camera, this, SLOT(at_replyReceived(int, const QnPtzSpaceMapper &, int)));
     m_requests.insert(camera);
     m_resourceByHandle.insert(handle, camera);
@@ -62,6 +68,11 @@ void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraAdded(const QnVirtualCa
     addMapper(camera, NULL);
 
     connect(camera, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
+    if(QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>()) {
+        connect(server, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
+        connect(server, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_server_statusChanged(const QnResourcePtr &)));
+    }
+
     at_resource_statusChanged(camera);
 }
 
@@ -71,24 +82,24 @@ void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraRemoved(const QnVirtual
     removeMapper(camera);
 }
 
+void QnWorkbenchPtzMapperWatcher::at_server_serverIfFound(const QnMediaServerResourcePtr &server) {
+    foreach(const QnVirtualCameraResourcePtr &camera, m_ptzCamerasWatcher->ptzCameras())
+        if(camera->getParentId() == server->getId() && !mapper(camera))
+            sendRequest(server, camera);
+}
+
+void QnWorkbenchPtzMapperWatcher::at_server_statusChanged(const QnResourcePtr &resource) {
+    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        at_server_serverIfFound(server);
+}
+
 void QnWorkbenchPtzMapperWatcher::at_resource_statusChanged(const QnResourcePtr &resource) {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if(!camera)
         return;
 
-    QnResource::Status status = resource->getStatus();
-    if(status == QnResource::Online && status == QnResource::Recording)
-        return;
-
-    if(m_requests.contains(camera))
-        return; /* No duplicate requests. */
-
     QnMediaServerResourcePtr server = resource->getParentResource().dynamicCast<QnMediaServerResource>();
     if(!server)
-        return;
-
-    QnResource::Status serverStatus = server->getStatus();
-    if(serverStatus != QnResource::Online)
         return;
 
     sendRequest(server, camera);
