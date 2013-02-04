@@ -2411,6 +2411,10 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
+    // TODO: 
+    // #AK registerResource is not thread-safe and we have no guarantees on where this code is run from.
+    // Passing plain pointer instead of shared pointer is questionable. 
+    // Roma had hard to debug crashes because of it. Better keep calm and use ::toSharedPointer(this).
     QnSoapServer::instance()->getService()->registerResource(
         this,
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host() );
