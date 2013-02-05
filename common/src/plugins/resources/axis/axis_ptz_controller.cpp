@@ -174,7 +174,8 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
 }
 
 int QnAxisPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) {
-    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(xVelocity).arg(yVelocity).arg(zoomVelocity));
+     // TODO: #Elric *90? Just move all logical-physical transformations to mediaserver.
+    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(xVelocity * 90).arg(yVelocity * 90).arg(zoomVelocity));
 }
 
 int QnAxisPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) {
