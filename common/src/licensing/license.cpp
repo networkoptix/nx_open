@@ -229,7 +229,9 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
     QMutexLocker locker(&m_mutex);
 
     m_licenses.setHardwareId(licenses.hardwareId());
-    m_licenses = licenses;
+    m_licenses.clear();
+    foreach (QnLicensePtr license, licenses.values())
+        m_licenses.append(license);
 
     emit licensesChanged();
 }
@@ -279,10 +281,8 @@ void QnLicenseList::append(QnLicensePtr license)
     if (m_licenses.contains(license->key()))
         return;
 
-    if (!license->isValid())
-        return;
-
-    m_licenses.insert(license->key(), license);
+    if (license->isValid() && license->hardwareId() == m_hardwareId)
+        m_licenses.insert(license->key(), license);
 }
 
 void QnLicenseList::append(QnLicenseList licenses)

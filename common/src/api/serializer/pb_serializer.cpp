@@ -432,9 +432,11 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
         const pb::License& pb_license = *ci;
 
         QnLicensePtr license;
+        // Parse license and validate its signature
         parseLicense(license, pb_license);
-        licenses.append(license);
-
+        // Verify that license is for our hardwareid
+        if (license->hardwareId() == licenses->hardwareId())
+            licenses.append(license);
     }
 }
 
