@@ -230,7 +230,7 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
 
     m_licenses.setHardwareId(licenses.hardwareId());
     m_licenses.clear();
-    foreach (QnLicensePtr license, licenses.values())
+    foreach (QnLicensePtr license, licenses.licenses())
         m_licenses.append(license);
 
     emit licensesChanged();
