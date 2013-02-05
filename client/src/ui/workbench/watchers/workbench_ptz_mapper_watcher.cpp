@@ -29,20 +29,24 @@ QnWorkbenchPtzMapperWatcher::~QnWorkbenchPtzMapperWatcher() {
     disconnect(m_ptzCamerasWatcher, NULL, this, NULL);
 }
 
+void QnWorkbenchPtzMapperWatcher::setMapper(const QnVirtualCameraResourcePtr &resource, const QnPtzSpaceMapper *mapper) {
+    const QnPtzSpaceMapper *oldMapper = m_mapperByResource.value(resource, NULL);
+    if(oldMapper == mapper)
+        return;
+
+    delete oldMapper;
+    if(mapper) {
+        m_mapperByResource.insert(resource, mapper);
+    } else {
+        m_mapperByResource.remove(resource);
+    }
+
+    emit mapperChanged(resource);
+}
+
+
 const QnPtzSpaceMapper *QnWorkbenchPtzMapperWatcher::mapper(const QnVirtualCameraResourcePtr &resource) const {
     return m_mapperByResource.value(resource);
-}
-
-void QnWorkbenchPtzMapperWatcher::addMapper(const QnVirtualCameraResourcePtr &resource, const QnPtzSpaceMapper *mapper) {
-    delete m_mapperByResource.value(resource, NULL);
-
-    m_mapperByResource.insert(resource, mapper);
-}
-
-void QnWorkbenchPtzMapperWatcher::removeMapper(const QnVirtualCameraResourcePtr &resource) {
-    delete m_mapperByResource.value(resource, NULL);
-
-    m_mapperByResource.remove(resource);
 }
 
 void QnWorkbenchPtzMapperWatcher::sendRequest(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera) {
@@ -65,7 +69,7 @@ void QnWorkbenchPtzMapperWatcher::sendRequest(const QnMediaServerResourcePtr &se
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera) {
-    addMapper(camera, NULL);
+    setMapper(camera, NULL);
 
     connect(camera, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
     if(QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>()) {
@@ -79,7 +83,7 @@ void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraAdded(const QnVirtualCa
 void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera) {
     disconnect(camera, NULL, this, NULL);
 
-    removeMapper(camera);
+    setMapper(camera, NULL);
 }
 
 void QnWorkbenchPtzMapperWatcher::at_server_serverIfFound(const QnMediaServerResourcePtr &server) {
@@ -112,10 +116,10 @@ void QnWorkbenchPtzMapperWatcher::at_replyReceived(int status, const QnPtzSpaceM
     m_resourceByHandle.remove(handle);
     m_requests.remove(camera);
 
-    if(!m_mapperByResource.contains(camera))
+    if(!m_ptzCamerasWatcher->ptzCameras().contains(camera))
         return; /* We're not watching this camera anymore. */
 
-    addMapper(camera, mapper.isNull() ? NULL : new QnPtzSpaceMapper(mapper));
+    setMapper(camera, mapper.isNull() ? NULL : new QnPtzSpaceMapper(mapper));
 
     disconnect(camera, NULL, this, NULL); /* Don't request for mapper again. */
 }

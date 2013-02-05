@@ -794,17 +794,3 @@ void QnMediaResourceWidget::at_radassButton_clicked() {
     setResolutionMode(static_cast<Qn::ResolutionMode>((resolutionMode() + 1) % Qn::ResolutionModeCount));
 }
 
-void QnMediaResourceWidget::at_replyReceived(int status, int handle) {
-    Q_UNUSED(status);
-    Q_UNUSED(handle);
-}
-
-void QnMediaResourceWidget::at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult) {
-    Q_UNUSED(status);
-    Q_UNUSED(operationResult);
-}
-
-
-
-
-

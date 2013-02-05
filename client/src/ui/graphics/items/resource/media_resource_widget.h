@@ -140,9 +140,6 @@ private slots:
     void at_ptzButton_toggled(bool checked);
     void at_radassButton_clicked();
 
-    void at_replyReceived(int status, int handle);
-    void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
-
     void at_camDisplay_liveChanged();
 
 private:

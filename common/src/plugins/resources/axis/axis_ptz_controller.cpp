@@ -69,7 +69,7 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
     m_spaceMapper(NULL)
 {
     QnAxisParameterMap params;
-    if(query(lit("param.cgi?action=list&group=PTZ"), &params))
+    if(query(lit("param.cgi?action=list&group=PTZ"), &params) && query(lit("param.cgi?action=list&group=Image.I0.Appearance"), &params))
         init(params);
 }
 
@@ -104,8 +104,16 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
         maxAngle /= 10.0;
 
         /* We implement E-Flip, so we don't want strange tilt angles. */
-        maxTilt = qMin(maxTilt, 180.0);
-        minTilt = qMax(minTilt, -180.0);
+        maxTilt = qMin(maxTilt, 90.0);
+        minTilt = qMax(minTilt, -90.0);
+
+        /* Axis takes care of image rotation automagically, but we still need to adjust tilt limits. */
+        qreal rotation = params.value("root.Image.I0.Appearance.Rotation", 0.0);
+        if(qFuzzyCompare(rotation, 180.0)) {
+            minTilt = -minTilt;
+            maxTilt = -maxTilt;
+            std::swap(minTilt, maxTilt);
+        }
 
         QnScalarSpaceMapper xMapper(minPan, maxPan, minPan, maxPan, qFuzzyCompare(maxPan - minPan, 360.0) ? Qn::PeriodicExtrapolation : Qn::ConstantExtrapolation);
         QnScalarSpaceMapper yMapper(minTilt, maxTilt, minTilt, maxTilt, Qn::ConstantExtrapolation);

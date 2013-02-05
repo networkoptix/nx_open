@@ -6,6 +6,7 @@
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
 
+#include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <api/api_fwd.h>
 
@@ -59,9 +60,12 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private slots:
-    void at_splashItem_destroyed();
-
+    void at_display_resourceAdded(const QnResourcePtr &resource);
+    void at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource);
+    void at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource);
     void at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera);
+
+    void at_splashItem_destroyed();
 
     void at_zoomInButton_pressed();
     void at_zoomInButton_released();
@@ -71,6 +75,8 @@ private slots:
 
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
+    void updateCapabilities(const QnSecurityCamResourcePtr &resource);
+    void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:
     QnMediaResourceWidget *target() const {
@@ -100,10 +106,9 @@ private:
 
 private:
     struct PtzData {
-        PtzData(): hasPanTilt(false), hasAbsoluteMove(false), overlayWidget(NULL) {}
+        PtzData(): capabilities(0), overlayWidget(NULL) {}
 
-        bool hasPanTilt;
-        bool hasAbsoluteMove;
+        Qn::CameraCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
         QRectF pendingAbsoluteMove;

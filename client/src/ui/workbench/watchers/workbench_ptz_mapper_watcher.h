@@ -24,9 +24,11 @@ public:
 
     const QnPtzSpaceMapper *mapper(const QnVirtualCameraResourcePtr &resource) const;
 
+signals:
+    void mapperChanged(const QnVirtualCameraResourcePtr &resource);
+
 private:
-    void addMapper(const QnVirtualCameraResourcePtr &resource, const QnPtzSpaceMapper *mapper);
-    void removeMapper(const QnVirtualCameraResourcePtr &resource);
+    void setMapper(const QnVirtualCameraResourcePtr &resource, const QnPtzSpaceMapper *mapper);
 
     void sendRequest(const QnMediaServerResourcePtr &server, const QnVirtualCameraResourcePtr &camera);
 

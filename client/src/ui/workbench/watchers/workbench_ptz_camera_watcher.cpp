@@ -20,8 +20,8 @@ QnWorkbenchPtzCameraWatcher::~QnWorkbenchPtzCameraWatcher() {
         at_resourcePool_resourceRemoved(*m_ptzCameras.begin());
 }
 
-QList<QnVirtualCameraResourcePtr> QnWorkbenchPtzCameraWatcher::ptzCameras() const {
-    return m_ptzCameras.toList();
+const QSet<QnVirtualCameraResourcePtr> &QnWorkbenchPtzCameraWatcher::ptzCameras() const {
+    return m_ptzCameras;
 }
 
 void QnWorkbenchPtzCameraWatcher::addPtzCamera(const QnVirtualCameraResourcePtr &camera) {

@@ -26,6 +26,7 @@
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
@@ -522,6 +523,9 @@ PtzInstrument::PtzInstrument(QObject *parent):
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
     connect(m_ptzController, SIGNAL(positionChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &)));
+    connect(m_mapperWatcher, SIGNAL(mapperChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &)));
+    connect(display(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_display_resourceAdded(const QnResourcePtr &)));
+    connect(display(), SIGNAL(resourceAboutToBeRemoved(const QnResourcePtr &)), this, SLOT(at_display_resourceAboutToBeRemoved(const QnResourcePtr &)));
 }
 
 PtzInstrument::~PtzInstrument() {
@@ -561,13 +565,11 @@ void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
     data.overlayWidget = overlay;
-    overlay->manipulatorWidget()->setVisible(data.hasPanTilt); // TODO: recheck if this is the right place for this call.
 
     connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
     connect(overlay->zoomInButton(),    SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
     connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
-
 
     widget->addOverlayWidget(overlay, false, false);
 }
@@ -594,8 +596,33 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
     if(hasCrosshair)
         ensureOverlayWidget(widget);
 
-    if(PtzOverlayWidget *overlay = overlayWidget(widget))
+    if(PtzOverlayWidget *overlay = overlayWidget(widget)) {
         opacityAnimator(overlay, 0.5)->animateTo(hasCrosshair ? 1.0 : 0.0);
+
+        overlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
+    }
+}
+
+void PtzInstrument::updateCapabilities(const QnSecurityCamResourcePtr &resource) {
+    foreach(QnResourceWidget *widget, display()->widgets(resource))
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+            updateCapabilities(mediaWidget);
+}
+
+void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return; /* Just to feel safe. We shouldn't get here. */
+
+    PtzData &data = m_dataByWidget[widget];
+    Qn::CameraCapabilities oldCapabilities = data.capabilities;
+
+    data.capabilities = camera->getCameraCapabilities();
+    if((data.capabilities & Qn::AbsolutePtzCapability) && !m_mapperWatcher->mapper(camera))
+        data.capabilities &= ~Qn::AbsolutePtzCapability; /* No mapper? Can't use absolute movement. */
+
+    if(oldCapabilities != data.capabilities)
+        updateOverlayWidget(widget);
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
@@ -703,16 +730,12 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
         if(QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
-            updateOverlayWidget(widget);
-
-            Qn::CameraCapabilities capabilities = camera->getCameraCapabilities();
 
             PtzData &data = m_dataByWidget[widget];
-            if((capabilities & Qn::AbsolutePtzCapability) && m_mapperWatcher->mapper(camera))
-                data.hasAbsoluteMove = true;
-            if(capabilities & Qn::ContinuousPanTiltCapability)
-                data.hasPanTilt = true;
             data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
+
+            updateCapabilities(widget);
+            updateOverlayWidget(widget);
 
             return true;
         }
@@ -722,10 +745,13 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
 }
 
 void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
+    base_type::unregisteredNotify(item);
+
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
 
+    PtzData &data = m_dataByWidget[object];
     m_dataByWidget.remove(object);
 }
 
@@ -820,7 +846,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             manipulator = NULL;
     }
 
-    if(!manipulator && !m_dataByWidget[target].hasAbsoluteMove)
+    if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::AbsolutePtzCapability))
         return false;
 
     m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
@@ -956,11 +982,14 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
     emit ptzProcessFinished(target());
 }
 
-void PtzInstrument::at_splashItem_destroyed() {
-    PtzSplashItem *item = static_cast<PtzSplashItem *>(sender());
+void PtzInstrument::at_display_resourceAdded(const QnResourcePtr &resource) {
+    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        connect(camera, SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)), this, SLOT(updateCapabilities(const QnSecurityCamResourcePtr &)));
+}
 
-    m_freeAnimations.removeAll(item);
-    m_activeAnimations.removeAll(item);
+void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource) {
+    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        disconnect(camera, NULL, this, NULL);
 }
 
 void PtzInstrument::at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera) {
@@ -974,6 +1003,17 @@ void PtzInstrument::at_ptzController_positionChanged(const QnVirtualCameraResour
 
     data.pendingAbsoluteMove = QRectF();
     ptzMoveTo(target(), rect);
+}
+
+void PtzInstrument::at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource) {
+    updateCapabilities(resource);
+}
+
+void PtzInstrument::at_splashItem_destroyed() {
+    PtzSplashItem *item = static_cast<PtzSplashItem *>(sender());
+
+    m_freeAnimations.removeAll(item);
+    m_activeAnimations.removeAll(item);
 }
 
 void PtzInstrument::at_zoomInButton_pressed() {

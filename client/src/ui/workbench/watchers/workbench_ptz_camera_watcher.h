@@ -13,7 +13,7 @@ public:
     QnWorkbenchPtzCameraWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchPtzCameraWatcher();
 
-    QList<QnVirtualCameraResourcePtr> ptzCameras() const;
+    const QSet<QnVirtualCameraResourcePtr> &ptzCameras() const;
 
 signals:
     void ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);

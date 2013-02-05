@@ -764,9 +764,15 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
-    m_widgetsByResource[widget->resource()].push_back(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         m_widgetByRenderer.insert(mediaWidget->renderer(), widget);
+    
+    /* Note that it is important to query resource from the widget as it may differ from the one passed
+     * here because of enabled / disabled state effects. */
+    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
+    widgetsForResource.push_back(widget);
+    if(widgetsForResource.size() == 1)
+        emit resourceAdded(widget->resource());
 
     synchronize(widget, false);
     bringToFront(widget);
@@ -819,9 +825,16 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
+    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
+    if(widgetsForResource.size() == 1) {
+        emit resourceAboutToBeRemoved(widget->resource());
+        m_widgetsByResource.remove(widget->resource());
+    } else {
+        widgetsForResource.removeOne(widget);
+    }
+
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    m_widgetsByResource[widget->resource()].removeOne(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         m_widgetByRenderer.remove(mediaWidget->renderer());
 
