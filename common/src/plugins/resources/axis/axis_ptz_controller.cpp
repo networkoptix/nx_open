@@ -112,7 +112,7 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
         if(qFuzzyCompare(rotation, 180.0)) {
             minTilt = -minTilt;
             maxTilt = -maxTilt;
-            std::swap(minTilt, maxTilt);
+            qSwap(minTilt, maxTilt);
         }
 
         QnScalarSpaceMapper xMapper(minPan, maxPan, minPan, maxPan, qFuzzyCompare(maxPan - minPan, 360.0) ? Qn::PeriodicExtrapolation : Qn::ConstantExtrapolation);
