@@ -75,7 +75,7 @@ public:
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
 private:
-    bool fileExists(const Chunk& chunk);
+    bool fileExists(const Chunk& chunk, bool checkDirOnly);
     void addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();

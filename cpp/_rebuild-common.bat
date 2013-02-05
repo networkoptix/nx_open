@@ -16,7 +16,7 @@ echo ARCH=%INPUT_ARCH%
 SET CURRENTDIR=%cd%
 
 cd ..\common
-call mvn package -U %CUSTOMIZATION% %ARCH%
+start /B cmd.exe /K call mvn package -U %CUSTOMIZATION% %ARCH%
 
 cd %CURRENTDIR%
-call mvn package -U %CUSTOMIZATION% %ARCH%
+start /B cmd.exe /K call mvn package -U %CUSTOMIZATION% %ARCH%

@@ -30,12 +30,15 @@
 #ifndef XVBA_TEST
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/videodecoderplugintypes.h>
+#include <plugins/videodecoders/abstract_decoder_event_receiver.h>
 #else
 quint64 getUsecTimer()
 {
     return 0;
 }
 #endif
+
+#include "mfxframeinfo_resource_reader.h"
 
 //#define USE_SYSMEM_SURFACE
 #ifndef USE_SYSMEM_SURFACE
@@ -126,10 +129,12 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     IDirect3DDeviceManager9* d3d9manager,
     const QnCompressedVideoDataPtr data,
     PluginUsageWatcher* const pluginUsageWatcher,
+    AbstractDecoderEventReceiver* const eventReceiver,
     unsigned int adapterNumber )
 :
     m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
+    m_eventReceiver( eventReceiver ),
     m_state( notInitialized ),
     m_syncPoint( NULL ),
     m_mfxSessionEstablished( false ),
@@ -219,10 +224,12 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     MFXVideoSession* const parentSession,
     IDirect3DDeviceManager9* d3d9manager,
     PluginUsageWatcher* const pluginUsageWatcher,
+    AbstractDecoderEventReceiver* const eventReceiver,
     unsigned int adapterNumber )
 :
     m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
+    m_eventReceiver( eventReceiver ),
     m_state( notInitialized ),
     m_syncPoint( NULL ),
     m_mfxSessionEstablished( false ),
@@ -331,7 +338,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 
     mfxBitstream inputStream;
     memset( &inputStream, 0, sizeof(inputStream) );
-    if( data )
+    if( data && data->data.size() > 0 )
     {
         Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
@@ -459,12 +466,18 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 #ifndef USE_ASYNC_IMPL
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    const bool isSeqHeaderPresent = readSequenceHeader( inputStream ) == MFX_ERR_NONE;
+    mfxVideoParam newStreamParams;
+    memset( &newStreamParams, 0, sizeof(newStreamParams) );
+    const bool isSeqHeaderPresent = readSequenceHeader( inputStream, &newStreamParams ) == MFX_ERR_NONE;
     if( m_reinitializeNeeded && isSeqHeaderPresent )
     {
         //have to wait for a sequence header and I-frame before reinitializing decoder
         closeMFXSession();
         m_reinitializeNeeded = false;
+
+        AbstractDecoderEventReceiver::DecoderBehaviour futherLifeStyle = m_eventReceiver->streamParamsChanged( this, MFXFrameInfoResourceReader(newStreamParams.mfx.FrameInfo) );
+        if( futherLifeStyle == AbstractDecoderEventReceiver::dbStop )
+            return false;
     }
     if( m_state < decoding && !init( MFX_CODEC_AVC, inputStream ) )
         return false;
@@ -703,6 +716,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
     return gotDisplayPicture;
 }
 #else   //USE_ASYNC_IMPL
+//NOTE async implementation can increase maximum number of simultaneously decoded streams
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const bool isSeqHeaderPresent = readSequenceHeader( inputStream ) == MFX_ERR_NONE;

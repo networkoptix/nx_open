@@ -33,6 +33,7 @@
 #include <utils/media/nalunits.h>
 #endif
 #include "mfxallocator.h"
+#include "mfx_video_session_ex.h"
 
 //!if defined, scale is performed with MFX, otherwise - by directx means (by rendering to surface with scaling)
 //#define SCALE_WITH_MFX
@@ -41,6 +42,7 @@
 //#define USE_ASYNC_IMPL
 
 
+class AbstractDecoderEventReceiver;
 class PluginUsageWatcher;
 
 //!Uses Intel Media SDK to provide hardware-accelerated video decoding
@@ -66,12 +68,14 @@ public:
         IDirect3DDeviceManager9* d3d9manager,
         const QnCompressedVideoDataPtr data,
         PluginUsageWatcher* const pluginUsageWatcher,
+        AbstractDecoderEventReceiver* const eventReceiver,
         unsigned int adapterNumber );
     //!Object instanciation without decoder initialization
     QuickSyncVideoDecoder(
         MFXVideoSession* const parentSession,
         IDirect3DDeviceManager9* d3d9manager,
         PluginUsageWatcher* const pluginUsageWatcher,
+        AbstractDecoderEventReceiver* const eventReceiver,
         unsigned int adapterNumber );
     virtual ~QuickSyncVideoDecoder();
 
@@ -131,14 +135,6 @@ public:
     size_t estimateSurfaceMemoryUsage() const;
 
 private:
-    class MyMFXVideoSession
-    :
-        public MFXVideoSession
-    {
-    public:
-        mfxSession& getInternalSession() { return m_session; }
-    };
-
     enum DecoderState
     {
         //!waiting for some data to start initialization
@@ -260,7 +256,8 @@ private:
 
     MFXVideoSession* const m_parentSession;
     PluginUsageWatcher* const m_pluginUsageWatcher;
-    MyMFXVideoSession m_mfxSession;
+    AbstractDecoderEventReceiver* const m_eventReceiver;
+    MFXVideoSessionEx m_mfxSession;
     DecoderState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
 #ifdef SCALE_WITH_MFX
