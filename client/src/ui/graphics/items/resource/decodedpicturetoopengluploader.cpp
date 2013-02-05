@@ -1199,8 +1199,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
                     emptyPictureBuf = (*it)->picture();
-                    if( (*it)->autoDelete() )
-                        delete (*it);
+                    delete (*it);
                     m_framesWaitingUploadInGUIThread.erase( it );
                     break;
                 }
@@ -1445,8 +1444,7 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
                 continue;
             }
             m_emptyBuffers.push_back( (*it)->picture() );
-            if( (*it)->autoDelete() )
-                delete *it;
+            delete *it;
             it = m_framesWaitingUploadInGUIThread.erase( it );
         }
 

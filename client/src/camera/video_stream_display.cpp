@@ -15,7 +15,6 @@
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
 
-
 QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber) :
     m_frameQueueIndex(0),
     m_decodeMode(QnAbstractVideoDecoder::DecodeMode_Full),
@@ -223,7 +222,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
         else {
             index = maxStart + maxInterval/2;
         }
-        Q_ASSERT(m_reverseQueue[index]->data[0]);
+        Q_ASSERT( m_reverseQueue[index]->data[0] || m_reverseQueue[index]->picData );
         m_reverseSizeInBytes -= avpicture_get_size((PixelFormat) m_reverseQueue[index]->format, m_reverseQueue[index]->width, m_reverseQueue[index]->height);
         m_reverseQueue[index]->reallocate(0,0,0);
     }
@@ -433,23 +432,15 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
         while (dec->decode(emptyData, &tmpOutFrame)) 
         {
-			tmpOutFrame->channel = data->channelNumber;
-			tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-			if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
-				tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
-			//tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
-			m_reverseQueue.enqueue(tmpOutFrame);
-            {
-                tmpOutFrame->channel = data->channelNumber;
-                tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-                if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
-                    tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
-                //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
-                m_reverseQueue.enqueue(tmpOutFrame);
-                m_reverseSizeInBytes += avpicture_get_size((PixelFormat)tmpOutFrame->format, tmpOutFrame->width, tmpOutFrame->height);
-                checkQueueOverflow(dec);
-                tmpOutFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
-            }
+            tmpOutFrame->channel = data->channelNumber;
+            tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+            if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
+                tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
+            //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
+            m_reverseQueue.enqueue(tmpOutFrame);
+            m_reverseSizeInBytes += avpicture_get_size((PixelFormat)tmpOutFrame->format, tmpOutFrame->width, tmpOutFrame->height);
+            checkQueueOverflow(dec);
+            tmpOutFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
         }
         m_flushedBeforeReverseStart = true;
         reorderPrevFrames();
@@ -540,9 +531,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     //outFrame->pts = data->timestamp;
     if (reverseMode) 
     {
-        if (outFrame->flags & AV_REVERSE_BLOCK_START) {
+        if (outFrame->flags & AV_REVERSE_BLOCK_START)
             reorderPrevFrames();
-        }
         m_reverseQueue.enqueue(outFrame);
         m_reverseSizeInBytes += avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
         checkQueueOverflow(dec);
