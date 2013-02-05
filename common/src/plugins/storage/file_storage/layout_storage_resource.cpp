@@ -255,9 +255,10 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = removeProtocolPrefix(storage->getUrl());
-        storage->setUrl(newName); // update binary offsetvalue
-        if (storageUrl == removeProtocolPrefix(newName))
+        if (storageUrl == removeProtocolPrefix(newName)) {
+            storage->setUrl(newName); // update binary offsetvalue
             storage->restoreOpenedFiles();
+        }
         else if (storageUrl == removeProtocolPrefix(oldName)) {
             storage->setUrl(newName);
             storage->restoreOpenedFiles();
