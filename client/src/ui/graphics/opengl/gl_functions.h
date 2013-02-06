@@ -23,15 +23,16 @@ typedef uint64_t GLuint64;
 class QnGlFunctions {
 public:
     enum Feature {
-        ArbPrograms = 0x1,              /**< Supports ARB shader programs. */
-        OpenGL1_3 = 0x02,               /**< Implements OpenGL1.3 spec. */
-        OpenGL1_5 = 0x04,               /**< Implements OpenGL1.5 spec. */
-        OpenGL2_0 = 0x08,               /**< Implements OpenGL2.0 spec. */
-        OpenGL3_2 = 0x10,
-        
-        ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
-        NoOpenGLFullScreen = 0x0002000,  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
-        ARB_Sync = 0x00004000            /**< ARB_Sync extension is present */
+        OpenGL1_3           = 0x00000001,   /**< Implements OpenGL1.3 spec. */
+        OpenGL1_5           = 0x00000002,   /**< Implements OpenGL1.5 spec. */
+        OpenGL2_0           = 0x00000004,   /**< Implements OpenGL2.0 spec. */
+        OpenGL3_2           = 0x00000008,   /**< Implements OpenGL3.2 spec. */
+
+        ArbPrograms         = 0x00010000,   /**< Supports ARB shader programs. */
+        ArbSync             = 0x00020000,   /**< ArbSync extension is present. */
+
+        ShadersBroken       = 0x10000000,   /**< Vendor has messed something up, and shaders are not supported. */
+        NoOpenGLFullScreen  = 0x20000000,   /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -107,10 +108,12 @@ public:
     void glEnableVertexAttribArray(GLuint index);
     void glDisableVertexAttribArray(GLuint index);
 
-    GLsync glFenceSync(	GLenum condition, GLbitfield flags );
-    void glDeleteSync( GLsync sync );
-    void glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout );
-    GLenum glClientWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout );
+    /* OpenGL3_2 group. */
+
+    GLsync glFenceSync(GLenum condition, GLbitfield flags);
+    void glDeleteSync(GLsync sync);
+    void glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
+    GLenum glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;

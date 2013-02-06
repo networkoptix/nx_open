@@ -15,7 +15,7 @@ GLFence::GLFence( QnGlFunctions* const glFunctions )
 :
     m_glFunctions( glFunctions ),
     m_fenceSyncName( 0 ),
-    m_arbSyncPresent( glFunctions->features() & QnGlFunctions::ARB_Sync )
+    m_arbSyncPresent( glFunctions->features() & QnGlFunctions::ArbSync )
 {
 }
 
