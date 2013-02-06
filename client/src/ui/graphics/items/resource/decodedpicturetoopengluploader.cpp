@@ -54,6 +54,8 @@
 
 //#define SYNC_UPLOADING_WITH_GLFENCE
 
+//preceding bunch of macro will be removed after this functionality has been tested and works as expected
+
 
 namespace
 {
@@ -955,6 +957,7 @@ public:
         m_dest( dest ),
         m_src( src ),
         m_uploader( uploader ),
+        m_isRunning( false ),
         m_done( false ),
         m_success( false )
     {
@@ -963,6 +966,8 @@ public:
 
     virtual void run()
     {
+        m_isRunning = true;
+
         m_success = 
 #ifdef GL_COPY_AGGREGATION
             m_uploader->uploadDataToGlWithAggregation(
@@ -981,6 +986,8 @@ public:
             m_uploader->pictureDataUploadSucceeded( NULL, m_dest );
         else
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
+
+        m_isRunning = false;
     }
 
     bool done() const
@@ -993,10 +1000,26 @@ public:
         return m_success;
     }
 
+    DecodedPictureToOpenGLUploader::UploadedPicture* picture()
+    {
+        return m_dest;
+    }
+
+    void markAsRunning()
+    {
+        m_isRunning = true;
+    }
+
+    bool isRunning() const
+    {
+        return m_isRunning;
+    }
+
 private:
     DecodedPictureToOpenGLUploader::UploadedPicture* const m_dest;
     QSharedPointer<CLVideoDecoderOutput> m_src;
     DecodedPictureToOpenGLUploader* m_uploader;
+    bool m_isRunning;
     bool m_done;
     bool m_success;
 };
@@ -1080,15 +1103,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
 DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 {
     //ensure there is no pointer to the object in the async uploader queue
-    {
-        QMutexLocker lk( &m_mutex );
-        for( ;; )
-        {
-            if( m_usedUploaders.empty() )
-                break;
-            m_cond.wait( lk.mutex() );
-        }
-    }
+    discardAllFramesPostedToDisplay();
 
     for( std::deque<AsyncPicDataUploader*>::iterator
         it = m_unusedUploaders.begin();
@@ -1173,7 +1188,25 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 NX_LOG( QString::fromAscii( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
                     arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
             }
-            else
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+            else if( !useAsyncUpload && !m_framesWaitingUploadInGUIThread.empty() )
+            {
+                for( std::deque<AVPacketUploader*>::iterator
+                    it = m_framesWaitingUploadInGUIThread.begin();
+                    it != m_framesWaitingUploadInGUIThread.end();
+                    ++it )
+                {
+                    if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
+                        continue;
+                    emptyPictureBuf = (*it)->picture();
+                    delete (*it);
+                    m_framesWaitingUploadInGUIThread.erase( it );
+                    break;
+                }
+            }
+#endif
+
+            if( emptyPictureBuf == NULL )
             {
                 if( useAsyncUpload )
                 {
@@ -1261,10 +1294,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         m_uploadThread->push( avPacketUploader.release() );
 #elif defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD)
         m_framesWaitingUploadInGUIThread.push_back( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
-        while( !m_framesWaitingUploadInGUIThread.empty() )
-        {
-            m_cond.wait( lk.mutex() );
-        }
 #else
         //using uploading thread, blocking till upload is completed
         std::auto_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
@@ -1288,20 +1317,23 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 {
     QMutexLocker lk( &m_mutex );
 
-    UploadedPicture* pic = NULL;
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     if( !m_framesWaitingUploadInGUIThread.empty() )
     {
         //uploading
         AVPacketUploader* frameToUpload = m_framesWaitingUploadInGUIThread.front();
-        m_framesWaitingUploadInGUIThread.pop_front();
+        frameToUpload->markAsRunning();
+        frameToUpload->picture()->m_skippingForbidden = true;   //otherwise, we could come to situation that there is no data to display
         lk.unlock();
         frameToUpload->run();
         lk.relock();
+        m_framesWaitingUploadInGUIThread.pop_front();
         delete frameToUpload;
         m_cond.wakeAll();   //notifying that upload is completed
     }
 #endif
+
+    UploadedPicture* pic = NULL;
     if( !m_picturesWaitingRendering.empty() )
     {
         pic = m_picturesWaitingRendering.front();
@@ -1345,7 +1377,7 @@ void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
     QMutexLocker lk( &m_mutex );
 
-    while( !m_terminated && (!m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
+    while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
         m_cond.wait( lk.mutex() );
 }
 
@@ -1355,6 +1387,23 @@ void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
         return; //if hardware decoder is used, waiting can result in bad playback experience
 
     QMutexLocker lk( &m_mutex );
+
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
+    while( !m_framesWaitingUploadInGUIThread.empty() )
+        m_cond.wait( lk.mutex() );
+
+    //for( std::deque<AVPacketUploader*>::iterator
+    //    it = m_framesWaitingUploadInGUIThread.begin();
+    //    it != m_framesWaitingUploadInGUIThread.end();
+    //    ++it )
+    //{
+    //    (*it)->picture()->m_skippingForbidden = true;
+    //}
+#endif
+#ifdef UPLOAD_SYSMEM_FRAMES_ASYNC
+    #error "Not implemented"
+#endif
 
     //marking, that skipping frames currently in queue is forbidden and exiting...
     for( std::deque<UploadedPicture*>::iterator
@@ -1378,10 +1427,32 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 {
     QMutexLocker lk( &m_mutex );
 
-    if( !m_usedUploaders.empty() )
+    while( !m_usedUploaders.empty() )
+        m_cond.wait( lk.mutex() );
+
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    while( !m_framesWaitingUploadInGUIThread.empty() )
     {
-        Q_ASSERT( false );
+        for( std::deque<AVPacketUploader*>::iterator
+            it = m_framesWaitingUploadInGUIThread.begin();
+            it != m_framesWaitingUploadInGUIThread.end();
+            )
+        {
+            if( (*it)->isRunning() )
+            {
+                ++it;
+                continue;
+            }
+            m_emptyBuffers.push_back( (*it)->picture() );
+            delete *it;
+            it = m_framesWaitingUploadInGUIThread.erase( it );
+        }
+
+        if( m_framesWaitingUploadInGUIThread.empty() )
+            break;
+        m_cond.wait( lk.mutex() );
     }
+#endif
 
     for( std::deque<UploadedPicture*>::iterator
         it = m_picturesWaitingRendering.begin();

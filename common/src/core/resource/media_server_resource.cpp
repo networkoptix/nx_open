@@ -7,8 +7,6 @@
 QnLocalMediaServerResource::QnLocalMediaServerResource()
     : QnResource()
 {
-    QThreadPool::globalInstance()->setMaxThreadCount( QThreadPool::globalInstance()->maxThreadCount()*2 );
-
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
     removeFlags(QnResource::media); // TODO: is this call needed here?

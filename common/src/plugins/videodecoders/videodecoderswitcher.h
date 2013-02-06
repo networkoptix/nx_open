@@ -7,22 +7,32 @@
 
 #include <memory>
 
+#include <QMutex>
+
+#include "abstract_decoder_event_receiver.h"
 #include "../../decoders/video/abstractdecoder.h"
 
 
+class QnAbstractVideoDecoderPlugin;
+
 //!Delegates calls to video decoder. Supports switching between soft and hw decoder
 /*!
-    Switching is done by external signal, so this class object itself does not decide when to switch
+    Can switch to SW decoding on stream params change or on external signal (\a switchToSoftwareDecoding() method call)
+    \note switchToSoftwareDecoding is allowed to be called from thread, different from decoding thread
 */
 class VideoDecoderSwitcher
 :
-    public QnAbstractVideoDecoder
+    public QnAbstractVideoDecoder,
+    public AbstractDecoderEventReceiver
 {
 public:
     /*!
-        \param hwDecoder Decoder. MUST not be NULL! VideoDecoderSwitcher object takes ownership of \a hwDecoder
+        \param hwDecoder Decoder. Can be specified later with \a setHWDecoder call. VideoDecoderSwitcher object takes ownership of \a hwDecoder
     */
-    VideoDecoderSwitcher( QnAbstractVideoDecoder* hwDecoder, const QnCompressedVideoDataPtr& sequenceHeader );
+    VideoDecoderSwitcher(
+        QnAbstractVideoDecoder* hwDecoder,
+        const QnCompressedVideoDataPtr& sequenceHeader,
+        const QnAbstractVideoDecoderPlugin& decoderFactory );
 
     //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
     virtual PixelFormat GetPixelFormat() const;
@@ -55,6 +65,15 @@ public:
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     virtual unsigned int getDecoderCaps() const;
 
+    //!Implementation of AbstractDecoderEventReceiver::streamParamsChanged
+    virtual DecoderBehaviour streamParamsChanged(
+        QnAbstractVideoDecoder* decoder,
+        const stree::AbstractResourceReader& newStreamParams );
+
+    /*!
+        Takes ownership of \a hwDecoder
+    */
+    void setHWDecoder( QnAbstractVideoDecoder* hwDecoder );
     //!Switches to ffmpeg decoder, destroys hardware decoder object
     void switchToSoftwareDecoding();
 
@@ -62,6 +81,9 @@ private:
     std::auto_ptr<QnAbstractVideoDecoder> m_decoder;
     //!Used to initialize new decoder object in case of decoder switching
     QnCompressedVideoDataPtr m_mediaSequenceHeader;
+    const QnAbstractVideoDecoderPlugin& m_decoderFactory;
+    bool m_switchToSWDecoding;
+    mutable QMutex m_mutex;
 };
 
 #endif  //VIDEODECODERSWITCHER_H

@@ -170,7 +170,6 @@ void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
     if( !ctx.uploader )
         return;
     ctx.uploader->ensureAllFramesWillBeDisplayed();
-    //ctx.uploader->waitForAllFramesDisplayed();
 }
 
 void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)

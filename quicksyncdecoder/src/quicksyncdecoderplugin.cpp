@@ -13,6 +13,7 @@
 #include <plugins/videodecoders/predefinedusagecalculator.h>
 #include <plugins/videodecoders/videodecoderswitcher.h>
 
+#include "mfxframeinfo_resource_reader.h"
 #include "quicksyncvideodecoder.h"
 
 //!if defined, a mfx session is created in QuicksyncDecoderPlugin and all mfx sessions are joined with this one
@@ -142,15 +143,26 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
 
     NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Creating decoder..."), cl_logINFO );
 
+    std::auto_ptr<VideoDecoderSwitcher> videoDecoderSwitcher( new VideoDecoderSwitcher( NULL, data, *this ) );
+
     //parsing media sequence header to determine necessary parameters
     std::auto_ptr<QuickSyncVideoDecoder> decoder( new QuickSyncVideoDecoder(
         m_mfxSession.get(),
         d3d9Ctx.d3d9manager,
         m_usageWatcher.get(),
+        videoDecoderSwitcher.get(),
         m_adapterNumber ) );
+
+#ifdef USE_SINGLE_DEVICE_PER_DECODER
+    //releasing ref to d3d device, so it will be destroyed when decoder done using it
+    m_d3dDevices.pop_back();
+    ULONG refCount = d3d9Ctx.d3d9manager->Release();
+    refCount = d3d9Ctx.d3d9Device->Release();
+#endif
 
     mfxVideoParam videoParam;
     memset( &videoParam, 0, sizeof(videoParam) );
+    //MFXFrameInfoResourceReader frameInfoReader( videoParam );
     DecoderStreamDescription desc;
     if( decoder->readSequenceHeader( data, &videoParam ) )
     {
@@ -164,59 +176,27 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
         desc.put( DecoderParameter::videoMemoryUsage, decoder->estimateSurfaceMemoryUsage() );
     }
 
-    //filling stream parameters
-    desc.put( DecoderParameter::sdkVersion, m_sdkVersionStr );
-    desc.put( DecoderParameter::decoderName, DECODER_NAME );
-    desc.put( DecoderParameter::osName, m_osName );
     desc.put( DecoderParameter::totalCurrentNumberOfDecoders, currentSWDecoderCount+m_usageWatcher->currentSessionCount() );
 
-    stree::MultiSourceResourceReader mediaStreamParams1( desc, *m_graphicsDesc.get() );
-    stree::MultiSourceResourceReader mediaStreamParams( mediaStreamParams1, *m_cpuDesc.get() );
-
-    //locking shared memory region
-    PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
-    if( !usageLock.locked() )
-    {
-        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to lock shared usage watcher. Cannot create decoder"), cl_logWARNING );
-        return NULL;
-    }
-
-    if( !m_usageWatcher->readExternalUsage() )
-    {
-        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to read total usage. Cannot create decoder"), cl_logWARNING );
-        return NULL;
-    }
-
-    //retrieving existing sessions' info
-    //adding availableVideoMemory param
-    stree::ResourceContainer curUsageParams = m_usageWatcher->currentTotalUsage();
-    quint64 newStreamEstimatedVideoMemoryUsage = 0;
-    mediaStreamParams.getTypedVal( DecoderParameter::videoMemoryUsage, &newStreamEstimatedVideoMemoryUsage );
-    UINT availableVideoMem = d3d9Ctx.d3d9Device->GetAvailableTextureMem();
-    availableVideoMem = availableVideoMem > newStreamEstimatedVideoMemoryUsage
-        ? (availableVideoMem - newStreamEstimatedVideoMemoryUsage)
-        : 0;
-    curUsageParams.put( DecoderParameter::availableVideoMemory, availableVideoMem );
-
-#ifdef USE_SINGLE_DEVICE_PER_DECODER
-    //releasing ref to d3d device, so it will be destroyed when decoder done using it
-    m_d3dDevices.pop_back();
-    ULONG refCount = d3d9Ctx.d3d9manager->Release();
-    refCount = d3d9Ctx.d3d9Device->Release();
-#endif
-
-    //joining media stream parameters with GPU description
-    if( !m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( mediaStreamParams, curUsageParams ) )
+    if( !isStreamSupportedNonSafe(desc) )
         return NULL;
 
     decoder->decode( data, NULL );
+
     if( !decoder->isHardwareAccelerationEnabled() )
         return NULL;
 
     //updating usage in shared memory...
     m_usageWatcher->updateUsageParams();
 
-    return new VideoDecoderSwitcher( decoder.release(), data );
+    videoDecoderSwitcher->setHWDecoder( decoder.release() );
+    return videoDecoderSwitcher.release();
+}
+
+bool QuicksyncDecoderPlugin::isStreamSupported( const stree::AbstractResourceReader& newStreamParams ) const
+{
+    QMutexLocker lk( &m_mutex );
+    return isStreamSupportedNonSafe( newStreamParams );
 }
 
 bool QuicksyncDecoderPlugin::initialize() const
@@ -456,6 +436,51 @@ QString QuicksyncDecoderPlugin::winVersionToName( const OSVERSIONINFOEX& osVersi
 
     return QString("%1 %2 (%3.%4)").arg(osName).arg(QString::fromWCharArray(osVersionInfo.szCSDVersion)).
         arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion);
+}
+
+bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractResourceReader& streamParams ) const
+{
+    DecoderStreamDescription desc;
+    //filling stream parameters
+    desc.put( DecoderParameter::sdkVersion, m_sdkVersionStr );
+    desc.put( DecoderParameter::decoderName, DECODER_NAME );
+    desc.put( DecoderParameter::osName, m_osName );
+    //desc.put( DecoderParameter::totalCurrentNumberOfDecoders, currentSWDecoderCount+m_usageWatcher->currentSessionCount() );  //TODO/IMPL
+
+    stree::MultiSourceResourceReader mediaStreamParams1( desc, *m_graphicsDesc.get() );
+    stree::MultiSourceResourceReader mediaStreamParams2( mediaStreamParams1, streamParams );
+    stree::MultiSourceResourceReader mediaStreamParams( mediaStreamParams2, *m_cpuDesc.get() );
+
+    //locking shared memory region
+    PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
+    if( !usageLock.locked() )
+    {
+        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to lock shared usage watcher. Cannot create decoder"), cl_logWARNING );
+        return false;
+    }
+
+    if( !m_usageWatcher->readExternalUsage() )
+    {
+        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to read total usage. Cannot create decoder"), cl_logWARNING );
+        return false;
+    }
+
+    //retrieving existing sessions' info
+    //adding availableVideoMemory param
+    stree::ResourceContainer curUsageParams = m_usageWatcher->currentTotalUsage();
+    quint64 newStreamEstimatedVideoMemoryUsage = 0;
+    if( !m_d3dDevices.empty() )
+    {
+        mediaStreamParams.getTypedVal( DecoderParameter::videoMemoryUsage, &newStreamEstimatedVideoMemoryUsage );
+        UINT availableVideoMem = m_d3dDevices[0].d3d9Device->GetAvailableTextureMem();
+        availableVideoMem = availableVideoMem > newStreamEstimatedVideoMemoryUsage
+            ? (availableVideoMem - newStreamEstimatedVideoMemoryUsage)
+            : 0;
+        curUsageParams.put( DecoderParameter::availableVideoMemory, availableVideoMem );
+    }
+
+    //joining media stream parameters with GPU description
+    return m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( mediaStreamParams, curUsageParams );
 }
 
 Q_EXPORT_PLUGIN2( quicksyncdecoderplugin, QuicksyncDecoderPlugin );

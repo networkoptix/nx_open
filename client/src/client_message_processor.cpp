@@ -89,18 +89,8 @@ void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray 
     Q_UNUSED(handle)
     Q_UNUSED(errorString)
     Q_UNUSED(status)
-    foreach (QnLicensePtr license, licenses.licenses())
-    {
-        // Someone wants to steal our software
-        if (!license->isValid())
-        {
-            QnLicenseList dummy;
-            dummy.setHardwareId("invalid");
-            qnLicensePool->replaceLicenses(dummy);
-            break;
-        }
-    }
 
+    // licenses are already verified
     qnLicensePool->replaceLicenses(licenses);
 }
 
@@ -108,8 +98,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
     if (message.eventType == Qn::Message_Type_License)
     {
-        if (message.license->isValid())
-            qnLicensePool->addLicense(message.license);
+        qnLicensePool->addLicense(message.license);
     }
     else if (message.eventType == Qn::Message_Type_ResourceDisabledChange)
     {
