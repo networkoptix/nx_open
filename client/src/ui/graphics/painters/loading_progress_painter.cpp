@@ -9,11 +9,20 @@
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
     QnGlFunctions(context),
+    m_initialized(false),
     m_sectorCount(sectorCount),
     m_shader(QnColorShaderProgram::instance(context))
 {
-    if(context != QGLContext::currentContext())
+    if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
+        return;
+    }
+
+    if(!(features() & OpenGL2_0)) {
+        qnWarning("OpenGL version 2.0 is required.");
+        return;
+    }
+
 
     QByteArray data;
 
@@ -48,10 +57,13 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_initialized = true;
 }
 
 QnLoadingProgressPainter::~QnLoadingProgressPainter() {
-    glDeleteBuffers(1, &m_buffer);
+    if(m_initialized)
+        glDeleteBuffers(1, &m_buffer);
 }
 
 void QnLoadingProgressPainter::paint() {
@@ -59,6 +71,9 @@ void QnLoadingProgressPainter::paint() {
 }
 
 void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
+    if(!m_initialized)
+        return;
+
     glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
 

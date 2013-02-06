@@ -85,6 +85,8 @@ namespace stree
                 return equal;
             else if( str == QString::fromAscii("greater") )
                 return greater;
+            else if( str == QString::fromAscii("less") )
+                return less;
             else if( str == QString::fromAscii("wildcard") )
                 return wildcard;
             else

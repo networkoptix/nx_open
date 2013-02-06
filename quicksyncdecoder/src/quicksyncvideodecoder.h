@@ -79,41 +79,43 @@ public:
         unsigned int adapterNumber );
     virtual ~QuickSyncVideoDecoder();
 
-    virtual PixelFormat GetPixelFormat() const;
+    virtual PixelFormat GetPixelFormat() const override;
 
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
 #ifndef XVBA_TEST
     //!Not implemented yet
-    virtual void setLightCpuMode( DecodeMode val );
+    virtual void setLightCpuMode( DecodeMode val ) override;
 #endif
     //!Implementation of QnAbstractVideoDecoder::getWidth
-    virtual int getWidth() const;
+    virtual int getWidth() const override;
     //!Implementation of QnAbstractVideoDecoder::getHeight
-    virtual int getHeight() const;
+    virtual int getHeight() const override;
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
-    virtual QSize getOriginalPictureSize() const;
+    virtual QSize getOriginalPictureSize() const override;
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
-    virtual double getSampleAspectRatio() const;
+    virtual double getSampleAspectRatio() const override;
     //!Reset decoder. Used for seek
-    virtual void resetDecoder( QnCompressedVideoDataPtr data );
+    virtual void resetDecoder( QnCompressedVideoDataPtr data ) override;
 #endif
     //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
-    virtual const AVFrame* lastFrame() const;
+    virtual const AVFrame* lastFrame() const override;
     //!Hint decoder to scale decoded pictures (decoder is allowed to ignore this hint)
     /*!
         \note \a outSize.width is aligned to 16, \a outSize.height is aligned to 32 because of limitation of underlying API
     */
-    virtual void setOutPictureSize( const QSize& outSize );
+    virtual void setOutPictureSize( const QSize& outSize ) override;
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
-    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
+    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const override;
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
         Supports \a decodedPictureScaling and \a tracksDecodedPictureBuffer
     */
-    virtual unsigned int getDecoderCaps() const;
+    virtual unsigned int getDecoderCaps() const override;
+    //!Implementation of QnAbstractVideoDecoder::setSpeed
+    virtual void setSpeed( float newValue ) override;
 #endif
 
 #ifndef XVBA_TEST
@@ -304,6 +306,7 @@ private:
     DWORD m_prevOutPictureClock;
     int m_recursionDepth;
     MotionInfoContainerType m_srcMotionInfo;
+    float m_speed;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;

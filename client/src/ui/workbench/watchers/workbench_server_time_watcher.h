@@ -37,7 +37,7 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
 private:
-    void updateServerTime(const QnMediaServerResourcePtr &server);
+    void sendRequest(const QnMediaServerResourcePtr &server);
 
 private slots:
     void at_server_serverIfFound(const QnMediaServerResourcePtr &resource);

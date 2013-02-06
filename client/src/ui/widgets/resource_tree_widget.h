@@ -7,6 +7,7 @@
 #include <QtGui/QItemSelectionModel>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_managment/resource_criterion.h>
 
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
@@ -47,6 +48,9 @@ public:
     void setModel(QAbstractItemModel *model);
 
     QItemSelectionModel *selectionModel();
+
+    const QnResourceCriterion &criterion() const;
+    void setCriterion(const QnResourceCriterion &criterion);
 
     void setWorkbench(QnWorkbench *workbench);
 
@@ -128,6 +132,8 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
+
+    QnResourceCriterion m_criterion;
 
     QnResourceTreeItemDelegate *m_itemDelegate;
 

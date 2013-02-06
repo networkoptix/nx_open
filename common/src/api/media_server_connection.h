@@ -17,6 +17,8 @@
     
 #include "api_fwd.h"
 
+class QnPtzSpaceMapper;
+
 namespace detail {
     class QnMediaServerSimpleReplyProcessor: public QObject
     {
@@ -161,6 +163,17 @@ namespace detail {
         void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
     };
 
+    class QnMediaServerPtzGetSpaceMapperReplyProcessor: public QObject {
+        Q_OBJECT
+    public:
+        QnMediaServerPtzGetSpaceMapperReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
+
+    signals:
+        void finished(int status, const QnPtzSpaceMapper &mapper, int handle);
+    };
 
 } // namespace detail
 
@@ -240,6 +253,7 @@ public:
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
     int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, qreal xPos, qreal yPos, qreal zoomPos, QObject *target, const char *slot);
     int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int asyncGetTime(QObject *target, const char *slot);
 

@@ -15,6 +15,7 @@ namespace QnResourceProperty {
         const char *flags = "flags";
         const char *url = "url";
         const char *tags = "tags";
+        const char *cameraCapabilities = "cameraCapabilities";
 
         const char *properties[] = {id, typeId, uniqueId, name, searchString, status, flags, url, tags, NULL};
 

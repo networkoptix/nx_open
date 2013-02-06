@@ -13,7 +13,6 @@
 #include <business/business_event_connector.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "common/common_meta_types.h"
 #include "serverutil.h"
 
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
@@ -31,8 +30,6 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE)
 {
-    QnCommonMetaTypes::initilize();
-
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;

@@ -86,8 +86,14 @@ typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
 
 class QnPlPulseResource;
 typedef QSharedPointer<QnPlPulseResource> QnPlPulseResourcePtr;
+typedef QnSharedResourcePointerList<QnPlPulseResource> QnPlPulseResourceList;
 
 class QnPlIqResource;
 typedef QSharedPointer<QnPlIqResource> QnPlIqResourcePtr;
+typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
+
+class QnPlWatchDogResource;
+typedef QSharedPointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
+typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
 
 #endif // QN_RESOURCE_FWD_H

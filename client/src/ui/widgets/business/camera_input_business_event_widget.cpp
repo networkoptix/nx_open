@@ -18,7 +18,7 @@ QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *pare
 
 QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
 {
-    delete ui;
+    delete ui; // TODO: #gdm use QScopedPointer
 }
 
 void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -29,23 +29,23 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::EventResourcesField) {
-        QSet<QString> total_relays;
+        QSet<QString> inputPorts;
         bool inited = false;
 
         QnVirtualCameraResourceList cameras = model->eventResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            QStringList camera_relays = camera->getRelayOutputList();
+            QStringList cameraInputs = camera->getInputPortList();
             if (!inited) {
-                total_relays = camera_relays.toSet();
+                inputPorts = cameraInputs.toSet();
                 inited = true;
             } else {
-                total_relays = total_relays.intersect(camera_relays.toSet());
+                inputPorts = inputPorts.intersect(cameraInputs.toSet());
             }
         }
 
         ui->relayComboBox->clear();
         ui->relayComboBox->addItem(tr("<automatic>"), QString());
-        foreach (QString relay, total_relays)
+        foreach (QString relay, inputPorts)
             ui->relayComboBox->addItem(relay, relay);
 
     }

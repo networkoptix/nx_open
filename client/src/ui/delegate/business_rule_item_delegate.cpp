@@ -6,6 +6,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -132,7 +133,7 @@ void QnSelectResourcesDialogButton::setDialogDelegate(QnSelectCamerasDialogDeleg
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnSelectCamerasDialog dialog(this); //TODO: #GDM servers dialog?
+    QnSelectCamerasDialog dialog(QnResourceCriterion(), this); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();

@@ -51,6 +51,8 @@ namespace DecoderParameter
         framePictureSize,
         //double
         fps,
+        //double
+        speed,
         //uint64
         pixelsPerSecond,
         //uint64

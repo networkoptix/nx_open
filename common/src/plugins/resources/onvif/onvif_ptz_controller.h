@@ -7,16 +7,19 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/interface/abstract_ptz_controller.h"
 
+class QnPtzSpaceMapper;
+
 class QnOnvifPtzController: public QnAbstractPtzController {
     Q_OBJECT
 public:
-    QnOnvifPtzController(QnResourcePtr res);
+    QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
     virtual int stopMove() override;
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
     virtual Qn::CameraCapabilities getCapabilities() override;
+    virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
     QString getPtzConfigurationToken();
     void setMediaProfileToken(const QString& value);
@@ -25,8 +28,9 @@ private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
 
 private:
-    QnPlOnvifResourcePtr m_res;
+    QnPlOnvifResourcePtr m_resource;
     Qn::CameraCapabilities m_capabilities;
+    const QnPtzSpaceMapper *m_ptzMapper;
     QString m_mediaProfile;
     QString m_ptzConfigurationToken;
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative

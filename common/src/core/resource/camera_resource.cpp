@@ -1,16 +1,13 @@
 #include "camera_resource.h"
 #include "resource_consumer.h"
-#include "common/common_meta_types.h"
 
-QnVirtualCameraResource::QnVirtualCameraResource()
-    : m_scheduleDisabled(true),
-      m_audioEnabled(false),
-      m_manuallyAdded(false),
-      m_advancedWorking(false),
-      m_dtsFactory(0)
-{
-    QnCommonMetaTypes::initilize();
-}
+QnVirtualCameraResource::QnVirtualCameraResource():
+    m_scheduleDisabled(true),
+    m_audioEnabled(false),
+    m_manuallyAdded(false),
+    m_advancedWorking(false),
+    m_dtsFactory(0)
+{}
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
 {
@@ -29,6 +26,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
     resolutionFactor = pow(resolutionFactor, (float)0.5);
 
     float frameRateFactor = fps/30.0;
+    frameRateFactor = pow(frameRateFactor, (float)0.4);
 
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);

@@ -11,6 +11,8 @@ class QnAbstractDTSFactory;
 class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
     Q_OBJECT
+    Q_FLAGS(QnCommonGlobals::CameraCapabilities)
+    Q_PROPERTY(QnCommonGlobals::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
 
 public:
     QnVirtualCameraResource();

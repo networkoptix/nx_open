@@ -52,4 +52,5 @@ private:
 #define qnEnumNameMapper(SCOPE, ENUM)                                           \
     QnEnumNameMapper(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM))
 
+
 #endif // QN_ENUM_NAME_MAPPER_H

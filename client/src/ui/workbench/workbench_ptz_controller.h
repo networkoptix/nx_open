@@ -11,7 +11,7 @@
 
 #include "workbench_context_aware.h"
 
-class QnWorkbenchPtzMapperManager;
+class QnWorkbenchPtzMapperWatcher;
 
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -91,7 +91,7 @@ private:
         int attemptCount[RequestTypeCount];
     };
 
-    QnWorkbenchPtzMapperManager *m_mapperManager;
+    QnWorkbenchPtzMapperWatcher *m_mapperWatcher;
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;

@@ -1,11 +1,13 @@
 #include "popup_collection_widget.h"
 #include "ui_popup_collection_widget.h"
 
+#include <utils/common/event_processors.h>
+
 #include <business/actions/popup_business_action.h>
 
 #include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context.h>
-#include "ui/workbench/workbench_access_controller.h"
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/settings.h>
 
@@ -15,8 +17,13 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
-    setAttribute(Qt::WA_ShowWithoutActivating);
-    setFocusPolicy(Qt::NoFocus);
+
+    // TODO: Evil! Layout code does not belong here.
+    // Layout must be done by widget's parent, not the widget itself.
+    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
+    resizeSignalizer->setEventType(QEvent::Resize);
+    parent->installEventFilter(resizeSignalizer);
+    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -43,7 +50,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return false;
 
     if (QWidget* w = m_widgetsByType[eventType]) {
-        QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w);
+        QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w); // TODO: #gdm Why don't store QnPopupWidget * in a map? This way we won't need dynamic_casts.
         pw->addBusinessAction(businessAction);
     } else {
         QnPopupWidget* pw = new QnPopupWidget(this);
@@ -53,21 +60,28 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_widget_closed(BusinessEventType::Value, bool)));
     }
 
-    if (isVisible())
-        updatePosition();
     return true;
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
-    updatePosition();
     base_type::showEvent(event);
+    updatePosition();
+}
+
+void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
+    base_type::resizeEvent(event);
+    updatePosition();
 }
 
 void QnPopupCollectionWidget::updatePosition() {
-    QRect pgeom = static_cast<QWidget *>(parent())->geometry();
-    QRect geom = geometry();
-    qDebug() << "update position" << pgeom << geom;
-    setGeometry(pgeom.left() + pgeom.width() - geom.width(), pgeom.top() + pgeom.height() - geom.height(), geom.width(), geom.height());
+    // TODO: #gdm you have QWidget::parentWidget for that. Please spend some time reading through QWidget docs.
+    // QRect pgeom = static_cast<QWidget *>(parent())->geometry();
+    
+    // TODO: #gdm there were some bugs here related to improper use of QWidget::geometry. Please read QWidget docs =).
+
+    QSize parentSize = parentWidget()->size();
+    QSize size = this->size();
+    move(parentSize.width() - size.width(), parentSize.height() - size.height());
 }
 
 void QnPopupCollectionWidget::at_widget_closed(BusinessEventType::Value eventType, bool ignore) {

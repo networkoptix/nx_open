@@ -445,7 +445,7 @@ bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractReso
     desc.put( DecoderParameter::sdkVersion, m_sdkVersionStr );
     desc.put( DecoderParameter::decoderName, DECODER_NAME );
     desc.put( DecoderParameter::osName, m_osName );
-    //desc.put( DecoderParameter::totalCurrentNumberOfDecoders, currentSWDecoderCount+m_usageWatcher->currentSessionCount() );  //TODO/IMPL
+    desc.put( DecoderParameter::totalCurrentNumberOfDecoders, m_usageWatcher->currentSessionCount() );  //TODO/IMPL add currentSWDecoderCount
 
     stree::MultiSourceResourceReader mediaStreamParams1( desc, *m_graphicsDesc.get() );
     stree::MultiSourceResourceReader mediaStreamParams2( mediaStreamParams1, streamParams );

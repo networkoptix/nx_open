@@ -581,6 +581,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
         text(tr("Advanced Event Rules...")).
+        shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 
     factory(Qn::SystemSettingsAction).
