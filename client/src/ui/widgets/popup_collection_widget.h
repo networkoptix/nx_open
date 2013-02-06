@@ -24,6 +24,7 @@ public:
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void updatePosition();

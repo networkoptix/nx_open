@@ -17,10 +17,9 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
-    setAttribute(Qt::WA_ShowWithoutActivating);
-    setFocusPolicy(Qt::NoFocus);
 
-    // TODO: Evil! This must be done in parentChange event handler.
+    // TODO: Evil! Layout code does not belong here.
+    // Layout must be done by widget's parent, not the widget itself.
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
     parent->installEventFilter(resizeSignalizer);
@@ -61,17 +60,17 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_widget_closed(BusinessEventType::Value, bool)));
     }
 
-    // TODO: #GDM I believe the idea here is "Widget's size has changed => we need to update its position".
-    // If this is indeed the case, then this bit of code actually belongs to resizeEvent() handler.
-    if (isVisible())
-        updatePosition(); 
-
     return true;
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
-    updatePosition();
     base_type::showEvent(event);
+    updatePosition();
+}
+
+void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
+    base_type::resizeEvent(event);
+    updatePosition();
 }
 
 void QnPopupCollectionWidget::updatePosition() {
