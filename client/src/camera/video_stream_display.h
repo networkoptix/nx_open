@@ -67,6 +67,9 @@ public:
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
     bool selfSyncUsed() const;
 
+    //!Blocks until all frames passed to \a display have been rendered
+    void flushFramesToRenderer();
+
 private:
     mutable QMutex m_mtx;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;

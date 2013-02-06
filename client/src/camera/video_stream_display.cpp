@@ -658,6 +658,11 @@ bool QnVideoStreamDisplay::selfSyncUsed() const
     return m_bufferedFrameDisplayer;
 }
 
+void QnVideoStreamDisplay::flushFramesToRenderer()
+{
+    m_drawer->finishPostedFramesRender( m_channelNumber );
+}
+
 bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
 {
     static const int ROUND_FACTOR = 16;
