@@ -114,6 +114,7 @@ public:
     bool disabled() const;
     void setDisabled(const bool value);
 
+    // TODO: #GDM/#VASILENKO Schedule as a string? What is the format? Where are docs?
     QString schedule() const;
     void setSchedule(const QString value);
 

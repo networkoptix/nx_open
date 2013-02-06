@@ -1212,8 +1212,8 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     businessRule->setAggregationPeriod(pb_businessRule.aggregationperiod());
     businessRule->setDisabled(pb_businessRule.disabled());
-    businessRule->setComments(QString::fromStdString(pb_businessRule.comments()));
-    businessRule->setSchedule(QString::fromStdString(pb_businessRule.schedule()));
+    businessRule->setComments(QString::fromUtf8(pb_businessRule.comments().c_str()));
+    businessRule->setSchedule(QString::fromUtf8(pb_businessRule.schedule().c_str()));
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)
