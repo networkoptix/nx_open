@@ -6,6 +6,7 @@
 class QnTimePeriod;
 class QnTimePeriodList;
 
+// TODO: #Elric move to common_globals
 namespace Qn {
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */

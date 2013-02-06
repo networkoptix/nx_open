@@ -2,6 +2,7 @@
 #define QN_COMMON_GLOBALS_H
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.

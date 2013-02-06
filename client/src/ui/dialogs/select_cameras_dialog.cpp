@@ -10,11 +10,9 @@
 
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnSelectCamerasDialogDelegate ------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
-
+// -------------------------------------------------------------------------- //
+// QnSelectCamerasDialogDelegate 
+// -------------------------------------------------------------------------- //
 QnSelectCamerasDialogDelegate::QnSelectCamerasDialogDelegate(QObject *parent):
     QObject(parent)
 {
@@ -37,11 +35,11 @@ bool QnSelectCamerasDialogDelegate::isApplyAllowed() {
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnSelectCamerasDialog --------------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
 
-QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext *context) :
+// -------------------------------------------------------------------------- //
+// QnSelectCamerasDialog 
+// -------------------------------------------------------------------------- //
+QnSelectCamerasDialog::QnSelectCamerasDialog(const QnResourceCriterion &criterion, QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnSelectCamerasDialog),
@@ -60,6 +58,7 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
+    ui->resourcesWidget->setCriterion(criterion);
 
     ui->delegateFrame->setVisible(false);
 }
