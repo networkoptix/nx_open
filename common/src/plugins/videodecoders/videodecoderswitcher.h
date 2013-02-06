@@ -64,6 +64,8 @@ public:
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     virtual unsigned int getDecoderCaps() const;
+    //!Implementation of QnAbstractVideoDecoder::setSpeed
+    virtual void setSpeed( float newValue );
 
     //!Implementation of AbstractDecoderEventReceiver::streamParamsChanged
     virtual DecoderBehaviour streamParamsChanged(

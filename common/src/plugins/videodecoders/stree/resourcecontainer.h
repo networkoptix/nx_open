@@ -66,6 +66,27 @@ namespace stree
         std::map<int, QVariant> m_mediaStreamPameters;
     };
 
+    class SingleResourceContainer
+    :
+        public AbstractResourceReader,
+        public AbstractResourceWriter
+    {
+    public:
+        SingleResourceContainer();
+        SingleResourceContainer(
+            int resID,
+            QVariant value );
+
+        //!Implementation of AbstractResourceReader::get
+        virtual bool get( int resID, QVariant* const value ) const;
+        //!Implementation of AbstractResourceReader::put
+        virtual void put( int resID, const QVariant& value );
+
+    private:
+        int m_resID;
+        QVariant m_value;
+    };
+
     //!Reads from two AbstractResourceReader
     class MultiSourceResourceReader
     :

@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////
-// 17 oct 2012    Andrey Kolesnikov
+// 7 feb 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifndef MAXLESSERMATCHCONTAINER_H
-#define MAXLESSERMATCHCONTAINER_H
+#ifndef STREECONTAINER_H
+#define STREECONTAINER_H
 
 #include <map>
 
@@ -11,12 +11,12 @@
 namespace stree
 {
     /*!
-        \a find methods select element with maximum key less than being searched
+        \a find methods select element with min key greater than searched one
     */
-    template<class KeyType, class MappedType>
-       class MaxLesserMatchContainer
+    template<class KeyType, class MappedType, class Predicate>
+       class ConditionMatchContainer
     {
-        typedef std::map<KeyType, MappedType, std::greater<KeyType> > InternalContainerType;
+        typedef std::map<KeyType, MappedType, Predicate> InternalContainerType;
 
     public:
         typedef typename InternalContainerType::iterator iterator;
@@ -68,6 +68,20 @@ namespace stree
     private:
         InternalContainerType m_container;
     };
+
+    template <class KeyType, class MappedType>
+        class MinGreaterMatchContainer
+    :
+        public ConditionMatchContainer<KeyType, MappedType, std::less<KeyType> >
+    {
+    };
+
+    template <class KeyType, class MappedType>
+        class MaxLesserMatchContainer
+    :
+        public ConditionMatchContainer<KeyType, MappedType, std::greater<KeyType> >
+    {
+    };
 }
 
-#endif  //MAXLESSERMATCHCONTAINER_H
+#endif  //STREECONTAINER_H

@@ -128,6 +128,14 @@ unsigned int VideoDecoderSwitcher::getDecoderCaps() const
     return m_decoder->getDecoderCaps();
 }
 
+void VideoDecoderSwitcher::setSpeed( float newValue )
+{
+    QMutexLocker lk( &m_mutex );
+
+    if( m_decoder.get() )
+        m_decoder->setSpeed( newValue );
+}
+
 //!Implementation of AbstractDecoderManagerCallback::streamParamsChanged
 AbstractDecoderEventReceiver::DecoderBehaviour VideoDecoderSwitcher::streamParamsChanged(
     QnAbstractVideoDecoder* /*decoder*/,

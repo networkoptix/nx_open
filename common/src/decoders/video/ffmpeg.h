@@ -59,6 +59,7 @@ public:
         Supports \a multiThreadedMode
     */
     virtual unsigned int getDecoderCaps() const;
+    virtual void setSpeed( float newValue ) override;
 
 private:
     static AVCodec* findCodec(CodecID codecId);

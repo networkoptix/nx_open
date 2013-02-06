@@ -272,6 +272,10 @@ unsigned int CLFFmpegVideoDecoder::getDecoderCaps() const
     return QnAbstractVideoDecoder::multiThreadedMode;
 }
 
+void CLFFmpegVideoDecoder::setSpeed( float newValue )
+{
+}
+
 int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
 {
     for (int i = 0; i < m_motionMap.size(); ++i) {
