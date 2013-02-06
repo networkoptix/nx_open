@@ -3,7 +3,6 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSecurityCamResource::QnSecurityCamResource(): 
-    QnMediaResource(),
     m_dpFactory(0),
     m_motionType(Qn::MT_Default),
     m_recActionCnt(0)
@@ -22,7 +21,7 @@ QnSecurityCamResource::~QnSecurityCamResource()
 
 void QnSecurityCamResource::updateInner(QnResourcePtr other)
 {
-    QnMediaResource::updateInner(other);
+    base_type::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
@@ -46,42 +45,42 @@ QString QnSecurityCamResource::oemName() const
 
 int QnSecurityCamResource::getMaxFps()
 {
-    if (!hasParam(QLatin1String("MaxFPS")))
+    if (!hasParam(lit("MaxFPS")))
     {
         //Q_ASSERT(false);
         return 15;
     }
 
     QVariant val;
-    getParam(QLatin1String("MaxFPS"), val, QnDomainMemory);
+    getParam(lit("MaxFPS"), val, QnDomainMemory);
     return val.toInt();
 }
 
 int QnSecurityCamResource::reservedSecondStreamFps()
 {
-    if (!hasParam(QLatin1String("reservedSecondStreamFps")))
+    if (!hasParam(lit("reservedSecondStreamFps")))
     {
         //Q_ASSERT(false);
         return 2;
     }
 
     QVariant val;
-    getParam(QLatin1String("reservedSecondStreamFps"), val, QnDomainMemory);
+    getParam(lit("reservedSecondStreamFps"), val, QnDomainMemory);
     return val.toInt();
 }
 
 QSize QnSecurityCamResource::getMaxSensorSize()
 {
 
-    if (!hasParam(QLatin1String("MaxSensorWidth")) || !hasParam(QLatin1String("MaxSensorHeight")))
+    if (!hasParam(lit("MaxSensorWidth")) || !hasParam(lit("MaxSensorHeight")))
     {
         Q_ASSERT(false);
         return QSize(0,0);
     }
 
     QVariant val_w, val_h;
-    getParam(QLatin1String("MaxSensorWidth"), val_w, QnDomainMemory);
-    getParam(QLatin1String("MaxSensorHeight"), val_h, QnDomainMemory);
+    getParam(lit("MaxSensorWidth"), val_w, QnDomainMemory);
+    getParam(lit("MaxSensorHeight"), val_h, QnDomainMemory);
 
     return QSize(val_w.toInt(), val_h.toInt());
 
@@ -230,7 +229,7 @@ const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-    if (!hasParam(QLatin1String("hasDualStreaming")))
+    if (!hasParam(lit("hasDualStreaming")))
     {
         //Q_ASSERT(false);
         return false;
@@ -238,13 +237,13 @@ bool QnSecurityCamResource::hasDualStreaming() const
 
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(QLatin1String("hasDualStreaming"), val, QnDomainMemory);
+    this_casted->getParam(lit("hasDualStreaming"), val, QnDomainMemory);
     return val.toInt();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 {
-    if (!hasParam(QLatin1String("streamFpsSharing")))
+    if (!hasParam(lit("streamFpsSharing")))
     {
         //Q_ASSERT(false);
         return Qn::sharePixels;
@@ -252,14 +251,14 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(QLatin1String("streamFpsSharing"), val, QnDomainMemory);
+    this_casted->getParam(lit("streamFpsSharing"), val, QnDomainMemory);
 
     QString sval = val.toString();
 
-    if (sval == QLatin1String("shareFps"))
+    if (sval == lit("shareFps"))
         return Qn::shareFps;
 
-    if (sval == QLatin1String("noSharing"))
+    if (sval == lit("noSharing"))
         return Qn::noSharing;
 
     return Qn::sharePixels;
@@ -317,17 +316,17 @@ Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(QLatin1String("supportedMotion"), val, QnDomainMemory))
+    if (this_casted->getParam(lit("supportedMotion"), val, QnDomainMemory))
     {
         QStringList vals = val.toString().split(QLatin1Char(','));
         for (int i = 0; i < vals.size(); ++i)
         {
             QString s1 = vals[i].toLower();
-            if (s1 == QLatin1String("hardwaregrid"))
+            if (s1 == lit("hardwaregrid"))
                 return Qn::MT_HardwareGrid;
-            else if (s1 == QLatin1String("softwaregrid") && hasDualStreaming())
+            else if (s1 == lit("softwaregrid") && hasDualStreaming())
                 return Qn::MT_SoftwareGrid;
-            else if (s1 == QLatin1String("motionwindow"))
+            else if (s1 == lit("motionwindow"))
                 return Qn::MT_MotionWindow;
         }
         return Qn::MT_NoMotion;
@@ -341,7 +340,7 @@ int QnSecurityCamResource::motionWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(QLatin1String("motionWindowCnt"), val, QnDomainMemory))
+    if (this_casted->getParam(lit("motionWindowCnt"), val, QnDomainMemory))
     {
         return val.toInt();
     }
@@ -352,7 +351,7 @@ int QnSecurityCamResource::motionMaskWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(QLatin1String("motionMaskWindowCnt"), val, QnDomainMemory))
+    if (this_casted->getParam(lit("motionMaskWindowCnt"), val, QnDomainMemory))
     {
         return val.toInt();
     }
@@ -363,7 +362,7 @@ int QnSecurityCamResource::motionSensWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(QLatin1String("motionSensWindowCnt"), val, QnDomainMemory))
+    if (this_casted->getParam(lit("motionSensWindowCnt"), val, QnDomainMemory))
     {
         return val.toInt();
     }
@@ -374,7 +373,7 @@ bool QnSecurityCamResource::isAudioSupported() const
 {
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
     QVariant val;
-    if (this_casted->getParam(QLatin1String("isAudioSupported"), val, QnDomainMemory))
+    if (this_casted->getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return val.toUInt() > 0;
     else
         return false;
@@ -386,17 +385,17 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const
     Qn::MotionTypes result = Qn::MT_Default;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
 
-    if (this_casted->getParam(QLatin1String("supportedMotion"), val, QnDomainMemory))
+    if (this_casted->getParam(lit("supportedMotion"), val, QnDomainMemory))
     {
         QStringList vals = val.toString().split(QLatin1Char(','));
         foreach(const QString& str, vals)
         {
             QString s1 = str.toLower().trimmed();
-            if (s1 == QLatin1String("hardwaregrid"))
+            if (s1 == lit("hardwaregrid"))
                 result |= Qn::MT_HardwareGrid;
-            else if (s1 == QLatin1String("softwaregrid"))
+            else if (s1 == lit("softwaregrid"))
                 result |= Qn::MT_SoftwareGrid;
-            else if (s1 == QLatin1String("motionwindow"))
+            else if (s1 == lit("motionwindow"))
                 result |= Qn::MT_MotionWindow;
         }
         if (!hasDualStreaming() && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
@@ -439,16 +438,18 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
-    setParam(QLatin1String("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
-
-    // TODO: #1.5 this signal won't be emitted if parameter was changed directly (e.g. as a result of resource update).
-
-    // TODO: we don't check whether they have actually changed. This better be fixed.
-    emit cameraCapabilitiesChanged(::toSharedPointer(this));
+    setParam(lit("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
 }
 
 void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability, bool value) {
     setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
+}
+
+bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
+    bool result = base_type::setParam(name, val, domain);
+    if(result && name == lit("cameraCapabilities"))
+        emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: we don't check whether they have actually changed. This better be fixed.
+    return result;
 }
 
 bool QnSecurityCamResource::isRecordingEventAttached() const
