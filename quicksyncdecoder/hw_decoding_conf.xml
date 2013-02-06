@@ -55,4 +55,9 @@
     </condition>
   </condition>
 
+  <!-- rewind is not supported -->
+  <condition resName="speed" matchType="less">
+    <set value="0" resName="simultaneousStreamCount" resValue="0"/>
+  </condition>
+
 </sequence>

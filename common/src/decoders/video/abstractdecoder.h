@@ -94,6 +94,8 @@ public:
     virtual void setOutPictureSize( const QSize& outSize ) = 0;
     //!Get decoder capabilities
     virtual unsigned int getDecoderCaps() const = 0;
+    //!Notifies decoder about source stream speed change
+    virtual void setSpeed( float newValue ) = 0;
 
 private:
     QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}

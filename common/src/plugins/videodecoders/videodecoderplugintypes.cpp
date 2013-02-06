@@ -48,6 +48,8 @@ namespace DecoderParameter
                 return "framePictureSize";
             case fps:
                 return "fps";
+            case speed:
+                return "speed";
             case pixelsPerSecond:
                 return "pixelsPerSecond";
             case videoMemoryUsage:
@@ -103,6 +105,8 @@ namespace DecoderParameter
             return framePictureSize;
         else if( name == "fps" )
             return fps;
+        else if( name == "speed" )
+            return speed;
         else if( name == "pixelsPerSecond" )
             return pixelsPerSecond;
         else if( name == "videoMemoryUsage" )
@@ -140,6 +144,7 @@ DecoderResourcesNameset::DecoderResourcesNameset()
     registerResource( DecoderParameter::framePictureHeight, QString::fromAscii("framePictureHeight"), QVariant::Int );
     registerResource( DecoderParameter::framePictureSize, QString::fromAscii("framePictureSize"), QVariant::UInt );
     registerResource( DecoderParameter::fps, QString::fromAscii("fps"), QVariant::Double );
+    registerResource( DecoderParameter::speed, QString::fromAscii("speed"), QVariant::Double );
     registerResource( DecoderParameter::pixelsPerSecond, QString::fromAscii("pixelsPerSecond"), QVariant::ULongLong );
     registerResource( DecoderParameter::videoMemoryUsage, QString::fromAscii("videoMemoryUsage"), QVariant::ULongLong );
     registerResource( DecoderParameter::availableVideoMemory, QString::fromAscii("availableVideoMemory"), QVariant::ULongLong );
