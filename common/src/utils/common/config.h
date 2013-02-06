@@ -128,6 +128,12 @@ namespace Qn {
 inline QString lit(const char *s) {
     return QLatin1String(s);
 }
+
+/** Helper function to mark characters that are not to be translated. */
+inline QChar lit(char c) {
+    return QLatin1Char(c);
+}
+
 #endif // __cplusplus
 
 

@@ -20,11 +20,13 @@ QnScalarSpaceMapper::QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal p
 }
 
 void QnScalarSpaceMapper::init(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
-    foreach(const QPointF &point, logicalToPhysical) {
-        m_logicalToPhysical.addPoint(point.x(), point.y());
-        m_physicalToLogical.addPoint(point.y(), point.x());
-    }
+    QVector<QPointF> physicalToLogical;
+    foreach(const QPointF &point, logicalToPhysical)
+        physicalToLogical.push_back(QPointF(point.y(), point.x()));
+
+    m_logicalToPhysical.setPoints(logicalToPhysical);
     m_logicalToPhysical.setExtrapolationMode(extrapolationMode);
+    m_physicalToLogical.setPoints(physicalToLogical);
     m_physicalToLogical.setExtrapolationMode(extrapolationMode);
 
     qreal logicalA, logicalB, physicalA, physicalB;
@@ -158,6 +160,12 @@ void serialize(const QnPtzSpaceMapper &value, QVariant *target) {
 
 bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
     assert(target);
+
+    if(value.type() == QVariant::Invalid) {
+        /* That's null mapper. */
+        *target = QnPtzSpaceMapper();
+        return true;
+    }
 
     if(value.type() != QVariant::Map)
         return false;

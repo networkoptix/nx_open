@@ -5,17 +5,14 @@
 #include "utils/network/ping.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-#include "common/common_meta_types.h"
 
-QnNetworkResource::QnNetworkResource()
-    : QnResource(),
-      m_authenticated(true),
-      m_networkStatus(0),
-      m_networkTimeout(3000),
-      m_probablyNeedToUpdateStatus(false)
+QnNetworkResource::QnNetworkResource(): 
+    QnResource(),
+    m_authenticated(true),
+    m_networkStatus(0),
+    m_networkTimeout(3000),
+    m_probablyNeedToUpdateStatus(false)
 {
-    QnCommonMetaTypes::initilize();
-
     addFlags(network | motion);
 }
 

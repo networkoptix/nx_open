@@ -1,48 +1,27 @@
-#include "workbench_ptz_mapper_manager.h"
-
-#include <cassert>
+#include "ptz_mapper_pool.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
-#include <utils/settings.h>
-
-#include <core/resource/camera_resource.h>
+#include <utils/common/space_mapper.h>
 
 
-QnWorkbenchPtzMapperManager::QnWorkbenchPtzMapperManager(QObject *parent):
-    QObject(parent),
-    QnWorkbenchContextAware(parent)
-{
-    loadMappers();
-}
+QnPtzMapperPool::QnPtzMapperPool(QObject *parent):
+    QObject(parent) 
+{}
 
-QnWorkbenchPtzMapperManager::~QnWorkbenchPtzMapperManager() {
+QnPtzMapperPool::~QnPtzMapperPool() {
     qDeleteAll(m_mappers);
     m_mappers.clear();
     m_mapperByModel.clear();
 }
 
-QnPtzSpaceMapper *QnWorkbenchPtzMapperManager::mapper(const QString &model) const {
-    return m_mapperByModel.value(model.toLower());
+const QnPtzSpaceMapper *QnPtzMapperPool::mapper(const QString &model) const {
+    return m_mapperByModel.value(model.toLower());    
 }
 
-QnPtzSpaceMapper *QnWorkbenchPtzMapperManager::mapper(const QnVirtualCameraResourcePtr &resource) const {
-    if(!resource) {
-        qnNullWarning(resource);
-        return NULL;
-    }
-
-    return mapper(resource->getModel());
-}
-
-const QList<QnPtzSpaceMapper *> &QnWorkbenchPtzMapperManager::mappers() const {
-    return m_mappers;
-}
-
-void QnWorkbenchPtzMapperManager::addMapper(QnPtzSpaceMapper *mapper) {
+void QnPtzMapperPool::addMapper(const QnPtzSpaceMapper *mapper) {
     if(!mapper) {
         qnNullWarning(mapper);
         return;
@@ -58,7 +37,7 @@ void QnWorkbenchPtzMapperManager::addMapper(QnPtzSpaceMapper *mapper) {
         m_mapperByModel[model.toLower()] = mapper;
 }
 
-void QnWorkbenchPtzMapperManager::removeMapper(QnPtzSpaceMapper *mapper) {
+void QnPtzMapperPool::removeMapper(const QnPtzSpaceMapper *mapper) {
     if(!mapper) {
         qnNullWarning(mapper);
         return;
@@ -71,26 +50,21 @@ void QnWorkbenchPtzMapperManager::removeMapper(QnPtzSpaceMapper *mapper) {
         m_mapperByModel.remove(model);
 }
 
-void QnWorkbenchPtzMapperManager::loadMappers() {
-    QList<QString> mappingFileNames;
-    mappingFileNames 
-        << lit(":/ptz_mappers.json") 
-        << QCoreApplication::applicationDirPath() + lit("/ptz_mappers.json")
-        << qnSettings->extraPtzMappingsPath();
+bool QnPtzMapperPool::load(const QString &fileName) {
+    if(!QFile::exists(fileName)) {
+        qnWarning("File '%1' does not exist", fileName);
+        return false;
+    }
 
-    foreach(const QString &fileName, mappingFileNames)
-        if(QFile::exists(fileName))
-            loadMappers(fileName);
-}
-
-bool QnWorkbenchPtzMapperManager::loadMappers(const QString &fileName) {
-    bool result = loadMappersInternal(fileName);
-    if(!result)
+    if(!loadInternal(fileName)) {
         qnWarning("Error while loading PTZ mappings from file '%1'.", fileName);
-    return result;
+        return false;
+    }
+        
+    return true;
 }
 
-bool QnWorkbenchPtzMapperManager::loadMappersInternal(const QString &fileName) {
+bool QnPtzMapperPool::loadInternal(const QString &fileName) {
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
@@ -119,3 +93,4 @@ bool QnWorkbenchPtzMapperManager::loadMappersInternal(const QString &fileName) {
         addMapper(new QnPtzSpaceMapper(mapper));
     return true;
 }
+

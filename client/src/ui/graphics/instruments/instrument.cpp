@@ -36,7 +36,7 @@
 #include "instrument_manager.h"
 
 Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-    QObject(parent),
+    base_type(parent),
     m_animationTimer(NULL)
 {
     initialize();
@@ -48,7 +48,7 @@ Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSe
 }
 
 Instrument::Instrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent):
-    QObject(parent)
+    base_type(parent)
 {
     initialize();
 

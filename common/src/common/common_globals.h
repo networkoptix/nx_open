@@ -5,6 +5,9 @@
 
 #include <utils/common/gadget.h>
 
+namespace QnCommonGlobals {}
+namespace Qn { using namespace QnCommonGlobals; }
+
 #ifdef Q_MOC_RUN
 class QnCommonGlobals
 #else
@@ -28,14 +31,42 @@ public:
 
     enum CameraCapability { 
         NoCapabilities                      = 0x0, 
-        ContinuousPtzCapability             = 0x01, 
-        ZoomCapability                      = 0x02, 
         PrimaryStreamSoftMotionCapability   = 0x04,
         relayInput                          = 0x08,
         relayOutput                         = 0x10,
-        AbsolutePtzCapability               = 0x20
+        AbsolutePtzCapability               = 0x20,
+        ContinuousPanTiltCapability         = 0x40,
+        ContinuousZoomCapability            = 0x80,
+
+        /* Shortcuts */
+        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability,
+
+        /* Deprecated capabilities. */
+        DeprecatedContinuousPtzCapability   = 0x01,
+        DeprecatedZoomCapability            = 0x02
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
+
+    /**
+     * \param capabilities              Camera capability flags containing some deprecated values.
+     * \returns                         Camera capability flags with deprecated values replaced with new ones.
+     */
+    inline Qn::CameraCapabilities undeprecate(Qn::CameraCapabilities capabilities) {
+        Qn::CameraCapabilities result = capabilities;
+
+        if(result & Qn::DeprecatedContinuousPtzCapability) {
+            result &= ~Qn::DeprecatedContinuousPtzCapability;
+            result |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability;
+        }
+
+        if(result & Qn::DeprecatedZoomCapability) {
+            result &= ~Qn::DeprecatedZoomCapability;
+            result |= Qn::ContinuousZoomCapability;
+        }
+
+        return result;
+    }
 
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
@@ -53,11 +84,5 @@ public:
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
 } // namespace QnCommonGlobals
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnCommonGlobals::CameraCapabilities);
-
-namespace Qn {
-    using namespace QnCommonGlobals;
-}
 
 #endif // QN_COMMON_GLOBALS_H

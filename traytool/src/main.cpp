@@ -9,12 +9,11 @@
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
 #include "systraywindow.h"
+#include "common/common_module.h"
 
 
 int main(int argc, char *argv[])
 {
-    qRegisterMetaType<TypeSpecificParamMap>( "TypeSpecificParamMap" );
-
     //RevealResponse response;
     //const char* str = 
     //    "{\n"
@@ -47,6 +46,8 @@ int main(int argc, char *argv[])
     // Each user may have it's own traytool running.
     QtSingleApplication app(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String(QN_APPLICATION_NAME), argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
+
+    QnCommonModule common(argc, argv);
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 

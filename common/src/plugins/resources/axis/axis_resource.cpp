@@ -4,13 +4,14 @@
 #include <functional>
 #include <memory>
 
+#include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
 #include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
-
+#include "axis_ptz_controller.h"
 
 using namespace std;
 
@@ -348,6 +349,15 @@ bool QnPlAxisResource::initInternal()
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
 
     initializeIOPorts( &http );
+
+    initializePtz(&http);
+
+    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
+    {
+        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
+    }
 
     return true;
 }
@@ -907,4 +917,22 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
             return;
         }
     }
+}
+
+void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
+    QString ptzString;
+    CLHttpStatus status = readAxisParameter(http, lit("Properties.PTZ.PTZ"), &ptzString);
+    if(status != CL_HTTP_SUCCESS)
+        return;
+
+    if(ptzString != lit("yes"))
+        return;
+
+    m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
+
+    setCameraCapabilities(getCameraCapabilities() | m_ptzController->getCapabilities());
+}
+
+QnAbstractPtzController* QnPlAxisResource::getPtzController() {
+    return m_ptzController.data();
 }

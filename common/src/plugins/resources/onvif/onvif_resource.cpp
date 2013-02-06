@@ -176,7 +176,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
-    m_ptzController(0),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
     m_eventCapabilities( NULL ),
@@ -196,7 +195,6 @@ QnPlOnvifResource::~QnPlOnvifResource()
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
-    delete m_ptzController;
 }
 
 
@@ -1990,13 +1988,11 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
 
-    if (m_ptzController == 0) 
+    if (!m_ptzController) 
     {
-        QnOnvifPtzController* controller = new QnOnvifPtzController(toSharedPointer());
+        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(::toSharedPointer(this)));
         if (!controller->getPtzConfigurationToken().isEmpty())
-            m_ptzController = controller;
-        else
-            delete controller;
+            m_ptzController.reset(controller.take());
     }
 
     QMutexLocker lock(&m_physicalParamsMutex);
@@ -2140,9 +2136,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
-QnOnvifPtzController* QnPlOnvifResource::getPtzController()
+QnAbstractPtzController* QnPlOnvifResource::getPtzController()
 {
-    return m_ptzController;
+    return m_ptzController.data();
 }
 
 int QnPlOnvifResource::getChannel() const
@@ -2415,6 +2411,10 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
+    // TODO: 
+    // #AK registerResource is not thread-safe and we have no guarantees on where this code is run from.
+    // Passing plain pointer instead of shared pointer is questionable. 
+    // Roma had hard to debug crashes because of it. Better keep calm and use ::toSharedPointer(this).
     QnSoapServer::instance()->getService()->registerResource(
         this,
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host() );

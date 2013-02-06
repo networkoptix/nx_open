@@ -19,6 +19,8 @@ public:
 class QnSecurityCamResource : virtual public QnMediaResource {
     Q_OBJECT
 
+    typedef QnMediaResource base_type;
+
 public:
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
@@ -75,6 +77,7 @@ public:
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
+    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain) override;
 
     /*!
         Change output with id \a ouputID state to \a activate

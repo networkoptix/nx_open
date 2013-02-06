@@ -176,7 +176,7 @@ public:
     static int calcTimeDrift(const QString& deviceUrl);
 
 
-    virtual QnOnvifPtzController* getPtzController() override;
+    virtual QnAbstractPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
 
     //!Relay input with token \a relayToken has changed its state to \a active
@@ -381,7 +381,7 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    QnOnvifPtzController* m_ptzController;
+    QScopedPointer<QnOnvifPtzController> m_ptzController;
 
     QString m_imagingUrl;
     QString m_ptzUrl;

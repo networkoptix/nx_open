@@ -282,6 +282,9 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
+    void resourceAdded(const QnResourcePtr &resource);
+    void resourceAboutToBeRemoved(const QnResourcePtr &resource);
+
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 

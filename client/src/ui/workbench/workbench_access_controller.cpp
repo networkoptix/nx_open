@@ -51,20 +51,11 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
         return result;
 
     result = static_cast<Qn::Permissions>(user->getPermissions());
+    
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;
 
-    if(result & Qn::DeprecatedEditCamerasPermission) {
-        result &= ~Qn::DeprecatedEditCamerasPermission;
-        result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
-    }
-
-    if(result & Qn::DeprecatedViewExportArchivePermission) {
-        result &= ~Qn::DeprecatedViewExportArchivePermission;
-        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
-    }
-
-    return result;
+    return Qn::undeprecate(result);
 }
 
 bool QnWorkbenchAccessController::hasGlobalPermissions(Qn::Permissions requiredPermissions) const {

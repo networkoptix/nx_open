@@ -1,5 +1,6 @@
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "dw_zoom_ptz_controller.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -112,6 +113,13 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     return qMax(1024,result);
 }
 
+QnAbstractPtzController *QnPlWatchDogResource::getPtzController() {
+    QnAbstractPtzController *result = base_type::getPtzController();
+    if(result)
+        return result; /* Use PTZ controller from ONVIF if one is present. */
+    return m_ptzController.data();
+}
+
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
 {
     //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method
@@ -124,7 +132,11 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
-        setCameraCapability(Qn::ZoomCapability, suffix.endsWith(QLatin1String("-FOCUS")));
+        bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
+        if(hasFocus) {
+            setCameraCapability(Qn::ContinuousZoomCapability, true);
+            m_ptzController.reset(new QnDwZoomPtzController(::toSharedPointer(this)));
+        }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;

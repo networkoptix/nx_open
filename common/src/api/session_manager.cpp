@@ -7,6 +7,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "utils/common/warnings.h"
+#include "utils/common/delete_later.h"
 #include "common/common_meta_types.h"
 #include "app_server_connection.h"
 
@@ -19,8 +20,8 @@ void SessionManagerReplyProcessor::at_replyReceived()
 
     emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), reply->errorString().toAscii()), m_handle);
 
-    reply->deleteLater();
-    deleteLater();
+    qnDeleteLater(reply);
+    qnDeleteLater(this);
 }
 
 void SyncRequestProcessor::at_finished(const QnHTTPRawResponse& response, int handle)
