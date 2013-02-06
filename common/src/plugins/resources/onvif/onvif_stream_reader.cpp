@@ -720,24 +720,7 @@ void QnOnvifStreamReader::pleaseStop()
     m_multiCodec.pleaseStop();
 }
 
-
-/*
-for (;it != response.Configurations.end(); ++it) 
+bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
 {
-if (!(*it) || !(*it)->Bounds)
-{
-continue;
+    return m_onvifRes->secondaryResolutionIsLarge();
 }
-
-if ((*it)->Name == name) 
-{
-return *it;
-}
-
-unsigned long curSquare = (*it)->Bounds->height * (*it)->Bounds->width;
-if (curSquare > square) {
-square = curSquare;
-result = *it;
-}
-}
-*/

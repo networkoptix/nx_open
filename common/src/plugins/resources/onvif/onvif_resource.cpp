@@ -49,8 +49,6 @@ static const unsigned int MS_PER_SECOND = 1000;
 static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
 
 //Forth times greater than default = 320 x 240
-const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
-    SECONDARY_STREAM_DEFAULT_RESOLUTION.width() * SECONDARY_STREAM_DEFAULT_RESOLUTION.height() * 4;
 
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 
@@ -114,16 +112,25 @@ public:
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
-    int square1 = 0;
-    for (int i = 0; i < s1.resolutions.size(); ++i)
-        square1 = qMax(square1, s1.resolutions[i].width() * s1.resolutions[i].height());
+    int square1Max = 0;
+    int square1Min = INT_MAX;
+    for (int i = 0; i < s1.resolutions.size(); ++i) {
+        square1Max = qMax(square1Max, s1.resolutions[i].width() * s1.resolutions[i].height());
+        square1Min = qMin(square1Min, s1.resolutions[i].width() * s1.resolutions[i].height());
+    }
     
-    int square2 = 0;
-    for (int i = 0; i < s2.resolutions.size(); ++i)
-        square2 = qMax(square2, s2.resolutions[i].width() * s2.resolutions[i].height());
+    int square2Max = 0;
+    int square2Min = INT_MAX;
+    for (int i = 0; i < s2.resolutions.size(); ++i) {
+        square2Max = qMax(square2Max, s2.resolutions[i].width() * s2.resolutions[i].height());
+        square2Min = qMin(square2Min, s2.resolutions[i].width() * s2.resolutions[i].height());
+    }
 
-    if (square1 != square2)
-        return square1 > square2;
+    if (square1Max != square2Max)
+        return square1Max > square2Max;
+
+    if (square1Min != square2Min)
+        return square1Min > square2Min;
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
@@ -210,6 +217,9 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     while (ifacePtrIter != ifaces.end()) 
     {
         onvifXsd__NetworkInterface* ifacePtr = *ifacePtrIter;
+
+        if (!ifacePtr->Info)
+            continue;
 
         if (ifacePtr->Enabled && ifacePtr->IPv4->Enabled) {
             onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
@@ -435,7 +445,7 @@ float QnPlOnvifResource::getResolutionAspectRatio(const QSize& resolution)
 QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const
 {
     QMutexLocker lock(&m_mutex);
-    return getNearestResolution(resolution, aspectRatio, MAX_SECONDARY_RESOLUTION_SQUARE, m_secondaryResolutionList);
+    return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
 QSize QnPlOnvifResource::getNearestResolution(const QSize& resolution, float aspectRatio,
@@ -1328,7 +1338,6 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     }
 
     QList<VideoOptionsLocal> optionsList;
-    std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator encIt = confResponse.Configurations.begin();
     for (int confNum = confRangeStart; confNum < confRangeEnd; ++confNum)
     {
         onvifXsd__VideoEncoderConfiguration* configuration = confResponse.Configurations[confNum];
@@ -1342,7 +1351,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         {
             VideoOptionsReq optRequest;
             VideoOptionsResp optResp;
-            optRequest.ConfigurationToken = &(*encIt)->token;
+            optRequest.ConfigurationToken = &configuration->token;
             optRequest.ProfileToken = NULL;
 
             MediaSoapWrapper soapWrapper(endpoint, login, password, m_timeDrift);
@@ -2637,3 +2646,7 @@ void QnPlOnvifResource::updateToChannel(int value)
     setName(getName() + QString(QLatin1String("-channel %1")).arg(value+1));
 }
 
+bool QnPlOnvifResource::secondaryResolutionIsLarge() const
+{ 
+    return m_secondaryResolution.width() * m_secondaryResolution.height() > 720 * 480;
+}
