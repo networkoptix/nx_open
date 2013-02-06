@@ -26,15 +26,14 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
 
 private slots:
-    void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
-
-private:
     void updatePosition();
+
+    void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
 
 private:
     Ui::QnPopupCollectionWidget *ui;
 
-    QMap<BusinessEventType::Value, QWidget*> m_widgetsByType;
+    QMap<BusinessEventType::Value, QWidget *> m_widgetsByType;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

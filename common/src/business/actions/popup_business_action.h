@@ -4,7 +4,6 @@
 #include "abstract_business_action.h"
 
 namespace BusinessActionParameters {
-
     /** UserGroup contains 1 if action is Admin-Only, otherwise 0. */
     quint64 getUserGroup(const QnBusinessParams &params);
     void setUserGroup(QnBusinessParams* params, const quint64 value);
