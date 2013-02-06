@@ -29,7 +29,7 @@ public:
         OpenGL3_2           = 0x00000008,   /**< Implements OpenGL3.2 spec. */
 
         ArbPrograms         = 0x00010000,   /**< Supports ARB shader programs. */
-        ArbSync             = 0x00020000,   /**< ArbSync extension is present. */
+        ArbSync             = 0x00020000,   /**< Supports ARB sync primitives. */
 
         ShadersBroken       = 0x10000000,   /**< Vendor has messed something up, and shaders are not supported. */
         NoOpenGLFullScreen  = 0x20000000,   /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
