@@ -267,7 +267,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
 
         m_responseLine = m_responseLine.toLower();
 
-        if (!m_responseLine.contains("200 ok"))// not ok
+        if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
         {
             close();
 

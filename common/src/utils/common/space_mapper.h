@@ -5,6 +5,7 @@
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
+#include <QtCore/QMetaType>
 
 #include "interpolator.h"
 
@@ -117,6 +118,10 @@ public:
     QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper, const QStringList &models): m_fromCamera(mapper), m_toCamera(mapper), m_models(models) {}
     QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera, const QStringList &models): m_fromCamera(fromCamera), m_toCamera(toCamera), m_models(models) {}
 
+    bool isNull() const {
+        return m_models.isEmpty() && m_fromCamera.isNull() && m_toCamera.isNull();
+    }
+
     const QnVectorSpaceMapper &fromCamera() const {
         return m_fromCamera;
     }
@@ -136,6 +141,8 @@ private:
 
 void serialize(const QnPtzSpaceMapper &value, QVariant *target);
 bool deserialize(const QVariant &value, QnPtzSpaceMapper *target);
+
+Q_DECLARE_METATYPE(QnPtzSpaceMapper);
 
 
 #endif // QN_SPACE_MAPPER_H

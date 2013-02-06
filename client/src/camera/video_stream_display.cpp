@@ -658,6 +658,11 @@ bool QnVideoStreamDisplay::selfSyncUsed() const
     return m_bufferedFrameDisplayer;
 }
 
+void QnVideoStreamDisplay::flushFramesToRenderer()
+{
+    m_drawer->finishPostedFramesRender( m_channelNumber );
+}
+
 bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
 {
     static const int ROUND_FACTOR = 16;
@@ -720,6 +725,16 @@ void QnVideoStreamDisplay::setSpeed(float value)
     m_reverseMode = value < 0;
     if (m_reverseMode)
         m_enableFrameQueue = true;
+
+    QMutexLocker lock(&m_mtx);
+    for( QMap<CodecID, QnAbstractVideoDecoder*>::const_iterator
+        it = m_decoder.begin();
+        it != m_decoder.end();
+        ++it )
+    {
+        it.value()->setSpeed( value );
+    }
+
     //if (qAbs(m_speed) > 1.0+FPS_EPS)
     //    m_enableFrameQueue = true;
 }

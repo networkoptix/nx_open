@@ -234,6 +234,7 @@ protected:
         base_type::setData(index, state, Qt::CheckStateRole);
     }
 
+    // TODO: #GDM codestyle, use camelCase, not under_score.
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
         if (!m_filterEnabled)
             return true;
@@ -323,6 +324,16 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     }
 
     emit viewportSizeChanged();
+}
+
+const QnResourceCriterion &QnResourceTreeWidget::criterion() const {
+    return m_criterion;
+}
+
+void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion) {
+    m_criterion = criterion;
+    
+    updateFilter();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel() {
@@ -438,15 +449,13 @@ void QnResourceTreeWidget::updateFilter() {
     }
 
     ui->clearFilterButton->setVisible(!filter.isEmpty());
-//    QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
     m_resourceProxyModel->clearCriteria();
     m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
-  //  if(flags != 0)
-  //      model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
+    m_resourceProxyModel->addCriterion(m_criterion);
     m_resourceProxyModel->addCriterion(QnResourceCriterion(QnResource::server));
 
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
+    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }
@@ -477,7 +486,7 @@ void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
 void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
-    // TODO: This is totally evil. This check belongs to the slot that handles activation.
+    // TODO: #Elric. This is totally evil. This check belongs to the slot that handles activation.
     if (resource &&
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
         !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */

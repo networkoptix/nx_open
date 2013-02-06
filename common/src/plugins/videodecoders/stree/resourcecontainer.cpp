@@ -23,6 +23,36 @@ namespace stree
     }
 
 
+    SingleResourceContainer::SingleResourceContainer()
+    :
+        m_resID( 0 )
+    {
+    }
+
+    SingleResourceContainer::SingleResourceContainer(
+        int resID,
+        QVariant value )
+    :
+        m_resID( resID ),
+        m_value( value )
+    {
+    }
+
+    bool SingleResourceContainer::get( int resID, QVariant* const value ) const
+    {
+        if( resID != m_resID )
+            return false;
+        *value = m_value;
+        return true;
+    }
+
+    void SingleResourceContainer::put( int resID, const QVariant& value )
+    {
+        m_resID = resID;
+        m_value = value;
+    }
+
+
     MultiSourceResourceReader::MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 )
     :
         m_rc1( rc1 ),

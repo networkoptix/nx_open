@@ -34,7 +34,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionResourcesField) {
-        QSet<QString> total_relays;
+        QSet<QString> total_relays; // TODO: #GDM codestyle, use camelCase, not under_scores in local variable names.
         bool inited = false;
 
         QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();

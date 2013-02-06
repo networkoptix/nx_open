@@ -14,26 +14,14 @@
 class QnInterpolator: public std::unary_function<qreal, qreal> {
 public:
     QnInterpolator(): 
-        m_extrapolationMode(Qn::ConstantExtrapolation), 
-        m_ready(false) 
+        m_extrapolationMode(Qn::ConstantExtrapolation)
     {}
 
     bool isNull() const {
         return m_points.isEmpty() && m_extrapolationMode == Qn::ConstantExtrapolation;
     }
 
-    void addPoint(qreal x, qreal y) {
-        addPoint(QPointF(x, y));
-    }
-
-    void addPoint(const QPointF &point) {
-        m_points.push_back(point);
-        m_ready = false;
-    }
-
     const QVector<QPointF> &points() const {
-        ensureReady();
-
         return m_points;
     }
 
@@ -41,9 +29,13 @@ public:
         return m_points[index];
     }
 
-    qreal operator()(qreal x) const{
-        ensureReady();
+    void setPoints(const QVector<QPointF> &points) {
+        m_points = points;
 
+        qSort(m_points.begin(), m_points.end(), PointLess());
+    }
+
+    qreal operator()(qreal x) const{
         return valueInternal(x, m_extrapolationMode);
     }
 
@@ -63,14 +55,6 @@ protected:
             return l.x() < r.x();
         }
     };
-
-    void ensureReady() const {
-        if(m_ready)
-            return;
-
-        qSort(m_points.begin(), m_points.end(), PointLess());
-        m_ready = true;
-    }
 
     qreal valueInternal(qreal x, Qn::ExtrapolationMode extrapolationMode) const {
         QVector<QPointF>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), QPointF(x, 0.0), PointLess());
@@ -141,8 +125,7 @@ protected:
 
 private:
     Qn::ExtrapolationMode m_extrapolationMode;
-    mutable bool m_ready;
-    mutable QVector<QPointF> m_points;
+    QVector<QPointF> m_points;
 };
 
 

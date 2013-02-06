@@ -307,7 +307,7 @@ int QnCamDisplay::getBufferingMask()
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
         channelMask = channelMask*2  + 1;
     return channelMask;
-};
+}
 
 float sign(float value)
 {
@@ -756,13 +756,13 @@ void QnCamDisplay::setSpeed(float speed)
         }
         m_speed = speed;
     }
-};
+}
 
 void QnCamDisplay::unblockTimeValue()
 {
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         m_display[i]->unblockTimeValue();
-};
+}
 
 void QnCamDisplay::processNewSpeed(float speed)
 {
@@ -995,6 +995,12 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
             }
             */
+
+            //performing before locking m_timeMutex. Otherwise we could get dead-lock between this thread and a setSpeed, called from main thread.
+                //E.g. setLastDisplayedTime waits for frames rendered, setSpeed (main thread) waits for m_timeMutex
+            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+                m_display[i]->flushFramesToRenderer();
+
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {

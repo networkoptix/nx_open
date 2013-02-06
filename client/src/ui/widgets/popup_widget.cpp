@@ -121,7 +121,7 @@ void QnPopupWidget::updateCameraDetails(const QnAbstractBusinessActionPtr &busin
             if (n > 1)
                 cameras += QString(resourceRepeat).arg(key).arg(n);
             else
-                cameras += resource;
+                cameras += key;
         }
         text = text.arg(cameras);
     }

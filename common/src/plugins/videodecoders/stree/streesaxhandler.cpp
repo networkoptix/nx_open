@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 
-#include "maxlessermatchcontainer.h"
+#include "streecontainer.h"
 #include "wildcardmatchcontainer.h"
 
 
@@ -221,6 +221,8 @@ namespace stree
                 return new ConditionNode<std::map<ResValueType, AbstractNode*> >( matchResID );
             case MatchType::greater:
                 return new ConditionNode<MaxLesserMatchContainer<ResValueType, AbstractNode*> >( matchResID );
+            case MatchType::less:
+                return new ConditionNode<MinGreaterMatchContainer<ResValueType, AbstractNode*> >( matchResID );
             default:
                 Q_ASSERT(false);
                 return NULL;
@@ -235,6 +237,8 @@ namespace stree
                 return new ConditionNode<std::map<QString, AbstractNode*> >( matchResID );
             case MatchType::greater:
                 return new ConditionNode<MaxLesserMatchContainer<QString, AbstractNode*> >( matchResID );
+            case MatchType::less:
+                return new ConditionNode<MinGreaterMatchContainer<QString, AbstractNode*> >( matchResID );
             case MatchType::wildcard:
                 return new ConditionNode<WildcardMatchContainer<QString, AbstractNode*> >( matchResID );
             default:

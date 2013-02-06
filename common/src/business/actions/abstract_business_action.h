@@ -92,6 +92,7 @@ public:
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
 
+    // TODO: #GDM not clear what is this. Comments?
     void setAggregationCount(int value);
     int getAggregationCount() const;
 

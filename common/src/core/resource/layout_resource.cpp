@@ -4,15 +4,12 @@
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_pool.h"
-#include "common/common_meta_types.h"
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0)
 {
-    QnCommonMetaTypes::initilize();
-
     setStatus(Online, true);
     addFlags(QnResource::layout);
 }
