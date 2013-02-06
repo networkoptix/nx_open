@@ -308,8 +308,8 @@ protected:
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
-    void deinitSceneContext();
-    void initSceneContext();
+    void deinitSceneView();
+    void initSceneView();
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 

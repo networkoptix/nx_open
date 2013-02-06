@@ -1,6 +1,7 @@
 #include "gl_hardware_checker.h"
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
+#include <QtGui/QMessageBox>
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/log.h>

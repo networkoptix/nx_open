@@ -73,8 +73,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
 
-    const QGLWidget *viewPortAsGLWidget = qobject_cast<const QGLWidget *>(QnWorkbenchContextAware::display()->view()->viewport());
-    m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL);
+    // TODO: 
+    // Strictly speaking, this is a hack.
+    // We shouldn't be using OpenGL context in class constructor.
+    QGraphicsView *view = QnWorkbenchContextAware::display()->view();
+    const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
+    m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
