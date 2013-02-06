@@ -502,8 +502,6 @@ private:
     PtzZoomButtonWidget *m_zoomOutButton;
 };
 
-Q_DECLARE_METATYPE(PtzOverlayWidget *);
-
 
 // -------------------------------------------------------------------------- //
 // PtzInstrument
@@ -974,7 +972,7 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
         } else if(!manipulator() && m_isClick) {
             m_clickTimer.start(m_clickDelayMSec, this);
             m_clickPos = info->mousePressItemPos();
-        } else if(manipulator() && m_isClick) {
+        } else if(manipulator()) {
             ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
         }
     }
