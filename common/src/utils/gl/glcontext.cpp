@@ -215,19 +215,14 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
     m_dc = NULL;
     m_winID = wnd;
     m_previousErrorCode = 0;
-#ifdef USE_INTERNAL_WIDGET
     m_widget.reset( new QWidget() );
-#endif
 
-#ifdef USE_INTERNAL_WIDGET
     m_winID = m_widget->winId();
-#endif
 
 #ifdef _WIN32
     Q_ASSERT( IsWindow( m_winID ) );
 
     HDC dc = GetDC( m_winID );
-#ifdef USE_INTERNAL_WIDGET
     //reading pixel format of src window
     {
         HDC hdc = GetDC( wnd );
@@ -246,7 +241,6 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
             return;
         }
     }
-#endif
     //TODO/IMPL no need to request function address every time
     PFNWGLCREATECONTEXTATTRIBSARBPROC my_wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress( "wglCreateContextAttribsARB" );
     if( my_wglCreateContextAttribsARB )

@@ -17,9 +17,6 @@
 struct __GLXcontextRec;
 #endif
 
-// TODO: #AK document this define?
-#define USE_INTERNAL_WIDGET
-
 class QGLContext;
 
 
@@ -105,12 +102,10 @@ public:
 private:
     SYS_GL_CTX_HANDLE m_handle;
     SYS_PAINT_DEVICE_HANDLE m_dc;
-#ifdef USE_INTERNAL_WIDGET
     std::auto_ptr<QWidget> m_widget;
-#endif
     WId m_winID;
     unsigned int m_previousErrorCode;
-#if defined(USE_INTERNAL_WIDGET) && defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
     PIXELFORMATDESCRIPTOR m_pfd;
 #endif
 
