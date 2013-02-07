@@ -36,6 +36,8 @@ public:
     explicit QnSelectCamerasDialogDelegate(QObject* parent = NULL);
     ~QnSelectCamerasDialogDelegate();
 
+    // TODO: #gdm need doxydocs for these methods.
+
     virtual void setWidgetLayout(QLayout* layout);
     virtual void modelDataChanged(const QnResourceList &selected);
     virtual bool isApplyAllowed();

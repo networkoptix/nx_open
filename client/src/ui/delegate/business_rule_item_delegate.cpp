@@ -49,6 +49,10 @@ namespace {
         }
 
     protected:
+        // TODO: #gdm 
+        // It is a good practice to use positive clauses in method names so that
+        // the programmer who calls into your code doesn't have to do double negation.
+        // Writing something like !isCameraInvalid() can be brain-straining.
         virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const = 0;
         virtual QString getText(int invalid, int total) const = 0;
 
