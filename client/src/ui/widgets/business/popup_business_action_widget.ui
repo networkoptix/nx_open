@@ -40,11 +40,7 @@
    <item>
     <widget class="QPushButton" name="settingsButton">
      <property name="text">
-      <string>Settings...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../../../../x86/build/client-custom.qrc">
-       <normaloff>:/skin/titlebar/recording_hovered.png</normaloff>:/skin/titlebar/recording_hovered.png</iconset>
+      <string>Notification Settings...</string>
      </property>
     </widget>
    </item>

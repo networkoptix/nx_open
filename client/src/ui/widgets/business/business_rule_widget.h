@@ -69,6 +69,7 @@ private:
     QnResourceList m_dropResources;
 
     bool m_updating;
+    bool m_aggregationPeriodChanged;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

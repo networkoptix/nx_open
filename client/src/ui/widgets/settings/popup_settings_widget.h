@@ -22,7 +22,7 @@ public:
     void submitToSettings(QnSettings* settings);
 
 private slots:
-    void at_ignoreAllCheckBox_toggled(bool checked);
+    void at_showAllCheckBox_toggled(bool checked);
 
 private:
     Ui::QnPopupSettingsWidget *ui;

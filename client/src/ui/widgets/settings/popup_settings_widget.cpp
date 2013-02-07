@@ -13,17 +13,16 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(BusinessEventType::toString(BusinessEventType::Value(i)));
-        ui->ignoreLayout->addWidget(checkbox);
+        ui->checkBoxesLayout->addWidget(checkbox);
         m_checkBoxes << checkbox;
     }
 
-    connect(ui->ignoreAllCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_ignoreAllCheckBox_toggled(bool)));
-
+    connect(ui->showAllCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_showAllCheckBox_toggled(bool)));
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
 {
-    delete ui;
+    delete ui; // TODO: #GDM use QScopedPointer
 }
 
 void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
@@ -32,20 +31,20 @@ void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
     bool all = true;
 
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        bool checked = ignored & flag;
+        bool checked = !(ignored & flag);
         m_checkBoxes[i]->setChecked(checked);
         all = all && checked;
         flag = flag << 1;
     }
 
-    ui->ignoreAllCheckBox->setChecked(all);
+    ui->showAllCheckBox->setChecked(all);
 }
 
 void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
     quint64 ignored = 0;
     quint64 flag = 1;
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        if (m_checkBoxes[i]->isChecked() || ui->ignoreAllCheckBox->isChecked())
+        if (!m_checkBoxes[i]->isChecked() && !ui->showAllCheckBox->isChecked())
             ignored |= flag;
         flag = flag << 1;
     }
@@ -53,10 +52,9 @@ void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
     settings->setIgnorePopupFlags(ignored);
 }
 
-void QnPopupSettingsWidget::at_ignoreAllCheckBox_toggled(bool checked) {
-
+void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
+    // TODO: #GDM also update checked state!
     foreach (QCheckBox* checkbox, m_checkBoxes) {
         checkbox->setEnabled(!checked);
     }
-
 }
