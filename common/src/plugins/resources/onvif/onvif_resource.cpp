@@ -375,7 +375,7 @@ bool QnPlOnvifResource::initInternal()
 
     if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
     {
-        if (!fetchAndSetDeviceInformation() && getMediaUrl().isEmpty())
+        if (!fetchAndSetDeviceInformation(false) && getMediaUrl().isEmpty())
         {
             qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
             return false;
@@ -636,7 +636,7 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
     return url.toString();
 }
 
-bool QnPlOnvifResource::fetchAndSetDeviceInformation()
+bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 {
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
@@ -668,6 +668,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             setModel(QLatin1String(response.Model.c_str()));
             setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
             hardwareId = QString::fromStdString(response.HardwareId);
+
+            if (performSimpleCheck)
+                return true;
         }
     }
 

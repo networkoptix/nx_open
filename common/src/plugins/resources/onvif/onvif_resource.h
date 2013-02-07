@@ -176,7 +176,7 @@ public:
 
 
     virtual QnAbstractPtzController* getPtzController() override;
-    bool fetchAndSetDeviceInformation();
+    bool fetchAndSetDeviceInformation(bool performSimpleCheck);
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
