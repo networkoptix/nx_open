@@ -218,15 +218,12 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         d->responseHeaders.setValue(QLatin1String("Transfer-Encoding"), QLatin1String("chunked"));
         d->responseHeaders.setContentType(QLatin1String(contentType));
     }
-    if (!d->responseBody.isEmpty())
-    {
-        //d->responseHeaders.setContentLength(d->responseBody.length());
-        //d->responseHeaders.setContentType(QLatin1String(contentType));
-        if (!contentEncoding.isEmpty())
-            d->responseHeaders.setValue(QLatin1String("Content-Encoding"), QLatin1String(contentEncoding));
+
+    if (!contentEncoding.isEmpty())
+        d->responseHeaders.setValue(QLatin1String("Content-Encoding"), QLatin1String(contentEncoding));
+    if (!contentType.isEmpty())
         d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
-        d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
-    }
+    d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
     response.replace(0,4,transport);

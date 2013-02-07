@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QRegion>
-
+#include <QMutex>
 
 #include "media_resource.h"
 #include "motion_window.h"
@@ -18,6 +18,8 @@ public:
 
 class QnSecurityCamResource : virtual public QnMediaResource {
     Q_OBJECT
+
+    typedef QnMediaResource base_type;
 
 public:
     Qn::MotionTypes supportedMotionType() const;
@@ -75,6 +77,7 @@ public:
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
+    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain) override;
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -117,8 +120,14 @@ protected:
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting
+    /*!
+        Excess calls of this method is legal and MUST be correctly handled in implementation
+    */
     virtual bool startInputPortMonitoring();
     //!MUST be overridden for camera with input port. Default implementation does noting
+    /*!
+        Excess calls of this method is legal and MUST be correctly handled in implementation
+    */
     virtual void stopInputPortMonitoring();
     virtual bool isInputPortMonitored() const;
 
@@ -126,8 +135,9 @@ protected:
     QList<QnMotionRegion> m_motionMaskList;
 
 private:
+    //mutable QMutex m_camIOMutex;
+
     QnDataProviderFactory *m_dpFactory;
-    
     QnScheduleTaskList m_scheduleTasks;
     Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;

@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "core/resource/resource_fwd.h"
+#include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -36,15 +36,18 @@ public:
     explicit QnSelectCamerasDialogDelegate(QObject* parent = NULL);
     ~QnSelectCamerasDialogDelegate();
 
+    // TODO: #gdm need doxydocs for these methods.
+
     virtual void setWidgetLayout(QLayout* layout);
     virtual void modelDataChanged(const QnResourceList &selected);
     virtual bool isApplyAllowed();
 };
 
-class QnSelectCamerasDialog : public QDialog, public QnWorkbenchContextAware
-{
+// TODO: #GDM camera selection dialog 
+class QnSelectCamerasDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QDialog base_type;
+
 public:
     explicit QnSelectCamerasDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnSelectCamerasDialog();
@@ -54,13 +57,15 @@ public:
 
     QnSelectCamerasDialogDelegate* delegate();
     void setDelegate(QnSelectCamerasDialogDelegate* delegate);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void at_resourceModel_dataChanged();
+
 private:
     QScopedPointer<Ui::QnSelectCamerasDialog> ui;
-
     QnResourcePoolModel *m_resourceModel;
     QnSelectCamerasDialogDelegate* m_delegate;
 };

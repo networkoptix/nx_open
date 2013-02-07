@@ -5,7 +5,8 @@
 
 #include "utils/common/util.h"
 #include "utils/common/request_param.h"
-#include "common/common_meta_types.h"
+#include "utils/common/space_mapper.h"
+#include "utils/common/json.h"
 
 #include "media_server_connection.h"
 #include "media_server_connection_p.h"
@@ -240,9 +241,7 @@ QnMediaServerConnection::QnMediaServerConnection(const QUrl &url, QObject *paren
     QObject(parent),
     m_url(url),
     m_proxyPort(0)
-{
-    QnCommonMetaTypes::initilize();
-}
+{}
 
 QnMediaServerConnection::~QnMediaServerConnection() {}
 
@@ -639,7 +638,16 @@ int QnMediaServerConnection::asyncPtzGetPos(const QnNetworkResourcePtr &camera, 
     requestParams << QnRequestParam("res_id", camera->getPhysicalId());
 
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getPosition"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
-    
+}
+
+int QnMediaServerConnection::asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    detail::QnMediaServerPtzGetSpaceMapperReplyProcessor *processor = new detail::QnMediaServerPtzGetSpaceMapperReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QnPtzSpaceMapper &, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getSpaceMapper"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
 int QnMediaServerConnection::asyncGetTime(QObject *target, const char *slot) {
@@ -680,5 +688,21 @@ void detail::QnMediaServerPtzGetPosReplyProcessor::at_replyReceived(const QnHTTP
 
     emit finished(response.status, xPos, yPos, zoomPos, handle);
     deleteLater();
+}
+
+void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(const QnHTTPRawResponse &response, int handle) {
+    const QByteArray& reply = response.data;
+    int status = response.status;
+
+    QnPtzSpaceMapper mapper;
+    if(response.status == 0) {
+        QVariantMap map;
+        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "mapper", &mapper))
+            status = 1;
+    } else {
+        qnWarning("Could not get ptz space mapper for camera: %1.", response.errorString);
+    }
+
+    emit finished(status, mapper, handle);
 }
 

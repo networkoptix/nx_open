@@ -6,18 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>16</width>
-    <height>16</height>
+    <width>358</width>
+    <height>223</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string/>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>

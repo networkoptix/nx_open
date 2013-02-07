@@ -55,9 +55,8 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
     if (event.eventType == Qn::Message_Type_License)
     {
-        // New license added
-        if (event.license->isValid())
-            qnLicensePool->addLicense(event.license);
+        // New license added. LicensePool verifies it.
+        qnLicensePool->addLicense(event.license);
     }
     else if (event.eventType == Qn::Message_Type_CameraServerItem)
     {

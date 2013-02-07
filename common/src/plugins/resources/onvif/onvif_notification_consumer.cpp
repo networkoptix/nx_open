@@ -5,6 +5,8 @@
 
 #include "onvif_notification_consumer.h"
 
+#include <QMutexLocker>
+
 #include "onvif_resource.h"
 #include "../../../utils/common/log.h"
 
@@ -70,12 +72,15 @@ void OnvifNotificationConsumer::registerResource(
     QnPlOnvifResource* const resource,
     const QString& notificationProducerAddress )
 {
+    QMutexLocker lk( &m_mutex );
     m_notificationProducerAddressToResource[notificationProducerAddress] = resource;
 }
 
 //!Cancel registration of \a resource
 void OnvifNotificationConsumer::removeResourceRegistration( QnPlOnvifResource* const resource )
 {
+    QMutexLocker lk( &m_mutex );
+
     for( map<QString, QnPlOnvifResource*>::iterator
         it = m_notificationProducerAddressToResource.begin();
         it != m_notificationProducerAddressToResource.end();

@@ -584,7 +584,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Apply changes before copy schedule</string>
+          <string>Apply changes before copying schedule</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

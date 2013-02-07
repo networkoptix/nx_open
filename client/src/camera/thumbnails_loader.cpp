@@ -10,7 +10,6 @@
 #include <utils/common/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
-#include <client/client_meta_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
@@ -60,8 +59,6 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource, bool decode):
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
-    QnClientMetaTypes::initialize();
-
     connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
 
     start();

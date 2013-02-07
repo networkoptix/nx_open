@@ -30,12 +30,15 @@
 #ifndef XVBA_TEST
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/videodecoderplugintypes.h>
+#include <plugins/videodecoders/abstract_decoder_event_receiver.h>
 #else
 quint64 getUsecTimer()
 {
     return 0;
 }
 #endif
+
+#include "mfxframeinfo_resource_reader.h"
 
 //#define USE_SYSMEM_SURFACE
 #ifndef USE_SYSMEM_SURFACE
@@ -126,10 +129,12 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     IDirect3DDeviceManager9* d3d9manager,
     const QnCompressedVideoDataPtr data,
     PluginUsageWatcher* const pluginUsageWatcher,
+    AbstractDecoderEventReceiver* const eventReceiver,
     unsigned int adapterNumber )
 :
     m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
+    m_eventReceiver( eventReceiver ),
     m_state( notInitialized ),
     m_syncPoint( NULL ),
     m_mfxSessionEstablished( false ),
@@ -150,7 +155,8 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_totalOutputFrames( 0 ),
     m_prevInputFrameMs( (DWORD)-1 ),
     m_prevOutPictureClock( 0 ),
-    m_recursionDepth( 0 )
+    m_recursionDepth( 0 ),
+    m_speed( 1.0 )
 #ifdef USE_OPENCL
     ,m_clContext( NULL ),
     m_prevCLStatus( CL_SUCCESS ),
@@ -219,10 +225,12 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     MFXVideoSession* const parentSession,
     IDirect3DDeviceManager9* d3d9manager,
     PluginUsageWatcher* const pluginUsageWatcher,
+    AbstractDecoderEventReceiver* const eventReceiver,
     unsigned int adapterNumber )
 :
     m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
+    m_eventReceiver( eventReceiver ),
     m_state( notInitialized ),
     m_syncPoint( NULL ),
     m_mfxSessionEstablished( false ),
@@ -331,7 +339,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 
     mfxBitstream inputStream;
     memset( &inputStream, 0, sizeof(inputStream) );
-    if( data )
+    if( data && data->data.size() > 0 )
     {
         Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
@@ -412,7 +420,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 
         //saving motion info
         m_srcMotionInfo[data->timestamp] = data->motion;
-        if( m_srcMotionInfo.size() > m_decodingAllocResponse.NumFrameActual + m_vppAllocResponse.NumFrameActual + 1 )
+        if( m_srcMotionInfo.size() > m_decodingAllocResponse.NumFrameActual + m_vppAllocResponse.NumFrameActual + 1U )
         {
             //removing old motion info
             for( MotionInfoContainerType::size_type
@@ -459,12 +467,22 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 #ifndef USE_ASYNC_IMPL
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    const bool isSeqHeaderPresent = readSequenceHeader( inputStream ) == MFX_ERR_NONE;
+    mfxVideoParam newStreamParams;
+    memset( &newStreamParams, 0, sizeof(newStreamParams) );
+    const bool isSeqHeaderPresent = readSequenceHeader( inputStream, &newStreamParams ) == MFX_ERR_NONE;
     if( m_reinitializeNeeded && isSeqHeaderPresent )
     {
         //have to wait for a sequence header and I-frame before reinitializing decoder
         closeMFXSession();
         m_reinitializeNeeded = false;
+
+        if( m_eventReceiver )
+        {
+            AbstractDecoderEventReceiver::DecoderBehaviour futherLifeStyle = m_eventReceiver->streamParamsChanged(
+                this, MFXFrameInfoResourceReader(newStreamParams.mfx.FrameInfo) );
+            if( futherLifeStyle == AbstractDecoderEventReceiver::dbStop )
+                return false;
+        }
     }
     if( m_state < decoding && !init( MFX_CODEC_AVC, inputStream ) )
         return false;
@@ -703,6 +721,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
     return gotDisplayPicture;
 }
 #else   //USE_ASYNC_IMPL
+//NOTE async implementation can increase maximum number of simultaneously decoded streams
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const bool isSeqHeaderPresent = readSequenceHeader( inputStream ) == MFX_ERR_NONE;
@@ -1032,6 +1051,14 @@ unsigned int QuickSyncVideoDecoder::getDecoderCaps() const
 #endif
 }
 
+void QuickSyncVideoDecoder::setSpeed( float newValue )
+{
+    if( !m_eventReceiver )
+        return;
+    m_speed = newValue;
+    m_eventReceiver->streamParamsChanged( this, *this );
+}
+
 bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const
 {
     switch( resID )
@@ -1053,6 +1080,9 @@ bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const
             return true;
         case DecoderParameter::videoMemoryUsage:
             *value = (qlonglong)m_decoderSurfaceSizeInBytes * m_decoderSurfacePool.size() + (qlonglong)m_vppSurfaceSizeInBytes * m_vppOutSurfacePool.size();
+            return true;
+        case DecoderParameter::speed:
+            *value = m_speed;
             return true;
         default:
             return false;
@@ -1915,7 +1945,7 @@ QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::fin
         }
 
         //could not find unused surface: forcing unlock of used surface...
-        for( int i = 0; i < surfacePool->size(); ++i )
+        for( size_t i = 0; i < surfacePool->size(); ++i )
         {
             SurfaceContext& surfaceCtx = *surfacePool->at(i);
 
@@ -2160,8 +2190,9 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 #endif  //CONVERT_NV12_TO_YV12
 #endif  //RETURN_D3D_SURFACE
 
-    outFrame->width = decodedFrame->Info.Width;
-    outFrame->height = decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual);
+    const QSize& originalPictureSize = getOriginalPictureSize();
+    outFrame->width = originalPictureSize.width();
+    outFrame->height = originalPictureSize.height();
 #ifndef CONVERT_NV12_TO_YV12
     outFrame->format = PIX_FMT_NV12;
 #else
@@ -2601,7 +2632,7 @@ void QuickSyncVideoDecoder::initializeScaleSurfacePool()
     request.Info.Height = m_srcStreamParam.mfx.FrameInfo.Height;
 
     allocateSurfacePool( &m_vppOutSurfacePool, &request, &m_vppAllocResponse );
-    for( int i = 0; i < m_vppOutSurfacePool.size(); ++i )
+    for( size_t i = 0; i < m_vppOutSurfacePool.size(); ++i )
         m_vppOutSurfacePool[i]->mfxSurface.Info = request.Info; // m_processingParams.vpp.Out;
 
     m_vppSurfaceSizeInBytes = request.Info.Width * request.Info.Height * 3 / 2;

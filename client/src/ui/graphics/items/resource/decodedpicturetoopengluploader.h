@@ -271,7 +271,7 @@ private:
     unsigned int nextPicSequenceValue();
     void ensurePBOInitialized(
         DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf,
-        int pboIndex,
+        unsigned int pboIndex,
         size_t sizeInBytes );
     void releasePictureBuffers();
     void savePicToFile( AVFrame* const pic, int pts );

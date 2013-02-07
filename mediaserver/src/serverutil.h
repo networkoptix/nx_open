@@ -6,7 +6,6 @@
 QString authKey();
 QString serverGuid();
 QString getDataDirectory();
-QString defaultStoragePath();
 void syncStoragesToSettings(QnMediaServerResourcePtr server);
 
 #endif // _SERVER_UTIL_H

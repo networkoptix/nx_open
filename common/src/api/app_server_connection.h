@@ -62,6 +62,7 @@ namespace conn_detail
 class QN_EXPORT QnAppServerConnection
 {
 public:
+
     ~QnAppServerConnection();
 
     void stop();
@@ -77,11 +78,11 @@ public:
     int getBusinessRules(QnBusinessEventRules &businessRules);
 
     int setResourceStatus(const QnId& resourceId, QnResource::Status status);
-    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
+    int saveServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
-    bool setPanicMode(bool value);
+    bool setPanicMode(QnMediaServerResource::PanicMode value);
     bool dumpDatabase(QByteArray& data);
     bool restoreDatabase(const QByteArray& data);
 

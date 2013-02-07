@@ -23,7 +23,7 @@ QString QnLocalMediaServerResource::getUniqueId() const
 
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
-    m_panicMode(false)
+    m_panicMode(PM_None)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -117,6 +117,7 @@ void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &sto
 
 // --------------------------------------------------
 
+/*
 class TestConnectionTask: public QRunnable
 {
 public:
@@ -137,6 +138,20 @@ private:
     QnMediaServerResourcePtr m_owner;
     QUrl m_url;
 };
+*/
+
+void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
+{
+    QByteArray guid = getGuid().toUtf8();
+    if (response.data.contains("Requested method is absent") || response.data.contains(guid))
+    {
+        // server OK
+        QUrl url = m_runningIfRequests.value(responseNum);
+        if (!url.isEmpty())
+            setPrimaryIF(url.host());
+        m_runningIfRequests.remove(responseNum);
+    }
+}
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
@@ -174,11 +189,11 @@ bool QnMediaServerResource::getReserve() const
     return m_reserve;
 }
 
-bool QnMediaServerResource::isPanicMode() const {
+QnMediaServerResource::PanicMode QnMediaServerResource::getPanicMode() const {
     return m_panicMode;
 }
 
-void QnMediaServerResource::setPanicMode(bool panicMode) {
+void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
     if(m_panicMode == panicMode)
         return;
 
@@ -199,8 +214,11 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
-        QThreadPool::globalInstance()->start(task);
+        //TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
+        //QThreadPool::globalInstance()->start(task);
+        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+        m_runningIfRequests.insert(requestNum, url);
+
     }
 }
 
@@ -213,7 +231,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
     QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
-        setPanicMode(localOther->isPanicMode());
+        setPanicMode(localOther->getPanicMode());
 
         m_reserve = localOther->m_reserve;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;

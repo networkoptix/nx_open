@@ -407,10 +407,13 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
 {
     //notifying resources to start input monitoring
     {
-        const QnResourceList& resList = businessRule->eventResources();
         if( businessRule->eventType() == BusinessEventType::BE_Camera_Input)
         {
-            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            QnResourceList resList = businessRule->eventResources();
+            if (resList.isEmpty())
+                resList = qnResPool->getAllEnabledCameras();
+
+            for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
             {
                 QnSharedResourcePointer<QnSecurityCamResource> securityCam = it->dynamicCast<QnSecurityCamResource>();
                 if( !securityCam )

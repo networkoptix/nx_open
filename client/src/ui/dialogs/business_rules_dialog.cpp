@@ -11,6 +11,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <utils/common/event_processors.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
 
@@ -18,7 +20,7 @@
 #include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include "ui/workbench/workbench_access_controller.h"
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/settings.h>
 
@@ -59,6 +61,13 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
             this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
 
     ui->tableView->clearSelection();
+
+    // TODO: #Elric replace with a single connect call
+    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
+    resizeSignalizer->setEventType(QEvent::Resize);
+    ui->tableView->viewport()->installEventFilter(resizeSignalizer);
+    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
+
 
     //TODO: show description label if no rules are loaded
 
@@ -273,6 +282,14 @@ void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &cu
     m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
+}
+
+void QnBusinessRulesDialog::at_tableViewport_resizeEvent() {
+    QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
+    if(selectedIndices.isEmpty())
+        return;
+    
+    ui->tableView->scrollTo(selectedIndices.front());
 }
 
 void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {

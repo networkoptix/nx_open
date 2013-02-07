@@ -55,6 +55,7 @@ UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
     {
         CAtlString countString;
         countString.Format(L"%d", count);
+        // TODO: no need for NUMBER_OF_STORAGES. save all storages instead.
         MsiSetProperty(hInstall, L"NUMBER_OF_STORAGES", countString);
     }
 
@@ -90,46 +91,11 @@ LExit:
 }
 
 /**
-  * Check if directory specified in SERVER_DIRECTORY is writable by LocalSystem User
-  * Set SERVER_DIR_CANT_WRITE property if so. Otherwize set it to empty string.
-  */
-UINT __stdcall CheckServerDirectoryWritable(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "CheckServerDirectoryWritable");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    LPCWSTR folderToCheck = GetProperty(hInstall, L"SERVER_DIRECTORY");
-
-    WCHAR volumePathName[20];
-    GetVolumePathName(folderToCheck, volumePathName, 20);
-
-    DWORD flags;
-    GetVolumeInformation(volumePathName, 0, 0, 0, 0, &flags, 0, 0);
-
-    if (flags & FILE_READ_ONLY_VOLUME)
-        MsiSetProperty(hInstall, L"SERVERDIR_CANT_WRITE", L"CANTWRITE");
-    else
-        MsiSetProperty(hInstall, L"SERVERDIR_CANT_WRITE", L"");
-
-LExit:
-
-    if (folderToCheck)
-        delete[] folderToCheck;
-
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
-/**
   * Check if drive which contains directory specified in SERVER_DIRECTORY installer property 
   * have space less than 10GB.
   * Set SERVERDIR_LOWDISKSPACE property if so. Otherwize set SERVERDIR_LOWDISKSPACE property to empty string.
   */
+#if 0
 UINT __stdcall CheckServerDriveLowSpace(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -165,6 +131,7 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+#endif
 
 UINT __stdcall SetMoviesFolder(MSIHANDLE hInstall)
 {
@@ -276,58 +243,6 @@ UINT __stdcall FindFreePorts(MSIHANDLE hInstall)
 LExit:
 
     FinishWinsock();
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
-UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "FixServerFolder");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    {
-        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
-        fixPath(serverFolder);
-        MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
-    }
-
-LExit:
-    
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
-UINT __stdcall AnalyzeServerDirectoryReg(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "AnalyzeServerDirectoryReg");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    {
-        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY_REG");
-
-        if (CPath(serverFolder).IsDirectory())
-            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"YEP");
-        else
-            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"");
-
-        if (serverFolder.Find(L"coldstore://") == 0)
-            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"YEP");
-        else
-            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"");
-    }
-
-LExit:
-    
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }

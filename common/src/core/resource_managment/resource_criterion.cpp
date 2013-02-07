@@ -44,13 +44,23 @@ QnResourceCriterion::QnResourceCriterion(const QRegExp &regExp, const char *prop
     m_customCriterion(NULL)
 {}
 
-QnResourceCriterion::QnResourceCriterion(int flags, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
+QnResourceCriterion::QnResourceCriterion(QnResource::Flags flags, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
     m_nextOperation(Next),
     m_type(Containment),
     m_propertyName(propertyName),
     m_targetValue(flags),
+    m_customCriterion(NULL)
+{}
+
+QnResourceCriterion::QnResourceCriterion(Qn::CameraCapabilities cameraCapabilities, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
+    m_matchOperation(matchOperation),
+    m_mismatchOperation(mismatchOperation),
+    m_nextOperation(Next),
+    m_type(Containment),
+    m_propertyName(propertyName),
+    m_targetValue(cameraCapabilities),
     m_customCriterion(NULL)
 {}
 
@@ -344,9 +354,11 @@ void QnResourceCriterionGroup::setCriteria(const QnResourceCriterionList &criter
 void QnResourceCriterionGroup::setPattern(const QString &pattern) {
     clear();
 
-    /* Empty pattern matches nothing. */
-    if (pattern.isEmpty())
+    /* Empty pattern matches everything. */
+    if (pattern.isEmpty()) {
+        addCriterion(QnResourceCriterion(QVariant(), Nothing, NULL, Accept, Accept));
         return;
+    }
 
     /* Normalize pattern. */
     QString normalizedPattern = pattern;

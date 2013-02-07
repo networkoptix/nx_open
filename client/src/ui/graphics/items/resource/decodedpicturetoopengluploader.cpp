@@ -39,6 +39,7 @@
 #endif
 //#define UPLOAD_SYSMEM_FRAMES_ASYNC
 #define UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+//#define USE_MIN_GL_TEXTURES
 
 #if defined(UPLOAD_SYSMEM_FRAMES_ASYNC) && defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD)
 #error "UPLOAD_SYSMEM_FRAMES_ASYNC and UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD cannot be defined simultaneously"
@@ -53,6 +54,8 @@
 #endif
 
 //#define SYNC_UPLOADING_WITH_GLFENCE
+
+//preceding bunch of macro will be removed after this functionality has been tested and works as expected
 
 
 namespace
@@ -175,13 +178,6 @@ private:
 };
 
 int DecodedPictureToOpenGLUploaderPrivate::maxTextureSize = 0;
-
-typedef QnGlContextData<
-    DecodedPictureToOpenGLUploaderPrivate,
-    QnGlContextDataForwardingFactory<DecodedPictureToOpenGLUploaderPrivate>
-> DecodedPictureToOpenGLUploaderPrivateStorage;
-Q_GLOBAL_STATIC(DecodedPictureToOpenGLUploaderPrivateStorage, qn_decodedPictureToOpenGLUploaderPrivateStorage);
-//TODO: #ak unused qn_decodedPictureToOpenGLUploaderPrivateStorage - is it really required?
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererTexture
@@ -899,7 +895,7 @@ private:
         unsigned int srcPitch )
     {
         static const unsigned int PIXEL_SIZE = 1;
-        for( int y = 0; y < dstHeight; ++y )
+        for( unsigned int y = 0; y < dstHeight; ++y )
         {
             memcpy_stream_load( (__m128i*)(dstMem+y*dstPitch), (__m128i*)(srcMem+y*srcPitch), dstWidth*PIXEL_SIZE );
             if( !picDataRef.isValid() )
@@ -915,14 +911,14 @@ private:
     inline bool streamLoadAndDeinterleaveNV12UVPlaneEx(
         const QnAbstractPictureDataRef& picDataRef,
         const quint8* srcMem,
-        unsigned int srcWidth,
+        unsigned int /*srcWidth*/,
         unsigned int srcHeight,
         size_t srcPitch,
         quint8* dstUPlane,
         quint8* dstVPlane,
         size_t dstPitch )
     {
-        for( int y = 0; y < srcHeight / 2; ++y )
+        for( unsigned int y = 0; y < srcHeight / 2; ++y )
         {
             streamLoadAndDeinterleaveNV12UVPlane(
                 (__m128i*)(srcMem + y*srcPitch),
@@ -955,6 +951,7 @@ public:
         m_dest( dest ),
         m_src( src ),
         m_uploader( uploader ),
+        m_isRunning( false ),
         m_done( false ),
         m_success( false )
     {
@@ -963,6 +960,8 @@ public:
 
     virtual void run()
     {
+        m_isRunning = true;
+
         m_success = 
 #ifdef GL_COPY_AGGREGATION
             m_uploader->uploadDataToGlWithAggregation(
@@ -981,6 +980,8 @@ public:
             m_uploader->pictureDataUploadSucceeded( NULL, m_dest );
         else
             m_uploader->pictureDataUploadFailed( NULL, m_dest );
+
+        m_isRunning = false;
     }
 
     bool done() const
@@ -993,10 +994,26 @@ public:
         return m_success;
     }
 
+    DecodedPictureToOpenGLUploader::UploadedPicture* picture()
+    {
+        return m_dest;
+    }
+
+    void markAsRunning()
+    {
+        m_isRunning = true;
+    }
+
+    bool isRunning() const
+    {
+        return m_isRunning;
+    }
+
 private:
     DecodedPictureToOpenGLUploader::UploadedPicture* const m_dest;
     QSharedPointer<CLVideoDecoderOutput> m_src;
     DecodedPictureToOpenGLUploader* m_uploader;
+    bool m_isRunning;
     bool m_done;
     bool m_success;
 };
@@ -1080,15 +1097,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
 DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 {
     //ensure there is no pointer to the object in the async uploader queue
-    {
-        QMutexLocker lk( &m_mutex );
-        for( ;; )
-        {
-            if( m_usedUploaders.empty() )
-                break;
-            m_cond.wait( lk.mutex() );
-        }
-    }
+    discardAllFramesPostedToDisplay();
 
     for( std::deque<AsyncPicDataUploader*>::iterator
         it = m_unusedUploaders.begin();
@@ -1141,11 +1150,24 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
 #endif
     m_format = decodedPicture->format;
     UploadedPicture* emptyPictureBuf = NULL;
+
+    QMutexLocker lk( &m_mutex );
+
     {
-        QMutexLocker lk( &m_mutex );
         //searching for a non-used picture buffer
         for( ;; )
         {
+#if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && defined(USE_MIN_GL_TEXTURES)
+            if( !useAsyncUpload && !m_hardwareDecoderUsed && !m_renderedPictures.empty() )
+            {
+                //this condition allows to use single PictureBuffer for rendering
+                emptyPictureBuf = m_renderedPictures.front();
+                m_renderedPictures.pop_front();
+                NX_LOG( QString::fromAscii( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                    arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
+            }
+            else
+#endif
             if( !m_emptyBuffers.empty() )
             {
                 emptyPictureBuf = m_emptyBuffers.front();
@@ -1153,18 +1175,18 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 NX_LOG( QString::fromAscii( "Found empty buffer" ), cl_logDEBUG2 );
             }
             else if( (!useAsyncUpload && !m_renderedPictures.empty())
-                  || (useAsyncUpload && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1 : 0))) )  //reserving one uploaded picture (preferring picture 
+                  || (useAsyncUpload && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1U : 0U))) )  //reserving one uploaded picture (preferring picture 
                                                                                                                        //which has not been shown yet) so that renderer always 
                                                                                                                        //gets something to draw...
             {
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                NX_LOG( QString::fromAscii( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else if( ((!useAsyncUpload && !m_picturesWaitingRendering.empty())
-                       || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1 : 0))))
+                       || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1U : 0U))))
                       && !m_picturesWaitingRendering.front()->m_skippingForbidden )
             {
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
@@ -1173,7 +1195,25 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 NX_LOG( QString::fromAscii( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
                     arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
             }
-            else
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+            else if( !useAsyncUpload && !m_framesWaitingUploadInGUIThread.empty() )
+            {
+                for( std::deque<AVPacketUploader*>::iterator
+                    it = m_framesWaitingUploadInGUIThread.begin();
+                    it != m_framesWaitingUploadInGUIThread.end();
+                    ++it )
+                {
+                    if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
+                        continue;
+                    emptyPictureBuf = (*it)->picture();
+                    delete (*it);
+                    m_framesWaitingUploadInGUIThread.erase( it );
+                    break;
+                }
+            }
+#endif
+
+            if( emptyPictureBuf == NULL )
             {
                 if( useAsyncUpload )
                 {
@@ -1218,7 +1258,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstD3DSurface )
         {
             //posting picture to worker thread
-            QMutexLocker lk( &m_mutex );
 
             AsyncPicDataUploader* uploaderToUse = NULL;
             if( m_unusedUploaders.empty() )
@@ -1250,7 +1289,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
     {
         //have go through upload thread, since opengl uploading does not scale good on Intel HD Graphics and 
             //it does not matter on PCIe graphics card due to high video memory bandwidth
-        QMutexLocker lk( &m_mutex );
 
 #ifdef UPLOAD_SYSMEM_FRAMES_ASYNC
         QSharedPointer<CLVideoDecoderOutput> decodedPictureCopy( new CLVideoDecoderOutput() );
@@ -1261,10 +1299,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         m_uploadThread->push( avPacketUploader.release() );
 #elif defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD)
         m_framesWaitingUploadInGUIThread.push_back( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
-        while( !m_framesWaitingUploadInGUIThread.empty() )
-        {
-            m_cond.wait( lk.mutex() );
-        }
 #else
         //using uploading thread, blocking till upload is completed
         std::auto_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
@@ -1288,20 +1322,23 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 {
     QMutexLocker lk( &m_mutex );
 
-    UploadedPicture* pic = NULL;
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     if( !m_framesWaitingUploadInGUIThread.empty() )
     {
         //uploading
         AVPacketUploader* frameToUpload = m_framesWaitingUploadInGUIThread.front();
-        m_framesWaitingUploadInGUIThread.pop_front();
+        frameToUpload->markAsRunning();
+        frameToUpload->picture()->m_skippingForbidden = true;   //otherwise, we could come to situation that there is no data to display
         lk.unlock();
         frameToUpload->run();
         lk.relock();
+        m_framesWaitingUploadInGUIThread.pop_front();
         delete frameToUpload;
         m_cond.wakeAll();   //notifying that upload is completed
     }
 #endif
+
+    UploadedPicture* pic = NULL;
     if( !m_picturesWaitingRendering.empty() )
     {
         pic = m_picturesWaitingRendering.front();
@@ -1345,7 +1382,7 @@ void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
     QMutexLocker lk( &m_mutex );
 
-    while( !m_terminated && (!m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
+    while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedUploaders.empty() || !m_picturesBeingRendered.empty()) )
         m_cond.wait( lk.mutex() );
 }
 
@@ -1355,6 +1392,23 @@ void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
         return; //if hardware decoder is used, waiting can result in bad playback experience
 
     QMutexLocker lk( &m_mutex );
+
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
+    while( !m_framesWaitingUploadInGUIThread.empty() )
+        m_cond.wait( lk.mutex() );
+
+    //for( std::deque<AVPacketUploader*>::iterator
+    //    it = m_framesWaitingUploadInGUIThread.begin();
+    //    it != m_framesWaitingUploadInGUIThread.end();
+    //    ++it )
+    //{
+    //    (*it)->picture()->m_skippingForbidden = true;
+    //}
+#endif
+#ifdef UPLOAD_SYSMEM_FRAMES_ASYNC
+    #error "Not implemented"
+#endif
 
     //marking, that skipping frames currently in queue is forbidden and exiting...
     for( std::deque<UploadedPicture*>::iterator
@@ -1378,10 +1432,32 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 {
     QMutexLocker lk( &m_mutex );
 
-    if( !m_usedUploaders.empty() )
+    while( !m_usedUploaders.empty() )
+        m_cond.wait( lk.mutex() );
+
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    while( !m_framesWaitingUploadInGUIThread.empty() )
     {
-        Q_ASSERT( false );
+        for( std::deque<AVPacketUploader*>::iterator
+            it = m_framesWaitingUploadInGUIThread.begin();
+            it != m_framesWaitingUploadInGUIThread.end();
+            )
+        {
+            if( (*it)->isRunning() )
+            {
+                ++it;
+                continue;
+            }
+            m_emptyBuffers.push_back( (*it)->picture() );
+            delete *it;
+            it = m_framesWaitingUploadInGUIThread.erase( it );
+        }
+
+        if( m_framesWaitingUploadInGUIThread.empty() )
+            break;
+        m_cond.wait( lk.mutex() );
     }
+#endif
 
     for( std::deque<UploadedPicture*>::iterator
         it = m_picturesWaitingRendering.begin();
@@ -1630,9 +1706,9 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 #ifdef USE_PBO
 #ifdef USE_SINGLE_PBO_PER_FRAME
-            const int pboIndex = 0;
+            const unsigned int pboIndex = 0;
 #else
-            const int pboIndex = i;
+            const unsigned int pboIndex = i;
 #endif
             ensurePBOInitialized( emptyPictureBuf, pboIndex, lineSizes[i]*h[i] );
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, emptyPictureBuf->pboID(pboIndex) );
@@ -1664,7 +1740,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
             DEBUG_CODE(glCheckError("glPixelStorei"));
-            Q_ASSERT( (quint64)lineSizes[i] >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+            Q_ASSERT( ((quint64)lineSizes[i]) >= qPower2Ceil(r_w[i],ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             qPower2Ceil(r_w[i],ROUND_COEFF),
@@ -1938,7 +2014,7 @@ unsigned int DecodedPictureToOpenGLUploader::nextPicSequenceValue()
 
 void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
     DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf,
-    int pboIndex,
+    unsigned int pboIndex,
     size_t sizeInBytes )
 {
     if( picBuf->m_pbo.size() <= pboIndex )

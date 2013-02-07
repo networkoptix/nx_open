@@ -93,7 +93,7 @@ private slots:
     void doStop();
     void doStart();
 
-    void doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, int handle, Qt::ConnectionType connectionType);
     void doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data, QObject *target, const char *slot, int handle);
     void doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, int id, QObject *target, const char *slot, int handle);
 
@@ -117,15 +117,15 @@ public:
                         QnHTTPRawResponse& response);
 
     // Asynchronous requests return request handle
-    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot);
-    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot);
+    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
+    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
     int sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
     int sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
     int sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot);
 
 signals:
-    void asyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, int handle);
+    void asyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, int handle, Qt::ConnectionType connectionType);
     void asyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle);
     void asyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle);
 

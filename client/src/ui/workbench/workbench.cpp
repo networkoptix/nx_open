@@ -3,7 +3,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
-#include <client/client_meta_types.h>
 
 #include <core/resource_managment/resource_pool.h>
 
@@ -29,8 +28,6 @@ QnWorkbench::QnWorkbench(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_currentLayout(NULL)
 {
-    QnClientMetaTypes::initialize();
-
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         m_itemByRole[i] = NULL;
 

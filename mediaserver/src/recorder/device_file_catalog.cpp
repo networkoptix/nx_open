@@ -107,7 +107,7 @@ QString getDirName(const QString& prefix, int currentParts[4], int i)
     return result;
 }
 
-bool DeviceFileCatalog::fileExists(const Chunk& chunk)
+bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
 {
     //fileSize = 0;
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
@@ -131,7 +131,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
 
-   // bool sameDir = true;
+    bool sameDir = true;
 
     IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
     if (itr == m_prevPartsMap->end()) {
@@ -149,23 +149,8 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         }
         else 
         {
-          //  sameDir = false;
+            sameDir = false;
             // new folder. check it
-
-            /*
-            for (int j = 0; j < i; ++j)
-            prefix += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
-
-            bool exist = true;
-            for (int j = i; j < 4; ++j)
-            {
-                prefix += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
-                if (exist)
-                    exist &= storage->isDirExists(prefix);
-                prevParts[j].first = currentParts[j];
-                prevParts[j].second = exist;
-            }
-            */
 
             for (int j = i; j < 4; ++j) {
                 prevParts[j].first = currentParts[j];
@@ -181,11 +166,11 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         return false;
 
     // do not check files. just check dirs
-    return true;
+    if (checkDirOnly)
+        return true;
 
-    /*
     if (!sameDir) {
-        itr.value().entryList = storage->getFileList(prefix);
+        itr.value().entryList = storage->getFileList(getDirName(prefix, currentParts, 3));
     }
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
 
@@ -195,7 +180,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         if (info.fileName() == fName)
         {
             found = true;
-            fileSize = info.size();
+            qint64 fileSize = info.size();
             if (fileSize < 1024) 
             {
                 // file is absent or empty media file
@@ -205,15 +190,8 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
             break;
         }
     }
-    if (!found)
-        return false;
-    //if (!m_existFileList.contains(fName))
-    //    return false;
-
-    //m_duplicateName = (fName == m_prevFileNames[chunk.storageIndex]) && sameDir;
-    m_prevFileNames[chunk.storageIndex] = fName;
-    return true;
-    */
+    //m_prevFileNames[chunk.storageIndex] = fName;
+    return found;
 }
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage)
@@ -296,6 +274,7 @@ void DeviceFileCatalog::deserializeTitleFile()
     if (headerLine.contains("timezone"))
         timeZoneExist = 1;
     QByteArray line;
+    bool checkDirOnly = false;
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
@@ -334,9 +313,12 @@ void DeviceFileCatalog::deserializeTitleFile()
             // Skip chunks for unavaileble storage
              //addChunk(chunk, lastStartTime);
         }
-        else if (fileExists(chunk))
+        else if (fileExists(chunk, checkDirOnly))
         {
             //chunk.setFileSize(chunkFileSize);
+
+            // optimization. Since we have got first file, check dirs only. It is required to check files at begin to determine archive start point
+            checkDirOnly = true; 
 
             if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
             {

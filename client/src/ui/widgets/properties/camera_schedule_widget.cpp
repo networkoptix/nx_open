@@ -125,6 +125,7 @@ void QnCameraScheduleWidget::endUpdate() {
     if (m_inUpdate > 0)
         return;
     connectToGridWidget();
+    updateGridParams(); // TODO: does not belong here...
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)

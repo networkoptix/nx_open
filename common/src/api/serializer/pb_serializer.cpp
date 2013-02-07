@@ -188,7 +188,7 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
 
     if (pb_server.has_panicmode())
     {
-        server->setPanicMode(pb_server.panicmode());
+        server->setPanicMode(QnMediaServerResource::PanicMode(pb_server.panicmode()));
     }
 
     if (pb_server.storage_size() > 0)
@@ -432,9 +432,11 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
         const pb::License& pb_license = *ci;
 
         QnLicensePtr license;
+        // Parse license and validate its signature
         parseLicense(license, pb_license);
-        licenses.append(license);
-
+        // Verify that license is for our hardwareid
+        if (license->hardwareId() == licenses.hardwareId())
+            licenses.append(license);
     }
 }
 
@@ -953,7 +955,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());
 
     pb_server.set_reserve(serverPtr->getReserve());
-    pb_server.set_panicmode(serverPtr->isPanicMode());
+    pb_server.set_panicmode((int) serverPtr->getPanicMode());
 
     if (!serverPtr->getStorages().isEmpty()) {
         foreach (const QnAbstractStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
@@ -1165,13 +1167,15 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
 {
-    license = QnLicensePtr(new QnLicense(
+    QnLicensePtr rawLicense = QnLicensePtr(new QnLicense(
                             QString::fromUtf8(pb_license.name().c_str()),
                             pb_license.key().c_str(),
                             pb_license.cameracount(),
                             pb_license.hwid().c_str(),
                             pb_license.signature().c_str()
                             ));
+
+    license = rawLicense->isValid() ? rawLicense : QnLicensePtr();
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
@@ -1208,8 +1212,8 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     businessRule->setAggregationPeriod(pb_businessRule.aggregationperiod());
     businessRule->setDisabled(pb_businessRule.disabled());
-    businessRule->setComments(QString::fromStdString(pb_businessRule.comments()));
-    businessRule->setSchedule(QString::fromStdString(pb_businessRule.schedule()));
+    businessRule->setComments(QString::fromUtf8(pb_businessRule.comments().c_str()));
+    businessRule->setSchedule(QString::fromUtf8(pb_businessRule.schedule().c_str()));
 }
 
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction)

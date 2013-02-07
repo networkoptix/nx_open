@@ -122,7 +122,7 @@ bool QnPlSonyResource::initInternal()
         getNetworkTimeout(),
         getAuth() );
     //turning on input monitoring
-    CLHttpStatus status = http.doGET( "/command/system.cgi?AlarmData=on" );
+    CLHttpStatus status = http.doGET( QLatin1String("/command/system.cgi?AlarmData=on") );
     if( status % 100 != 2 )
     {
         NX_LOG( QString::fromLatin1("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
@@ -142,6 +142,12 @@ bool QnPlSonyResource::startInputPortMonitoring()
         || hasFlags(QnResource::foreigner) )     //we do not own camera
     {
         return false;
+    }
+
+    if( m_inputMonitorHttpClient )
+    {
+        m_inputMonitorHttpClient->scheduleForRemoval();
+        m_inputMonitorHttpClient = NULL;
     }
 
     const QAuthenticator& auth = getAuth();
@@ -166,7 +172,10 @@ bool QnPlSonyResource::startInputPortMonitoring()
 void QnPlSonyResource::stopInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
+    if( !m_inputMonitorHttpClient )
+        return;
     m_inputMonitorHttpClient->scheduleForRemoval();
+    m_inputMonitorHttpClient = NULL;
 }
 
 bool QnPlSonyResource::isInputPortMonitored() const
@@ -179,7 +188,8 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClient* httpClient )
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    Q_ASSERT( httpClient == m_inputMonitorHttpClient );
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoring() call
+        return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
     {
@@ -200,7 +210,8 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClient* httpClien
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    Q_ASSERT( httpClient == m_inputMonitorHttpClient );
+    if( m_inputMonitorHttpClient != httpClient )
+        return;
 
     const BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
     for( int offset = 0; offset < msgBodyBuf.size(); )

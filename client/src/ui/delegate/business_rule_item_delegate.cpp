@@ -6,6 +6,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -18,11 +19,11 @@
 namespace {
 
     class QnCheckCameraAndWarnDelegate: public QnSelectCamerasDialogDelegate {
-
     public:
         QnCheckCameraAndWarnDelegate(QWidget* parent):
             QnSelectCamerasDialogDelegate(parent),
-            m_warningLabel(NULL){}
+            m_warningLabel(NULL)
+        {}
 
         virtual void setWidgetLayout(QLayout *layout) override {
             m_warningLabel = new QLabel(layout->parentWidget());
@@ -46,12 +47,19 @@ namespace {
             m_warningLabel->setText(getText(invalid, cameras.size()));
             m_warningLabel->setVisible(invalid > 0);
         }
+
     protected:
+        // TODO: #gdm 
+        // It is a good practice to use positive clauses in method names so that
+        // the programmer who calls into your code doesn't have to do double negation.
+        // Writing something like !isCameraInvalid() can be brain-straining.
         virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const = 0;
         virtual QString getText(int invalid, int total) const = 0;
+
     private:
         QLabel* m_warningLabel;
     };
+
 
     class QnMotionEnabledDelegate: public QnCheckCameraAndWarnDelegate {
     public:

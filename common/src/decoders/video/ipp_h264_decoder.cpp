@@ -67,4 +67,8 @@ unsigned int IPPH264Decoder::getDecoderCaps() const
     return 0;
 }
 
+void IPPH264Decoder::setSpeed( float newValue )
+{
+}
+
 #endif

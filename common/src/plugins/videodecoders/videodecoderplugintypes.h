@@ -19,7 +19,7 @@ namespace DecoderParameter
         decoderName = 1,
         //string
         osName,
-        //string. CPU archtecture (x64 or x86)
+        //string. CPU architecture (x64 or x86)
         architecture,
         //string. CPU brand and name
         cpuString,
@@ -51,6 +51,8 @@ namespace DecoderParameter
         framePictureSize,
         //double
         fps,
+        //double
+        speed,
         //uint64
         pixelsPerSecond,
         //uint64

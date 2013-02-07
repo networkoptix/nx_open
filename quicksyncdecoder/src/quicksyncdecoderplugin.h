@@ -55,6 +55,8 @@ public:
         const QnCompressedVideoDataPtr& data,
         const QGLContext* const glContext,
         int currentSWDecoderCount ) const;
+    //!Implementation of QnAbstractVideoDecoderPlugin::isStreamSupported
+    virtual bool isStreamSupported( const stree::AbstractResourceReader& newStreamParams ) const override;
 
 private:
     class D3D9DeviceContext
@@ -95,6 +97,7 @@ private:
     bool openD3D9Device() const;
     void closeD3D9Device();
     QString winVersionToName( const OSVERSIONINFOEX& osVersionInfo ) const;
+    bool isStreamSupportedNonSafe( const stree::AbstractResourceReader& newStreamParams ) const;
 };
 
 #endif  //QUICKSYNCDECODERPLUGIN_H

@@ -4,7 +4,6 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
-#include "common/common_meta_types.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
@@ -22,8 +21,6 @@ QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
 {
-    QnCommonMetaTypes::initilize();
-
     localServer = QnResourcePtr(new QnLocalMediaServerResource);
     addResource(localServer);
 }
@@ -299,6 +296,19 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     }
 
     return QnNetworkResourcePtr(0);
+}
+
+QnResourceList QnResourcePool::getAllEnabledCameras() const
+{
+    QnResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+            result << camResource;
+    }
+
+    return result;
 }
 
 QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const

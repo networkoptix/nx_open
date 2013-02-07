@@ -2949,9 +2949,14 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
     QnMediaServerResourceList resources = resourcePool()->getResources().filtered<QnMediaServerResource>();
 
-    foreach(QnMediaServerResourcePtr resource, resources) {
-        if(resource->isPanicMode() != checked) {
-            resource->setPanicMode(checked);
+    foreach(QnMediaServerResourcePtr resource, resources) 
+    {
+        bool isPanicMode = resource->getPanicMode() != QnMediaServerResource::PM_None;
+        if(isPanicMode != checked) {
+            QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+            if (checked)
+                val = QnMediaServerResource::PM_User;
+            resource->setPanicMode(val);
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
         }
     }

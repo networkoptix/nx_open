@@ -6,6 +6,7 @@
 #include <utils/common/request_param.h>
 #include <utils/appcast/update_info.h>
 #include <utils/network/networkoptixmodulerevealcommon.h>
+#include <utils/common/space_mapper.h>
 
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
@@ -75,6 +76,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
     qRegisterMetaType<QnStatisticsData>();
 
+    qRegisterMetaType<QnPtzSpaceMapper>();
+
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
@@ -93,6 +96,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     
+    qRegisterMetaType<Qt::ConnectionType>();
 
     qn_commonMetaTypes_initialized = true;
 }

@@ -32,12 +32,18 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
 {
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    bool val = action->getToggleState() == ToggleState::On;
-    conn->setPanicMode(val);
     QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
-    if (mediaServer)
-        mediaServer->setPanicMode(val);
+    if (!mediaServer)
+        return false;
+    if (mediaServer->getPanicMode() == QnMediaServerResource::PM_User)
+        return true; // ignore panic business action if panic mode turn on by user
+
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+    if (action->getToggleState() == ToggleState::On)
+        val =  QnMediaServerResource::PM_BusinessEvents;
+    conn->setPanicMode(val);
+    mediaServer->setPanicMode(val);
     return true;
 }
 

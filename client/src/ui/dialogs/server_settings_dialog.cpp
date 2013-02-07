@@ -147,7 +147,7 @@ void QnServerSettingsDialog::updateFromResources() {
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
-    bool panicMode = m_server->isPanicMode();
+    bool panicMode = m_server->getPanicMode() != QnMediaServerResource::PM_None;
     ui->panicModeLabel->setText(panicMode ? tr("On") : tr("Off"));
     {
         QPalette palette = this->palette();

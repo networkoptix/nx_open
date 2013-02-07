@@ -368,7 +368,7 @@ int QnAppServerConnection::getResources(const QString& args, QnResourceList& res
     return status;
 }
 
-int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& authKey)
+int QnAppServerConnection::saveServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& authKey)
 {
     m_lastError.clear();
 
@@ -865,21 +865,6 @@ bool initLicenses(QnAppServerConnectionPtr appServerConnection)
         return false;
     }
 
-    foreach (QnLicensePtr license, licenses.licenses())
-    {
-        // If some license is invalid set hardwareId to some invalid value and clear licenses
-        if (!license->isValid())
-        {
-            // Returning true to stop asking for licenses
-
-            QnLicenseList dummy;
-            dummy.setHardwareId("invalid");
-            qnLicensePool->replaceLicenses(dummy);
-
-            return true;
-        }
-    }
-
     qnLicensePool->replaceLicenses(licenses);
 
     return true;
@@ -889,7 +874,7 @@ int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server)
 {
     QByteArray authKey;
     QnMediaServerResourceList servers;
-    return registerServer(server, servers, authKey);
+    return saveServer(server, servers, authKey);
 }
 
 int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera)
@@ -1033,14 +1018,14 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     return result;
 }
 
-bool QnAppServerConnection::setPanicMode(bool value)
+bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
 {
     m_lastError.clear();
 
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);
 
-    requestParams.append(QnRequestParam("mode", value ? "on" : "off"));
+    requestParams.append(QnRequestParam("mode", QString::number(value)));
 
     QnHTTPRawResponse response;
     int result = QnSessionManager::instance()->sendPostRequest(m_url, panicObject, requestHeaders, requestParams, "", response);

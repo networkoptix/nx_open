@@ -10,11 +10,9 @@
 
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnSelectCamerasDialogDelegate ------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
-
+// -------------------------------------------------------------------------- //
+// QnSelectCamerasDialogDelegate 
+// -------------------------------------------------------------------------- //
 QnSelectCamerasDialogDelegate::QnSelectCamerasDialogDelegate(QObject *parent):
     QObject(parent)
 {
@@ -37,10 +35,10 @@ bool QnSelectCamerasDialogDelegate::isApplyAllowed() {
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnSelectCamerasDialog --------------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
 
+// -------------------------------------------------------------------------- //
+// QnSelectCamerasDialog 
+// -------------------------------------------------------------------------- //
 QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),

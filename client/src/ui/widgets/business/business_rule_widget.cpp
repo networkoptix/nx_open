@@ -13,6 +13,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/style/resource_icon_cache.h>

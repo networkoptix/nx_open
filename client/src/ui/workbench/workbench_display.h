@@ -282,6 +282,9 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
+    void resourceAdded(const QnResourcePtr &resource);
+    void resourceAboutToBeRemoved(const QnResourcePtr &resource);
+
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 
@@ -305,8 +308,8 @@ protected:
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
-    void deinitSceneContext();
-    void initSceneContext();
+    void deinitSceneView();
+    void initSceneView();
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
