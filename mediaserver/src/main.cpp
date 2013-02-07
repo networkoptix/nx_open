@@ -243,6 +243,7 @@ QnAbstractStorageResourcePtr createStorage(const QString& path)
     return storage;
 }
 
+#ifdef Q_OS_WIN
 static int freeGB(QString drive)
 {
     ULARGE_INTEGER freeBytes;
@@ -251,6 +252,7 @@ static int freeGB(QString drive)
 
     return freeBytes.HighPart * 4 + (freeBytes.LowPart>> 30);
 }
+#endif
 
 static QStringList listRecordFolders()
 {
