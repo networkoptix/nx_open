@@ -368,7 +368,7 @@ int QnAppServerConnection::getResources(const QString& args, QnResourceList& res
     return status;
 }
 
-int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& authKey)
+int QnAppServerConnection::saveServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& authKey)
 {
     m_lastError.clear();
 
@@ -874,7 +874,7 @@ int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server)
 {
     QByteArray authKey;
     QnMediaServerResourceList servers;
-    return registerServer(server, servers, authKey);
+    return saveServer(server, servers, authKey);
 }
 
 int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera)

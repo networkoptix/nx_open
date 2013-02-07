@@ -8,6 +8,8 @@
 
 #include <map>
 
+#include <QMutex>
+
 #include <soapNotificationConsumerBindingService.h>
 
 
@@ -22,9 +24,6 @@ public:
     //!Implementation of NotificationConsumerBindingService::copy
 	virtual	NotificationConsumerBindingService* copy();
     //!Implementation of NotificationConsumerBindingService::Notify
-    /*!
-        Triggeres input business event
-    */
 	virtual	int Notify( _oasisWsnB2__Notify* oasisWsnB2__Notify );
 
     //!Pass notifications from address \a notificationProducerAddress to \a resource
@@ -36,6 +35,7 @@ public:
 
 private:
     std::map<QString, QnPlOnvifResource*> m_notificationProducerAddressToResource;
+    mutable QMutex m_mutex;
 };
 
 #endif  //ONVIF_NOTIFICATION_CONSUMER_H

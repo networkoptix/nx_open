@@ -41,7 +41,7 @@ class VideoOptionsLocal;
 //first = width, second = height
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
 
 
 class QDomElement;
@@ -93,7 +93,6 @@ public:
     static QString AUDIO_SUPPORTED_PARAM_NAME;
     static QString DUAL_STREAMING_PARAM_NAME;
     static const float QUALITY_COEF;
-    static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
     static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
@@ -195,6 +194,7 @@ public:
     bool detectVideoSourceCount();
 
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    bool secondaryResolutionIsLarge() const;
 signals:
     //!Emitted on camera input port state has been changed
     /*!

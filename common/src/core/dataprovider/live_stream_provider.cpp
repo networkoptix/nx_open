@@ -216,7 +216,9 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
     Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     int newSecFps;
 
-    if (sharingMethod == Qn::sharePixels)
+    if (secondaryResolutionIsLarge())
+        newSecFps = MIN_SECOND_STREAM_FPS;
+    else if (sharingMethod == Qn::sharePixels)
     {
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
         if (maxFps - newFps < 2 )

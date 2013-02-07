@@ -39,6 +39,7 @@
 #endif
 //#define UPLOAD_SYSMEM_FRAMES_ASYNC
 #define UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+//#define USE_MIN_GL_TEXTURES
 
 #if defined(UPLOAD_SYSMEM_FRAMES_ASYNC) && defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD)
 #error "UPLOAD_SYSMEM_FRAMES_ASYNC and UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD cannot be defined simultaneously"
@@ -177,13 +178,6 @@ private:
 };
 
 int DecodedPictureToOpenGLUploaderPrivate::maxTextureSize = 0;
-
-typedef QnGlContextData<
-    DecodedPictureToOpenGLUploaderPrivate,
-    QnGlContextDataForwardingFactory<DecodedPictureToOpenGLUploaderPrivate>
-> DecodedPictureToOpenGLUploaderPrivateStorage;
-Q_GLOBAL_STATIC(DecodedPictureToOpenGLUploaderPrivateStorage, qn_decodedPictureToOpenGLUploaderPrivateStorage);
-//TODO: #ak unused qn_decodedPictureToOpenGLUploaderPrivateStorage - is it really required?
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererTexture
@@ -901,7 +895,7 @@ private:
         unsigned int srcPitch )
     {
         static const unsigned int PIXEL_SIZE = 1;
-        for( int y = 0; y < dstHeight; ++y )
+        for( unsigned int y = 0; y < dstHeight; ++y )
         {
             memcpy_stream_load( (__m128i*)(dstMem+y*dstPitch), (__m128i*)(srcMem+y*srcPitch), dstWidth*PIXEL_SIZE );
             if( !picDataRef.isValid() )
@@ -917,14 +911,14 @@ private:
     inline bool streamLoadAndDeinterleaveNV12UVPlaneEx(
         const QnAbstractPictureDataRef& picDataRef,
         const quint8* srcMem,
-        unsigned int srcWidth,
+        unsigned int /*srcWidth*/,
         unsigned int srcHeight,
         size_t srcPitch,
         quint8* dstUPlane,
         quint8* dstVPlane,
         size_t dstPitch )
     {
-        for( int y = 0; y < srcHeight / 2; ++y )
+        for( unsigned int y = 0; y < srcHeight / 2; ++y )
         {
             streamLoadAndDeinterleaveNV12UVPlane(
                 (__m128i*)(srcMem + y*srcPitch),
@@ -1156,11 +1150,24 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
 #endif
     m_format = decodedPicture->format;
     UploadedPicture* emptyPictureBuf = NULL;
+
+    QMutexLocker lk( &m_mutex );
+
     {
-        QMutexLocker lk( &m_mutex );
         //searching for a non-used picture buffer
         for( ;; )
         {
+#if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && defined(USE_MIN_GL_TEXTURES)
+            if( !useAsyncUpload && !m_hardwareDecoderUsed && !m_renderedPictures.empty() )
+            {
+                //this condition allows to use single PictureBuffer for rendering
+                emptyPictureBuf = m_renderedPictures.front();
+                m_renderedPictures.pop_front();
+                NX_LOG( QString::fromAscii( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                    arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
+            }
+            else
+#endif
             if( !m_emptyBuffers.empty() )
             {
                 emptyPictureBuf = m_emptyBuffers.front();
@@ -1168,18 +1175,18 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 NX_LOG( QString::fromAscii( "Found empty buffer" ), cl_logDEBUG2 );
             }
             else if( (!useAsyncUpload && !m_renderedPictures.empty())
-                  || (useAsyncUpload && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1 : 0))) )  //reserving one uploaded picture (preferring picture 
+                  || (useAsyncUpload && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1U : 0U))) )  //reserving one uploaded picture (preferring picture 
                                                                                                                        //which has not been shown yet) so that renderer always 
                                                                                                                        //gets something to draw...
             {
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                NX_LOG( QString::fromAscii( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else if( ((!useAsyncUpload && !m_picturesWaitingRendering.empty())
-                       || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1 : 0))))
+                       || (useAsyncUpload && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1U : 0U))))
                       && !m_picturesWaitingRendering.front()->m_skippingForbidden )
             {
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
@@ -1251,7 +1258,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstD3DSurface )
         {
             //posting picture to worker thread
-            QMutexLocker lk( &m_mutex );
 
             AsyncPicDataUploader* uploaderToUse = NULL;
             if( m_unusedUploaders.empty() )
@@ -1283,7 +1289,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
     {
         //have go through upload thread, since opengl uploading does not scale good on Intel HD Graphics and 
             //it does not matter on PCIe graphics card due to high video memory bandwidth
-        QMutexLocker lk( &m_mutex );
 
 #ifdef UPLOAD_SYSMEM_FRAMES_ASYNC
         QSharedPointer<CLVideoDecoderOutput> decodedPictureCopy( new CLVideoDecoderOutput() );
@@ -1701,9 +1706,9 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 #ifdef USE_PBO
 #ifdef USE_SINGLE_PBO_PER_FRAME
-            const int pboIndex = 0;
+            const unsigned int pboIndex = 0;
 #else
-            const int pboIndex = i;
+            const unsigned int pboIndex = i;
 #endif
             ensurePBOInitialized( emptyPictureBuf, pboIndex, lineSizes[i]*h[i] );
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, emptyPictureBuf->pboID(pboIndex) );
@@ -1735,7 +1740,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
             DEBUG_CODE(glCheckError("glPixelStorei"));
-            Q_ASSERT( (quint64)lineSizes[i] >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+            Q_ASSERT( ((quint64)lineSizes[i]) >= qPower2Ceil(r_w[i],ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             qPower2Ceil(r_w[i],ROUND_COEFF),
@@ -2009,7 +2014,7 @@ unsigned int DecodedPictureToOpenGLUploader::nextPicSequenceValue()
 
 void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
     DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf,
-    int pboIndex,
+    unsigned int pboIndex,
     size_t sizeInBytes )
 {
     if( picBuf->m_pbo.size() <= pboIndex )
