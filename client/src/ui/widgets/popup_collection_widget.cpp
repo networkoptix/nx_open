@@ -44,9 +44,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
-    quint64 ignored = qnSettings->ignorePopupFlags();
-    quint64 flag = (quint64)1 << (quint64)eventType;
-    if (ignored & flag)
+    if (!(qnSettings->shownPopups() & (1 << eventType)))
         return false;
 
     if (QWidget* w = m_widgetsByType[eventType]) {
@@ -85,13 +83,8 @@ void QnPopupCollectionWidget::updatePosition() {
 }
 
 void QnPopupCollectionWidget::at_widget_closed(BusinessEventType::Value eventType, bool ignore) {
-
-    if (ignore) {
-        quint64 ignored = qnSettings->ignorePopupFlags();
-        quint64 flag = (quint64)1 << (quint64)eventType;
-        ignored |= flag;
-        qnSettings->setIgnorePopupFlags(ignored);
-    }
+    if (ignore)
+        qnSettings->setShownPopups(qnSettings->shownPopups() & ~(1 << eventType));
 
     if (!m_widgetsByType.contains(eventType))
         return;
