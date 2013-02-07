@@ -78,7 +78,7 @@ public:
     int getBusinessRules(QnBusinessEventRules &businessRules);
 
     int setResourceStatus(const QnId& resourceId, QnResource::Status status);
-    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
+    int saveServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
