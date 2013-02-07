@@ -2420,13 +2420,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
-    // TODO: 
-    // #AK registerResource is not thread-safe and we have no guarantees on where this code is run from.
-    // Passing plain pointer instead of shared pointer is questionable. 
-    // Roma had hard to debug crashes because of it. Better keep calm and use ::toSharedPointer(this).
-    // DONE: 
-        //registerResource made thread-safe
-        //Not using shared pointer here because it is not OnvifNotificationConsumer who should decide when to destroy resource
+    /* Note that we don't pass shared pointer here as this would create a 
+     * cyclic reference and onvif resource will never be deleted. */
     QnSoapServer::instance()->getService()->registerResource(
         this,
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host() );
