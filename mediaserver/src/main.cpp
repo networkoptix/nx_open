@@ -275,11 +275,14 @@ static QStringList listRecordFolders()
             maxFreeSpace = freeSpace;
         }
 
-        if (freeSpace >= 100)
+        if (freeSpace >= 100) {
+            cl_log.log(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
             folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        }
     }
 
     if (folderPaths.isEmpty()) {
+        cl_log.log(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
         folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
     }
 #endif
