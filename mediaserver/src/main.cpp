@@ -252,9 +252,9 @@ static int freeGB(QString drive)
     return freeBytes.HighPart * 4 + (freeBytes.LowPart>> 30);
 }
 
-static QStringList listDrives()
+static QStringList listRecordFolders()
 {
-    QStringList drivePaths;
+    QStringList folderPaths;
 
     QString maxFreeSpaceDrive;
     int maxFreeSpace = 0;
@@ -276,23 +276,26 @@ static QStringList listDrives()
         }
 
         if (freeSpace >= 100)
-            drivePaths.append(path);
+            folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
     }
 
-    if (drivePaths.isEmpty()) {
-        drivePaths.append(maxFreeSpaceDrive);
+    if (folderPaths.isEmpty()) {
+        folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
     }
 #endif
 
-    return drivePaths;
+#ifdef Q_OS_LINUX
+    folderPaths.append(getDataDirectory() + "/data");
+#endif
+
+    return folderPaths;
 }
 
 QnAbstractStorageResourceList createStorages()
 {
     QnAbstractStorageResourceList storages;
 
-    foreach(QString drivePath, listDrives()) {
-        QString folderPath = drivePath + QN_MEDIA_FOLDER_NAME;
+    foreach(QString folderPath, listRecordFolders()) {
         storages.append(createStorage(folderPath));
         cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
     }
