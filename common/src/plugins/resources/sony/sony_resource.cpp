@@ -144,6 +144,12 @@ bool QnPlSonyResource::startInputPortMonitoring()
         return false;
     }
 
+    if( m_inputMonitorHttpClient )
+    {
+        m_inputMonitorHttpClient->scheduleForRemoval();
+        m_inputMonitorHttpClient = NULL;
+    }
+
     const QAuthenticator& auth = getAuth();
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
@@ -166,6 +172,8 @@ bool QnPlSonyResource::startInputPortMonitoring()
 void QnPlSonyResource::stopInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
+    if( !m_inputMonitorHttpClient )
+        return;
     m_inputMonitorHttpClient->scheduleForRemoval();
     m_inputMonitorHttpClient = NULL;
 }
