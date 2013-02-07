@@ -39,7 +39,7 @@ bool QnSelectCamerasDialogDelegate::isApplyAllowed() {
 // -------------------------------------------------------------------------- //
 // QnSelectCamerasDialog 
 // -------------------------------------------------------------------------- //
-QnSelectCamerasDialog::QnSelectCamerasDialog(const QnResourceCriterion &criterion, QWidget *parent, QnWorkbenchContext *context) :
+QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnSelectCamerasDialog),
@@ -58,7 +58,6 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(const QnResourceCriterion &criterio
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
-    ui->resourcesWidget->setCriterion(criterion);
 
     ui->delegateFrame->setVisible(false);
 }

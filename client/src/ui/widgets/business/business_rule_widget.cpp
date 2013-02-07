@@ -336,11 +336,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    /*QnResourceCriterion criterion(Qn::relayInput);
-    criterion.setMatchOperation(QnResourceCriterion::Next);
-    criterion.setMismatchOperation(QnResourceCriterion::Reject);*/ // TODO
-
-    QnSelectCamerasDialog dialog(QnResourceCriterion(), this, context()); //TODO: #GDM or servers?
+    QnSelectCamerasDialog dialog(this, context()); //TODO: #GDM or servers?
     dialog.setSelectedResources(m_model->eventResources());
     if (dialog.exec() != QDialog::Accepted)
         return;
@@ -351,7 +347,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    QnSelectCamerasDialog dialog(QnResourceCriterion(), this, context());
+    QnSelectCamerasDialog dialog(this, context());
     dialog.setSelectedResources(m_model->actionResources());
     if (dialog.exec() != QDialog::Accepted)
         return;
