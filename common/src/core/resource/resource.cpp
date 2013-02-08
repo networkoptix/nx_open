@@ -29,7 +29,9 @@ QnResource::QnResource():
     m_status(Offline),
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
-{}
+{
+    connect(this, SIGNAL(parameterValueChangedQueued(const QnResourcePtr &, const QnParam &)), this, SIGNAL(parameterValueChanged(const QnResourcePtr &, const QnParam &)), Qt::QueuedConnection);
+}
 
 QnResource::~QnResource()
 {
@@ -380,7 +382,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+                emit parameterValueChangedQueued(::toSharedPointer(this), param);
             }
             emit asyncParamGetDone(toSharedPointer(this), name, newValue, true);
             return true;
@@ -451,7 +453,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
+        emit parameterValueChangedQueued(::toSharedPointer(this), param);
 
     emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;
