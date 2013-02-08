@@ -253,7 +253,7 @@ public:
     static void addCommandToProc(QnAbstractDataPacketPtr data);
     static int commandProcQueueSize();
 
-    void update(QnResourcePtr other);
+    void update(QnResourcePtr other, bool silenceMode = false);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }

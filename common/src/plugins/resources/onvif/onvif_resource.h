@@ -408,6 +408,7 @@ private:
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
+    void checkPrimaryResolution(QSize& primaryResolution);
 };
 
 #endif //onvif_resource_h
