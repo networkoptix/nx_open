@@ -40,7 +40,7 @@
    <item>
     <widget class="QPushButton" name="settingsButton">
      <property name="text">
-      <string>Notification Settings...</string>
+      <string>Global Notification Settings...</string>
      </property>
     </widget>
    </item>
