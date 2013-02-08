@@ -43,13 +43,16 @@ protected:
     void initActionParameters();
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
+
+    void updateModelAggregationPeriod();
+
 private slots:
     void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
-    void at_aggregationPeriodChanged();
+    void at_ui_aggregationPeriodChanged();
     void at_commentsLineEdit_textChanged(const QString &value);
 
     void at_eventResourcesHolder_clicked();

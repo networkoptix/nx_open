@@ -1459,13 +1459,13 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
     }
 #endif
 
-    for( std::deque<UploadedPicture*>::iterator
-        it = m_picturesWaitingRendering.begin();
-        !m_picturesWaitingRendering.empty();
+	for( std::deque<UploadedPicture*>::iterator
+		it = m_picturesWaitingRendering.begin();
+		it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
          )
     {
         m_emptyBuffers.push_back( *it );
-        m_picturesWaitingRendering.erase( it++ );
+        it = m_picturesWaitingRendering.erase( it );
     }
 }
 

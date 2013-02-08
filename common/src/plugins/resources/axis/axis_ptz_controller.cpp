@@ -69,11 +69,11 @@ private:
 QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
-    m_capabilities(0),
+    m_capabilities(Qn::NoCapabilities),
     m_spaceMapper(NULL)
 {
     QnAxisParameterMap params;
-    if(query(lit("param.cgi?action=list&group=PTZ"), &params) && query(lit("param.cgi?action=list&group=Image.I0.Appearance"), &params))
+    if(query(lit("param.cgi?action=list"), &params))
         init(params);
 }
 
@@ -82,11 +82,12 @@ QnAxisPtzController::~QnAxisPtzController() {
 }
 
 void QnAxisPtzController::init(const QnAxisParameterMap &params) {
-    // TODO: #Elric
-    // check:
-    // root.PTZ.Various.V1.PanEnabled=true
-    // root.PTZ.Various.V1.TiltEnabled=true
-    // root.PTZ.Various.V1.ZoomEnabled=true
+    QString ptzEnabled = params.value<QString>("root.Properties.PTZ.PTZ");
+    if(ptzEnabled != lit("yes"))
+        return;
+
+    if(params.value<bool>("root.PTZ.Various.V1.Locked"))
+        return;
 
     if(params.value<bool>("root.PTZ.Support.S1.ContinuousPan") && params.value<bool>("root.PTZ.Support.S1.ContinuousTilt"))
         m_capabilities |= Qn::ContinuousPanTiltCapability;
@@ -96,7 +97,13 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
 
     if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan") && params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt") && params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom"))
         m_capabilities |= Qn::AbsolutePtzCapability;
- 
+
+    if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled") || !params.value<bool>("root.PTZ.Various.V1.TiltEnabled"))
+        m_capabilities &= ~(Qn::AbsolutePtzCapability | Qn::ContinuousPanTiltCapability);
+
+    if(!params.value<bool>("root.PTZ.Various.V1.ZoomEnabled"))
+        m_capabilities &= ~(Qn::AbsolutePtzCapability | Qn::ContinuousZoomCapability);
+
     qreal minPan, maxPan, minTilt, maxTilt, minAngle, maxAngle;
     if(
         params.value("root.PTZ.Limit.L1.MinPan", &minPan) &&

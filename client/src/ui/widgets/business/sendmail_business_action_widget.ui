@@ -30,7 +30,7 @@
    <item>
     <widget class="QPushButton" name="settingsButton">
      <property name="text">
-      <string>Email Settings...</string>
+      <string>Global Email Settings...</string>
      </property>
     </widget>
    </item>

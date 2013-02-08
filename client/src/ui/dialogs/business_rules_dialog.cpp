@@ -8,6 +8,7 @@
 #include <QtGui/QItemEditorFactory>
 #include <QtGui/QComboBox>
 #include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
 
 #include <api/app_server_connection.h>
 
