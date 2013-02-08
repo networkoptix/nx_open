@@ -328,9 +328,10 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
 #endif
 }
 
-QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
+QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResource::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
+    *pm = QnMediaServerResource::PM_None;
 
     while (servers.isEmpty())
     {
@@ -343,6 +344,7 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
 
     foreach(QnMediaServerResourcePtr server, servers)
     {
+        *pm = server->getPanicMode();
         if (server->getGuid() == serverGuid())
             return server;
     }
@@ -860,13 +862,15 @@ void QnMain::run()
 
     QHostAddress publicAddress = getPublicAddress();
 
+    QnMediaServerResource::PanicMode pm;
     while (m_mediaServer.isNull())
     {
-        QnMediaServerResourcePtr server = findServer(appServerConnection);
+        QnMediaServerResourcePtr server = findServer(appServerConnection, &pm);
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setGuid(serverGuid());
+            server->setPanicMode(pm);
         }
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
