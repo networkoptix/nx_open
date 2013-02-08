@@ -379,7 +379,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
-    quint32 duration = int(data->m_duration/1000);
+    quint32 duration = int((data->timestamp+data->m_duration)/1000 - timestamp);
     if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
