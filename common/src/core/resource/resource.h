@@ -221,7 +221,7 @@ public:
     virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
 signals:
-    void parameterValueChanged(const QnParam &param);
+    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
     void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
@@ -245,6 +245,8 @@ signals:
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
+
+    void parameterValueChangedQueued(const QnResourcePtr &resource, const QnParam &param);
 
 public:
     // this is thread to process commands like setparam
