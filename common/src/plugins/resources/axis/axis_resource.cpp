@@ -934,7 +934,7 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     if(capabilities == Qn::NoCapabilities)
         m_ptzController.reset();
 
-    setCameraCapabilities((getCameraCapabilities() & ~AllPtzCapabilities) | capabilities);
+    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
