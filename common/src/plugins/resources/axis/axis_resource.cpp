@@ -920,10 +920,8 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 }
 
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
-    // TODO: #Elric check root.PTZ.Various.V1.Locked. It it's true then PTZ is disabled.
-
     // TODO: make configurable.
-    static const char *brokenPtzCameras[] = {"AXISP3344", NULL};
+    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
 
     // TODO: use QHash here, +^
     QString localModel = getModel();
@@ -931,18 +929,12 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-
-    QString ptzString;
-    CLHttpStatus status = readAxisParameter(http, lit("Properties.PTZ.PTZ"), &ptzString);
-    if(status != CL_HTTP_SUCCESS)
-        return;
-
-    if(ptzString != lit("yes"))
-        return;
-
     m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
+    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoCapabilities)
+        m_ptzController.reset();
 
-    setCameraCapabilities(getCameraCapabilities() | m_ptzController->getCapabilities());
+    setCameraCapabilities((getCameraCapabilities() & ~AllPtzCapabilities) | capabilities);
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
