@@ -125,6 +125,7 @@ void QnCameraScheduleWidget::endUpdate() {
     if (m_inUpdate > 0)
         return;
     connectToGridWidget();
+    updateGridParams(); // TODO: does not belong here...
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)
@@ -365,7 +366,7 @@ static inline QString getLongText(const QString &text)
         return QLatin1String("Best");
     return QLatin1String("-");
 }
-
+ 
 int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
 {
     for (int i = 0; i < ui->qualityComboBox->count(); ++i)

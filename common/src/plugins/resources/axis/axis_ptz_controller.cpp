@@ -58,7 +58,11 @@ public:
     }
 
 private:
+#ifdef _DEBUG /* QMap is easier to look through in debug. */
+    QMap<QString, QString> m_data;
+#else
     QHash<QString, QString> m_data;
+#endif
 };
 
 
@@ -78,6 +82,12 @@ QnAxisPtzController::~QnAxisPtzController() {
 }
 
 void QnAxisPtzController::init(const QnAxisParameterMap &params) {
+    // TODO: #Elric
+    // check:
+    // root.PTZ.Various.V1.PanEnabled=true
+    // root.PTZ.Various.V1.TiltEnabled=true
+    // root.PTZ.Various.V1.ZoomEnabled=true
+
     if(params.value<bool>("root.PTZ.Support.S1.ContinuousPan") && params.value<bool>("root.PTZ.Support.S1.ContinuousTilt"))
         m_capabilities |= Qn::ContinuousPanTiltCapability;
 

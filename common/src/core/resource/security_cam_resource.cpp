@@ -1,6 +1,10 @@
+
 #include "security_cam_resource.h"
 
+#include <QMutexLocker>
+
 #include "plugins/resources/archive/archive_stream_reader.h"
+
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
@@ -122,6 +126,8 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone()
 {
+    QMutexLocker lk( &m_mutex );
+
     if( m_inputPortListenerCount > 0 )
         startInputPortMonitoring();
 }
@@ -284,6 +290,8 @@ bool QnSecurityCamResource::setRelayOutputState(
 
 void QnSecurityCamResource::inputPortListenerAttached()
 {
+    QMutexLocker lk( &m_mutex );
+
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
         startInputPortMonitoring();
@@ -291,6 +299,8 @@ void QnSecurityCamResource::inputPortListenerAttached()
 
 void QnSecurityCamResource::inputPortListenerDetached()
 {
+    QMutexLocker lk( &m_mutex );
+ 
     if( m_inputPortListenerCount <= 0 )
         return;
 

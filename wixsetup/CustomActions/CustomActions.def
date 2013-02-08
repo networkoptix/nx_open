@@ -3,16 +3,12 @@ LIBRARY "CustomActions"
 EXPORTS
 
 FindConfiguredStorages
-CheckServerDriveLowSpace
-CheckServerDirectoryWritable
 GenerateGuidsForServers
 SetMoviesFolder
 CheckPorts
 FindFreePorts
-FixServerFolder
 FixClientFolder
 CopyMediaServerProfile
 CopyAppServerProfile
 IsClientFolderExists
-AnalyzeServerDirectoryReg
 DeleteDatabaseFile

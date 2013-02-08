@@ -58,7 +58,7 @@ public:
 
         DEV_MODE,
 
-        IGNORE_POPUPS,
+        SHOWN_POPUPS,
 
         VARIABLE_COUNT
     };
@@ -105,7 +105,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_RW_PROPERTY(bool,                    isDevMode,              setDevMode,                 DEV_MODE,                   false)
-        QN_DECLARE_RW_PROPERTY(quint64,                 ignorePopupFlags,       setIgnorePopupFlags,        IGNORE_POPUPS,              0)
+        QN_DECLARE_RW_PROPERTY(quint64,                 shownPopups,            setShownPopups,             SHOWN_POPUPS,               0xFFFFFFFFFFFFFFFFull)
     QN_END_PROPERTY_STORAGE()
 
 private:

@@ -4,7 +4,6 @@
 #include <QDialog>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_managment/resource_criterion.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -37,6 +36,8 @@ public:
     explicit QnSelectCamerasDialogDelegate(QObject* parent = NULL);
     ~QnSelectCamerasDialogDelegate();
 
+    // TODO: #gdm need doxydocs for these methods.
+
     virtual void setWidgetLayout(QLayout* layout);
     virtual void modelDataChanged(const QnResourceList &selected);
     virtual bool isApplyAllowed();
@@ -48,7 +49,7 @@ class QnSelectCamerasDialog : public QDialog, public QnWorkbenchContextAware {
     typedef QDialog base_type;
 
 public:
-    explicit QnSelectCamerasDialog(const QnResourceCriterion &criterion = QnResourceCriterion(), QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnSelectCamerasDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnSelectCamerasDialog();
 
     QnResourceList getSelectedResources() const;

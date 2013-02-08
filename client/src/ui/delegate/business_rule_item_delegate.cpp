@@ -19,11 +19,11 @@
 namespace {
 
     class QnCheckCameraAndWarnDelegate: public QnSelectCamerasDialogDelegate {
-
     public:
         QnCheckCameraAndWarnDelegate(QWidget* parent):
             QnSelectCamerasDialogDelegate(parent),
-            m_warningLabel(NULL){}
+            m_warningLabel(NULL)
+        {}
 
         virtual void setWidgetLayout(QLayout *layout) override {
             m_warningLabel = new QLabel(layout->parentWidget());
@@ -47,12 +47,19 @@ namespace {
             m_warningLabel->setText(getText(invalid, cameras.size()));
             m_warningLabel->setVisible(invalid > 0);
         }
+
     protected:
+        // TODO: #gdm 
+        // It is a good practice to use positive clauses in method names so that
+        // the programmer who calls into your code doesn't have to do double negation.
+        // Writing something like !isCameraInvalid() can be brain-straining.
         virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const = 0;
         virtual QString getText(int invalid, int total) const = 0;
+
     private:
         QLabel* m_warningLabel;
     };
+
 
     class QnMotionEnabledDelegate: public QnCheckCameraAndWarnDelegate {
     public:
@@ -133,7 +140,7 @@ void QnSelectResourcesDialogButton::setDialogDelegate(QnSelectCamerasDialogDeleg
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnSelectCamerasDialog dialog(QnResourceCriterion(), this); //TODO: #GDM servers dialog?
+    QnSelectCamerasDialog dialog(this); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();

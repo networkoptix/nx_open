@@ -13,50 +13,52 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(BusinessEventType::toString(BusinessEventType::Value(i)));
-        ui->ignoreLayout->addWidget(checkbox);
+        ui->checkBoxesLayout->addWidget(checkbox);
         m_checkBoxes << checkbox;
     }
 
-    connect(ui->ignoreAllCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_ignoreAllCheckBox_toggled(bool)));
-
+    connect(ui->showAllCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_showAllCheckBox_toggled(bool)));
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
 {
-    delete ui;
+    delete ui; // TODO: #GDM use QScopedPointer
 }
 
 void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
-    quint64 ignored = settings->ignorePopupFlags();
+    quint64 shown = settings->shownPopups();
     quint64 flag = 1;
     bool all = true;
 
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        bool checked = ignored & flag;
+        bool checked = shown & flag;
         m_checkBoxes[i]->setChecked(checked);
         all = all && checked;
         flag = flag << 1;
     }
 
-    ui->ignoreAllCheckBox->setChecked(all);
+    ui->showAllCheckBox->setChecked(all);
 }
 
 void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
-    quint64 ignored = 0;
+    quint64 shown = settings->shownPopups();
     quint64 flag = 1;
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        if (m_checkBoxes[i]->isChecked() || ui->ignoreAllCheckBox->isChecked())
-            ignored |= flag;
+        if (m_checkBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
+            shown |= flag;
+        } else {
+            shown &= ~flag;
+        }
         flag = flag << 1;
     }
 
-    settings->setIgnorePopupFlags(ignored);
+    settings->setShownPopups(shown);
 }
 
-void QnPopupSettingsWidget::at_ignoreAllCheckBox_toggled(bool checked) {
-
+void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
+    // TODO: #GDM also update checked state!
+    // TODO: maybe tristate for 'show all' checkbox would be better.
     foreach (QCheckBox* checkbox, m_checkBoxes) {
         checkbox->setEnabled(!checked);
     }
-
 }

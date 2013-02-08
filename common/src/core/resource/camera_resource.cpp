@@ -118,6 +118,7 @@ void QnVirtualCameraResource::unLockDTSFactory()
 
 QString QnVirtualCameraResource::getModel() const
 {
+    QMutexLocker locker(&m_mutex);
     return m_model;
 }
 

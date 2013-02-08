@@ -233,17 +233,79 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
 }
 
-QnAbstractStorageResourcePtr createDefaultStorage()
+QnAbstractStorageResourcePtr createStorage(const QString& path)
 {
-    //QnStorageResourcePtr storage(new QnStorageResource());
     QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
-    storage->setUrl(defaultStoragePath());
+    storage->setUrl(path);
     storage->setSpaceLimit(5ll * 1000000000);
 
-    cl_log.log("Creating new storage", cl_logINFO);
-
     return storage;
+}
+
+#ifdef Q_OS_WIN
+static int freeGB(QString drive)
+{
+    ULARGE_INTEGER freeBytes;
+
+    GetDiskFreeSpaceEx(drive.toStdWString().c_str(), &freeBytes, 0, 0);
+
+    return freeBytes.HighPart * 4 + (freeBytes.LowPart>> 30);
+}
+#endif
+
+static QStringList listRecordFolders()
+{
+    QStringList folderPaths;
+
+    QString maxFreeSpaceDrive;
+    int maxFreeSpace = 0;
+
+#ifdef Q_OS_WIN
+    foreach (QFileInfo drive, QDir::drives()) {
+        if (!drive.isWritable())
+            continue;
+
+        QString path = drive.absolutePath();
+        if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
+            continue;
+
+        int freeSpace = freeGB(path);
+
+        if (maxFreeSpaceDrive.isEmpty() || freeSpace > maxFreeSpace) {
+            maxFreeSpaceDrive = path;
+            maxFreeSpace = freeSpace;
+        }
+
+        if (freeSpace >= 100) {
+            cl_log.log(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
+            folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        }
+    }
+
+    if (folderPaths.isEmpty()) {
+        cl_log.log(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
+        folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
+    }
+#endif
+
+#ifdef Q_OS_LINUX
+    folderPaths.append(getDataDirectory() + "/data");
+#endif
+
+    return folderPaths;
+}
+
+QnAbstractStorageResourceList createStorages()
+{
+    QnAbstractStorageResourceList storages;
+
+    foreach(QString folderPath, listRecordFolders()) {
+        storages.append(createStorage(folderPath));
+        cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+    }
+
+    return storages;
 }
 
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress)
@@ -264,16 +326,6 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setStreamingUrl(QString("https://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
 #endif
 #endif
-}
-
-QnMediaServerResourcePtr createServer()
-{
-    QnMediaServerResourcePtr serverPtr(new QnMediaServerResource());
-    serverPtr->setGuid(serverGuid());
-
-    serverPtr->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
-
-    return serverPtr;
 }
 
 QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
@@ -304,7 +356,7 @@ QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
     serverPtr->setStatus(QnResource::Online);
 
     QByteArray authKey;
-    if (appServerConnection->registerServer(serverPtr, servers, authKey) != 0)
+    if (appServerConnection->saveServer(serverPtr, servers, authKey) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
 
@@ -812,8 +864,10 @@ void QnMain::run()
     {
         QnMediaServerResourcePtr server = findServer(appServerConnection);
 
-        if (!server)
-            server = createServer();
+        if (!server) {
+            server = QnMediaServerResourcePtr(new QnMediaServerResource());
+            server->setGuid(serverGuid());
+        }
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
 
@@ -831,8 +885,8 @@ void QnMain::run()
         server->setNetAddrList(serverIfaceList);
 
         QnAbstractStorageResourceList storages = server->getStorages();
-        if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
-            server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
+        if (storages.isEmpty())
+            server->setStorages(createStorages());
 
         m_mediaServer = registerServer(appServerConnection, server);
         if (m_mediaServer.isNull())

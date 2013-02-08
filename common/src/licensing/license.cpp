@@ -135,7 +135,7 @@ bool QnLicense::isValid() const
     {
         m_validLicense = 0;
 
-        // Note, than we do not check HWID here
+        // Note, than we do check HWID here as we suppose m_hardwareId is real current ECS hwid
         if (!m_signature.isEmpty())
         {
             QByteArray licenseString;

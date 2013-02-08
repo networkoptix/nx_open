@@ -920,6 +920,18 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 }
 
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
+    // TODO: #Elric check root.PTZ.Various.V1.Locked. It it's true then PTZ is disabled.
+
+    // TODO: make configurable.
+    static const char *brokenPtzCameras[] = {"AXISP3344", NULL};
+
+    // TODO: use QHash here, +^
+    QString localModel = getModel();
+    for(const char **model = brokenPtzCameras; *model; model++)
+        if(localModel == QLatin1String(*model))
+            return;
+
+
     QString ptzString;
     CLHttpStatus status = readAxisParameter(http, lit("Properties.PTZ.PTZ"), &ptzString);
     if(status != CL_HTTP_SUCCESS)

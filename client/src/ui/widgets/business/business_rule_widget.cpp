@@ -26,6 +26,10 @@
 #include <utils/settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
+// TODO: #GDM 
+// Why are you using QFrame as container for subwidgets of QnBusinessRuleWidget?
+// Why don't just use QWidget?
+
 namespace {
     QString toggleStateToString(ToggleState::Value value, bool prolonged) {
         switch( value )
@@ -42,6 +46,9 @@ namespace {
         }
         return QString();
     }
+
+    // TODO: #gdm fill aggregationComboBox in cpp file so that
+    // names & numbers are in one place. Store steps in userData.
 
     // make sure size is equal to ui->aggregationComboBox->count()
     const int aggregationSteps[] = {
@@ -103,6 +110,8 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         disconnect(m_model, 0, this, 0);
 
     m_model = model;
+    m_aggregationPeriodChanged = false;
+
     if (!m_model) {
 /*        ui->eventTypeComboBox->setModel(NULL);
         ui->eventStatesComboBox->setModel(NULL);
@@ -166,8 +175,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionResourcesFrame->setVisible(isResourceRequired);
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
-
         ui->actionAggregationFrame->setVisible(actionIsInstant);
+
         initActionParameters();
     }
 
@@ -314,12 +323,16 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
     m_model->setActionType(val);
+
+    if(!m_aggregationPeriodChanged)
+        m_model->setAggregationPeriod(val == BusinessActionType::BA_SendMail ? 60 * 60 : 60);
 }
 
 void QnBusinessRuleWidget::at_aggregationPeriodChanged() {
     if (!m_model || m_updating)
         return;
 
+    m_aggregationPeriodChanged = true;
     int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
     int idx = ui->aggregationPeriodComboBox->currentIndex();
     m_model->setAggregationPeriod(val * aggregationSteps[idx]);
@@ -336,11 +349,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    /*QnResourceCriterion criterion(Qn::relayInput);
-    criterion.setMatchOperation(QnResourceCriterion::Next);
-    criterion.setMismatchOperation(QnResourceCriterion::Reject);*/ // TODO
-
-    QnSelectCamerasDialog dialog(QnResourceCriterion(), this, context()); //TODO: #GDM or servers?
+    QnSelectCamerasDialog dialog(this, context()); //TODO: #GDM or servers?
     dialog.setSelectedResources(m_model->eventResources());
     if (dialog.exec() != QDialog::Accepted)
         return;
@@ -351,7 +360,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    QnSelectCamerasDialog dialog(QnResourceCriterion(), this, context());
+    QnSelectCamerasDialog dialog(this, context());
     dialog.setSelectedResources(m_model->actionResources());
     if (dialog.exec() != QDialog::Accepted)
         return;
