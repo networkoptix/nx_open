@@ -231,7 +231,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                         break;
                     }
 
-                    if (!rez.isEmpty() && fullStartTime < rez.last().startTimeMs + rez.last().durationMs + (detailLevel-1))
+                    if (!rez.isEmpty() && fullStartTime <= rez.last().startTimeMs + rez.last().durationMs + detailLevel)
                         rez.last().durationMs = qMax(rez.last().durationMs, i->duration + fullStartTime - rez.last().startTimeMs);
                     else
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
