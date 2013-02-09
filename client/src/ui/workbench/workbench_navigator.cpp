@@ -512,7 +512,9 @@ void QnWorkbenchNavigator::jumpBackward() {
             if (currentTime == DATETIME_NOW) {
                 pos = periods.last().startTimeMs * 1000;
             } else {
-                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime / 1000);
+                // todo: if position at chunk begin, some epsilon between current pos and chunk start. It is need investigate more about max epsilon amount and why epsilon is present
+                // I add 100 ms as temporary solution
+                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime / 1000 + 100);
                 itr = qMax(itr - 2, periods.constBegin());
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && itr->durationMs != -1)
@@ -520,7 +522,7 @@ void QnWorkbenchNavigator::jumpBackward() {
             }
         }
     }
-    reader->jumpTo(pos, 0);
+    reader->jumpTo(pos, pos);
 }
 
 void QnWorkbenchNavigator::jumpForward() {
@@ -543,14 +545,17 @@ void QnWorkbenchNavigator::jumpForward() {
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
-        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000);
+        qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
+        // todo: if position at chunk begin, some epsilon between current pos and chunk start. It is need investigate more about max epsilon amount and why epsilon is present
+        // I add 100 ms as temporary solution
+        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime + 100);
         if (itr == periods.end() || (reader->isReverseMode() && itr->durationMs == -1)) {
             pos = DATETIME_NOW;
         } else {
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }
     }
-    reader->jumpTo(pos, 0);
+    reader->jumpTo(pos, pos);
 }
 
 void QnWorkbenchNavigator::stepBackward() {
