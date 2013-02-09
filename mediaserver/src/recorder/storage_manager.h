@@ -74,6 +74,7 @@ private:
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
+    QString toCanonicalPath(const QString& path);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;

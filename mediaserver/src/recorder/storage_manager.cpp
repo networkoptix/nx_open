@@ -45,6 +45,15 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
     }
 }
 
+QString QnStorageManager::toCanonicalPath(const QString& path)
+{
+    QString result = path;
+    result.replace(L'\\', L'/');
+    if (!result.endsWith(L'/'))
+        result += QLatin1String("/");
+    return result;
+}
+
 bool QnStorageManager::deserializeStorageFile()
 {
 #ifdef _TEST_TWO_SERVERS
@@ -62,7 +71,7 @@ bool QnStorageManager::deserializeStorageFile()
         line = storageFile.readLine();
         QStringList params = line.split(';');
         if (params.size() >= 2)
-            m_storageIndexes.insert(params[0], params[1].toInt());
+            m_storageIndexes.insert(toCanonicalPath(params[0]), params[1].toInt());
     } while (!line.isEmpty());
     storageFile.close();
     return true;
@@ -93,8 +102,9 @@ bool QnStorageManager::serializeStorageFile()
 }
 
 // determine storage index (aka 16 bit hash)
-int QnStorageManager::detectStorageIndex(const QString& path)
+int QnStorageManager::detectStorageIndex(const QString& p)
 {
+    QString path = toCanonicalPath(p);
     if (!m_storageFileReaded)
         m_storageFileReaded = deserializeStorageFile();
 
