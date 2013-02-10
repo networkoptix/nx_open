@@ -23,7 +23,7 @@ QnUpdateInfoItemList QnAppCastParser::items() const {
     return m_items;
 }
 
-QnUpdateInfoItemList QnAppCastParser::newItems(const QnVersion& engineVersion) const {
+QnUpdateInfoItemList QnAppCastParser::newItems(const QnSoftwareVersion& engineVersion) const {
     QnUpdateInfoItemList filtered;
 
     foreach(const QnUpdateInfoItem &item, m_items)
