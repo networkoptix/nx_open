@@ -9,6 +9,7 @@
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
+#include <utils/common/software_version.h>
 
 #include <ui/workbench/workbench_state.h>
 
@@ -101,7 +102,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                 extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
         QN_DECLARE_RW_PROPERTY(QUrl,                    updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
-        QN_DECLARE_RW_PROPERTY(QnVersion,               ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnVersion())
+        QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,       ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
         QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)

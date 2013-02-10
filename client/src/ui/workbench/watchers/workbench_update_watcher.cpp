@@ -52,7 +52,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList 
     qSort(updates.begin(), updates.end(), UpdateEngineVersionLess());
     QnUpdateInfoItem lastUpdate = updates.last();
 
-    QnVersion currentVersion = QnVersion(QLatin1String(QN_ENGINE_VERSION));
+    QnSoftwareVersion currentVersion = QnSoftwareVersion(QLatin1String(QN_ENGINE_VERSION));
     if(lastUpdate.engineVersion <= currentVersion)
         return;
 

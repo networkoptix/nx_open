@@ -8,15 +8,15 @@
 
 #include <boost/operators.hpp>
 
-#include <utils/common/version.h>
+#include <utils/common/software_version.h>
 
 
 struct QnUpdateInfoItem: public boost::equality_comparable1<QnUpdateInfoItem> {
     /** Product version of the update. This is the version to be displayed to the user. */
-    QnVersion productVersion;
+    QnSoftwareVersion productVersion;
 
     /** Engine version of the update. */
-    QnVersion engineVersion;
+    QnSoftwareVersion engineVersion;
 
     /** Update information title. */
     QString title;
@@ -48,6 +48,7 @@ struct QnUpdateInfoItem: public boost::equality_comparable1<QnUpdateInfoItem> {
 
 typedef QList<QnUpdateInfoItem> QnUpdateInfoItemList;
 
+Q_DECLARE_METATYPE(QnUpdateInfoItem)
 Q_DECLARE_METATYPE(QnUpdateInfoItemList)
 
 #endif // QN_UPDATE_INFO_H

@@ -56,6 +56,7 @@
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
+#include <ui/dialogs/checkable_message_box.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -83,6 +84,7 @@
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -95,7 +97,6 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
-#include "../watchers/workbench_server_time_watcher.h"
 
 
 
@@ -2967,7 +2968,7 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     if(update.isNull())
         return;
     
-    QnVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
+    QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
     if(update.engineVersion <= ignoredUpdateVersion)
         return;
 
