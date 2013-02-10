@@ -2967,11 +2967,23 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     if(update.isNull())
         return;
     
-    QMessageBox::information(
+    QnVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
+    if(update.engineVersion <= ignoredUpdateVersion)
+        return;
+
+    bool ignoreThisVersion = false;
+    QnCheckableMessageBox::question(
         widget(), 
         tr("Software Update is Available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString())
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
+        tr("Don't notify again about this update."),
+        &ignoreThisVersion,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, 
+        QDialogButtonBox::Ok
     );
+
+    if(ignoreThisVersion)
+        qnSettings->setIgnoredUpdateVersion(update.engineVersion);
 }
 
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
