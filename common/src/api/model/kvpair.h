@@ -10,11 +10,9 @@ public:
     QnKvPair(const QString& name, const QString& value);
     ~QnKvPair() {}
 
-    void setName(const char* name); // TODO: drop
     void setName(const QString& name);
     const QString& name() const;
 
-    void setValue(const char* value); // TODO: drop
     void setValue(const QString& value);
     const QString& value() const;
 
