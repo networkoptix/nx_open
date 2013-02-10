@@ -260,6 +260,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
     connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
     connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
+    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
+    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
+    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -2870,6 +2873,18 @@ void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
     setItemsResolutionMode(Qn::HighResolution);
+}
+
+void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
+
+}
+
+void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
+
+}
+
+void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
+
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

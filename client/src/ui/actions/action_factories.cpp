@@ -52,3 +52,11 @@ void QnOpenCurrentUserLayoutActionFactory::at_action_triggered() {
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 }
 
+
+QList<QAction *> QnPtzGoToPresetActionFactory::newActions(QObject *parent) {
+    return QList<QAction *>();
+}
+
+void QnPtzGoToPresetActionFactory::at_action_triggered() {
+
+}

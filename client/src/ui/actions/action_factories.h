@@ -35,4 +35,16 @@ private slots:
 };
 
 
+class QnPtzGoToPresetActionFactory: public QnActionFactory {
+    Q_OBJECT;
+public:
+    QnPtzGoToPresetActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
+
+    virtual QList<QAction *> newActions(QObject *parent) override;
+
+private slots:
+    void at_action_triggered();
+};
+
+
 #endif // QN_ACTION_FACTORIES_H

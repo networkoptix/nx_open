@@ -5,6 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QList>
 
+#include <common/common_globals.h>
 #include <core/resource/resource.h> // TODO: #Elric remove once resource flags are moved out
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_property.h>
@@ -195,6 +196,10 @@ namespace QnResourceCriterionExpressions {
 
     inline QnResourceCriterionExpression hasStatus(QnResource::Status status) {
         return QnResourceCriterion(status, QnResourceCriterion::Equality, QnResourceProperty::status);
+    }
+
+    inline QnResourceCriterionExpression hasCapabilities(Qn::CameraCapabilities capabilities) {
+        return QnResourceCriterion(capabilities);
     }
 
     inline QnResourceCriterionExpression operator||(const QnResourceCriterionExpression &le, const QnResourceCriterionExpression &re) {
