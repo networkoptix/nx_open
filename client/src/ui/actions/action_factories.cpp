@@ -16,7 +16,13 @@
 namespace {
     struct LayoutNameCmp {
         bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-            return qnNaturalStringLessThan(l->getName(), r->getName());
+            return qnNaturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
+        }
+    };
+
+    struct PtzPresetNameCmp {
+        bool operator()(const QnPtzPreset &l, const QnPtzPreset &r) {
+            return qnNaturalStringCaseInsensitiveLessThan(l.name, r.name);
         }
     };
 
@@ -59,7 +65,11 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         return QList<QAction *>();
 
     QList<QAction *> result;
-    foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera)) {
+
+    QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera);
+    qSort(presets.begin(), presets.end(), PtzPresetNameCmp());
+
+    foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
         action->setText(preset.name);
         action->setData(QVariant::fromValue<QnVirtualCameraResourcePtr>(camera));
