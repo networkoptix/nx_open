@@ -445,8 +445,8 @@ void parseKvPairs(QnKvPairList& kvPairs, const PbKvPairList& pb_kvPairs)
     for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
     {
         QnKvPair kvPair;
-        kvPair.setName(ci->name().c_str());
-        kvPair.setValue(ci->value().c_str());
+        kvPair.setName(QString::fromUtf8(ci->name().c_str()));
+        kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
 
         kvPairs.append(kvPair);
     }
@@ -457,8 +457,8 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
     for (PbSettingList::const_iterator ci = pb_settings.begin(); ci != pb_settings.end(); ++ci)
     {
         QnKvPair kvPair;
-        kvPair.setName(ci->name().c_str());
-        kvPair.setValue(ci->value().c_str());
+        kvPair.setName(QString::fromUtf8(ci->name().c_str()));
+        kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
 
         kvPairs.append(kvPair);
     }
@@ -640,14 +640,15 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
 
 void serializeKvPair_i(pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
 {
-    pb_kvPair.set_name(kvPair.name().toStdString());
-    pb_kvPair.set_value(kvPair.value().toStdString());
+    pb_kvPair.set_resourceid(1); // TODO: #Elric EVIL!!!!!!!!!!!11111111111
+    pb_kvPair.set_name(kvPair.name().toUtf8());
+    pb_kvPair.set_value(kvPair.value().toUtf8());
 }
 
 void serializeSetting_i(pb::Setting& pb_setting, const QnKvPair& kvPair)
 {
-    pb_setting.set_name(kvPair.name().toStdString());
-    pb_setting.set_value(kvPair.value().toStdString());
+    pb_setting.set_name(kvPair.name().toUtf8());
+    pb_setting.set_value(kvPair.value().toUtf8());
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)

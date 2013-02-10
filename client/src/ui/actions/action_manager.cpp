@@ -1374,7 +1374,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
         return result;
     } else if(parent->childFactory()) {
-        QList<QAction *> actions = parent->childFactory()->newActions(NULL);
+        QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
             QMenu *result = new QMenu();

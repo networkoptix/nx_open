@@ -20,7 +20,7 @@ const QString &QnKvPair::name() const
 
 void QnKvPair::setValue(const char* value)
 {
-    m_value = QString::fromUtf8(value);
+    m_value = QString::fromUtf8(value); 
 }
 
 void QnKvPair::setValue(const QString &value)
