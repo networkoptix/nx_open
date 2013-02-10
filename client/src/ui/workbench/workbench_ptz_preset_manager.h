@@ -32,6 +32,7 @@ public:
 
     QnPtzPreset ptzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name) const;
     QList<QnPtzPreset> ptzPresets(const QnVirtualCameraResourcePtr &camera) const;
+    void setPtzPresets(const QnVirtualCameraResourcePtr &camera, const QList<QnPtzPreset> &presets);
 
     void addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name, const QVector3D &logicalPosition);
     void removePtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name);
