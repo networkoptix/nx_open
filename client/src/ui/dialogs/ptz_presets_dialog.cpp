@@ -120,7 +120,7 @@ void QnPtzPresetsDialog::at_removeButton_clicked() {
         selectedItems.insert(m_model->itemFromIndex(index));
 
     foreach(QStandardItem *item, selectedItems)
-        delete item;
+        m_model->invisibleRootItem()->removeRow(item->row());
 }
 
 void QnPtzPresetsDialog::at_activateButton_clicked() {
