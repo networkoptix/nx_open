@@ -512,10 +512,8 @@ void QnWorkbenchNavigator::jumpBackward() {
             if (currentTime == DATETIME_NOW) {
                 pos = periods.last().startTimeMs * 1000;
             } else {
-                // todo: if position at chunk begin, some epsilon between current pos and chunk start. It is need investigate more about max epsilon amount and why epsilon is present
-                // I add 100 ms as temporary solution
-                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime / 1000 + 100);
-                itr = qMax(itr - 2, periods.constBegin());
+                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime/1000, true);
+                itr = qMax(itr - 1, periods.constBegin());
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && itr->durationMs != -1)
                     pos += itr->durationMs * 1000;
@@ -546,9 +544,10 @@ void QnWorkbenchNavigator::jumpForward() {
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
         qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
-        // todo: if position at chunk begin, some epsilon between current pos and chunk start. It is need investigate more about max epsilon amount and why epsilon is present
-        // I add 100 ms as temporary solution
-        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime + 100);
+        QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
+        if (itr != periods.constEnd() && (itr+1) != periods.constEnd())
+            ++itr;
+        
         if (itr == periods.end() || (reader->isReverseMode() && itr->durationMs == -1)) {
             pos = DATETIME_NOW;
         } else {

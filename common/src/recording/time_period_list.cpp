@@ -5,7 +5,7 @@ QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 time
     if (isEmpty())
         return end();
 
-    const_iterator itr = qUpperBound(begin(), end(), timeMs);
+    const_iterator itr = qUpperBound(constBegin(), constEnd(), timeMs);
     if (itr != begin())
         --itr;
 
