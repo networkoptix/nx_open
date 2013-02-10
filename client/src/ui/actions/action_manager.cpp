@@ -772,6 +772,33 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
     } factory.endSubMenu();
 
+    factory().
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("PTZ..."));
+
+    factory.beginSubMenu(); {
+        factory(Qn::PtzSavePresetAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Save Current Position...")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzGoToPresetMenu).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Go to Position...")).
+            childFactory(new QnPtzGoToPresetActionFactory(this)).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzManagePresetsAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Manage Saved Positions...")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzGoToPresetAction).
+            flags(Qn::SingleTarget | Qn::ResourceTarget).
+            text(tr("Go To Saved Position")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+    } factory.endSubMenu();
+
 #if 0
     factory(Qn::ToggleRadassAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
@@ -1347,7 +1374,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
         return result;
     } else if(parent->childFactory()) {
-        QList<QAction *> actions = parent->childFactory()->newActions(NULL);
+        QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
             QMenu *result = new QMenu();

@@ -5,6 +5,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include "action_parameters.h"
+
 class QAction;
 
 class QnActionFactory: public QObject, public QnWorkbenchContextAware {
@@ -15,7 +17,8 @@ public:
         QnWorkbenchContextAware(parent)
     {}
 
-    virtual QList<QAction *> newActions(QObject *parent = NULL) {
+    virtual QList<QAction *> newActions(const QnActionParameters &parameters, QObject *parent = NULL) {
+        Q_UNUSED(parameters);
         Q_UNUSED(parent);
 
         return QList<QAction *>();
@@ -28,7 +31,19 @@ class QnOpenCurrentUserLayoutActionFactory: public QnActionFactory {
 public:
     QnOpenCurrentUserLayoutActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
 
-    virtual QList<QAction *> newActions(QObject *parent) override;
+    virtual QList<QAction *> newActions(const QnActionParameters &parameters, QObject *parent) override;
+
+private slots:
+    void at_action_triggered();
+};
+
+
+class QnPtzGoToPresetActionFactory: public QnActionFactory {
+    Q_OBJECT;
+public:
+    QnPtzGoToPresetActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
+
+    virtual QList<QAction *> newActions(const QnActionParameters &parameters, QObject *parent) override;
 
 private slots:
     void at_action_triggered();

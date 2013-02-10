@@ -496,6 +496,14 @@ int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *sl
     return getObjectsAsync(businessRuleObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
+int QnAppServerConnection::getKvPairsAsync(QObject* target, const char* slot) 
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, kvPairObject);
+    QObject::connect(processor, SIGNAL(finishedKvPair(int, QByteArray, QnKvPairList, int)), target, slot);
+
+    return getObjectsAsync(kvPairObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
 int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, settingObject);

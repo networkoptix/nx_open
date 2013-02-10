@@ -79,6 +79,8 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_ptz_preset_manager.h>
+#include <ui/workbench/workbench_ptz_controller.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
@@ -260,6 +262,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
     connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
     connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
+    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
+    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
+    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -269,6 +274,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
+
+    context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
     /*
     SignalingInstrument *activityInstrument = new SignalingInstrument(
@@ -2870,6 +2877,46 @@ void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
     setItemsResolutionMode(Qn::HighResolution);
+}
+
+void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
+    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
+
+    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(camera);
+    if(qIsNaN(position)) {
+        return; // TODO
+    }
+
+    bool ok = false;
+    QString name = QInputDialog::getText(widget(), tr("Save Position"), tr("Enter position name:"), QLineEdit::Normal, QString(), &ok);
+    if(!ok)
+        return;
+
+    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, name, position);
+}
+
+void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
+
+    QString name = parameters.argument<QString>(Qn::NameParameter);
+    if(name.isEmpty())
+        return;
+
+    QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
+    if(preset.isNull())
+        return;
+
+    context()->instance<QnWorkbenchPtzController>()->setPosition(camera, preset.logicalPosition);
+}
+
+void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
+
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

@@ -302,6 +302,10 @@ protected slots:
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
 
+    void at_ptzSavePresetAction_triggered();
+    void at_ptzGoToPresetAction_triggered();
+    void at_ptzManagePresetsAction_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);

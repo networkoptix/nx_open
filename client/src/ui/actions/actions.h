@@ -479,6 +479,29 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /**
+         * Opens preset name editing dialog and saves current position as a new PTZ preset.
+         */
+        PtzSavePresetAction,
+
+        /**
+         * Menu containing all PTZ presets.
+         */
+        PtzGoToPresetMenu,
+
+        /**
+         * Moves camera to the given PTZ preset.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- name of the PTZ preset.
+         */
+        PtzGoToPresetAction,
+
+        /**
+         * Opens PTZ preset management dialog.
+         */
+        PtzManagePresetsAction,
+
 
 
         /* Layout actions. */
