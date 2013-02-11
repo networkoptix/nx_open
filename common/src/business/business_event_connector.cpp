@@ -49,11 +49,12 @@ void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
-void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp)
+void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason)
 {
     QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(
         resource,
-        timeStamp));
+        timeStamp,
+        reason));
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 

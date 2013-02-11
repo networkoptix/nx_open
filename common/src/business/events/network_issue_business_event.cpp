@@ -15,6 +15,6 @@ QnNetworkIssueBusinessEvent::QnNetworkIssueBusinessEvent(
 QString QnNetworkIssueBusinessEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
-    text += QObject::tr("  reason%1\n").arg(m_reason);
+    text += QObject::tr("  reason: %1\n").arg(m_reason);
     return text;
 }

@@ -3,15 +3,18 @@
 
 QnMServerFailureBusinessEvent::QnMServerFailureBusinessEvent(
         const QnResourcePtr& resource,
-        qint64 timeStamp):
+        qint64 timeStamp,
+        const QString& reason):
     base_type(BusinessEventType::BE_MediaServer_Failure,
                             resource,
-                            timeStamp)
+                            timeStamp),
+                            m_reason(reason)
 {
 }
 
 QString QnMServerFailureBusinessEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
+    text += QObject::tr(". Reason: %1").arg(m_reason);
     return text;
 }

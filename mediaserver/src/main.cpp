@@ -524,7 +524,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
-    m_universalTcpListener(0)
+    m_universalTcpListener(0),
+    m_timer(0)
 {
     serviceMainInstance = this;
 }
@@ -672,6 +673,11 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
 {
     if (status != 0)
         qWarning() << "Error saving server: " << errorString;
+}
+
+void QnMain::at_timer()
+{
+    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
 }
 
 void QnMain::at_cameraIPConflict(QHostAddress host)
@@ -991,6 +997,16 @@ void QnMain::run()
     QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
     QnSoapServer::instance()->start();
 
+    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
+    if (lastRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer, lastRunningTime*1000, tr("Media server is started after an unexpected shutdown"));
+
+    m_timer = new QTimer(this);
+    at_timer();
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    m_timer->start(60 * 1000);
+
+
     exec();
 }
 
@@ -1061,6 +1077,7 @@ void stopServer(int signal)
     QnVideoCameraPool::instance()->stop();
     av_lockmgr_register(NULL);
     qApp->quit();
+    qSettings.setValue("lastRunningTime", 0);
 }
 
 int main(int argc, char* argv[])
