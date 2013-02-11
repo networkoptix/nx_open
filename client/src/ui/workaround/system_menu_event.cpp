@@ -8,8 +8,7 @@
 #include <Windows.h>
 
 namespace {
-
-    QAbstractEventDispatcher::EventFilter qn_sysMenu_oldEventFilter;
+    QAbstractEventDispatcher::EventFilter qn_sysMenu_oldEventFilter = NULL;
 
     bool qn_sysMenu_eventFilter(void *message) {
         MSG *msg = static_cast<MSG *>(message);
@@ -31,18 +30,16 @@ namespace {
         }
     }
 
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_sysMenu_initEventFilter, {
-        qn_sysMenu_oldEventFilter = QAbstractEventDispatcher::instance(qApp->thread())->setEventFilter(&qn_sysMenu_eventFilter);
-    });
-
 } // anonymous namespace
-
 #endif // Q_OS_WIN
 
 
 void QnSystemMenuEvent::initialize() {
 #ifdef Q_OS_WIN
-    qn_sysMenu_initEventFilter();
+    if(qn_sysMenu_oldEventFilter)
+        return;
+
+    qn_sysMenu_oldEventFilter = QAbstractEventDispatcher::instance(qApp->thread())->setEventFilter(&qn_sysMenu_eventFilter);
 #endif
 }
 

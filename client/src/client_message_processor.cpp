@@ -10,12 +10,16 @@
 
 #include "client_message_processor.h"
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(QnClientMessageProcessor, qn_clientMessageProcessor_instance, {
-    QThread *thread = new QThread(); // TODO: leaking thread here.
-    thread->start();
+class QnClientMessageProcessorInstance: public QnClientMessageProcessor {
+public:
+    QnClientMessageProcessorInstance() {
+        QThread *thread = new QThread(); // TODO: #Elric leaking thread here.
+        thread->start();
 
-    x->moveToThread(thread);
-})
+        moveToThread(thread);
+    }
+};
+Q_GLOBAL_STATIC(QnClientMessageProcessorInstance, qn_clientMessageProcessor_instance);
 
 QnClientMessageProcessor* QnClientMessageProcessor::instance()
 {
