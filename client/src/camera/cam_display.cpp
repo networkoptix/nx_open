@@ -525,10 +525,12 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
-                if (m_buffering == 0) {
+                if (m_buffering == 0) 
+                {
+                    unblockTimeValue();
+                    waitForFramesDisplayed(); // new videoStreamDisplay displays data async, so ensure that new position actual
                     if (m_extTimeSrc)
                         m_extTimeSrc->onBufferingFinished(this);
-                    unblockTimeValue();
                 }
             }
             else
@@ -574,7 +576,10 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();
 
-    blockTimeValue(time);
+    if (m_speed >= 0)
+        moveTimeTo(qMax(time, getCurrentTime()));
+    else
+        moveTimeTo(qMin(time, getCurrentTime()));
 
     m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended) {
@@ -591,6 +596,18 @@ void QnCamDisplay::blockTimeValue(qint64 time)
             m_display[i]->blockTimeValue(time);
         }
     }
+}
+
+void QnCamDisplay::moveTimeTo(qint64 time)
+{
+    blockTimeValue(time);
+    unblockTimeValue();
+}
+
+void QnCamDisplay::waitForFramesDisplayed()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+        m_display[i]->waitForFramesDisplayed();
 }
 
 void QnCamDisplay::onBeforeJump(qint64 time)

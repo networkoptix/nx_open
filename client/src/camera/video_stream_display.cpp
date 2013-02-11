@@ -232,6 +232,8 @@ void QnVideoStreamDisplay::waitForFramesDisplayed()
 {
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->waitForFramesDisplayed();
+    else
+        m_drawer->waitForFrameDisplayed(0); // wait old frame
     m_queueWasFilled = false;
 }
 
