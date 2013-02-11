@@ -221,11 +221,10 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
 {
     QString someMacAddress;
     std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
-    std::vector<class onvifXsd__NetworkInterface*>::const_iterator ifacePtrIter = ifaces.begin();
 
-    while (ifacePtrIter != ifaces.end()) 
+    for (int i = 0; i < ifaces.size(); ++i)
     {
-        onvifXsd__NetworkInterface* ifacePtr = *ifacePtrIter;
+        onvifXsd__NetworkInterface* ifacePtr = ifaces[i];
 
         if (!ifacePtr->Info)
             continue;
@@ -259,8 +258,6 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
                 ++addrPtrIter;
             }
         }
-
-        ++ifacePtrIter;
     }
 
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
