@@ -2974,6 +2974,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
         return;
     }
 
+    action(Qn::JumpToLiveAction)->trigger(); // TODO: ?
     context()->instance<QnWorkbenchPtzController>()->setPosition(camera, preset.logicalPosition);
 }
 
