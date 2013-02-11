@@ -151,7 +151,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             ownResource = qnResPool->getResourceById(message.resource->getId());
 
         if (ownResource.isNull())
-            qnResPool->addResource(message.resource);
+            qnResPool->addResource(message.resource); // TODO: #Ivan
         else
             ownResource->update(message.resource);
 
