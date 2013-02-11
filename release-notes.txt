@@ -13,21 +13,22 @@ NEW FEATURES:
 	 - Storage Failure (if Media Server unable to write file on a storage)
 	 - Network Issue: RTP timeout or RTP packet loss
 	 - Camera IP Conflict (if several cameras or servers have the same IP address)
-     - Input Signal on Camera (if supported - ONVIF only)
-	 - Media Server Failure - if a media server goes down
+     - Input Signal on Camera (if supported - ONVIF and Axis only)
+	 - Media Server Failure - if a media server goes down or reboots for some reason
 	 - Media Servers Conflict - if another Media Server that connected to another EC is pulling video from the same camera
    - Actions: 
      - Camera Recording (camera(s) should be specified). Camera(s) should have Recording enabled
      - Panic Recording
 	 - Send Mail. recipient(s) should be specified. Mail Server settings should be configured in Global Settings
 	 - Show Notification. User roles can be specified. Notification parameters should be configured in Global Settings
-     - Camera Output(if supported - ONVIF only)	 
-   - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has connon and advanced parameters.
+     - Camera Output(if supported - ONVIF and Axis only)	 
+   - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has common and advanced parameters.
  - Hardware acceleration of video decoding (Intel Quick Sync only). The flag in System Settings will be available only if Intel HD graphics is enabled
  - PTZ is greatly improved:
    - PTZ is much more user-friendly and precise
-   - PTZ works correctly for rotated/flipped cameras
-   - Current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported for a camera.
+   - PTZ works correctly for rotated/flipped Axis cameras
+   - PTZ positions can be saved/restored (if camera supports positioning)
+   - Current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported for a camera
  
 IMPROVEMENTS:
  - CTRL can be used in Calendar Search to select multiple dates
@@ -45,7 +46,7 @@ BUGS FIXED:
  - If a distance between recorded fragments were small (2-3sec), then "Next chunk" button resulted in jump over these chunks. Fixed
  - "Open in a new window" didn't work for items of Multi-Video exported files. Now it works
  - Selection of items was not saved correctly item if a layout was closed and reopened. Fixed
- - If two cameras were playing bidel near the live position and one of them was closed, than another didn't jump up to live and could stuck. Fixed
+ - If two cameras were playing video near the live position and one of them was closed, than another didn't jump up to live and could stuck. Fixed
  - If open several Multi-Videos and change one another was corrupted. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------

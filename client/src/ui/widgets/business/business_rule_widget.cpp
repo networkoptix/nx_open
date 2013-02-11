@@ -167,8 +167,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     if (fields & QnBusiness::ActionTypeField) {
-        QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(
-                    m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
+        QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
         bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
@@ -178,6 +177,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionAggregationFrame->setVisible(actionIsInstant);
 
         initActionParameters();
+
+        if(!m_aggregationPeriodChanged) {
+            QnScopedValueRollback<bool> guard(&m_updating, false);
+            m_model->setAggregationPeriod(m_model->actionType() == BusinessActionType::BA_SendMail ? 60 * 60 : 60);
+        }
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
@@ -334,9 +338,6 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) 
     int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
     m_model->setActionType(val);
-
-    if(!m_aggregationPeriodChanged)
-        m_model->setAggregationPeriod(val == BusinessActionType::BA_SendMail ? 60 * 60 : 60);
 }
 
 void QnBusinessRuleWidget::at_ui_aggregationPeriodChanged() {
