@@ -67,14 +67,11 @@ namespace QnBusinessEventRuntime {
     qint64 getEventTimestamp(const QnBusinessParams &params);
     void setEventTimestamp(QnBusinessParams* params, qint64 value);
 
-    QString getEventResourceName(const QnBusinessParams &params);
-    void setEventResourceName(QnBusinessParams* params, QString value);
+    int getEventResourceId(const QnBusinessParams &params);
+    void setEventResourceId(QnBusinessParams* params, int value);
 
     QString getEventReason(const QnBusinessParams &params);
     void setEventReason(QnBusinessParams* params, QString value);
-
-    QString getEventResourceUrl(const QnBusinessParams &params);
-    void setEventResourceUrl(QnBusinessParams* params, QString value);
 
     QString getEventDescription(const QnBusinessParams &params);
     void setEventDescription(QnBusinessParams* params, QString value);

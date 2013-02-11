@@ -6,6 +6,9 @@
 
 #include <business/events/mserver_conflict_business_event.h>
 
+#include <core/resource/resource.h>
+#include <core/resource_managment/resource_pool.h>
+
 QnPopupWidget::QnPopupWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnPopupWidget),
@@ -98,7 +101,7 @@ void QnPopupWidget::updateCameraDetails(const QnAbstractBusinessActionPtr &busin
     static const QLatin1String resourceDetailsSummary("<html><head/><body><p>at %1</span></p></body></html>");
     static const QLatin1String resourceRepeat("%1 (%2 times)");
     static const QLatin1String cameraImg("<img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>");
-
+/*
     QString resource = QnBusinessEventRuntime::getEventResourceName(businessAction->getRuntimeParams());
     if (qnSettings->isIpShownInTree())
         resource = QString(QLatin1String("%1 (%2)"))
@@ -131,6 +134,7 @@ void QnPopupWidget::updateCameraDetails(const QnAbstractBusinessActionPtr &busin
     }
 
     ui->detailsLabel->setText(text);
+*/
 }
 
 void QnPopupWidget::updateConflictECDetails(const QnAbstractBusinessActionPtr &businessAction) {

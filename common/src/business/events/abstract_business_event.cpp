@@ -139,8 +139,7 @@ namespace QnBusinessEventRuntime {
 
     static QLatin1String typeStr("eventType");
     static QLatin1String timestampStr("eventTimestamp");
-    static QLatin1String nameStr("eventResourceName");
-    static QLatin1String urlStr("eventResourceUrl");
+    static QLatin1String resourceIdStr("eventResourceId");
     static QLatin1String descriptionStr("eventDescription");
     static QLatin1String reasonStr("eventReason");
 
@@ -160,12 +159,12 @@ namespace QnBusinessEventRuntime {
         (*params)[timestampStr] = value;
     }
 
-    QString getEventResourceName(const QnBusinessParams &params) {
-        return params.value(nameStr, QString()).toString();
+    int getEventResourceId(const QnBusinessParams &params) {
+        return params.value(resourceIdStr).toInt();
     }
 
-    void setEventResourceName(QnBusinessParams* params, QString value) {
-        (*params)[nameStr] = value;
+    void setEventResourceId(QnBusinessParams* params, int value) {
+        (*params)[resourceIdStr] = value;
     }
 
     QString getEventReason(const QnBusinessParams &params) {
@@ -174,14 +173,6 @@ namespace QnBusinessEventRuntime {
 
     void setEventReason(QnBusinessParams* params, QString value) {
         (*params)[reasonStr] = value;
-    }
-
-    QString getEventResourceUrl(const QnBusinessParams &params) {
-        return params.value(urlStr, QString()).toString();
-    }
-
-    void setEventResourceUrl(QnBusinessParams* params, QString value) {
-        (*params)[urlStr] = value;
     }
 
     QString getEventDescription(const QnBusinessParams &params) {
@@ -217,8 +208,7 @@ QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
     QnBusinessEventRuntime::setEventType(&params, m_eventType);
     QnBusinessEventRuntime::setEventTimestamp(&params, m_timeStamp);
     QnBusinessEventRuntime::setEventDescription(&params, toString());
-    QnBusinessEventRuntime::setEventResourceName(&params, m_resource ? m_resource->getName() : QString());
-    QnBusinessEventRuntime::setEventResourceUrl(&params, m_resource ? m_resource->getUrl() : QString());
+    QnBusinessEventRuntime::setEventResourceId(&params, m_resource ? m_resource->getId().toInt() : 0);
 
     return params;
 }

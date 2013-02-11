@@ -5,6 +5,9 @@
 
 #include "sendmail_business_action.h"
 
+#include <core/resource/resource.h>
+#include <core/resource_managment/resource_pool.h>
+
 namespace BusinessActionParameters {
     static QLatin1String emailAddress("emailAddress");
 
@@ -21,9 +24,12 @@ namespace BusinessActionParameters {
 QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessParams &runtimeParams):
     base_type(BusinessActionType::BA_SendMail, runtimeParams)
 {
+    int id = QnBusinessEventRuntime::getEventResourceId(runtimeParams);
+    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
+
     m_eventType =           QnBusinessEventRuntime::getEventType(runtimeParams);
-    m_eventResourceName =   QnBusinessEventRuntime::getEventResourceName(runtimeParams);
-    m_eventResourceUrl =    QnBusinessEventRuntime::getEventResourceUrl(runtimeParams);
+    m_eventResourceName =   res ? res->getName() : QString();
+    m_eventResourceUrl =    res ? res->getUrl() : QString();
     m_eventDescription =    QnBusinessEventRuntime::getEventDescription(runtimeParams);
 }
 
