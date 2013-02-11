@@ -163,6 +163,9 @@ public:
     virtual ~DecodedPictureToOpenGLUploader();
 
     //!Implementation of QnStoppable::pleaseStop()
+    /*!
+        Call this to inform object that no more frames will be displayed
+    */
     virtual void pleaseStop() override;
 
     //!Uploads \a decodedPicture to opengl texture(s). Used by decoder thread
