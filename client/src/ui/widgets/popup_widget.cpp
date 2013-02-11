@@ -19,6 +19,8 @@ QnPopupWidget::QnPopupWidget(QWidget *parent) :
     connect(ui->okButton, SIGNAL(clicked()), this, SLOT(at_okButton_clicked()));
 
     m_headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
+    m_model = new QStandardItemModel(this);
+    ui->eventsTreeView->setModel(m_model);
 }
 
 QnPopupWidget::~QnPopupWidget()
@@ -97,6 +99,15 @@ void QnPopupWidget::updateDetails(const QnAbstractBusinessActionPtr &businessAct
 }
 
 void QnPopupWidget::updateCameraDetails(const QnAbstractBusinessActionPtr &businessAction) {
+
+    m_model->clear(); //TODO: do not clear when not nessessary
+    QStandardItem *parentItem = m_model->invisibleRootItem();
+     for (int i = 0; i < 4; ++i) {
+         QStandardItem *item = new QStandardItem(QString("item %0").arg(i));
+         parentItem->appendRow(item);
+         parentItem = item;
+     }
+
     //TODO: #GDM tr()
     static const QLatin1String resourceDetailsSummary("<html><head/><body><p>at %1</span></p></body></html>");
     static const QLatin1String resourceRepeat("%1 (%2 times)");

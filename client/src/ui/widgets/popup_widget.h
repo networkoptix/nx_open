@@ -1,7 +1,9 @@
 #ifndef POPUP_WIDGET_H
 #define POPUP_WIDGET_H
 
-#include <QWidget>
+#include <QtGui/QWidget>
+#include <QtGui/QStandardItemModel>
+
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 
@@ -42,6 +44,8 @@ private:
     QString m_eventTime;
     QList<QWidget*> m_headerLabels;
     QMap<QString, int> m_resourcesCount;
+
+    QStandardItemModel* m_model;
 };
 
 #endif // POPUP_WIDGET_H
