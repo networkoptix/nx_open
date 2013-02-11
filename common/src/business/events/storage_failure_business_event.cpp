@@ -1,6 +1,21 @@
 #include "storage_failure_business_event.h"
 #include "core/resource/resource.h"
 
+namespace QnBusinessEventRuntime
+{
+    static QLatin1String storageUrlStr("storageUrl");
+
+    QString getStorageResourceUrl(const QnBusinessParams &params)
+    {
+        return params.value(storageUrlStr, QString()).toString();
+    }
+
+    void setStorageResourceUrl(QnBusinessParams* params, QString value)
+    {
+        (*params)[storageUrlStr] = value;
+    }
+}
+
 QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
@@ -23,4 +38,12 @@ QString QnStorageFailureBusinessEvent::toString() const
     else
         text += QObject::tr("  no storage for writting\n");
     return text;
+}
+
+QnBusinessParams QnStorageFailureBusinessEvent::getRuntimeParams() const {
+    QnBusinessParams params = base_type::getRuntimeParams();
+    QnBusinessEventRuntime::setEventReason(&params, m_reason);
+    if (m_storageResource)
+        QnBusinessEventRuntime::setStorageResourceUrl(&params, m_storageResource->getUrl());
+    return params;
 }

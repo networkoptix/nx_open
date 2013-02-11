@@ -18,3 +18,9 @@ QString QnMServerFailureBusinessEvent::toString() const
     text += QObject::tr(". Reason: %1").arg(m_reason);
     return text;
 }
+
+QnBusinessParams QnMServerFailureBusinessEvent::getRuntimeParams() const {
+    QnBusinessParams params = base_type::getRuntimeParams();
+    QnBusinessEventRuntime::setEventReason(&params, m_reason);
+    return params;
+}

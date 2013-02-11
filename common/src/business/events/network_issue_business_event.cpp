@@ -18,3 +18,9 @@ QString QnNetworkIssueBusinessEvent::toString() const
     text += QObject::tr("  reason: %1\n").arg(m_reason);
     return text;
 }
+
+QnBusinessParams QnNetworkIssueBusinessEvent::getRuntimeParams() const {
+    QnBusinessParams params = base_type::getRuntimeParams();
+    QnBusinessEventRuntime::setEventReason(&params, m_reason);
+    return params;
+}

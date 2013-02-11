@@ -71,7 +71,11 @@ void QnPopupWidget::initAction(const QnAbstractBusinessActionPtr &businessAction
             ui->notificationLabel->setVisible(true);
             break;
     }
-    m_eventTime = qnSyncTime->currentDateTime().toString(QLatin1String("hh:mm:ss"));
+    qint64 eventTimestamp = QnBusinessEventRuntime::getEventTimestamp(businessAction->getRuntimeParams());
+    if (eventTimestamp == 0)
+        eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
+
+    m_eventTime = QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
 }
 
 void QnPopupWidget::updateDetails(const QnAbstractBusinessActionPtr &businessAction) {

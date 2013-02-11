@@ -3,6 +3,12 @@
 
 #include "instant_business_event.h"
 
+namespace QnBusinessEventRuntime
+{
+    QString getStorageResourceUrl(const QnBusinessParams &params);
+    void setStorageResourceUrl(QnBusinessParams* params, QString value);
+}
+
 class QnStorageFailureBusinessEvent: public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
@@ -13,6 +19,7 @@ public:
                           const QString& reason);
 
     virtual QString toString() const override;
+    virtual QnBusinessParams getRuntimeParams() const override;
 private:
     QString m_reason;
     QnResourcePtr m_storageResource;

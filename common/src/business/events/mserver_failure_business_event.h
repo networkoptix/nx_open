@@ -10,6 +10,7 @@ public:
     QnMServerFailureBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp, const QString& reason);
 
     virtual QString toString() const override;
+    virtual QnBusinessParams getRuntimeParams() const override;
 private:
     QString m_reason;
 };
