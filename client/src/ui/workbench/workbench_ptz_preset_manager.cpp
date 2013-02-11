@@ -1,6 +1,10 @@
 #include "workbench_ptz_preset_manager.h"
 
-#include <algorithm>
+#include <iterator> /* For std::back_inserter. */
+
+#include <boost/range/algorithm/find_if.hpp>
+#include <boost/range/algorithm/copy.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
@@ -30,6 +34,17 @@ namespace {
         PtzPresetData data;
     };
 
+    struct PtzPresetCameraPredicate {
+        PtzPresetCameraPredicate(const QString &cameraPhysicaId): cameraPhysicaId(cameraPhysicaId) {}
+
+        bool operator()(const PtzPresetData &value) const {
+            return value.cameraPhysicalId == cameraPhysicaId;
+        }
+    
+        QString cameraPhysicaId;
+    };
+
+    // TODO: #Elric move out
     inline void serialize(const QVector3D &value, QVariant *target) {
         QVariantMap result;
         QJson::serialize(value.x(), "x", &result);
@@ -111,7 +126,7 @@ QnPtzPreset QnWorkbenchPtzPresetManager::ptzPreset(const QnVirtualCameraResource
     if(!camera || name.isEmpty())
         return QnPtzPreset();
 
-    QVector<PtzPresetData>::iterator pos = std::find_if(d->presets.begin(), d->presets.end(), PtzPresetKeyPredicate(PtzPresetData(camera->getPhysicalId(), name, QVector3D())));
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetKeyPredicate(PtzPresetData(camera->getPhysicalId(), name, QVector3D())));
     if(pos == d->presets.end())
         return QnPtzPreset();
 
@@ -130,6 +145,21 @@ QList<QnPtzPreset> QnWorkbenchPtzPresetManager::ptzPresets(const QnVirtualCamera
     return result;
 }
 
+void QnWorkbenchPtzPresetManager::setPtzPresets(const QnVirtualCameraResourcePtr &camera, const QList<QnPtzPreset> &presets) {
+    if(!camera) {
+        qnNullWarning(camera);
+        return;
+    }
+
+    boost::remove_erase_if(d->presets, PtzPresetCameraPredicate(camera->getPhysicalId()));
+    
+    QString cameraPhysicalId = camera->getPhysicalId();
+    foreach(const QnPtzPreset &preset, presets)
+        d->presets.push_back(PtzPresetData(cameraPhysicalId, preset.name, preset.logicalPosition));
+
+    savePresets();
+}
+
 void QnWorkbenchPtzPresetManager::addPtzPreset(const QnVirtualCameraResourcePtr &camera, const QString &name, const QVector3D &logicalPosition) {
     if(!camera) {
         qnNullWarning(camera);
@@ -142,7 +172,7 @@ void QnWorkbenchPtzPresetManager::addPtzPreset(const QnVirtualCameraResourcePtr 
     }
 
     PtzPresetData data(camera->getPhysicalId(), name, logicalPosition);
-    QVector<PtzPresetData>::iterator pos = std::find_if(d->presets.begin(), d->presets.end(), PtzPresetKeyPredicate(data));
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetKeyPredicate(data));
     if(pos != d->presets.end()) {
         *pos = data; /* Replace existing. */
     } else {
@@ -163,7 +193,7 @@ void QnWorkbenchPtzPresetManager::removePtzPreset(const QnVirtualCameraResourceP
         return;
     }
 
-    QVector<PtzPresetData>::iterator pos = std::find_if(d->presets.begin(), d->presets.end(), PtzPresetKeyPredicate(PtzPresetData(camera->getPhysicalId(), name, QVector3D())));
+    QVector<PtzPresetData>::iterator pos = boost::find_if(d->presets, PtzPresetKeyPredicate(PtzPresetData(camera->getPhysicalId(), name, QVector3D())));
     if(pos == d->presets.end())
         return;
 

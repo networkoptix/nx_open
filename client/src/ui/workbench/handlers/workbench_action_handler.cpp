@@ -57,6 +57,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/ptz_presets_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -2916,7 +2917,13 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
+    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
 
+    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget()));
+    dialog->setCamera(camera);
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
