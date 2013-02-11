@@ -36,11 +36,20 @@ public:
     explicit QnSelectCamerasDialogDelegate(QObject* parent = NULL);
     ~QnSelectCamerasDialogDelegate();
 
-    // TODO: #gdm need doxydocs for these methods.
+    /**
+     * @brief init                  This method allows delegate setup custom error or statistics widget
+     *                              that will be displayed below the resources list.
+     * @param parent                Parent container widget.
+     */
+    virtual void init(QWidget* parent);
 
-    virtual void setWidgetLayout(QLayout* layout);
-    virtual void modelDataChanged(const QnResourceList &selected);
-    virtual bool isApplyAllowed();
+    /**
+     * @brief validate              This method allows delegate modify message depending on the selection
+     *                              and control the OK button status.
+     * @param selectedResources     List of selected resources.
+     * @return                      True if selection is valid and OK button can be pressed.
+     */
+    virtual bool validate(const QnResourceList &selectedResources);
 };
 
 // TODO: #GDM camera selection dialog 
