@@ -1286,22 +1286,11 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+    notifyAboutUpdate(false);
 }
 
 void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
-    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(update.isNull()) {
-        QMessageBox::information(widget(), tr("Information"), tr("No updates available."));
-        return;
-    }
-
-    QMessageBox::information(
-        widget(), 
-        tr("Software update is available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
-        QMessageBox::Ok | QMessageBox::Cancel, 
-        QMessageBox::Ok
-    );
+    notifyAboutUpdate(true);
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
