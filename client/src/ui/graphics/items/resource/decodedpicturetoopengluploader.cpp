@@ -1099,6 +1099,8 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
     //ensure there is no pointer to the object in the async uploader queue
     discardAllFramesPostedToDisplay();
 
+    pleaseStop();
+
     for( std::deque<AsyncPicDataUploader*>::iterator
         it = m_unusedUploaders.begin();
         it != m_unusedUploaders.end();
@@ -1157,6 +1159,9 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         //searching for a non-used picture buffer
         for( ;; )
         {
+            if( m_terminated )
+                return;
+
 #if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && defined(USE_MIN_GL_TEXTURES)
             if( !useAsyncUpload && !m_hardwareDecoderUsed && !m_renderedPictures.empty() )
             {
@@ -1395,7 +1400,7 @@ void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
-    while( !m_framesWaitingUploadInGUIThread.empty() )
+    while( !m_terminated && !m_framesWaitingUploadInGUIThread.empty() )
         m_cond.wait( lk.mutex() );
 
     //for( std::deque<AVPacketUploader*>::iterator
