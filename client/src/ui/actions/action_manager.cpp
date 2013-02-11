@@ -595,6 +595,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
     
+    factory(Qn::CheckForUpdatesAction).
+        flags(Qn::Main).
+        text(tr("Check for Updates..."));
+
     factory(Qn::AboutAction).
         flags(Qn::Main).
         text(tr("About...")).

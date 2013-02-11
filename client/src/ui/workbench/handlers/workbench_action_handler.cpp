@@ -195,6 +195,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
     connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
+    connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
@@ -1254,6 +1255,53 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
     
     if(dialog->exec())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
+}
+
+void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
+    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(update.isNull()) {
+        if(alwaysNotify)
+            QMessageBox::information(widget(), tr("Information"), tr("No updates available."));
+        return;
+    }
+
+    QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
+    bool ignoreThisVersion = update.engineVersion <= ignoredUpdateVersion;
+    bool thisVersionWasIgnored = ignoreThisVersion;
+    if(ignoreThisVersion && !alwaysNotify)
+        return;
+
+    QnCheckableMessageBox::question(
+        widget(), 
+        tr("Software update is available"), 
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
+        tr("Don't notify again about this update."),
+        &ignoreThisVersion,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, 
+        QDialogButtonBox::Ok
+    );
+
+    if(ignoreThisVersion != thisVersionWasIgnored)
+        qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
+}
+
+void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+}
+
+void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
+    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(update.isNull()) {
+        QMessageBox::information(widget(), tr("Information"), tr("No updates available."));
+        return;
+    }
+
+    QMessageBox::information(
+        widget(), 
+        tr("Software update is available"), 
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
+        QMessageBox::Ok | QMessageBox::Cancel, 
+        QMessageBox::Ok
+    );
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
@@ -3039,30 +3087,6 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
         }
     }
-}
-
-void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(update.isNull())
-        return;
-    
-    QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
-    if(update.engineVersion <= ignoredUpdateVersion)
-        return;
-
-    bool ignoreThisVersion = false;
-    QnCheckableMessageBox::question(
-        widget(), 
-        tr("Software Update is Available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
-        tr("Don't notify again about this update."),
-        &ignoreThisVersion,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, 
-        QDialogButtonBox::Ok
-    );
-
-    if(ignoreThisVersion)
-        qnSettings->setIgnoredUpdateVersion(update.engineVersion);
 }
 
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
