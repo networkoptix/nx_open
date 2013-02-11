@@ -14,8 +14,7 @@ namespace Ui {
 
 class QnResourcePoolModel;
 
-class QnExportCameraSettingsDialog : public QDialog, public QnWorkbenchContextAware
-{
+class QnExportCameraSettingsDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
     
     typedef QDialog base_type;
@@ -29,8 +28,10 @@ public:
     void setRecordingEnabled(bool enabled = true);
 
     void setMotionParams(bool motionUsed, bool dualStreamingUsed);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void at_resourceModel_dataChanged();
 
