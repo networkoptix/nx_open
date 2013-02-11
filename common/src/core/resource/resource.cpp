@@ -92,7 +92,7 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 
     }
-	silenceMode |= other->hasFlags(QnResource::foreigner);
+    silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
@@ -226,15 +226,15 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-	QnId parentID;
-	QnResourcePool* resourcePool = NULL;
-	{
-	    QMutexLocker mutexLocker(&m_mutex);
-		parentID = getParentId();
-		resourcePool = m_resourcePool;
-	}
+    QnId parentID;
+    QnResourcePool* resourcePool = NULL;
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        parentID = getParentId();
+        resourcePool = m_resourcePool;
+    }
 
-	if (resourcePool)
+    if (resourcePool)
         return resourcePool->getResourceById(parentID);
     else
         return QnResourcePtr();
