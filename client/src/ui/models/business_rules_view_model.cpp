@@ -423,7 +423,16 @@ QnBusinessParams QnBusinessRuleViewModel::eventParams() const {
 
 void QnBusinessRuleViewModel::setEventParams(const QnBusinessParams &params)
 {
-    //TODO: check equal
+    bool hasChanges = false;
+    foreach(const QString &key, params.keys()) {
+        if (m_eventParams[key] == params[key])
+            continue;
+        m_eventParams[key] = params[key];
+        hasChanges = true;
+    }
+
+    if (!hasChanges)
+        return;
 
     m_eventParams = params;
     m_modified = true;
@@ -494,7 +503,16 @@ QnBusinessParams QnBusinessRuleViewModel::actionParams() const
 
 void QnBusinessRuleViewModel::setActionParams(const QnBusinessParams &params)
 {
-    //TODO: check equal
+    bool hasChanges = false;
+    foreach(const QString &key, params.keys()) {
+        if (m_actionParams.contains(key) && m_actionParams[key] == params[key])
+            continue;
+        m_actionParams[key] = params[key];
+        hasChanges = true;
+    }
+
+    if (!hasChanges)
+        return;
 
     m_actionParams = params;
     m_modified = true;

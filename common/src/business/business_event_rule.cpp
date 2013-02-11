@@ -76,6 +76,7 @@ BusinessActionType::Value QnBusinessEventRule::actionType() const {
 
 void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
     m_actionType = value;
+    //TODO: #gdm fill action params with default values? filter action resources?
 }
 
 QnResourceList QnBusinessEventRule::actionResources() const {
