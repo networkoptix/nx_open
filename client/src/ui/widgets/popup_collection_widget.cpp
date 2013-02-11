@@ -1,15 +1,17 @@
 #include "popup_collection_widget.h"
 #include "ui_popup_collection_widget.h"
 
-#include <utils/common/event_processors.h>
-
 #include <business/actions/popup_business_action.h>
+
+#include <core/resource/resource.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/settings.h>
+#include <utils/common/event_processors.h>
 
 QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
     base_type(parent),
@@ -37,15 +39,25 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
 
     //TODO: #GDM check if camera is visible to us
     int group = BusinessActionParameters::getUserGroup(businessAction->getParams());
-    if (group > 0 && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
+    if (group > 0 && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
+        qDebug() << "popup for admins received, we are not admin";
         return false;
+    }
     // now 1 is Admins Only
 
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
-    if (!(qnSettings->shownPopups() & (1 << eventType)))
+    if (!(qnSettings->shownPopups() & (1 << eventType))) {
+        qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return false;
+    }
+
+    int id = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
+    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
+    QString resource = res ? res->getName() : QString();
+
+    qDebug() << "popup received" << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
 
     if (QWidget* w = m_widgetsByType[eventType]) {
         QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w); // TODO: #gdm Why don't store QnPopupWidget * in a map? This way we won't need dynamic_casts.
