@@ -1467,7 +1467,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 #ifndef STANDALONE_MODE
     static const char *appserverAddedPropertyName = "_qn_appserverAdded";
     if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnAppServerResourceSearcher::instance());
         QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
     }
 #endif
@@ -1487,9 +1486,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
-    QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
     QnResourceDiscoveryManager::instance()->start();
-    QnResourceDiscoveryManager::instance()->setReady(true);
+    
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());

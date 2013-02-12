@@ -5,6 +5,7 @@
 
 #include <utils/common/qnid.h>
 
+#include <core/resource/resource_type.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_history.h>
 
@@ -53,6 +54,11 @@ struct QnMessage
     QnCameraHistoryItemPtr cameraServerItem;
     QnBusinessEventRulePtr businessRule;
     QnAbstractBusinessActionPtr businessAction;
+
+    QnResourceTypeList resourceTypes;
+    QnResourceList resources;
+    QnLicenseList licenses;
+    QnCameraHistoryList cameraServerItems;
 
     bool load(const pb::Message& message);
 
