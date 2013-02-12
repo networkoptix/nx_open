@@ -9,19 +9,19 @@ NEW FEATURES:
  - Events and Actions:
    - Events: 
      - Motion (camera(s) should be specified). Camera(s) should have Recording enabled
-	 - Camera Disconnected (camera(s) can be specified). If not, any camera will trigger the event
-	 - Storage Failure (if Media Server unable to write file on a storage)
-	 - Network Issue: RTP timeout or RTP packet loss
-	 - Camera IP Conflict (if several cameras or servers have the same IP address)
+     - Camera Disconnected (camera(s) can be specified). If not, any camera will trigger the event
+     - Storage Failure (if Media Server unable to write file on a storage)
+     - Network Issue: RTP timeout or RTP packet loss
+     - Camera IP Conflict (if several cameras or servers have the same IP address)
      - Input Signal on Camera (if supported - ONVIF and Axis only)
-	 - Media Server Failure - if a media server goes down or reboots for some reason
-	 - Media Servers Conflict - if another Media Server that connected to another EC is pulling video from the same camera
+     - Media Server Failure - if a media server goes down or reboots for some reason
+     - Media Servers Conflict - if another Media Server that connected to another EC is pulling video from the same camera
    - Actions: 
      - Camera Recording (camera(s) should be specified). Camera(s) should have Recording enabled
      - Panic Recording
-	 - Send Mail. recipient(s) should be specified. Mail Server settings should be configured in Global Settings
-	 - Show Notification. User roles can be specified. Notification parameters should be configured in Global Settings
-     - Camera Output(if supported - ONVIF and Axis only)	 
+     - Send Mail. recipient(s) should be specified. Mail Server settings should be configured in Global Settings
+     - Show Notification. User roles can be specified. Notification parameters should be configured in Global Settings
+     - Camera Output(if supported - ONVIF and Axis only)     
    - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has common and advanced parameters.
  - Hardware acceleration of video decoding (Intel Quick Sync only). The flag in System Settings will be available only if Intel HD graphics is enabled
  - PTZ is greatly improved:
@@ -268,7 +268,7 @@ Improvements:
  - If rewind back up to the end of archive circles were moving instead of NO DATA. Fixed.
  - If run Media Server after client then client was trying to connect via Media Proxy. Fixed.
  - Fixed incorrect tab behavior in login dialog. 
- - If hold Right mouse Bbutton on Timeline	current selection cleared. Now not.
+ - If hold Right mouse Bbutton on Timeline    current selection cleared. Now not.
  - Incorrect total # of licenses displayed in recording schedule form right after a license registration. Fixed.
  - Screen recording were saved as *.av. Now *.avi.
  - If switch off a server and try to seek on the recorded position camera could hang for a long time instead of NO DATA. Fixed.
