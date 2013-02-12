@@ -2067,7 +2067,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
 
-    QSettings settings;
+    QSettings settings; // TODO: #Elric replace with QnSettings
     settings.beginGroup(QLatin1String("screenshots"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -2294,7 +2294,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     else
         return false; // not used
 
-    QSettings settings;
+    QSettings settings; // TODO: replace with QnSettings
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
@@ -2717,7 +2717,7 @@ Do you want to continue?"),
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
     QSettings settings;
-    settings.beginGroup(QLatin1String("export"));
+    settings.beginGroup(QLatin1String("export")); // TODO: replace with QnSettings
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
         previousDir = qnSettings->mediaFolder();
