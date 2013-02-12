@@ -83,6 +83,7 @@ private:
     PacketCotainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
     qint64 m_prevPacketSrcTimestamp;
+    //!In micros
     quint64 m_currentPacketTimestamp;
 };
 

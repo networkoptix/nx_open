@@ -4,6 +4,11 @@
 
 #include "streaming_chunk_cache_key.h"
 
+#include <QHash>
+#include <QStringList>
+
+#include "streaming_params.h"
+
 
 StreamingChunkCacheKey::StreamingChunkCacheKey()
 {
@@ -24,82 +29,168 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     quint64 startTimestamp,
     quint64 duration,
     const std::multimap<QString, QString>& auxiliaryParams )
+:
+    m_uniqueResourceID( uniqueResourceID ),
+    m_channel( channel ),
+    m_containerFormat( containerFormat ),
+    m_startTimestamp(startTimestamp  ),
+    m_duration( duration )
+    //,m_auxiliaryParams( auxiliaryParams )
 {
+    std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find( StreamingParams::VIDEO_CODEC_PARAM_NAME );
+    if( it != auxiliaryParams.end() )
+        m_videoCodec = it->second;
+
+    it = auxiliaryParams.find( StreamingParams::AUDIO_CODEC_PARAM_NAME );
+    if( it != auxiliaryParams.end() )
+        m_audioCodec = it->second;
+
+    it = auxiliaryParams.find( StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME );
+    if( it != auxiliaryParams.end() )
+    {
+        //1920x1080
+        const QStringList& sizesStr = it->second.split(QChar('x'));
+        m_pictureSizePixels = QSize(
+            sizesStr.size() > 0 ? sizesStr[0].toInt() : 0,
+            sizesStr.size() > 1 ? sizesStr[1].toInt() : 0 );
+    }
 }
 
 //!data source (camera id, stream id)
-QString StreamingChunkCacheKey::srcResourceUniqueID() const
+const QString& StreamingChunkCacheKey::srcResourceUniqueID() const
 {
-    //TODO/IMPL
-    return QString();
+    return m_uniqueResourceID;
 }
 
 unsigned int StreamingChunkCacheKey::channel() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_channel;
 }
 
 quint64 StreamingChunkCacheKey::startTimestamp() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_startTimestamp;
 }
 
 //!Duration in millis
 quint64 StreamingChunkCacheKey::duration() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_duration;
 }
 
 //!startTimestamp() + duration
 quint64 StreamingChunkCacheKey::endTimestamp() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_startTimestamp + m_duration;
 }
 
 //!Video resolution
-QSize StreamingChunkCacheKey::pictureSizePixels() const
+const QSize& StreamingChunkCacheKey::pictureSizePixels() const
 {
-    //TODO/IMPL
-    return QSize();
+    return m_pictureSizePixels;
 }
 
 //media format (codec format, container format)
-QString StreamingChunkCacheKey::containerFormat() const
+const QString& StreamingChunkCacheKey::containerFormat() const
 {
-    //TODO/IMPL
-    return QString();
+    return m_containerFormat;
 }
 
-QString StreamingChunkCacheKey::videoCodec() const
+const QString& StreamingChunkCacheKey::videoCodec() const
 {
-    //TODO/IMPL
-    return QString();
+    return m_videoCodec;
 }
 
-QString StreamingChunkCacheKey::audioCodec() const
+const QString& StreamingChunkCacheKey::audioCodec() const
 {
-    //TODO/IMPL
-    return QString();
+    return m_audioCodec;
 }
 
 bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) const
 {
-    //TODO/IMPL
-    return false;
+    if( m_uniqueResourceID < right.m_uniqueResourceID )
+        return true;
+    else if( m_uniqueResourceID > right.m_uniqueResourceID )
+        return false;
+
+    if( m_channel < right.m_channel )
+        return true;
+    else if( m_channel > right.m_channel )
+        return false;
+
+    if( m_containerFormat < right.m_containerFormat )
+        return true;
+    else if( m_containerFormat > right.m_containerFormat )
+        return false;
+
+    if( m_startTimestamp < right.m_startTimestamp )
+        return true;
+    else if( m_startTimestamp > right.m_startTimestamp )
+        return false;
+
+    if( m_duration < right.m_duration )
+        return true;
+    else if( m_duration > right.m_duration )
+        return false;
+
+    if( m_pictureSizePixels.width() < right.m_pictureSizePixels.width() )
+        return true;
+    else if( m_pictureSizePixels.width() > right.m_pictureSizePixels.width() )
+        return false;
+
+    if( m_pictureSizePixels.height() < right.m_pictureSizePixels.height() )
+        return true;
+    else if( m_pictureSizePixels.height() > right.m_pictureSizePixels.height() )
+        return false;
+
+    if( m_videoCodec < right.m_videoCodec )
+        return true;
+    else if( m_videoCodec > right.m_videoCodec )
+        return false;
+
+    if( m_audioCodec < right.m_audioCodec )
+        return true;
+    else if( m_audioCodec > right.m_audioCodec )
+        return false;
+
+    //if( m_auxiliaryParams < right.m_auxiliaryParams )
+    //    return true;
+    //else if( m_auxiliaryParams > right.m_auxiliaryParams )
+    //    return false;
+
+    return false;   //equal
+}
+
+bool StreamingChunkCacheKey::operator>( const StreamingChunkCacheKey& right ) const
+{
+    return right < *this;
 }
 
 bool StreamingChunkCacheKey::operator==( const StreamingChunkCacheKey& right ) const
 {
-    //TODO/IMPL
-    return false;
+    return (m_uniqueResourceID == right.m_uniqueResourceID)
+        && (m_channel == right.m_channel)
+        && (m_containerFormat == right.m_containerFormat)
+        && (m_startTimestamp == right.m_startTimestamp)
+        && (m_duration == right.m_duration);
+        //&& (m_auxiliaryParams == right.m_auxiliaryParams);
+}
+
+bool StreamingChunkCacheKey::operator!=( const StreamingChunkCacheKey& right ) const
+{
+    return !(*this == right);
 }
 
 uint qHash( const StreamingChunkCacheKey& key )
 {
-    //TODO/IMPL
-    return 0;
+    return qHash(key.srcResourceUniqueID())
+        + key.channel()
+        + key.startTimestamp()
+        + key.duration()
+        + key.endTimestamp()
+        + key.pictureSizePixels().width()
+        + key.pictureSizePixels().height()
+        + qHash(key.containerFormat())
+        + qHash(key.videoCodec())
+        + qHash(key.audioCodec());
 }

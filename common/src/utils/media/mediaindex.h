@@ -38,12 +38,17 @@ public:
 
     MediaIndex();
 
+    /*!
+        \param currentPacketTimestamp In micros
+        \param packetDateTime
+    */
     void addPoint(
-        quint64 currentPacketTimestamp,
+        quint64 currentPacketTimestampUSec,
         const QDateTime& packetDateTime,
         bool isKeyFrame );
     /*!
         Resulting chunk duration almost always differs from \a targetDurationMSec
+        \param desiredStartTime Timestamp in micros
         \param targetDurationMSec Desired chunk duration (in millis)
         \return Number of chunks generated
         \note Does not clear \a chunkList, but appends data to it
@@ -70,9 +75,13 @@ private:
 
     //!Returns timestamp of closest key frame to the left of \a desiredStartTime, aligned with \a targetDurationMSec to enable chunk caching
     /*!
-        E.g., if \a targetDurationMSec is 10 sec, than value of 20 (or closest to the left key frame timestamp) sec will be returned for \a desiredStartTime of 20-29
+        E.g., if \a targetDurationMSec is 10 sec, than value of 20 (or closest from the left key frame timestamp) sec will be returned for \a desiredStartTime of 20-29
+        \param desiredStartTime micros
+        \param generateChunkListNonSafe millis
     */
-    quint64 getClosestChunkStartTimestamp( quint64 desiredStartTime ) const;
+    quint64 getClosestChunkStartTimestamp(
+        quint64 desiredStartTime,
+        unsigned int targetDurationMSec ) const;
     unsigned int generateChunkListNonSafe(
         quint64 desiredStartTime,
         unsigned int targetDurationMSec,

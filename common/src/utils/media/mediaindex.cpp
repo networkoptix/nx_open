@@ -58,7 +58,7 @@ unsigned int MediaIndex::generateChunkList(
         return 0;
 
     return generateChunkListNonSafe(
-        getClosestChunkStartTimestamp( desiredStartTime ),
+        getClosestChunkStartTimestamp( desiredStartTime, targetDurationMSec ),
         targetDurationMSec,
         chunksToGenerate,
         chunkList,
@@ -76,17 +76,25 @@ unsigned int MediaIndex::generateChunkListForLivePlayback(
         return 0;
 
     return generateChunkListNonSafe(
-        getClosestChunkStartTimestamp( *(--m_timestampIndex.end()) - chunksToGenerate*targetDurationMSec*MICROS_IN_MS ),
+        getClosestChunkStartTimestamp( *(--m_timestampIndex.end()) - chunksToGenerate*targetDurationMSec*MICROS_IN_MS, targetDurationMSec ),
         targetDurationMSec,
         chunksToGenerate,
         chunkList,
         false );
 }
 
-quint64 MediaIndex::getClosestChunkStartTimestamp( quint64 desiredStartTime ) const
+quint64 MediaIndex::getClosestChunkStartTimestamp( quint64 desiredStartTime, unsigned int targetDurationMSec ) const
 {
-    //TODO/IMPL
-    return 0;
+    if( m_timestampIndex.empty() )
+        return 0;
+    if( m_timestampIndex.size() == 1 )
+        return *m_timestampIndex.begin();
+
+    const quint64 alignedTimstamp = desiredStartTime / 1000 / targetDurationMSec;
+    TimestampIndexType::const_iterator it = m_timestampIndex.upper_bound( alignedTimstamp );
+    if( it != m_timestampIndex.begin() )
+        --it;
+    return *it;
 }
 
 unsigned int MediaIndex::generateChunkListNonSafe(
