@@ -65,6 +65,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
     if (existResource)
         soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
+    else if (!info.defaultLogin.isEmpty())
+        soapWrapper.setLoginPassword(info.defaultLogin.toStdString(), info.defaultPassword.toStdString());
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
     //qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();

@@ -14,6 +14,9 @@ struct EndpointAdditionalInfo
     QString uniqId;
     QString discoveryIp;
 
+    QString defaultLogin;
+    QString defaultPassword;
+
     EndpointAdditionalInfo() {}
 
     EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, 
