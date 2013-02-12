@@ -68,7 +68,8 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(user->getName() == m_userName) {
+    /* Logins are case-insensitive. */
+    if(user->getName().toLower() == m_userName.toLower()) {
         setCurrentUser(user);
     } else if(user == m_user) {
         setCurrentUser(QnUserResourcePtr());
