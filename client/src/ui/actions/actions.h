@@ -234,6 +234,11 @@ namespace Qn {
         AboutAction,
 
         /**
+         * Checks for updates.
+         */
+        CheckForUpdatesAction,
+
+        /**
          * Closes the client.
          */
         ExitAction,

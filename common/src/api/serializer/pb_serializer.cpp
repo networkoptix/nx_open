@@ -25,13 +25,6 @@
 #define fromStdString use_fromUtf8_or_fromLatin1
 #define toStdString use_toUtf8_or_toLatin1
 
-
-void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
-void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
-void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
-void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
-
 namespace {
 
 typedef google::protobuf::RepeatedPtrField<pb::Resource>            PbResourceList;
@@ -41,6 +34,19 @@ typedef google::protobuf::RepeatedPtrField<pb::CameraServerItem>    PbCameraServ
 typedef google::protobuf::RepeatedPtrField<pb::BusinessRule>        PbBusinessRuleList;
 typedef google::protobuf::RepeatedPtrField<pb::KvPair>              PbKvPairList;
 typedef google::protobuf::RepeatedPtrField<pb::Setting>             PbSettingList;
+}
+
+void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
+void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
+void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
+void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
+void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
+void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
+void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
+void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
+
+namespace {
 
 QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {
@@ -329,125 +335,6 @@ void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
     }
 }
 
-void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory)
-{
-    for (PbResourceList::const_iterator ci = pb_resources.begin(); ci != pb_resources.end(); ++ci)
-    {
-        const pb::Resource& pb_resource = *ci;
-
-        QnResourcePtr resource;
-        parseResource(resource, pb_resource, resourceFactory);
-        if (resource)
-            resources.append(resource);
-        else
-            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
-    }
-}
-
-void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes)
-{
-    for (PbResourceTypeList::const_iterator ci = pb_resourceTypes.begin (); ci != pb_resourceTypes.end (); ++ci)
-    {
-        const pb::ResourceType& pb_resourceType = *ci;
-
-        QnResourceTypePtr resourceType(new QnResourceType());
-
-        resourceType->setId(pb_resourceType.id());
-        resourceType->setName(QString::fromUtf8(pb_resourceType.name().c_str()));
-        if (pb_resourceType.has_manufacture())
-            resourceType->setManufacture(QString::fromUtf8(pb_resourceType.manufacture().c_str()));
-
-        if (pb_resourceType.parentid_size() > 0)
-        {
-            for (int i = 0; i < pb_resourceType.parentid_size(); i++)
-            {
-                qint32 id = pb_resourceType.parentid(i);
-                if (i == 0)
-                    resourceType->setParentId(id);
-                else
-                    resourceType->addAdditionalParent(id);
-            }
-        }
-
-        if (pb_resourceType.propertytype_size() > 0)
-        {
-            for (int i = 0; i < pb_resourceType.propertytype_size(); i++)
-            {
-                const pb::PropertyType& pb_propertyType = pb_resourceType.propertytype(i);
-
-                QnParamTypePtr param(new QnParamType());
-                param->name = QString::fromUtf8(pb_propertyType.name().c_str());
-                param->type = (QnParamType::DataType)pb_propertyType.type();
-
-                param->id = pb_propertyType.id();
-
-                if (pb_propertyType.has_min())
-                    param->min_val = pb_propertyType.min();
-
-                if (pb_propertyType.has_max())
-                    param->max_val = pb_propertyType.max();
-
-                if (pb_propertyType.has_step())
-                    param->step = pb_propertyType.step();
-
-                if (pb_propertyType.has_values())
-                {
-                    QString values = QString::fromUtf8(pb_propertyType.values().c_str());
-                    foreach(QString val, values.split(QLatin1Char(',')))
-                        param->possible_values.push_back(val.trimmed());
-                }
-
-                if (pb_propertyType.has_ui_values())
-                {
-                    QString ui_values = QString::fromUtf8(pb_propertyType.ui_values().c_str());
-                    foreach(QString val, ui_values.split(QLatin1Char(',')))
-                        param->ui_possible_values.push_back(val.trimmed());
-                }
-
-                if (pb_propertyType.has_default_value())
-                    param->default_value = QString::fromUtf8(pb_propertyType.default_value().c_str());
-
-                if (pb_propertyType.has_nethelper())
-                    param->paramNetHelper = QString::fromUtf8(pb_propertyType.nethelper().c_str());
-
-                if (pb_propertyType.has_group())
-                    param->group = QString::fromUtf8(pb_propertyType.group().c_str());
-
-                if (pb_propertyType.has_sub_group())
-                    param->subgroup = QString::fromUtf8(pb_propertyType.sub_group().c_str());
-
-                if (pb_propertyType.has_description())
-                    param->description = QString::fromUtf8(pb_propertyType.description().c_str());
-
-                if (pb_propertyType.has_ui())
-                    param->ui = pb_propertyType.ui();
-
-                if (pb_propertyType.has_readonly())
-                    param->isReadOnly = pb_propertyType.readonly();
-
-                resourceType->addParamType(param);
-            }
-        }
-
-        resourceTypes.append(resourceType);
-    }
-}
-
-void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
-{
-    for (PbLicenseList::const_iterator ci = pb_licenses.begin(); ci != pb_licenses.end(); ++ci)
-    {
-        const pb::License& pb_license = *ci;
-
-        QnLicensePtr license;
-        // Parse license and validate its signature
-        parseLicense(license, pb_license);
-        // Verify that license is valid and for our hardwareid
-        if (license)
-            licenses.append(license);
-    }
-}
-
 void parseKvPairs(QnKvPairList& kvPairs, const PbKvPairList& pb_kvPairs)
 {
     for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
@@ -472,49 +359,6 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
     }
 }
 
-
-void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
-{
-    typedef QMap<qint64, QString> TimestampGuid;
-    typedef QMap<QString, TimestampGuid> HistoryType;
-
-    // CameraMAC -> (Timestamp -> ServerGuid)
-    HistoryType history;
-
-    // Fill temporary history map
-    for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
-    {
-        const pb::CameraServerItem& pb_item = *ci;
-        history[QString::fromUtf8(pb_item.physicalid().c_str())][pb_item.timestamp()] = QString::fromUtf8(pb_item.serverguid().c_str());
-    }
-
-    for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
-    {
-        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
-
-        if (ci.value().isEmpty())
-            continue;
-
-        QMapIterator<qint64, QString> camit(ci.value());
-        camit.toFront();
-
-        qint64 duration;
-        cameraHistory->setPhysicalId(ci.key());
-        while (camit.hasNext())
-        {
-            camit.next();
-
-            if (camit.hasNext())
-                duration = camit.peekNext().key() - camit.key();
-            else
-                duration = -1;
-
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
-        }
-
-        cameraServerItems.append(cameraHistory);
-    }
-}
 
 void parseBusinessRules(QnBusinessEventRules& businessRules, const PbBusinessRuleList& pb_businessRules) {
     for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
@@ -833,7 +677,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
         throw QnSerializeException(errorString);
     }
 
-    parserCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
+    parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
 
 void QnApiPbSerializer::deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data)
@@ -1241,3 +1085,166 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
     businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
     businessAction->setAggregationCount(pb_businessAction.aggregationcount());
 }
+
+void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
+{
+    for (PbLicenseList::const_iterator ci = pb_licenses.begin(); ci != pb_licenses.end(); ++ci)
+    {
+        const pb::License& pb_license = *ci;
+
+        QnLicensePtr license;
+        // Parse license and validate its signature
+        parseLicense(license, pb_license);
+        // Verify that license is valid and for our hardwareid
+        if (license)
+            licenses.append(license);
+    }
+}
+
+void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory)
+{
+    for (PbResourceList::const_iterator ci = pb_resources.begin(); ci != pb_resources.end(); ++ci)
+    {
+        const pb::Resource& pb_resource = *ci;
+
+        QnResourcePtr resource;
+        parseResource(resource, pb_resource, resourceFactory);
+        if (resource)
+            resources.append(resource);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
+    }
+}
+
+void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes)
+{
+    for (PbResourceTypeList::const_iterator ci = pb_resourceTypes.begin (); ci != pb_resourceTypes.end (); ++ci)
+    {
+        const pb::ResourceType& pb_resourceType = *ci;
+
+        QnResourceTypePtr resourceType(new QnResourceType());
+
+        resourceType->setId(pb_resourceType.id());
+        resourceType->setName(QString::fromUtf8(pb_resourceType.name().c_str()));
+        if (pb_resourceType.has_manufacture())
+            resourceType->setManufacture(QString::fromUtf8(pb_resourceType.manufacture().c_str()));
+
+        if (pb_resourceType.parentid_size() > 0)
+        {
+            for (int i = 0; i < pb_resourceType.parentid_size(); i++)
+            {
+                qint32 id = pb_resourceType.parentid(i);
+                if (i == 0)
+                    resourceType->setParentId(id);
+                else
+                    resourceType->addAdditionalParent(id);
+            }
+        }
+
+        if (pb_resourceType.propertytype_size() > 0)
+        {
+            for (int i = 0; i < pb_resourceType.propertytype_size(); i++)
+            {
+                const pb::PropertyType& pb_propertyType = pb_resourceType.propertytype(i);
+
+                QnParamTypePtr param(new QnParamType());
+                param->name = QString::fromUtf8(pb_propertyType.name().c_str());
+                param->type = (QnParamType::DataType)pb_propertyType.type();
+
+                param->id = pb_propertyType.id();
+
+                if (pb_propertyType.has_min())
+                    param->min_val = pb_propertyType.min();
+
+                if (pb_propertyType.has_max())
+                    param->max_val = pb_propertyType.max();
+
+                if (pb_propertyType.has_step())
+                    param->step = pb_propertyType.step();
+
+                if (pb_propertyType.has_values())
+                {
+                    QString values = QString::fromUtf8(pb_propertyType.values().c_str());
+                    foreach(QString val, values.split(QLatin1Char(',')))
+                        param->possible_values.push_back(val.trimmed());
+                }
+
+                if (pb_propertyType.has_ui_values())
+                {
+                    QString ui_values = QString::fromUtf8(pb_propertyType.ui_values().c_str());
+                    foreach(QString val, ui_values.split(QLatin1Char(',')))
+                        param->ui_possible_values.push_back(val.trimmed());
+                }
+
+                if (pb_propertyType.has_default_value())
+                    param->default_value = QString::fromUtf8(pb_propertyType.default_value().c_str());
+
+                if (pb_propertyType.has_nethelper())
+                    param->paramNetHelper = QString::fromUtf8(pb_propertyType.nethelper().c_str());
+
+                if (pb_propertyType.has_group())
+                    param->group = QString::fromUtf8(pb_propertyType.group().c_str());
+
+                if (pb_propertyType.has_sub_group())
+                    param->subgroup = QString::fromUtf8(pb_propertyType.sub_group().c_str());
+
+                if (pb_propertyType.has_description())
+                    param->description = QString::fromUtf8(pb_propertyType.description().c_str());
+
+                if (pb_propertyType.has_ui())
+                    param->ui = pb_propertyType.ui();
+
+                if (pb_propertyType.has_readonly())
+                    param->isReadOnly = pb_propertyType.readonly();
+
+                resourceType->addParamType(param);
+            }
+        }
+
+        resourceTypes.append(resourceType);
+    }
+}
+
+void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
+{
+    typedef QMap<qint64, QString> TimestampGuid;
+    typedef QMap<QString, TimestampGuid> HistoryType;
+
+    // CameraMAC -> (Timestamp -> ServerGuid)
+    HistoryType history;
+
+    // Fill temporary history map
+    for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
+    {
+        const pb::CameraServerItem& pb_item = *ci;
+        history[QString::fromUtf8(pb_item.physicalid().c_str())][pb_item.timestamp()] = QString::fromUtf8(pb_item.serverguid().c_str());
+    }
+
+    for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
+    {
+        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
+
+        if (ci.value().isEmpty())
+            continue;
+
+        QMapIterator<qint64, QString> camit(ci.value());
+        camit.toFront();
+
+        qint64 duration;
+        cameraHistory->setPhysicalId(ci.key());
+        while (camit.hasNext())
+        {
+            camit.next();
+
+            if (camit.hasNext())
+                duration = camit.peekNext().key() - camit.key();
+            else
+                duration = -1;
+
+            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+        }
+
+        cameraServerItems.append(cameraHistory);
+    }
+}
+

@@ -381,7 +381,7 @@ namespace {
         }
         return result;
     }
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QnGlFunctions::Features, qn_estimatedFeatures, { *x = estimateFeatures(); });
+    Q_GLOBAL_STATIC_WITH_ARGS(QnGlFunctions::Features, qn_estimatedFeatures, (estimateFeatures()));
 }
 #endif
 

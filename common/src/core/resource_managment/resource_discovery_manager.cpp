@@ -153,22 +153,6 @@ void QnResourceDiscoveryManager::run()
     while (!needToStop() && !m_ready)
         QnSleep::msleep(1);
 
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    while (!needToStop() && !initResourceTypes(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-
-    while (!needToStop() && !initLicenses(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-
-    while (!needToStop() && !initCameraHistory(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-
     m_runNumber = 0;
 
     while (!needToStop())

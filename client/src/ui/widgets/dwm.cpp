@@ -139,9 +139,7 @@ bool QnDwmPrivate::isSupported() {
     return result;
 }
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_dwm_isSupported, {
-    *x = QnDwmPrivate::isSupported();
-});
+Q_GLOBAL_STATIC_WITH_ARGS(bool, qn_dwm_isSupported, (QnDwmPrivate::isSupported()));
 
 void QnDwmPrivate::init(QWidget *widget) {
     this->widget = widget;

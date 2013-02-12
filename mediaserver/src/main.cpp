@@ -680,12 +680,12 @@ void QnMain::at_timer()
     qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
 }
 
-void QnMain::at_cameraIPConflict(QHostAddress host)
+void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 {
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
         host,
-        qnResPool->getAllNetResourceByHostAddress(host),
+        macAddrList,
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
@@ -801,14 +801,11 @@ void QnMain::run()
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress)), this, SLOT(at_cameraIPConflict(QHostAddress)));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
-        if (QnSessionManager::checkIfAppServerIsOld())
-            return;
-
         if (appServerConnection->connect(connectInfo) == 0)
             break;
 
