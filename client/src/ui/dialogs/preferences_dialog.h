@@ -14,7 +14,7 @@ class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
 class QnRecordingSettingsWidget;
 class QnYouTubeSettingsWidget;
-class QnSmtpSettingsWidget; //TODO: temporary, until we have wider server settings widget
+class QnServerSettingsWidget;
 class QnPopupSettingsWidget;
 
 
@@ -61,9 +61,9 @@ private:
     QScopedPointer<Ui::PreferencesDialog> ui;
     QnRecordingSettingsWidget *m_recordingSettingsWidget;
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
-    QnLicenseManagerWidget *m_licenseManagerWidget;
-    QnSmtpSettingsWidget *m_smtpSettingsWidget;
     QnPopupSettingsWidget *m_popupSettingsWidget;
+    QnLicenseManagerWidget *m_licenseManagerWidget;
+    QnServerSettingsWidget *m_serverSettingsWidget;
 
     QnSettings *m_settings;
 

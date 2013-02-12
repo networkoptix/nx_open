@@ -24,8 +24,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
-#include <ui/widgets/settings/smtp_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
+#include <ui/widgets/settings/server_settings_widget.h>
 
 #include <youtube/youtubesettingswidget.h>
 
@@ -37,7 +37,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
     m_licenseManagerWidget(NULL),
-    m_smtpSettingsWidget(NULL),
+    m_serverSettingsWidget(NULL),
     m_popupSettingsWidget(NULL),
     m_settings(qnSettings),
     m_licenseTabIndex(0),
@@ -67,6 +67,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
+    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
+    m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
+
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
     tabWidget->addTab(youTubeSettingsWidget, tr("YouTube"));
@@ -77,11 +80,8 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
-    m_smtpSettingsWidget = new QnSmtpSettingsWidget(this);
-    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_smtpSettingsWidget, tr("Mail Server"));
-
-    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
-    m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
+    m_serverSettingsWidget = new QnServerSettingsWidget(this);
+    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Mail Server"));
 
     resize(1, 1); // set widget size to minimal possible
 
@@ -185,8 +185,8 @@ void QnPreferencesDialog::submitToSettings() {
 
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
-    if (m_smtpSettingsWidget)
-        m_smtpSettingsWidget->submit();
+    if (m_serverSettingsWidget)
+        m_serverSettingsWidget->submit();
     if (m_popupSettingsWidget)
         m_popupSettingsWidget->submitToSettings(m_settings);
 
@@ -299,7 +299,7 @@ void QnPreferencesDialog::at_context_userChanged() {
     ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
     ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
-        m_smtpSettingsWidget->update();
+        m_serverSettingsWidget->update();
     }
 }
 
