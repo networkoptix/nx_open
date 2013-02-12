@@ -1210,6 +1210,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 {
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
+                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
+                        arg((*it)->picture()->m_pts).arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts/1000).toString(QLatin1String("hh:mm:ss.zzz"))), cl_logDEBUG2 );
                     emptyPictureBuf = (*it)->picture();
                     delete (*it);
                     m_framesWaitingUploadInGUIThread.erase( it );
@@ -1743,12 +1745,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             glBindTexture( GL_TEXTURE_2D, texture->id() );
             DEBUG_CODE(glCheckError("glBindTexture"));
 
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
+            const quint64 lineSizes_i = lineSizes[i];
+            const quint64 r_w_i = r_w[i];
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
             DEBUG_CODE(glCheckError("glPixelStorei"));
-            Q_ASSERT( ((quint64)lineSizes[i]) >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+            Q_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
-                            qPower2Ceil(r_w[i],ROUND_COEFF),
+                            qPower2Ceil(r_w_i,ROUND_COEFF),
 #ifdef PARTIAL_FRAME_UPLOAD
                             1,
 #else
