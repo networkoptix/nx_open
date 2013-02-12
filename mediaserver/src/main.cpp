@@ -79,6 +79,7 @@
 #include "plugins/resources/mserver_resource_searcher.h"
 #include "rest/handlers/log_handler.h"
 #include "rest/handlers/favico_handler.h"
+#include "business/events/reasoned_business_event.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
