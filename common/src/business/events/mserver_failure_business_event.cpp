@@ -4,23 +4,30 @@
 QnMServerFailureBusinessEvent::QnMServerFailureBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
-        const QString& reason):
+        int reasonCode):
     base_type(BusinessEventType::BE_MediaServer_Failure,
                             resource,
-                            timeStamp),
-                            m_reason(reason)
+                            timeStamp,
+                            reasonCode)
 {
 }
 
 QString QnMServerFailureBusinessEvent::toString() const
 {
-    QString text = QnAbstractBusinessEvent::toString();
-    text += QObject::tr(". Reason: %1").arg(m_reason);
-    return text;
-}
+    QString reasonText;
+    switch (m_reasonCode) {
+        case MSERVER_TERMINATED:
+            reasonText = QObject::tr("Media server was terminated unexpectedly");
+            break;
+        case MSERVER_STARTED:
+            reasonText = QObject::tr("Media server is started after an unexpected shutdown");
+            break;
+        default:
+            break;
+    }
 
-QnBusinessParams QnMServerFailureBusinessEvent::getRuntimeParams() const {
-    QnBusinessParams params = base_type::getRuntimeParams();
-    QnBusinessEventRuntime::setEventReason(&params, m_reason);
-    return params;
+
+    QString text = QnAbstractBusinessEvent::toString();
+    text += QObject::tr(". Reason: %1").arg(reasonText);
+    return text;
 }

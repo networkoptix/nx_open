@@ -69,8 +69,6 @@ void DecodedPictureToOpenGLUploadThread::run()
         if( !toRun )
             break;
 
-        NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread::run. m_taskQueue.size()=%1").arg(m_taskQueue.size()), cl_logDEBUG1 );
-
         std::auto_ptr<UploadFrameRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
         toRun->run();
     }

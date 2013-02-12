@@ -70,9 +70,6 @@ namespace QnBusinessEventRuntime {
     int getEventResourceId(const QnBusinessParams &params);
     void setEventResourceId(QnBusinessParams* params, int value);
 
-    QString getEventReason(const QnBusinessParams &params);
-    void setEventReason(QnBusinessParams* params, QString value);
-
     QString getEventDescription(const QnBusinessParams &params);
     void setEventDescription(QnBusinessParams* params, QString value);
 

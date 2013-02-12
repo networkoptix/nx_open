@@ -141,7 +141,6 @@ namespace QnBusinessEventRuntime {
     static QLatin1String timestampStr("eventTimestamp");
     static QLatin1String resourceIdStr("eventResourceId");
     static QLatin1String descriptionStr("eventDescription");
-    static QLatin1String reasonStr("eventReason");
 
     BusinessEventType::Value getEventType(const QnBusinessParams &params) {
         return (BusinessEventType::Value) params.value(typeStr, BusinessEventType::BE_NotDefined).toInt();
@@ -165,14 +164,6 @@ namespace QnBusinessEventRuntime {
 
     void setEventResourceId(QnBusinessParams* params, int value) {
         (*params)[resourceIdStr] = value;
-    }
-
-    QString getEventReason(const QnBusinessParams &params) {
-        return params.value(reasonStr, QString()).toString();
-    }
-
-    void setEventReason(QnBusinessParams* params, QString value) {
-        (*params)[reasonStr] = value;
     }
 
     QString getEventDescription(const QnBusinessParams &params) {

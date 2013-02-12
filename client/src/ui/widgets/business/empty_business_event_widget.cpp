@@ -10,6 +10,5 @@ QnEmptyBusinessEventWidget::QnEmptyBusinessEventWidget(QWidget *parent) :
 
 QnEmptyBusinessEventWidget::~QnEmptyBusinessEventWidget()
 {
-    delete ui;
 }
 

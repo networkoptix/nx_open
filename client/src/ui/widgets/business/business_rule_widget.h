@@ -26,7 +26,7 @@ class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
     typedef QWidget base_type;
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
-    ~QnBusinessRuleWidget();
+    virtual ~QnBusinessRuleWidget();
 
     QnBusinessRuleViewModel* model() const;
     void setModel(QnBusinessRuleViewModel* model);
@@ -44,8 +44,6 @@ protected:
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
-    void updateModelAggregationPeriod();
-
 private slots:
     void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
@@ -58,8 +56,9 @@ private slots:
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
 
+    void updateModelAggregationPeriod();
 private:
-    Ui::QnBusinessRuleWidget *ui;
+    QScopedPointer<Ui::QnBusinessRuleWidget> ui;
 
     QnBusinessRuleViewModel* m_model;
 
@@ -72,7 +71,6 @@ private:
     QnResourceList m_dropResources;
 
     bool m_updating;
-    bool m_aggregationPeriodChanged;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

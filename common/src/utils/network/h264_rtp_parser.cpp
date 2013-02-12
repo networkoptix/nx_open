@@ -244,9 +244,9 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     if (isPacketLost) {
         if (m_timeHelper)
-            qWarning() << "RTP Packet lost detected for camera " << m_timeHelper->getResID() << ".old seq=" << m_prevSequenceNum << "new seq=" << sequenceNum;
+            qWarning() << "RTP Packet loss detected for camera " << m_timeHelper->getResID() << ".old seq=" << m_prevSequenceNum << "new seq=" << sequenceNum;
         else
-            qWarning() << "RTP Packet lost detected!!!!";
+            qWarning() << "RTP Packet loss detected!!!!";
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     }
@@ -300,15 +300,15 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 	            //m_videoBuffer.write( (const char*) &nalUnitType, 1);
 	        }
 	        else {
-	            // if packet lost occured in the middle of FU packet, reset flag.
-	            // packet lost will be reported on the last FU packet. So, do not report problem twice
+                // if packet loss occured in the middle of FU packet, reset flag.
+                // packet loss will be reported on the last FU packet. So, do not report problem twice
 	            isPacketLost = false;
 	        }
 
 	        if (*curPtr  & 0x40) // FU_A last packet
 	        {
 	            if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
-	                return clearInternalBuffer(); // packet lost detected
+                    return clearInternalBuffer(); // packet loss detected
 	        }
 
 	        curPtr++;

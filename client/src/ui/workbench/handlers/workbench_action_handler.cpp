@@ -26,6 +26,8 @@
 
 #include <api/session_manager.h>
 
+#include <business/actions/popup_business_action.h>
+
 #include <device_plugins/server_camera/appserver.h>
 
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -878,6 +880,25 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+    int total = qnResPool->getAllEnabledCameras().size();
+    if (total == 0)
+        return;
+
+    int n = qrand() % total;
+    int id = qnResPool->getAllEnabledCameras().at(n)->getId();
+
+    n = qrand() % 3;
+
+    QnBusinessParams params;
+    QnBusinessEventRuntime::setEventType(&params, n == 0 ? BusinessEventType::BE_Camera_Disconnect
+                                                         : n == 1 ? BusinessEventType::BE_Camera_Input
+                                                                  : BusinessEventType::BE_Camera_Motion
+                                         );
+    QnBusinessEventRuntime::setEventResourceId(&params, id);
+
+    QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
+    at_eventManager_actionReceived(ba);
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {

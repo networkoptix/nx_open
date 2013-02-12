@@ -9,11 +9,15 @@
 #include <ui/help/help_topic_accessor.h>
 
 QnTreeView::QnTreeView(QWidget *parent): 
-    QTreeView(parent)
+    base_type(parent)
 {}
 
 QnTreeView::~QnTreeView() {
     return;
+}
+
+int QnTreeView::rowHeight(const QModelIndex &index) const {
+    return base_type::rowHeight(index);
 }
 
 void QnTreeView::keyPressEvent(QKeyEvent *event) {

@@ -996,7 +996,9 @@ void QnMain::run()
 
     qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
     if (lastRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer, lastRunningTime*1000, tr("Media server is started after an unexpected shutdown"));
+        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
+                                                   lastRunningTime*1000,
+                                                   MSERVER_STARTED);
 
     m_timer = new QTimer(this);
     at_timer();

@@ -11,6 +11,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include <business/business_event_connector.h>
+#include <business/events/reasoned_business_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "serverutil.h"
@@ -49,7 +50,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     connect(this, SIGNAL(recordingFailed(QString)), this, SLOT(at_recordingFailed(QString)));
 
     connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnAbstractDataPacketPtr)));
-    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnResourcePtr, const QString&)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, const QnResourcePtr&, const QString&)));
+    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, int, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, int, const QnResourcePtr&)));
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -62,7 +63,7 @@ void QnServerStreamRecorder::at_recordingFailed(QString msg)
     Q_UNUSED(msg)
 	Q_ASSERT(m_mediaServer);
     if (m_mediaServer)
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), m_storage, QLatin1String("IO error occured."));
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), STORAGE_IO_ERROR ,m_storage);
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -95,7 +96,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), m_storage, "Not enough HDD/SSD speed for recording");
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), STORAGE_NOT_ENOUGH_SPEED, m_storage);
 
 		qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
         markNeedKeyData();

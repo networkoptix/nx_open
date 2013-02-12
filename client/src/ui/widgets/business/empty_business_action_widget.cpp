@@ -10,5 +10,4 @@ QnEmptyBusinessActionWidget::QnEmptyBusinessActionWidget(QWidget *parent) :
 
 QnEmptyBusinessActionWidget::~QnEmptyBusinessActionWidget()
 {
-    delete ui;
 }

@@ -32,7 +32,7 @@ public:
     int getLastResponseCode() const;
     void pleaseStop();
 signals:
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, const QString& msg);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, int reasonCode, const QString& reasonText);
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);

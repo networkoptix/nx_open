@@ -42,7 +42,6 @@ void QnClientMessageProcessor::init(const QUrl& url, int timeout)
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
-    connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }
 
 QnClientMessageProcessor::QnClientMessageProcessor()
