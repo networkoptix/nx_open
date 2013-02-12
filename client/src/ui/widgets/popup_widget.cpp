@@ -49,13 +49,21 @@ namespace {
 QnPopupWidget::QnPopupWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnPopupWidget),
-    m_eventType(BusinessEventType::BE_NotDefined)
+    m_eventType(BusinessEventType::BE_NotDefined),
+    m_showAllItem(NULL),
+    m_showAll(false)
 {
     ui->setupUi(this);
     connect(ui->okButton, SIGNAL(clicked()), this, SLOT(at_okButton_clicked()));
 
     m_model = new QStandardItemModel(this);
     ui->eventsTreeView->setModel(m_model);
+
+    connect(ui->eventsTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(at_eventsTreeView_clicked(QModelIndex)));
+
+    QPalette pal = ui->eventsTreeView->palette();
+    pal.setColor(QPalette::Base, pal.color(QPalette::Window));
+    ui->eventsTreeView->setPalette(pal);
 }
 
 QnPopupWidget::~QnPopupWidget()
@@ -66,12 +74,64 @@ void QnPopupWidget::at_okButton_clicked() {
     emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
 }
 
+void QnPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
+    if (m_showAll)
+        return;
+
+    QStandardItem* item = m_model->itemFromIndex(index);
+    if (m_showAllItem && item == m_showAllItem) {
+        m_showAll = true;
+
+        QStandardItem* root = m_model->invisibleRootItem();
+        QModelIndex index = m_model->indexFromItem(root);
+        int showAllRow = -1;
+        for (int i = 0; i < root->rowCount(); i++) {
+            if (root->child(i) == m_showAllItem) {
+                showAllRow = i;
+                continue;
+            }
+            ui->eventsTreeView->setRowHidden(i, index, false);
+        }
+        if (showAllRow >= 0)
+            root->removeRow(showAllRow);
+    }
+}
+
 bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (m_eventType == BusinessEventType::BE_NotDefined) //not initialized
         initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
-    bool result = updateTreeModel(businessAction);
+    if (!updateTreeModel(businessAction))
+        return false;
+
     ui->eventsTreeView->expandAll();
-    return result;
+    QStandardItem* root = m_model->invisibleRootItem();
+    if (!m_showAll && !m_showAllItem && root->rowCount() > 2) {
+        //add '...'
+
+        m_showAllItem = new QStandardItem();
+        m_showAllItem->setForeground(QBrush(Qt::yellow));
+
+        QFont font = m_showAllItem->font();
+        font.setUnderline(true);
+        m_showAllItem->setFont(font);
+        root->appendRow(m_showAllItem);
+    }
+
+    if (!m_showAll && m_showAllItem) {
+        //hide additional rows
+
+        QModelIndex index = m_model->indexFromItem(root);
+        int hidden = 0;
+        for (int i = 2; i < root->rowCount(); i++) {
+            if (root->child(i) == m_showAllItem)
+                continue;
+            ui->eventsTreeView->setRowHidden(i, index, true);
+            hidden++;
+        }
+        m_showAllItem->setText(tr("%1 others...").arg(hidden));
+    }
+
+    return true;
 }
 
 void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {

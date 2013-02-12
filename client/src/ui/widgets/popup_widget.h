@@ -31,6 +31,7 @@ signals:
 
 private slots:
     void at_okButton_clicked();
+    void at_eventsTreeView_clicked(const QModelIndex &index);
 
 private:
     /**
@@ -90,6 +91,9 @@ private:
     BusinessEventType::Value m_eventType;
 
     QStandardItemModel* m_model;
+
+    QStandardItem* m_showAllItem;
+    bool m_showAll;
 };
 
 #endif // POPUP_WIDGET_H
