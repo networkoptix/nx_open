@@ -58,6 +58,7 @@ struct QnMessage
     QnResourceTypeList resourceTypes;
     QnResourceList resources;
     QnLicenseList licenses;
+    QnCameraHistoryList cameraServerItems;
 
     bool load(const pb::Message& message);
 

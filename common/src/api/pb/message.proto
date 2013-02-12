@@ -83,4 +83,5 @@ message InitialMessage {
     repeated ResourceType resourceType = 1;
     repeated Resource resource = 2;
     repeated License license = 3;
+    repeated CameraServerItem cameraServerItem = 4;
 }

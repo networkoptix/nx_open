@@ -40,7 +40,7 @@ void QnClientMessageProcessor::init(const QUrl& url, int timeout)
     m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
-    connect(m_source.data(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()));
+    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }
@@ -62,39 +62,14 @@ void QnClientMessageProcessor::stop()
         m_source->stop();
 }
 
-void QnClientMessageProcessor::at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
+void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 {
-    Q_UNUSED(handle)
-    if (status != 0)
-    {
-        qDebug() << "QnEventManager::resourcesReceived(): Can't get resource from appserver. Reason: " << errorString;
-        return;
-    }
-
     foreach (const QnResourcePtr& resource, resources)
-    {
-        QnResourcePtr ownResource;
-    
-        QString guid = resource->getGuid();
-        if (!guid.isEmpty())
-            ownResource = qnResPool->getResourceByGuid(guid);
-        else
-            ownResource = qnResPool->getResourceById(resource->getId());
-
-        if (ownResource.isNull())
-            qnResPool->addResource(resource);
-        else
-            ownResource->update(resource);
-    }
+        replaceResource(resource);
 }
 
-void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
+void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
 {
-    Q_UNUSED(handle)
-    Q_UNUSED(errorString)
-    Q_UNUSED(status)
-
-    // licenses are already verified
     qnLicensePool->replaceLicenses(licenses);
 }
 
@@ -190,19 +165,21 @@ void QnClientMessageProcessor::at_connectionClosed(QString errorString)
     emit connectionClosed();
 }
 
+void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
+{
+    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        QnCameraHistoryPool::instance()->addCameraHistory(history);
+}
+
 void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
 {
-    foreach (QnResourcePtr resource, message.resources) {
-    }
+    processResources(message.resources);
+    processLicenses(message.licenses);
+    processCameraServerItems(message.cameraServerItems);
 
+    QnResourceDiscoveryManager::instance()->setReady(true);
     qDebug() << "Connection opened";
 
     qnSyncTime->reset();
     emit connectionOpened();
-}
-
-void QnClientMessageProcessor::at_connectionReset()
-{
-    QnAppServerConnectionFactory::createConnection()->
-            getResourcesAsync(QLatin1String(""), QLatin1String("resource"), this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
 }

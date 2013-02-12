@@ -44,6 +44,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
+void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
 
 namespace {
 
@@ -358,49 +359,6 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
     }
 }
 
-
-void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
-{
-    typedef QMap<qint64, QString> TimestampGuid;
-    typedef QMap<QString, TimestampGuid> HistoryType;
-
-    // CameraMAC -> (Timestamp -> ServerGuid)
-    HistoryType history;
-
-    // Fill temporary history map
-    for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
-    {
-        const pb::CameraServerItem& pb_item = *ci;
-        history[QString::fromUtf8(pb_item.physicalid().c_str())][pb_item.timestamp()] = QString::fromUtf8(pb_item.serverguid().c_str());
-    }
-
-    for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
-    {
-        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
-
-        if (ci.value().isEmpty())
-            continue;
-
-        QMapIterator<qint64, QString> camit(ci.value());
-        camit.toFront();
-
-        qint64 duration;
-        cameraHistory->setPhysicalId(ci.key());
-        while (camit.hasNext())
-        {
-            camit.next();
-
-            if (camit.hasNext())
-                duration = camit.peekNext().key() - camit.key();
-            else
-                duration = -1;
-
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
-        }
-
-        cameraServerItems.append(cameraHistory);
-    }
-}
 
 void parseBusinessRules(QnBusinessEventRules& businessRules, const PbBusinessRuleList& pb_businessRules) {
     for (PbBusinessRuleList::const_iterator ci = pb_businessRules.begin(); ci != pb_businessRules.end(); ++ci)
@@ -719,7 +677,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
         throw QnSerializeException(errorString);
     }
 
-    parserCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
+    parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
 
 void QnApiPbSerializer::deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data)
@@ -1246,3 +1204,47 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
         resourceTypes.append(resourceType);
     }
 }
+
+void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
+{
+    typedef QMap<qint64, QString> TimestampGuid;
+    typedef QMap<QString, TimestampGuid> HistoryType;
+
+    // CameraMAC -> (Timestamp -> ServerGuid)
+    HistoryType history;
+
+    // Fill temporary history map
+    for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
+    {
+        const pb::CameraServerItem& pb_item = *ci;
+        history[QString::fromUtf8(pb_item.physicalid().c_str())][pb_item.timestamp()] = QString::fromUtf8(pb_item.serverguid().c_str());
+    }
+
+    for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
+    {
+        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
+
+        if (ci.value().isEmpty())
+            continue;
+
+        QMapIterator<qint64, QString> camit(ci.value());
+        camit.toFront();
+
+        qint64 duration;
+        cameraHistory->setPhysicalId(ci.key());
+        while (camit.hasNext())
+        {
+            camit.next();
+
+            if (camit.hasNext())
+                duration = camit.peekNext().key() - camit.key();
+            else
+                duration = -1;
+
+            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+        }
+
+        cameraServerItems.append(cameraHistory);
+    }
+}
+

@@ -22,6 +22,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
+void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
 
 namespace Qn
 {
@@ -110,8 +111,11 @@ bool QnMessage::load(const pb::Message &message)
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
+            qnResTypePool->replaceResourceTypeList(resourceTypes);
+
             parseResources(resources, initialMessage.resource(), *QnAppServerConnectionFactory::defaultFactory());
             parseLicenses(licenses, initialMessage.license());
+            parseCameraServerItems(cameraServerItems, initialMessage.cameraserveritem());
             break;
         }
         case pb::Message_Type_Ping:
