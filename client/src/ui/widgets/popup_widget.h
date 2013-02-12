@@ -17,7 +17,7 @@ class QnPopupWidget : public QWidget
     
 public:
     explicit QnPopupWidget(QWidget *parent = 0);
-    ~QnPopupWidget();
+    virtual ~QnPopupWidget();
     
     void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
@@ -28,22 +28,49 @@ private slots:
     void at_okButton_clicked();
 
 private:
-    void initAction(const QnAbstractBusinessActionPtr& businessAction);
-    void updateDetails(const QnAbstractBusinessActionPtr& businessAction);
-    void showSingle();
-    void showMultiple();
+    /**
+     * @brief initWidget            Setup stored parameters and display header.
+     * @param eventType             Type of the event that will be displayed in this widget instance.
+     */
+    void initWidget(BusinessEventType::Value eventType);
 
-    void updateCameraDetails(const QnAbstractBusinessActionPtr& businessAction);
-    void updateConflictECDetails(const QnAbstractBusinessActionPtr& businessAction);
+    /**
+     * @brief getEventTime          Get human-readable string containing time when event occured.
+     * @param eventParams           Params of the last event.
+     * @return                      String formatted as hh:mm:ss
+     */
+    QString getEventTime(const QnBusinessParams& eventParams);
+
+    /**
+     * @brief updateTreeModel       Build tree model depending of event type.
+     * @param businessAction        Last received action.
+     */
+    void updateTreeModel(const QnAbstractBusinessActionPtr& businessAction);
+
+    /**
+     * @brief updateSimpleTree      Used to build and update tree containing only event resources.
+     * @param businessAction        Last received action.
+     */
+    void updateSimpleTree(const QnAbstractBusinessActionPtr& businessAction);
+
+    /**
+     * @brief updateReasonTree      Used to build and update tree containing event resources
+     *                              and event reason (for failure events).
+     * @param businessAction        Last received action.
+     */
+    void updateReasonTree(const QnAbstractBusinessActionPtr& businessAction);
+
+    /**
+     * @brief updateConflictTree    Used to build and update tree containing event resources
+     *                              and list of conflicting entities.
+     * @param businessAction        Last received action.
+     */
+    void updateConflictTree(const QnAbstractBusinessActionPtr& businessAction);
 
 private:
-    Ui::QnPopupWidget *ui;
+    QScopedPointer<Ui::QnPopupWidget> ui;
 
     BusinessEventType::Value m_eventType;
-    int m_eventCount;
-    QString m_eventTime;
-    QList<QWidget*> m_headerLabels;
-    QMap<QString, int> m_resourcesCount;
 
     QStandardItemModel* m_model;
 };

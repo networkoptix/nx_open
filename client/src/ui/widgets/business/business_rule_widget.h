@@ -26,7 +26,7 @@ class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
     typedef QWidget base_type;
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
-    ~QnBusinessRuleWidget();
+    virtual ~QnBusinessRuleWidget();
 
     QnBusinessRuleViewModel* model() const;
     void setModel(QnBusinessRuleViewModel* model);
@@ -59,7 +59,7 @@ private slots:
     void at_actionResourcesHolder_clicked();
 
 private:
-    Ui::QnBusinessRuleWidget *ui;
+    QScopedPointer<Ui::QnBusinessRuleWidget> ui;
 
     QnBusinessRuleViewModel* m_model;
 

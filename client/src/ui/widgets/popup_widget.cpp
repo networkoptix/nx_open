@@ -1,58 +1,64 @@
 #include "popup_widget.h"
 #include "ui_popup_widget.h"
 
-#include <utils/common/synctime.h>
-#include <utils/settings.h>
-
-#include <business/events/mserver_conflict_business_event.h>
+#include <business/events/conflict_business_event.h>
 
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/style/resource_icon_cache.h>
+
+#include <utils/common/synctime.h>
+#include <utils/settings.h>
+
+namespace {
+
+    enum ItemDataRole {
+        ResourceIdRole = Qt::UserRole + 1,
+        EventCountRole,
+        EventTimeRole,
+        EventReasonRole,
+        ConflictsRole
+
+    };
+
+}
+
 QnPopupWidget::QnPopupWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnPopupWidget),
-    m_eventType(BusinessEventType::BE_NotDefined),
-    m_eventCount(0)
+    m_eventType(BusinessEventType::BE_NotDefined)
 {
     ui->setupUi(this);
     connect(ui->okButton, SIGNAL(clicked()), this, SLOT(at_okButton_clicked()));
 
-    m_headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
     m_model = new QStandardItemModel(this);
     ui->eventsTreeView->setModel(m_model);
 }
 
 QnPopupWidget::~QnPopupWidget()
 {
-    delete ui;
 }
 
 void QnPopupWidget::at_okButton_clicked() {
-    bool ignore = ui->checkBox->isChecked();
-    emit closed(m_eventType, ignore);
+    emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
 }
 
 void QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    if (m_eventCount == 0) //not initialized
-        initAction(businessAction);
-
-    int count = qMin(businessAction->getAggregationCount(), 1);
-    m_eventCount += count;
-
-    updateDetails(businessAction);
-
-    if (m_eventCount == 1)
-        showSingle();
-    else
-        showMultiple();
+    if (m_eventType == BusinessEventType::BE_NotDefined) //not initialized
+        initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
+    updateTreeModel(businessAction);
+    ui->eventsTreeView->expandAll();
 }
 
-void QnPopupWidget::initAction(const QnAbstractBusinessActionPtr &businessAction) {
-    foreach (QWidget* w, m_headerLabels)
+void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {
+    QList<QWidget*> headerLabels;
+    headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
+
+    foreach (QWidget* w, headerLabels)
         w->setVisible(false);
 
-    m_eventType = QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams());
+    m_eventType = eventType;
     switch (m_eventType) {
         case BusinessEventType::BE_NotDefined:
             return;
@@ -76,112 +82,173 @@ void QnPopupWidget::initAction(const QnAbstractBusinessActionPtr &businessAction
             ui->notificationLabel->setVisible(true);
             break;
     }
-    qint64 eventTimestamp = QnBusinessEventRuntime::getEventTimestamp(businessAction->getRuntimeParams());
-    if (eventTimestamp == 0)
-        eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
-
-    m_eventTime = QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
+    ui->eventLabel->setText(BusinessEventType::toString(eventType));
 }
 
-void QnPopupWidget::updateDetails(const QnAbstractBusinessActionPtr &businessAction) {
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams());
-
-    switch (eventType) {
+void QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
+    switch (m_eventType) {
         case BusinessEventType::BE_Camera_Disconnect:
         case BusinessEventType::BE_Camera_Input:
         case BusinessEventType::BE_Camera_Motion:
-            updateCameraDetails(businessAction);
+            updateSimpleTree(businessAction);
+            break;
+        case BusinessEventType::BE_Storage_Failure:
+        case BusinessEventType::BE_Network_Issue:
+        case BusinessEventType::BE_MediaServer_Failure:
+            updateReasonTree(businessAction);
+            break;
+        case BusinessEventType::BE_Camera_Ip_Conflict:
+        case BusinessEventType::BE_MediaServer_Conflict:
+            updateConflictTree(businessAction);
             break;
         default:
-            ui->detailsLabel->setVisible(false);
             break;
     }
 }
 
-void QnPopupWidget::updateCameraDetails(const QnAbstractBusinessActionPtr &businessAction) {
+QString QnPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
+    qint64 eventTimestamp = QnBusinessEventRuntime::getEventTimestamp(eventParams);
+    if (eventTimestamp == 0)
+        eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
 
-    m_model->clear(); //TODO: do not clear when not nessessary
-    QStandardItem *parentItem = m_model->invisibleRootItem();
-     for (int i = 0; i < 4; ++i) {
-         QStandardItem *item = new QStandardItem(QString("item %0").arg(i));
-         parentItem->appendRow(item);
-         parentItem = item;
-     }
+    return QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
+}
 
-    //TODO: #GDM tr()
-    static const QLatin1String resourceDetailsSummary("<html><head/><body><p>at %1</span></p></body></html>");
-    static const QLatin1String resourceRepeat("%1 (%2 times)");
-    static const QLatin1String cameraImg("<img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>");
+void QnPopupWidget::updateSimpleTree(const QnAbstractBusinessActionPtr &businessAction) {
+    int resourceId = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
 
-    int id = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
-    if (!res)
-        return;
+    QStandardItem *root = m_model->invisibleRootItem();
+    QStandardItem *item = NULL;
 
-    QString resource = res->getName();
-    if (qnSettings->isIpShownInTree())
-        resource = QString(QLatin1String("%1 (%2)"))
-                .arg(resource)
-                .arg(res->getUrl());
+    for (int i = 0; i < root->rowCount(); i++) {
+        QStandardItem* child = root->child(i);
+        if (child->data(ResourceIdRole).toInt() != resourceId)
+            continue;
 
-    int count = qMin(businessAction->getAggregationCount(), 1);
+        item = child;
+        break;
+    }
+    if (item == NULL) {
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+        if (!resource)
+            return;
 
-    if (!m_resourcesCount.contains(resource))
-        m_resourcesCount[resource] = count;
-    else
-        m_resourcesCount[resource] += count;
-
-    QString text = resourceDetailsSummary;
-    if (m_eventCount == m_resourcesCount[resource]) { //single event occured some times
-        text = text.arg(cameraImg + resource);
-    } else {
-        QString cameras;
-        foreach (QString key, m_resourcesCount.keys()) {
-            if (cameras.length() > 0)
-                cameras += QLatin1String("<br>");
-            cameras += cameraImg;
-            int n = m_resourcesCount[key];
-            if (n > 1)
-                cameras += QString(resourceRepeat).arg(key).arg(n);
-            else
-                cameras += key;
-        }
-        text = text.arg(cameras);
+        item = new QStandardItem();
+        item->setText(resource->getName());
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setData(resourceId, ResourceIdRole);
+        item->setData(0, EventCountRole);
+        item->setData(getEventTime(businessAction->getRuntimeParams()), EventTimeRole);
+        root->appendRow(item);
     }
 
-    ui->detailsLabel->setText(text);
+    item->removeRows(0, item->rowCount());
 
+    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
+    item->setData(count, EventCountRole);
+    QString timeStamp = item->data(EventTimeRole).toString();
+    if (count == 1)
+        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
+    else
+        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
 }
 
-void QnPopupWidget::updateConflictECDetails(const QnAbstractBusinessActionPtr &businessAction) {
+void QnPopupWidget::updateReasonTree(const QnAbstractBusinessActionPtr &businessAction) {
+    int resourceId = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
+    QString eventReason = QnBusinessEventRuntime::getEventReason(businessAction->getRuntimeParams());
 
-    //TODO: #GDM tr()
-    static const QLatin1String resourceDetailsSummary("<html><head/><body><p>EC %1 <br>conflicting with <br>%2</span></p></body></html>");
+    QStandardItem *root = m_model->invisibleRootItem();
+    QStandardItem *item = NULL;
 
-    QString current = QnBusinessEventRuntime::getCurrentEC(businessAction->getRuntimeParams());
-    QString conflicting = QnBusinessEventRuntime::getConflictECs(businessAction->getRuntimeParams()).join(QLatin1String("<br>"));
+    for (int i = 0; i < root->rowCount(); i++) {
+        QStandardItem* child = root->child(i);
+        if (child->data(ResourceIdRole).toInt() != resourceId)
+            continue;
+        if (child->data(EventReasonRole).toString() != eventReason)
+            continue;
 
-    ui->detailsLabel->setText(QString(resourceDetailsSummary).arg(current).arg(conflicting));
+        item = child;
+        break;
+    }
+    if (item == NULL) {
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+        if (!resource)
+            return;
 
+        item = new QStandardItem();
+        item->setText(resource->getName());
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setData(resourceId, ResourceIdRole);
+        item->setData(0, EventCountRole);
+        item->setData(getEventTime(businessAction->getRuntimeParams()), EventTimeRole);
+        item->setData(eventReason, EventReasonRole);
+        root->appendRow(item);
+    }
+
+    item->removeRows(0, item->rowCount());
+
+    item->appendRow(new QStandardItem(eventReason));
+
+    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
+    item->setData(count, EventCountRole);
+    QString timeStamp = item->data(EventTimeRole).toString();
+    if (count == 1)
+        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
+    else
+        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
 }
 
-void QnPopupWidget::showSingle() {
+void QnPopupWidget::updateConflictTree(const QnAbstractBusinessActionPtr &businessAction) {
+    int resourceId = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
 
-    //TODO: #GDM tr()
-    static const QLatin1String singleEvent("<html><head/><body><p>%1 at <span style=\" text-decoration: underline;\">%3</span></p></body></html>");
+    QStandardItem *root = m_model->invisibleRootItem();
+    QStandardItem *item = NULL;
 
-    QString eventString = BusinessEventType::toString(m_eventType);
-    QString description = QString(singleEvent).arg(eventString).arg(m_eventTime);
-    ui->eventLabel->setText(description);
-}
+    for (int i = 0; i < root->rowCount(); i++) {
+        QStandardItem* child = root->child(i);
+        if (child->data(ResourceIdRole).toInt() != resourceId)
+            continue;
 
-void QnPopupWidget::showMultiple() {
-    //TODO: #GDM tr()
-    static const QLatin1String multipleEvents("<html><head/><body><p>%1 <span style=\" font-weight:600;\">%2 times </span>"\
-                                        "since <span style=\" text-decoration: underline;\">%3</span></p></body></html>");
+        item = child;
+        break;
+    }
+    if (item == NULL) {
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+        if (!resource)
+            return;
 
+        item = new QStandardItem();
+        item->setText(resource->getName());
+        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+        item->setData(resourceId, ResourceIdRole);
+        item->setData(0, EventCountRole);
+        item->setData(getEventTime(businessAction->getRuntimeParams()), EventTimeRole);
+        item->setData(QVariant::fromValue(QStringList()), ConflictsRole);
+        root->appendRow(item);
+    }
 
-    QString eventString = BusinessEventType::toString(m_eventType);
-    QString description = QString(multipleEvents).arg(eventString).arg(m_eventCount).arg(m_eventTime);
-    ui->eventLabel->setText(description);
+    QString source = QnBusinessEventRuntime::getSource(businessAction->getRuntimeParams());
+    QStringList newConflicts = QnBusinessEventRuntime::getConflicts(businessAction->getRuntimeParams());
+
+    QStringList conflicts = item->data(ConflictsRole).value<QStringList>();
+    foreach(QString entity, newConflicts) {
+        if (conflicts.contains(entity, Qt::CaseInsensitive))
+            continue;
+        conflicts << entity;
+    }
+
+    item->removeRows(0, item->rowCount());
+
+    item->appendRow(new QStandardItem(source));
+    item->appendRow(new QStandardItem(tr("conflicted with")));
+    foreach(QString entity, conflicts)
+        item->appendRow(new QStandardItem(entity));
+
+    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
+    item->setData(count, EventCountRole);
+    QString timeStamp = item->data(EventTimeRole).toString();
+    if (count == 1)
+        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
+    else
+        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
 }

@@ -18,7 +18,7 @@ public:
     explicit QnEmptyBusinessActionWidget(QWidget *parent = 0);
     ~QnEmptyBusinessActionWidget();
 private:
-    Ui::QnEmptyBusinessActionWidget *ui;
+    QScopedPointer<Ui::QnEmptyBusinessActionWidget> ui;
 };
 
 #endif // EMPTY_BUSINESS_ACTION_WIDGET_H

@@ -30,7 +30,6 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
 {
-    delete ui; // TODO: #GDM use QScopedPonyter
 }
 
 bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {

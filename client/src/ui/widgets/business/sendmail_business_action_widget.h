@@ -27,7 +27,7 @@ private slots:
     void paramsChanged();
 
 private:
-    Ui::QnSendmailBusinessActionWidget *ui;
+    QScopedPointer<Ui::QnSendmailBusinessActionWidget> ui;
 };
 
 #endif // SENDMAIL_BUSINESS_ACTION_WIDGET_H

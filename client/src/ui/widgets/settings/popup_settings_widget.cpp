@@ -22,7 +22,6 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
 {
-    delete ui; // TODO: #GDM use QScopedPointer
 }
 
 void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {

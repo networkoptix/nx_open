@@ -32,7 +32,7 @@ private slots:
     void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
 
 private:
-    Ui::QnPopupCollectionWidget *ui;
+    QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
     QMap<BusinessEventType::Value, QWidget *> m_widgetsByType;
 };

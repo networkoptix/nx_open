@@ -1,0 +1,31 @@
+#ifndef CONFLICT_BUSINESS_EVENT_H
+#define CONFLICT_BUSINESS_EVENT_H
+
+#include "instant_business_event.h"
+#include "core/resource/resource_fwd.h"
+
+namespace QnBusinessEventRuntime {
+    QString getSource(const QnBusinessParams &params);
+    void setSource(QnBusinessParams* params, QString value);
+
+    QStringList getConflicts(const QnBusinessParams &params);
+    void setConflicts(QnBusinessParams* params, QStringList value);
+}
+
+class QnConflictBusinessEvent : public QnInstantBusinessEvent
+{
+    typedef QnInstantBusinessEvent base_type;
+public:
+    explicit QnConflictBusinessEvent(const BusinessEventType::Value eventType,
+                                     const QnResourcePtr& resource,
+                                     const qint64 timeStamp,
+                                     const QString& source = QString(),
+                                     const QStringList& conflicts = QStringList());
+    
+    virtual QnBusinessParams getRuntimeParams() const override;
+protected:
+    QString m_source;
+    QStringList m_conflicts;
+};
+
+#endif // CONFLICT_BUSINESS_EVENT_H
