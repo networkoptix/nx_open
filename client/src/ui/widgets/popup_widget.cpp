@@ -44,11 +44,12 @@ void QnPopupWidget::at_okButton_clicked() {
     emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
 }
 
-void QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (m_eventType == BusinessEventType::BE_NotDefined) //not initialized
         initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
-    updateTreeModel(businessAction);
+    bool result = updateTreeModel(businessAction);
     ui->eventsTreeView->expandAll();
+    return result;
 }
 
 void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {
@@ -85,8 +86,8 @@ void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {
     ui->eventLabel->setText(BusinessEventType::toString(eventType));
 }
 
-void QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
-    QStandardItem* item = NULL;
+bool QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
+    QStandardItem* item;
     switch (m_eventType) {
         case BusinessEventType::BE_Camera_Disconnect:
         case BusinessEventType::BE_Camera_Input:
@@ -103,18 +104,20 @@ void QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessA
             item = updateConflictTree(businessAction->getRuntimeParams());
             break;
         default:
-            break;
+            return false;
     }
 
-    if (item) {
-        int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
-        item->setData(count, EventCountRole);
-        QString timeStamp = item->data(EventTimeRole).toString();
-        if (count == 1)
-            item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
-        else
-            item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
-    }
+    if (!item)
+        return false;
+
+    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
+    item->setData(count, EventCountRole);
+    QString timeStamp = item->data(EventTimeRole).toString();
+    if (count == 1)
+        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
+    else
+        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
+    return true;
 }
 
 QString QnPopupWidget::getEventTime(const QnBusinessParams &eventParams) {

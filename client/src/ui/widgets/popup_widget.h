@@ -19,7 +19,12 @@ public:
     explicit QnPopupWidget(QWidget *parent = 0);
     virtual ~QnPopupWidget();
     
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    /**
+     * @brief addBusinessAction     Update widget with new action received.
+     * @param businessAction        Received action.
+     * @return                      True if addition was successful, false otherwise.
+     */
+    bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
 signals:
     void closed(BusinessEventType::Value eventType, bool ignore);
@@ -41,31 +46,41 @@ private:
      */
     QString getEventTime(const QnBusinessParams& eventParams);
 
+    /**
+     * @brief findOrCreateItem      Find or create item in the model containing data related
+     *                              to received event.
+     * @param eventParams           Params of the last event.
+     * @return                      Item or NULL if event resource does not exist.
+     */
     QStandardItem* findOrCreateItem(const QnBusinessParams& eventParams);
 
     /**
      * @brief updateTreeModel       Build tree model depending of event type.
      * @param businessAction        Last received action.
+     * @return                      True if update was successful, false otherwise.
      */
-    void updateTreeModel(const QnAbstractBusinessActionPtr& businessAction);
+    bool updateTreeModel(const QnAbstractBusinessActionPtr& businessAction);
 
     /**
      * @brief updateSimpleTree      Used to build and update tree containing only event resources.
-     * @param businessAction        Last received action.
+     * @param eventParams           Params of the last event.
+     * @return                      Updated item or NULL if event resource does not exist.
      */
     QStandardItem* updateSimpleTree(const QnBusinessParams& eventParams);
 
     /**
      * @brief updateReasonTree      Used to build and update tree containing event resources
      *                              and event reason (for failure events).
-     * @param businessAction        Last received action.
+     * @param eventParams           Params of the last event.
+     * @return                      Updated item or NULL if event resource does not exist.
      */
     QStandardItem* updateReasonTree(const QnBusinessParams& eventParams);
 
     /**
      * @brief updateConflictTree    Used to build and update tree containing event resources
      *                              and list of conflicting entities.
-     * @param businessAction        Last received action.
+     * @param eventParams           Params of the last event.
+     * @return                      Updated item or NULL if event resource does not exist.
      */
     QStandardItem* updateConflictTree(const QnBusinessParams& eventParams);
 
