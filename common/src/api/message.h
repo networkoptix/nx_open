@@ -55,7 +55,6 @@ struct QnMessage
     QnBusinessEventRulePtr businessRule;
     QnAbstractBusinessActionPtr businessAction;
 
-    QByteArray hardwareId;
     QnResourceTypeList resourceTypes;
     QnResourceList resources;
     QnLicenseList licenses;
