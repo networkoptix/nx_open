@@ -173,7 +173,11 @@ void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
 void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
 {
     processResources(message.resources);
-    processLicenses(message.licenses);
+
+    QnLicenseList licenses = message.licenses;
+    licenses.setHardwareId(message.hardwareId);
+    processLicenses(licenses);
+
     processCameraServerItems(message.cameraServerItems);
 
     QnResourceDiscoveryManager::instance()->setReady(true);
