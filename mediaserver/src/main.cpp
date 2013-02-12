@@ -806,9 +806,6 @@ void QnMain::run()
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
-        if (QnSessionManager::checkIfAppServerIsOld())
-            return;
-
         if (appServerConnection->connect(connectInfo) == 0)
             break;
 
