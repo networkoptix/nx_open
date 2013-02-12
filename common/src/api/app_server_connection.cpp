@@ -1044,32 +1044,12 @@ bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
     return result;
 }
 
-bool QnAppServerConnection::dumpDatabase(QByteArray& data)
-{
-    m_lastError.clear();
-
-    QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendGetRequest(m_url, dumpdbObject, m_requestHeaders, m_requestParams, response);
-
-    if (result)
-        m_lastError = response.errorString;
-    else
-        data = response.data;
-
-    return result;
+int QnAppServerConnection::dumpDatabase(QObject *target, const char *slot) {
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, dumpdbObject, m_requestHeaders, m_requestParams, target, slot);
 }
 
-bool QnAppServerConnection::restoreDatabase(const QByteArray& data)
-{
-    m_lastError.clear();
-
-    QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendPostRequest(m_url, restoredbObject, m_requestHeaders, m_requestParams, data, response);
-
-    if (result)
-        m_lastError = response.errorString;
-
-    return result;
+int QnAppServerConnection::restoreDatabase(const QByteArray& data, QObject *target, const char *slot) {
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, restoredbObject, m_requestHeaders, m_requestParams, data, target, slot);
 }
 
 bool QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction)

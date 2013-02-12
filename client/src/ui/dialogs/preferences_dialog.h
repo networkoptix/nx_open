@@ -17,6 +17,7 @@ class QnYouTubeSettingsWidget;
 class QnSmtpSettingsWidget; //TODO: temporary, until we have wider server settings widget
 class QnPopupSettingsWidget;
 
+
 namespace Ui {
     class PreferencesDialog;
 }
@@ -66,10 +67,10 @@ private:
 
     QnSettings *m_settings;
 
-    /** Index of "Licenses" tab to open it from outside */
+    /** Index of "Licenses" tab to open it from outside. */
     int m_licenseTabIndex;
 
-    /** Index of "Server Settings" tab to open it from outside */
+    /** Index of "Server Settings" tab to open it from outside. */
     int m_serverSettingsTabIndex;
 
     int m_popupSettingsTabIndex;
