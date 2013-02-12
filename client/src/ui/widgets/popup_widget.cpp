@@ -2,6 +2,7 @@
 #include "ui_popup_widget.h"
 
 #include <business/events/conflict_business_event.h>
+#include <business/events/reasoned_business_event.h>
 
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -234,7 +235,8 @@ bool QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessA
     if (count == 1)
         item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
     else
-        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
+        item->appendRow(new QStandardItem(tr("%1 times since %2 %2 %2 %2 %2 %2 %2").arg(count).arg(timeStamp)));
+
     return true;
 }
 
@@ -248,14 +250,14 @@ QString QnPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
 
 QStandardItem* QnPopupWidget::findOrCreateItem(const QnBusinessParams& eventParams) {
     int resourceId = QnBusinessEventRuntime::getEventResourceId(eventParams);
-    QString eventReason = QnBusinessEventRuntime::getEventReason(eventParams);
+    int eventReasonCode = QnBusinessEventRuntime::getReasonCode(eventParams);
 
     QStandardItem *root = m_model->invisibleRootItem();
     for (int i = 0; i < root->rowCount(); i++) {
         QStandardItem* item = root->child(i);
         if (item->data(ResourceIdRole).toInt() != resourceId)
             continue;
-        if (eventReason != QString() && item->data(EventReasonRole).toString() != eventReason)
+        if (eventReasonCode > 0 && item->data(EventReasonRole).toInt() != eventReasonCode)
             continue;
 
         return item;
@@ -271,7 +273,7 @@ QStandardItem* QnPopupWidget::findOrCreateItem(const QnBusinessParams& eventPara
     item->setData(QnBusinessEventRuntime::getEventResourceId(eventParams), ResourceIdRole);
     item->setData(0, EventCountRole);
     item->setData(getEventTime(eventParams), EventTimeRole);
-    item->setData(eventReason, EventReasonRole);
+    item->setData(eventReasonCode, EventReasonRole);
     root->appendRow(item);
     return item;
 }
@@ -290,8 +292,31 @@ QStandardItem* QnPopupWidget::updateReasonTree(const QnBusinessParams& eventPara
     if (!item)
         return NULL;
 
-    item->removeRows(0, item->rowCount());
-    item->appendRow(new QStandardItem(item->data(EventReasonRole).toString()));
+    item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
+
+    switch (item->data(EventReasonRole).toInt()) {
+        case NETWORK_ISSUE_NO_FRAME:
+            item->appendRow(new QStandardItem(tr("No frame.")));
+            break;
+        case NETWORK_ISSUE_RTP_PACKET_LOST:
+            item->appendRow(new QStandardItem(tr("Packet loss detected.")));
+            break;
+        case MSERVER_TERMINATED:
+            item->appendRow(new QStandardItem(tr("Server stopped.")));
+            break;
+        case MSERVER_STARTED:
+            item->appendRow(new QStandardItem(tr("Server started.")));
+            break;
+        case STORAGE_IO_ERROR:
+            item->appendRow(new QStandardItem(tr("IO Error.")));
+            break;
+        case STORAGE_NOT_ENOUGH_SPEED:
+            item->appendRow(new QStandardItem(tr("Disk speed.")));
+            break;
+        default:
+            break;
+    }
+
     return item;
 }
 

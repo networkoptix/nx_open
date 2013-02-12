@@ -27,11 +27,11 @@ public slots:
 
     /*! Some problem with storage
     */
-    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, const QnResourcePtr &storageRes, const QString& reason);
+    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, int reasonCode, const QnResourcePtr &storageRes);
 
     /*! Some problem with network
     */
-    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason);
+    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode, const QString &reasonText);
 
     /*!
         \param inputPortID device-specific ID of input port
@@ -39,7 +39,7 @@ public slots:
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
 
-    void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason);
+    void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode);
 
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList, qint64 timeStamp);
 
