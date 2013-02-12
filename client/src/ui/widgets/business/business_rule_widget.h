@@ -44,8 +44,6 @@ protected:
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
-    void updateModelAggregationPeriod();
-
 private slots:
     void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
@@ -58,6 +56,7 @@ private slots:
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
 
+    void updateModelAggregationPeriod();
 private:
     QScopedPointer<Ui::QnBusinessRuleWidget> ui;
 
@@ -72,7 +71,6 @@ private:
     QnResourceList m_dropResources;
 
     bool m_updating;
-    bool m_aggregationPeriodChanged;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

@@ -109,7 +109,6 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         disconnect(m_model, 0, this, 0);
 
     m_model = model;
-    m_aggregationPeriodChanged = false;
 
     if (!m_model) {
 /*        ui->eventTypeComboBox->setModel(NULL);
@@ -176,11 +175,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionAggregationFrame->setVisible(actionIsInstant);
 
         initActionParameters();
-
-        if(!m_aggregationPeriodChanged) {
-            QnScopedValueRollback<bool> guard(&m_updating, false);
-            m_model->setAggregationPeriod(m_model->actionType() == BusinessActionType::BA_SendMail ? 60 * 60 : 60);
-        }
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
@@ -343,7 +337,6 @@ void QnBusinessRuleWidget::at_ui_aggregationPeriodChanged() {
     if (!m_model || m_updating)
         return;
 
-    m_aggregationPeriodChanged = true;
     updateModelAggregationPeriod();
 }
 
