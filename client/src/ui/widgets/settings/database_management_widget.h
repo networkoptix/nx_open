@@ -50,7 +50,6 @@ public:
 private slots:
     void at_backupButton_clicked();
     void at_restoreButton_clicked();
-    void at_replyReceived(const QnHTTPRawResponse &response, int handle);
 
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;

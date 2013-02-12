@@ -81,7 +81,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 #endif
 
     m_serverSettingsWidget = new QnServerSettingsWidget(this);
-    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Mail Server"));
+    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
 
     resize(1, 1); // set widget size to minimal possible
 
