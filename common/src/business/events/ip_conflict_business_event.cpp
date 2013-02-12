@@ -4,7 +4,7 @@
 namespace QnBusinessEventRuntime {
 
     static QLatin1String addressStr("cameraAddress");
-    static QLatin1String conflictingIds("conflictingIds");
+    static QLatin1String macAddrs("macAddrs");
 
     QHostAddress getCameraAddress(const QnBusinessParams &params) {
         // using QString as inner storage in case of future ipv6 support
@@ -15,12 +15,12 @@ namespace QnBusinessEventRuntime {
         (*params)[addressStr] = value.toString();
     }
 
-    QVariantList getConflictingCamerasIds(const QnBusinessParams &params) {
-        return params.value(conflictingIds).value<QVariantList>();
+    QStringList getConflictingMacAddrs(const QnBusinessParams &params) {
+        return params.value(macAddrs).value<QStringList>();
     }
 
-    void setConflictingCamerasIds(QnBusinessParams* params, QVariantList value) {
-        (*params)[conflictingIds] = QVariant::fromValue(value);
+    void setConflictingMacAddrs(QnBusinessParams* params, QStringList value) {
+        (*params)[macAddrs] = QVariant::fromValue(value);
     }
 
 } //namespace QnBusinessEventRuntime
@@ -28,11 +28,11 @@ namespace QnBusinessEventRuntime {
 QnIPConflictBusinessEvent::QnIPConflictBusinessEvent(
         const QnResourcePtr& resource, 
         const QHostAddress& address, 
-        const QnNetworkResourceList& cameras,
+        const QStringList& macAddrList,
         qint64 timeStamp):
         base_type(BusinessEventType::BE_Camera_Ip_Conflict, resource, timeStamp),
         m_address(address),
-        m_cameras(cameras)
+        m_macAddrList(macAddrList)
 {
 }
 
@@ -40,10 +40,10 @@ QString QnIPConflictBusinessEvent::toString() const
 {
     QString text = base_type::toString();
     text += QObject::tr(" conflicting cameras:");
-    for (int i = 0; i < m_cameras.size(); ++i) {
+    for (int i = 0; i < m_macAddrList.size(); ++i) {
         if (i > 0)
             text += QLatin1String(", ");
-        text += m_cameras[i]->getMAC().toString();
+        text += m_macAddrList[i];
     }
     return text;
 }
@@ -51,11 +51,6 @@ QString QnIPConflictBusinessEvent::toString() const
 QnBusinessParams QnIPConflictBusinessEvent::getRuntimeParams() const {
     QnBusinessParams params = base_type::getRuntimeParams();
     QnBusinessEventRuntime::setCameraAddress(&params, m_address);
-
-    QVariantList ids;
-    foreach(const QnResourcePtr &camera, m_cameras)
-        ids << camera->getId().toInt();
-
-    QnBusinessEventRuntime::setConflictingCamerasIds(&params, ids);
+    QnBusinessEventRuntime::setConflictingMacAddrs(&params, m_macAddrList);
     return params;
 }

@@ -10,21 +10,21 @@ namespace QnBusinessEventRuntime {
     QHostAddress getCameraAddress(const QnBusinessParams &params);
     void setCameraAddress(QnBusinessParams* params, QHostAddress value);
 
-    QVariantList getConflictingCamerasIds(const QnBusinessParams &params);
-    void setConflictingCamerasIds(QnBusinessParams* params, QVariantList value);
+    QStringList getConflictingMacAddrs(const QnBusinessParams &params);
+    void setConflictingMacAddrs(QnBusinessParams* params, QStringList value);
 }
 
 class QnIPConflictBusinessEvent: public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
 public:
-    QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QnNetworkResourceList& cameras,  qint64 timeStamp);
+    QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QStringList& macAddrList,  qint64 timeStamp);
     virtual QString toString() const override;
 
     virtual QnBusinessParams getRuntimeParams() const override;
 private:
     QHostAddress m_address;
-    QnNetworkResourceList m_cameras;
+    QStringList m_macAddrList;
 };
 
 typedef QSharedPointer<QnIPConflictBusinessEvent> QnIPConflictBusinessEventPtr;
