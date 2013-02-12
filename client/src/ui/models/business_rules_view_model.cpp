@@ -471,6 +471,7 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
         return;
 
     bool resourcesRequired = BusinessActionType::isResourceRequired(m_actionType);
+    bool wasEmailAction = m_actionType == BusinessActionType::BA_SendMail;
 
     m_actionType = value;
     m_modified = true;
@@ -478,6 +479,18 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
     QnBusiness::Fields fields = QnBusiness::ActionTypeField | QnBusiness::ModifiedField;
     if (BusinessActionType::isResourceRequired(m_actionType) != resourcesRequired)
         fields |= QnBusiness::ActionResourcesField;
+
+    /*
+     *  If action is "send e-mail" default units for aggregation period should be hours, not minutes.
+     *  Works only if aggregation period was not changed from default value.
+     */
+    if (value == BusinessActionType::BA_SendMail && m_aggregationPeriod == 60) {
+        m_aggregationPeriod = 60*60;
+        fields |= QnBusiness::AggregationField;
+    } else if (wasEmailAction && m_aggregationPeriod == 60*60) {
+        m_aggregationPeriod = 60;
+        fields |= QnBusiness::AggregationField;
+    }
 
     emit dataChanged(this, fields);
 }

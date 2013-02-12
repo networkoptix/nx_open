@@ -31,7 +31,7 @@ public:
 signals:
     void stopped();
     void messageReceived(QnMessage message);
-    void connectionOpened();
+    void connectionOpened(QnMessage message);
     void connectionClosed(QString errorString);
     void connectionReset();
 

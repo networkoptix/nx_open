@@ -4,23 +4,40 @@
 QnNetworkIssueBusinessEvent::QnNetworkIssueBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
-        const QString& reason):
+        int reasonCode,
+        const QString &reasonText):
     base_type(BusinessEventType::BE_Network_Issue,
-                            resource,
-                            timeStamp),
-    m_reason(reason)
+              resource,
+              timeStamp,
+              reasonCode,
+              reasonText)
+
 {
 }
 
 QString QnNetworkIssueBusinessEvent::toString() const
 {
-    QString text = QnAbstractBusinessEvent::toString();
-    text += QObject::tr("  reason: %1\n").arg(m_reason);
-    return text;
-}
+    QString reasonText;
+    switch (m_reasonCode) {
+        case NETWORK_ISSUE_NO_FRAME:
+            reasonText = QObject::tr("No video frame during %1 seconds").arg(m_reasonText);
+            break;
+        case NETWORK_ISSUE_RTP_PACKET_LOST:
+            {
+                QStringList seqs = m_reasonText.split(QLatin1Char(';'));
+                if (seqs.size() != 2)
+                    break;
+                reasonText = QObject::tr("RTP packet loss detected. Prev seq.=%1 next seq.=%2")
+                        .arg(seqs[0])
+                        .arg(seqs[1]);
+            }
+            break;
+        default:
+            break;
 
-QnBusinessParams QnNetworkIssueBusinessEvent::getRuntimeParams() const {
-    QnBusinessParams params = base_type::getRuntimeParams();
-    QnBusinessEventRuntime::setEventReason(&params, m_reason);
-    return params;
+    }
+
+    QString text = QnAbstractBusinessEvent::toString();
+    text += QObject::tr("  reason: %1\n").arg(reasonText);
+    return text;
 }

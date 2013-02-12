@@ -371,28 +371,10 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
         inputStream.TimeStamp = data->timestamp;
 
     #ifndef XVBA_TEST
-        if( (m_state < decoding) && data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
+        if( (m_state < decoding) && isH264SeqHeaderInExtraData(data) )
         {
             std::basic_string<mfxU8> seqHeader;
-            //sps & pps is in the extradata, parsing it...
-            // prefix is unit len
-            int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
-
-            const mfxU8* curNal = data->context->ctx()->extradata+5;
-            const mfxU8* dataEnd = data->context->ctx()->extradata + data->context->ctx()->extradata_size;
-            while( curNal < dataEnd - reqUnitSize )
-            {
-                unsigned int curSize = 0;
-                for( int i = 0; i < reqUnitSize; ++i ) 
-                    curSize = (curSize << 8) + curNal[i];
-                curNal += reqUnitSize;
-                curSize = std::min<>(curSize, (unsigned int)(dataEnd - curNal));
-                seqHeader.append( curNal, curSize );
-
-                curNal += curSize;
-            }
-
-            seqHeader.append( (const quint8*)data->data.data(), data->data.size() );
+            readH264SeqHeaderFromExtraData( data, &seqHeader );
 
             inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
             inputStream.DataLength = seqHeader.size();
@@ -1090,6 +1072,15 @@ bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const
 }
 #endif
 
+static const quint8 H264_START_CODE[] = { 0, 0, 0, 1 };
+
+//dishonorably stolen from libavcodec source
+#ifndef AV_RB16
+#   define AV_RB16(x)                           \
+    ((((const uint8_t*)(x))[0] << 8) |          \
+      ((const uint8_t*)(x))[1])
+#endif
+
 bool QuickSyncVideoDecoder::readSequenceHeader( const QnCompressedVideoDataPtr data, mfxVideoParam* const streamParams )
 {
     mfxBitstream inputStream;
@@ -1097,28 +1088,10 @@ bool QuickSyncVideoDecoder::readSequenceHeader( const QnCompressedVideoDataPtr d
     //inputStream->TimeStamp = av_rescale_q( data->timestamp, SRC_DATA_TIMESTAMP_RESOLUTION, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION );
     inputStream.TimeStamp = data->timestamp;
 #ifndef XVBA_TEST
-    if( data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
+    if( isH264SeqHeaderInExtraData(data) )
     {
         std::basic_string<mfxU8> seqHeader;
-        //sps & pps is in the extradata, parsing it...
-        // prefix is unit len
-        int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
-
-        const mfxU8* curNal = data->context->ctx()->extradata+5;
-        const mfxU8* dataEnd = data->context->ctx()->extradata + data->context->ctx()->extradata_size;
-        while( curNal < dataEnd - reqUnitSize )
-        {
-            unsigned int curSize = 0;
-            for( int i = 0; i < reqUnitSize; ++i ) 
-                curSize = (curSize << 8) + curNal[i];
-            curNal += reqUnitSize;
-            curSize = std::min<>(curSize, (unsigned int)(dataEnd - curNal));
-            seqHeader.append( curNal, curSize );
-
-            curNal += curSize;
-        }
-
-        seqHeader.append( (const quint8*)data->data.data(), data->data.size() );
+        readH264SeqHeaderFromExtraData( data, &seqHeader );
 
         inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
         inputStream.DataLength = seqHeader.size();
@@ -2732,3 +2705,55 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
 }
 #endif
 #endif
+
+bool QuickSyncVideoDecoder::isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const
+{
+    return data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1;
+}
+
+bool QuickSyncVideoDecoder::readH264SeqHeaderFromExtraData(
+    const QnCompressedVideoDataPtr data,
+    std::basic_string<mfxU8>* const seqHeader )
+{
+    const unsigned char* p = data->context->ctx()->extradata;
+
+    //sps & pps is in the extradata, parsing it...
+    //following code has been taken from libavcodec/h264.c
+
+    // prefix is unit len
+    //const int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
+    /* sps and pps in the avcC always have length coded with 2 bytes,
+     * so put a fake nal_length_size = 2 while parsing them */
+    //int nal_length_size = 2;
+
+    // Decode sps from avcC
+    int cnt = *(p + 5) & 0x1f; // Number of sps
+    p += 6;
+
+    for( int i = 0; i < cnt; i++ )
+    {
+        const int nalsize = AV_RB16(p);
+        p += 2; //skipping nalusize
+        if( nalsize > data->context->ctx()->extradata_size - (p-data->context->ctx()->extradata) )
+            break;
+        seqHeader->append( H264_START_CODE, sizeof(H264_START_CODE) );
+        seqHeader->append( p, nalsize );
+        p += nalsize;
+    }
+
+    // Decode pps from avcC
+    cnt = *(p++); // Number of pps
+    for( int i = 0; i < cnt; ++i )
+    {
+        const int nalsize = AV_RB16(p);
+        p += 2;
+        if( nalsize > data->context->ctx()->extradata_size - (p-data->context->ctx()->extradata) )
+            break;
+
+        seqHeader->append( H264_START_CODE, sizeof(H264_START_CODE) );
+        seqHeader->append( p, nalsize );
+        p += nalsize;
+    }
+
+    return true;
+}

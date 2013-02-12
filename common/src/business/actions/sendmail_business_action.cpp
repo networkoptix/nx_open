@@ -62,7 +62,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
         arg(!m_eventResourceUrl.isEmpty() ? m_eventResourceUrl : QObject::tr("UNKNOWN"));
     text += m_eventDescription;
 
-    text += QObject::tr(". Action parameters:\n");
+    text += QObject::tr("Action parameters:\n");
     //printing action params
     for( QnBusinessParams::const_iterator
         it = getParams().begin();

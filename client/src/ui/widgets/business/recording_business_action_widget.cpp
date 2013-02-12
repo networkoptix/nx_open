@@ -32,7 +32,6 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
 
 QnRecordingBusinessActionWidget::~QnRecordingBusinessActionWidget()
 {
-    delete ui;
 }
 
 void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {

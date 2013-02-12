@@ -79,6 +79,7 @@
 #include "plugins/resources/mserver_resource_searcher.h"
 #include "rest/handlers/log_handler.h"
 #include "rest/handlers/favico_handler.h"
+#include "business/events/reasoned_business_event.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -806,9 +807,6 @@ void QnMain::run()
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
-        if (QnSessionManager::checkIfAppServerIsOld())
-            return;
-
         if (appServerConnection->connect(connectInfo) == 0)
             break;
 
@@ -999,7 +997,9 @@ void QnMain::run()
 
     qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
     if (lastRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer, lastRunningTime*1000, tr("Media server is started after an unexpected shutdown"));
+        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
+                                                   lastRunningTime*1000,
+                                                   MSERVER_STARTED);
 
     m_timer = new QTimer(this);
     at_timer();

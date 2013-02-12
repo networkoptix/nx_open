@@ -3,28 +3,15 @@
 
 #include <QHostAddress>
 
-#include "instant_business_event.h"
+#include "conflict_business_event.h"
 #include "core/resource/resource_fwd.h"
 
-namespace QnBusinessEventRuntime {
-    QHostAddress getCameraAddress(const QnBusinessParams &params);
-    void setCameraAddress(QnBusinessParams* params, QHostAddress value);
-
-    QVariantList getConflictingCamerasMac(const QnBusinessParams &params);
-    void setConflictingCamerasMac(QnBusinessParams* params, QVariantList value);
-}
-
-class QnIPConflictBusinessEvent: public QnInstantBusinessEvent
+class QnIPConflictBusinessEvent: public QnConflictBusinessEvent
 {
-    typedef QnInstantBusinessEvent base_type;
+    typedef QnConflictBusinessEvent base_type;
 public:
-    QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QStringList& cameras,  qint64 timeStamp);
+    QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QStringList& macAddrList,  qint64 timeStamp);
     virtual QString toString() const override;
-
-    virtual QnBusinessParams getRuntimeParams() const override;
-private:
-    QHostAddress m_address;
-    QStringList m_cameras;
 };
 
 typedef QSharedPointer<QnIPConflictBusinessEvent> QnIPConflictBusinessEventPtr;

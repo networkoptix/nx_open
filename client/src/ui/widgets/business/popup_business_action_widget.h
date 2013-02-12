@@ -26,7 +26,7 @@ private slots:
     void at_settingsButton_clicked();
 
 private:
-    Ui::QnPopupBusinessActionWidget *ui;
+    QScopedPointer<Ui::QnPopupBusinessActionWidget> ui;
 };
 
 #endif // POPUP_BUSINESS_ACTION_WIDGET_H

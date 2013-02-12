@@ -26,6 +26,8 @@
 
 #include <api/session_manager.h>
 
+#include <business/actions/popup_business_action.h>
+
 #include <device_plugins/server_camera/appserver.h>
 
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -878,6 +880,25 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+    int total = qnResPool->getAllEnabledCameras().size();
+    if (total == 0)
+        return;
+
+    int n = qrand() % total;
+    int id = qnResPool->getAllEnabledCameras().at(n)->getId();
+
+    n = qrand() % 3;
+
+    QnBusinessParams params;
+    QnBusinessEventRuntime::setEventType(&params, n == 0 ? BusinessEventType::BE_Camera_Disconnect
+                                                         : n == 1 ? BusinessEventType::BE_Camera_Input
+                                                                  : BusinessEventType::BE_Camera_Motion
+                                         );
+    QnBusinessEventRuntime::setEventResourceId(&params, id);
+
+    QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
+    at_eventManager_actionReceived(ba);
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -1467,7 +1488,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 #ifndef STANDALONE_MODE
     static const char *appserverAddedPropertyName = "_qn_appserverAdded";
     if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnAppServerResourceSearcher::instance());
         QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
     }
 #endif
@@ -1487,9 +1507,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
-    QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
     QnResourceDiscoveryManager::instance()->start();
-    QnResourceDiscoveryManager::instance()->setReady(true);
+    
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
@@ -2048,7 +2067,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
 
-    QSettings settings;
+    QSettings settings; // TODO: #Elric replace with QnSettings
     settings.beginGroup(QLatin1String("screenshots"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -2275,7 +2294,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     else
         return false; // not used
 
-    QSettings settings;
+    QSettings settings; // TODO: replace with QnSettings
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
@@ -2698,7 +2717,7 @@ Do you want to continue?"),
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
     QSettings settings;
-    settings.beginGroup(QLatin1String("export"));
+    settings.beginGroup(QLatin1String("export")); // TODO: replace with QnSettings
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
         previousDir = qnSettings->mediaFolder();

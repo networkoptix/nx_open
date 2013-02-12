@@ -600,11 +600,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
 // Handlers
 // -------------------------------------------------------------------------- //
 Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    if(options() & ControlPtz) {
-        return Qn::NoSection; /* No resizing when PTZ control is ON. */
-    } else {
-        return base_type::windowFrameSectionsAt(region);
-    }
+    return base_type::windowFrameSectionsAt(region);
 }
 
 int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {

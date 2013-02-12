@@ -37,7 +37,7 @@
 
 //!if defined, scale is performed with MFX, otherwise - by directx means (by rendering to surface with scaling)
 //#define SCALE_WITH_MFX
-//#define WRITE_INPUT_STREAM_TO_FILE_1
+#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
 
@@ -375,6 +375,11 @@ private:
     void initializeScaleSurfacePool();
     mfxStatus scaleFrame( const mfxFrameSurface1& from, mfxFrameSurface1* const to );
 #endif
+    bool isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const;
+    /*!
+        On return, \a seqHeader contains NALUs, reader from \a data->context->ctx()->extradata
+    */
+    bool readH264SeqHeaderFromExtraData( const QnCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
 };
 
 #endif  //QUICKSYNCVIDEODECODER_H

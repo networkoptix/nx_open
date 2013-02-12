@@ -14,8 +14,9 @@ class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
 class QnRecordingSettingsWidget;
 class QnYouTubeSettingsWidget;
-class QnSmtpSettingsWidget; //TODO: temporary, until we have wider server settings widget
+class QnServerSettingsWidget;
 class QnPopupSettingsWidget;
+
 
 namespace Ui {
     class PreferencesDialog;
@@ -60,16 +61,16 @@ private:
     QScopedPointer<Ui::PreferencesDialog> ui;
     QnRecordingSettingsWidget *m_recordingSettingsWidget;
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
-    QnLicenseManagerWidget *m_licenseManagerWidget;
-    QnSmtpSettingsWidget *m_smtpSettingsWidget;
     QnPopupSettingsWidget *m_popupSettingsWidget;
+    QnLicenseManagerWidget *m_licenseManagerWidget;
+    QnServerSettingsWidget *m_serverSettingsWidget;
 
     QnSettings *m_settings;
 
-    /** Index of "Licenses" tab to open it from outside */
+    /** Index of "Licenses" tab to open it from outside. */
     int m_licenseTabIndex;
 
-    /** Index of "Server Settings" tab to open it from outside */
+    /** Index of "Server Settings" tab to open it from outside. */
     int m_serverSettingsTabIndex;
 
     int m_popupSettingsTabIndex;

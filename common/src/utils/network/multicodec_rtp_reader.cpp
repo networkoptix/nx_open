@@ -10,6 +10,7 @@
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
 #include <business/business_event_connector.h>
+#include <business/events/reasoned_business_event.h>
 #include "utils/common/synctime.h"
 
 extern QSettings qSettings;
@@ -34,7 +35,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
-    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, const QString&)), qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, const QString&)));
+    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, int, const QString&)),
+            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, int, const QString&)));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -205,7 +207,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     }
     if (m_RtpSession.isOpened() && !m_pleaseStop) {
         qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
-        emit networkIssue(getResource(), qnSyncTime->currentUSecsSinceEpoch(), QString(QLatin1String("No video frame during %1 seconds")).arg(MAX_FRAME_DURATION*2/1000));
+        emit networkIssue(getResource(),
+                          qnSyncTime->currentUSecsSinceEpoch(),
+                          NETWORK_ISSUE_NO_FRAME,
+                          QString::number((qlonglong) MAX_FRAME_DURATION*2/1000));
     }
     return result;
 }
@@ -352,7 +357,10 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 {
-    emit networkIssue(getResource(), qnSyncTime->currentUSecsSinceEpoch(), QString(QLatin1String("RTP packet lost detected. prev seq.=%1 next seq.=%2")).arg(prev).arg(next));
+    emit networkIssue(getResource(),
+                      qnSyncTime->currentUSecsSinceEpoch(),
+                      NETWORK_ISSUE_RTP_PACKET_LOST,
+                      QString(QLatin1String("%1;%2")).arg(prev).arg(next));
 }
 
 

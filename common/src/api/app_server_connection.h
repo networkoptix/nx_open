@@ -83,8 +83,6 @@ public:
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
     bool setPanicMode(QnMediaServerResource::PanicMode value);
-    bool dumpDatabase(QByteArray& data);
-    bool restoreDatabase(const QByteArray& data);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
@@ -114,6 +112,9 @@ public:
 
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
+
+    int dumpDatabase(QObject *target, const char *slot);
+    int restoreDatabase(const QByteArray& data, QObject *target, const char *slot);
 
     // Returns request id
     int saveAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
@@ -156,6 +157,7 @@ private:
 private:
     // By now this is used only by synchronous api.
     // TODO: Make use for asynch API as well
+    // TODO: #Ivan 
     QByteArray m_lastError;
 
     QUrl m_url;
