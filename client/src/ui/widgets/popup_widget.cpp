@@ -86,23 +86,34 @@ void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {
 }
 
 void QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
+    QStandardItem* item = NULL;
     switch (m_eventType) {
         case BusinessEventType::BE_Camera_Disconnect:
         case BusinessEventType::BE_Camera_Input:
         case BusinessEventType::BE_Camera_Motion:
-            updateSimpleTree(businessAction);
+            item = updateSimpleTree(businessAction->getRuntimeParams());
             break;
         case BusinessEventType::BE_Storage_Failure:
         case BusinessEventType::BE_Network_Issue:
         case BusinessEventType::BE_MediaServer_Failure:
-            updateReasonTree(businessAction);
+            item = updateReasonTree(businessAction->getRuntimeParams());
             break;
         case BusinessEventType::BE_Camera_Ip_Conflict:
         case BusinessEventType::BE_MediaServer_Conflict:
-            updateConflictTree(businessAction);
+            item = updateConflictTree(businessAction->getRuntimeParams());
             break;
         default:
             break;
+    }
+
+    if (item) {
+        int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
+        item->setData(count, EventCountRole);
+        QString timeStamp = item->data(EventTimeRole).toString();
+        if (count == 1)
+            item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
+        else
+            item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
     }
 }
 
@@ -114,121 +125,63 @@ QString QnPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
     return QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
 }
 
-void QnPopupWidget::updateSimpleTree(const QnAbstractBusinessActionPtr &businessAction) {
-    int resourceId = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
+QStandardItem* QnPopupWidget::findOrCreateItem(const QnBusinessParams& eventParams) {
+    int resourceId = QnBusinessEventRuntime::getEventResourceId(eventParams);
+    QString eventReason = QnBusinessEventRuntime::getEventReason(eventParams);
 
     QStandardItem *root = m_model->invisibleRootItem();
-    QStandardItem *item = NULL;
-
     for (int i = 0; i < root->rowCount(); i++) {
-        QStandardItem* child = root->child(i);
-        if (child->data(ResourceIdRole).toInt() != resourceId)
+        QStandardItem* item = root->child(i);
+        if (item->data(ResourceIdRole).toInt() != resourceId)
+            continue;
+        if (eventReason != QString() && item->data(EventReasonRole).toString() != eventReason)
             continue;
 
-        item = child;
-        break;
-    }
-    if (item == NULL) {
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-        if (!resource)
-            return;
-
-        item = new QStandardItem();
-        item->setText(resource->getName());
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        item->setData(resourceId, ResourceIdRole);
-        item->setData(0, EventCountRole);
-        item->setData(getEventTime(businessAction->getRuntimeParams()), EventTimeRole);
-        root->appendRow(item);
+        return item;
     }
 
-    item->removeRows(0, item->rowCount());
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+    if (!resource)
+        return NULL;
 
-    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
-    item->setData(count, EventCountRole);
-    QString timeStamp = item->data(EventTimeRole).toString();
-    if (count == 1)
-        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
-    else
-        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
+    QStandardItem *item = new QStandardItem();
+    item->setText(resource->getName());
+    item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
+    item->setData(QnBusinessEventRuntime::getEventResourceId(eventParams), ResourceIdRole);
+    item->setData(0, EventCountRole);
+    item->setData(getEventTime(eventParams), EventTimeRole);
+    item->setData(eventReason, EventReasonRole);
+    root->appendRow(item);
+    return item;
 }
 
-void QnPopupWidget::updateReasonTree(const QnAbstractBusinessActionPtr &businessAction) {
-    int resourceId = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
-    QString eventReason = QnBusinessEventRuntime::getEventReason(businessAction->getRuntimeParams());
-
-    QStandardItem *root = m_model->invisibleRootItem();
-    QStandardItem *item = NULL;
-
-    for (int i = 0; i < root->rowCount(); i++) {
-        QStandardItem* child = root->child(i);
-        if (child->data(ResourceIdRole).toInt() != resourceId)
-            continue;
-        if (child->data(EventReasonRole).toString() != eventReason)
-            continue;
-
-        item = child;
-        break;
-    }
-    if (item == NULL) {
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-        if (!resource)
-            return;
-
-        item = new QStandardItem();
-        item->setText(resource->getName());
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        item->setData(resourceId, ResourceIdRole);
-        item->setData(0, EventCountRole);
-        item->setData(getEventTime(businessAction->getRuntimeParams()), EventTimeRole);
-        item->setData(eventReason, EventReasonRole);
-        root->appendRow(item);
-    }
+QStandardItem* QnPopupWidget::updateSimpleTree(const QnBusinessParams& eventParams) {
+    QStandardItem *item = findOrCreateItem(eventParams);
+    if (!item)
+        return NULL;
 
     item->removeRows(0, item->rowCount());
-
-    item->appendRow(new QStandardItem(eventReason));
-
-    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
-    item->setData(count, EventCountRole);
-    QString timeStamp = item->data(EventTimeRole).toString();
-    if (count == 1)
-        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
-    else
-        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
+    return item;
 }
 
-void QnPopupWidget::updateConflictTree(const QnAbstractBusinessActionPtr &businessAction) {
-    int resourceId = QnBusinessEventRuntime::getEventResourceId(businessAction->getRuntimeParams());
+QStandardItem* QnPopupWidget::updateReasonTree(const QnBusinessParams& eventParams) {
+    QStandardItem *item = findOrCreateItem(eventParams);
+    if (!item)
+        return NULL;
 
-    QStandardItem *root = m_model->invisibleRootItem();
-    QStandardItem *item = NULL;
+    item->removeRows(0, item->rowCount());
+    item->appendRow(new QStandardItem(item->data(EventReasonRole).toString()));
+    return item;
+}
 
-    for (int i = 0; i < root->rowCount(); i++) {
-        QStandardItem* child = root->child(i);
-        if (child->data(ResourceIdRole).toInt() != resourceId)
-            continue;
+QStandardItem* QnPopupWidget::updateConflictTree(const QnBusinessParams& eventParams) {
 
-        item = child;
-        break;
-    }
-    if (item == NULL) {
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-        if (!resource)
-            return;
+    QStandardItem *item = findOrCreateItem(eventParams);
+    if (!item)
+        return NULL;
 
-        item = new QStandardItem();
-        item->setText(resource->getName());
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        item->setData(resourceId, ResourceIdRole);
-        item->setData(0, EventCountRole);
-        item->setData(getEventTime(businessAction->getRuntimeParams()), EventTimeRole);
-        item->setData(QVariant::fromValue(QStringList()), ConflictsRole);
-        root->appendRow(item);
-    }
-
-    QString source = QnBusinessEventRuntime::getSource(businessAction->getRuntimeParams());
-    QStringList newConflicts = QnBusinessEventRuntime::getConflicts(businessAction->getRuntimeParams());
+    QString source = QnBusinessEventRuntime::getSource(eventParams);
+    QStringList newConflicts = QnBusinessEventRuntime::getConflicts(eventParams);
 
     QStringList conflicts = item->data(ConflictsRole).value<QStringList>();
     foreach(QString entity, newConflicts) {
@@ -236,6 +189,7 @@ void QnPopupWidget::updateConflictTree(const QnAbstractBusinessActionPtr &busine
             continue;
         conflicts << entity;
     }
+    item->setData(QVariant::fromValue(conflicts), ConflictsRole);
 
     item->removeRows(0, item->rowCount());
 
@@ -243,12 +197,5 @@ void QnPopupWidget::updateConflictTree(const QnAbstractBusinessActionPtr &busine
     item->appendRow(new QStandardItem(tr("conflicted with")));
     foreach(QString entity, conflicts)
         item->appendRow(new QStandardItem(entity));
-
-    int count = item->data(EventCountRole).toInt() + qMax(businessAction->getAggregationCount(), 1);
-    item->setData(count, EventCountRole);
-    QString timeStamp = item->data(EventTimeRole).toString();
-    if (count == 1)
-        item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
-    else
-        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
+    return item;
 }

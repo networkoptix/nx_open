@@ -41,6 +41,8 @@ private:
      */
     QString getEventTime(const QnBusinessParams& eventParams);
 
+    QStandardItem* findOrCreateItem(const QnBusinessParams& eventParams);
+
     /**
      * @brief updateTreeModel       Build tree model depending of event type.
      * @param businessAction        Last received action.
@@ -51,21 +53,21 @@ private:
      * @brief updateSimpleTree      Used to build and update tree containing only event resources.
      * @param businessAction        Last received action.
      */
-    void updateSimpleTree(const QnAbstractBusinessActionPtr& businessAction);
+    QStandardItem* updateSimpleTree(const QnBusinessParams& eventParams);
 
     /**
      * @brief updateReasonTree      Used to build and update tree containing event resources
      *                              and event reason (for failure events).
      * @param businessAction        Last received action.
      */
-    void updateReasonTree(const QnAbstractBusinessActionPtr& businessAction);
+    QStandardItem* updateReasonTree(const QnBusinessParams& eventParams);
 
     /**
      * @brief updateConflictTree    Used to build and update tree containing event resources
      *                              and list of conflicting entities.
      * @param businessAction        Last received action.
      */
-    void updateConflictTree(const QnAbstractBusinessActionPtr& businessAction);
+    QStandardItem* updateConflictTree(const QnBusinessParams& eventParams);
 
 private:
     QScopedPointer<Ui::QnPopupWidget> ui;
