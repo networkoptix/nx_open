@@ -21,7 +21,6 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, 
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
 {
-    delete ui;
 }
 
 void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {

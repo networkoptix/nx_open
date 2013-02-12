@@ -18,7 +18,6 @@ QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *pare
 
 QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
 {
-    delete ui; // TODO: #gdm use QScopedPointer
 }
 
 void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {

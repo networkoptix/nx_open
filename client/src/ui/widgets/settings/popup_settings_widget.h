@@ -25,7 +25,7 @@ private slots:
     void at_showAllCheckBox_toggled(bool checked);
 
 private:
-    Ui::QnPopupSettingsWidget *ui;
+    QScopedPointer<Ui::QnPopupSettingsWidget> ui;
     QList<QCheckBox* > m_checkBoxes;
 };
 

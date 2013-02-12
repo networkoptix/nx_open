@@ -98,7 +98,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
 {
-    delete ui;
 }
 
 QnBusinessRuleViewModel* QnBusinessRuleWidget::model() const {

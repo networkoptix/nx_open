@@ -25,7 +25,7 @@ private slots:
     void at_settings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
 private:
-    Ui::QnSmtpSettingsWidget *ui;
+    QScopedPointer<Ui::QnSmtpSettingsWidget> ui;
 
     int m_requestHandle;
 };

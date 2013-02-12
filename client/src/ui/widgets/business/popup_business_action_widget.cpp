@@ -21,7 +21,6 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent, QnWork
 
 QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
 {
-    delete ui;
 }
 
 void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
