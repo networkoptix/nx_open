@@ -1454,9 +1454,18 @@ qint64 QnCamDisplay::getNextTime() const
     else
     {
         qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
+        qint64 lastTime = m_display[0]->getLastDisplayedTime();
+
+        if ((quint64)rez != AV_NOPTS_VALUE)
+            return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
+        else
+            return lastTime;
+
+        /*
         return m_display[0] == NULL || (quint64)rez != AV_NOPTS_VALUE
             ? rez
             : m_display[0]->getLastDisplayedTime();
+        */
     }
 }
 
