@@ -39,6 +39,7 @@ QnIPConflictBusinessEvent::QnIPConflictBusinessEvent(
 QString QnIPConflictBusinessEvent::toString() const
 {
     QString text = base_type::toString();
+    text += QObject::tr(" conflicting ip address: %1.").arg(m_address.toString());
     text += QObject::tr(" conflicting cameras: ");
     bool firstTime = true;
     foreach(const QString& mac, m_cameras) 
