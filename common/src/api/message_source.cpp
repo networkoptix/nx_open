@@ -187,7 +187,7 @@ void QnMessageSource::httpReadyRead()
                 emit connectionReset();
             }
 
-            emit connectionOpened();
+            emit connectionOpened(event);
         } else if (event.eventType != Qn::Message_Type_Ping)
         {
             emit messageReceived(event);

@@ -35,12 +35,13 @@ private slots:
 
     void at_messageReceived(QnMessage message);
     void at_connectionClosed(QString errorString);
-    void at_connectionOpened();
+    void at_connectionOpened(QnMessage message);
     void at_connectionReset();
 
 private:
     void init();
     void init(const QUrl& url, int reconnectTimeout);
+    void replaceResource(QnResourcePtr resource);
 
 private:
     static const int EVENT_RECONNECT_TIMEOUT = 3000;

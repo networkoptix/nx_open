@@ -98,6 +98,25 @@ void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray 
     qnLicensePool->replaceLicenses(licenses);
 }
 
+void QnClientMessageProcessor::replaceResource(QnResourcePtr resource)
+{
+    QnResourcePtr ownResource;
+
+    QString guid = resource->getGuid();
+    if (!guid.isEmpty())
+        ownResource = qnResPool->getResourceByGuid(guid);
+    else
+        ownResource = qnResPool->getResourceById(resource->getId());
+
+    if (ownResource.isNull())
+        qnResPool->addResource(resource); // TODO: #Ivan
+    else
+        ownResource->update(resource);
+
+    if(QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
+        layout->requestStore();
+}
+
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
     if (message.eventType == Qn::Message_Type_License)
@@ -142,22 +161,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             return;
         }
 
-        QnResourcePtr ownResource;
-    
-        QString guid = message.resource->getGuid();
-        if (!guid.isEmpty())
-            ownResource = qnResPool->getResourceByGuid(guid);
-        else
-            ownResource = qnResPool->getResourceById(message.resource->getId());
-
-        if (ownResource.isNull())
-            qnResPool->addResource(message.resource); // TODO: #Ivan
-        else
-            ownResource->update(message.resource);
-
-        if(QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
-            layout->requestStore();
-
+        replaceResource(message.resource);
     }
     else if (message.eventType == Qn::Message_Type_ResourceDelete)
     {
@@ -186,8 +190,11 @@ void QnClientMessageProcessor::at_connectionClosed(QString errorString)
     emit connectionClosed();
 }
 
-void QnClientMessageProcessor::at_connectionOpened()
+void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
 {
+    foreach (QnResourcePtr resource, message.resources) {
+    }
+
     qDebug() << "Connection opened";
 
     qnSyncTime->reset();
