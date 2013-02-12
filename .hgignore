@@ -22,7 +22,6 @@ syntax: glob
 compatibility_info.cpp
 
 .DS_Store
-.idea
 Debug
 Release
 
