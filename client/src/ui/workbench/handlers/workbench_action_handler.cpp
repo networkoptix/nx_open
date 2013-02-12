@@ -882,6 +882,9 @@ void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
 
     int total = qnResPool->getAllEnabledCameras().size();
+    if (total == 0)
+        return;
+
     int n = qrand() % total;
     int id = qnResPool->getAllEnabledCameras().at(n)->getId();
 
