@@ -4,7 +4,7 @@
 namespace QnBusinessEventRuntime {
 
     static QLatin1String addressStr("cameraAddress");
-    static QLatin1String conflictingMac("conflictingMac");
+    static QLatin1String conflictingIds("conflictingIds");
 
     QHostAddress getCameraAddress(const QnBusinessParams &params) {
         // using QString as inner storage in case of future ipv6 support
@@ -15,12 +15,12 @@ namespace QnBusinessEventRuntime {
         (*params)[addressStr] = value.toString();
     }
 
-    QVariantList getConflictingCamerasMac(const QnBusinessParams &params) {
-        return params.value(conflictingMac).value<QVariantList>();
+    QVariantList getConflictingCamerasIds(const QnBusinessParams &params) {
+        return params.value(conflictingIds).value<QVariantList>();
     }
 
-    void setConflictingCamerasMac(QnBusinessParams* params, QVariantList value) {
-        (*params)[conflictingMac] = QVariant::fromValue(value);
+    void setConflictingCamerasIds(QnBusinessParams* params, QVariantList value) {
+        (*params)[conflictingIds] = QVariant::fromValue(value);
     }
 
 } //namespace QnBusinessEventRuntime
@@ -28,7 +28,7 @@ namespace QnBusinessEventRuntime {
 QnIPConflictBusinessEvent::QnIPConflictBusinessEvent(
         const QnResourcePtr& resource, 
         const QHostAddress& address, 
-        const QStringList& cameras,
+        const QnNetworkResourceList& cameras,
         qint64 timeStamp):
         base_type(BusinessEventType::BE_Camera_Ip_Conflict, resource, timeStamp),
         m_address(address),
@@ -39,15 +39,11 @@ QnIPConflictBusinessEvent::QnIPConflictBusinessEvent(
 QString QnIPConflictBusinessEvent::toString() const
 {
     QString text = base_type::toString();
-    text += QObject::tr(" conflicting ip address: %1.").arg(m_address.toString());
-    text += QObject::tr(" conflicting cameras: ");
-    bool firstTime = true;
-    foreach(const QString& mac, m_cameras) 
-    {
-        if (!firstTime)
+    text += QObject::tr(" conflicting cameras:");
+    for (int i = 0; i < m_cameras.size(); ++i) {
+        if (i > 0)
             text += QLatin1String(", ");
-        text += mac;
-        firstTime = false;
+        text += m_cameras[i]->getMAC().toString();
     }
     return text;
 }
@@ -56,10 +52,10 @@ QnBusinessParams QnIPConflictBusinessEvent::getRuntimeParams() const {
     QnBusinessParams params = base_type::getRuntimeParams();
     QnBusinessEventRuntime::setCameraAddress(&params, m_address);
 
-    QVariantList macList;
-    foreach(const QString &mac, m_cameras)
-        macList << mac;
+    QVariantList ids;
+    foreach(const QnResourcePtr &camera, m_cameras)
+        ids << camera->getId().toInt();
 
-    QnBusinessEventRuntime::setConflictingCamerasMac(&params, macList);
+    QnBusinessEventRuntime::setConflictingCamerasIds(&params, ids);
     return params;
 }

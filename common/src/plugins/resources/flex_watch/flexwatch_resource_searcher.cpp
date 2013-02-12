@@ -67,8 +67,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             info.mac = QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
             info.uniqId = info.mac;
             info.discoveryIp = sender.toString();
-            info.defaultLogin = QLatin1String("root");
-            info.defaultPassword = QLatin1String("root");
+
             onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result);
 
         }

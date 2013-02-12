@@ -69,7 +69,7 @@ protected:
     virtual bool processDiscoveredResources(QnResourceList& resources);
 signals:
     void localInterfacesChanged();
-    void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
+    void CameraIPConflict(QHostAddress addr);
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
