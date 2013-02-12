@@ -147,6 +147,8 @@ public:
         base_type(parent),
         m_splashType(Invalid)
     {
+        setAcceptedMouseButtons(0);
+
         QGradient gradients[5];
 
         /* Sector numbering for rectangular splash:
@@ -254,6 +256,8 @@ public:
         m_size(QSizeF(32, 32)),
         m_pathValid(false)
     {
+        setAcceptedMouseButtons(0);
+
         setPen(ptzArrowBorderColor);
         setBrush(ptzArrowBaseColor);
     }
@@ -313,7 +317,7 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// PtzManipulatorWidget
+// PtzZoomButtonWidget
 // -------------------------------------------------------------------------- //
 class PtzZoomButtonWidget: public QnImageButtonWidget {
     typedef QnImageButtonWidget base_type;
@@ -401,9 +405,10 @@ public:
         m_zoomInButton(new PtzZoomButtonWidget(this)),
         m_zoomOutButton(new PtzZoomButtonWidget(this))
     {
+        setAcceptedMouseButtons(0);
+
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
-
         m_arrowItem->setOpacity(0.0);
 
         updateLayout();
