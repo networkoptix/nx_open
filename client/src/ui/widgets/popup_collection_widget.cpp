@@ -6,7 +6,6 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -58,8 +57,8 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
 
     qDebug() << "popup received" << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
 
-    if (QWidget* w = m_widgetsByType[eventType]) {
-        QnPopupWidget* pw = dynamic_cast<QnPopupWidget*>(w); // TODO: #gdm Why don't store QnPopupWidget * in a map? This way we won't need dynamic_casts.
+    if (m_widgetsByType.contains(eventType)) {
+        QnPopupWidget* pw = m_widgetsByType[eventType];
         pw->addBusinessAction(businessAction);
     } else {
         QnPopupWidget* pw = new QnPopupWidget(this);
@@ -84,11 +83,6 @@ void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void QnPopupCollectionWidget::updatePosition() {
-    // TODO: #gdm you have QWidget::parentWidget for that. Please spend some time reading through QWidget docs.
-    // QRect pgeom = static_cast<QWidget *>(parent())->geometry();
-    
-    // TODO: #gdm there were some bugs here related to improper use of QWidget::geometry. Please read QWidget docs =).
-
     QSize parentSize = parentWidget()->size();
     QSize size = this->size();
     move(parentSize.width() - size.width(), parentSize.height() - size.height());

@@ -5,6 +5,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 
+#include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -34,7 +35,7 @@ private slots:
 private:
     QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
-    QMap<BusinessEventType::Value, QWidget *> m_widgetsByType;
+    QMap<BusinessEventType::Value, QnPopupWidget *> m_widgetsByType;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

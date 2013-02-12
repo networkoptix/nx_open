@@ -60,6 +60,8 @@ QnPopupWidget::QnPopupWidget(QWidget *parent) :
     ui->eventsTreeView->setModel(m_model);
 
     connect(ui->eventsTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(at_eventsTreeView_clicked(QModelIndex)));
+    connect(ui->eventsTreeView, SIGNAL(expanded(QModelIndex)), this, SLOT(updateTreeSize()));
+    connect(ui->eventsTreeView, SIGNAL(collapsed(QModelIndex)), this, SLOT(updateTreeSize()));
 
     QPalette pal = ui->eventsTreeView->palette();
     pal.setColor(QPalette::Base, pal.color(QPalette::Window));
@@ -79,22 +81,45 @@ void QnPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
         return;
 
     QStandardItem* item = m_model->itemFromIndex(index);
-    if (m_showAllItem && item == m_showAllItem) {
-        m_showAll = true;
+    if (!m_showAllItem || item != m_showAllItem)
+        return;
 
-        QStandardItem* root = m_model->invisibleRootItem();
-        QModelIndex index = m_model->indexFromItem(root);
-        int showAllRow = -1;
-        for (int i = 0; i < root->rowCount(); i++) {
-            if (root->child(i) == m_showAllItem) {
-                showAllRow = i;
-                continue;
-            }
-            ui->eventsTreeView->setRowHidden(i, index, false);
+    m_showAll = true;
+
+    QStandardItem* root = m_model->invisibleRootItem();
+    QModelIndex rootIndex = m_model->indexFromItem(root);
+    int showAllRow = -1;
+    for (int i = 0; i < root->rowCount(); i++) {
+        if (root->child(i) == m_showAllItem) {
+            showAllRow = i;
+            continue;
         }
-        if (showAllRow >= 0)
-            root->removeRow(showAllRow);
+        ui->eventsTreeView->setRowHidden(i, rootIndex, false);
     }
+    if (showAllRow >= 0)
+        root->removeRow(showAllRow);
+
+    ui->eventsTreeView->expandAll();
+    updateTreeSize();
+
+}
+
+void QnPopupWidget::updateTreeSize() {
+    int rowCount = 0;
+    QStandardItem* root = m_model->invisibleRootItem();
+    QModelIndex rootIndex = m_model->indexFromItem(root);
+
+    for (int i = 0; i < root->rowCount(); i++) {
+        QStandardItem* item = root->child(i);
+        if (ui->eventsTreeView->isRowHidden(i, rootIndex))
+            continue;
+        rowCount++;
+        if (ui->eventsTreeView->isExpanded(m_model->indexFromItem(item)))
+            rowCount += item->rowCount();
+    }
+
+    ui->eventsTreeView->setMaximumHeight(rowCount *
+        ui->eventsTreeView->rowHeight(m_model->indexFromItem(root->child(0))));
 }
 
 bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -103,8 +128,10 @@ bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &busines
     if (!updateTreeModel(businessAction))
         return false;
 
-    ui->eventsTreeView->expandAll();
+  //  ui->eventsTreeView->expandAll();
     QStandardItem* root = m_model->invisibleRootItem();
+
+
     if (!m_showAll && !m_showAllItem && root->rowCount() > 2) {
         //add '...'
 
@@ -117,11 +144,12 @@ bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &busines
         root->appendRow(m_showAllItem);
     }
 
+    int hidden = 0;
     if (!m_showAll && m_showAllItem) {
         //hide additional rows
 
         QModelIndex index = m_model->indexFromItem(root);
-        int hidden = 0;
+
         for (int i = 2; i < root->rowCount(); i++) {
             if (root->child(i) == m_showAllItem)
                 continue;
@@ -131,6 +159,14 @@ bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &busines
         m_showAllItem->setText(tr("%1 others...").arg(hidden));
     }
 
+    updateTreeSize();
+
+    /*if (!m_showAll) {
+        ui->eventsTreeView->setMaximumHeight(
+                    (root->rowCount() - hidden) *
+                    ui->eventsTreeView->rowHeight(
+                        m_model->indexFromItem(root->child(0))));
+    }*/
     return true;
 }
 

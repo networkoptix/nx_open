@@ -33,6 +33,8 @@ private slots:
     void at_okButton_clicked();
     void at_eventsTreeView_clicked(const QModelIndex &index);
 
+    void updateTreeSize();
+
 private:
     /**
      * @brief initWidget            Setup stored parameters and display header.

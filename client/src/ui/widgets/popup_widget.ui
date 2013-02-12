@@ -7,16 +7,22 @@
     <x>0</x>
     <y>0</y>
     <width>247</width>
-    <height>228</height>
+    <height>216</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string/>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
    <property name="sizeConstraint">
     <enum>QLayout::SetFixedSize</enum>
    </property>
@@ -109,10 +115,16 @@
    <item>
     <widget class="QnTreeView" name="eventsTreeView">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>84</height>
+      </size>
      </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
