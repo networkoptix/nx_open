@@ -109,11 +109,12 @@ protected:
         /* Draw 'recording' icon. */
         bool recording = false, scheduled = false;
         if(resource) {
-            if(resource->getStatus() == QnResource::Recording) {
-                recording = true;
+            if(!resource->isDisabled()) {
+                if(resource->getStatus() == QnResource::Recording)
+                    recording = true;
             } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
                 foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                    if(otherCamera->getStatus() == QnResource::Recording) {
+                    if(!otherCamera->isDisabled() && otherCamera->getStatus() == QnResource::Recording) {
                         recording = true;
                         break;
                     }
