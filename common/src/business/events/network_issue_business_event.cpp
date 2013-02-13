@@ -19,10 +19,10 @@ QString QnNetworkIssueBusinessEvent::toString() const
 {
     QString reasonText;
     switch (m_reasonCode) {
-        case NETWORK_ISSUE_NO_FRAME:
+        case QnBusiness::NetworkIssueNoFrame:
             reasonText = QObject::tr("No video frame during %1 seconds").arg(m_reasonText);
             break;
-        case NETWORK_ISSUE_RTP_PACKET_LOST:
+        case QnBusiness::NetworkIssueRtpPacketLoss:
             {
                 QStringList seqs = m_reasonText.split(QLatin1Char(';'));
                 if (seqs.size() != 2)

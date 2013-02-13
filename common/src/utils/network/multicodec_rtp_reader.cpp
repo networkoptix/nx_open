@@ -209,7 +209,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
         emit networkIssue(getResource(),
                           qnSyncTime->currentUSecsSinceEpoch(),
-                          NETWORK_ISSUE_NO_FRAME,
+                          QnBusiness::NetworkIssueNoFrame,
                           QString::number((qlonglong) MAX_FRAME_DURATION*2/1000));
     }
     return result;
@@ -359,7 +359,7 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 {
     emit networkIssue(getResource(),
                       qnSyncTime->currentUSecsSinceEpoch(),
-                      NETWORK_ISSUE_RTP_PACKET_LOST,
+                      QnBusiness::NetworkIssueRtpPacketLoss,
                       QString(QLatin1String("%1;%2")).arg(prev).arg(next));
 }
 

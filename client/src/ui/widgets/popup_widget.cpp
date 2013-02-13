@@ -19,6 +19,7 @@ namespace {
         EventCountRole,
         EventTimeRole,
         EventReasonRole,
+        EventReasonTextRole,
         ConflictsRole
 
     };
@@ -106,7 +107,7 @@ void QnPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
 }
 
 void QnPopupWidget::updateTreeSize() {
-    int rowCount = 0;
+    int height = 0;
     QStandardItem* root = m_model->invisibleRootItem();
     QModelIndex rootIndex = m_model->indexFromItem(root);
 
@@ -114,13 +115,16 @@ void QnPopupWidget::updateTreeSize() {
         QStandardItem* item = root->child(i);
         if (ui->eventsTreeView->isRowHidden(i, rootIndex))
             continue;
-        rowCount++;
-        if (ui->eventsTreeView->isExpanded(m_model->indexFromItem(item)))
-            rowCount += item->rowCount();
+        height += ui->eventsTreeView->rowHeight(m_model->indexFromItem(item));
+        if (!ui->eventsTreeView->isExpanded(m_model->indexFromItem(item)))
+            continue;
+
+        for (int j = 0; j < item->rowCount(); j++) {
+            height += ui->eventsTreeView->rowHeight(m_model->indexFromItem(item->child(j)));
+        }
     }
 
-    ui->eventsTreeView->setMaximumHeight(rowCount *
-        ui->eventsTreeView->rowHeight(m_model->indexFromItem(root->child(0))));
+    ui->eventsTreeView->setMaximumHeight(height);
 }
 
 bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -161,13 +165,6 @@ bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &busines
     }
 
     updateTreeSize();
-
-    /*if (!m_showAll) {
-        ui->eventsTreeView->setMaximumHeight(
-                    (root->rowCount() - hidden) *
-                    ui->eventsTreeView->rowHeight(
-                        m_model->indexFromItem(root->child(0))));
-    }*/
     return true;
 }
 
@@ -274,6 +271,7 @@ QStandardItem* QnPopupWidget::findOrCreateItem(const QnBusinessParams& eventPara
     item->setData(0, EventCountRole);
     item->setData(getEventTime(eventParams), EventTimeRole);
     item->setData(eventReasonCode, EventReasonRole);
+    item->setData(QnBusinessEventRuntime::getReasonText(eventParams), EventReasonTextRole);
     root->appendRow(item);
     return item;
 }
@@ -294,24 +292,43 @@ QStandardItem* QnPopupWidget::updateReasonTree(const QnBusinessParams& eventPara
 
     item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
 
-    switch (item->data(EventReasonRole).toInt()) {
-        case NETWORK_ISSUE_NO_FRAME:
-            item->appendRow(new QStandardItem(tr("No frame.")));
+    QnBusiness::EventReason reasonCode = (QnBusiness::EventReason)item->data(EventReasonRole).toInt();
+    QString reasonText = item->data(EventReasonTextRole).toString();
+
+    switch (reasonCode) {
+        case QnBusiness::NetworkIssueNoFrame:
+            if (m_eventType == BusinessEventType::BE_Network_Issue)
+                item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
+                                                  .arg(reasonText)));
             break;
-        case NETWORK_ISSUE_RTP_PACKET_LOST:
-            item->appendRow(new QStandardItem(tr("Packet loss detected.")));
+        case QnBusiness::NetworkIssueRtpPacketLoss:
+            if (m_eventType == BusinessEventType::BE_Network_Issue) {
+                QStringList seqs = reasonText.split(QLatin1Char(';'));
+                if (seqs.size() != 2)
+                    break;
+                QString text = tr("RTP packet loss detected.\nPrev seq.=%1 next seq.=%2")
+                        .arg(seqs[0])
+                        .arg(seqs[1]);
+                item->appendRow(new QStandardItem(text));
+            }
             break;
-        case MSERVER_TERMINATED:
-            item->appendRow(new QStandardItem(tr("Server stopped.")));
+        case QnBusiness::MServerIssueTerminated:
+            if (m_eventType == BusinessEventType::BE_MediaServer_Failure)
+                item->appendRow(new QStandardItem(tr("Server terminated.")));
             break;
-        case MSERVER_STARTED:
-            item->appendRow(new QStandardItem(tr("Server started.")));
+        case QnBusiness::MServerIssueStarted:
+            if (m_eventType == BusinessEventType::BE_MediaServer_Failure)
+                item->appendRow(new QStandardItem(tr("Server started after crash.")));
             break;
-        case STORAGE_IO_ERROR:
-            item->appendRow(new QStandardItem(tr("IO Error.")));
+        case QnBusiness::StorageIssueIoError:
+            if (m_eventType == BusinessEventType::BE_Storage_Failure)
+                item->appendRow(new QStandardItem(tr("I/O Error occured at\n%1")
+                                                  .arg(reasonText)));
             break;
-        case STORAGE_NOT_ENOUGH_SPEED:
-            item->appendRow(new QStandardItem(tr("Disk speed.")));
+        case QnBusiness::StorageIssueNotEnoughSpeed:
+            if (m_eventType == BusinessEventType::BE_Storage_Failure)
+                item->appendRow(new QStandardItem(tr("Not enough HDD/SSD speed\nfor recording at\n%1.")
+                                                  .arg(reasonText)));
             break;
         default:
             break;

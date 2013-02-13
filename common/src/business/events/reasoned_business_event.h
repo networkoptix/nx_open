@@ -3,14 +3,19 @@
 
 #include "instant_business_event.h"
 
-// TODO: WTF? In one place of business events module we use enums, in another - defines. 
-// How about trying to write consistent code?
-#define NETWORK_ISSUE_NO_FRAME 1
-#define NETWORK_ISSUE_RTP_PACKET_LOST 2
-#define MSERVER_TERMINATED 3
-#define MSERVER_STARTED 4
-#define STORAGE_IO_ERROR 5
-#define STORAGE_NOT_ENOUGH_SPEED 6
+namespace QnBusiness {
+
+    enum EventReason {
+        NoReason,
+        NetworkIssueNoFrame,
+        NetworkIssueRtpPacketLoss,
+        MServerIssueTerminated,
+        MServerIssueStarted,
+        StorageIssueIoError,
+        StorageIssueNotEnoughSpeed
+    };
+
+}
 
 namespace QnBusinessEventRuntime {
 

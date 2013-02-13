@@ -16,10 +16,10 @@ QString QnMServerFailureBusinessEvent::toString() const
 {
     QString reasonText;
     switch (m_reasonCode) {
-        case MSERVER_TERMINATED:
+        case QnBusiness::MServerIssueTerminated:
             reasonText = QObject::tr("Media server was terminated unexpectedly");
             break;
-        case MSERVER_STARTED:
+        case QnBusiness::MServerIssueStarted:
             reasonText = QObject::tr("Media server is started after an unexpected shutdown");
             break;
         default:

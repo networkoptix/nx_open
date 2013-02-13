@@ -63,7 +63,7 @@ void QnServerStreamRecorder::at_recordingFailed(QString msg)
     Q_UNUSED(msg)
 	Q_ASSERT(m_mediaServer);
     if (m_mediaServer)
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), STORAGE_IO_ERROR ,m_storage);
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError ,m_storage);
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -96,7 +96,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), STORAGE_NOT_ENOUGH_SPEED, m_storage);
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueNotEnoughSpeed, m_storage);
 
 		qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
         markNeedKeyData();

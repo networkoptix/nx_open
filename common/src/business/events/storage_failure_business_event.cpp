@@ -34,10 +34,10 @@ QString QnStorageFailureBusinessEvent::toString() const
 {
     QString reasonText;
     switch (m_reasonCode) {
-        case STORAGE_IO_ERROR:
+        case QnBusiness::StorageIssueIoError:
             reasonText = QObject::tr("IO error occured.");
             break;
-        case STORAGE_NOT_ENOUGH_SPEED:
+        case QnBusiness::StorageIssueNotEnoughSpeed:
             reasonText = QObject::tr("Not enough HDD/SSD speed for recording.");
             break;
         default:
