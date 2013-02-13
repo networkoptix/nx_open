@@ -197,7 +197,7 @@ bool QnNetworkResource::shoudResolveConflicts() const
     return false;
 }
 
-bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
+bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
     if (source->getHostAddress() != getHostAddress())
     {
