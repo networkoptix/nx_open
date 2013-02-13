@@ -16,6 +16,10 @@ QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource) 
         qnWarning("Invalid non-camera resource '%1' provided to ptz controller.", resource ? resource->getName() : QLatin1String("NULL"));
 }
 
+QnAbstractPtzController::~QnAbstractPtzController() {
+
+}
+
 void QnAbstractPtzController::getCalibrate(QnVirtualCameraResourcePtr res, qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff)
 {
     QVariant val = 1.0;

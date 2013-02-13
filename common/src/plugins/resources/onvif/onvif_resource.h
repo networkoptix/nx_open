@@ -118,9 +118,9 @@ public:
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
 
-    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) override;
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
-    virtual int getMaxOnvifRequestTries() const { return 1; };
+    virtual int getMaxOnvifRequestTries() const { return 1; }
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;

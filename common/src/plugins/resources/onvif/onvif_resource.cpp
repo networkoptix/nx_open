@@ -1152,7 +1152,7 @@ bool QnPlOnvifResource::shoudResolveConflicts() const
     return false;
 }
 
-bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
+bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)
 {
     QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
     if (!onvifR)
