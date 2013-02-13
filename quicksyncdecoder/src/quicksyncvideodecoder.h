@@ -37,7 +37,7 @@
 
 //!if defined, scale is performed with MFX, otherwise - by directx means (by rendering to surface with scaling)
 //#define SCALE_WITH_MFX
-#define WRITE_INPUT_STREAM_TO_FILE_1
+//#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
 
