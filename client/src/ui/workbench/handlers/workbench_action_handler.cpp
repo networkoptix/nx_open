@@ -2039,6 +2039,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setGuid(QUuid::createUuid());
 
     connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    user->setPassword(QString()); // forget the password now
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
@@ -2201,10 +2202,10 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     
 
     // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-    QString userPassword = qnSettings->lastUsedConnection().url.password();
+    QString currentPassword = qnSettings->lastUsedConnection().url.password();
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
-        dialog->setCurrentPassword(userPassword);
+        dialog->setCurrentPassword(currentPassword);
     } else {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     }
@@ -2215,24 +2216,26 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
-        if (user == context()->user() && user->getPassword().isEmpty())
-            user->setPassword(userPassword);
 
-        if (user->isAdmin() && userPassword != user->getPassword()) {
+        if (user == context()->user()                           // if we
+                && user->isAdmin()                              // are owner
+                && !user->getPassword().isEmpty()               // and have changed our password
+                && currentPassword != user->getPassword()       // to another password
+                )
+        {
             QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
             int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                                  QMessageBox::Ok, QMessageBox::Discard);
             if (button == QMessageBox::Discard) {
-                user->setPassword(userPassword); // TODO #gdm ask elric: why the hell we store empty strings?
-//                return; // we cannot change anything else for the Owner so we can return safely
+                user->setPassword(QString());
             }
         }
 
-        // TODO #gdm ask elric: should we restore empty user->password at at_resources_saved()?
         connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
-        if(user == context()->user() && newPassword != userPassword) {
+        user->setPassword(QString());
+        if(user == context()->user() && !newPassword.isEmpty() && newPassword != currentPassword) {
             /* Password was changed. Change it in global settings and hope for the best. */
             QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);

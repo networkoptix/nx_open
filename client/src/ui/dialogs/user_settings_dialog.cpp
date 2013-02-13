@@ -222,8 +222,8 @@ void QnUserSettingsDialog::submitToResource() {
         return;
 
     m_user->setName(ui->loginEdit->text());
-    if(!ui->passwordEdit->text().isEmpty())
-        m_user->setPassword(ui->passwordEdit->text());
+//    if(!ui->passwordEdit->text().isEmpty())
+    m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
 
     quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
     if (rights == CUSTOM_RIGHTS)
@@ -317,13 +317,8 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if (ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
             hint = tr("Passwords do not match.");
             valid = false;
-        } else if ( (ui->passwordEdit->text().isEmpty() ||
-                     ui->confirmPasswordEdit->text().isEmpty())
-                    && (ui->passwordEdit->placeholderText().isEmpty() ||        // new user
-                        (ui->currentPasswordEdit->text() == m_currentPassword   // change current user password
-                         && !m_currentPassword.isEmpty()                        // edit other user
-                        )
-                       )
+        } else if ( (ui->passwordEdit->text().isEmpty() || ui->confirmPasswordEdit->text().isEmpty())
+                    && ui->passwordEdit->placeholderText().isEmpty() // creating new user
                   )
         {
             hint = tr("Password cannot be empty.");
