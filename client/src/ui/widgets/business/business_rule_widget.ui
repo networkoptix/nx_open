@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>919</width>
+    <width>955</width>
     <height>240</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
-         <number>6</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0">
@@ -139,7 +139,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>1</height>
            </size>
           </property>
          </spacer>
@@ -156,7 +156,7 @@
            <string>Schedule...</string>
           </property>
           <property name="icon">
-           <iconset resource="../../../../x86/build/client-custom.qrc">
+           <iconset>
             <normaloff>:/skin/tree/servers.png</normaloff>:/skin/tree/servers.png</iconset>
           </property>
          </widget>
@@ -187,7 +187,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
-         <number>6</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
@@ -398,8 +398,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../../x86/build/client-custom.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
