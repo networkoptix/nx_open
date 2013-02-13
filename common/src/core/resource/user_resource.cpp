@@ -47,6 +47,18 @@ void QnUserResource::setAdmin(bool isAdmin)
     m_isAdmin = isAdmin;
 }
 
+QString QnUserResource::getEmail() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_email;
+}
+
+void QnUserResource::setEmail(const QString& email)
+{
+    QMutexLocker locker(&m_mutex);
+    m_email = email;
+}
+
 void QnUserResource::updateInner(QnResourcePtr other) 
 {
     base_type::updateInner(other);
@@ -56,5 +68,6 @@ void QnUserResource::updateInner(QnResourcePtr other)
         setPassword(localOther->getPassword());
         setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());
+        setEmail(localOther->getEmail());
     }
 }
