@@ -34,6 +34,13 @@ namespace boost {
 #define QMutableHashIterator    qt_java_style_iterators_are_forbidden
 #define QVectorIterator         qt_java_style_iterators_are_forbidden
 
+
+/* Prevent the usage of Q_GLOBAL_STATIC_WITH_INITIALIZER as it is not thread-safe.
+ * See http://lists.qt-project.org/pipermail/development/2012-March/002636.html. */
+#undef Q_GLOBAL_STATIC_WITH_INITIALIZER
+#define Q_GLOBAL_STATIC_WITH_INITIALIZER Q_GLOBAL_STATIC_WITH_INITIALIZER___IS_DEPRECATED 
+
+
 #endif // __cplusplus
 
 #endif // QN_DEPRECATION_H

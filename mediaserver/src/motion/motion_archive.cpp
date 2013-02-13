@@ -231,7 +231,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                         break;
                     }
 
-                    if (!rez.isEmpty() && fullStartTime < rez.last().startTimeMs + rez.last().durationMs + (detailLevel-1))
+                    if (!rez.isEmpty() && fullStartTime <= rez.last().startTimeMs + rez.last().durationMs + detailLevel)
                         rez.last().durationMs = qMax(rez.last().durationMs, i->duration + fullStartTime - rez.last().startTimeMs);
                     else
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
@@ -379,7 +379,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
-    quint32 duration = int(data->m_duration/1000);
+    quint32 duration = int((data->timestamp+data->m_duration)/1000 - timestamp);
     if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();

@@ -1,21 +1,19 @@
 #ifndef __STORAGE_FAILURE_BUSINESS_EVENT_H__
 #define __STORAGE_FAILURE_BUSINESS_EVENT_H__
 
-#include "instant_business_event.h"
+#include "reasoned_business_event.h"
 
-class QnStorageFailureBusinessEvent: public QnInstantBusinessEvent
+class QnStorageFailureBusinessEvent: public QnReasonedBusinessEvent
 {
-    typedef QnInstantBusinessEvent base_type;
+    typedef QnReasonedBusinessEvent base_type;
 public:
     QnStorageFailureBusinessEvent(const QnResourcePtr& resource,
                           qint64 timeStamp,
-                          QnResourcePtr storageResource,
-                          const QString& reason);
+                          int reasonCode,
+                          QnResourcePtr storageResource
+                          );
 
     virtual QString toString() const override;
-private:
-    QString m_reason;
-    QnResourcePtr m_storageResource;
 };
 
 typedef QSharedPointer<QnStorageFailureBusinessEvent> QnStorageFailureBusinessEventPtr;

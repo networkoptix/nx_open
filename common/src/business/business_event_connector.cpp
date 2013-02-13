@@ -39,40 +39,43 @@ void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resour
     qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
 }
 
-void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, const QnResourcePtr &storageRes, const QString& reason)
+void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, int reasonCode, const QnResourcePtr &storageRes)
 {
     QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(
         mServerRes,
         timeStamp,
-        storageRes,
-        reason));
+        reasonCode,
+        storageRes
+    ));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
-void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp)
+void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode)
 {
     QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(
         resource,
-        timeStamp));
+        timeStamp,
+        reasonCode));
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 
-void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QnNetworkResourceList& cameras, qint64 timeStamp)
+void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList , qint64 timeStamp)
 {
     QnIPConflictBusinessEventPtr ipConflictEvent(new QnIPConflictBusinessEvent(
         resource,
         hostAddress,
-        cameras,
+        macAddrList,
         timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(ipConflictEvent);
 }
 
-void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, const QString& reason)
+void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode, const QString &reasonText)
 {
     QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
         resource,
         timeStamp,
-        reason));
+        reasonCode,
+        reasonText));
     qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
 }
 

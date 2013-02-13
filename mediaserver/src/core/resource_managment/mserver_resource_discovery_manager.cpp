@@ -54,7 +54,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     QSet<QString> discoveredResources;
 
     //assemble list of existing ip
-    QMap<quint32, int> ipsList;
+    QMap<quint32, QSet<QString> > ipsList;
 
 
     //excluding already existing resources
@@ -80,12 +80,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     {
                         // do not count 2--N channels of multichannel cameras as conflict
                         quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-                        if (ips) {
-                            if (ipsList.contains(ips))
-                                ipsList[ips]++;
-                            else
-                                ipsList[ips] = 1;
-                        }
+                        if (ips)
+                            ipsList[ips].insert(newNetRes->getMAC().toString());
                     }
                 }
 
@@ -143,12 +139,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     }
 
     // ========================= send conflict info =====================
-    for (QMap<quint32, int>::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
+    for (QMap<quint32, QSet<QString> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
-        if (itr.value() > 1) 
+        if (itr.value().size() > 1) 
         {
             QHostAddress hostAddr(itr.key());
-            emit CameraIPConflict(hostAddr);
+            emit CameraIPConflict(hostAddr, itr.value().toList());
         }
     }
 
@@ -183,7 +179,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (netRes && netRes->shoudResolveConflicts())
         {
             quint32 ips = resolveAddress(netRes->getHostAddress()).toIPv4Address();
-            if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
+            if (ipsList.count(ips) > 0 && ipsList[ips].size() > 1)
             {
                 netRes->setNetworkStatus(QnNetworkResource::BadHostAddr);
                 cl_log.log(netRes->getHostAddress() , " conflicting. Has same IP as someone else.", cl_logINFO);

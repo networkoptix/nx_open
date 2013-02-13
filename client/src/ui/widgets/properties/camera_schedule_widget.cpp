@@ -366,7 +366,7 @@ static inline QString getLongText(const QString &text)
         return QLatin1String("Best");
     return QLatin1String("-");
 }
-
+ 
 int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
 {
     for (int i = 0; i < ui->qualityComboBox->count(); ++i)

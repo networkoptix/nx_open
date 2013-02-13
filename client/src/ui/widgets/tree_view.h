@@ -11,11 +11,15 @@
  * It also adds several features that the QTreeView is lacking.
  */
 class QnTreeView: public QTreeView {
-    Q_OBJECT;
+    Q_OBJECT
+
+    typedef QTreeView base_type;
 public:
     QnTreeView(QWidget *parent = NULL);
 
     virtual ~QnTreeView();
+
+    int rowHeight(const QModelIndex &index) const;
 
 signals:
     /**

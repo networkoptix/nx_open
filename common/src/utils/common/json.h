@@ -18,7 +18,7 @@ inline void serialize(const TYPE &value, QVariant *target) {                    
 }                                                                               \
                                                                                 \
 inline bool deserialize(const QVariant &value, TYPE *target) {                  \
-    if(value.type() != qMetaTypeId<TYPE>())                                     \
+    if(value.type() != qMetaTypeId<TYPE>())      /* TODO: WRONG!!!    */        \
         return false;                                                           \
                                                                                 \
     *target = value.value<TYPE>();                                              \
@@ -143,25 +143,21 @@ namespace QJson {
 } // namespace QJson
 
 
-template<class T>
-void serialize(const QList<T> &value, QVariant *target) {
-    QJson_detail::serialize_list<T, QList<T> >(value, target);
-}
+#define QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS(TYPE)                            \
+template<class T>                                                               \
+void serialize(const TYPE<T> &value, QVariant *target) {                        \
+    QJson_detail::serialize_list<T, TYPE<T> >(value, target);                   \
+}                                                                               \
+                                                                                \
+template<class T>                                                               \
+bool deserialize(const QVariant &value, TYPE<T> *target) {                      \
+    return QJson_detail::deserialize_list<T, TYPE<T> >(value, target);          \
+}                                                                               \
 
-template<class T>
-bool deserialize(const QVariant &value, QList<T> *target) {
-    return QJson_detail::deserialize_list<T, QList<T> >(value, target);
-}
+QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS(QList);
+QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS(QVector);
 
-template<class T>
-void serialize(const QVector<T> &value, QVariant *target) {
-    QJson_detail::serialize_list<T, QVector<T> >(value, target);
-}
-
-template<class T>
-bool deserialize(const QVariant &value, QVector<T> *target) {
-    return QJson_detail::deserialize_list<T, QVector<T> >(value, target);
-}
+#undef QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS
 
 
 #endif // QN_JSON_H

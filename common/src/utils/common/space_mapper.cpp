@@ -1,7 +1,5 @@
 #include "space_mapper.h"
 
-#include <cassert>
-
 #include <utils/common/enum_name_mapper.h>
 #include <utils/common/json.h>
 
@@ -49,8 +47,6 @@ void QnScalarSpaceMapper::init(const QVector<QPointF> &logicalToPhysical, Qn::Ex
 }
 
 void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
-    assert(target);
-
     QString extrapolationMode = qn_extrapolationMode_enumNameMapper()->name(value.logicalToPhysical().extrapolationMode());
 
     QVariantList logical, physical;
@@ -67,8 +63,6 @@ void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
 }
 
 bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
-    assert(target);
-
     if(value.type() == QVariant::Invalid) {
         /* That's null mapper. */
         *target = QnScalarSpaceMapper();
@@ -109,8 +103,6 @@ bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
 // QnVectorSpaceMapper
 // -------------------------------------------------------------------------- //
 void serialize(const QnVectorSpaceMapper &value, QVariant *target) {
-    assert(target);
-
     QVariantMap result;
     QJson::serialize(value.mapper(QnVectorSpaceMapper::X), "x", &result);
     QJson::serialize(value.mapper(QnVectorSpaceMapper::Y), "y", &result);
@@ -119,8 +111,6 @@ void serialize(const QnVectorSpaceMapper &value, QVariant *target) {
 }
 
 bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
-    assert(target);
-    
     if(value.type() == QVariant::Invalid) {
         /* That's null mapper. */
         *target = QnVectorSpaceMapper();
@@ -149,8 +139,6 @@ bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
 // QnPtzSpaceMapper
 // -------------------------------------------------------------------------- //
 void serialize(const QnPtzSpaceMapper &value, QVariant *target) {
-    assert(target);
-
     QVariantMap result;
     QJson::serialize(value.models(), "models", &result);
     QJson::serialize(value.fromCamera(), "fromCamera", &result);
@@ -159,8 +147,6 @@ void serialize(const QnPtzSpaceMapper &value, QVariant *target) {
 }
 
 bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
-    assert(target);
-
     if(value.type() == QVariant::Invalid) {
         /* That's null mapper. */
         *target = QnPtzSpaceMapper();

@@ -13,6 +13,7 @@ class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
     QnAbstractPtzController(const QnResourcePtr &resource);
+    virtual ~QnAbstractPtzController();
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
     virtual int stopMove() = 0;

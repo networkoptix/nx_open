@@ -27,7 +27,7 @@ namespace BusinessEventType
             case BE_Camera_Ip_Conflict:
                 return QObject::tr("Camera IP Conflict");
             case BE_MediaServer_Failure:
-                return QObject::tr("Mediaserver connection lost");
+                return QObject::tr("Mediaserver failure");
             case BE_MediaServer_Conflict:
                 return QObject::tr("Mediaservers conflict");
             case BE_UserDefined:
@@ -138,8 +138,8 @@ namespace BusinessEventType
 namespace QnBusinessEventRuntime {
 
     static QLatin1String typeStr("eventType");
-    static QLatin1String nameStr("eventResourceName");
-    static QLatin1String urlStr("eventResourceUrl");
+    static QLatin1String timestampStr("eventTimestamp");
+    static QLatin1String resourceIdStr("eventResourceId");
     static QLatin1String descriptionStr("eventDescription");
 
     BusinessEventType::Value getEventType(const QnBusinessParams &params) {
@@ -150,20 +150,20 @@ namespace QnBusinessEventRuntime {
         (*params)[typeStr] = (int)value;
     }
 
-    QString getEventResourceName(const QnBusinessParams &params) {
-        return params.value(nameStr, QString()).toString();
+    qint64 getEventTimestamp(const QnBusinessParams &params) {
+        return params.value(timestampStr, BusinessEventType::BE_NotDefined).toLongLong();
     }
 
-    void setEventResourceName(QnBusinessParams* params, QString value) {
-        (*params)[nameStr] = value;
+    void setEventTimestamp(QnBusinessParams* params, qint64 value) {
+        (*params)[timestampStr] = value;
     }
 
-    QString getEventResourceUrl(const QnBusinessParams &params) {
-        return params.value(urlStr, QString()).toString();
+    int getEventResourceId(const QnBusinessParams &params) {
+        return params.value(resourceIdStr).toInt();
     }
 
-    void setEventResourceUrl(QnBusinessParams* params, QString value) {
-        (*params)[urlStr] = value;
+    void setEventResourceId(QnBusinessParams* params, int value) {
+        (*params)[resourceIdStr] = value;
     }
 
     QString getEventDescription(const QnBusinessParams &params) {
@@ -197,9 +197,9 @@ QString QnAbstractBusinessEvent::toString() const
 QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
     QnBusinessParams params;
     QnBusinessEventRuntime::setEventType(&params, m_eventType);
+    QnBusinessEventRuntime::setEventTimestamp(&params, m_timeStamp);
     QnBusinessEventRuntime::setEventDescription(&params, toString());
-    QnBusinessEventRuntime::setEventResourceName(&params, m_resource ? m_resource->getName() : QString());
-    QnBusinessEventRuntime::setEventResourceUrl(&params, m_resource ? m_resource->getUrl() : QString());
+    QnBusinessEventRuntime::setEventResourceId(&params, m_resource ? m_resource->getId().toInt() : 0);
 
     return params;
 }

@@ -25,35 +25,32 @@ namespace {
             m_warningLabel(NULL)
         {}
 
-        virtual void setWidgetLayout(QLayout *layout) override {
-            m_warningLabel = new QLabel(layout->parentWidget());
-            QPalette palette = layout->parentWidget()->palette();
+        virtual void init(QWidget* parent) override {
+            m_warningLabel = new QLabel(parent);
+            QPalette palette = parent->palette();
             palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
             m_warningLabel->setPalette(palette);
 
-            layout->addWidget(m_warningLabel);
+            parent->layout()->addWidget(m_warningLabel);
         }
 
-        virtual void modelDataChanged(const QnResourceList &selected) override {
+        virtual bool validate(const QnResourceList &selected) override {
             if (!m_warningLabel)
-                return;
+                return true;
             int invalid = 0;
             QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
             foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-                if (isCameraInvalid(camera)) {
+                if (!isCameraValid(camera)) {
                     invalid++;
                 }
             }
             m_warningLabel->setText(getText(invalid, cameras.size()));
             m_warningLabel->setVisible(invalid > 0);
+            return true;
         }
 
     protected:
-        // TODO: #gdm 
-        // It is a good practice to use positive clauses in method names so that
-        // the programmer who calls into your code doesn't have to do double negation.
-        // Writing something like !isCameraInvalid() can be brain-straining.
-        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const = 0;
+        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const = 0;
         virtual QString getText(int invalid, int total) const = 0;
 
     private:
@@ -65,8 +62,8 @@ namespace {
     public:
         QnMotionEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
-            return !QnMotionBusinessEvent::isResourceValid(camera);
+        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+            return QnMotionBusinessEvent::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
             return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
@@ -77,8 +74,8 @@ namespace {
     public:
         QnRecordingEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
-            return !QnRecordingBusinessAction::isResourceValid(camera);
+        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+            return QnRecordingBusinessAction::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
             return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
@@ -89,8 +86,8 @@ namespace {
     public:
         QnInputEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
-            return !QnCameraInputEvent::isResourceValid(camera);
+        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+            return QnCameraInputEvent::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
             return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
@@ -101,8 +98,8 @@ namespace {
     public:
         QnOutputEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraInvalid(const QnVirtualCameraResourcePtr &camera) const override {
-            return !QnCameraOutputBusinessAction::isResourceValid(camera);
+        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+            return QnCameraOutputBusinessAction::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
             return tr("%1 of %2 selected cameras have not output relays.").arg(invalid).arg(total);

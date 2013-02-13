@@ -1109,6 +1109,9 @@ int QnRtspConnectionProcessor::composeSetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
 
+    if (!d->mediaRes)
+        return CODE_NOT_FOUND;
+
     createDataProvider();
 
     QList<QByteArray> parameters = d->requestBody.split('\n');

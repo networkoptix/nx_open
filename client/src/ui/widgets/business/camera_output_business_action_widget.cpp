@@ -23,7 +23,6 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 
 QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()
 {
-    delete ui;
 }
 
 void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {

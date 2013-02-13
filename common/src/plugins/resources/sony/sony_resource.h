@@ -26,8 +26,9 @@ class QnPlSonyResource : public QnPlOnvifResource
 
 public:
     QnPlSonyResource();
+    virtual ~QnPlSonyResource();
 
-    virtual int getMaxOnvifRequestTries() const override { return 5; };
+    virtual int getMaxOnvifRequestTries() const override { return 5; }
 
 protected:
     virtual bool updateResourceCapabilities() override;

@@ -10,7 +10,7 @@ QnNetworkResource::QnNetworkResource():
     QnResource(),
     m_authenticated(true),
     m_networkStatus(0),
-    m_networkTimeout(3000),
+    m_networkTimeout(5000),
     m_probablyNeedToUpdateStatus(false)
 {
     addFlags(network | motion);

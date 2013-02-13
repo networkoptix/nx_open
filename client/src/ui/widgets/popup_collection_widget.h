@@ -11,6 +11,8 @@ namespace Ui {
     class QnPopupCollectionWidget;
 }
 
+class QnPopupWidget;
+
 class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -18,7 +20,7 @@ class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
     
 public:
     explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
-    ~QnPopupCollectionWidget();
+    virtual ~QnPopupCollectionWidget();
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
@@ -32,9 +34,9 @@ private slots:
     void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
 
 private:
-    Ui::QnPopupCollectionWidget *ui;
+    QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
-    QMap<BusinessEventType::Value, QWidget *> m_widgetsByType;
+    QMap<BusinessEventType::Value, QnPopupWidget *> m_widgetsByType;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

@@ -26,7 +26,7 @@ class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
     typedef QWidget base_type;
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
-    ~QnBusinessRuleWidget();
+    virtual ~QnBusinessRuleWidget();
 
     QnBusinessRuleViewModel* model() const;
     void setModel(QnBusinessRuleViewModel* model);
@@ -43,20 +43,22 @@ protected:
     void initActionParameters();
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 private slots:
     void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
 
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
     void at_actionTypeComboBox_currentIndexChanged(int index);
-    void at_aggregationPeriodChanged();
+    void at_ui_aggregationPeriodChanged();
     void at_commentsLineEdit_textChanged(const QString &value);
 
     void at_eventResourcesHolder_clicked();
     void at_actionResourcesHolder_clicked();
 
+    void updateModelAggregationPeriod();
 private:
-    Ui::QnBusinessRuleWidget *ui;
+    QScopedPointer<Ui::QnBusinessRuleWidget> ui;
 
     QnBusinessRuleViewModel* m_model;
 

@@ -118,9 +118,9 @@ public:
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
 
-    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) override;
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
-    virtual int getMaxOnvifRequestTries() const { return 1; };
+    virtual int getMaxOnvifRequestTries() const { return 1; }
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
@@ -176,7 +176,7 @@ public:
 
 
     virtual QnAbstractPtzController* getPtzController() override;
-    bool fetchAndSetDeviceInformation();
+    bool fetchAndSetDeviceInformation(bool performSimpleCheck);
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -408,6 +408,7 @@ private:
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
+    void checkPrimaryResolution(QSize& primaryResolution);
 };
 
 #endif //onvif_resource_h

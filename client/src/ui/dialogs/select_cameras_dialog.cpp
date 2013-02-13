@@ -2,6 +2,7 @@
 #include "ui_select_cameras_dialog.h"
 
 #include <core/resource_managment/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
 #include <ui/models/resource_pool_model.h>
@@ -23,15 +24,12 @@ QnSelectCamerasDialogDelegate::~QnSelectCamerasDialogDelegate() {
 
 }
 
-void QnSelectCamerasDialogDelegate::setWidgetLayout(QLayout *layout) {
-    Q_UNUSED(layout)
+void QnSelectCamerasDialogDelegate::init(QWidget* parent) {
+    Q_UNUSED(parent)
 }
 
-void QnSelectCamerasDialogDelegate::modelDataChanged(const QnResourceList &selected) {
-    Q_UNUSED(selected)
-}
-
-bool QnSelectCamerasDialogDelegate::isApplyAllowed() {
+bool QnSelectCamerasDialogDelegate::validate(const QnResourceList &selectedResources) {
+    Q_UNUSED(selectedResources)
     return true;
 }
 
@@ -115,7 +113,7 @@ void QnSelectCamerasDialog::setDelegate(QnSelectCamerasDialogDelegate *delegate)
     Q_ASSERT(!m_delegate);
     m_delegate = delegate;
     if (m_delegate) {
-        m_delegate->setWidgetLayout(ui->delegateLayout);
+        m_delegate->init(ui->delegateFrame);
     }
     ui->delegateFrame->setVisible(m_delegate && ui->delegateLayout->count() > 0);
     at_resourceModel_dataChanged();
@@ -126,8 +124,6 @@ QnSelectCamerasDialogDelegate* QnSelectCamerasDialog::delegate() {
 }
 
 void QnSelectCamerasDialog::at_resourceModel_dataChanged() {
-    if (m_delegate)
-        m_delegate->modelDataChanged(getSelectedResources());
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->isApplyAllowed());
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(getSelectedResources()));
 }
 

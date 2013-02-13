@@ -291,54 +291,58 @@ bool QnPlAxisResource::initInternal()
     QByteArray body;
     http.readAll(body);
 
-    QMutexLocker lock(&m_mutex);
-
-    m_resolutionList.clear();
-    int paramValuePos = body.indexOf('=');
-    if (paramValuePos == -1)
     {
-        qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
-        return false;
-    }
+        QMutexLocker lock(&m_mutex);
 
-    m_palntscRes = false;
-
-    m_resolutionList = body.mid(paramValuePos+1).split(',');
-    for (int i = 0; i < m_resolutionList.size(); ++i)
-    {
-        m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
-
-        
-        if (m_resolutionList[i]=="qcif")
+        m_resolutionList.clear();
+        int paramValuePos = body.indexOf('=');
+        if (paramValuePos == -1)
         {
-            m_resolutionList[i] = "176x144";
-            m_palntscRes = true;
+            qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
+            return false;
         }
 
-        else if (m_resolutionList[i]=="cif")
-        {
-            m_resolutionList[i] = "352x288";
-            m_palntscRes = true;
-        }
+        m_palntscRes = false;
 
-        else if (m_resolutionList[i]=="2cif")
+        m_resolutionList = body.mid(paramValuePos+1).split(',');
+        for (int i = 0; i < m_resolutionList.size(); ++i)
         {
-            m_resolutionList[i] = "704x288";
-            m_palntscRes = true;
-        }
+            m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
 
-        else if (m_resolutionList[i]=="4cif")
-        {
-            m_resolutionList[i] = "704x576";
-            m_palntscRes = true;
-        }
+            
+            if (m_resolutionList[i]=="qcif")
+            {
+                m_resolutionList[i] = "176x144";
+                m_palntscRes = true;
+            }
 
-        else if (m_resolutionList[i]=="d1")
-        {
-            m_resolutionList[i] = "720x576";
-            m_palntscRes = true;
+            else if (m_resolutionList[i]=="cif")
+            {
+                m_resolutionList[i] = "352x288";
+                m_palntscRes = true;
+            }
+
+            else if (m_resolutionList[i]=="2cif")
+            {
+                m_resolutionList[i] = "704x288";
+                m_palntscRes = true;
+            }
+
+            else if (m_resolutionList[i]=="4cif")
+            {
+                m_resolutionList[i] = "704x576";
+                m_palntscRes = true;
+            }
+
+            else if (m_resolutionList[i]=="d1")
+            {
+                m_resolutionList[i] = "720x576";
+                m_palntscRes = true;
+            }
         }
-    }
+    }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
+            //m_initMutex is locked up the stack
+    
 
 
     //root.Image.MotionDetection=no
@@ -920,10 +924,9 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 }
 
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
-    // TODO: #Elric check root.PTZ.Various.V1.Locked. It it's true then PTZ is disabled.
-
+    Q_UNUSED(http)
     // TODO: make configurable.
-    static const char *brokenPtzCameras[] = {"AXISP3344", NULL};
+    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
 
     // TODO: use QHash here, +^
     QString localModel = getModel();
@@ -931,18 +934,12 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-
-    QString ptzString;
-    CLHttpStatus status = readAxisParameter(http, lit("Properties.PTZ.PTZ"), &ptzString);
-    if(status != CL_HTTP_SUCCESS)
-        return;
-
-    if(ptzString != lit("yes"))
-        return;
-
     m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
+    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoCapabilities)
+        m_ptzController.reset();
 
-    setCameraCapabilities(getCameraCapabilities() | m_ptzController->getCapabilities());
+    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {

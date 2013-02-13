@@ -3,6 +3,28 @@
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
 #include "core/resource_managment/resource_pool.h"
+#include "core/dataprovider/live_stream_provider.h"
+
+bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
+{
+    bool rez = false;
+    netRes->lockConsumers();
+    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+    {
+        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+        if (lp)
+        {
+            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
+            if (lr && lr->isRunning()) {
+                rez = true;
+                break;
+            }
+        }
+    }
+
+    netRes->unlockConsumers();
+    return rez;
+}
 
 /*
 *   Port list used for manual camera add
@@ -74,30 +96,41 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     int onvifPort = url.port(80);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
-    int channel = url.queryItemValue(QLatin1String("channel")).toInt();
-    if (channel > 0) {
-        QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
-        QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
-        if (rpResource && rpResource->getStatus() != QnResource::Offline) {
-            QnPlOnvifResourcePtr res(new QnPlOnvifResource());
-            res->setPhysicalId(rpResource->getPhysicalId());
-            res->update(rpResource);
-            res->updateToChannel(channel-1);
-            resList << res;
-        }
-        return resList;
-    }
-
     QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
     resource->setTypeId(typePtr->getId());
     resource->setAuth(auth);
-    //resource->setDiscoveryAddr(addr);
     QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
+    // optimization. do not pull resource every time if resource already in pool
+    QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
+    QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
+    if (rpResource) 
+    {
+        int channel = url.queryItemValue(QLatin1String("channel")).toInt();
+        
+        if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
+            resource->calcTimeDrift();
+            if (!resource->fetchAndSetDeviceInformation(true))
+                return resList; // no answer from camera
+        }
+        else if (rpResource->getStatus() == QnResource::Offline)
+            return resList; // do not add 1..N channels if resource is offline
+
+        resource->setPhysicalId(rpResource->getPhysicalId());
+        resource->update(rpResource, true);
+        if (channel > 0)
+            resource->updateToChannel(channel-1);
+
+        QString userName = resource->getAuth().user();
+
+        resList << resource;
+        return resList;
+    }
+
     resource->calcTimeDrift();
-    if (resource->fetchAndSetDeviceInformation())
+    if (resource->fetchAndSetDeviceInformation(false))
     {
         // Clarify resource type
         QString fullName = resource->getName();

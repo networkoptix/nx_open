@@ -26,7 +26,6 @@ public slots:
 
     void timeout();
 
-    void oldHttpTestResults(const QnHTTPRawResponse& response, int handle);
     void testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:

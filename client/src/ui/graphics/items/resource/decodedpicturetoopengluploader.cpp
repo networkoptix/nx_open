@@ -1099,6 +1099,8 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
     //ensure there is no pointer to the object in the async uploader queue
     discardAllFramesPostedToDisplay();
 
+    pleaseStop();
+
     for( std::deque<AsyncPicDataUploader*>::iterator
         it = m_unusedUploaders.begin();
         it != m_unusedUploaders.end();
@@ -1157,6 +1159,9 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
         //searching for a non-used picture buffer
         for( ;; )
         {
+            if( m_terminated )
+                return;
+
 #if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && defined(USE_MIN_GL_TEXTURES)
             if( !useAsyncUpload && !m_hardwareDecoderUsed && !m_renderedPictures.empty() )
             {
@@ -1205,6 +1210,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture( const QSharedPointer<
                 {
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
+                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
+                        arg((*it)->picture()->m_pts).arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts/1000).toString(QLatin1String("hh:mm:ss.zzz"))), cl_logDEBUG2 );
                     emptyPictureBuf = (*it)->picture();
                     delete (*it);
                     m_framesWaitingUploadInGUIThread.erase( it );
@@ -1395,7 +1402,7 @@ void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
-    while( !m_framesWaitingUploadInGUIThread.empty() )
+    while( !m_terminated && !m_framesWaitingUploadInGUIThread.empty() )
         m_cond.wait( lk.mutex() );
 
     //for( std::deque<AVPacketUploader*>::iterator
@@ -1459,13 +1466,13 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
     }
 #endif
 
-    for( std::deque<UploadedPicture*>::iterator
-        it = m_picturesWaitingRendering.begin();
-        !m_picturesWaitingRendering.empty();
+	for( std::deque<UploadedPicture*>::iterator
+		it = m_picturesWaitingRendering.begin();
+		it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
          )
     {
         m_emptyBuffers.push_back( *it );
-        m_picturesWaitingRendering.erase( it++ );
+        it = m_picturesWaitingRendering.erase( it );
     }
 }
 
@@ -1738,12 +1745,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             glBindTexture( GL_TEXTURE_2D, texture->id() );
             DEBUG_CODE(glCheckError("glBindTexture"));
 
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes[i]);
+            const quint64 lineSizes_i = lineSizes[i];
+            const quint64 r_w_i = r_w[i];
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
             DEBUG_CODE(glCheckError("glPixelStorei"));
-            Q_ASSERT( ((quint64)lineSizes[i]) >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+            Q_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
-                            qPower2Ceil(r_w[i],ROUND_COEFF),
+                            qPower2Ceil(r_w_i,ROUND_COEFF),
 #ifdef PARTIAL_FRAME_UPLOAD
                             1,
 #else

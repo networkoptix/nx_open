@@ -29,7 +29,9 @@ QnResource::QnResource():
     m_status(Offline),
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
-{}
+{
+    connect(this, SIGNAL(parameterValueChangedQueued(const QnResourcePtr &, const QnParam &)), this, SIGNAL(parameterValueChanged(const QnResourcePtr &, const QnParam &)), Qt::QueuedConnection);
+}
 
 QnResource::~QnResource()
 {
@@ -79,7 +81,7 @@ void QnResource::updateInner(QnResourcePtr other)
     setParentId(other->m_parentId);
 }
 
-void QnResource::update(QnResourcePtr other)
+void QnResource::update(QnResourcePtr other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
@@ -90,7 +92,7 @@ void QnResource::update(QnResourcePtr other)
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 
     }
-	bool silenceMode = other->hasFlags(QnResource::foreigner);
+    silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
@@ -224,9 +226,16 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    if (m_resourcePool)
-        return m_resourcePool->getResourceById(getParentId());
+    QnId parentID;
+    QnResourcePool* resourcePool = NULL;
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        parentID = getParentId();
+        resourcePool = m_resourcePool;
+    }
+
+    if (resourcePool)
+        return resourcePool->getResourceById(parentID);
     else
         return QnResourcePtr();
 }
@@ -380,7 +389,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+                emit parameterValueChangedQueued(::toSharedPointer(this), param);
             }
             emit asyncParamGetDone(toSharedPointer(this), name, newValue, true);
             return true;
@@ -451,7 +460,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
+        emit parameterValueChangedQueued(::toSharedPointer(this), param);
 
     emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;

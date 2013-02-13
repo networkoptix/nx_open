@@ -250,6 +250,7 @@ protected slots:
     void at_openFileAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
+    void at_checkForUpdatesAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
@@ -302,6 +303,10 @@ protected slots:
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
 
+    void at_ptzSavePresetAction_triggered();
+    void at_ptzGoToPresetAction_triggered();
+    void at_ptzManagePresetsAction_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
@@ -340,6 +345,8 @@ private:
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
+    void notifyAboutUpdate(bool alwaysNotify);
+
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

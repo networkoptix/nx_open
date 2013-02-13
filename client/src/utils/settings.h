@@ -9,6 +9,7 @@
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
+#include <utils/common/software_version.h>
 
 #include <ui/workbench/workbench_state.h>
 
@@ -33,6 +34,8 @@ public:
         SOFTWARE_YUV,
         USER_WORKBENCH_STATES,
 
+        LAST_DATABASE_BACKUP_DIR,
+
         BACKGROUND_EDITABLE,
         BACKGROUND_ANIMATED,
         BACKGROUND_COLOR,
@@ -49,6 +52,7 @@ public:
         EXTRA_PTZ_MAPPINGS_PATH,
 
         UPDATE_FEED_URL,
+        IGNORED_UPDATE_VERSION,
 
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
@@ -58,7 +62,7 @@ public:
 
         DEV_MODE,
 
-        IGNORE_POPUPS,
+        SHOWN_POPUPS,
 
         VARIABLE_COUNT
     };
@@ -86,6 +90,7 @@ private:
         QN_DECLARE_RW_PROPERTY(qreal,                   audioVolume,            setAudioVolume,             AUDIO_VOLUME,               1.0)
         QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
         QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
+        QN_DECLARE_RW_PROPERTY(QString,                 lastDatabaseBackupDir,  setLastDatabaseBackupDir,   LAST_DATABASE_BACKUP_DIR,   QString())
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
         QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
@@ -100,12 +105,13 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                 extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
         QN_DECLARE_RW_PROPERTY(QUrl,                    updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
+        QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,       ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
         QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_RW_PROPERTY(bool,                    isDevMode,              setDevMode,                 DEV_MODE,                   false)
-        QN_DECLARE_RW_PROPERTY(quint64,                 ignorePopupFlags,       setIgnorePopupFlags,        IGNORE_POPUPS,              0)
+        QN_DECLARE_RW_PROPERTY(quint64,                 shownPopups,            setShownPopups,             SHOWN_POPUPS,               0xFFFFFFFFFFFFFFFFull)
     QN_END_PROPERTY_STORAGE()
 
 private:

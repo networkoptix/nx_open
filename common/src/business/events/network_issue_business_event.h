@@ -1,19 +1,18 @@
 #ifndef __NETWORK_ISSUE_BUSINESS_EVENT_H__
 #define __NETWORK_ISSUE_BUSINESS_EVENT_H__
 
-#include "instant_business_event.h"
+#include "reasoned_business_event.h"
 
-class QnNetworkIssueBusinessEvent: public QnInstantBusinessEvent
+class QnNetworkIssueBusinessEvent: public QnReasonedBusinessEvent
 {
-    typedef QnInstantBusinessEvent base_type;
+    typedef QnReasonedBusinessEvent base_type;
 public:
     QnNetworkIssueBusinessEvent(const QnResourcePtr& resource,
                           qint64 timeStamp,
-                          const QString& reason);
+                          int reasonCode,
+                          const QString &reasonText);
 
     virtual QString toString() const override;
-private:
-    QString m_reason;
 };
 
 typedef QSharedPointer<QnNetworkIssueBusinessEvent> QnNetworkIssueBusinessEventPtr;

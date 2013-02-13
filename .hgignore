@@ -22,13 +22,13 @@ syntax: glob
 compatibility_info.cpp
 
 .DS_Store
-.idea
 Debug
 Release
 
 build-environment/x86
 build-environment/x64
 
+appserver/.idea
 appserver/env
 appserver/gen
 appserver/db/ecs.db

@@ -80,6 +80,7 @@
 #include "plugins/resources/mserver_resource_searcher.h"
 #include "rest/handlers/log_handler.h"
 #include "rest/handlers/favico_handler.h"
+#include "business/events/reasoned_business_event.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -329,9 +330,10 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
 #endif
 }
 
-QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
+QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResource::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
+    *pm = QnMediaServerResource::PM_None;
 
     while (servers.isEmpty())
     {
@@ -344,6 +346,7 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
 
     foreach(QnMediaServerResourcePtr server, servers)
     {
+        *pm = server->getPanicMode();
         if (server->getGuid() == serverGuid())
             return server;
     }
@@ -523,7 +526,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
-    m_universalTcpListener(0)
+    m_universalTcpListener(0),
+    m_timer(0)
 {
     serviceMainInstance = this;
 }
@@ -673,12 +677,17 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
         qWarning() << "Error saving server: " << errorString;
 }
 
-void QnMain::at_cameraIPConflict(QHostAddress host)
+void QnMain::at_timer()
+{
+    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 {
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
         host,
-        qnResPool->getAllNetResourceByHostAddress(host),
+        macAddrList,
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
@@ -795,14 +804,11 @@ void QnMain::run()
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress)), this, SLOT(at_cameraIPConflict(QHostAddress)));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
-        if (QnSessionManager::checkIfAppServerIsOld())
-            return;
-
         if (appServerConnection->connect(connectInfo) == 0)
             break;
 
@@ -862,13 +868,15 @@ void QnMain::run()
 
     QHostAddress publicAddress = getPublicAddress();
 
+    QnMediaServerResource::PanicMode pm;
     while (m_mediaServer.isNull())
     {
-        QnMediaServerResourcePtr server = findServer(appServerConnection);
+        QnMediaServerResourcePtr server = findServer(appServerConnection, &pm);
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setGuid(serverGuid());
+            server->setPanicMode(pm);
         }
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
@@ -989,6 +997,18 @@ void QnMain::run()
     QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
     QnSoapServer::instance()->start();
 
+    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
+    if (lastRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
+                                                   lastRunningTime*1000,
+                                                   QnBusiness::MServerIssueStarted);
+
+    m_timer = new QTimer(this);
+    at_timer();
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    m_timer->start(60 * 1000);
+
+
     exec();
 }
 
@@ -1059,6 +1079,7 @@ void stopServer(int signal)
     QnVideoCameraPool::instance()->stop();
     av_lockmgr_register(NULL);
     qApp->quit();
+    qSettings.setValue("lastRunningTime", 0);
 }
 
 int main(int argc, char* argv[])

@@ -167,27 +167,11 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
         return getMetaData();
 
     QnAbstractMediaDataPtr rez;
-    int errorCount = 0;
-    for (int i = 0; i < 10; ++i)
-    {
+    for (int i = 0; i < 2 && !rez; ++i)
         rez = m_multiCodec.getNextData();
-        if (rez) 
-        {
-            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-            //ToDo: if (videoData)
-            //    parseMotionInfo(videoData);
-            
-            //if (!videoData || isGotFrame(videoData))
-            break;
-        }
-        else {
-            errorCount++;
-            if (errorCount > 1) {
-                closeStream();
-                break;
-            }
-        }
-    }
+    
+    if (!rez)
+        closeStream();
     
     return rez;
 }

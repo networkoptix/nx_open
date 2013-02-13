@@ -1,13 +1,13 @@
 #ifndef __MSERVER_FAILURE_BUSINESS_EVENT_H__
 #define __MSERVER_FAILURE_BUSINESS_EVENT_H__
 
-#include "instant_business_event.h"
+#include "reasoned_business_event.h"
 
-class QnMServerFailureBusinessEvent: public QnInstantBusinessEvent
+class QnMServerFailureBusinessEvent: public QnReasonedBusinessEvent
 {
-    typedef QnInstantBusinessEvent base_type;
+    typedef QnReasonedBusinessEvent base_type;
 public:
-    QnMServerFailureBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp);
+    QnMServerFailureBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp, int reasonCode);
 
     virtual QString toString() const override;
 };

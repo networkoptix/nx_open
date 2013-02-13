@@ -186,7 +186,8 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
         {
             if (m_timeChangeEnabled) {
                 m_lastDisplayedTime = picLock->pts();
-                //qDebug() << "new displayTime=" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
+                //qDebug() << "QnGLRenderer::paint. Frame timestamp ("<<m_lastDisplayedTime<<") " <<
+                //    QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
             }
         }
         m_prevFrameSequence = picLock->sequence();
@@ -341,12 +342,12 @@ qint64 QnGLRenderer::lastDisplayedTime() const
     return m_lastDisplayedTime;
 }
 
-void QnGLRenderer::blockTimeValue(qint64  timestamp )
+void QnGLRenderer::blockTimeValue( qint64 timestamp )
 {
     QMutexLocker lock(&m_mutex);
     m_lastDisplayedTime = timestamp;
     m_timeChangeEnabled = false;
-    //qDebug() << "blockTimeValue" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
+    //qDebug() << "QnGLRenderer::blockTimeValue ("<<m_lastDisplayedTime<<")" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
 }
 
 void QnGLRenderer::unblockTimeValue()

@@ -42,6 +42,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QUuid>();
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
+    qRegisterMetaType<Qt::ConnectionType>();
 
     qRegisterMetaType<QnMacAddress>();
 
@@ -63,17 +64,17 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnLayoutItemData>();
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
-    qRegisterMetaType<QnScheduleTaskList>("QnScheduleTaskList");
+    qRegisterMetaType<QnScheduleTaskList>();
 
-    qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
-    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
-    qRegisterMetaType<QnReplyHeaderList>("QnReplyHeaderList");
+    qRegisterMetaType<QnRequestParamList>();
+    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList"); /* The underlying type is identical to QnRequestParamList. */
+    qRegisterMetaType<QnReplyHeaderList>();
     qRegisterMetaType<QnHTTPRawResponse>();
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
-    qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
+    qRegisterMetaType<QnCamerasFoundInfoList>();
+    qRegisterMetaType<QnStatisticsDataList>();
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<QnPtzSpaceMapper>();
@@ -81,22 +82,22 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
-    qRegisterMetaType<QnUpdateInfoItemList>("QnUpdateInfoItemList");
+    qRegisterMetaType<QnSoftwareVersion>();
+    qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
+    qRegisterMetaType<QnUpdateInfoItem>();
+    qRegisterMetaType<QnUpdateInfoItemList>();
 
-    qRegisterMetaType<TypeSpecificParamMap>("TypeSpecificParamMap");
+    qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
     qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
     qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
 
-    //events/actions
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     
-    qRegisterMetaType<Qt::ConnectionType>();
-
     qn_commonMetaTypes_initialized = true;
 }

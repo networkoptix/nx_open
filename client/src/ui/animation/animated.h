@@ -1,6 +1,8 @@
 #ifndef QN_ANIMATED_H
 #define QN_ANIMATED_H
 
+#include <boost/type_traits/is_base_of.hpp>
+
 #include <QtCore/QSet>
 #include <QtCore/QScopedPointer>
 #include <QtGui/QGraphicsItem>
@@ -45,22 +47,6 @@ private:
 };
 
 
-namespace detail {
-    template<class Base>
-    struct base_is_animated {
-        typedef char true_type;
-        typedef struct { char dummy[2]; } false_type;
-
-        static true_type check(AnimatedBase *);
-        static false_type check(...);
-
-        enum {
-            value = (sizeof(check(static_cast<Base *>(NULL))) == sizeof(true_type))
-        };
-    };
-} // namespace detail
-
-
 /**
  * Convenience base class for graphics items that need to hook into the 
  * animation system provided by instrument manager.
@@ -71,7 +57,7 @@ namespace detail {
  * available, and move to another animation timer in case the item's scene is
  * changed.
  */
-template<class Base, bool baseIsAnimated = detail::base_is_animated<Base>::value>
+template<class Base, bool baseIsAnimated = boost::is_base_of<AnimatedBase, Base>::value >
 class Animated: public Base, public AnimatedBase {
 public:
     QN_FORWARD_CONSTRUCTOR(Animated, Base, { updateScene(this->scene()); });

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>WeekTime Schedule Editor</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
@@ -223,15 +223,6 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>

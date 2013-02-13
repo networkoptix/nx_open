@@ -18,6 +18,10 @@ QnPlSonyResource::QnPlSonyResource()
 {
 }
 
+QnPlSonyResource::~QnPlSonyResource() {
+
+}
+
 bool QnPlSonyResource::updateResourceCapabilities()
 {
     if (!QnPlOnvifResource::updateResourceCapabilities()) {

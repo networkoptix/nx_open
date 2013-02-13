@@ -9,6 +9,7 @@
 #include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
+#include <business/events/reasoned_business_event.h>
 
 QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
 {
@@ -46,7 +47,9 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
 
     if (errStr.isEmpty()) {
         if (eventType == QLatin1String("MServerFailure"))
-            qnBusinessRuleConnector->at_mserverFailure(resource, qnSyncTime->currentUSecsSinceEpoch());
+            qnBusinessRuleConnector->at_mserverFailure(resource,
+                                                       qnSyncTime->currentUSecsSinceEpoch(),
+                                                       QnBusiness::MServerIssueTerminated);
         //else if (eventType == "UserEvent")
         //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
         else if (errStr.isEmpty())

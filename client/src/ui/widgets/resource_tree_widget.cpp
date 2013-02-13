@@ -195,11 +195,13 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        /* Local node must be the last one in a list. */
         bool leftLocal = left.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
         bool rightLocal = right.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
             return rightLocal;
 
+        /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
         int result = leftDisplay.compare(rightDisplay);
@@ -212,7 +214,11 @@ protected:
         /* We want the order to be defined even for items with the same name. */
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
-        return leftResource < rightResource;
+        if(leftResource && rightResource) {
+            return leftResource->getUniqueId() < rightResource->getUniqueId();
+        } else {
+            return leftResource < rightResource;
+        }
     }
 
     /*!

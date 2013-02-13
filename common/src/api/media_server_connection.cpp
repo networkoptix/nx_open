@@ -32,18 +32,16 @@ public:
     {
     }
 
-    void removeFromProxyList(const QUrl& url)
+    void removeFromProxyList(const QString& mServerId)
     {
         QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.remove(url);
+        m_proxyInfo.remove(mServerId);
     }
 
-    void addToProxyList(const QUrl& url, const QString& addr, int port)
+    void addToProxyList(const QString& mServerId, const QString& addr, int port)
     {
         QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.insert(url, ProxyInfo(addr, port));
+        m_proxyInfo.insert(mServerId, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
@@ -91,13 +89,16 @@ private:
 
 Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(QWeakPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, {
-    QnNetworkProxyFactory *instance = new QnNetworkProxyFactory();
-    *x = instance;
+QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
+    QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
 
     /* Qt will take ownership of the supplied instance. */
-    QNetworkProxyFactory::setApplicationProxyFactory(instance);
-});
+    QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
+    
+    return result;
+}
+
+Q_GLOBAL_STATIC_WITH_ARGS(QWeakPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
 
 QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 {
@@ -237,11 +238,13 @@ namespace detail
 
 // ---------------------------------- QnMediaServerConnection ---------------------
 
-QnMediaServerConnection::QnMediaServerConnection(const QUrl &url, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnResourcePtr mServer, QObject *parent):
     QObject(parent),
-    m_url(url),
+    m_mServer(mServer),
     m_proxyPort(0)
-{}
+{
+    m_url = m_mServer.dynamicCast<QnMediaServerResource>()->getApiUrl();
+}
 
 QnMediaServerConnection::~QnMediaServerConnection() {}
 
@@ -516,9 +519,9 @@ void QnMediaServerConnection::setProxyAddr(const QString& addr, int port)
     m_proxyAddr = addr;
     m_proxyPort = port;
     if (port)
-        QnNetworkProxyFactory::instance()->addToProxyList(m_url, addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(m_mServer->getId().toString(), addr, port);
     else
-        QnNetworkProxyFactory::instance()->removeFromProxyList(m_url);
+        QnNetworkProxyFactory::instance()->removeFromProxyList(m_mServer->getId().toString());
 }
 
 void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int) {

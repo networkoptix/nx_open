@@ -37,8 +37,6 @@ QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
 QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
-const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
-const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
 const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 200; //200 ms
@@ -51,6 +49,19 @@ static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
 //Forth times greater than default = 320 x 240
 
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
+
+
+/* Some cameras declare invalid max resolution */
+struct StrictResolution {
+    char* model;
+    QSize maxRes;
+};
+
+StrictResolution strictResolutionList[] =
+{
+    { "Brickcom-30xN", QSize(1920, 1080) }
+};
+
 
 //width > height is prefered
 bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -210,11 +221,10 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
 {
     QString someMacAddress;
     std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
-    std::vector<class onvifXsd__NetworkInterface*>::const_iterator ifacePtrIter = ifaces.begin();
 
-    while (ifacePtrIter != ifaces.end()) 
+    for (int i = 0; i < ifaces.size(); ++i)
     {
-        onvifXsd__NetworkInterface* ifacePtr = *ifacePtrIter;
+        onvifXsd__NetworkInterface* ifacePtr = ifaces[i];
 
         if (!ifacePtr->Info)
             continue;
@@ -248,8 +258,6 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
                 ++addrPtrIter;
             }
         }
-
-        ++ifacePtrIter;
     }
 
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
@@ -375,7 +383,7 @@ bool QnPlOnvifResource::initInternal()
 
     if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
     {
-        if (!fetchAndSetDeviceInformation() && getMediaUrl().isEmpty())
+        if (!fetchAndSetDeviceInformation(false) && getMediaUrl().isEmpty())
         {
             qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
             return false;
@@ -484,6 +492,15 @@ QSize QnPlOnvifResource::getNearestResolution(const QSize& resolution, float asp
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
+void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
+{
+    for (int i = 0; i < sizeof(strictResolutionList) / sizeof(StrictResolution); ++i)
+    {
+        if (getModel() == QLatin1String(strictResolutionList[i].model))
+            primaryResolution = strictResolutionList[i].maxRes;
+    }
+}
+
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 {
     QMutexLocker lock(&m_mutex);
@@ -493,6 +510,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
     }
 
     m_primaryResolution = m_resolutionList.front();
+    checkPrimaryResolution(m_primaryResolution);
     float currentAspect = getResolutionAspectRatio(m_primaryResolution);
 
     // SD NTCS/PAL resolutions have non standart SAR. fix it
@@ -636,7 +654,7 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
     return url.toString();
 }
 
-bool QnPlOnvifResource::fetchAndSetDeviceInformation()
+bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 {
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
@@ -668,6 +686,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             setModel(QLatin1String(response.Model.c_str()));
             setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
             hardwareId = QString::fromStdString(response.HardwareId);
+
+            if (performSimpleCheck)
+                return true;
         }
     }
 
@@ -1131,7 +1152,7 @@ bool QnPlOnvifResource::shoudResolveConflicts() const
     return false;
 }
 
-bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
+bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)
 {
     QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
     if (!onvifR)

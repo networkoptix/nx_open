@@ -188,7 +188,7 @@ class QN_EXPORT QnMediaServerConnection: public QObject
 {
     Q_OBJECT
 public:
-    QnMediaServerConnection(const QUrl &url, QObject *parent = 0);
+    QnMediaServerConnection(QnResourcePtr mServer, QObject *parent = 0);
     virtual ~QnMediaServerConnection();
 
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
@@ -268,6 +268,7 @@ private:
 
 private:
     QUrl m_url;
+    QnResourcePtr m_mServer;
     QString m_proxyAddr;
     int m_proxyPort;
 };

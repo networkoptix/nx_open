@@ -1,7 +1,5 @@
 #include "business_rules_view_model.h"
 
-#include <QRegExp>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -19,6 +17,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/settings.h>
+#include <utils/common/email.h>
 
 namespace {
 
@@ -82,20 +81,6 @@ namespace {
             }
         }
         return resource->getName();
-    }
-
-    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b");
-
-    bool isEmailValid(QString email) {
-        QRegExp rx(emailPattern);
-        return rx.exactMatch(email.toUpper());
-    }
-
-    bool isEmailValid(QStringList emails) {
-        foreach (QString email, emails)
-            if (!isEmailValid(email))
-                return false;
-        return true;
     }
 
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -423,7 +408,16 @@ QnBusinessParams QnBusinessRuleViewModel::eventParams() const {
 
 void QnBusinessRuleViewModel::setEventParams(const QnBusinessParams &params)
 {
-    //TODO: check equal
+    bool hasChanges = false;
+    foreach(const QString &key, params.keys()) {
+        if (m_eventParams[key] == params[key])
+            continue;
+        m_eventParams[key] = params[key];
+        hasChanges = true;
+    }
+
+    if (!hasChanges)
+        return;
 
     m_eventParams = params;
     m_modified = true;
@@ -462,6 +456,7 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
         return;
 
     bool resourcesRequired = BusinessActionType::isResourceRequired(m_actionType);
+    bool wasEmailAction = m_actionType == BusinessActionType::BA_SendMail;
 
     m_actionType = value;
     m_modified = true;
@@ -469,6 +464,18 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
     QnBusiness::Fields fields = QnBusiness::ActionTypeField | QnBusiness::ModifiedField;
     if (BusinessActionType::isResourceRequired(m_actionType) != resourcesRequired)
         fields |= QnBusiness::ActionResourcesField;
+
+    /*
+     *  If action is "send e-mail" default units for aggregation period should be hours, not minutes.
+     *  Works only if aggregation period was not changed from default value.
+     */
+    if (value == BusinessActionType::BA_SendMail && m_aggregationPeriod == 60) {
+        m_aggregationPeriod = 60*60;
+        fields |= QnBusiness::AggregationField;
+    } else if (wasEmailAction && m_aggregationPeriod == 60*60) {
+        m_aggregationPeriod = 60;
+        fields |= QnBusiness::AggregationField;
+    }
 
     emit dataChanged(this, fields);
 }
@@ -494,7 +501,16 @@ QnBusinessParams QnBusinessRuleViewModel::actionParams() const
 
 void QnBusinessRuleViewModel::setActionParams(const QnBusinessParams &params)
 {
-    //TODO: check equal
+    bool hasChanges = false;
+    foreach(const QString &key, params.keys()) {
+        if (m_actionParams.contains(key) && m_actionParams[key] == params[key])
+            continue;
+        m_actionParams[key] = params[key];
+        hasChanges = true;
+    }
+
+    if (!hasChanges)
+        return;
 
     m_actionParams = params;
     m_modified = true;

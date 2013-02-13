@@ -24,7 +24,7 @@ private slots:
     void paramsChanged();
 
 private:
-    Ui::QnRecordingBusinessActionWidget *ui;
+    QScopedPointer<Ui::QnRecordingBusinessActionWidget> ui;
 };
 
 #endif // RECORDING_BUSINESS_ACTION_WIDGET_H

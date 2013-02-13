@@ -31,7 +31,6 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 {
-    delete ui;
 }
 
 void QnSmtpSettingsWidget::update() {

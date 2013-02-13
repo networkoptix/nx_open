@@ -221,7 +221,7 @@ public:
     virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
 signals:
-    void parameterValueChanged(const QnParam &param);
+    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
     void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
@@ -246,6 +246,8 @@ signals:
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
+    void parameterValueChangedQueued(const QnResourcePtr &resource, const QnParam &param);
+
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -253,7 +255,7 @@ public:
     static void addCommandToProc(QnAbstractDataPacketPtr data);
     static int commandProcQueueSize();
 
-    void update(QnResourcePtr other);
+    void update(QnResourcePtr other, bool silenceMode = false);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }

@@ -15,9 +15,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCheckBox" name="ignoreAllCheckBox">
+    <widget class="QCheckBox" name="showAllCheckBox">
      <property name="text">
-      <string>Ignore all notifications</string>
+      <string>Show all notifications</string>
      </property>
     </widget>
    </item>
@@ -31,9 +31,9 @@
    <item>
     <widget class="QGroupBox" name="verticalGroupBox">
      <property name="title">
-      <string>Ignored events</string>
+      <string>Notifications to show</string>
      </property>
-     <layout class="QVBoxLayout" name="ignoreLayout"/>
+     <layout class="QVBoxLayout" name="checkBoxesLayout"/>
     </widget>
    </item>
    <item>

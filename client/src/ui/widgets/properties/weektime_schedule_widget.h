@@ -10,6 +10,8 @@ namespace Ui {
     class WeekTimeScheduleWidget;
 }
 
+// TODO: #GDM this is a dialog => should be named XXXDialog and placed in /dialogs
+// OR we could rework our widget/dialog source placement conventions.
 class QnWeekTimeScheduleWidget: public QDialog
 {
     Q_OBJECT

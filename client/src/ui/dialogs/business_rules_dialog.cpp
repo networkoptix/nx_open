@@ -8,6 +8,7 @@
 #include <QtGui/QItemEditorFactory>
 #include <QtGui/QComboBox>
 #include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
 
 #include <api/app_server_connection.h>
 
@@ -118,6 +119,7 @@ void QnBusinessRulesDialog::reject() {
                       QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                       QMessageBox::Cancel);
 
+    // TODO: #GDM codestyle, indentation. See how its done in other places for switch-case.
     switch (btn) {
         case QMessageBox::Yes:
             if (!saveAll())
