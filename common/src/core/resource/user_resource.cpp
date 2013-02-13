@@ -16,34 +16,36 @@ QString QnUserResource::getUniqueId() const
 QString QnUserResource::getPassword() const
 {
     QMutexLocker locker(&m_mutex);
-
     return m_password;
 }
 
 void QnUserResource::setPassword(const QString& password)
 {
     QMutexLocker locker(&m_mutex);
-
     m_password = password;
 }
 
 quint64 QnUserResource::getPermissions() const
 {
+    QMutexLocker locker(&m_mutex);
     return m_permissions;
 }
 
 void QnUserResource::setPermissions(quint64 rights)
 {
+    QMutexLocker locker(&m_mutex);
     m_permissions = rights;
 }
 
 bool QnUserResource::isAdmin() const
 {
+    QMutexLocker locker(&m_mutex);
     return m_isAdmin;
 }
 
 void QnUserResource::setAdmin(bool isAdmin)
 {
+    QMutexLocker locker(&m_mutex);
     m_isAdmin = isAdmin;
 }
 

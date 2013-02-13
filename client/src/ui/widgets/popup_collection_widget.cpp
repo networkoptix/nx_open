@@ -6,6 +6,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
