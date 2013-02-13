@@ -181,7 +181,9 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     if( !isStreamSupportedNonSafe(desc) )
         return NULL;
 
+    decoder->setInitializationMode( true );
     decoder->decode( data, NULL );
+    decoder->setInitializationMode( false );
 
     if( !decoder->isHardwareAccelerationEnabled() )
         return NULL;

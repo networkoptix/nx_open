@@ -135,6 +135,11 @@ public:
     bool readSequenceHeader( const QnCompressedVideoDataPtr data, mfxVideoParam* const streamParams );
     //!Returns estimate in bytes of required frame surface memory to decode stream. Estimaion based on previously parsed header (by method \a readSequenceHeader)
     size_t estimateSurfaceMemoryUsage() const;
+    /*!
+        In initialization mode, decoder does not decode frames, only reads sequence header and initializes internal data, if needed
+        \todo Some refactoring would be appropriate (e.g., add initialize method)
+    */
+    void setInitializationMode( bool val );
 
 private:
     enum DecoderState
@@ -307,6 +312,7 @@ private:
     int m_recursionDepth;
     MotionInfoContainerType m_srcMotionInfo;
     float m_speed;
+    bool m_initializationMode;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;

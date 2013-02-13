@@ -156,7 +156,8 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_prevInputFrameMs( (DWORD)-1 ),
     m_prevOutPictureClock( 0 ),
     m_recursionDepth( 0 ),
-    m_speed( 1.0 )
+    m_speed( 1.0 ),
+    m_initializationMode( false )
 #ifdef USE_OPENCL
     ,m_clContext( NULL ),
     m_prevCLStatus( CL_SUCCESS ),
@@ -251,7 +252,9 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_totalOutputFrames( 0 ),
     m_prevInputFrameMs( (DWORD)-1 ),
     m_prevOutPictureClock( 0 ),
-    m_recursionDepth( 0 )
+    m_recursionDepth( 0 ),
+    m_speed( 1.0 ),
+    m_initializationMode( false )
 #ifdef USE_OPENCL
     ,m_clContext( NULL ),
     m_prevCLStatus( CL_SUCCESS ),
@@ -452,7 +455,8 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
     mfxVideoParam newStreamParams;
     memset( &newStreamParams, 0, sizeof(newStreamParams) );
     const bool isSeqHeaderPresent = readSequenceHeader( inputStream, &newStreamParams ) == MFX_ERR_NONE;
-    if( m_reinitializeNeeded && isSeqHeaderPresent )
+
+    if( m_state > notInitialized && m_reinitializeNeeded && isSeqHeaderPresent )
     {
         //have to wait for a sequence header and I-frame before reinitializing decoder
         closeMFXSession();
@@ -467,6 +471,9 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
         }
     }
     if( m_state < decoding && !init( MFX_CODEC_AVC, inputStream ) )
+        return false;
+
+    if( m_initializationMode )
         return false;
 
     bool gotDisplayPicture = false;
@@ -2345,6 +2352,11 @@ size_t QuickSyncVideoDecoder::estimateSurfaceMemoryUsage() const
             + SCALED_SURFACE_COUNT * m_sps->getWidth() * m_sps->getHeight() //surfaces used for scaling
 #endif
             )* 3 / 2;   //decoder uses NV12 format. Every pixel is 12 bits in size
+}
+
+void QuickSyncVideoDecoder::setInitializationMode( bool val )
+{
+    m_initializationMode = val;
 }
 
 QString QuickSyncVideoDecoder::mfxStatusCodeToString( mfxStatus status ) const
