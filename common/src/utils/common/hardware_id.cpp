@@ -11,6 +11,8 @@ using namespace std;
 #include "hardware_id.h"
 #include <QByteArray>
 
+static const QString VERSION_STR(QLatin1String("01"));
+
 int execQuery(IWbemServices *pSvc, const char* fieldName, const char* objectName, QString& rezStr)
 {
     QString reqStr(QLatin1String("SELECT %1 FROM %2"));
@@ -215,7 +217,7 @@ QString getHardwareId()
         return QString();
     
     QByteArray hash = QCryptographicHash::hash(result, QCryptographicHash::Md5);
-    return QString::fromLocal8Bit(hash.toHex());
+    return VERSION_STR + QString::fromLocal8Bit(hash.toHex());
 }
 
 #endif
