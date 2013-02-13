@@ -185,6 +185,8 @@ namespace Qn {
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
         CreateLayoutPermission                  = 0x08000000,   /**< Permission to create layouts for the user. */
+        ReadEmailPermission                     = ReadPermission,
+        WriteEmailPermission                    = WritePasswordPermission,
 
         /* Media-specific permissions. */
         ExportPermission                        = 0x20000000,   /**< Permission to export video parts. */

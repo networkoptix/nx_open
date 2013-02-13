@@ -2188,9 +2188,15 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
     accessRightsFlags &= flags;
 
+    QnUserSettingsDialog::ElementFlags emailFlags =
+        ((permissions & Qn::ReadEmailPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
+    emailFlags &= flags;
+
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
     dialog->setEditorPermissions(accessController()->globalPermissions());
     
 
@@ -2209,14 +2215,16 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
+        if (user == context()->user() && user->getPassword().isEmpty())
+            user->setPassword(userPassword);
 
         if (user->isAdmin() && userPassword != user->getPassword()) {
             QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
             int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                                  QMessageBox::Ok, QMessageBox::Discard);
             if (button == QMessageBox::Discard) {
-                user->setPassword(QString()); // TODO #gdm ask elric: why the hell we store empty strings?
-                return; // we cannot change anything else for the Owner so we can return safely
+                user->setPassword(userPassword); // TODO #gdm ask elric: why the hell we store empty strings?
+//                return; // we cannot change anything else for the Owner so we can return safely
             }
         }
 
