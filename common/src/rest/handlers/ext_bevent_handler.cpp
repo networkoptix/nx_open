@@ -49,7 +49,7 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
         if (eventType == QLatin1String("MServerFailure"))
             qnBusinessRuleConnector->at_mserverFailure(resource,
                                                        qnSyncTime->currentUSecsSinceEpoch(),
-                                                       MSERVER_TERMINATED);
+                                                       QnBusiness::MServerIssueTerminated);
         //else if (eventType == "UserEvent")
         //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
         else if (errStr.isEmpty())

@@ -145,7 +145,6 @@ private:
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
     void waitForFramesDisplayed();
-    void moveTimeTo(qint64 time);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];

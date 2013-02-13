@@ -319,6 +319,8 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
     user->setAdmin(pb_user.isadmin());
     user->setPermissions(pb_user.rights());
     user->setGuid(QString::fromUtf8(pb_userResource.guid().c_str()));
+    if (pb_user.has_email())
+        user->setEmail(QString::fromUtf8(pb_user.email().c_str()));
 }
 
 void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
@@ -838,6 +840,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
     pb_user.set_rights(userPtr->getPermissions());
     pb_user.set_isadmin(userPtr->isAdmin());
+    pb_user.set_email(userPtr->getEmail().toUtf8().constData());
     pb_userResource.set_guid(userPtr->getGuid().toUtf8().constData());
 
     std::string str;

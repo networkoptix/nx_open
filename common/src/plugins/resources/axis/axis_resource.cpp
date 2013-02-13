@@ -924,6 +924,7 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 }
 
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
+    Q_UNUSED(http)
     // TODO: make configurable.
     static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
 

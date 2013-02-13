@@ -28,6 +28,10 @@
 
 #include <business/actions/popup_business_action.h>
 
+//TODO: #GDM remove when debug will not be required
+#include <business/events/reasoned_business_event.h>
+#include <business/events/conflict_business_event.h>
+
 #include <device_plugins/server_camera/appserver.h>
 
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -886,16 +890,66 @@ void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
         return;
 
     int n = qrand() % total;
-    int id = qnResPool->getAllEnabledCameras().at(n)->getId();
+    int camId = qnResPool->getAllEnabledCameras().at(n)->getId();
 
-    n = qrand() % 3;
+    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
+    if (servers.size() == 0)
+        return;
+
+    n = qrand() % servers.size();
+    int srvId = servers.at(n)->getId();
+
+
+    n = qrand() % BusinessEventType::BE_Count;
+    BusinessEventType::Value eventType = (BusinessEventType::Value)n;
 
     QnBusinessParams params;
-    QnBusinessEventRuntime::setEventType(&params, n == 0 ? BusinessEventType::BE_Camera_Disconnect
-                                                         : n == 1 ? BusinessEventType::BE_Camera_Input
-                                                                  : BusinessEventType::BE_Camera_Motion
-                                         );
-    QnBusinessEventRuntime::setEventResourceId(&params, id);
+    QnBusinessEventRuntime::setEventType(&params, eventType);
+
+    n = qrand() % 2;
+
+    QStringList conflicts;
+    conflicts << QLatin1String("50:e5:49:43:b2:5A");
+    conflicts << QLatin1String("50:e5:49:43:b2:5B");
+    conflicts << QLatin1String("50:e5:49:43:b2:5C");
+
+    switch (eventType) {
+        case BusinessEventType::BE_Camera_Input:
+        case BusinessEventType::BE_Camera_Motion:
+        case BusinessEventType::BE_Camera_Disconnect:
+            QnBusinessEventRuntime::setEventResourceId(&params, camId);
+            break;
+
+        case BusinessEventType::BE_Storage_Failure:
+            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
+            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::StorageIssueIoError : QnBusiness::StorageIssueNotEnoughSpeed);
+            QnBusinessEventRuntime::setReasonText(&params, QLatin1String("C:\\;D:\\"));
+            break;
+        case BusinessEventType::BE_Network_Issue:
+            QnBusinessEventRuntime::setEventResourceId(&params, camId);
+            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueRtpPacketLoss);
+            QnBusinessEventRuntime::setReasonText(&params, n == 0 ? QLatin1String("10") : QLatin1String("25245;26532"));
+            break;
+        case BusinessEventType::BE_MediaServer_Failure:
+            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
+            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::MServerIssueStarted : QnBusiness::MServerIssueTerminated);
+            break;
+        case BusinessEventType::BE_Camera_Ip_Conflict:
+            QnBusinessEventRuntime::setEventResourceId(&params, camId);
+            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
+            QnBusinessEventRuntime::setConflicts(&params, conflicts);
+            break;
+        case BusinessEventType::BE_MediaServer_Conflict:
+            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
+            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
+            QnBusinessEventRuntime::setConflicts(&params, conflicts);
+            break;
+        default:
+            break;
+    }
+
+
+
 
     QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
     at_eventManager_actionReceived(ba);

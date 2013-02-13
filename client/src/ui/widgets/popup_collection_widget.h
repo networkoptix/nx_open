@@ -5,12 +5,13 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 
-#include <ui/widgets/popup_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class QnPopupCollectionWidget;
 }
+
+class QnPopupWidget;
 
 class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -19,7 +20,7 @@ class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
     
 public:
     explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
-    ~QnPopupCollectionWidget();
+    virtual ~QnPopupCollectionWidget();
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 

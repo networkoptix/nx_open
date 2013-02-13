@@ -578,9 +578,9 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_buffering = getBufferingMask();
 
     if (m_speed >= 0)
-        moveTimeTo(qMax(time, getCurrentTime()));
+        blockTimeValue(qMax(time, getCurrentTime()));
     else
-        moveTimeTo(qMin(time, getCurrentTime()));
+        blockTimeValue(qMin(time, getCurrentTime()));
 
     m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended) {
@@ -597,12 +597,6 @@ void QnCamDisplay::blockTimeValue(qint64 time)
             m_display[i]->blockTimeValue(time);
         }
     }
-}
-
-void QnCamDisplay::moveTimeTo(qint64 time)
-{
-    blockTimeValue(time);
-    unblockTimeValue();
 }
 
 void QnCamDisplay::waitForFramesDisplayed()
@@ -986,8 +980,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (vd && m_display[vd->channelNumber] )
             m_display[vd->channelNumber]->waitForFramesDisplayed();
-        if (vd || ad)
-            afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
+        //if (vd || ad)
+        //    afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
 
     if (emptyData && !flushCurrentBuffer)
@@ -1454,9 +1448,18 @@ qint64 QnCamDisplay::getNextTime() const
     else
     {
         qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
+        qint64 lastTime = m_display[0]->getLastDisplayedTime();
+
+        if ((quint64)rez != AV_NOPTS_VALUE)
+            return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
+        else
+            return lastTime;
+
+        /*
         return m_display[0] == NULL || (quint64)rez != AV_NOPTS_VALUE
             ? rez
             : m_display[0]->getLastDisplayedTime();
+        */
     }
 }
 

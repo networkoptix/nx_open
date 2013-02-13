@@ -12,5 +12,8 @@ QnAxisOnvifResource::QnAxisOnvifResource()
 
 int QnAxisOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
 {
+    Q_UNUSED(q)
+    Q_UNUSED(resolution)
+    Q_UNUSED(fps)
     return 0;
 }

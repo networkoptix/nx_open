@@ -999,7 +999,7 @@ void QnMain::run()
     if (lastRunningTime)
         qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
                                                    lastRunningTime*1000,
-                                                   MSERVER_STARTED);
+                                                   QnBusiness::MServerIssueStarted);
 
     m_timer = new QTimer(this);
     at_timer();

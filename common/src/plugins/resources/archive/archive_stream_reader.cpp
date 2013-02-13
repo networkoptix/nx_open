@@ -748,15 +748,17 @@ begin_label:
         }
     }
 
-    if (m_currentData && m_eof)
+    if (m_currentData && m_currentData->dataType != QnAbstractMediaData::META_V1)
     {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
-        m_eof = false;
-    }
-
-    if (m_BOF) {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        m_BOF = false;
+        if (m_eof)
+        {
+            m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
+            m_eof = false;
+        }
+        if (m_BOF) {
+            m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
+            m_BOF = false;
+        }
     }
 
     if (m_isStillImage)

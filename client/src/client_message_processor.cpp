@@ -174,6 +174,7 @@ void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
 {
     processResources(message.resources);
     processLicenses(message.licenses);
+
     processCameraServerItems(message.cameraServerItems);
 
     QnResourceDiscoveryManager::instance()->setReady(true);
