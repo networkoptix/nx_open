@@ -45,23 +45,21 @@ int execQuery(IWbemServices *pSvc, const char* fieldName, const char* objectName
     IWbemClassObject *pclsObj;
     ULONG uReturn = 0;
 
-    while (pEnumerator)
+    if (pEnumerator)
     {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
             &pclsObj, &uReturn);
 
-        if(0 == uReturn)
+        if(0 != uReturn)
         {
-            break;
+            VARIANT vtProp;
+            // Get the value of the Name property
+            //hr = pclsObj->Get(L"SerialNumber", 0, &vtProp, 0, 0);
+            hr = pclsObj->Get((LPCWSTR) QString(QLatin1String(fieldName)).data(), 0, &vtProp, 0, 0);
+            rezStr = QString::fromUtf16(vtProp.bstrVal).trimmed();
+            VariantClear(&vtProp);
+            pclsObj->Release();
         }
-
-        VARIANT vtProp;
-        // Get the value of the Name property
-        //hr = pclsObj->Get(L"SerialNumber", 0, &vtProp, 0, 0);
-        hr = pclsObj->Get((LPCWSTR) QString(QLatin1String(fieldName)).data(), 0, &vtProp, 0, 0);
-        rezStr = QString::fromUtf16(vtProp.bstrVal).trimmed();
-        VariantClear(&vtProp);
-        pclsObj->Release();
     }
 
     pEnumerator->Release();
@@ -187,10 +185,19 @@ QString getHardwareId()
         return QString();               // Program has failed.
     }
 
-    QString boardID, biosID, hddID;
+    QString boardID, boardManufacturer, boardProduct;
+    QString biosID, biosManufacturer;
+    QString hddID, hddManufacturer;
+
     hres = execQuery(pSvc, "SerialNumber", "Win32_BaseBoard", boardID);
+    hres = execQuery(pSvc, "Manufacturer", "Win32_BaseBoard", boardManufacturer);
+    hres = execQuery(pSvc, "Product", "Win32_BaseBoard", boardProduct);
+
     hres = execQuery(pSvc, "SerialNumber", "CIM_BIOSElement", biosID);
+    hres = execQuery(pSvc, "Manufacturer", "CIM_BIOSElement", biosManufacturer);
+
     hres = execQuery(pSvc, "SerialNumber", "Win32_PhysicalMedia", hddID);
+    hres = execQuery(pSvc, "Manufacturer", "Win32_PhysicalMedia", hddManufacturer);
 
     // Cleanup
     // ========
@@ -201,10 +208,10 @@ QString getHardwareId()
 
     QByteArray result;
     if (!boardID.isEmpty() || !biosID.isEmpty())
-        result = (boardID + biosID).toUtf8();
+        result = (boardID + boardManufacturer + boardProduct + biosID + biosManufacturer).toUtf8();
+    else if (!hddID.isEmpty())
+        result = (hddID + hddManufacturer).toUtf8();
     else
-        result = hddID.toUtf8();
-    if (result.isEmpty())
         return QString();
     
     QByteArray hash = QCryptographicHash::hash(result, QCryptographicHash::Md5);
