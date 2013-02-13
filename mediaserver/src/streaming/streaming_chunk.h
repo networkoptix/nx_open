@@ -5,6 +5,8 @@
 #ifndef STREAMINGCHUNK_H
 #define STREAMINGCHUNK_H
 
+#include <QByteArray>
+#include <QMutex>
 #include <QObject>
 #include <QSize>
 #include <QString>
@@ -12,14 +14,15 @@
 #include "streaming_chunk_cache_key.h"
 
 
+//!Chunk of media data, ready to be used by some streaming protocol (e.g., hls). 
 /*!
-    Chunk of data, ready to be used by some streaming protocol (e.g., hls). 
     In general, it is transcoded small (~10s) part of archive chunk.
 
     Chunk can actually not contain data, but only expect some data to arrive.
     Chunk, which is still being filled by data is "opened". Chunk already filled is "closed".
 
     \note Class methods are thread-safe
+    \note It is recommended to connect to this class signals using direct connection
 */
 class StreamingChunk
 :
@@ -28,10 +31,16 @@ class StreamingChunk
     Q_OBJECT
 
 public:
+    //!For sequential chunk reading 
     class SequentialReadingContext
     {
+        friend class StreamingChunk;
+
     public:
         SequentialReadingContext();
+
+    private:
+        int m_currentOffset;
     };
 
     enum State
@@ -52,41 +61,33 @@ public:
 
     const StreamingChunkCacheKey& params() const;
 
-    ////!Data source (camera id, stream id)
-    //QString srcResourceUniqueID() const;
-    //unsigned int channelNumber() const;
-    ////!Start date
-    ///*!
-    //    \return millis since 1970/1/1 00:00, UTC
-    //*/
-    //quint64 startTimestamp() const;
-    ////!Duration in millis
-    //quint64 duration() const;
-    ////!Video resolution
-    //QSize pictureSizePixels() const;
-    ////!Media format (codec format, container format)
-    //QString containerFormat() const;
-    //QString videoCodec() const;
-    //QString audioCodec() const;
     QString mimeType() const;
 
     //!Returns whole chunk data
     QByteArray data() const;
 
-    //!sequential reading
+    //!Sequential reading
     /*!
         Appends data to \a dataBuffer.
         End-of stream is signalled with returning no data and returning \a true
         \param ctx Used to save position
-        \return true, if data read. false, if no data in chunk
+        \return true, if some data has been read or end-of file has been reached. false, if no data in chunk, but some data may arrive in future
         \note If chunk is not being modified, then first call returns whole chunk data
         \todo Use container that do not require copying to get array substring
     */
     bool tryRead( SequentialReadingContext* const ctx, QByteArray* const dataBuffer );
 
     //!Only one thread is allowed to modify chunk data at a time
-    void openForModification();
+    /*!
+        \return false, if chunk already opened for modification
+    */
+    bool openForModification();
+    //!Add more data to chunk
+    /*!
+        Emits signal \a newDataIsAvailable
+    */
     void appendData( const QByteArray& data );
+    //!
     void doneModification( ResultCode result );
 
 signals:
@@ -98,6 +99,9 @@ signals:
 
 private:
     StreamingChunkCacheKey m_params;
+    mutable QMutex m_mutex;
+    QByteArray m_data;
+    bool m_isOpenedForModification;
 };
 
 #endif  //STREAMINGCHUNK_H

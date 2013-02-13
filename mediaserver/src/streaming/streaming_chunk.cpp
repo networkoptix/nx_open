@@ -4,8 +4,12 @@
 
 #include "streaming_chunk.h"
 
+#include <QMutexLocker>
+
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext()
+:
+    m_currentOffset( 0 )
 {
     Q_ASSERT( false );
 }
@@ -13,7 +17,8 @@ StreamingChunk::SequentialReadingContext::SequentialReadingContext()
 
 StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
 :
-    m_params( params )
+    m_params( params ),
+    m_isOpenedForModification( false )
 {
     Q_ASSERT( false );
 }
@@ -32,28 +37,44 @@ QString StreamingChunk::mimeType() const
 //!Returns whole chunk data
 QByteArray StreamingChunk::data() const
 {
-    //TODO/IMPL
-    return QByteArray();
+    QMutexLocker lk( &m_mutex );
+    return m_data;
 }
 
 bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, QByteArray* const dataBuffer )
 {
-    //TODO/IMPL
-    return false;
+    QMutexLocker lk( &m_mutex );
+    if( ctx->m_currentOffset >= m_data.size() )
+        return !m_isOpenedForModification;  //if opened, expecting more data to arrive to chunk
+    dataBuffer->append( m_data.mid( ctx->m_currentOffset ) );
+    ctx->m_currentOffset = m_data.size();
+    return true;
 }
 
 //!Only one thread is allowed to modify chunk data at a time
-void StreamingChunk::openForModification()
+bool StreamingChunk::openForModification()
 {
-    //TODO/IMPL
+    QMutexLocker lk( &m_mutex );
+    if( m_isOpenedForModification )
+        return false;
+    m_isOpenedForModification = true;
+    return true;
 }
 
 void StreamingChunk::appendData( const QByteArray& data )
 {
-    //TODO/IMPL
+    {
+        QMutexLocker lk( &m_mutex );
+        Q_ASSERT( m_isOpenedForModification );
+        m_data.append( data );
+    }
+
+    emit newDataIsAvailable( this, data.size() );
 }
 
-void StreamingChunk::doneModification( StreamingChunk::ResultCode result )
+void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 {
-    //TODO/IMPL
+    QMutexLocker lk( &m_mutex );
+    Q_ASSERT( m_isOpenedForModification );
+    m_isOpenedForModification = false;
 }
