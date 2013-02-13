@@ -1,7 +1,5 @@
 #include "business_rules_view_model.h"
 
-#include <QRegExp>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -19,6 +17,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/settings.h>
+#include <utils/common/email.h>
 
 namespace {
 
@@ -82,20 +81,6 @@ namespace {
             }
         }
         return resource->getName();
-    }
-
-    const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b");
-
-    bool isEmailValid(QString email) {
-        QRegExp rx(emailPattern);
-        return rx.exactMatch(email.toUpper());
-    }
-
-    bool isEmailValid(QStringList emails) {
-        foreach (QString email, emails)
-            if (!isEmailValid(email))
-                return false;
-        return true;
     }
 
     const int ProlongedActionRole = Qt::UserRole + 2;

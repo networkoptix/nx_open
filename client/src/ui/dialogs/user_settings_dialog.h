@@ -23,6 +23,7 @@ public:
         CurrentPassword,
         Password,
         AccessRights,
+        Email,
         ElementCount
     };
 
@@ -66,6 +67,7 @@ protected slots:
     void updateCurrentPassword() { updateElement(CurrentPassword); }
     void updatePassword() { updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
+    void updateEmail() { updateElement(Email); }
     void loadAccessRightsToUi(quint64 rights);
 
     void updateDependantPermissions();
