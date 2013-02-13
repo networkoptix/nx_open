@@ -1,15 +1,14 @@
 #ifdef Q_OS_WIN
 
-#define _WIN32_DCOM
-#include <iostream>
-using namespace std;
+#include "hardware_id.h"
+
+#include <QByteArray>
+#include <QCryptographicHash>
 #include <comdef.h>
 #include <Wbemidl.h>
-# pragma comment(lib, "wbemuuid.lib")
-#include "qcryptographichash.h"
 
-#include "hardware_id.h"
-#include <QByteArray>
+#define _WIN32_DCOM
+# pragma comment(lib, "wbemuuid.lib")
 
 static const QString VERSION_STR(QLatin1String("01"));
 
@@ -35,7 +34,7 @@ int execQuery(IWbemServices *pSvc, const char* fieldName, const char* objectName
 
     if (FAILED(hres))
     {
-        cout << "Query for operating system name failed."
+        qWarning() << "Query for operating system name failed."
             << " Error code = 0x" 
             << hex << hres << endl;
         return 1;               // Program has failed.
@@ -79,7 +78,7 @@ QString getHardwareId()
     hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
     if (FAILED(hres))
     {
-        cout << "Failed to initialize COM library. Error code = 0x" 
+        qWarning() << "Failed to initialize COM library. Error code = 0x" 
             << hex << hres << endl;
         return QString();                  // Program has failed.
     }
@@ -106,7 +105,7 @@ QString getHardwareId()
 
     if (FAILED(hres))
     {
-        cout << "Failed to initialize security. Error code = 0x" 
+        qWarning() << "Failed to initialize security. Error code = 0x" 
             << hex << hres << endl;
         CoUninitialize();
         return QString();                    // Program has failed.
@@ -125,7 +124,7 @@ QString getHardwareId()
 
     if (FAILED(hres))
     {
-        cout << "Failed to create IWbemLocator object."
+        qWarning() << "Failed to create IWbemLocator object."
             << " Err code = 0x"
             << hex << hres << endl;
         CoUninitialize();
@@ -153,14 +152,14 @@ QString getHardwareId()
 
     if (FAILED(hres))
     {
-        cout << "Could not connect. Error code = 0x" 
+        qWarning() << "Could not connect. Error code = 0x" 
             << hex << hres << endl;
         pLoc->Release();     
         CoUninitialize();
         return QString();                // Program has failed.
     }
 
-    cout << "Connected to ROOT\\CIMV2 WMI namespace" << endl;
+    qDebug() << "Connected to ROOT\\CIMV2 WMI namespace" << endl;
 
 
     // Step 5: --------------------------------------------------
@@ -179,7 +178,7 @@ QString getHardwareId()
 
     if (FAILED(hres))
     {
-        cout << "Could not set proxy blanket. Error code = 0x" 
+        qWarning() << "Could not set proxy blanket. Error code = 0x" 
             << hex << hres << endl;
         pSvc->Release();
         pLoc->Release();     
