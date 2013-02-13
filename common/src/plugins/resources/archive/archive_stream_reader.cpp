@@ -748,7 +748,7 @@ begin_label:
         }
     }
 
-    if (m_currentData && m_currentData->dataType != QnAbstractMediaData.META_V1)
+    if (m_currentData && m_currentData->dataType != QnAbstractMediaData::META_V1)
     {
         if (m_eof)
         {

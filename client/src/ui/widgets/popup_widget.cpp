@@ -235,7 +235,7 @@ bool QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessA
     if (count == 1)
         item->appendRow(new QStandardItem(tr("at %1").arg(timeStamp)));
     else
-        item->appendRow(new QStandardItem(tr("%1 times since %2 %2 %2 %2 %2 %2 %2").arg(count).arg(timeStamp)));
+        item->appendRow(new QStandardItem(tr("%1 times since %2").arg(count).arg(timeStamp)));
 
     return true;
 }

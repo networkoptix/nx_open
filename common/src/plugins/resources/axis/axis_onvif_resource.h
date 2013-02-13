@@ -31,4 +31,4 @@ public:
 
 typedef QnSharedResourcePointer<QnAxisOnvifResource> QnAxisOnvifResourcePtr;
 
-#endif / /__AXIS_ONVIF_RESOURCE_H__
+#endif //__AXIS_ONVIF_RESOURCE_H__

@@ -14,6 +14,8 @@ QnDwZoomPtzController::~QnDwZoomPtzController() {
 }
 
 int QnDwZoomPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) {
+    Q_UNUSED(xVelocity)
+    Q_UNUSED(yVelocity)
     CameraSetting setting(
         QLatin1String("%%Lens%%Zoom"),
         QLatin1String("Zoom"),
@@ -45,10 +47,16 @@ int QnDwZoomPtzController::stopMove() {
 }
 
 int QnDwZoomPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) {
+    Q_UNUSED(xPos)
+    Q_UNUSED(yPos)
+    Q_UNUSED(zoomPos)
     return 1;
 }
 
 int QnDwZoomPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) {
+    Q_UNUSED(xPos)
+    Q_UNUSED(yPos)
+    Q_UNUSED(zoomPos)
     return 1;
 }
 
