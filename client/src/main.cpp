@@ -327,7 +327,6 @@ int qnMain(int argc, char *argv[])
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    platform->monitor()->totalPartitionSpaceInfo();
 
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;
