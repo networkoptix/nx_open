@@ -159,7 +159,6 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
             m_lastErrMessage = tr("OpenCLTranscode is not implemented");
             return -1;
         default:
-            //TODO: #vasilenko Check 'Value not handled in switch' case.
             m_lastErrMessage = tr("Unknown Transcode Method");
             return -1;
     }
@@ -190,11 +189,10 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCLTranscode is not implemented");
-            return -1;
+            break;
         default:
-            //TODO: #vasilenko Check 'Value not handled in switch' case.
             m_lastErrMessage = tr("Unknown Transcode Method");
-            return -1;
+            break;
     }
     return m_lastErrMessage.isEmpty();
 }

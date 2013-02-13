@@ -43,19 +43,12 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMaxFps(int maxFps, int maxDualStreamFps);
-    int getMaxFps(bool motionPlusLqOnly);
+    void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
+    int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
 
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
-
-    /**
-     * @brief cellValueNotChanged       This signal is emitted when there was a try to change cell value
-     *                                  but real value was the same.
-     */
-    void cellValueNotChanged(const QPoint &cell);
-
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;

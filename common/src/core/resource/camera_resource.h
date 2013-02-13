@@ -11,6 +11,8 @@ class QnAbstractDTSFactory;
 class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
     Q_OBJECT
+    Q_FLAGS(QnCommonGlobals::CameraCapabilities)
+    Q_PROPERTY(QnCommonGlobals::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
 
 public:
     QnVirtualCameraResource();
@@ -45,9 +47,32 @@ public:
     QString getFirmware() const;
     void setFirmware(QString firmware);
 
+	virtual QString getUniqueId() const override;
+
+// -------------------------------------------------------------------------- //
+// Begin QnSecurityCamResource metaobject support
+// -------------------------------------------------------------------------- //
+    /* These are copied from QnSecurityCamResource. For metaobject system to work
+     * correctly, no signals/slots must be declared before these ones. */
+public slots:
+    virtual void inputPortListenerAttached() override { QnSecurityCamResource::inputPortListenerAttached(); }
+    virtual void inputPortListenerDetached() override { QnSecurityCamResource::inputPortListenerDetached(); }
+
+    virtual void recordingEventAttached() override { QnSecurityCamResource::recordingEventAttached(); }
+    virtual void recordingEventDetached() override { QnSecurityCamResource::recordingEventDetached(); }
+
+signals:
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+
+protected slots:
+    virtual void at_disabledChanged() override { QnSecurityCamResource::at_disabledChanged(); }
+// -------------------------------------------------------------------------- //
+// End QnSecurityCamResource metaobject support
+// -------------------------------------------------------------------------- //
+
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource) override;
 
 private:
     bool m_scheduleDisabled;
@@ -60,7 +85,6 @@ private:
 
     QnAbstractDTSFactory* m_dtsFactory;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
 
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
@@ -69,19 +93,11 @@ class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResourc
 public:
     QnPhysicalCameraResource();
 
-    // returns 0 if primary stream does not exist
-    int getPrimaryStreamDesiredFps() const;
-
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    void onPrimaryFpsUpdated(int newFps);
-
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
-#ifdef _DEBUG
-    void debugCheck() const;
-#endif
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);

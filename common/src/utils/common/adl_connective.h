@@ -63,9 +63,6 @@ class AdlConnective: public Base {
 public:
     QN_FORWARD_CONSTRUCTOR(AdlConnective, Base, {});
 
-    using Base::connect;
-    using Base::disconnect;
-
     template<class T1, class T2>
     static bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection) {
         return Qn::detail::adl_connect(sender, signal, receiver, method, type);

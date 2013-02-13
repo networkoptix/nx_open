@@ -1,0 +1,53 @@
+{
+    "__comment__": "                                                \
+    Get width from here:                                            \
+    http://en.wikipedia.org/wiki/Image_sensor_format                \
+    Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          \
+                                                                    \
+    Calculate width-based crop factor C = 36/W.                     \
+                                                                    \
+    Multiply focal lengths by width-based crop factor to get        \
+    width-based equivalent focal length.                            \
+    ",
+    
+    "version": "1.0",
+    "mappers": [
+        {
+            "models": [
+                "AXIS Q6035-E"
+            ],
+            "fromCamera": {
+                "x" : {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [-1,   1],
+                    "physical": [ 0, 360]
+                },
+                "y" : {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [-0.5, 0.111],
+                    "physical": [ -90,    20]
+                },
+                "z" : {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [   0,     1],
+                    "physical": [35.25, 711.1]
+                }
+            },
+            "toCamera": {
+                "x" : null,
+                "y" : {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [-0.5, 0.0, 1.0],
+                    "physical": [ -90, 0.0,  20]
+                },
+                "z" : null
+            }
+        }
+    ]
+}
+
+
+
+
+
+

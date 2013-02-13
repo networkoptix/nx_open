@@ -35,14 +35,14 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 
 qint64 QnServerArchiveDelegate::startTime()
 {
-    if (m_catalogHi && m_catalogHi->minTime() != AV_NOPTS_VALUE)
+    if (m_catalogHi && m_catalogHi->minTime() != (qint64)AV_NOPTS_VALUE)
     {
-        if (m_catalogLow && m_catalogLow->minTime() != AV_NOPTS_VALUE)
+        if (m_catalogLow && m_catalogLow->minTime() != (qint64)AV_NOPTS_VALUE)
             return qMin(m_catalogHi->minTime(), m_catalogLow->minTime())*1000;
         else
             return m_catalogHi->minTime()*1000;
     }
-    else if (m_catalogLow && m_catalogLow->minTime() != AV_NOPTS_VALUE)
+    else if (m_catalogLow && m_catalogLow->minTime() != (qint64)AV_NOPTS_VALUE)
     {
         return m_catalogLow->minTime()*1000;
     }
@@ -112,7 +112,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     DeviceFileCatalogPtr newChunkCatalog;
 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
-    m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod);
+    m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, !m_reverseMode); // use precise find if no REW mode
     if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
     {
         m_eof = true;
@@ -179,7 +179,7 @@ qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (!m_motionRegion.isEmpty()) 
     {
         //time = correctTimeByMask(time, m_reverseMode);
-        m_eof = time == AV_NOPTS_VALUE;
+        m_eof = time == (qint64)AV_NOPTS_VALUE;
         if (m_eof)
             return -1; 
     }
@@ -202,7 +202,7 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
         return false;
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
-    m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk);
+    m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }
 
@@ -224,7 +224,7 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
     int chunkSwitchCnt = 0;
-    while (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
+    while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
         DeviceFileCatalog::Chunk chunk;
         DeviceFileCatalogPtr chunkCatalog;

@@ -195,7 +195,7 @@ static int DVDReadLBUDF( dvd_reader_t *device, quint32 lb_number,
     lb_number += (quint32)ret;
   }
 
-  return block_count;
+  return (int) block_count;
 }
 
 

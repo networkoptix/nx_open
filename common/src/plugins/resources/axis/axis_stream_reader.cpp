@@ -14,7 +14,6 @@ static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    QnLiveStreamProvider(res),
     m_rtpStreamParser(res),
     m_oldFirmwareWarned(false)
 {
@@ -169,7 +168,7 @@ void QnAxisStreamReader::openStream()
     else if (status != CL_HTTP_SUCCESS)
         return;
 
-    if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != MT_SoftwareGrid)
+    if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
     {
         res->setMotionMaskPhysical(0);
     }

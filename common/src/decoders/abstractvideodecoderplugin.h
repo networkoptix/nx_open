@@ -12,6 +12,7 @@
 
 #include "abstractclientplugin.h"
 #include "../core/datapacket/media_data_packet.h"
+#include "../plugins/videodecoders/stree/resourcecontainer.h"
 
 
 class QnAbstractVideoDecoder;
@@ -45,6 +46,7 @@ public:
             const QnCompressedVideoDataPtr& data,
             const QGLContext* const glContext,
             int currentSWDecoderCount ) const = 0;
+    virtual bool isStreamSupported( const stree::AbstractResourceReader& newStreamParams ) const = 0;
 };
 
 Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.plugin.videodecoder/0.1" );

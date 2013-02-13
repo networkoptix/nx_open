@@ -50,10 +50,10 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
         }
         else if (params[i].first == "startTime") 
         {
-            startTime = parseDateTime(params[i].second);
+            startTime = parseDateTime(params[i].second.toUtf8());
         }
         else if (params[i].first == "endTime") {
-            endTime = parseDateTime(params[i].second);
+            endTime = parseDateTime(params[i].second.toUtf8());
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();
@@ -169,6 +169,7 @@ QString QnRecordedChunksHandler::description() const
 int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
+    Q_UNUSED(contentType)
     //QString method = path.mid(path.lastIndexOf('/')+1);
     QString method = QFileInfo(path).baseName();
 

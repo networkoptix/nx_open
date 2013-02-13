@@ -22,13 +22,14 @@ syntax: glob
 compatibility_info.cpp
 
 .DS_Store
-.idea
 Debug
 Release
 
 build-environment/x86
 build-environment/x64
 
+appserver/.idea
+appserver/env
 appserver/gen
 appserver/db/ecs.db
 appserver/setup/db/ecs.db
@@ -157,4 +158,3 @@ launcher/x64
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
-mvnc.sh

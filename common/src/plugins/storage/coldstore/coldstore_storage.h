@@ -26,6 +26,7 @@ public:
     virtual bool isStorageAvailable() override;
     virtual bool isStorageAvailableForWriting() override;
     virtual qint64 getFreeSpace() override;
+    virtual qint64 getTotalSpace() override;
     virtual bool isNeedControlFreeSpace() override;
 
     virtual QFileInfoList getFileList(const QString& dirName) override;

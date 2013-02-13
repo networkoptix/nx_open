@@ -4,12 +4,10 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
-#include "common/common_meta_types.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -23,8 +21,6 @@ QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
 {
-    QnCommonMetaTypes::initilize();
-
     localServer = QnResourcePtr(new QnLocalMediaServerResource);
     addResource(localServer);
 }
@@ -96,6 +92,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 
         /* Fix up items that are stored in layout. */
+        /*
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             foreach(QnLayoutItemData data, layout->getItems()) {
                 if(!data.resource.id.isValid()) {
@@ -124,6 +121,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 }
             }
         }
+        */
 
         resource->setResourcePool(this);
     }
@@ -149,8 +147,11 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
 
-        if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
-            resource->init();
+        if (!resource->hasFlags(QnResource::foreigner))
+        {
+            if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
+                resource->init();
+        }
 
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
@@ -297,6 +298,19 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
+QnResourceList QnResourcePool::getAllEnabledCameras() const
+{
+    QnResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+            result << camResource;
+    }
+
+    return result;
+}
+
 QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
 {
     QnNetworkResourceList result;
@@ -304,6 +318,24 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QStrin
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getPhysicalId() == physicalId)
+            result << netResource;
+    }
+
+    return result;
+}
+
+QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const
+{
+    return getAllNetResourceByHostAddress(hostAddress.toString());
+}
+
+QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QString &hostAddress) const
+{
+    QnNetworkResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
+        if (netResource != 0 && netResource->getHostAddress() == hostAddress)
             result << netResource;
     }
 

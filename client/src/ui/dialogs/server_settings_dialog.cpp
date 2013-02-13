@@ -147,7 +147,7 @@ void QnServerSettingsDialog::updateFromResources() {
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
-    bool panicMode = m_server->isPanicMode();
+    bool panicMode = m_server->getPanicMode() != QnMediaServerResource::PM_None;
     ui->panicModeLabel->setText(panicMode ? tr("On") : tr("Off"));
     {
         QPalette palette = this->palette();
@@ -212,7 +212,8 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
         if (!storage)
             continue;
 
-        qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
+        //qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
+        qint64 availableSpace = itr.value().totalSpace;
         if (itr.value().errorCode == detail::INVALID_PATH)
         {
             QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
@@ -223,6 +224,15 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
             QMessageBox::critical(this, tr("Can't verify storage path"), tr("Cannot verify storage path '%1'. Cannot establish connection to the media server.").arg(storage->getUrl()));
             return false;
         }
+        else if (availableSpace < storage->getSpaceLimit())
+        {
+            QMessageBox::critical(this, tr("Not enough disk space"),
+                tr("Storage '%1'\nYou have less storage space available than reserved free space value. Additional %2Gb are required.")
+                .arg(storage->getUrl())
+                .arg(formatGbStr(storage->getSpaceLimit() - availableSpace)));
+            return false;
+        }
+        /*
         else if (availableSpace < 0)
         {
             QMessageBox::critical(this, tr("Not enough disk space"),
@@ -238,6 +248,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
                 .arg(storage->getUrl())
                 .arg(formatGbStr(availableSpace)));
         }
+        */
     }
 
     return true;

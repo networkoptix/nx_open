@@ -26,30 +26,27 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
 
     Q_ASSERT( context != NULL );
 
-    GLContext::SYS_PAINT_DEVICE_HANDLE curDeviceHandle = NULL;
-    GLContext::SYS_GL_CTX_HANDLE contextSysID = GLContext::getSysHandleOfQtContext( context, &curDeviceHandle );
-
-    //if context has changed, we need to share existing contexts with this one
-    if( !DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-            contextSysID,
-            DecodedPictureToOpenGLUploaderContextPool::instance()->paintWindowHandle(),
-            1 ) )
-    {
-        cl_log.log( QString::fromAscii("QnResourceWidgetRenderer. Failed to create auxiliary opengl context shared with GUI thread context. "
-            "Rendering of stream is impossible" ), cl_logERROR );
-        return;
-    }
+    const QGLContext* currentContextBak = QGLContext::currentContext();
+    if( context && (currentContextBak != context) )
+        const_cast<QGLContext*>(context)->makeCurrent();
 
     m_channelRenderers.resize( channelCount );
     for( int i = 0; i < channelCount; ++i )
     {
         RenderingTools renderingTools;
-        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context, contextSysID );
+        renderingTools.uploader = new DecodedPictureToOpenGLUploader( context );
         renderingTools.uploader->setForceSoftYUV( qnSettings->isSoftwareYuv() );
         renderingTools.renderer = new QnGLRenderer( context, *renderingTools.uploader );
         renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
         renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
         m_channelRenderers[i] = renderingTools;
+    }
+
+    if( context && currentContextBak != context ) {
+        if( currentContextBak )
+            const_cast<QGLContext*>(currentContextBak)->makeCurrent();
+        else
+            const_cast<QGLContext*>(context)->doneCurrent();
     }
 }
 
@@ -73,6 +70,15 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
+void QnResourceWidgetRenderer::pleaseStop()
+{
+    foreach(RenderingTools ctx, m_channelRenderers)
+    {
+        if( ctx.uploader )
+            ctx.uploader->pleaseStop();
+    }
+}
+
 void QnResourceWidgetRenderer::update() {
     //renderer->update() is not needed anymore since during paint renderer takes newest decoded picture
 
@@ -85,12 +91,39 @@ void QnResourceWidgetRenderer::update() {
 
 qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const { 
     const RenderingTools& ctx = m_channelRenderers[channel];
-    return ctx.renderer ? ctx.renderer->lastDisplayedTime() : 0;
+    return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
 }
+
+void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const 
+{
+    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    if (ctx.renderer) 
+        ctx.renderer->blockTimeValue(timestamp);
+}
+
+void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const 
+{  
+    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    if (ctx.renderer) 
+        ctx.renderer->unblockTimeValue();
+}
+
+bool QnResourceWidgetRenderer::isTimeBlocked(int channelNumber) const
+{
+    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    return ctx.renderer && ctx.renderer->isTimeBlocked();
+}
+
 
 qint64 QnResourceWidgetRenderer::isLowQualityImage(int channel) const { 
     const RenderingTools& ctx = m_channelRenderers[channel];
     return ctx.renderer ? ctx.renderer->isLowQualityImage() : 0;
+}
+
+bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
+{
+    const RenderingTools& ctx = m_channelRenderers[channel];
+    return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
 QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const 
@@ -123,11 +156,28 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     }
 }
 
-void QnResourceWidgetRenderer::waitForFrameDisplayed(int /*channel*/) {
-    //RenderingTools& ctx = m_channelRenderers[channel];
-    //if( !ctx.uploader )
-    //    return;
-    //ctx.uploader->waitForCurrentDecodedPictureRendered();
+void QnResourceWidgetRenderer::discardAllFramesPostedToDisplay(int channel)
+{
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->discardAllFramesPostedToDisplay();
+    ctx.uploader->waitForCurrentFrameDisplayed();
+}
+
+void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->ensureAllFramesWillBeDisplayed();
+}
+
+void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
+{
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->waitForAllFramesDisplayed();
 }
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {

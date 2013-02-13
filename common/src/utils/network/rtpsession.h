@@ -9,6 +9,8 @@
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
 
+//#define DEBUG_TIMINGS
+
 class RTPSession;
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
@@ -39,7 +41,7 @@ public:
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
 private:
-    double cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
     bool isLocalTimeChanged();
     bool isCameraTimeChanged(const RtspStatistic& statistics);
     void reset();
@@ -64,6 +66,16 @@ private:
 
     static QMutex m_camClockMutex;
     static QMap<QString, CamSyncInfo*> m_camClock;
+    qint64 m_lastWarnTime;
+
+#ifdef DEBUG_TIMINGS
+    void printTime(double jitter);
+    QTime m_statsTimer;
+    double m_minJitter;
+    double m_maxJitter;
+    double m_jitterSum;
+    int m_jitPackets;
+#endif
 };
 
 class RTPIODevice
@@ -80,6 +92,10 @@ public:
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
+    
+    void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
+    quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
+    quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
     void processRtcpData();
 private:
@@ -89,6 +105,7 @@ private:
     UDPSocket* m_mediaSocket;
     UDPSocket* m_rtcpSocket;
     quint32 ssrc;
+    quint8 m_rtpTrackNum;
 };
 
 class RTPSession: public QObject
@@ -121,6 +138,7 @@ public:
                 trackType = TT_UNKNOWN;
 
             ioDevice = new RTPIODevice(owner, useTCP);
+            ioDevice->setRtpTrackNum(_trackNum * 2);
         }
 
         void setSSRC(quint32 value);

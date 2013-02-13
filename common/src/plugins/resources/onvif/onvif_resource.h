@@ -41,7 +41,7 @@ class VideoOptionsLocal;
 //first = width, second = height
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
 
 
 class QDomElement;
@@ -93,7 +93,6 @@ public:
     static QString AUDIO_SUPPORTED_PARAM_NAME;
     static QString DUAL_STREAMING_PARAM_NAME;
     static const float QUALITY_COEF;
-    static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
     static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
@@ -119,9 +118,9 @@ public:
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
 
-    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) override;
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
-    virtual int getMaxOnvifRequestTries() const { return 1; };
+    virtual int getMaxOnvifRequestTries() const { return 1; }
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
@@ -176,8 +175,8 @@ public:
     static int calcTimeDrift(const QString& deviceUrl);
 
 
-    virtual QnOnvifPtzController* getPtzController() override;
-    bool fetchAndSetDeviceInformation();
+    virtual QnAbstractPtzController* getPtzController() override;
+    bool fetchAndSetDeviceInformation(bool performSimpleCheck);
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -187,8 +186,28 @@ public:
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
     virtual void setUrl(const QString &url) override;
-    int getChannel() const;
+    virtual int getChannel() const override;
     int getMaxChannels() const;
+
+    void updateToChannel(int value);
+
+    bool detectVideoSourceCount();
+
+    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    bool secondaryResolutionIsLarge() const;
+signals:
+    //!Emitted on camera input port state has been changed
+    /*!
+        \param resource Smart pointer to \a this
+        \param inputPortID
+        \param value true if input is connected, false otherwise
+        \param timestamp MSecs since epoch, UTC
+    */
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp);
 
 protected:
     void setCodec(CODECS c, bool isPrimary);
@@ -237,13 +256,14 @@ private:
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
-    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
 
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
     bool sendVideoSourceToCamera(VideoSource* source) const;
 
     QRect getVideoSourceMaxSize(const QString& configToken);
+
+    bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
@@ -254,6 +274,7 @@ protected:
 
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
+    virtual bool isInputPortMonitored() const override;
 
 private slots:
     void onRenewSubscriptionTimer();
@@ -360,7 +381,7 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    QnOnvifPtzController* m_ptzController;
+    QScopedPointer<QnOnvifPtzController> m_ptzController;
 
     QString m_imagingUrl;
     QString m_ptzUrl;
@@ -374,6 +395,7 @@ private:
     QMutex m_subscriptionMutex;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
+    quint64 m_renewSubscriptionTaskID;
     int m_channelNumer; // video/audio source number
     int m_maxChannels;
 	
@@ -386,6 +408,7 @@ private:
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
+    void checkPrimaryResolution(QSize& primaryResolution);
 };
 
 #endif //onvif_resource_h

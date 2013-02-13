@@ -1,12 +1,11 @@
 #ifndef AXIS_STREAM_REDER_H__
 #define AXIS_STREAM_REDER_H__
 
-#include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
-class QnAxisStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnAxisStreamReader: public CLServerPushStreamreader
 {
 public:
     QnAxisStreamReader(QnResourcePtr res);

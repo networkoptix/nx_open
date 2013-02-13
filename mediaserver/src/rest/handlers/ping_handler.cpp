@@ -11,6 +11,10 @@ QnRestPingHandler::QnRestPingHandler()
 
 int QnRestPingHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    Q_UNUSED(contentType)
+
     result.append(QString("<pong>%1</pong>\n").arg(serverGuid()).toUtf8());
     return CODE_OK;
 }

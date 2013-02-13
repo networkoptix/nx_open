@@ -150,7 +150,7 @@ void TimerManager::run()
     {
         try
         {
-            const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+            qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
             for( ;; )
             {
                 if( m_impl->timeToTask.empty() )
@@ -192,10 +192,11 @@ void TimerManager::run()
                     break;
             }
 
+            currentTime = QDateTime::currentMSecsSinceEpoch();
             if( m_impl->timeToTask.empty() )
                 m_impl->cond.wait( lk.mutex() );
-            else
-                m_impl->cond.wait( lk.mutex(), m_impl->timeToTask.begin()->first.first - QDateTime::currentMSecsSinceEpoch() );
+            else if( m_impl->timeToTask.begin()->first.first > currentTime )
+                m_impl->cond.wait( lk.mutex(), m_impl->timeToTask.begin()->first.first - currentTime );
 
             continue;
         }

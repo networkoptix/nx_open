@@ -31,7 +31,6 @@ struct ACS_VideoHeader
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
-QnLiveStreamProvider(res),
 m_rtpReader(res),
 mHttpClient(0),
 m_h264(false),
@@ -79,7 +78,7 @@ void PlDlinkStreamReader::openStream()
     if (cam_info_file.length()==0)
         return;
 
-    if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != MT_SoftwareGrid)
+    if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
     {
         res->setMotionMaskPhysical(0);
     }

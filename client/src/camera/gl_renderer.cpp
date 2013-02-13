@@ -89,7 +89,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_saturation( 0 ),
     m_lastDisplayedTime( AV_NOPTS_VALUE ),
     m_lastDisplayedFlags( 0 ),
-    m_prevFrameSequence( 0 )
+    m_prevFrameSequence( 0 ),
+    m_timeChangeEnabled(true)
 {
     Q_ASSERT( context );
 
@@ -109,6 +110,9 @@ QnGLRenderer::~QnGLRenderer()
 
 void QnGLRenderer::beforeDestroy()
 {
+    m_yuy2ToRgbShaderProgram.reset();
+    m_yv12ToRgbShaderProgram.reset();
+    m_nv12ToRgbShaderProgram.reset();
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -122,9 +126,16 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 
 Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
 {
+    NX_LOG( QString::fromLatin1("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
+
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
+    {
+        NX_LOG( QString::fromLatin1("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2 );
         return Qn::NothingRendered;
+    }
+
+    m_lastDisplayedFlags = picLock->flags();
 
     Qn::RenderStatus result = picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
     const bool draw = picLock->width() <= maxTextureSize() && picLock->height() <= maxTextureSize();
@@ -147,6 +158,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
             case PIX_FMT_YUV420P:
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
         	    drawYV12VideoTexture(
+                    picLock,
                     picLock->textureRect(),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
@@ -168,9 +180,17 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 Q_ASSERT( false );
         }
 
+        QMutexLocker lock(&m_mutex);
+
+        if( picLock->pts() != AV_NOPTS_VALUE && m_prevFrameSequence != picLock->sequence()) 
+        {
+            if (m_timeChangeEnabled) {
+                m_lastDisplayedTime = picLock->pts();
+                //qDebug() << "QnGLRenderer::paint. Frame timestamp ("<<m_lastDisplayedTime<<") " <<
+                //    QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));
+            }
+        }
         m_prevFrameSequence = picLock->sequence();
-        if( picLock->pts() != AV_NOPTS_VALUE )
-            m_lastDisplayedTime = picLock->pts();
         m_lastDisplayedMetadata = picLock->metadata();
     }
     else
@@ -178,11 +198,13 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
         result = Qn::NothingRendered;
     }
 
+    NX_LOG( QString::fromLatin1("Exiting QnGLRenderer::paint (2)"), cl_logDEBUG2 );
+
     return result;
 }
 
 void QnGLRenderer::drawVideoTextureDirectly(
-	const QRectF& tex0Coords,
+	const QRectF& /*tex0Coords*/,
 	unsigned int tex0ID,
 	const float* v_array )
 {
@@ -205,15 +227,16 @@ void QnGLRenderer::drawVideoTextureDirectly(
     };
 
     glEnable(GL_TEXTURE_2D);
-    glCheckError("glEnable");
+    DEBUG_CODE(glCheckError("glEnable"));
 
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    glCheckError("glBindTexture");
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 }
 
 void QnGLRenderer::drawYV12VideoTexture(
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
 	const QRectF& tex0Coords,
 	unsigned int tex0ID,
 	unsigned int tex1ID,
@@ -227,33 +250,29 @@ void QnGLRenderer::drawYV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    //float tx_array[8] = {
-    //    0.0f, 0.0f,
-    //    tex0Coords.x(), 0.0f,
-    //    tex0Coords.x(), tex0Coords.y(),
-    //    0.0f, tex0Coords.y()
-    //};
+    NX_LOG( QString::fromLatin1("Rendering YUV420 textures %1, %2, %3").
+        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     glEnable(GL_TEXTURE_2D);
-    glCheckError("glEnable");
+    DEBUG_CODE(glCheckError("glEnable"));
 
 	m_yv12ToRgbShaderProgram->bind();
     m_yv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
 
 	glActiveTexture(GL_TEXTURE2);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, tex2ID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
 	glActiveTexture(GL_TEXTURE1);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, tex1ID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
 	glActiveTexture(GL_TEXTURE0);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, tex0ID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
@@ -274,7 +293,7 @@ void QnGLRenderer::drawNV12VideoTexture(
     };
 
     glEnable(GL_TEXTURE_2D);
-    glCheckError("glEnable");
+    DEBUG_CODE(glCheckError("glEnable"));
 
 	m_nv12ToRgbShaderProgram->bind();
 	//m_nv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
@@ -284,14 +303,14 @@ void QnGLRenderer::drawNV12VideoTexture(
     m_nv12ToRgbShaderProgram->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
 	glActiveTexture(GL_TEXTURE1);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
 	glActiveTexture(GL_TEXTURE0);
-	glCheckError("glActiveTexture");
+	DEBUG_CODE(glCheckError("glActiveTexture"));
 	glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
-	glCheckError("glBindTexture");
+	DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
@@ -300,26 +319,47 @@ void QnGLRenderer::drawNV12VideoTexture(
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
 {
+    DEBUG_CODE(glCheckError("glBindBuffer"));
     glVertexPointer(2, GL_FLOAT, 0, v_array);
-    glCheckError("glVertexPointer");
+    DEBUG_CODE(glCheckError("glVertexPointer"));
     glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
-    glCheckError("glTexCoordPointer");
+    DEBUG_CODE(glCheckError("glTexCoordPointer"));
     glEnableClientState(GL_VERTEX_ARRAY);
-    glCheckError("glEnableClientState");
+    DEBUG_CODE(glCheckError("glEnableClientState"));
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glCheckError("glEnableClientState");
+    DEBUG_CODE(glCheckError("glEnableClientState"));
     glDrawArrays(GL_QUADS, 0, 4);
-    glCheckError("glDrawArrays");
+    DEBUG_CODE(glCheckError("glDrawArrays"));
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glCheckError("glDisableClientState");
+    DEBUG_CODE(glCheckError("glDisableClientState"));
     glDisableClientState(GL_VERTEX_ARRAY);
-    glCheckError("glDisableClientState");
+    DEBUG_CODE(glCheckError("glDisableClientState"));
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
-    QMutexLocker locker(&m_displaySync);
+    QMutexLocker locker(&m_mutex);
     return m_lastDisplayedTime;
+}
+
+void QnGLRenderer::blockTimeValue( qint64 timestamp )
+{
+    QMutexLocker lock(&m_mutex);
+    m_lastDisplayedTime = timestamp;
+    m_timeChangeEnabled = false;
+    //qDebug() << "QnGLRenderer::blockTimeValue ("<<m_lastDisplayedTime<<")" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
+}
+
+void QnGLRenderer::unblockTimeValue()
+{  
+    QMutexLocker lock(&m_mutex);
+    //qDebug() << "unblockTimeValue";
+    m_timeChangeEnabled = true;
+}
+
+bool QnGLRenderer::isTimeBlocked() const
+{
+    return !m_timeChangeEnabled;
 }
 
 bool QnGLRenderer::isLowQualityImage() const
@@ -329,8 +369,13 @@ bool QnGLRenderer::isLowQualityImage() const
 
 QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 {
-    QMutexLocker locker(&m_displaySync);
+    QMutexLocker locker(&m_mutex);
     return m_lastDisplayedMetadata;
+}
+
+bool QnGLRenderer::isHardwareDecoderUsed() const
+{
+    return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 }
 
 bool QnGLRenderer::isYV12ToRgbShaderUsed() const
@@ -339,6 +384,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_yv12ToRgbShaderProgram.get()
         && m_yv12ToRgbShaderProgram->isValid();
 }
 
@@ -347,6 +393,7 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
     return (features() & QnGlFunctions::ArbPrograms)
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
-        && !m_decodedPictureProvider.isForcedSoftYUV();
+        && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_nv12ToRgbShaderProgram.get();
         //&& m_nv12ToRgbShaderProgram->isValid();
 }

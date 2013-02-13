@@ -1,53 +1,40 @@
 package pb;
 
+import "businessCommon.proto";
+import "businessAction.proto";
+
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "BusinessRuleProtos";
+
 enum BusinessEventType {
-    NotDefined         = 0;
+    NotDefinedEvent    = 0;
     Camera_Motion      = 1;
     Camera_Input       = 2;
     Camera_Disconnect  = 3;
     Storage_Failure    = 4;
-    UserDefined        = 1000;
-}
-
-enum BusinessActionType
-{
-    // media server based actions
-    CameraOutput     = 0;    // set camera output signal
-    Bookmark         = 1;    // mark part of camera archive as undeleted
-    CameraRecording  = 2;    // start camera recording
-    PanicRecording   = 3;    // activate panic recording mode
-
-    // these actions can be executed from any endpoint. Actually these actions call specified function at EC
-    SendMail         = 4;
-    Alert            = 5;
-    ShowPopup        = 6;
-}
-
-enum ToggleStateType
-{
-    State_Off        = 0;
-    State_On         = 1;
-    State_NotDefined = 2;
+    Network_Issue      = 5;
+    Camera_Ip_Conflict = 6;
+    MediaServer_Failure= 7;
+    MediaServer_Conflict=8;
+    UserDefinedEvent   = 1000;
 }
 
 message BusinessRule {
     optional int32 id                      = 1;
+
     optional BusinessEventType eventType   = 2;
-    optional int32  eventResource          = 3;
+    repeated int32  eventResource          = 3;
     optional string eventCondition         = 4;
+    optional ToggleStateType eventState    = 5;
 
-    optional BusinessActionType actionType = 5;
-    optional int32 actionResource          = 6;
-    optional string actionParams           = 7;
-}
+    optional BusinessActionType actionType = 6;
+    repeated int32 actionResource          = 7;
+    optional string actionParams           = 8;
 
-message BusinessAction {
-    optional BusinessActionType actionType = 1;
-    optional int32 actionResource          = 2;
-    optional string actionParams           = 3;
-    optional int32 businessRuleId          = 4;
-    optional string runtimeParams          = 5;
-    optional ToggleStateType toggleState   = 6;	
+    optional int32 aggregationPeriod       = 9; // msecs
+    optional bool disabled                 = 10;
+    optional string comments               = 11;
+    optional string schedule               = 12;
 }
 
 message BusinessRules {

@@ -22,7 +22,7 @@ struct AVCodecContext;
 
 enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_None};
 
-class QnMediaContext {
+class QnMediaContext: public QnAbstractMediaContext {
 public:
 
     QnMediaContext(AVCodecContext* ctx);
@@ -38,8 +38,8 @@ public:
 private:
     AVCodecContext* m_ctx;
 };
-
 typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
+
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
@@ -61,7 +61,9 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_NewServer = 1024, // swith archive to a new media server
         MediaFlags_DecodeTwice = 2048,
         MediaFlags_FCZ = 4096, // fast channel zapping flag
-        MediaFlags_AfterDrop = 1024*8 // some data were dropped before current data
+        MediaFlags_AfterDrop = 1024*8, // some data were dropped before current data
+
+        MediaFlags_HWDecodingUsed = 1024*16 //hardware decoding used
     };
 
     enum DataType {
@@ -359,18 +361,5 @@ private:
     void assign(QnCompressedAudioData* other);
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
-
-
-class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
-{
-public:
-    CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
-
-
-    qint64 mediaLength() const;
-private:
-    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
-};
-
 
 #endif //abstract_media_data_h_112

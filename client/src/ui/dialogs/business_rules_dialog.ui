@@ -6,51 +6,36 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>877</width>
-    <height>756</height>
+    <width>1078</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Server Management Rules</string>
+   <string>Advanced Event Rules</string>
   </property>
-  <property name="modal">
-   <bool>true</bool>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="newRuleButton">
+      <widget class="QPushButton" name="addRuleButton">
        <property name="text">
-        <string>New</string>
+        <string>Add</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../x86/build/client-custom.qrc">
+         <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="saveButton">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="saveAllButton">
-       <property name="text">
-        <string>Save All</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="undoButton">
-       <property name="text">
-        <string>Undo</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="deleteButton">
+      <widget class="QPushButton" name="deleteRuleButton">
        <property name="text">
         <string>Delete</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/skin/titlebar/exit_hovered.png</normalon>
+        </iconset>
        </property>
       </widget>
      </item>
@@ -68,31 +53,41 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="refreshButton">
+      <widget class="QPushButton" name="advancedButton">
        <property name="text">
-        <string>Refresh</string>
+        <string>Advanced...</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="closeButton">
-       <property name="text">
-        <string>Close</string>
+       <property name="icon">
+        <iconset>
+         <normalon>:/skin/titlebar/dropdown_hovered.png</normalon>
+        </iconset>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="rulesGroupBox">
-     <property name="title">
-      <string>List of rules</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+    <widget class="QFrame" name="rulesFrame">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QTableView" name="tableView">
+       <widget class="QnTableView" name="tableView">
         <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
+         <set>QAbstractItemView::AllEditTriggers</set>
         </property>
         <property name="showDropIndicator" stdset="0">
          <bool>false</bool>
@@ -124,32 +119,32 @@
     </widget>
    </item>
    <item>
-    <widget class="QnStorageSpaceWidget" name="horizontalSlider">
-     <property name="value">
-      <number>50</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
+    <widget class="QnBusinessRuleWidget" name="detailsWidget" native="true"/>
    </item>
    <item>
-    <widget class="QGroupBox" name="detailsGroupBox">
-     <property name="title">
-      <string>Details</string>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
-     <layout class="QVBoxLayout" name="detailsLayout"/>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnStorageSpaceWidget</class>
-   <extends>QSlider</extends>
-   <header>ui/widgets/storage_space_widget.h</header>
+   <class>QnBusinessRuleWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/business/business_rule_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/table_view.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../x86/build/client-custom.qrc"/>
+ </resources>
  <connections/>
 </ui>

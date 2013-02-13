@@ -44,6 +44,7 @@ extern "C" {
 
 /* Boost headers. */
 #include <boost/foreach.hpp>
+#include <boost/array.hpp>
 
 /* QT headers. */
 #include <QAction>
@@ -147,5 +148,7 @@ extern "C" {
 #include <QtGui>
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
+
+#include <ui/workaround/deprecation.h>
 
 #endif

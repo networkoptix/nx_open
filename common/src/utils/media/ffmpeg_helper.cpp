@@ -2,6 +2,7 @@
 #include "nalUnits.h"
 #include "bitStream.h"
 #include "vc1Parser.h"
+#include "core/resource/storage_resource.h"
 
 //extern QMutex global_ffmpeg_mutex;
 
@@ -580,7 +581,7 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
     data->append((const char*) &ctx->codec_id, 4);
     
     if (ctx->rc_eq) 
-        appendCtxField(data, Field_RC_EQ, ctx->rc_eq, strlen(ctx->rc_eq)+1); // +1 because of include \0 byte
+        appendCtxField(data, Field_RC_EQ, ctx->rc_eq, (int) strlen(ctx->rc_eq)+1); // +1 because of include \0 byte
     if (ctx->extradata) 
         appendCtxField(data, Field_EXTRADATA, (const char*) ctx->extradata, ctx->extradata_size);
     if (ctx->intra_matrix) 
@@ -716,4 +717,108 @@ QString getAudioCodecDescription(AVCodecContext* codecContext)
         result += QString::number(codecContext->channels);
 
     return result;
+}
+
+static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
+{
+    QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
+    return reader->read((char*) buf, size);
+}
+
+static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
+{
+    QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
+    if (reader)
+        return reader->write((char*) buf, size);
+    else
+        return 0;
+}
+
+static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
+{
+    QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
+
+    qint64 absolutePos = pos;
+    switch (whence)
+    {
+    case SEEK_SET: 
+        break;
+    case SEEK_CUR: 
+        absolutePos = reader->pos() + pos;
+        break;
+    case SEEK_END: 
+        absolutePos = reader->size() + pos;
+        break;
+    case 65536:
+        return reader->size();
+    default:
+        return AVERROR(ENOENT);
+    }
+
+    return reader->seek(absolutePos);
+}
+
+
+AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)
+{
+    int prefix = url.indexOf(QLatin1String("://"));
+    QString path = prefix == -1 ? url : url.mid(prefix+3);
+
+    quint8* ioBuffer;
+    AVIOContext* ffmpegIOContext;
+
+    QIODevice* ioDevice = resource->open(path, openMode);
+    if (ioDevice == 0)
+        return 0;
+
+    ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
+    ffmpegIOContext = avio_alloc_context(
+        ioBuffer,
+        IO_BLOCK_SIZE,
+        (openMode & QIODevice::WriteOnly) ? 1 : 0,
+        ioDevice,
+        &ffmpegReadPacket,
+        &ffmpegWritePacket,
+        &ffmpegSeek);
+
+    return ffmpegIOContext;
+}
+
+AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE)
+{
+    quint8* ioBuffer;
+    AVIOContext* ffmpegIOContext;
+
+    ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
+    ffmpegIOContext = avio_alloc_context(
+        ioBuffer,
+        IO_BLOCK_SIZE,
+        (ioDevice->openMode() & QIODevice::WriteOnly) ? 1 : 0,
+        ioDevice,
+        &ffmpegReadPacket,
+        &ffmpegWritePacket,
+        &ffmpegSeek);
+
+    return ffmpegIOContext;
+}
+
+qint64 QnFfmpegHelper::getFileSizeByIOContext(AVIOContext* ioContext)
+{
+    if (ioContext)
+    {
+        QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
+        return ioDevice->size();
+    }
+    return 0;
+}
+
+void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
+{
+    if (ioContext)
+    {
+        QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
+        delete ioDevice;
+        ioContext->opaque = 0;
+        avio_close(ioContext);
+    }
 }

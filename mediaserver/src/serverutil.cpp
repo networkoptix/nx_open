@@ -7,14 +7,7 @@
 #include "settings.h"
 #include "version.h"
 
-QString defaultStoragePath()
-{
-#ifdef Q_OS_WIN
-    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString());
-#else
-    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString());
-#endif
-}
+static QnMediaServerResourcePtr m_server;
 
 void syncStoragesToSettings(QnMediaServerResourcePtr server)
 {
@@ -29,10 +22,6 @@ void syncStoragesToSettings(QnMediaServerResourcePtr server)
     }
 
     qSettings.endArray();
-
-    if (storages.size() == 1) {
-        qSettings.setValue("mediaDir", QDir::toNativeSeparators(storages.at(0)->getUrl()));
-    }
 }
 
 QString authKey()
@@ -42,8 +31,12 @@ QString authKey()
 
 QString serverGuid()
 {
-    QString guid = qSettings.value("serverGuid").toString();
+    static QString guid;
 
+    if (!guid.isEmpty())
+        return guid;
+
+    guid = qSettings.value("serverGuid").toString();
     if (guid.isEmpty())
     {
         if (!qSettings.isWritable())
@@ -70,4 +63,3 @@ QString getDataDirectory()
     return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #endif
 }
-

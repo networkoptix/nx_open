@@ -20,8 +20,9 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
-// ------ Delegate class -----
-
+// -------------------------------------------------------------------------- //
+// QnResourceTreeItemDelegate
+// -------------------------------------------------------------------------- //
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
 
@@ -108,11 +109,12 @@ protected:
         /* Draw 'recording' icon. */
         bool recording = false, scheduled = false;
         if(resource) {
-            if(resource->getStatus() == QnResource::Recording) {
-                recording = true;
+            if(!resource->isDisabled()) {
+                if(resource->getStatus() == QnResource::Recording)
+                    recording = true;
             } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
                 foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                    if(otherCamera->getStatus() == QnResource::Recording) {
+                    if(!otherCamera->isDisabled() && otherCamera->getStatus() == QnResource::Recording) {
                         recording = true;
                         break;
                     }
@@ -145,8 +147,10 @@ private:
     QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
 };
 
-// ------ Style class -----
 
+// -------------------------------------------------------------------------- //
+// QnResourceTreeStyle
+// -------------------------------------------------------------------------- //
 class QnResourceTreeStyle: public QnProxyStyle {
 public:
     explicit QnResourceTreeStyle(QStyle *baseStyle, QObject *parent = NULL): QnProxyStyle(baseStyle, parent) {}
@@ -169,8 +173,10 @@ public:
     }
 };
 
-// ------ Sort model class ------
 
+// -------------------------------------------------------------------------- //
+// QnResourceTreeSortProxyModel
+// -------------------------------------------------------------------------- //
 class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel {
     typedef QnResourceSearchProxyModel base_type;
 
@@ -190,11 +196,13 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        /* Local node must be the last one in a list. */
         bool leftLocal = left.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
         bool rightLocal = right.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
             return rightLocal;
 
+        /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
         int result = leftDisplay.compare(rightDisplay);
@@ -207,7 +215,11 @@ protected:
         /* We want the order to be defined even for items with the same name. */
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
-        return leftResource < rightResource;
+        if(leftResource && rightResource) {
+            return leftResource->getUniqueId() < rightResource->getUniqueId();
+        } else {
+            return leftResource < rightResource;
+        }
     }
 
     /*!
@@ -229,6 +241,7 @@ protected:
         base_type::setData(index, state, Qt::CheckStateRole);
     }
 
+    // TODO: #GDM codestyle, use camelCase, not under_score.
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
         if (!m_filterEnabled)
             return true;
@@ -244,8 +257,9 @@ private:
 };
 
 
-// ------ Widget class -----
-
+// -------------------------------------------------------------------------- //
+// QnResourceTreeWidget
+// -------------------------------------------------------------------------- //
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
@@ -315,13 +329,23 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
+
     emit viewportSizeChanged();
+}
+
+const QnResourceCriterion &QnResourceTreeWidget::criterion() const {
+    return m_criterion;
+}
+
+void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion) {
+    m_criterion = criterion;
+    
+    updateFilter();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel() {
     return ui->resourcesTreeView->selectionModel();
 }
-
 
 void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
     m_itemDelegate->setWorkbench(workbench);
@@ -411,26 +435,11 @@ bool QnResourceTreeWidget::isEditingEnabled() const {
     return m_editingEnabled;
 }
 
-// ----------- Handlers -------------
-
-bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-            (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
-        emit viewportSizeChanged();
-    }
-    return base_type::eventFilter(obj, event);
-}
-
-void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
-    emit viewportSizeChanged();
-    base_type::resizeEvent(event);
-}
-
-void QnResourceTreeWidget::updateCheckboxesVisibility(){
+void QnResourceTreeWidget::updateCheckboxesVisibility() {
     ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
 }
 
-void QnResourceTreeWidget::updateColumnsSize(){
+void QnResourceTreeWidget::updateColumnsSize() {
     const int checkBoxSize = 16;
     const int offset = checkBoxSize * 1.5;
     ui->resourcesTreeView->setColumnWidth(1, checkBoxSize);
@@ -447,22 +456,34 @@ void QnResourceTreeWidget::updateFilter() {
     }
 
     ui->clearFilterButton->setVisible(!filter.isEmpty());
-//    QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
     m_resourceProxyModel->clearCriteria();
     m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
-  //  if(flags != 0)
-  //      model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
+    m_resourceProxyModel->addCriterion(m_criterion);
     m_resourceProxyModel->addCriterion(QnResourceCriterion(QnResource::server));
 
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
+    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
+    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
+        (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
+            emit viewportSizeChanged();
+    }
+    return base_type::eventFilter(obj, event);
+}
+
+void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
+    emit viewportSizeChanged();
+    base_type::resizeEvent(event);
+}
+
 void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
@@ -472,6 +493,7 @@ void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
 void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
+    // TODO: #Elric. This is totally evil. This check belongs to the slot that handles activation.
     if (resource &&
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
         !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */

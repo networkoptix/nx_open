@@ -9,6 +9,8 @@
 QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
     QN_INIT_MODULE_RESOURCES(client);
 
+    QnClientMetaTypes::initialize();
+
     new QnCommonModule(argc, argv, this);
 }
 

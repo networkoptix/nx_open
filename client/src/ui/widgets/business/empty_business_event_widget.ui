@@ -7,22 +7,18 @@
     <x>0</x>
     <y>0</y>
     <width>663</width>
-    <height>26</height>
+    <height>17</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="topMargin">
+   <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>This event type has no additional parameters</string>
-     </property>
-    </widget>
+    <widget class="QLabel" name="label"/>
    </item>
   </layout>
  </widget>

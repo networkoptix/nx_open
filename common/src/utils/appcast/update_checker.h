@@ -33,7 +33,7 @@ private:
     QNetworkAccessManager m_accessManager;
     QNetworkReply *m_reply;
     QUrl m_url;
-    QnVersion m_engineVersion;
+    QnSoftwareVersion m_engineVersion;
 };
 
 #endif // UPDATE_CHECKER_H_

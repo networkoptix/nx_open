@@ -4,10 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QHash>
-#include <QtCore/QHashIterator>
-#include <QtCore/QMutableHashIterator>
 #include <QtCore/QLinkedList>
-#include <QtCore/QLinkedListIterator>
 
 enum  QnStatisticsDeviceType {
     CPU,
@@ -34,11 +31,6 @@ struct QnStatisticsData{
 };
 
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
-
-// TODO: remove this iterator hell.
-typedef QLinkedListIterator<qreal> QnStatisticsDataIterator; 
-typedef QHashIterator<QString, QnStatisticsData> QnStatisticsIterator;
-typedef QMutableHashIterator<QString, QnStatisticsData> QnStatisticsCleaner;
 
 Q_DECLARE_METATYPE(QnStatisticsDataList)
 Q_DECLARE_METATYPE(QnStatisticsData)

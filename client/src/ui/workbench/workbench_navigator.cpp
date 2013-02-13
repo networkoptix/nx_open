@@ -304,7 +304,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
             /* Media was paused while on live. Jump to archive when resumed. */
             qint64 time = camDisplay->getCurrentTime();
             reader->resumeMedia();
-            if (time != AV_NOPTS_VALUE && reader->getSpeed() > 0)
+            if (time != (qint64)AV_NOPTS_VALUE && reader->getSpeed() > 0)
                 reader->directJumpToNonKeyFrame(time+1);
         } else {
             reader->resumeMedia();
@@ -512,15 +512,15 @@ void QnWorkbenchNavigator::jumpBackward() {
             if (currentTime == DATETIME_NOW) {
                 pos = periods.last().startTimeMs * 1000;
             } else {
-                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime / 1000);
-                itr = qMax(itr - 2, periods.constBegin());
+                QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime/1000, true);
+                itr = qMax(itr - 1, periods.constBegin());
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && itr->durationMs != -1)
                     pos += itr->durationMs * 1000;
             }
         }
     }
-    reader->jumpTo(pos, 0);
+    reader->jumpTo(pos, pos);
 }
 
 void QnWorkbenchNavigator::jumpForward() {
@@ -543,14 +543,18 @@ void QnWorkbenchNavigator::jumpForward() {
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
-        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000);
+        qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
+        QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
+        if (itr != periods.constEnd() && (itr+1) != periods.constEnd())
+            ++itr;
+        
         if (itr == periods.end() || (reader->isReverseMode() && itr->durationMs == -1)) {
             pos = DATETIME_NOW;
         } else {
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }
     }
-    reader->jumpTo(pos, 0);
+    reader->jumpTo(pos, pos);
 }
 
 void QnWorkbenchNavigator::stepBackward() {

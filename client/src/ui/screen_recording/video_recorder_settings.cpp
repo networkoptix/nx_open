@@ -5,7 +5,7 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
 #ifdef Q_OS_WIN32
-#   include "device_plugins/desktop/win_audio_helper.h"
+#   include "device_plugins/desktop_win_only/win_audio_helper.h"
 #endif
 
 QRegExp QnVideoRecorderSettings::m_devNumberExpr(QLatin1String(" \\([0-9]+\\)$"));

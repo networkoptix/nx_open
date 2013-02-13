@@ -2,7 +2,6 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <client/client_meta_types.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -11,8 +10,6 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    QnClientMetaTypes::initialize();
-
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
@@ -71,7 +68,8 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(user->getName() == m_userName) {
+    /* Logins are case-insensitive. */
+    if(user->getName().toLower() == m_userName.toLower()) {
         setCurrentUser(user);
     } else if(user == m_user) {
         setCurrentUser(QnUserResourcePtr());

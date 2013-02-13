@@ -20,7 +20,7 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
     m_vertexOffset = vertexStream.offset();
     vertexStream << QVector2D(0.0f, 0.0f);
     for(int i = 0; i <= sectorCount; i++)
-        vertexStream << polar<QVector2D>(2 * M_PI * i / sectorCount, 1.0f);
+        vertexStream << polarToCartesian<QVector2D>(1.0f, 2 * M_PI * i / sectorCount);
     m_vertexCount = sectorCount + 2;
 
     /* Generate color data. */

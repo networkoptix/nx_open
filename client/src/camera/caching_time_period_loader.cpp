@@ -4,7 +4,6 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <client/client_meta_types.h>
 
 #include "time_period_loader.h"
 #include "multi_camera_time_period_loader.h"
@@ -46,8 +45,6 @@ QnCachingTimePeriodLoader::~QnCachingTimePeriodLoader() {
 }
 
 void QnCachingTimePeriodLoader::init() {
-    QnClientMetaTypes::initialize();
-
     m_loadingMargin = 1.0;
     m_updateInterval = defaultUpdateInterval;
     m_resourceIsLocal = !m_resource.dynamicCast<QnNetworkResource>();

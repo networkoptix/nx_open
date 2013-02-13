@@ -105,10 +105,11 @@ QString QnTestCameraResourceSearcher::manufacture() const
     return QLatin1String(QnTestCameraResource::MANUFACTURE);
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    return QnResourcePtr(0);
+    Q_UNUSED(doMultichannelCheck)
+    return QList<QnResourcePtr>();
 }
 

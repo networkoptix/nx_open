@@ -73,11 +73,12 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlPulseSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    return QnResourcePtr(0);
+    Q_UNUSED(doMultichannelCheck)
+    return QList<QnResourcePtr>();
 }
 
 QString QnPlPulseSearcher::manufacture() const

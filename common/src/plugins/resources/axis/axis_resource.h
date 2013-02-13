@@ -11,6 +11,7 @@
 #include "utils/network/simple_http_client.h"
 #include <utils/network/http/multipartcontentparser.h>
 
+class QnAxisPtzController;
 
 class QnPlAxisResource : public QnPhysicalCameraResource
 {
@@ -43,7 +44,7 @@ public:
     bool readMotionInfo();
 
     virtual void setMotionMaskPhysical(int channel) override;
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
     int getChannelNum() const;
 
@@ -57,6 +58,22 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
+    virtual QnAbstractPtzController* getPtzController() override;
+
+signals:
+    //!Emitted on camera input port state has been changed
+    /*!
+        \param resource Smart pointer to \a this
+        \param inputPortID
+        \param value true if input is connected, false otherwise
+        \param timestamp MSecs since epoch, UTC
+    */
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp);
+
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClient* httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient );
@@ -69,6 +86,7 @@ protected:
     virtual void setCropingPhysical(QRect croping);
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
+    virtual bool isInputPortMonitored() const override;
 
 private:
     void clear();
@@ -91,9 +109,11 @@ private:
     std::map<QString, unsigned int> m_inputPortNameToIndex;
     std::map<QString, unsigned int> m_outputPortNameToIndex;
     mutable QMutex m_inputPortMutex;
+    //!map<input port index (1-based), http client>
     std::map<unsigned int, nx_http::AsyncHttpClient*> m_inputPortHttpMonitor;
     nx_http::MultipartContentParser m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
+    QScopedPointer<QnAxisPtzController> m_ptzController;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(
@@ -111,6 +131,10 @@ private:
     void initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     void forgetHttpClient( nx_http::AsyncHttpClient* const httpClient );
+
+    void initializePtz(CLSimpleHTTPClient *http);
+
+    friend class QnAxisPtzController;
 };
 
 #endif //axis_resource_h_2215

@@ -45,6 +45,15 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
     }
 }
 
+QString QnStorageManager::toCanonicalPath(const QString& path)
+{
+    QString result = path;
+    result.replace(L'\\', L'/');
+    if (!result.endsWith(L'/'))
+        result += QLatin1String("/");
+    return result;
+}
+
 bool QnStorageManager::deserializeStorageFile()
 {
 #ifdef _TEST_TWO_SERVERS
@@ -61,8 +70,13 @@ bool QnStorageManager::deserializeStorageFile()
     do {
         line = storageFile.readLine();
         QStringList params = line.split(';');
-        if (params.size() >= 2)
-            m_storageIndexes.insert(params[0], params[1].toInt());
+        if (params.size() >= 2) {
+            QString path = toCanonicalPath(params[0]);
+            for (int i = 0; i < params.size(); ++i) {
+                int index = params[i].toInt();
+                m_storageIndexes[path].insert(index);
+            }
+        }
     } while (!line.isEmpty());
     storageFile.close();
     return true;
@@ -79,11 +93,14 @@ bool QnStorageManager::serializeStorageFile()
     if (!storageFile.open(QFile::WriteOnly | QFile::Truncate))
         return false;
     storageFile.write("path; index\n");
-    for (QMap<QString, int>::const_iterator itr = m_storageIndexes.constBegin(); itr != m_storageIndexes.constEnd(); ++itr)
+    for (QMap<QString, QSet<int> >::const_iterator itr = m_storageIndexes.constBegin(); itr != m_storageIndexes.constEnd(); ++itr)
     {
         storageFile.write(itr.key().toUtf8());
-        storageFile.write(";");
-        storageFile.write(QByteArray::number(itr.value()));
+        const QSet<int>& values = itr.value();
+        foreach(const int& value, values) {
+            storageFile.write(";");
+            storageFile.write(QByteArray::number(value));
+        }
         storageFile.write("\n");
     }
     storageFile.close();
@@ -93,24 +110,39 @@ bool QnStorageManager::serializeStorageFile()
 }
 
 // determine storage index (aka 16 bit hash)
-int QnStorageManager::detectStorageIndex(const QString& path)
+int QnStorageManager::detectStorageIndex(const QString& p)
 {
+    QString path = toCanonicalPath(p);
     if (!m_storageFileReaded)
         m_storageFileReaded = deserializeStorageFile();
 
     if (m_storageIndexes.contains(path))
     {
-        return m_storageIndexes.value(path);
+        return *m_storageIndexes.value(path).begin();
     }
     else {
         int index = -1;
-        foreach (int value, m_storageIndexes.values())
-            index = qMax(index, value);
+        foreach (const QSet<int>& indexes, m_storageIndexes.values()) 
+        {
+            foreach (const int& value, indexes) 
+                index = qMax(index, value);
+        }
         index++;
-        m_storageIndexes.insert(path, index);
+        m_storageIndexes.insert(path, QSet<int>() << index);
         serializeStorageFile();
         return index;
     }
+}
+
+QSet<int> QnStorageManager::getDeprecateIndexList(const QString& p)
+{
+    QString path = toCanonicalPath(p);
+    QSet<int> result = m_storageIndexes.value(path);
+
+    if (!result.isEmpty())
+        result.erase(result.begin());
+
+    return result;
 }
 
 void QnStorageManager::addStorage(QnStorageResourcePtr storage)
@@ -121,30 +153,38 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     
     cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
-    QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
-    if (oldStorage)
-        storage->addWritedSpace(oldStorage->getWritedSpace());
+    removeStorage(storage); // remove existing storage record if exists
+    //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
+    //if (oldStorage)
+    //    storage->addWritedSpace(oldStorage->getWritedSpace());
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);
+
+
+    QSet<int> depracateStorageIndexes = getDeprecateIndexList(storage->getUrl());
+    foreach(const int& value, depracateStorageIndexes)
+        m_storageRoots.insert(value, storage);
+
     connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
 }
 
-QnStorageResourcePtr QnStorageManager::removeStorage(QnStorageResourcePtr storage)
+void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
 {
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
 
     // remove existing storage record if exists
-    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
     {
         if (itr.value()->getId() == storage->getId()) {
             QnStorageResourcePtr oldStorage = itr.value();
-            m_storageRoots.erase(itr);
-            return oldStorage;
+            itr = m_storageRoots.erase(itr);
+        }
+        else {
+            ++itr;
         }
     }
-    return QnStorageResourcePtr();
 }
 
 bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
@@ -266,7 +306,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
             for (FileCatalogMap::const_iterator itr = m_devFileCatalogHi.constBegin(); itr != m_devFileCatalogHi.constEnd(); ++itr)
             {
                 qint64 firstTime = itr.value()->firstTime();
-                if (firstTime != AV_NOPTS_VALUE && firstTime < minTime)
+                if (firstTime != (qint64)AV_NOPTS_VALUE && firstTime < minTime)
                 {
                     minTime = itr.value()->firstTime();
                     mac = itr.key();
@@ -278,12 +318,13 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         if (catalog != 0) 
         {
             qint64 fileSize = catalog->deleteFirstRecord();
-            toDelete -= fileSize;
+            if (fileSize > 0)
+                toDelete -= fileSize;
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
             if (catalogLowRes != 0) 
             {
                 qint64 minTime = catalog->minTime();
-                if (minTime != AV_NOPTS_VALUE) {
+                if (minTime != (qint64)AV_NOPTS_VALUE) {
                     int idx = catalogLowRes->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
                     if (idx != -1)
                         toDelete -= catalogLowRes->deleteRecordsBefore(idx);
@@ -292,7 +333,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                     catalogLowRes->clear();
                 }
             }
-            if (fileSize == 0)
+            if (fileSize == -1)
                 break; // nothing to delete
         }
         else
@@ -321,7 +362,8 @@ void QnStorageManager::updateStorageStatistics()
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
-        qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        qint64 storageSpace = fileStorage->getSpaceLimit();
         totalSpace += storageSpace;
     }
 
@@ -331,7 +373,8 @@ void QnStorageManager::updateStorageStatistics()
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
-        qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
+        qint64 storageSpace = fileStorage->getSpaceLimit();
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
@@ -340,7 +383,7 @@ void QnStorageManager::updateStorageStatistics()
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
     QnStorageResourcePtr result;
-    float minBitrate = INT_MAX;
+    float minBitrate = (float) INT_MAX;
 
     {
         QMutexLocker lock(&m_mutexStorages);
@@ -501,10 +544,9 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     int storageIndex;
     QString quality, mac;
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
-    if (storageIndex == -1)
-        return false;
-    storage->releaseBitrate(provider);
-    storage->addWritedSpace(fileSize);
+    if (storageIndex >= 0)
+        storage->releaseBitrate(provider);
+        //storage->addWritedSpace(fileSize);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)

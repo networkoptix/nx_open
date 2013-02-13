@@ -22,7 +22,7 @@ public:
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
-    QnStorageResourcePtr removeStorage(QnStorageResourcePtr storage);
+    void removeStorage(QnStorageResourcePtr storage);
 
     /*
     * Remove storage if storage is absent in specified list
@@ -64,6 +64,7 @@ public slots:
 private:
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);
+    QSet<int> getDeprecateIndexList(const QString& p);
     bool deserializeStorageFile();
     bool serializeStorageFile();
     void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
@@ -74,6 +75,7 @@ private:
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
+    QString toCanonicalPath(const QString& path);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -82,7 +84,7 @@ private:
     mutable QMutex m_mutexStorages;
     mutable QMutex m_mutexCatalog;
 
-    QMap<QString, int> m_storageIndexes;
+    QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storageFileReaded;
     bool m_storagesStatisticsReady;
     QTimer m_timer;

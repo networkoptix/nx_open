@@ -10,9 +10,4 @@ QnEmptyBusinessActionWidget::QnEmptyBusinessActionWidget(QWidget *parent) :
 
 QnEmptyBusinessActionWidget::~QnEmptyBusinessActionWidget()
 {
-    delete ui;
-}
-
-QString QnEmptyBusinessActionWidget::description() const {
-    return QLatin1String("not implemented yet");
 }

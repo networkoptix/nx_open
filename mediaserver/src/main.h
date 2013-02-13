@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <QTimer>
 #include "utils/common/long_runnable.h"
 #include "core/resource/media_server_resource.h"
 #include "http/progressive_downloading_server.h"
@@ -27,7 +28,8 @@ private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
     void at_serverSaved(int, const QByteArray&, const QnResourceList&, int);
-
+    void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
+    void at_timer();
 private:
     void initTcpListener();
     QHostAddress getPublicAddress();
@@ -42,6 +44,7 @@ private:
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
+    QTimer* m_timer;
 };
 
 #endif // MAIN_H

@@ -33,6 +33,7 @@
 #include <utils/media/nalunits.h>
 #endif
 #include "mfxallocator.h"
+#include "mfx_video_session_ex.h"
 
 //!if defined, scale is performed with MFX, otherwise - by directx means (by rendering to surface with scaling)
 //#define SCALE_WITH_MFX
@@ -41,6 +42,7 @@
 //#define USE_ASYNC_IMPL
 
 
+class AbstractDecoderEventReceiver;
 class PluginUsageWatcher;
 
 //!Uses Intel Media SDK to provide hardware-accelerated video decoding
@@ -66,50 +68,54 @@ public:
         IDirect3DDeviceManager9* d3d9manager,
         const QnCompressedVideoDataPtr data,
         PluginUsageWatcher* const pluginUsageWatcher,
+        AbstractDecoderEventReceiver* const eventReceiver,
         unsigned int adapterNumber );
     //!Object instanciation without decoder initialization
     QuickSyncVideoDecoder(
         MFXVideoSession* const parentSession,
         IDirect3DDeviceManager9* d3d9manager,
         PluginUsageWatcher* const pluginUsageWatcher,
+        AbstractDecoderEventReceiver* const eventReceiver,
         unsigned int adapterNumber );
     virtual ~QuickSyncVideoDecoder();
 
-    virtual PixelFormat GetPixelFormat() const;
+    virtual PixelFormat GetPixelFormat() const override;
 
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
 #ifndef XVBA_TEST
     //!Not implemented yet
-    virtual void setLightCpuMode( DecodeMode val );
+    virtual void setLightCpuMode( DecodeMode val ) override;
 #endif
     //!Implementation of QnAbstractVideoDecoder::getWidth
-    virtual int getWidth() const;
+    virtual int getWidth() const override;
     //!Implementation of QnAbstractVideoDecoder::getHeight
-    virtual int getHeight() const;
+    virtual int getHeight() const override;
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
-    virtual QSize getOriginalPictureSize() const;
+    virtual QSize getOriginalPictureSize() const override;
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
-    virtual double getSampleAspectRatio() const;
+    virtual double getSampleAspectRatio() const override;
     //!Reset decoder. Used for seek
-    virtual void resetDecoder( QnCompressedVideoDataPtr data );
+    virtual void resetDecoder( QnCompressedVideoDataPtr data ) override;
 #endif
     //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
-    virtual const AVFrame* lastFrame() const;
+    virtual const AVFrame* lastFrame() const override;
     //!Hint decoder to scale decoded pictures (decoder is allowed to ignore this hint)
     /*!
         \note \a outSize.width is aligned to 16, \a outSize.height is aligned to 32 because of limitation of underlying API
     */
-    virtual void setOutPictureSize( const QSize& outSize );
+    virtual void setOutPictureSize( const QSize& outSize ) override;
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
-    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
+    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const override;
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
         Supports \a decodedPictureScaling and \a tracksDecodedPictureBuffer
     */
-    virtual unsigned int getDecoderCaps() const;
+    virtual unsigned int getDecoderCaps() const override;
+    //!Implementation of QnAbstractVideoDecoder::setSpeed
+    virtual void setSpeed( float newValue ) override;
 #endif
 
 #ifndef XVBA_TEST
@@ -129,16 +135,13 @@ public:
     bool readSequenceHeader( const QnCompressedVideoDataPtr data, mfxVideoParam* const streamParams );
     //!Returns estimate in bytes of required frame surface memory to decode stream. Estimaion based on previously parsed header (by method \a readSequenceHeader)
     size_t estimateSurfaceMemoryUsage() const;
+    /*!
+        In initialization mode, decoder does not decode frames, only reads sequence header and initializes internal data, if needed
+        \todo Some refactoring would be appropriate (e.g., add initialize method)
+    */
+    void setInitializationMode( bool val );
 
 private:
-    class MyMFXVideoSession
-    :
-        public MFXVideoSession
-    {
-    public:
-        mfxSession& getInternalSession() { return m_session; }
-    };
-
     enum DecoderState
     {
         //!waiting for some data to start initialization
@@ -256,9 +259,12 @@ private:
         T* m_ptr;
     };
 
+    typedef std::map<qint64, QnMetaDataV1Ptr> MotionInfoContainerType;
+
     MFXVideoSession* const m_parentSession;
     PluginUsageWatcher* const m_pluginUsageWatcher;
-    MyMFXVideoSession m_mfxSession;
+    AbstractDecoderEventReceiver* const m_eventReceiver;
+    MFXVideoSessionEx m_mfxSession;
     DecoderState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
 #ifdef SCALE_WITH_MFX
@@ -304,6 +310,9 @@ private:
     std::auto_ptr<PPSUnit> m_pps;
     DWORD m_prevOutPictureClock;
     int m_recursionDepth;
+    MotionInfoContainerType m_srcMotionInfo;
+    float m_speed;
+    bool m_initializationMode;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;
@@ -372,6 +381,11 @@ private:
     void initializeScaleSurfacePool();
     mfxStatus scaleFrame( const mfxFrameSurface1& from, mfxFrameSurface1* const to );
 #endif
+    bool isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const;
+    /*!
+        On return, \a seqHeader contains NALUs, reader from \a data->context->ctx()->extradata
+    */
+    bool readH264SeqHeaderFromExtraData( const QnCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
 };
 
 #endif  //QUICKSYNCVIDEODECODER_H

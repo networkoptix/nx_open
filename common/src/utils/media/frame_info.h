@@ -173,6 +173,9 @@ private:
 private:
     bool m_useExternalData; // pointers only copied to this frame
     bool m_displaying;
+
+    CLVideoDecoderOutput( const CLVideoDecoderOutput& );
+    const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 };
 
 /*

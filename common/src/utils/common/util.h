@@ -60,6 +60,8 @@ QN_EXPORT QString closeDirPath(const QString& value);
 
 QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
 
+QN_EXPORT qint64 getDiskTotalSpace(const QString& root);
+
 #define DATETIME_NOW INT64_MAX 
 
 #define DEFAULT_APPSERVER_HOST "127.0.0.1"

@@ -16,13 +16,14 @@ class QnCameraInputBusinessEventWidget : public QnAbstractBusinessParamsWidget
 public:
     explicit QnCameraInputBusinessEventWidget(QWidget *parent = 0);
     ~QnCameraInputBusinessEventWidget();
-    
 
-    virtual void loadParameters(const QnBusinessParams &params) override;
-    virtual QnBusinessParams parameters() const override;
-    virtual QString description() const override;
+protected slots:
+    virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
+private slots:
+    void paramsChanged();
+
 private:
-    Ui::QnCameraInputBusinessEventWidget *ui;
+    QScopedPointer<Ui::QnCameraInputBusinessEventWidget> ui;
 };
 
 #endif // CAMERA_INPUT_BUSINESS_EVENT_WIDGET_H

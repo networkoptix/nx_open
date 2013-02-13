@@ -6,6 +6,10 @@
 
 int QnVersionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    Q_UNUSED(contentType)
+
     result.append(QString("<root><engineVersion>%1</engineVersion><revision>%2</revision></root>\n").arg(QN_ENGINE_VERSION).arg(QN_APPLICATION_REVISION).toUtf8());
     return CODE_OK;
 }

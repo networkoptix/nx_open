@@ -95,6 +95,7 @@ namespace Qn {
                                              * If item's rect is invalid, but not empty (width or height are negative), then any position is OK. */
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ItemFlags)
 
 
     /**
@@ -129,6 +130,7 @@ namespace Qn {
         AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
     };
     Q_DECLARE_FLAGS(Borders, Border)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
 
 
     /**
@@ -142,6 +144,7 @@ namespace Qn {
         MarginsAffectPosition = 0x2
     };
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MarginFlags)
 
 
     /**
@@ -159,6 +162,7 @@ namespace Qn {
         ResourceIsChanged = 0x4
     };
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
 
     /**
@@ -181,6 +185,8 @@ namespace Qn {
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
         CreateLayoutPermission                  = 0x08000000,   /**< Permission to create layouts for the user. */
+        ReadEmailPermission                     = ReadPermission,
+        WriteEmailPermission                    = WritePasswordPermission,
 
         /* Media-specific permissions. */
         ExportPermission                        = 0x20000000,   /**< Permission to export video parts. */
@@ -214,6 +220,28 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+
+
+    /**
+     * \param permissions               Permission flags containing some deprecated values.
+     * \returns                         Permission flags with deprecated values replaced with new ones.
+     */
+    inline Qn::Permissions undeprecate(Qn::Permissions permissions) {
+        Qn::Permissions result = permissions;
+
+        if(result & Qn::DeprecatedEditCamerasPermission) {
+            result &= ~Qn::DeprecatedEditCamerasPermission;
+            result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
+        }
+
+        if(result & Qn::DeprecatedViewExportArchivePermission) {
+            result &= ~Qn::DeprecatedViewExportArchivePermission;
+            result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
+        }
+
+        return result;
+    }
 
 
     /**
@@ -248,12 +276,6 @@ namespace Qn {
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders)
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
-
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 

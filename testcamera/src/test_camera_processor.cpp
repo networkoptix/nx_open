@@ -3,13 +3,13 @@
 #include "test_camera.h"
 #include "camera_pool.h"
 
-class QnTestCameraProcessor::QnTestCameraProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnTestCameraProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTestCameraProcessorPrivate():
-      QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate()
+      QnTCPConnectionProcessorPrivate()
       {
 
       }

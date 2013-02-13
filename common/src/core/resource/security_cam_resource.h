@@ -2,48 +2,37 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QRegion>
-#include "media_resource.h"
-#include "core/misc/schedule_task.h"
-#include "motion_window.h"
+#include <QMutex>
 
-class QnDataProviderFactory
-{
+#include "media_resource.h"
+#include "motion_window.h"
+#include "core/misc/schedule_task.h"
+
+class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
 };
 
-enum MotionType {MT_Default = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4, MT_NoMotion = 8};
 
-enum StreamFpsSharingMethod 
-{
-    shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-    sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-    noSharing // second stream does not subtract first stream fps 
-};
-
-Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
-
-class QnSecurityCamResource : virtual public QnMediaResource
-{
+class QnSecurityCamResource : virtual public QnMediaResource {
     Q_OBJECT
 
-public:
-    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+    typedef QnMediaResource base_type;
 
-    MotionTypeFlags supportedMotionType() const;
+public:
+    Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
-    MotionType getCameraBasedMotionType() const;
-    MotionType getDefaultMotionType() const;
+    Qn::MotionType getCameraBasedMotionType() const;
+    Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
 
 
-    MotionType getMotionType();
-    void setMotionType(MotionType value);
+    Qn::MotionType getMotionType();
+    void setMotionType(Qn::MotionType value);
 
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
@@ -74,21 +63,21 @@ public:
     QList<QnMotionRegion> getMotionRegionList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
-    const QnScheduleTaskList &getScheduleTasks() const;
+    const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 
-    virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
+    virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
 
     virtual QStringList getRelayOutputList() const;
     virtual QStringList getInputPortList() const;
 
 
-    CameraCapabilities getCameraCapabilities() const;
-    bool checkCameraCapability(CameraCapabilities value) const;
-    void addCameraCapabilities(CameraCapabilities value);
-    void removeCameraCapabilities(CameraCapabilities value);
+    Qn::CameraCapabilities getCameraCapabilities() const;
+    void setCameraCapabilities(Qn::CameraCapabilities capabilities);
+    void setCameraCapability(Qn::CameraCapability capability, bool value);
 
+    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain) override;
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -97,49 +86,62 @@ public:
     */
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
-signals:
-    /** 
-     * This signal is virtual to work around a problem with inheritance from
-     * two <tt>QObject</tt>s. 
-     */
-    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    //!Emitted on camera input port state has been changed
-    /*!
-        \param resource Smart pointer to \a this
-        \param inputPortID
-        \param value true if input is connected, false otherwise
-        \param timestamp MSecs since epoch, UTC
-    */
-    void cameraInput(
-        QnResourcePtr resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp);
+    bool isRecordingEventAttached() const;
 
-private slots:
-    void at_disabledChanged();
+// -------------------------------------------------------------------------- //
+// Begin QnSecurityCamResource signals/slots
+// -------------------------------------------------------------------------- //
+    /* For metaobject system to work correctly, this block must be in sync with
+     * the one in QnVirtualCameraResource. */
+public slots:
+    virtual void inputPortListenerAttached();
+    virtual void inputPortListenerDetached();
+
+    virtual void recordingEventAttached();
+    virtual void recordingEventDetached();
+
+signals:
+    virtual void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
+    virtual void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+
+protected slots:
+    virtual void at_disabledChanged();
+// -------------------------------------------------------------------------- //
+// End QnSecurityCamResource signals/slots
+// -------------------------------------------------------------------------- //
 
 protected:
     void updateInner(QnResourcePtr other) override;
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
+    virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting
+    /*!
+        Excess calls of this method is legal and MUST be correctly handled in implementation
+    */
     virtual bool startInputPortMonitoring();
     //!MUST be overridden for camera with input port. Default implementation does noting
+    /*!
+        Excess calls of this method is legal and MUST be correctly handled in implementation
+    */
     virtual void stopInputPortMonitoring();
+    virtual bool isInputPortMonitored() const;
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
 
 private:
-    QnDataProviderFactory* m_dpFactory;
-    
+    //mutable QMutex m_camIOMutex;
+
+    QnDataProviderFactory *m_dpFactory;
     QnScheduleTaskList m_scheduleTasks;
-    MotionType m_motionType;
+    Qn::MotionType m_motionType;
+    QAtomicInt m_inputPortListenerCount;
+    int m_recActionCnt;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

@@ -25,7 +25,9 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
-    //const QnStorageManager::StorageMap storages = qnStorageMan->getAllStorages();
+    Q_UNUSED(contentType)
+
+    const QnStorageManager::StorageMap storages = qnStorageMan->getAllStorages();
     QString result;
     result.append("<?xml version=\"1.0\"?>\n");
     result.append("<root>\n");
@@ -65,8 +67,9 @@ int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamLi
     return executeGet(path, params, result, contentType);
 }
 
-QString QnStatisticsHandler::description() const
+QString QnStatisticsHandler::description(TCPSocket* tcpSocket) const
 {
+    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Returns server info: CPU usage, HDD usage e.t.c \n";
     return rez;

@@ -7,6 +7,7 @@
 #include <QtGui/QItemSelectionModel>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_managment/resource_criterion.h>
 
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
@@ -38,6 +39,7 @@ class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
     
     typedef QWidget base_type;
+
 public:
     explicit QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
@@ -46,6 +48,9 @@ public:
     void setModel(QAbstractItemModel *model);
 
     QItemSelectionModel *selectionModel();
+
+    const QnResourceCriterion &criterion() const;
+    void setCriterion(const QnResourceCriterion &criterion);
 
     void setWorkbench(QnWorkbench *workbench);
 
@@ -104,11 +109,13 @@ public:
      * @return                          True if editing is allowed.
      */
     bool isEditingEnabled() const;
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;
 
     void updateCheckboxesVisibility();
+
 signals:
     void activated(const QnResourcePtr &resource);
     void viewportSizeChanged();
@@ -122,8 +129,11 @@ private slots:
 
     void updateColumnsSize();
     void updateFilter();
+
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
+
+    QnResourceCriterion m_criterion;
 
     QnResourceTreeItemDelegate *m_itemDelegate;
 

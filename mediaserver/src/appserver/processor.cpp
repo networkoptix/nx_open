@@ -8,6 +8,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
     m_appServer = QnAppServerConnectionFactory::createConnection();
+    connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
@@ -43,7 +44,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QString password = cameraResource->getAuth().password();
 
 
-        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance().containManualCamera(cameraResource->getUrl()))
+        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
 
         if (m_appServer->addCamera(cameraResource, cameras) != 0)
@@ -89,6 +90,8 @@ bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &re
 
 void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
 {
+    Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
     else

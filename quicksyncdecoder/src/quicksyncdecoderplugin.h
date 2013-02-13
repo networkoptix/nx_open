@@ -14,12 +14,15 @@
 
 #include <QMutex>
 
+#include <utils/common/config.h>
+
 #include <plugins/videodecoders/abstractvideodecoderusagecalculator.h>
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/stree/resourcenameset.h>
 #include <decoders/abstractvideodecoderplugin.h>
 
 #include "d3dgraphicsadapterdescription.h"
+#include "intelcpudescription.h"
 
 
 //!Plugin of Intel Media SDK (Quicksync) based h.264 decoder
@@ -52,6 +55,8 @@ public:
         const QnCompressedVideoDataPtr& data,
         const QGLContext* const glContext,
         int currentSWDecoderCount ) const;
+    //!Implementation of QnAbstractVideoDecoderPlugin::isStreamSupported
+    virtual bool isStreamSupported( const stree::AbstractResourceReader& newStreamParams ) const override;
 
 private:
     class D3D9DeviceContext
@@ -75,6 +80,7 @@ private:
     mutable std::auto_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
     mutable std::auto_ptr<MFXVideoSession> m_mfxSession;
     mutable std::auto_ptr<D3DGraphicsAdapterDescription> m_graphicsDesc;
+    mutable std::auto_ptr<IntelCPUDescription> m_cpuDesc;
     //!Graphics adapter number, quicksync is present on
     mutable unsigned int m_adapterNumber;
     mutable bool m_hardwareAccelerationEnabled;
@@ -82,7 +88,6 @@ private:
     mutable QString m_sdkVersionStr;
     mutable bool m_initialized;
     QString m_osName;
-    QString m_cpuString;
     mutable HRESULT m_prevD3DOperationResult;
     mutable QMutex m_mutex;
     mutable std::vector<D3D9DeviceContext> m_d3dDevices;
@@ -92,7 +97,7 @@ private:
     bool openD3D9Device() const;
     void closeD3D9Device();
     QString winVersionToName( const OSVERSIONINFOEX& osVersionInfo ) const;
-    void readCPUInfo();
+    bool isStreamSupportedNonSafe( const stree::AbstractResourceReader& newStreamParams ) const;
 };
 
 #endif  //QUICKSYNCDECODERPLUGIN_H

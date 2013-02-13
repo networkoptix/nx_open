@@ -9,29 +9,28 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
 #include <QtGui/QMessageBox>
+#include <QtGui/QIcon>
 
-#include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 
+#include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
+#include <ui/widgets/properties/weektime_schedule_widget.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_resource.h>
 
 #include <utils/settings.h>
+#include <utils/common/scoped_value_rollback.h>
 
+// TODO: #GDM 
+// Why are you using QFrame as container for subwidgets of QnBusinessRuleWidget?
+// Why don't just use QWidget?
 
 namespace {
-    QString extractHost(const QString &url) {
-        /* Try it as a host address first. */
-        QHostAddress hostAddress(url);
-        if(!hostAddress.isNull())
-            return hostAddress.toString();
-
-        /* Then go default QUrl route. */
-        return QUrl(url).host();
-    }
-
     QString toggleStateToString(ToggleState::Value value, bool prolonged) {
         switch( value )
         {
@@ -48,404 +47,337 @@ namespace {
         return QString();
     }
 
+    // TODO: #gdm fill aggregationComboBox in cpp file so that
+    // names & numbers are in one place. Store steps in userData.
+
+    // make sure size is equal to ui->aggregationComboBox->count()
+    const int aggregationSteps[] = {
+        1,                    /* 1 second. */
+        60,                   /* 1 minute. */
+        60 * 60,              /* 1 hour. */
+        60 * 60 * 24          /* 1 day. */
+    };
+
 } // namespace
 
-QnBusinessRuleWidget::QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent) :
-    QWidget(parent),
+QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnBusinessRuleWidget),
-    m_rule(rule),
-    m_hasChanges(false),
+    m_model(NULL),
     m_eventParameters(NULL),
     m_actionParameters(NULL),
-    m_eventTypesModel(new QStandardItemModel(this)),
-    m_eventResourcesModel(new QStandardItemModel(this)),
-    m_eventStatesModel(new QStandardItemModel(this)),
-    m_actionTypesModel(new QStandardItemModel(this)),
-    m_actionResourcesModel(new QStandardItemModel(this))
+    m_updating(false)
 {
     ui->setupUi(this);
 
-    ui->eventTypeComboBox->setModel(m_eventTypesModel);
-    ui->eventResourceComboBox->setModel(m_eventResourcesModel);
-    ui->eventStatesComboBox->setModel(m_eventStatesModel);
-    ui->actionTypeComboBox->setModel(m_actionTypesModel);
-    ui->actionResourceComboBox->setModel(m_actionResourcesModel);
+    ui->eventDefinitionGroupBox->installEventFilter(this);
+    ui->actionDefinitionGroupBox->installEventFilter(this);
 
     QPalette pal = this->palette();
     pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
     this->setPalette(pal);
 
-    connect(ui->eventTypeComboBox,      SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
-    connect(ui->eventStatesComboBox,    SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
-    connect(ui->eventResourceComboBox,  SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventResourceComboBox_currentIndexChanged(int)));
-    connect(ui->actionTypeComboBox,     SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
-    connect(ui->actionResourceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionResourceComboBox_currentIndexChanged(int)));
+    connect(ui->eventTypeComboBox,          SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
+    connect(ui->eventStatesComboBox,        SIGNAL(currentIndexChanged(int)),   this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
+    connect(ui->eventResourcesHolder,       SIGNAL(clicked()),                  this, SLOT(at_eventResourcesHolder_clicked()));
+    connect(ui->actionResourcesHolder,      SIGNAL(clicked()),                  this, SLOT(at_actionResourcesHolder_clicked()));
+    connect(ui->scheduleButton,             SIGNAL(clicked()),                  this, SLOT(at_scheduleButton_clicked()));
 
-    //TODO: connect notifyChaged on subitems
-    //TODO: setup onResourceChanged to update widgets depending on resource, e.g. max fps or channel list
+    connect(ui->actionTypeComboBox,         SIGNAL(currentIndexChanged(int)),   this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
 
-/*    connect(ui->resetButton,  SIGNAL(clicked()), this, SLOT(resetFromRule()));
+    connect(ui->aggregationCheckBox,        SIGNAL(toggled(bool)),              this, SLOT(updateModelAggregationPeriod()));
+    connect(ui->aggregationValueSpinBox,    SIGNAL(editingFinished()),          this, SLOT(at_ui_aggregationPeriodChanged()));
+    connect(ui->aggregationPeriodComboBox,  SIGNAL(currentIndexChanged(int)),   this, SLOT(at_ui_aggregationPeriodChanged()));
 
-    connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->applyButton,  SIGNAL(clicked()), this, SLOT(at_applyButton_clicked()));
-    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));*/
+    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationValueSpinBox, SLOT(setEnabled(bool)));
+    connect(ui->aggregationCheckBox, SIGNAL(toggled(bool)), ui->aggregationPeriodComboBox, SLOT(setEnabled(bool)));
 
-    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(updateResources()));
-    connect(qnResPool, SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateResources()));
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(updateResources()));
-
-    initEventTypes();
-    resetFromRule();
+    connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
 }
 
 QnBusinessRuleWidget::~QnBusinessRuleWidget()
 {
-    delete ui;
 }
 
-QnBusinessEventRulePtr QnBusinessRuleWidget::rule() const {
-    return m_rule;
+QnBusinessRuleViewModel* QnBusinessRuleWidget::model() const {
+    return m_model;
 }
 
-bool QnBusinessRuleWidget::hasChanges() const {
-    return m_hasChanges;
+void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
+    if (m_model)
+        disconnect(m_model, 0, this, 0);
+
+    m_model = model;
+
+    if (!m_model) {
+/*        ui->eventTypeComboBox->setModel(NULL);
+        ui->eventStatesComboBox->setModel(NULL);
+        ui->actionTypeComboBox->setModel(NULL);*/
+        //TODO: clear model? dummy?
+        return;
+    }
+
+    {
+        QnScopedValueRollback<bool> guard(&m_updating, true);
+        Q_UNUSED(guard)
+        ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
+        ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
+        ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
+    }
+
+    connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
+            this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
+    at_model_dataChanged(m_model, QnBusiness::AllFieldsMask);
 }
 
-void QnBusinessRuleWidget::initEventTypes() {
-    m_eventTypesModel->clear();
-    for (int i = BusinessEventType::BE_FirstType; i <= BusinessEventType::BE_LastType; i++) {
-        BusinessEventType::Value val = (BusinessEventType::Value)i;
+void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model,  QnBusiness::Fields fields) {
+    if (!model || m_model != model || m_updating)
+        return;
 
-        QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
-        item->setData(val);
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+    Q_UNUSED(guard)
 
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventTypesModel->appendRow(row);
+    if (fields & QnBusiness::EventTypeField) {
+
+        QModelIndexList eventTypeIdx = m_model->eventTypesModel()->match(
+                    m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
+        ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
+
+        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType());
+        ui->eventStatesComboBox->setVisible(prolonged);
+
+        bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
+        ui->eventResourcesFrame->setVisible(isResourceRequired);
+
+        initEventParameters();
+    }
+
+    if (fields & QnBusiness::EventStateField) {
+        QModelIndexList stateIdx = m_model->eventStatesModel()->match(
+                    m_model->eventStatesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventState(), 1, Qt::MatchExactly);
+        ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
+    }
+
+    if (fields & QnBusiness::EventResourcesField) {
+        ui->eventResourcesHolder->setText(m_model->data(QnBusiness::SourceColumn).toString());
+        ui->eventResourcesHolder->setIcon(m_model->data(QnBusiness::SourceColumn, Qt::DecorationRole).value<QIcon>());
+    }
+
+    if (fields & QnBusiness::ActionTypeField) {
+        QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
+        ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
+
+        bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
+        ui->actionResourcesFrame->setVisible(isResourceRequired);
+
+        bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
+        ui->actionAggregationFrame->setVisible(actionIsInstant);
+
+        initActionParameters();
+    }
+
+    if (fields & QnBusiness::ActionResourcesField) {
+        ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, QnBusiness::ShortTextRole).toString());
+        ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
+    }
+
+    if (fields & QnBusiness::AggregationField) {
+        int msecs = model->aggregationPeriod();
+        ui->aggregationCheckBox->setChecked(msecs > 0);
+        if (msecs > 0) {
+            int idx = 0;
+            while (idx < ui->aggregationPeriodComboBox->count() - 1
+                   && msecs >= aggregationSteps[idx+1]
+                   && msecs % aggregationSteps[idx+1] == 0)
+                idx++;
+
+            ui->aggregationPeriodComboBox->setCurrentIndex(idx);
+            ui->aggregationValueSpinBox->setValue(msecs / aggregationSteps[idx]);
+        }
+    }
+
+    if (fields & QnBusiness::CommentsField) {
+        QString text = model->comments();
+        if (ui->commentsLineEdit->text() != text)
+            ui->commentsLineEdit->setText(text);
     }
 }
 
-void QnBusinessRuleWidget::initEventResources(BusinessEventType::Value eventType) {
-    //TODO: update list on respool changed, keep selected if any
-    //TODO: think about opening list of rules before resources are loaded (or when offline)
-    m_eventResourcesModel->clear();
-
-    QnResourceList resources;
-
-    if (BusinessEventType::requiresCameraResource(eventType))
-        resources = qnResPool->getResources().filtered<QnVirtualCameraResource>();
-    else if (BusinessEventType::requiresServerResource(eventType))
-        resources = qnResPool->getResources().filtered<QnMediaServerResource>();
-
-    foreach (const QnResourcePtr &resource, resources) {
-        if (resource->isDisabled())
-            continue;
-        QStandardItem *item = new QStandardItem(getResourceName(resource));
-        item->setData(resource->getUniqueId());
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventResourcesModel->appendRow(row);
-    }
-    m_eventResourcesModel->sort(0);
-}
-
-void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
-    m_eventStatesModel->clear();
-
-    QList<ToggleState::Value> values;
-    values << ToggleState::NotDefined;
-    bool prolonged = BusinessEventType::hasToggleState(eventType);
-    if (prolonged)
-        values << ToggleState::On << ToggleState::Off;
-
-
-    foreach (ToggleState::Value val, values) {
-        QStandardItem *item = new QStandardItem(toggleStateToString(val, prolonged));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventStatesModel->appendRow(row);
-    }
-}
-
-void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
+void QnBusinessRuleWidget::initEventParameters() {
     if (m_eventParameters) {
         ui->eventParamsLayout->removeWidget(m_eventParameters);
-        //ui->eventLayout->removeWidget(m_eventParameters);
         m_eventParameters->setVisible(false);
+        m_eventParameters->setModel(NULL);
     }
 
-    if (m_eventWidgetsByType.contains(eventType)) {
-        m_eventParameters = m_eventWidgetsByType.find(eventType).value();
+    if (!m_model)
+        return;
+
+    if (m_eventWidgetsByType.contains(m_model->eventType())) {
+        m_eventParameters = m_eventWidgetsByType.find(m_model->eventType()).value();
     } else {
-        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this);
-        m_eventWidgetsByType[eventType] = m_eventParameters;
+        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(m_model->eventType(), this, context());
+        m_eventWidgetsByType[m_model->eventType()] = m_eventParameters;
     }
     if (m_eventParameters) {
         ui->eventParamsLayout->addWidget(m_eventParameters);
-        //ui->eventLayout->addWidget(m_eventParameters);
         m_eventParameters->setVisible(true);
+        m_eventParameters->setModel(m_model);
     }
 }
 
-void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
-
-    m_actionTypesModel->clear();
-    // what type of actions to show: prolonged or instant
-    bool instantActionsFilter = (eventState == ToggleState::On || eventState == ToggleState::Off)
-            || (!BusinessEventType::hasToggleState(getCurrentEventType()));
-
-    for (int i = BusinessActionType::BA_FirstType; i <= BusinessActionType::BA_LastType; i++) {
-        BusinessActionType::Value val = (BusinessActionType::Value)i;
-
-        if (BusinessActionType::hasToggleState(val) && instantActionsFilter)
-            continue;
-
-        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
-        item->setData(val);
-
-        QList<QStandardItem *> row;
-        row << item;
-        m_actionTypesModel->appendRow(row);
-    }
-
-}
-
-void QnBusinessRuleWidget::initActionResources(BusinessActionType::Value actionType) {
-    //TODO: update list on respool changed, keep selected if any
-    //TODO: think about opening list of rules before resources are loaded (or when offline)
-    m_actionResourcesModel->clear();
-
-    // all actions that do require resource are require camera resource
-    Q_UNUSED(actionType)
-    QnResourceList resources = qnResPool->getResources().filtered<QnVirtualCameraResource>();
-
-    foreach (const QnResourcePtr &resource, resources) {
-        if (resource->isDisabled())
-            continue;
-        QStandardItem *item = new QStandardItem(getResourceName(resource));
-        item->setData(resource->getUniqueId());
-        item->setIcon(qnResIconCache->icon(resource->flags(), resource->getStatus()));
-        QList<QStandardItem *> row;
-        row << item;
-        m_actionResourcesModel->appendRow(row);
-    }
-    m_actionResourcesModel->sort(0);
-}
-
-void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
+void QnBusinessRuleWidget::initActionParameters() {
     if (m_actionParameters) {
-        //ui->actionLayout->removeWidget(m_actionParameters);
         ui->actionParamsLayout->removeWidget(m_actionParameters);
         m_actionParameters->setVisible(false);
+        m_actionParameters->setModel(NULL);
     }
 
-    if (m_actionWidgetsByType.contains(actionType)) {
-        m_actionParameters = m_actionWidgetsByType.find(actionType).value();
+    if (!m_model)
+        return;
+
+    if (m_actionWidgetsByType.contains(m_model->actionType())) {
+        m_actionParameters = m_actionWidgetsByType.find(m_model->actionType()).value();
     } else {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this);
-        m_actionWidgetsByType[actionType] = m_actionParameters;
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this, context());
+        m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 
     if (m_actionParameters) {
-        //ui->actionLayout->addWidget(m_actionParameters);
         ui->actionParamsLayout->addWidget(m_actionParameters);
         m_actionParameters->setVisible(true);
+        m_actionParameters->setModel(m_model);
     }
 }
 
-BusinessEventType::Value QnBusinessRuleWidget::getCurrentEventType() const {
-    int typeIdx = m_eventTypesModel->item(ui->eventTypeComboBox->currentIndex())->data().toInt();
-    return (BusinessEventType::Value)typeIdx;
-}
+bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event) {
+    if (!m_model)
+        return base_type::eventFilter(object, event);;
 
-QnResourcePtr QnBusinessRuleWidget::getCurrentEventResource() const {
-    QString uniqueId = m_eventResourcesModel->item(ui->eventResourceComboBox->currentIndex())->data().toString();
-    return qnResPool->getResourceByUniqId(uniqueId);
-}
-
-ToggleState::Value QnBusinessRuleWidget::getCurrentEventToggleState() const {
-    int typeIdx = m_eventStatesModel->item(ui->eventStatesComboBox->currentIndex())->data().toInt();
-    return (ToggleState::Value)typeIdx;
-}
-
-
-BusinessActionType::Value QnBusinessRuleWidget::getCurrentActionType() const {
-    int typeIdx = m_actionTypesModel->item(ui->actionTypeComboBox->currentIndex())->data().toInt();
-    return (BusinessActionType::Value)typeIdx;
-}
-
-QnResourcePtr QnBusinessRuleWidget::getCurrentActionResource() const {
-    QString uniqueId = m_actionResourcesModel->item(ui->actionResourceComboBox->currentIndex())->data().toString();
-    return qnResPool->getResourceByUniqId(uniqueId);
-}
-
-QString QnBusinessRuleWidget::getResourceName(const QnResourcePtr& resource) const {
-    if (!resource)
-        return tr("<select target>");
-
-    QnResource::Flags flags = resource->flags();
-    if (qnSettings->isIpShownInTree()) {
-        if((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote)) {
-            QString host = extractHost(resource->getUrl());
-            if(!host.isEmpty())
-                return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
+    if (event->type() == QEvent::DragEnter) {
+        QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
+        m_dropResources = QnWorkbenchResource::deserializeResources(de->mimeData());
+        if (!m_dropResources.empty())
+            de->acceptProposedAction();
+        return true;
+    } else if (event->type() == QEvent::Drop) {
+        QDropEvent* de = static_cast<QDropEvent*>(event);
+        if (!m_dropResources.empty()) {
+            if (object == ui->eventDefinitionGroupBox) {
+                QnResourceList resources = m_model->eventResources();
+                foreach(QnResourcePtr res, m_dropResources) {
+                    if (resources.contains(res))
+                        continue;
+                    resources.append(res);
+                }
+                m_model->setEventResources(resources);
+            } else if (object == ui->actionDefinitionGroupBox) {
+                QnResourceList resources = m_model->actionResources();
+                foreach(QnResourcePtr res, m_dropResources) {
+                    if (resources.contains(res))
+                        continue;
+                    resources.append(res);
+                }
+                m_model->setActionResources(resources);
+            }
+            m_dropResources = QnResourceList();
+            de->acceptProposedAction();
         }
+        return true;
+    } else if (event->type() == QEvent::DragLeave) {
+        m_dropResources = QnResourceList();
+        return true;
     }
-    return resource->getName();
+
+    return base_type::eventFilter(object, event);
 }
 
-void QnBusinessRuleWidget::setHasChanges(bool hasChanges) {
-    if (hasChanges == m_hasChanges)
+void QnBusinessRuleWidget::updateModelAggregationPeriod() {
+    if (!m_model || m_updating)
         return;
-    m_hasChanges = hasChanges;
-    emit hasChangesChanged(this, m_hasChanges);
+
+    int val = ui->aggregationCheckBox->isChecked() ? ui->aggregationValueSpinBox->value() : 0;
+    int idx = ui->aggregationPeriodComboBox->currentIndex();
+    m_model->setAggregationPeriod(val * aggregationSteps[idx]);
 }
 
+
+// -------------------------------------------------------------------------- //
 // Handlers
-
-void QnBusinessRuleWidget::resetFromRule() {
-    QModelIndexList eventTypeIdx = m_eventTypesModel->match(m_eventTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->eventType());
-    ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
-
-    if (m_rule->eventResource()) {
-        QModelIndexList eventResourceIdx = m_eventResourcesModel->match(m_eventResourcesModel->index(0, 0), Qt::UserRole + 1,
-                                                                        m_rule->eventResource()->getUniqueId());
-        ui->eventResourceComboBox->setCurrentIndex(eventResourceIdx.isEmpty() ? 0 : eventResourceIdx.first().row());
-    } else {
-        ui->eventResourceComboBox->setCurrentIndex(0);
-    }
-
-    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(m_rule->eventParams());
-    QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)toggleState);
-    ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
-
-    QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->actionType());
-    ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
-
-    if (m_rule->actionResource()) {
-        QModelIndexList actionResourceIdx = m_actionResourcesModel->match(m_actionResourcesModel->index(0, 0), Qt::UserRole + 1,
-                                                                          m_rule->actionResource()->getUniqueId());
-        ui->actionResourceComboBox->setCurrentIndex(actionResourceIdx.isEmpty() ? 0 : actionResourceIdx.first().row());
-    } else {
-        ui->actionResourceComboBox->setCurrentIndex(0);
-    }
-
-
-    if (m_eventParameters)
-        m_eventParameters->loadParameters(m_rule->eventParams());
-    //TODO: setup widget depending on resource, e.g. max fps or channel list
-
-    if (m_actionParameters)
-        m_actionParameters->loadParameters(m_rule->actionParams());
-    //TODO: setup widget depending on resource, e.g. max fps or channel list
-
-    emit eventTypeChanged(this, m_rule->eventType());
-    emit eventResourceChanged(this, m_rule->eventResource());
-    emit eventStateChanged(this, toggleState);
-    emit actionTypeChanged(this, m_rule->actionType());
-    emit actionResourceChanged(this, m_rule->actionResource());
-
-    setHasChanges(false);
-}
-
-void QnBusinessRuleWidget::updateResources() {
-    BusinessEventType::Value eventType = getCurrentEventType();
-    if (BusinessEventType::isResourceRequired(eventType))
-        initEventResources(eventType);
-
-    BusinessActionType::Value actionType = getCurrentActionType();
-    if (BusinessActionType::isResourceRequired(actionType))
-        initActionResources(actionType);
-}
-
-void QnBusinessRuleWidget::apply() {
-    //TODO: validate params!
-
-    m_rule->setEventType(getCurrentEventType());
-
-    if (BusinessEventType::isResourceRequired(m_rule->eventType())) {
-        m_rule->setEventResource(getCurrentEventResource());
-    } else {
-        m_rule->setEventResource(QnResourcePtr());
-    }
-
-    QnBusinessParams eventParams;
-    if (m_eventParameters)
-        eventParams = m_eventParameters->parameters();
-    BusinessEventParameters::setToggleState(&eventParams, getCurrentEventToggleState());
-    m_rule->setEventParams(eventParams);
-
-    m_rule->setActionType(getCurrentActionType());
-
-    if (BusinessActionType::isResourceRequired(m_rule->actionType())) {
-        m_rule->setActionResource(getCurrentActionResource());
-    } else {
-        m_rule->setActionResource(QnResourcePtr());
-    }
-
-    if (m_actionParameters)
-        m_rule->setActionParams(m_actionParameters->parameters());
-}
-
+// -------------------------------------------------------------------------- //
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
-    int typeIdx = m_eventTypesModel->item(index)->data().toInt();
+    if (!m_model || m_updating)
+        return;
+
+    int typeIdx = m_model->eventTypesModel()->item(index)->data().toInt();
     BusinessEventType::Value val = (BusinessEventType::Value)typeIdx;
-
-    bool isResourceRequired = BusinessEventType::isResourceRequired(val);
-    ui->eventAtLabel->setVisible(isResourceRequired);
-    ui->eventResourceComboBox->setVisible(isResourceRequired);
-    if (isResourceRequired)
-        initEventResources(val);
-    else
-        emit eventResourceChanged(this, QnResourcePtr());
-    initEventStates(val);
-    initEventParameters(val);
-
-    setHasChanges(true);
-    emit eventTypeChanged(this, val);
+    m_model->setEventType(val);
 }
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
-    int typeIdx = m_eventStatesModel->item(index)->data().toInt();
+    if (!m_model || m_updating)
+        return;
+
+    int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
     ToggleState::Value val = (ToggleState::Value)typeIdx;
-
-    initActionTypes(val);
-
-    setHasChanges(true);
-    emit eventStateChanged(this, val);
-}
-
-void QnBusinessRuleWidget::at_eventResourceComboBox_currentIndexChanged(int index) {
-    setHasChanges(true);
-
-    QString uniqueId = m_eventResourcesModel->item(index)->data().toString();
-    emit eventResourceChanged(this, qnResPool->getResourceByUniqId(uniqueId));
+    m_model->setEventState(val);
 }
 
 void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) {
-    int typeIdx = m_actionTypesModel->item(index)->data().toInt();
+    if (!m_model || m_updating)
+        return;
+
+    int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
-
-    bool isResourceRequired = BusinessActionType::isResourceRequired(val);
-    ui->actionAtLabel->setVisible(isResourceRequired);
-    ui->actionResourceComboBox->setVisible(isResourceRequired);
-    if (isResourceRequired)
-        initActionResources(val);
-    else
-        emit actionResourceChanged(this, QnResourcePtr());
-
-    initActionParameters(val);
-
-    setHasChanges(true);
-    emit actionTypeChanged(this, val);
+    m_model->setActionType(val);
 }
 
-void QnBusinessRuleWidget::at_actionResourceComboBox_currentIndexChanged(int index) {
-    setHasChanges(true);
+void QnBusinessRuleWidget::at_ui_aggregationPeriodChanged() {
+    if (!m_model || m_updating)
+        return;
 
-    QString uniqueId = m_actionResourcesModel->item(index)->data().toString();
-    emit actionResourceChanged(this, qnResPool->getResourceByUniqId(uniqueId));
+    updateModelAggregationPeriod();
 }
+
+void QnBusinessRuleWidget::at_commentsLineEdit_textChanged(const QString &value) {
+    if (!m_model || m_updating)
+        return;
+
+    m_model->setComments(value);
+}
+
+void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
+    if (!m_model)
+        return;
+
+    QnSelectCamerasDialog dialog(this, context()); //TODO: #GDM or servers?
+    dialog.setSelectedResources(m_model->eventResources());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_model->setEventResources(dialog.getSelectedResources());
+}
+
+void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
+    if (!m_model)
+        return;
+
+    QnSelectCamerasDialog dialog(this, context());
+    dialog.setSelectedResources(m_model->actionResources());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_model->setActionResources(dialog.getSelectedResources());
+}
+
+void QnBusinessRuleWidget::at_scheduleButton_clicked() {
+    if (!m_model)
+        return;
+
+    QnWeekTimeScheduleWidget dialog(this);
+    dialog.setScheduleTasks(m_model->schedule());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+    m_model->setSchedule(dialog.scheduleTasks());
+}
+
+

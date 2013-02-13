@@ -26,7 +26,9 @@ class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
+class QnBusinessRulesDialog;
 class QnVideoCamera;
+class QnPopupCollectionWidget;
 
 // TODO: move out.
 struct QnThumbnailsSearchState {
@@ -189,6 +191,14 @@ protected:
         return m_cameraSettingsDialog.data();
     }
 
+    QnBusinessRulesDialog *businessRulesDialog() const {
+        return m_businessRulesDialog.data();
+    }
+
+    QnPopupCollectionWidget *popupCollectionWidget() const {
+        return m_popupCollectionWidget.data();
+    }
+
 protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
@@ -203,6 +213,7 @@ protected slots:
 
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();
+    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
@@ -239,10 +250,14 @@ protected slots:
     void at_openFileAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
+    void at_checkForUpdatesAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_showPopupAction_triggered();
     void at_getMoreLicensesAction_triggered();
+    void at_openServerSettingsAction_triggered();
+    void at_openPopupSettingsAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
@@ -288,6 +303,10 @@ protected slots:
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
 
+    void at_ptzSavePresetAction_triggered();
+    void at_ptzGoToPresetAction_triggered();
+    void at_ptzManagePresetsAction_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
@@ -326,6 +345,8 @@ private:
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
+    void notifyAboutUpdate(bool alwaysNotify);
+
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -334,6 +355,8 @@ private:
     QWeakPointer<QMenu> m_currentUserLayoutsMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
+    QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

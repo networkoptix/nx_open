@@ -10,6 +10,10 @@ QnTimeHandler::QnTimeHandler()
 
 int QnTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    Q_UNUSED(contentType)
+
     int offset = currentTimeZone();
     QString offsetStr = QString::number(offset);
     if (offset >= 0)

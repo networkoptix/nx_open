@@ -1014,7 +1014,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     QnMetaDataV1Ptr rez(new QnMetaDataV1());
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
     //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
-    rez->timestamp = m_lastFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
+    rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
 
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)
@@ -1053,7 +1053,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 bool QnMotionEstimation::existsMetadata() const
 {
-    return m_lastFrameTime - m_firstFrameTime >= 300 * 1000; // 30 ms agg period
+    return m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD; // 30 ms agg period
 }
 
 void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)

@@ -59,6 +59,7 @@ public:
         Supports \a multiThreadedMode
     */
     virtual unsigned int getDecoderCaps() const;
+    virtual void setSpeed( float newValue ) override;
 
 private:
     static AVCodec* findCodec(CodecID codecId);
@@ -107,6 +108,7 @@ private:
     typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
     MotionMap m_motionMap; 
     QAtomicInt* const m_swDecoderCount;
+    mutable double m_prevSampleAspectRatio;
 };
 
 #endif //cl_ffmpeg_h

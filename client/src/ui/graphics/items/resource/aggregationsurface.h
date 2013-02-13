@@ -75,7 +75,7 @@ private:
         }
     };
 
-    static const int MAX_PLANE_COUNT = 3;
+    static const unsigned int MAX_PLANE_COUNT = 3;
 
     mutable QMutex m_mutex;
     mutable QMutex m_uploadMutex;
@@ -143,7 +143,7 @@ public:
         \note Method assumes that context \a glContext is current
     */
     QSharedPointer<AggregationSurfaceRect> takeSurfaceRect(
-        GLContext* const glContext,
+        const GLContext* glContext,
         const PixelFormat format,
         const QSize& requiredEmptySize );
     //!Removes all surfaces associated with \a glContext. \a glContext MUST NOT be NULL
@@ -152,7 +152,7 @@ public:
     static AggregationSurfacePool* instance();
 
 private:
-    typedef std::multimap<std::pair<GLContext*, PixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
+    typedef std::multimap<std::pair<const GLContext*, PixelFormat>, QSharedPointer<AggregationSurface> > AggregationSurfaceContainer;
 
     QMutex m_mutex;
     AggregationSurfaceContainer m_surfaces;

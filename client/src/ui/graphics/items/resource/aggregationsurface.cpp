@@ -89,10 +89,10 @@ public:
     ~QnGlRendererTexture1()
     {
         //NOTE we do not delete texture here because it belongs to auxiliary gl context which will be removed when these textures are not needed anymore
-        if( m_id != (unsigned int)-1 )
+        if( m_id != (GLuint)-1 )
         {
             glDeleteTextures(1, &m_id);
-            m_id = -1;
+            m_id = (GLuint)-1;
         }
     }
 
@@ -154,7 +154,8 @@ public:
         if( m_allocated )
             return;
         glGenTextures( 1, &m_id );
-        m_allocated = true;
+        if( glGetError() == 0 )
+            m_allocated = true;
     }
 
 private:
@@ -186,7 +187,7 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
     for( int i = 0; i < MAX_PLANE_COUNT; ++i )
     {
         m_textures[i].reset(new QnGlRendererTexture1());
-        m_textures[i]->ensureAllocated();
+        //m_textures[i]->ensureAllocated();
     }
 
     size_t pitch[3];
@@ -316,6 +317,11 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 #endif
 
             glBindTexture( GL_TEXTURE_2D, texture->id() );
+
+            GLfloat w0 = 0;
+            glGetTexLevelParameterfv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w0 );
+            GLfloat h0 = 0;
+            glGetTexLevelParameterfv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h0 );
 
             glPixelStorei( GL_UNPACK_ROW_LENGTH, m_buffers[i].pitch );
             Q_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
@@ -496,7 +502,7 @@ void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], i
         m_invalidatedRegion += destRect;
     }
 
-    for( int i = 0; i < m_planeCount; ++i )
+    for( size_t i = 0; i < m_planeCount; ++i )
     {
         int horizontalResolution = i == 0 ? 1 : (m_format == PIX_FMT_YUV420P ? 2 : 1);
         int verticalResolution = i == 0 ? 1 : 2;
@@ -655,7 +661,7 @@ void AggregationSurfaceRect::ensureUploadedToOGL( qreal opacity )
 Q_GLOBAL_STATIC( AggregationSurfacePool, aggregationSurfacePoolInstanceGetter );
 
 QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
-    GLContext* const glContext,
+    const GLContext* glContext,
     const PixelFormat format,
     const QSize& requiredEmptySize )
 {

@@ -1517,7 +1517,7 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
     if(dvdread_verbose(device_of_file(ifofile->file)) >= 1) {
       fprintf(stderr, "libdvdread: *C_ADT nr_of_vobs > avaiable info entries\n");
     }
-    c_adt->nr_of_vobs = info_length / sizeof(cell_adr_t);
+    c_adt->nr_of_vobs = quint16(info_length / sizeof(cell_adr_t));
   }
   
   c_adt->cell_adr_table = (cell_adr_t *)malloc(info_length);

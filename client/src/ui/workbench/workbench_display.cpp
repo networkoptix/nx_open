@@ -257,24 +257,43 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene == scene)
         return;
 
-    if(m_scene != NULL && context() != NULL)
-        deinitSceneContext();
+    if(m_scene && m_view)
+        deinitSceneView();
 
     /* Prepare new scene. */
     m_scene = scene;
-    if(m_scene == NULL && m_dummyScene != NULL) {
+    if(!m_scene && m_dummyScene) {
         m_dummyScene->clear();
         m_scene = m_dummyScene;
     }
 
     /* Set up new scene.
      * It may be NULL only when this function is called from destructor. */
-    if(m_scene != NULL && context() != NULL)
-        initSceneContext();
+    if(m_scene && m_view)
+        initSceneView();
 }
 
-void QnWorkbenchDisplay::deinitSceneContext() {
-    assert(m_scene != NULL && context() != NULL);
+void QnWorkbenchDisplay::setView(QGraphicsView *view) {
+    if(m_view == view)
+        return;
+
+    if(m_scene && m_view)
+        deinitSceneView();
+
+    m_view = view;
+
+    if(m_scene && m_view) 
+        initSceneView();
+}
+
+void QnWorkbenchDisplay::deinitSceneView() {
+    assert(m_scene && m_view);
+
+    /* Deinit view. */
+    m_instrumentManager->unregisterView(m_view);
+    m_viewportAnimator->setView(NULL);
+
+    disconnect(m_view, NULL, this, NULL);
 
     /* Deinit scene. */
     m_instrumentManager->unregisterScene(m_scene);
@@ -303,26 +322,77 @@ void QnWorkbenchDisplay::deinitSceneContext() {
         removeItemInternal(item, true, false);
 }
 
-void QnWorkbenchDisplay::initSceneContext() {
-    assert(m_scene != NULL && context() != NULL);
+void QnWorkbenchDisplay::initSceneView() {
+    assert(m_scene && m_view);
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
-    if(m_view != NULL) {
-        m_view->setScene(m_scene);
-        m_instrumentManager->registerView(m_view);
-
-        initBoundingInstrument();
-    }
 
     /* Note that selection often changes there and back, and we don't want such changes to 
-     * affect our logic, so we use queued connections here. */
+     * affect our logic, so we use queued connections here. */ // TODO: I don't see queued connections
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged())); 
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+
+
+    /* Init view. */
+    m_view->setScene(m_scene);
+    m_instrumentManager->registerView(m_view);
+
+    connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
+
+    /* Configure OpenGL */
+    static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
+    if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
+        if (!QGLFormat::hasOpenGL()) {
+            qnCritical("Software rendering is not supported."); // TODO: this check must be performed on startup.
+        } else {
+            QGLFormat glFormat;
+            glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+            glFormat.setSwapInterval(1); /* Turn vsync on. */
+
+            QGLWidget *glWidget = new QGLWidget(glFormat);
+            new QnGlHardwareChecker(glWidget);
+            m_view->setViewport(glWidget);
+
+            /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
+            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(glWidget);
+        }
+
+        /* Turn on antialiasing at QPainter level. */
+        m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+
+        /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
+        m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+
+        /* All our items save and restore painter state. */
+        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
+        m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+
+        /* Don't even try to uncomment this one, it slows everything down. */
+        //m_view->setCacheMode(QGraphicsView::CacheBackground);
+
+        /* We don't need scrollbars. */
+        m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        /* This may be needed by instruments. */
+        m_view->setDragMode(QGraphicsView::NoDrag);
+        m_view->viewport()->setAcceptDrops(true);
+
+        /* Don't initialize it again. */
+        m_view->setProperty(qn_viewInitializedPropertyName, true);
+    }
+
+    /* Configure bounding instrument. */
+    initBoundingInstrument();
+
+    /* Configure viewport animator. */
+    m_viewportAnimator->setView(m_view);
+
 
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
@@ -354,83 +424,8 @@ void QnWorkbenchDisplay::initSceneContext() {
     connect(mapper,                 SIGNAL(cellSizeChanged()),                      this,                   SLOT(at_mapper_cellSizeChanged()));
     connect(mapper,                 SIGNAL(spacingChanged()),                       this,                   SLOT(at_mapper_spacingChanged()));
 
-    /* Create items. */
-    foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
-        addItemInternal(item, false);
-
-    for(int i = 0; i < Qn::ItemRoleCount; i++)
-        at_workbench_itemChanged(static_cast<Qn::ItemRole>(i));
-
-    synchronizeSceneBounds();
-}
-
-void QnWorkbenchDisplay::setView(QGraphicsView *view) {
-    if(m_view == view)
-        return;
-
-    if(m_view != NULL) {
-        m_instrumentManager->unregisterView(m_view);
-
-        disconnect(m_view, NULL, this, NULL);
-
-        m_viewportAnimator->setView(NULL);
-    }
-
-    m_view = view;
-
-    if(m_view != NULL) {
-        m_view->setScene(m_scene);
-
-        m_instrumentManager->registerView(m_view);
-
-        connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
-
-        /* Configure OpenGL */
-        if (!QGLFormat::hasOpenGL()) {
-            qnCritical("Software rendering is not supported.");
-        } else {
-            QGLFormat glFormat;
-            glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
-            glFormat.setSwapInterval(1); /* Turn vsync on. */
-
-            QGLWidget *glWidget = new QGLWidget(glFormat);
-            /*QnGlHardwareChecker* filter =*/
-            new QnGlHardwareChecker(glWidget);
-            m_view->setViewport(glWidget);
-
-            //initializing gl context pool used to render decoded pictures in non-GUI thread
-            DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindow( glWidget );
-            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-                GLContext::getSysHandleOfQtContext( glWidget->context() ) );
-        }
-
-        /* Turn on antialiasing at QPainter level. */
-        m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-
-        /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
-        m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-
-        /* All our items save and restore painter state. */
-        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
-        m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
-
-        /* Don't even try to uncomment this one, it slows everything down. */
-        //m_view->setCacheMode(QGraphicsView::CacheBackground);
-
-        /* We don't need scrollbars. */
-        m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-        /* This may be needed by instruments. */
-        m_view->setDragMode(QGraphicsView::NoDrag);
-        m_view->viewport()->setAcceptDrops(true);
-
-        /* Configure bounding instrument. */
-        initBoundingInstrument();
-
-        /* Configure viewport animator. */
-        m_viewportAnimator->setView(m_view);
-    }
+    /* Run handlers. */
+    at_workbench_currentLayoutChanged();
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
@@ -766,9 +761,15 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
-    m_widgetsByResource[widget->resource()].push_back(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         m_widgetByRenderer.insert(mediaWidget->renderer(), widget);
+    
+    /* Note that it is important to query resource from the widget as it may differ from the one passed
+     * here because of enabled / disabled state effects. */
+    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
+    widgetsForResource.push_back(widget);
+    if(widgetsForResource.size() == 1)
+        emit resourceAdded(widget->resource());
 
     synchronize(widget, false);
     bringToFront(widget);
@@ -821,9 +822,16 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
+    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
+    if(widgetsForResource.size() == 1) {
+        emit resourceAboutToBeRemoved(widget->resource());
+        m_widgetsByResource.remove(widget->resource());
+    } else {
+        widgetsForResource.removeOne(widget);
+    }
+
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    m_widgetsByResource[widget->resource()].removeOne(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         m_widgetByRenderer.remove(mediaWidget->renderer());
 

@@ -413,7 +413,7 @@ LIBDVDCSS_EXPORT dvdcss_t dvdcss_open ( char *psz_target )
         i_fd = open( psz_tagfile, O_RDWR|O_CREAT, 0644 );
         if( i_fd >= 0 )
         {
-            write( i_fd, psz_tag, strlen(psz_tag) );
+            write( i_fd, psz_tag, (int) strlen(psz_tag) );
             close( i_fd );
         }
     }

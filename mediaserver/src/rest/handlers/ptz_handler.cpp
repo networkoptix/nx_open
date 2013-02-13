@@ -3,6 +3,8 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
 #include "utils/common/util.h"
+#include "utils/common/json.h"
+#include "utils/common/space_mapper.h"
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
@@ -14,6 +16,8 @@ QnPtzHandler::QnPtzHandler()
 
 int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(contentType)
+
     QnVirtualCameraResourcePtr res;
     QnAbstractPtzController* ptz = 0;
     QString errStr;
@@ -95,8 +99,12 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         else if (action == "getCalibrate") {
             QnAbstractPtzController::getCalibrate(res, xSpeed, ySpeed, zoomSpeed);
             result.append("<root>\n");
+            result.append("<velocity>\n");
             QString velocity("<velocity xSpeed=\"%1\" ySpeed=\"%2\" zoomSpeed=\"%3\" />\n");
-            result.append(velocity.arg(xSpeed).arg(ySpeed).arg(zoomSpeed).toUtf8());
+            result.append(QString("<xSpeed>%1</xSpeed>").arg(xSpeed).toUtf8());
+            result.append(QString("<ySpeed>%1</ySpeed>").arg(ySpeed).toUtf8());
+            result.append(QString("<zoomSpeed>%1</zoomSpeed>").arg(zoomSpeed).toUtf8());
+            result.append("</velocity>\n");
             result.append("</root>\n");
             return CODE_OK;
         }
@@ -130,8 +138,11 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         }
         else {
             result.append("<root>\n");
-            QString posStr("<position xPos=\"\%1\" yPos=\"\%2\" zoomPos=\"\%3\"/>\n");
-            result.append(posStr.arg(xPos).arg(yPos).arg(zoomPos).toUtf8());
+            result.append("<position>\n");
+            result.append(QString("<xPos>%1</xPos>").arg(xPos).toUtf8());
+            result.append(QString("<yPos>%1</yPos>").arg(yPos).toUtf8());
+            result.append(QString("<zoomPos>%1</zoomPos>").arg(zoomPos).toUtf8());
+            result.append("</position>\n");
             result.append("</root>\n");
             return CODE_OK;
         }
@@ -141,16 +152,32 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         if (ptz->stopMove() != 0)
             errStr = "Error executing PTZ command";
     }
-    else {
-        errStr = QByteArray("Unknown ptz command ").append(action.toUtf8()).append("\n");
+    else if (action == "getSpaceMapper")
+    {
+        QnAbstractPtzController *ptzController = res->getPtzController();
+        const QnPtzSpaceMapper *spaceMapper = ptzController ? ptzController->getSpaceMapper() : NULL;
+        if(spaceMapper) {
+            QVariantMap map;
+            QJson::serialize(*spaceMapper, "mapper", &map);
+            QJson::serialize(map, &result);
+        } else {
+            result = "{ \"mapper\": null }";
+        }
+        contentType = "application/json";
     }
+    else 
+    {
+        errStr = QByteArray("Unknown ptz command ").append(action.toUtf8()).append("\n");
+    } 
 
-    result.append("<root>\n");
-    if (errStr.isEmpty())
-        result.append("SUCCESS");
-    else
-        result.append(errStr);
-    result.append("</root>\n");
+    if(contentType != "application/json") { // TODO: hack!
+        result.append("<root>\n");
+        if (errStr.isEmpty())
+            result.append("SUCCESS");
+        else
+            result.append(errStr);
+        result.append("</root>\n");
+    }
 
     return errStr.isEmpty() ? CODE_OK : CODE_INVALID_PARAMETER;
 
@@ -164,24 +191,29 @@ int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& par
 
 QString QnPtzHandler::description() const
 {
-    QString rez;
-    rez += "There is several ptz command: <BR>";
-    rez += "<b>api/ptz/move</b> - start camera moving <BR>";
-    rez += "<b>api/ptz/moveTo</b> - go to absolute position <BR>";
-    rez += "<b>api/ptz/stop</b> - stop camera moving <BR>";
-    rez += "<b>api/ptz/getPosition</b> - return current camera position <BR>";
-    rez += "<b>api/ptz/calibrate</b> - calibrate moving speed (addition speed coeff) <BR>";
-    rez += "<b>api/ptz/getCalibrate</b> - read current calibration settings <BR>";
-    rez += "<BR>Param <b>res_id</b> - camera physicalID";
-    rez += "<BR><BR>Arguments for 'move' and 'calibrate commands:";
-    rez += "<BR>Param <b>xSpeed</b> - rotation X velocity in range [-1..+1]";
-    rez += "<BR>Param <b>ySpeed</b> - rotation Y velocity in range [-1..+1]";
-    rez += "<BR>Param <b>zoomSpeed</b> - zoom velocity in range [-1..+1]";
-    rez += "<BR><BR>Arguments for 'moveTo' commands:";
-    rez += "<BR>Param <b>xPos</b> - go to absolute X position in range [-1..+1]";
-    rez += "<BR>Param <b>yPos</b> - go to absolute Y position in range [-1..+1]";
-    rez += "<BR>Param <b>zoomPos</b> - Optional. Go to absolute zoom position in range [0..+1]";
-    rez += "<BR><BR>If PTZ command do not return data, function return simple 'OK' message on success or error message if command fail. ";
-    rez += "For 'getCalibrate' command returns XML with coeffecients. For 'getPosition' command returns XML with current position.\n";
-    return rez;
+    return "\
+        There are several ptz commands: <BR>\
+        <b>api/ptz/move</b> - start camera moving.<BR>\
+        <b>api/ptz/moveTo</b> - go to absolute position.<BR>\
+        <b>api/ptz/stop</b> - stop camera moving.<BR>\
+        <b>api/ptz/getPosition</b> - return current camera position.<BR>\
+        <b>api/ptz/getSpaceMapper</b> - return JSON-serialized PTZ space mapper for the given camera, if any.<BR>\
+        <b>api/ptz/calibrate</b> - calibrate moving speed (addition speed coeff).<BR>\
+        <b>api/ptz/getCalibrate</b> - read current calibration settings.<BR>\
+        <BR>\
+        Param <b>res_id</b> - camera physicalID.<BR>\
+        <BR>\
+        Arguments for 'move' and 'calibrate' commands:<BR>\
+        Param <b>xSpeed</b> - rotation X velocity in range [-1..+1].<BR>\
+        Param <b>ySpeed</b> - rotation Y velocity in range [-1..+1].<BR>\
+        Param <b>zoomSpeed</b> - zoom velocity in range [-1..+1].<BR>\
+        <BR>\
+        Arguments for 'moveTo' commands:<BR>\
+        Param <b>xPos</b> - go to absolute X position in range [-1..+1].<BR>\
+        Param <b>yPos</b> - go to absolute Y position in range [-1..+1].<BR>\
+        Param <b>zoomPos</b> - Optional. Go to absolute zoom position in range [0..+1].<BR>\
+        <BR>\
+        If PTZ command do not return data, function return simple 'OK' message on success or error message if command fail. \
+        For 'getCalibrate' command returns XML with coeffecients. For 'getPosition' command returns XML with current position.\
+    ";
 }

@@ -47,8 +47,13 @@ namespace QnGl {
     GLboolean APIENTRY glUnmapBuffer(GLenum) { WARN(); return false; }
 
     void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
-    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
+    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); }
+    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); }
+
+    GLsync APIENTRY glFenceSync(GLenum, GLbitfield) { WARN(); return 0; }
+    void APIENTRY glDeleteSync(GLsync) { WARN(); }
+    void APIENTRY glWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); }
+    GLAPI GLenum APIENTRY glClientWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); return 0; }
 
 #undef WARN
 
@@ -154,6 +159,14 @@ public:
         if(status)
             m_features |= QnGlFunctions::OpenGL2_0;
 
+        status = true;
+        RESOLVE(PFNGLFENCESYNCPROC,                     glFenceSync);
+        RESOLVE(PFNGLDELETESYNCPROC,                    glDeleteSync);
+        RESOLVE(PFNGLCLIENTWAITSYNCPROC,                glClientWaitSync);
+        RESOLVE(PFNGLWAITSYNCPROC,                      glWaitSync);
+        if(status)
+            m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
+
 #undef RESOLVE
 
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
@@ -168,10 +181,17 @@ public:
 #endif
     }
 
-    virtual ~QnGlFunctionsPrivate() {}
+    virtual ~QnGlFunctionsPrivate()
+    {
+    }
 
     QnGlFunctions::Features features() const {
         return m_features;
+    }
+
+    const QGLContext* context() const
+    {
+        return m_context;
     }
 
 public:
@@ -194,6 +214,11 @@ public:
     PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
     PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
     PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+
+    PFNGLFENCESYNCPROC glFenceSync;
+    PFNGLDELETESYNCPROC glDeleteSync;
+    PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
+    PFNGLWAITSYNCPROC glWaitSync;
 
 private:
     template<class Function>
@@ -233,6 +258,11 @@ QnGlFunctions::QnGlFunctions(const QGLContext *context) {
 }
 
 QnGlFunctions::~QnGlFunctions() {}
+
+const QGLContext* QnGlFunctions::context() const
+{
+    return d->context();
+}
 
 QnGlFunctions::Features QnGlFunctions::features() const {
     return d->features();
@@ -310,6 +340,26 @@ void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
     d->glDisableVertexAttribArray(index);
 }
 
+GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags)
+{
+    return d->glFenceSync(condition, flags);
+}
+
+void QnGlFunctions::glDeleteSync(GLsync sync)
+{
+    d->glDeleteSync(sync);
+}
+
+void QnGlFunctions::glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+{
+    d->glWaitSync(sync, flags, timeout);
+}
+
+GLenum QnGlFunctions::glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+{
+    return d->glClientWaitSync(sync, flags, timeout);
+}
+
 #ifdef Q_OS_WIN
 namespace {
     QnGlFunctions::Features estimateFeatures() {
@@ -331,7 +381,7 @@ namespace {
         }
         return result;
     }
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QnGlFunctions::Features, qn_estimatedFeatures, { *x = estimateFeatures(); });
+    Q_GLOBAL_STATIC_WITH_ARGS(QnGlFunctions::Features, qn_estimatedFeatures, (estimateFeatures()));
 }
 #endif
 

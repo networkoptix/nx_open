@@ -13,8 +13,9 @@ class QnRtpVideoStreamParser;
 class QnResourceAudioLayout;
 
 
-class QnMulticodecRtpReader : public QnResourceConsumer
+class QnMulticodecRtpReader : public QObject, public QnResourceConsumer
 {
+    Q_OBJECT
 private:
     enum {BLOCK_SIZE = 1460};
 public:
@@ -30,6 +31,8 @@ public:
     const QnResourceAudioLayout* getAudioLayout() const;
     int getLastResponseCode() const;
     void pleaseStop();
+signals:
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, int reasonCode, const QString& reasonText);
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);
@@ -38,6 +41,9 @@ private:
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
+	void buildClientRTCPReport(quint8 chNumber);
+private slots:
+    void at_packetLost(quint32 prev, quint32 next);
 private:
     
     RTPSession m_RtpSession;
@@ -55,6 +61,7 @@ private:
     QnRtspTimeHelper m_timeHelper;
     QVector<int> m_gotKeyData;
     bool m_pleaseStop;
+    QTime m_rtcpReportTimer;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

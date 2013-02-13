@@ -49,8 +49,9 @@ QString QnPlISDResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
 
     QString host = url.host();
     int port = url.port();
@@ -74,7 +75,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
 
     if (name.length()==0)
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
 
     name = getValueFromString(name).trimmed();
@@ -94,7 +95,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
 
     if (mac.isEmpty() || name.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
 
     mac = getValueFromString(mac).trimmed();
@@ -110,7 +111,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
@@ -122,8 +123,9 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
-
-    return resource;
+    QList<QnResourcePtr> result;
+    result << resource;
+    return result;
 }
 
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)

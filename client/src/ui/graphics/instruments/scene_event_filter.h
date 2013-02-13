@@ -1,5 +1,5 @@
-#ifndef QN_PROXY_FILTER_ITEM_H
-#define QN_PROXY_FILTER_ITEM_H
+#ifndef QN_SCENE_EVENT_FILTER_H
+#define QN_SCENE_EVENT_FILTER_H
 
 #include <QGraphicsItem>
 
@@ -97,5 +97,5 @@ private:
 
 
 
-#endif // QN_PROXY_FILTER_ITEM_H
+#endif // QN_SCENE_EVENT_FILTER_H
 

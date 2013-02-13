@@ -70,7 +70,10 @@ public:
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
 
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
+    QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
+    QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
+    QnResourceList getAllEnabledCameras() const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag

@@ -5,6 +5,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QList>
 
+#include <common/common_globals.h>
+#include <core/resource/resource.h> // TODO: #Elric remove once resource flags are moved out
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_property.h>
 
@@ -12,7 +14,7 @@ class QRegExp;
 
 class QnResourceCriterionGroup;
 
-
+// TODO: #Elric this one works more like a filter. Rename.
 class QN_EXPORT QnResourceCriterion {
 public:
     enum Operation {
@@ -32,17 +34,23 @@ public:
 
     typedef Operation (*CriterionFunction)(const QnResourcePtr &, const QVariant &value);
 
-    QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    explicit QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
-    QnResourceCriterion(int flags, const char *propertyName = QnResourceProperty::flags, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    explicit QnResourceCriterion(QnResource::Flags flags, const char *propertyName = QnResourceProperty::flags, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
-    QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    explicit QnResourceCriterion(Qn::CameraCapabilities cameraCapabilities, const char *propertyName = QnResourceProperty::cameraCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
-    QnResourceCriterion(const QVariant &targetValue, Type type, const char *propertyName, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    explicit QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
-    QnResourceCriterion();
+    explicit QnResourceCriterion(const QVariant &targetValue, Type type, const char *propertyName, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+
+    explicit QnResourceCriterion();
 
     ~QnResourceCriterion();
+
+    bool isNull() const {
+        return m_type == Nothing;
+    }
 
     Operation matchOperation() const {
         return m_matchOperation;
@@ -182,12 +190,16 @@ namespace QnResourceCriterionExpressions {
         QnResourceCriterion m_criterion;
     };
 
-    inline QnResourceCriterionExpression hasFlags(int flags) {
+    inline QnResourceCriterionExpression hasFlags(QnResource::Flags flags) {
         return QnResourceCriterion(flags);
     }
 
-    inline QnResourceCriterionExpression hasStatus(int status) {
+    inline QnResourceCriterionExpression hasStatus(QnResource::Status status) {
         return QnResourceCriterion(status, QnResourceCriterion::Equality, QnResourceProperty::status);
+    }
+
+    inline QnResourceCriterionExpression hasCapabilities(Qn::CameraCapabilities capabilities) {
+        return QnResourceCriterion(capabilities);
     }
 
     inline QnResourceCriterionExpression operator||(const QnResourceCriterionExpression &le, const QnResourceCriterionExpression &re) {

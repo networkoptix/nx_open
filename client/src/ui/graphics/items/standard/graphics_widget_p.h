@@ -10,7 +10,7 @@ class GraphicsWidgetSceneData;
 
 class GraphicsWidgetPrivate {
 public:
-    GraphicsWidgetPrivate(): q_ptr(NULL), handlingFlags(0), style(NULL), windowData(NULL) {};
+    GraphicsWidgetPrivate(): q_ptr(NULL), handlingFlags(0), transformOrigin(GraphicsWidget::Legacy), style(NULL), windowData(NULL) {};
     virtual ~GraphicsWidgetPrivate();
 
     GraphicsWidgetSceneData *ensureSceneData();
@@ -28,6 +28,8 @@ protected:
 
     void ensureWindowData();
 
+    QPointF calculateTransformOrigin() const;
+
     void windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event);
     void windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -37,6 +39,7 @@ protected:
 protected:
     GraphicsWidget *q_ptr;
     GraphicsWidget::HandlingFlags handlingFlags;
+    GraphicsWidget::TransformOrigin transformOrigin;
     QWeakPointer<GraphicsWidgetSceneData> sceneData;
     mutable GraphicsStyle *style;
     mutable QScopedPointer<GraphicsStyle> reserveStyle;

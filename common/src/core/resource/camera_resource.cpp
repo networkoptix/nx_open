@@ -1,50 +1,17 @@
 #include "camera_resource.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
-#include "common/common_meta_types.h"
 
-QnVirtualCameraResource::QnVirtualCameraResource()
-    : m_scheduleDisabled(true),
-      m_audioEnabled(false),
-      m_manuallyAdded(false),
-      m_advancedWorking(false),
-      m_dtsFactory(0)
-{
-    QnCommonMetaTypes::initilize();
-}
+QnVirtualCameraResource::QnVirtualCameraResource():
+    m_scheduleDisabled(true),
+    m_audioEnabled(false),
+    m_manuallyAdded(false),
+    m_advancedWorking(false),
+    m_dtsFactory(0)
+{}
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
 {
     setFlags(local_live_cam);
-}
-
-int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const
-{
-#ifdef _DEBUG
-    debugCheck();
-#endif
-
-    QMutexLocker mutex(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (!lp)
-            continue;
-
-        if (lp->getRole() != QnResource::Role_SecondaryLiveVideo)
-        {
-            // must be a primary source 
-            return lp->getFps();
-        }
-    }
-
-    return 0;
-}
-
-int QnPhysicalCameraResource::getPrimaryStreamRealFps() const
-{
-    // will be implemented one day
-    return getPrimaryStreamDesiredFps();
 }
 
 int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
@@ -59,63 +26,13 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
     resolutionFactor = pow(resolutionFactor, (float)0.5);
 
     float frameRateFactor = fps/30.0;
+    frameRateFactor = pow(frameRateFactor, (float)0.4);
 
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(128,result);
 }
-
-void QnPhysicalCameraResource::onPrimaryFpsUpdated(int newFps)
-{
-#ifdef _DEBUG
-    debugCheck();
-#endif
-
-    QMutexLocker mutex(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (!lp)
-            continue;
-
-        if (lp->getRole() == QnResource::Role_SecondaryLiveVideo)
-        {
-            lp->onPrimaryFpsUpdated(newFps);
-            return;
-        }
-    }
-
-        
-}
-
-#ifdef _DEBUG
-void QnPhysicalCameraResource::debugCheck() const
-{
-    int countTotal = 0;
-    int countPrimary = 0;
-
-    QMutexLocker mutex(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (!lp)
-            continue;
-
-        ++countTotal;
-
-        if (lp->getRole() != QnResource::Role_SecondaryLiveVideo)
-        {
-            // must be a primary source 
-            ++countPrimary;
-        }
-    }
-
-    Q_ASSERT(countTotal<=2); // more than 2 stream readers connected ?
-    Q_ASSERT(countPrimary<=1); // more than 1 primary source ? 
-
-}
-#endif
 
 void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {
@@ -201,6 +118,7 @@ void QnVirtualCameraResource::unLockDTSFactory()
 
 QString QnVirtualCameraResource::getModel() const
 {
+    QMutexLocker locker(&m_mutex);
     return m_model;
 }
 
@@ -220,4 +138,13 @@ void QnVirtualCameraResource::setFirmware(QString firmware)
 {
     QMutexLocker locker(&m_mutex);
     m_firmware = firmware;
+}
+
+QString QnVirtualCameraResource::getUniqueId() const
+{
+	if (hasFlags(foreigner))
+		return getPhysicalId() + getParentId().toString();
+	else 
+		return getPhysicalId();
+
 }

@@ -122,7 +122,7 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
     if( index.column() != 0 || index.internalId() == 0 )
         return QModelIndex();
 
-    const size_t foundModuleIndex = index.internalId() & 0x00ffffff;
+    const int foundModuleIndex = index.internalId() & 0x00ffffff;
     if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) )
         return QModelIndex();
 
@@ -139,7 +139,7 @@ int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) con
 int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
 {
     if( !parent.isValid() )
-        return m_foundModules.size();
+        return (int) m_foundModules.size();
 
     if( parent.internalId() != 0 || //element with ip address
         parent.column() != 0 ||
@@ -150,7 +150,7 @@ int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
     }
 
     //returning number of IPs of enterprise controller
-    return m_foundModules[parent.row()].ipAddresses.size();
+    return (int) m_foundModules[parent.row()].ipAddresses.size();
 }
 
 void FoundEnterpriseControllersModel::remoteModuleFound(

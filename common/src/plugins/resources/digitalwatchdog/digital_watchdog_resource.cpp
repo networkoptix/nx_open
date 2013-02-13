@@ -1,5 +1,6 @@
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "dw_zoom_ptz_controller.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -104,12 +105,19 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     resolutionFactor = pow(resolutionFactor, (float)0.5);
 
     float frameRateFactor = fps/30.0;
-    frameRateFactor = pow(resolutionFactor, (float)0.4);
+    frameRateFactor = pow(frameRateFactor, (float)0.4);
 
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(1024,result);
+}
+
+QnAbstractPtzController *QnPlWatchDogResource::getPtzController() {
+    QnAbstractPtzController *result = base_type::getPtzController();
+    if(result)
+        return result; /* Use PTZ controller from ONVIF if one is present. */
+    return m_ptzController.data();
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
@@ -124,11 +132,11 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
-
-        if (suffix.endsWith(QLatin1String("-FOCUS")))
-            addCameraCapabilities(HasZoom);
-        else
-            removeCameraCapabilities(HasZoom);
+        bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
+        if(hasFocus) {
+            setCameraCapability(Qn::ContinuousZoomCapability, true);
+            m_ptzController.reset(new QnDwZoomPtzController(::toSharedPointer(this)));
+        }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;

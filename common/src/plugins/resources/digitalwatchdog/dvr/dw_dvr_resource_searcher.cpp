@@ -78,8 +78,8 @@ QnResourceList DwDvrResourceSearcher::findResources()
 
 void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const QString& host, int port, const QString& login, const QString& password)
 {
-#ifdef Q_OS_WIN
     /*
+#ifdef Q_OS_WIN
     static CLSID const clsid
         = { 0x67815DA3, 0xEC08, 0x41E0, { 0xAE, 0x60, 0x92, 0xE5, 0x93, 0x5E, 0xE8, 0xFB } };
 
@@ -104,19 +104,20 @@ void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const Q
     {
 
     }
-    */
 #else
+    */
     Q_UNUSED(resources)
     Q_UNUSED(host)
     Q_UNUSED(port)
     Q_UNUSED(login)
     Q_UNUSED(password)
-#endif
+//#endif
 }
 
-QnResourcePtr DwDvrResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> DwDvrResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    return QnResourcePtr();
+    Q_UNUSED(doMultichannelCheck)
+    return QList<QnResourcePtr>();
 }
