@@ -559,11 +559,12 @@ private:
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType):
+QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType, bool isFlat):
     QAbstractItemModel(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
-    m_rootNodeType(rootNodeType)
+    m_rootNodeType(rootNodeType),
+    m_flat(isFlat)
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
@@ -695,7 +696,9 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
             return NULL;
         }
     } else {
-        return this->node(parentResource);
+        if (!m_flat)
+            return this->node(parentResource);
+        return m_rootNodes[Qn::BastardNode];
     }
 }
 

@@ -4,6 +4,7 @@
 #include <business/actions/sendmail_business_action.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -49,4 +50,14 @@ void QnSendmailBusinessActionWidget::paramsChanged() {
 
 void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
     menu()->trigger(Qn::OpenServerSettingsAction);
+}
+
+void QnSendmailBusinessActionWidget::at_selectButton_clicked() {
+    QnSelectCamerasDialog dialog(this, Qn::UsersNode);
+    dialog.setSelectedResources(model()->actionResources());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    //TODO: #GDM use action resources for it
+    model()->setActionResources(dialog.getSelectedResources());
 }

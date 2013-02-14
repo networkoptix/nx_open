@@ -6,6 +6,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_criterion.h>
 
 #include <business/events/camera_input_business_event.h>
@@ -16,11 +17,14 @@
 #include <ui/models/business_rules_view_model.h>
 #include <ui/style/globals.h>
 
+#include <utils/common/email.h>
+
 namespace {
 
-    class QnCheckCameraAndWarnDelegate: public QnSelectCamerasDialogDelegate {
+    template<class T>
+    class QnCheckAndWarnDelegate: public QnSelectCamerasDialogDelegate {
     public:
-        QnCheckCameraAndWarnDelegate(QWidget* parent):
+        QnCheckAndWarnDelegate(QWidget* parent):
             QnSelectCamerasDialogDelegate(parent),
             m_warningLabel(NULL)
         {}
@@ -38,19 +42,19 @@ namespace {
             if (!m_warningLabel)
                 return true;
             int invalid = 0;
-            QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
-            foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-                if (!isCameraValid(camera)) {
+            QnSharedResourcePointerList<T> resources = selected.filtered<T>();
+            foreach (const QnSharedResourcePointer<T> &resource, resources) {
+                if (!isResourceValid(resource)) {
                     invalid++;
                 }
             }
-            m_warningLabel->setText(getText(invalid, cameras.size()));
+            m_warningLabel->setText(getText(invalid, resources.size()));
             m_warningLabel->setVisible(invalid > 0);
             return true;
         }
 
     protected:
-        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const = 0;
+        virtual bool isResourceValid(const QnSharedResourcePointer<T> &resource) const = 0;
         virtual QString getText(int invalid, int total) const = 0;
 
     private:
@@ -58,11 +62,11 @@ namespace {
     };
 
 
-    class QnMotionEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    class QnMotionEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
     public:
-        QnMotionEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+        QnMotionEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
             return QnMotionBusinessEvent::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
@@ -70,11 +74,11 @@ namespace {
         }
     };
 
-    class QnRecordingEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    class QnRecordingEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
     public:
-        QnRecordingEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+        QnRecordingEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
             return QnRecordingBusinessAction::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
@@ -82,11 +86,11 @@ namespace {
         }
     };
 
-    class QnInputEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    class QnInputEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
     public:
-        QnInputEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+        QnInputEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
             return QnCameraInputEvent::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
@@ -94,11 +98,11 @@ namespace {
         }
     };
 
-    class QnOutputEnabledDelegate: public QnCheckCameraAndWarnDelegate {
+    class QnOutputEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
     public:
-        QnOutputEnabledDelegate(QWidget* parent): QnCheckCameraAndWarnDelegate(parent){}
+        QnOutputEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
     protected:
-        virtual bool isCameraValid(const QnVirtualCameraResourcePtr &camera) const override {
+        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
             return QnCameraOutputBusinessAction::isResourceValid(camera);
         }
         virtual QString getText(int invalid, int total) const override {
@@ -106,6 +110,17 @@ namespace {
         }
     };
 
+    class QnEmailValidDelegate: public QnCheckAndWarnDelegate<QnUserResource> {
+    public:
+        QnEmailValidDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
+    protected:
+        virtual bool isResourceValid(const QnUserResourcePtr &user) const override {
+            return isEmailValid(user->getEmail());
+        }
+        virtual QString getText(int invalid, int total) const override {
+            return tr("%1 of %2 selected users have invalid email.").arg(invalid).arg(total);
+        }
+    };
 
 }
 
@@ -115,12 +130,13 @@ namespace {
 
 QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     base_type(parent),
-    m_dialogDelegate(NULL)
+    m_dialogDelegate(NULL),
+    m_nodeType(Qn::ServersNode)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
 
-QnResourceList QnSelectResourcesDialogButton::resources() {
+QnResourceList QnSelectResourcesDialogButton::resources() const {
     return m_resources;
 }
 
@@ -128,7 +144,7 @@ void QnSelectResourcesDialogButton::setResources(QnResourceList resources) {
     m_resources = resources;
 }
 
-QnSelectCamerasDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() {
+QnSelectCamerasDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() const {
     return m_dialogDelegate;
 }
 
@@ -136,8 +152,16 @@ void QnSelectResourcesDialogButton::setDialogDelegate(QnSelectCamerasDialogDeleg
     m_dialogDelegate = delegate;
 }
 
+Qn::NodeType QnSelectResourcesDialogButton::nodeType() const {
+    return m_nodeType;
+}
+
+void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
+    m_nodeType = nodeType;
+}
+
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnSelectCamerasDialog dialog(this); //TODO: #GDM servers dialog?
+    QnSelectCamerasDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
@@ -199,8 +223,6 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case QnBusiness::TargetColumn:
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
-                if (actionType == BusinessActionType::BA_SendMail)
-                    break;
 
                 if (actionType == BusinessActionType::BA_ShowPopup) {
                     QComboBox* comboBox = new QComboBox(parent);
@@ -213,10 +235,16 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-                if (actionType == BusinessActionType::BA_CameraRecording)
+                if (actionType == BusinessActionType::BA_CameraRecording) {
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
-                else if (actionType == BusinessActionType::BA_CameraOutput)
+                }
+                else if (actionType == BusinessActionType::BA_CameraOutput) {
                     btn->setDialogDelegate(new QnOutputEnabledDelegate(btn));
+                }
+                else if (actionType == BusinessActionType::BA_SendMail) {
+                    btn->setDialogDelegate(new QnEmailValidDelegate(btn));
+                    btn->setNodeType(Qn::UsersNode);
+                }
                 return btn;
             }
         case QnBusiness::EventColumn:
@@ -265,8 +293,6 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
         case QnBusiness::TargetColumn:
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
-                if (actionType == BusinessActionType::BA_SendMail)
-                    break;
 
                 if (actionType == BusinessActionType::BA_ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
@@ -313,8 +339,6 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
         case QnBusiness::TargetColumn:
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
-                if (actionType == BusinessActionType::BA_SendMail)
-                    break;
 
                 if (actionType == BusinessActionType::BA_ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {

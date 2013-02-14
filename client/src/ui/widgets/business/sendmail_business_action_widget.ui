@@ -6,21 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>823</width>
-    <height>27</height>
+    <width>635</width>
+    <height>23</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="margin">
     <number>0</number>
    </property>
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&amp;Recipients:</string>
+      <string>&amp;Additional Recipients:</string>
      </property>
      <property name="buddy">
       <cstring>emailLineEdit</cstring>
@@ -28,18 +28,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="emailLineEdit">
-     <property name="placeholderText">
-      <string>Select users or enter manually...</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>&amp;Select...</string>
-     </property>
-    </widget>
+    <widget class="QLineEdit" name="emailLineEdit"/>
    </item>
    <item>
     <widget class="QPushButton" name="settingsButton">
@@ -50,11 +39,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>emailLineEdit</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>settingsButton</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
