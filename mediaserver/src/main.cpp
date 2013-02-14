@@ -650,6 +650,17 @@ void QnMain::loadResourcesFromECS()
     }
 
     //loading business rules
+    QnUserResourceList users;
+    while( appServerConnection->getUsers(users) != 0 )
+    {
+        qDebug() << "QnMain::run(): Can't get users. Reason: " << appServerConnection->getLastError();
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    foreach(const QnUserResourcePtr &user, users)
+        qnResPool->addResource(user);
+
+    //loading business rules
     QnBusinessEventRules rules;
     while( appServerConnection->getBusinessRules(rules) != 0 )
     {
@@ -657,7 +668,7 @@ void QnMain::loadResourcesFromECS()
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
-    foreach(QnBusinessEventRulePtr rule, rules)
+    foreach(const QnBusinessEventRulePtr &rule, rules)
         qnBusinessRuleProcessor->addBusinessRule( rule );
 }
 
