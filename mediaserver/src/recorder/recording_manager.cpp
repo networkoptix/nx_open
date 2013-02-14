@@ -479,10 +479,7 @@ void QnRecordingManager::onTimer()
             recorders.recorderHiRes->updateScheduleInfo(time);
         if (recorders.recorderLowRes)
             recorders.recorderLowRes->updateScheduleInfo(time);
-        lock.unlock();  //unlocking mutex, since startOrStopRecording triggers blocking operations and can be long.
-                        //TODO: check for multithreading issues. Perhaps, single resource locking funtionality is necessary
         startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
-        lock.relock();
     }
 
     QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
