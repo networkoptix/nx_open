@@ -5,6 +5,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <client/client_globals.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -52,13 +54,13 @@ public:
     virtual bool validate(const QnResourceList &selectedResources);
 };
 
-// TODO: #GDM camera selection dialog 
+// TODO: #GDM rename to SelectResourcesDialog
 class QnSelectCamerasDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QDialog base_type;
 
 public:
-    explicit QnSelectCamerasDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnSelectCamerasDialog(QWidget *parent, Qn::NodeType rootNodeType = Qn::ServersNode);
     ~QnSelectCamerasDialog();
 
     QnResourceList getSelectedResources() const;
@@ -77,6 +79,7 @@ private:
     QScopedPointer<Ui::QnSelectCamerasDialog> ui;
     QnResourcePoolModel *m_resourceModel;
     QnSelectCamerasDialogDelegate* m_delegate;
+    bool m_flat;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H

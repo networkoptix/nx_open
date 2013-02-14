@@ -97,13 +97,6 @@
              </property>
             </spacer>
            </item>
-           <item>
-            <widget class="QLabel" name="eventDropLabel">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;Drop resources here&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -156,7 +149,7 @@
            <string>Schedule...</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="../../../../x86/build/client-custom.qrc">
             <normaloff>:/skin/tree/servers.png</normaloff>:/skin/tree/servers.png</iconset>
           </property>
          </widget>
@@ -248,13 +241,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="actionDropLabel">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;Drop resources here&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -398,6 +384,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../x86/build/client-custom.qrc"/>
+ </resources>
  <connections/>
 </ui>

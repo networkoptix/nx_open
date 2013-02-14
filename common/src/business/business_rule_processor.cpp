@@ -37,7 +37,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources();
+    QnResourceList resList = action->getResources().filtered<QnVirtualCameraResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -315,7 +315,16 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 {
     Q_ASSERT( action );
 
-    QString emailAddress = BusinessActionParameters::getEmailAddress(action->getParams());
+    QString emailAddress;
+    foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
+        if (user->getEmail().isEmpty())
+            continue;
+        if (!emailAddress.isEmpty())
+            emailAddress += QLatin1String(";");
+        emailAddress += user->getEmail();
+    }
+
+    emailAddress += BusinessActionParameters::getEmailAddress(action->getParams());
     if( emailAddress.isEmpty() )
     {
         cl_log.log( QString::fromLatin1("Action SendMail missing required parameter \"emailAddress\". Ignoring..."), cl_logWARNING );
