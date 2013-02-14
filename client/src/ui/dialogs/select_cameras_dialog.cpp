@@ -45,8 +45,16 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, Qn::NodeType rootN
 {
     ui->setupUi(this);
 
-    m_resourceModel = new QnResourcePoolModel(this, rootNodeType);
     m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
+    m_resourceModel = new QnResourcePoolModel(this, rootNodeType, m_flat);
+
+    switch (rootNodeType) {
+    case Qn::UsersNode:
+        setWindowTitle(tr("Select users..."));
+        break;
+    default: //default value is "Select cameras...", consistent to default value of rootNodeType
+        break;
+    }
 
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
 
