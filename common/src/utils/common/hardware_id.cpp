@@ -2,19 +2,17 @@
 
 #include "hardware_id.h"
 
-#include <QByteArray>
-#include <QCryptographicHash>
 #include <comdef.h>
 #include <Wbemidl.h>
 
 #define _WIN32_DCOM
 # pragma comment(lib, "wbemuuid.lib")
 
-static const QString VERSION_STR(QLatin1String("01"));
+static const char* VERSION_STR = "01";
 
 int execQuery(IWbemServices *pSvc, const char* fieldName, const char* objectName, QString& rezStr)
 {
-    QString reqStr(QLatin1String("SELECT %1 FROM %2"));
+    const char* reqStr = "SELECT %1 FROM %2";
 
     HRESULT hres;
 
@@ -27,6 +25,7 @@ int execQuery(IWbemServices *pSvc, const char* fieldName, const char* objectName
         bstr_t("WQL"), 
         //bstr_t("SELECT * FROM Win32_BaseBoard"),
         //bstr_t("SELECT SerialNumber FROM CIM_BIOSElement"),
+        CS
         bstr_t(reqStr.arg(QLatin1String(fieldName)).arg(QLatin1String(objectName)).toUtf8().data()),
         WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
         NULL,
@@ -68,7 +67,7 @@ int execQuery(IWbemServices *pSvc, const char* fieldName, const char* objectName
     return 0;
 }
 
-QString getHardwareId()
+const char* getHardwareId()
 {
     HRESULT hres;
 

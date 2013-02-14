@@ -4,6 +4,6 @@
 #include <QString>
 
 /** Return PC hardware ID based on motherboard ID, biosID and HDD ID */
-QString getHardwareId();
+const char* getHardwareId();
 
 #endif // __HARDWARE_ID_H__
