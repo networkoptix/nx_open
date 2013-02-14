@@ -130,7 +130,6 @@ inline bool deserialize(const QVariant &value, TYPE *target) {                  
 
 /* These are the types supported by QJson inside a QVariant.
  * See serializer.cpp from QJson for details. */
-
 QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(QString);
 QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(double);
 QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(bool);

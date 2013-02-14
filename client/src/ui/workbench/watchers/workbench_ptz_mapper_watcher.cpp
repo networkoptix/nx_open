@@ -75,6 +75,8 @@ void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraAdded(const QnVirtualCa
     if(QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>()) {
         connect(server, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
         connect(server, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_server_statusChanged(const QnResourcePtr &)));
+    } else {
+        qnWarning("Total fuck up in resource tree: no server for camera '%1'.", camera->getName()); // TODO: #Elric remove once the bug is tracked down.
     }
 
     at_resource_statusChanged(camera);
