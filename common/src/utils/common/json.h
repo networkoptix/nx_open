@@ -8,38 +8,6 @@
 #include <QtCore/QList>
 #include <QtCore/QVector>
 
-
-/* Free-standing (de)serialization functions are picked up via ADL by
- * the actual implementation. Feel free to add them for your own types. */
-
-#define QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(TYPE)                          \
-inline void serialize(const TYPE &value, QVariant *target) {                    \
-    *target = value;                                                            \
-}                                                                               \
-                                                                                \
-inline bool deserialize(const QVariant &value, TYPE *target) {                  \
-    if(value.type() != qMetaTypeId<TYPE>())      /* TODO: WRONG!!!    */        \
-        return false;                                                           \
-                                                                                \
-    *target = value.value<TYPE>();                                              \
-    return true;                                                                \
-}
-
-/* These are the types supported by QJson inside a QVariant.
- * See serializer.cpp from QJson for details. */
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(QVariantMap);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(QVariantList);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(QString);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(double);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(bool);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(int);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned int);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(long long);
-QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned long long);
-
-#undef QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS
-
-
 namespace QJson_detail {
     void serialize_json(const QVariant &value, QByteArray *target);
     bool deserialize_json(const QByteArray &value, QVariant *target);
@@ -143,6 +111,41 @@ namespace QJson {
 } // namespace QJson
 
 
+/* Free-standing (de)serialization functions are picked up via ADL by
+ * the actual implementation. Feel free to add them for your own types. */
+
+#define QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(TYPE)                          \
+inline void serialize(const TYPE &value, QVariant *target) {                    \
+    *target = QVariant::fromValue<TYPE>(value);                                 \
+}                                                                               \
+                                                                                \
+inline bool deserialize(const QVariant &value, TYPE *target) {                  \
+    QVariant localValue = value;                                                \
+    if(!localValue.convert(static_cast<QVariant::Type>(qMetaTypeId<TYPE>())))   \
+        return false;                                                           \
+                                                                                \
+    *target = localValue.value<TYPE>();                                         \
+    return true;                                                                \
+}
+
+/* These are the types supported by QJson inside a QVariant.
+ * See serializer.cpp from QJson for details. */
+
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(QString);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(double);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(bool);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(char);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned char);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(short);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned short);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(int);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned int);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(long);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned long);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(long long);
+QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS(unsigned long long); 
+#undef QN_DEFINE_DIRECT_SERIALIZATION_FUNCTIONS
+
 #define QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS(TYPE)                            \
 template<class T>                                                               \
 void serialize(const TYPE<T> &value, QVariant *target) {                        \
@@ -156,8 +159,22 @@ bool deserialize(const QVariant &value, TYPE<T> *target) {                      
 
 QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS(QList);
 QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS(QVector);
-
 #undef QN_DEFINE_LIST_SERIALIZATION_FUNCTIONS
 
+/* Serialization can actually fail for QVariant containers because of types
+ * unknown to QJson in them.
+ * 
+ * So we work that around by providing our own (de)serialization functions.
+ * Note that these are not perfectly symmetric, e.g. deserialization of 
+ * previously serialized QStringList will give a QVariantList. */
+
+void serialize(const QVariant &value, QVariant *target);
+bool deserialize(const QVariant &value, QVariant *target);
+
+void serialize(const QVariantList &value, QVariant *target);
+bool deserialize(const QVariant &value, QVariantList *target);
+
+void serialize(const QVariantMap &value, QVariant *target);
+bool deserialize(const QVariant &value, QVariantMap *target);
 
 #endif // QN_JSON_H
