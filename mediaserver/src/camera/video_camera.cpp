@@ -329,8 +329,10 @@ void QnVideoCamera::stopIfNoActivity()
     if (needStopSecondary)
         m_secondaryReader->pleaseStop();
 
+    /*
     if (needStopPrimary)
         m_primaryReader->stop();
     if (needStopSecondary)
         m_secondaryReader->stop();
+    */
 }
