@@ -9,7 +9,7 @@
 
 #include <utils/common/invocation_event.h>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
 #include <QtGui/private/qwidget_p.h>
 #include <qt_windows.h>
 #define NOMINMAX
@@ -84,7 +84,7 @@ public:
 
     void init(QWidget *widget);
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     void updateFrameStrut();
     bool calcSizeEvent(MSG *message, long *result);
     bool compositionChangedEvent(MSG *message, long *result);
@@ -105,7 +105,7 @@ public:
     /** Whether this api instance is functional. */
     bool hasApi;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     /** Whether DWM is available. */
     bool hasDwm;
 
@@ -127,7 +127,7 @@ public:
 bool QnDwmPrivate::isSupported() {
     bool result;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     /* We're using private Qt functions, so we have to check that the right runtime is used. */
     result = !qstrcmp(qVersion(), QT_VERSION_STR);
     if(!result)
@@ -145,7 +145,7 @@ void QnDwmPrivate::init(QWidget *widget) {
     this->widget = widget;
     hasApi = widget != NULL && qn_dwm_isSupported();
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     QLibrary dwmLib(QString::fromAscii("dwmapi"));
     dwmIsCompositionEnabled         = (PtrDwmIsCompositionEnabled)      dwmLib.resolve("DwmIsCompositionEnabled");
     dwmExtendFrameIntoClientArea    = (PtrDwmExtendFrameIntoClientArea) dwmLib.resolve("DwmExtendFrameIntoClientArea");
@@ -167,7 +167,7 @@ void QnDwmPrivate::init(QWidget *widget) {
 #endif // Q_OS_WIN
 }
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
 void QnDwmPrivate::updateFrameStrut() {
     QWidgetPrivate *wd = qt_widget_private(widget);
     QTLWExtra *tlwExtra = wd->maybeTopData();
@@ -212,7 +212,7 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     if(!d->hasDwm)
         return false;
 
@@ -235,7 +235,7 @@ bool QnDwm::isCompositionEnabled() const {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     if (!d->hasDwm)
         return false;
 
@@ -258,7 +258,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     if(!d->hasDwm)
         return false;
 
@@ -296,7 +296,7 @@ QMargins QnDwm::themeFrameMargins() const {
     if(!d->hasApi)
         return QMargins(-1, -1, -1, -1);
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     int frameX, frameY;
     if(d->widget->windowFlags() & Qt::FramelessWindowHint) {
         frameX = 0;
@@ -319,7 +319,7 @@ int QnDwm::themeTitleBarHeight() const {
     if(!d->hasApi)
         return -1;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     if((d->widget->windowFlags() & Qt::FramelessWindowHint) || (d->widget->windowFlags() & Qt::X11BypassWindowManagerHint)) {
         return 0;
     } else if(d->widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
@@ -338,7 +338,7 @@ QMargins QnDwm::currentFrameMargins() const {
     if(!d->hasApi)
         return errorValue;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     HWND hwnd = d->widget->winId();
     BOOL status = S_OK;
 
@@ -372,7 +372,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     HWND hwnd = d->widget->winId();
     BOOL status = S_OK;
 
@@ -399,7 +399,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     if(d->overrideFrameMargins) {
         /* Qt calculates frame margins based on window's style, 
          * not on actual margins specified by WM_NCCALCSIZE. We fix that. */
@@ -425,7 +425,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
     return false;
 }
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
 bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     if(d->widget == NULL)
         return false;

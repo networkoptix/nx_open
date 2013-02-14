@@ -7,7 +7,7 @@
 class QnDwmPrivate;
 
 class QnDwm: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QnDwm(QWidget *widget);
@@ -89,7 +89,7 @@ public:
      */
     bool widgetEvent(QEvent *event);
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
     /**
      * This function is to be called from widget's <tt>winEvent</tt> handler.
      * 
