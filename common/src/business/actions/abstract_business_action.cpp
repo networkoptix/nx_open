@@ -21,7 +21,7 @@ namespace BusinessActionType {
         return QObject::tr("Unknown (%1)").arg((int)val);
     }
 
-    bool isResourceRequired(Value val) {
+    bool requiresCameraResource(Value val) {
         switch(val) {
             case BA_NotDefined:         return false;
             case BA_CameraOutput:       return true;
@@ -31,6 +31,15 @@ namespace BusinessActionType {
             case BA_SendMail:           return false;
             case BA_Alert:              return false;
             case BA_ShowPopup:          return false;
+        }
+        return false;
+    }
+
+    bool requiresUserResource(Value val) {
+        switch(val) {
+            case BA_SendMail:           return true;
+        default:
+            break;
         }
         return false;
     }
