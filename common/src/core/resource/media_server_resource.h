@@ -67,8 +67,10 @@ public:
 
     QString getVersion() const;
     void setVersion(const QString& version);
+
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
+
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
     void panicModeChanged(const QnMediaServerResourcePtr &resource);

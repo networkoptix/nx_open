@@ -37,7 +37,7 @@ private slots:
 private:
     void init();
     void init(const QUrl& url, int reconnectTimeout);
-    void replaceResource(QnResourcePtr resource);
+    bool updateResource(QnResourcePtr resource, bool insert = true);
     void processResources(const QnResourceList& resources);
     void processLicenses(const QnLicenseList& licenses);
     void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
