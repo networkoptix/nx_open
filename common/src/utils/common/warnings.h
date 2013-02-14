@@ -78,6 +78,10 @@ namespace detail {
             return s.arg(text);
         }
 
+        inline QString operator<<(const QString &s, void *arg) {
+            return textstream_operator_lshift(s, arg);
+        }
+
         inline QString operator<<(const QString &s, const void *arg) {
             return textstream_operator_lshift(s, arg);
         }

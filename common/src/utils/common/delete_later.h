@@ -24,11 +24,11 @@ inline void qnDeleteLater(QObject *object) {
 #ifdef QN_HAS_PRIVATE_INCLUDES
         int loopLevel = QThreadData::get2(thread)->loopLevel;
         if(loopLevel == 0) {
-            /*qnCritical(
+            qnCritical(
                 "No event loop is running in thread %1@%2, to which the given object belongs. Object will not be deleted.", 
                 object->thread()->metaObject()->className(), 
                 static_cast<void *>(object->thread())
-            );*/
+            );
         }
 #endif
     }
