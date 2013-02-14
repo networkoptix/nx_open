@@ -65,7 +65,7 @@ protected:
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
-#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
+#ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 

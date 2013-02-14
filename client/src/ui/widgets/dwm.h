@@ -1,8 +1,12 @@
 #ifndef QN_DMW_H
 #define QN_DMW_H
 
-#include <QWidget>
-#include <QMargins>
+#include <QtCore/QMargins>
+#include <QtGui/QWidget>
+
+#if defined(Q_OS_WIN) && defined(QN_HAS_PRIVATE_INCLUDES)
+#   define QN_HAS_DWM
+#endif
 
 class QnDwmPrivate;
 
@@ -89,7 +93,7 @@ public:
      */
     bool widgetEvent(QEvent *event);
 
-#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
+#if defined(Q_OS_WIN)
     /**
      * This function is to be called from widget's <tt>winEvent</tt> handler.
      * 
