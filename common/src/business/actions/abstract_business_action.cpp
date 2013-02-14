@@ -76,7 +76,7 @@ void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {
     m_resources = resources;
 }
 
-const QnResourceList& QnAbstractBusinessAction::getResources() {
+const QnResourceList& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 

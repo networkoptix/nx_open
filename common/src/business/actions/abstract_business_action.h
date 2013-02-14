@@ -76,7 +76,7 @@ public:
     */
     void setResources(const QnResourceList& resources);
 
-    const QnResourceList& getResources();
+    const QnResourceList& getResources() const;
 
     void setParams(const QnBusinessParams& params);
     const QnBusinessParams& getParams() const;
