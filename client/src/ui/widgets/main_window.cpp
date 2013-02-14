@@ -549,7 +549,7 @@ void QnMainWindow::dropEvent(QDropEvent *event) {
     event->acceptProposedAction();
 }
 
-#if defined(Q_OS_WIN) &&!defined(NO_PRIVATE_INCLUDES)
+#ifdef Q_OS_WIN
 bool QnMainWindow::winEvent(MSG *message, long *result)
 {
     if(m_dwm->widgetWinEvent(message, result))

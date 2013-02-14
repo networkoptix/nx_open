@@ -1,6 +1,17 @@
 #ifndef QN_WARNINGS_H
 #define QN_WARNINGS_H
 
+#if defined(_MSC_VER) && _MSC_VER<1600 
+// TODO: msvc2008, remove this hell after transition to msvc2010
+#   ifdef _WIN64
+namespace std { typedef __int64 intptr_t; }
+#   else
+namespace std { typedef __int32 intptr_t; }
+#   endif
+#else
+#   include <cstdint> /* For std::intptr_t. */
+#endif
+
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
@@ -65,6 +76,10 @@ namespace detail {
             QTextStream stream(&text, QIODevice::WriteOnly);
             stream << arg;
             return s.arg(text);
+        }
+
+        inline QString operator<<(const QString &s, void *arg) {
+            return textstream_operator_lshift(s, arg);
         }
 
         inline QString operator<<(const QString &s, const void *arg) {

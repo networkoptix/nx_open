@@ -1,13 +1,12 @@
 #ifndef QN_DELETE_LATER_H
 #define QN_DELETE_LATER_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include "warnings.h"
 
-#ifdef QN_DELETE_LATER_DEBUG
-#   include <QThread>
+#ifdef QN_HAS_PRIVATE_INCLUDES
+#   include <QtCore/QThread>
 #   include <QtCore/private/qthread_p.h>
-#   include "warnings.h"
 #endif
 
 inline void qnDeleteLater(QObject *object) {
@@ -22,7 +21,7 @@ inline void qnDeleteLater(QObject *object) {
     } else {
         object->deleteLater();
 
-#ifdef QN_DELETE_LATER_DEBUG
+#ifdef QN_HAS_PRIVATE_INCLUDES
         int loopLevel = QThreadData::get2(thread)->loopLevel;
         if(loopLevel == 0) {
             qnCritical(
