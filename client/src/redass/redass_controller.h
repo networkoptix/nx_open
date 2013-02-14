@@ -11,6 +11,8 @@ class QnRedAssController: public QThread
 {
     Q_OBJECT
 public:
+    enum Mode { Mode_Auto, Mode_ForceHQ, Mode_ForceLQ };
+
     QnRedAssController();
 
     static QnRedAssController* instance();
@@ -18,6 +20,9 @@ public:
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
     int counsumerCount() const;
+
+    void setMode(Mode mode);
+    Mode getMode() const;
 
 public slots:
     /* Inform controller that not enough data or CPU for stream */
@@ -61,6 +66,7 @@ private:
     int m_hiQualityRetryCounter;
     int m_timerTicks;    // onTimer ticks count
     qint64 m_lastLqTime; // latest HQ->LQ switch time
+    Mode m_mode;
 private:
     QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed = INT_MAX);

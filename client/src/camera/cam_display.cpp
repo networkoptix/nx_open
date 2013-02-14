@@ -234,7 +234,6 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 			{
 				QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
                 qnRedAssController->onSlowStream(reader);
-				//reader->setQuality(MEDIA_Quality_Low, true);
 			}
 		}
 	}

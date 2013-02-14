@@ -32,7 +32,6 @@ public:
     const QnStatistics* getStatistics(int channel = 0);
     QnCamDisplay* getCamDisplay();
 
-    void setQuality(QnStreamQuality q, bool increase);
     qint64 getCurrentTime() const;
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
