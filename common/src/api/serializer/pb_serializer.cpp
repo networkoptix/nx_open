@@ -1050,16 +1050,26 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
     businessRule->setEventType(parsePbBusinessEventType(pb_businessRule.eventtype()));
 
     QnResourceList eventResources;
-    for (int i = 0; i < pb_businessRule.eventresource_size(); i++)
-        eventResources << qnResPool->getResourceById(pb_businessRule.eventresource(i));
+    for (int i = 0; i < pb_businessRule.eventresource_size(); i++) {
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i));
+        if (resource)
+            eventResources << resource;
+        else
+            qWarning() << "NULL event resource while reading rule" << pb_businessRule.id();
+    }
     businessRule->setEventResources(eventResources);
     businessRule->setEventParams(deserializeBusinessParams(pb_businessRule.eventcondition().c_str()));
     businessRule->setEventState((ToggleState::Value)pb_businessRule.eventstate());
 
     businessRule->setActionType(parsePbBusinessActionType(pb_businessRule.actiontype()));
     QnResourceList actionResources;
-    for (int i = 0; i < pb_businessRule.actionresource_size(); i++) //destination resource can belong to another server
-        actionResources << qnResPool->getResourceById(pb_businessRule.actionresource(i), QnResourcePool::rfAllResources);
+    for (int i = 0; i < pb_businessRule.actionresource_size(); i++) {//destination resource can belong to another server
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.actionresource(i), QnResourcePool::rfAllResources);
+        if (resource)
+            actionResources << resource;
+        else
+            qWarning() << "NULL action resource while reading rule" << pb_businessRule.id();
+    }
     businessRule->setActionResources(actionResources);
     businessRule->setActionParams(deserializeBusinessParams(pb_businessRule.actionparams().c_str()));
 

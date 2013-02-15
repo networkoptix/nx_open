@@ -37,15 +37,25 @@ bool QnSelectCamerasDialogDelegate::validate(const QnResourceList &selectedResou
 // -------------------------------------------------------------------------- //
 // QnSelectCamerasDialog 
 // -------------------------------------------------------------------------- //
-QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, QnWorkbenchContext *context) :
+QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, Qn::NodeType rootNodeType) :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnSelectCamerasDialog),
     m_delegate(NULL)
 {
     ui->setupUi(this);
 
-    m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
+    m_flat = rootNodeType == Qn::UsersNode; //TODO: #GDM servers?
+    m_resourceModel = new QnResourcePoolModel(this, rootNodeType, m_flat);
+
+    switch (rootNodeType) {
+    case Qn::UsersNode:
+        setWindowTitle(tr("Select users..."));
+        break;
+    default: //default value is "Select cameras...", consistent to default value of rootNodeType
+        break;
+    }
+
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
 
     /*
@@ -67,8 +77,18 @@ QnSelectCamerasDialog::~QnSelectCamerasDialog()
 QnResourceList QnSelectCamerasDialog::getSelectedResources() const {
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
-        //servers
+        //root nodes
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn);
+        if (m_flat) {
+            QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
+            bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+            if (!checked)
+                continue;
+            QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if(resource)
+                 result.append(resource);
+        }
+        else
         for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
             //cameras
             QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
@@ -86,8 +106,16 @@ QnResourceList QnSelectCamerasDialog::getSelectedResources() const {
 
 void QnSelectCamerasDialog::setSelectedResources(const QnResourceList &selected) {
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
-        //servers
+        //root nodes
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn);
+        if (m_flat) {
+            QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
+            QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
+            bool checked = selected.contains(resource);
+            m_resourceModel->setData(checkedIdx,
+                                     checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+        }
+        else
         for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
             //cameras
             QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);

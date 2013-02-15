@@ -168,7 +168,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
-        bool isResourceRequired = BusinessActionType::isResourceRequired(m_model->actionType());
+        bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
+                || BusinessActionType::requiresUserResource(m_model->actionType());
         ui->actionResourcesFrame->setVisible(isResourceRequired);
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
@@ -351,7 +352,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    QnSelectCamerasDialog dialog(this, context()); //TODO: #GDM or servers?
+    QnSelectCamerasDialog dialog(this); //TODO: #GDM or servers?
     dialog.setSelectedResources(m_model->eventResources());
     if (dialog.exec() != QDialog::Accepted)
         return;
@@ -362,7 +363,16 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    QnSelectCamerasDialog dialog(this, context());
+    Qn::NodeType node = BusinessActionType::requiresCameraResource(m_model->actionType())
+            ? Qn::ServersNode
+            : BusinessActionType::requiresUserResource(m_model->actionType())
+              ? Qn::UsersNode
+              : Qn::BastardNode;
+    if (node == Qn::BastardNode)
+        return;
+
+    //TODO: #GDM delegates!!!!
+    QnSelectCamerasDialog dialog(this, node);
     dialog.setSelectedResources(m_model->actionResources());
     if (dialog.exec() != QDialog::Accepted)
         return;

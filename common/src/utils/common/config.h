@@ -2,6 +2,18 @@
 #define QN_COMMON_CONFIG_H
 
 // -------------------------------------------------------------------------- //
+// Application settings. OK to change.
+// -------------------------------------------------------------------------- //
+/** 
+ * \def QN_HAS_PRIVATE_INCLUDES
+ * 
+ * Define if Qt private headers are available on your system.
+ */
+#define QN_HAS_PRIVATE_INCLUDES
+
+
+
+// -------------------------------------------------------------------------- //
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
@@ -12,6 +24,7 @@
 /* 
  * Addition free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
+
 
 
 // -------------------------------------------------------------------------- //
@@ -94,6 +107,7 @@
 #   pragma warning(error: 4715) /* not all control paths return a value */
 #   pragma warning(error: 4005) /* macro redefinition */
 #endif
+
 
 
 // -------------------------------------------------------------------------- //

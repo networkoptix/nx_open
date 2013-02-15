@@ -6,6 +6,7 @@
 #include "sendmail_business_action.h"
 
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 namespace BusinessActionParameters {
@@ -61,19 +62,18 @@ QString QnSendMailBusinessAction::getMessageBody() const {
         arg(!m_eventResourceName.isEmpty() ? m_eventResourceName : QObject::tr("UNKNOWN")).
         arg(!m_eventResourceUrl.isEmpty() ? m_eventResourceUrl : QObject::tr("UNKNOWN"));
     text += m_eventDescription;
-
-    text += QObject::tr("Action parameters:\n");
-    //printing action params
-    for( QnBusinessParams::const_iterator
-        it = getParams().begin();
-        it != getParams().end();
-        ++it )
-    {
-        text += QLatin1String("  ") + it.key() + QLatin1String(" = ") + it.value().toString() + QLatin1String("\n");
-    }
-
     if (getAggregationCount() > 1)
         text += QString(QLatin1String("  (repeated %1 times)")).arg(getAggregationCount());
+
+    text += QObject::tr("Adresates:\n");
+    QnResourceList resources = getResources();
+    foreach (const QnUserResourcePtr &user, resources.filtered<QnUserResource>())
+        text += user->getName() + QLatin1Char('\n');
+
+    QString additional = BusinessActionParameters::getEmailAddress(getParams());
+    QStringList receivers = additional.split(QLatin1Char(';'), QString::SkipEmptyParts);
+    foreach (const QString &receiver, receivers)
+        text += receiver + QLatin1Char('\n');
 
     return text;
 }

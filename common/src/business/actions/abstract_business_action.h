@@ -46,8 +46,9 @@ namespace BusinessActionType
 
     QString toString( Value val );
 
-
-    bool isResourceRequired(Value val);
+    //TODO: #GDM fix to resourceTypeRequired: None, Camera, Server, User, etc
+    bool requiresCameraResource(Value val);
+    bool requiresUserResource(Value val);
 
     bool hasToggleState(Value val);
 }
@@ -75,7 +76,7 @@ public:
     */
     void setResources(const QnResourceList& resources);
 
-    const QnResourceList& getResources();
+    const QnResourceList& getResources() const;
 
     void setParams(const QnBusinessParams& params);
     const QnBusinessParams& getParams() const;

@@ -16,12 +16,14 @@ class QnSelectResourcesDialogButton: public QPushButton {
 public:
     explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
 
-    QnResourceList resources();
+    QnResourceList resources() const;
     void setResources(QnResourceList resources);
 
-    QnSelectCamerasDialogDelegate* dialogDelegate();
+    QnSelectCamerasDialogDelegate* dialogDelegate() const;
     void setDialogDelegate(QnSelectCamerasDialogDelegate* delegate);
 
+    Qn::NodeType nodeType() const;
+    void setNodeType(Qn::NodeType nodeType);
 signals:
     void commit();
 
@@ -34,6 +36,7 @@ private slots:
 private:
     QnResourceList m_resources;
     QnSelectCamerasDialogDelegate* m_dialogDelegate;
+    Qn::NodeType m_nodeType;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate {

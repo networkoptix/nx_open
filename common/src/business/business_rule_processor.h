@@ -92,10 +92,9 @@ private:
 
     struct RunningRuleInfo
     {
-        RunningRuleInfo(): isActionRunning(false) {}
-        QnAbstractBusinessEventPtr bEvent;
-        QSet<QnId> resources;
-        bool isActionRunning;
+        RunningRuleInfo() {}
+        QMap<QnId, QnAbstractBusinessEventPtr> resources; 
+        QSet<QnId> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
 

@@ -76,8 +76,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
         bool isServer = resource.dynamicCast<QnMediaServerResource>();
         bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
+        bool isUser = resource.dynamicCast<QnUserResource>();
 
-        if (!isServer && !isCamera)
+        if (!isServer && !isCamera && !isUser)
             return;
 
         // If the resource is mediaServer then ignore if not this server
