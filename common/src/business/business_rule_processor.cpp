@@ -384,7 +384,8 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 {
     QString ruleId = rule->getUniqueId();
     RunningRuleInfo runtimeRule = m_rulesInProgress.value(ruleId);
-    if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty()) 
+    bool isToggledAction = BusinessActionType::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
+    if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
     {
         foreach(const QnId& resId, runtimeRule.isActionRunning)
         {
