@@ -92,9 +92,9 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
         if(insert) {
             qnResPool->addResource(resource);
             result = true;
-        	if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
-            	determineOptimalIF(mediaServer.data());
         }
+        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
+            determineOptimalIF(mediaServer.data());
     } 
     else {
         ownResource->update(resource);
@@ -115,7 +115,7 @@ void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaSe
     if (url.isEmpty())
         url = QLatin1String("127.0.0.1");
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    mediaServer->apiConnection()->setProxyAddr(url, port);
+    mediaServer->apiConnection()->setProxyAddr(resolveAddress(url).toString(), port);
     disconnect(mediaServer, NULL, this, NULL);
     connect(mediaServer, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &)));
     mediaServer->determineOptimalNetIF();
