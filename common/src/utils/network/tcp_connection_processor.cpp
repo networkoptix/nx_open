@@ -245,12 +245,22 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         d->socket->send(response.data(), response.size());
 }
 
-bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
+bool QnTCPConnectionProcessor::sendChunk( const QnByteArray& chunk )
+{
+    return sendChunk( chunk.data(), chunk.size() );
+}
+
+bool QnTCPConnectionProcessor::sendChunk( const QByteArray& chunk )
+{
+    return sendChunk( chunk.data(), chunk.size() );
+}
+
+bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
 {
     Q_D(QnTCPConnectionProcessor);
-    QByteArray result = QByteArray::number(chunk.size(),16);
+    QByteArray result = QByteArray::number(size,16);
     result.append("\r\n");
-    result.append(chunk.data(), chunk.size());
+    result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
     result.append("\r\n");
 
     int sended;

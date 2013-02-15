@@ -26,6 +26,8 @@ public:
     int getSocketTimeout();
 
     bool sendChunk(const QnByteArray& chunk);
+    bool sendChunk(const QByteArray& chunk);
+    bool sendChunk(const char* data, int size);
 
     void execute(QMutex& mutex);
     virtual void pleaseStop();

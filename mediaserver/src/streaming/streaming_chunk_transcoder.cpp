@@ -44,7 +44,10 @@ StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
 {
     m_transcodeThreads.resize( TRANSCODE_THREAD_COUNT );
     for( int i = 0; i < m_transcodeThreads.size(); ++i )
+    {
         m_transcodeThreads[i] = new StreamingChunkTranscoderThread();
+        m_transcodeThreads[i]->start();
+    }
 }
 
 StreamingChunkTranscoder::~StreamingChunkTranscoder()
@@ -248,20 +251,20 @@ bool StreamingChunkTranscoder::startTranscoding(
         return false;
     }
     //TODO/IMPL set correct video parameters
-    if( transcoder->setVideoCodec( CODEC_ID_H264, QnTranscoder::TM_DirectStreamCopy ) != 0 )
+    if( transcoder->setVideoCodec( CODEC_ID_MPEG2VIDEO, /*QnTranscoder::TM_DirectStreamCopy*/ QnTranscoder::TM_FfmpegTranscode ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
-    if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
-    {
-        NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-            arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
-            arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-        return false;
-    }
+    //if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
+    //{
+    //    NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
+    //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
+    //        arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
+    //    return false;
+    //}
 
     //TODO/IMPL selecting least used transcoding thread from pool
     StreamingChunkTranscoderThread* transcoderThread = m_transcodeThreads[rand() % m_transcodeThreads.size()];

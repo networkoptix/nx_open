@@ -72,6 +72,8 @@ private:
     QnCompressedAudioDataPtr m_lastAudioFrame;
     std::auto_ptr<MediaStreamCache> m_liveCache;
     MediaIndex m_mediaIndex;
+
+    bool ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader );
 };
 
 #endif // __VIDEO_CAMERA_H__

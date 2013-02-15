@@ -142,7 +142,17 @@ public:
 
         CacheItemData* itemData = m_cache.take( key );
         if( !itemData )
-            return NULL;
+        {
+            if( !m_itemProvider )
+                return NULL;
+
+            //requesting item from item provider
+            int itemCost = 1;
+            CachedType* item = m_itemProvider->get( key, &itemCost );
+            if( !item )
+                return NULL;
+            itemData = new CacheItemData( item, itemCost );
+        }
 
         m_usedItemsTotalCost += itemData->cost;
         const int cacheSizeBak = m_cache.size();
@@ -152,6 +162,7 @@ public:
             "ItemCache::takeForUse",
             QString("cacheSizeBak = %1, m_cache.size() = %2, m_cache.maxCost() = %3").arg(cacheSizeBak).arg(m_cache.size()).arg(m_cache.maxCost()).toLatin1().data() );
 
+        ++itemData->usageCount;
         m_usedItems.insert( std::make_pair( key, itemData ) );
         return itemData->item;
     }

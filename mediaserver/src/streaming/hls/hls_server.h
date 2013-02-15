@@ -55,6 +55,7 @@ private:
     StreamingChunk::SequentialReadingContext m_chunkReadCtx;
     QMutex m_mutex;
     QWaitCondition m_cond;
+    bool m_switchToChunkedTransfer;
     bool m_useChunkedTransfer;
     StreamingChunkCacheKey m_currentChunkKey;
 

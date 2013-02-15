@@ -77,14 +77,14 @@ private:
     /*!
         E.g., if \a targetDurationMSec is 10 sec, than value of 20 (or closest from the left key frame timestamp) sec will be returned for \a desiredStartTime of 20-29
         \param desiredStartTime micros
-        \param generateChunkListNonSafe millis
+        \param targetDurationMicros micros
     */
     quint64 getClosestChunkStartTimestamp(
         quint64 desiredStartTime,
-        unsigned int targetDurationMSec ) const;
+        unsigned int targetDurationMicros ) const;
     unsigned int generateChunkListNonSafe(
         quint64 desiredStartTime,
-        unsigned int targetDurationMSec,
+        unsigned int targetDurationMicros,
         unsigned int chunksToGenerate,
         std::vector<ChunkData>* const chunkList,
         bool allowSmallerLastChunk ) const;

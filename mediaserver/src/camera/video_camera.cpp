@@ -244,12 +244,15 @@ QnAbstractMediaStreamDataProviderPtr QnVideoCamera::getLiveReader(QnResource::Co
     if (m_primaryReader == 0 && !m_resource->isDisabled() && m_resource->isInitialized())
     {
         createReader(QnResource::Role_LiveVideo);
+        if( m_primaryReader )
+            ensureLiveCacheStarted( m_primaryReader );
         createReader(QnResource::Role_SecondaryLiveVideo);
         //if (m_primaryReader)
         //    m_primaryReader->start();
         //if (m_secondaryReader)
         //    m_secondaryReader->start();
     }
+
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 
@@ -374,6 +377,26 @@ bool QnVideoCamera::ensureLiveCacheStarted()
 
     //connecting live cache to reader
     reader->addDataProcessor( m_liveCache.get() );
+
+    return true;
+}
+
+//!Starts caching live stream, if not started
+/*!
+    \return true, if started, false if failed to start
+*/
+bool QnVideoCamera::ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader )
+{
+    if( m_liveCache.get() )
+        return true;
+
+    if( !primaryReader )
+        return false;
+
+    m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
+
+    //connecting live cache to reader
+    primaryReader->addDataProcessor( m_liveCache.get() );
 
     return true;
 }

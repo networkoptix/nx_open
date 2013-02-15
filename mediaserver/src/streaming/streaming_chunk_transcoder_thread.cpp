@@ -39,6 +39,7 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
 
 StreamingChunkTranscoderThread::StreamingChunkTranscoderThread()
 {
+    setObjectName( QLatin1String("StreamingChunkTranscoderThread") );
 }
 
 StreamingChunkTranscoderThread::~StreamingChunkTranscoderThread()
@@ -153,11 +154,14 @@ void StreamingChunkTranscoderThread::run()
             NX_LOG( QString::fromLatin1("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(res).arg(transcodeIter->second->msTranscoded), cl_logWARNING );
             removeTranscodingNonSafe( transcodeIter, false );
+            continue;
         }
 
         //TODO/IMPL protect from discontinuity in timestamp
         if( transcodeIter->second->prevPacketTimestamp == -1 )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;
+        if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000 )
+            transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;   //discontinuity
         if( srcMediaData->timestamp > transcodeIter->second->prevPacketTimestamp )
         {
             transcodeIter->second->msTranscoded += (srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) / 1000;
@@ -175,7 +179,7 @@ void StreamingChunkTranscoderThread::run()
             for( ;; )
             {
                 resultStream.clear();
-                int res = transcodeIter->second->transcoder->transcodePacket( QnAbstractMediaDataPtr(), resultStream );
+                int res = transcodeIter->second->transcoder->transcodePacket( QnAbstractMediaDataPtr( new QnEmptyMediaData() ), resultStream );
                 if( res || resultStream.size() == 0 )
                     break;
                 transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );

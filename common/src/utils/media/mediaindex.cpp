@@ -58,8 +58,8 @@ unsigned int MediaIndex::generateChunkList(
         return 0;
 
     return generateChunkListNonSafe(
-        getClosestChunkStartTimestamp( desiredStartTime, targetDurationMSec ),
-        targetDurationMSec,
+        desiredStartTime,
+        targetDurationMSec*MICROS_IN_MS,
         chunksToGenerate,
         chunkList,
         true );
@@ -76,35 +76,82 @@ unsigned int MediaIndex::generateChunkListForLivePlayback(
         return 0;
 
     return generateChunkListNonSafe(
-        getClosestChunkStartTimestamp( *(--m_timestampIndex.end()) - chunksToGenerate*targetDurationMSec*MICROS_IN_MS, targetDurationMSec ),
-        targetDurationMSec,
+        *(--m_timestampIndex.end()) - chunksToGenerate*targetDurationMSec*MICROS_IN_MS,
+        targetDurationMSec*MICROS_IN_MS,
         chunksToGenerate,
         chunkList,
         false );
 }
 
-quint64 MediaIndex::getClosestChunkStartTimestamp( quint64 desiredStartTime, unsigned int targetDurationMSec ) const
+quint64 MediaIndex::getClosestChunkStartTimestamp( quint64 desiredStartTime, unsigned int targetDurationMicros ) const
 {
     if( m_timestampIndex.empty() )
         return 0;
     if( m_timestampIndex.size() == 1 )
         return *m_timestampIndex.begin();
 
-    const quint64 alignedTimstamp = desiredStartTime / 1000 / targetDurationMSec;
-    TimestampIndexType::const_iterator it = m_timestampIndex.upper_bound( alignedTimstamp );
+    const quint64 alignedTimestamp = desiredStartTime / targetDurationMicros * targetDurationMicros;
+    TimestampIndexType::const_iterator it = m_timestampIndex.upper_bound( alignedTimestamp );
     if( it != m_timestampIndex.begin() )
         --it;
     return *it;
 }
 
+#if 1
 unsigned int MediaIndex::generateChunkListNonSafe(
     const quint64 desiredStartTime,
-    const unsigned int targetDurationMSec,
+    const unsigned int targetDurationMicros,
+    const unsigned int chunksToGenerate,
+    std::vector<ChunkData>* const chunkList,
+    const bool /*allowSmallerLastChunk*/ ) const
+{
+    //TODO/IMPL allowSmallerLastChunk
+
+    Q_ASSERT( targetDurationMicros > 0 );
+
+    if( m_timestampIndex.empty() )
+        return 0;
+
+    chunkList->reserve( chunkList->size() + chunksToGenerate );
+
+    unsigned int chunksGenerated = 0;
+    quint64 alignedBorder = desiredStartTime / targetDurationMicros * targetDurationMicros;
+    // if desiredStartTime is 25 and targetDurationMicros 10, then alignedBorder == 20
+
+    //searching for timestamp closest to currentChunkStart from the left
+    TimestampIndexType::const_iterator curChunkIter = m_timestampIndex.upper_bound( alignedBorder );
+    if( curChunkIter != m_timestampIndex.begin() )
+        --curChunkIter;
+    for( ;
+        chunksGenerated < chunksToGenerate;
+        ++chunksGenerated )
+    {
+        alignedBorder += targetDurationMicros;
+        TimestampIndexType::const_iterator nextChunkStartIter = m_timestampIndex.upper_bound( alignedBorder );
+        if( nextChunkStartIter != m_timestampIndex.begin() )
+            --nextChunkStartIter;
+
+        if( nextChunkStartIter == curChunkIter )
+            break;
+
+        chunkList->push_back( ChunkData(
+            *curChunkIter,
+            *nextChunkStartIter - *curChunkIter,
+            *curChunkIter / targetDurationMicros + 1 ) );
+        curChunkIter = nextChunkStartIter;
+    }
+
+    return chunksGenerated > 0;
+}
+#else
+unsigned int MediaIndex::generateChunkListNonSafe(
+    const quint64 desiredStartTime,
+    const unsigned int targetDurationMicros,
     const unsigned int chunksToGenerate,
     std::vector<ChunkData>* const chunkList,
     const bool allowSmallerLastChunk ) const
 {
-    Q_ASSERT( targetDurationMSec > 0 );
+    Q_ASSERT( targetDurationMicros > 0 );
 
     chunkList->reserve( chunkList->size() + chunksToGenerate );
 
@@ -117,7 +164,7 @@ unsigned int MediaIndex::generateChunkListNonSafe(
         ++chunksGenerated )
     {
         //searching for farest key frame not further than \a targetDurationMSec
-        TimestampIndexType::const_iterator nextChunkIter = m_timestampIndex.lower_bound( currentChunkStart+targetDurationMSec );
+        TimestampIndexType::const_iterator nextChunkIter = m_timestampIndex.lower_bound( currentChunkStart+targetDurationMicros );
         if( nextChunkIter == m_timestampIndex.end() )
         {
             if( !allowSmallerLastChunk )
@@ -125,16 +172,18 @@ unsigned int MediaIndex::generateChunkListNonSafe(
             else
                 nextChunkIter = (++m_timestampIndex.rbegin()).base();
         }
+        const quint64 nextChunkStartTimestamp = *nextChunkIter;
 
-        if( *nextChunkIter <= currentChunkStart )   //< is an actually assert condition
+        if( nextChunkStartTimestamp <= currentChunkStart )   //< is an actually assert condition
             break;
 
         chunkList->push_back( ChunkData(
             currentChunkStart,
-            *nextChunkIter - currentChunkStart,
-            currentChunkStart / (targetDurationMSec*MICROS_IN_MS) + 1 ) );
-        currentChunkStart = *nextChunkIter;
+            nextChunkStartTimestamp - currentChunkStart,
+            currentChunkStart / targetDurationMicros + 1 ) );
+        currentChunkStart = nextChunkStartTimestamp;
     }
 
     return chunksGenerated > 0;
 }
+#endif

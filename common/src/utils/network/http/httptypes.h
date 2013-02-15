@@ -149,6 +149,7 @@ namespace nx_http
             undefined = 0,
             _continue = 100,
             ok = 200,
+            noContent = 204,
             multipleChoices = 300,
             badRequest = 400,
             unauthorized = 401,

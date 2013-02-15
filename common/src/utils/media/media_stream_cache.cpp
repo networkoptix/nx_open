@@ -56,7 +56,6 @@ MediaStreamCache::MediaStreamCache(
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 )
 {
-    Q_ASSERT( false );
 }
 
 //!Implementation of QnAbstractDataReceptor::canAcceptData
@@ -65,7 +64,7 @@ bool MediaStreamCache::canAcceptData() const
     return true;
 }
 
-static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 700000;
+static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 3600*1000*1000UL;  //1 hour
 
 //!Implementation of QnAbstractDataReceptor::putData
 void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
@@ -80,15 +79,17 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
     //calculating timestamp, because we cannot rely on data->timestamp, since it may contain discontinuity in case of reconnect to camera
     if( m_prevPacketSrcTimestamp == -1 )
         m_prevPacketSrcTimestamp = data->timestamp;
+
+    if( qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF )
+    {
+        //timestamp discontinuity
+        m_prevPacketSrcTimestamp = data->timestamp;
+    }
+
     if( data->timestamp > m_prevPacketSrcTimestamp )
     {
-        qint64 srcTimestampDiff = data->timestamp - m_prevPacketSrcTimestamp;
-        if( srcTimestampDiff > MAX_ALLOWED_TIMESTAMP_DIFF )
-        {
-            m_prevPacketSrcTimestamp = data->timestamp; //discontinuity
-            srcTimestampDiff = 0;
-        }
-        m_currentPacketTimestamp += srcTimestampDiff;
+        m_currentPacketTimestamp += data->timestamp - m_prevPacketSrcTimestamp;
+        m_prevPacketSrcTimestamp = data->timestamp;
     }
 
     if( isKeyFrame )

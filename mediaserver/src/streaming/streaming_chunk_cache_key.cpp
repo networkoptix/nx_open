@@ -11,8 +11,11 @@
 
 
 StreamingChunkCacheKey::StreamingChunkCacheKey()
+:
+    m_channel( 0 ),
+    m_startTimestamp( 0 ),
+    m_duration( 0 )
 {
-    Q_ASSERT( false );
 }
 
 /*!
@@ -33,7 +36,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_uniqueResourceID( uniqueResourceID ),
     m_channel( channel ),
     m_containerFormat( containerFormat ),
-    m_startTimestamp(startTimestamp  ),
+    m_startTimestamp( startTimestamp ),
     m_duration( duration )
     //,m_auxiliaryParams( auxiliaryParams )
 {

@@ -11,7 +11,6 @@ StreamingChunk::SequentialReadingContext::SequentialReadingContext()
 :
     m_currentOffset( 0 )
 {
-    Q_ASSERT( false );
 }
 
 
@@ -20,7 +19,6 @@ StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
     m_params( params ),
     m_isOpenedForModification( false )
 {
-    Q_ASSERT( false );
 }
 
 const StreamingChunkCacheKey& StreamingChunk::params() const

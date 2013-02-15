@@ -16,6 +16,7 @@ QnSoapServer::QnSoapServer()
     m_terminated( false ),
     m_initialized( false )
 {
+    setObjectName( QLatin1String("QnSoapServer") );
 }
 
 QnSoapServer::QnSoapServer( unsigned int port, const char* path )

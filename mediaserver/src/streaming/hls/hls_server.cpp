@@ -28,12 +28,14 @@ static const double DEFAULT_TARGET_DURATION = 10;
 static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
 static const QLatin1String HLS_PREFIX( "/hls/" );
 static const QLatin1String HLS_SESSION_PARAM_NAME( "hls_session" );
+static const int MS_IN_SEC = 1000;
 
 QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( TCPSocket* socket, QnTcpListener* owner )
 :
     QnTCPConnectionProcessor( socket, owner ),
     m_state( sReceiving ),
     m_currentChunk( NULL ),
+    m_switchToChunkedTransfer( false ),
     m_useChunkedTransfer( false )
 {
     m_readBuffer.reserve( READ_BUFFER_SIZE );
@@ -56,28 +58,37 @@ void QnHttpLiveStreamingProcessor::run()
         {
             case sReceiving:
                 if( !receiveRequest() )
-                    return;
+                    m_state = sDone;
                 break;
 
             case sSending:
             {
                 Q_ASSERT( !m_writeBuffer.isEmpty() );
 
-                int bytesSent = sendData( m_writeBuffer );
+                int bytesSent = 0;
+                if( m_useChunkedTransfer )
+                    bytesSent = sendChunk( m_writeBuffer ) ? m_writeBuffer.size() : -1;
+                else
+                    bytesSent = sendData( m_writeBuffer );
                 if( bytesSent < 0 )
                 {
                     NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Terminating connection...").
                         arg(remoteHostAddress()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
-                    return;
+                    m_state = sDone;
+                    break;
                 }
                 m_writeBuffer.remove( 0, bytesSent );
                 if( !m_writeBuffer.isEmpty() )
                     break;  //continuing sending
                 if( !prepareDataToSend() )
                 {
-                    NX_LOG( QString::fromLatin1("Finished downloading %1 data to %2. Closing connection...").
+                    NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Closing connection...").
                         arg(QLatin1String("entity_path")).arg(remoteHostAddress()), cl_logDEBUG1 );
-                    return;
+                    //sending empty chunk to signal EOF
+                    if( m_useChunkedTransfer )
+                        sendChunk( QByteArray() );
+                    m_state = sDone;
+                    break;
                 }
                 break;
             }
@@ -156,7 +167,7 @@ void QnHttpLiveStreamingProcessor::processRequest( const nx_http::Request& reque
 {
     nx_http::Response response;
     response.statusLine.version = request.requestLine.version;
-    response.headers.insert( std::make_pair( "Date", QDateTime::currentDateTime().toString("ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL get timezone
+    response.headers.insert( std::make_pair( "Date", QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL get timezone
     response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME" "QN_APPLICATION_VERSION ) );
     response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //findRequestedFile can override this
 
@@ -254,7 +265,7 @@ void QnHttpLiveStreamingProcessor::sendResponse( const nx_http::Response& respon
     //serializing response to internal buffer
     nx_http::HttpHeaders::const_iterator it = response.headers.find( "Transfer-Encoding" );
     if( it != response.headers.end() && it->second == "chunked" )
-        m_useChunkedTransfer = true;
+        m_switchToChunkedTransfer = true;
     m_writeBuffer.clear();
     response.serialize( &m_writeBuffer );
 
@@ -264,6 +275,15 @@ void QnHttpLiveStreamingProcessor::sendResponse( const nx_http::Response& respon
 bool QnHttpLiveStreamingProcessor::prepareDataToSend()
 {
     Q_ASSERT( m_writeBuffer.isEmpty() );
+
+    if( !m_currentChunk )
+        return false;
+
+    if( m_switchToChunkedTransfer )
+    {
+        m_useChunkedTransfer = true;
+        m_switchToChunkedTransfer = false;
+    }
 
     QMutexLocker lk( &m_mutex );
     for( ;; )
@@ -345,12 +365,13 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getLivePlaylist(
     std::vector<MediaIndex::ChunkData> chunkList;
     const MediaIndex& mediaIndex = *camera->mediaIndex();
     if( !mediaIndex.generateChunkListForLivePlayback(
-            DEFAULT_TARGET_DURATION,
+            DEFAULT_TARGET_DURATION * MS_IN_SEC,
             MIN_CHUNK_COUNT_IN_PLAYLIST,
-            &chunkList ) )
+            &chunkList )
+        || chunkList.empty() )
     {
         NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(mediaResource->getUniqueId()), cl_logWARNING );
-        return nx_http::StatusCode::internalServerError;
+        return nx_http::StatusCode::noContent;
     }
 
     nx_hls::Playlist playlist;
@@ -385,7 +406,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getLivePlaylist(
         ++i )
     {
         nx_hls::Chunk hlsChunk;
-        hlsChunk.duration = chunkList[i].duration;
+        hlsChunk.duration = chunkList[i].duration / 1000000.0;
         hlsChunk.url.setPath( HLS_PREFIX + mediaResource->getUniqueId() );
         foreach( RequestParamsType::value_type param, commonChunkParams )
             hlsChunk.url.addQueryItem( param.first, param.second );
@@ -450,7 +471,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         uniqueResourceID.toString(),
         channelIter != requestParams.end()
             ? channelIter->second.toInt()
-            : -1,   //any channel
+            : 0,   //any channel
         containerIter->second,
         startTimestamp,
         durationIter != requestParams.end()
@@ -486,6 +507,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
 
     response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
     response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
+    response->statusLine.version = nx_http::Version::http_1_1;
 
     return nx_http::StatusCode::ok;
 }
