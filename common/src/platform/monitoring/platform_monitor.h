@@ -121,7 +121,7 @@ public:
      * @returns                         Platform-specific string describing this logical partition,
      *                                  suitable to be shown to the user.
      */
-    virtual QString partitionByPath(const QString &path) { return QString(); }
+    virtual QString partitionByPath(const QString &path) { return QString(); Q_UNUSED(path); }
 
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)

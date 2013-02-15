@@ -86,11 +86,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     at_context_userChanged();
     updateControlButtons();
-
-    ui->horizontalSlider->setMaximum(1024);
-    ui->horizontalSlider->setLockedValue(512);
-    ui->horizontalSlider->setRecordedValue(600);
-    ui->horizontalSlider->setValue(712);
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()

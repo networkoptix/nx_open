@@ -18,7 +18,7 @@ public:
     virtual qreal totalRamUsage() override { return 0.0; }
     virtual QList<HddLoad> totalHddLoad() override { return QList<HddLoad>(); }
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return QList<PartitionSpace>(); }
-    virtual QString partitionByPath(const QString &path) override { return QString(); }
+    virtual QString partitionByPath(const QString &) override { return QString(); }
 };
 
 
@@ -154,6 +154,13 @@ QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInf
     QMutexLocker locker(&d->mutex);
 
     return d_func()->base->totalPartitionSpaceInfo();
+}
+
+QString QnGlobalMonitor::partitionByPath(const QString &path) {
+    Q_D(QnGlobalMonitor);
+    QMutexLocker locker(&d->mutex);
+
+    return d_func()->base->partitionByPath(path);
 }
 
 void QnGlobalMonitor::timerEvent(QTimerEvent *event) {

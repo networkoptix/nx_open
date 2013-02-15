@@ -47,6 +47,7 @@ public:
     virtual qreal totalRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
+    virtual QString partitionByPath(const QString &path) override;
 
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
