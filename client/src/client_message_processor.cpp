@@ -63,8 +63,13 @@ void QnClientMessageProcessor::stop()
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 {
+    QnResourceList newResources;
+
     foreach (const QnResourcePtr& resource, resources)
-        replaceResource(resource);
+        if(!updateResource(resource, false))
+            newResources.push_back(resource);
+
+    qnResPool->addResources(newResources);
 }
 
 void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
@@ -72,8 +77,9 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnClientMessageProcessor::replaceResource(QnResourcePtr resource)
+bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: 'insert' parameter is hacky. Get rid of it and write some nicer code.
 {
+    bool result = false;
     QnResourcePtr ownResource;
 
     QString guid = resource->getGuid();
@@ -83,17 +89,20 @@ void QnClientMessageProcessor::replaceResource(QnResourcePtr resource)
         ownResource = qnResPool->getResourceById(resource->getId());
 
     if (ownResource.isNull()) {
-        qnResPool->addResource(resource); // TODO: #Ivan
-
-        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
-            determineOptimalIF(mediaServer.data());
-    } else
+        if(insert) {
+            qnResPool->addResource(resource);
+            result = true;
+        	if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
+            	determineOptimalIF(mediaServer.data());
+        }
+    else {
         ownResource->update(resource);
+        result = true;
+    }
 
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
-}
 
 void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaServer)
 {
@@ -158,7 +167,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             return;
         }
 
-        replaceResource(message.resource);
+        updateResource(message.resource);
     }
     else if (message.eventType == Qn::Message_Type_ResourceDelete)
     {

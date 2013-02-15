@@ -53,11 +53,11 @@ void QnWorkbenchPtzMapperWatcher::sendRequest(const QnMediaServerResourcePtr &se
     if(camera->getStatus() != QnResource::Online && camera->getStatus() != QnResource::Recording)
         return;
 
-    if(server->getStatus() != QnResource::Online || server->getPrimaryIF().isNull())
+    if(server->getStatus() != QnResource::Online/* || server->getPrimaryIF().isNull()*/) // TODO: #Elric use new getter implemented by roma that tells whether server's connection is ready.
         return;
 
-    if(m_requests.contains(camera))
-        return; /* No duplicate requests. */
+    //if(m_requests.contains(camera)) // TODO: #Elric remove once TODO above is resolved.
+        //return; /* No duplicate requests. */
 
     int handle = server->apiConnection()->asyncPtzGetSpaceMapper(camera, this, SLOT(at_replyReceived(int, const QnPtzSpaceMapper &, int)));
     m_requests.insert(camera);
