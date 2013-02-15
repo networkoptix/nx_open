@@ -42,7 +42,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
             timeDistanceAlt = INT_MAX; // actually chunk not found
 
         int findEps = m_quality == MEDIA_Quality_High ? SECOND_STREAM_FIND_EPS : FIRST_STREAM_FIND_EPS;
-        if (timeDistance - timeDistanceAlt > findEps || (timeDistance > 0 && usePreciseFind))
+        if (timeDistance - timeDistanceAlt > findEps || (timeDistance > timeDistanceAlt && usePreciseFind))
         {
             if (timeDistanceAlt == 0)
             {
