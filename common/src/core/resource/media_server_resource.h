@@ -87,7 +87,7 @@ private:
     bool m_reserve;
     PanicMode m_panicMode;
     QString m_version;
-    QMap<int, QUrl> m_runningIfRequests;
+    QMap<int, QString> m_runningIfRequests;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

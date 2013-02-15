@@ -32,16 +32,18 @@ public:
     {
     }
 
-    void removeFromProxyList(const QString& mServerId)
+    void removeFromProxyList(const QUrl& url)
     {
         QMutexLocker locker(&m_mutex);
-        m_proxyInfo.remove(mServerId);
+
+        m_proxyInfo.remove(url);
     }
 
-    void addToProxyList(const QString& mServerId, const QString& addr, int port)
+    void addToProxyList(const QUrl& url, const QString& addr, int port)
     {
         QMutexLocker locker(&m_mutex);
-        m_proxyInfo.insert(mServerId, ProxyInfo(addr, port));
+
+        m_proxyInfo.insert(url, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
@@ -518,10 +520,12 @@ void QnMediaServerConnection::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
+
+    QUrl apiUrl = m_mServer.dynamicCast<QnMediaServerResource>()->getApiUrl();
     if (port)
-        QnNetworkProxyFactory::instance()->addToProxyList(m_mServer->getId().toString(), addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl, addr, port);
     else
-        QnNetworkProxyFactory::instance()->removeFromProxyList(m_mServer->getId().toString());
+        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl);
 }
 
 void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int) {

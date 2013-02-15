@@ -3,6 +3,7 @@
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
+#include "utils/common/sleep.h"
 
 QnLocalMediaServerResource::QnLocalMediaServerResource()
     : QnResource()
@@ -143,12 +144,14 @@ private:
 void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
 {
     QByteArray guid = getGuid().toUtf8();
-    if (response.data.contains("Requested method is absent") || response.data.contains(guid))
+    if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
         // server OK
-        QUrl url = m_runningIfRequests.value(responseNum);
-        if (!url.isEmpty())
-            setPrimaryIF(url.host());
+        QString urlStr = m_runningIfRequests.value(responseNum);
+        if (urlStr == QLatin1String("proxy"))
+            setPrimaryIF(urlStr);
+        else
+            setPrimaryIF(QUrl(urlStr).host());
         m_runningIfRequests.remove(responseNum);
     }
 }
@@ -160,13 +163,16 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
         return;
     m_primaryIFSelected = true;
     
-    QUrl apiUrl(getApiUrl());
-    apiUrl.setHost(primaryIF);
-    setApiUrl(apiUrl.toString());
+    if (primaryIF != QLatin1String("proxy"))
+    {
+        QUrl apiUrl(getApiUrl());
+        apiUrl.setHost(primaryIF);
+        setApiUrl(apiUrl.toString());
 
-    QUrl url(getUrl());
-    url.setHost(primaryIF);
-    setUrl(url.toString());
+        QUrl url(getUrl());
+        url.setHost(primaryIF);
+        setUrl(url.toString());
+    }
 
     m_primaryIf = primaryIF;
     emit serverIfFound(::toSharedPointer(this), primaryIF);
@@ -217,9 +223,14 @@ void QnMediaServerResource::determineOptimalNetIF()
         //TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
         //QThreadPool::globalInstance()->start(task);
         int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
-        m_runningIfRequests.insert(requestNum, url);
-
+        m_runningIfRequests.insert(requestNum, url.toString());
     }
+
+    // send request via proxy (ping request always send directly, other request are sent via proxy here)
+    QnSleep::msleep(5); // send request slighty latter to preffer direct connect
+    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
+
 }
 
 void QnMediaServerResource::updateInner(QnResourcePtr other) 

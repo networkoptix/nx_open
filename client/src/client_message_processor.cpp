@@ -93,14 +93,38 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
             qnResPool->addResource(resource);
             result = true;
         }
-    } else {
+        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
+            determineOptimalIF(mediaServer.data());
+    } 
+    else {
         ownResource->update(resource);
         result = true;
     }
 
-    if(QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
+
+    if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
+
     return result;
+}
+
+void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaServer)
+{
+    // set proxy. If some media server IF will be found, proxy address will be cleared
+    QString url = QnAppServerConnectionFactory::defaultUrl().host();
+    if (url.isEmpty())
+        url = QLatin1String("127.0.0.1");
+    int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
+    mediaServer->apiConnection()->setProxyAddr(url, port);
+    disconnect(mediaServer, NULL, this, NULL);
+    connect(mediaServer, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &)));
+    mediaServer->determineOptimalNetIF();
+}
+
+void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url)
+{
+    if (url != QLatin1String("proxy"))
+        resource->apiConnection()->setProxyAddr(QString(), 0);
 }
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)

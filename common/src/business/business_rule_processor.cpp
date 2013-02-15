@@ -320,10 +320,12 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
         if (user->getEmail().isEmpty())
             continue;
         if (!emailAddress.isEmpty())
-            emailAddress += QLatin1String(";");
+            emailAddress += QLatin1Char(';');
         emailAddress += user->getEmail();
     }
 
+    if (!emailAddress.isEmpty())
+        emailAddress += QLatin1Char(';');
     emailAddress += BusinessActionParameters::getEmailAddress(action->getParams());
     if( emailAddress.isEmpty() )
     {
