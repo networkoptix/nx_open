@@ -1,0 +1,4 @@
+#ifndef vmax480_dts_reader_factory_h_1748
+#define vmax480_dts_reader_factory_h_1748
+
+#endif //vmax480_dts_reader_factory_h_1748

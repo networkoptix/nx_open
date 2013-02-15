@@ -77,6 +77,7 @@
 #include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
 #include "core/resource_managment/mserver_resource_discovery_manager.h"
 #include "plugins/resources/mserver_resource_searcher.h"
+#include "plugins/storage/dts/vmax480/vmax480_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -877,10 +878,13 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+
     //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
 
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
+    
 
     QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 
