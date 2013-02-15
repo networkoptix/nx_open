@@ -95,6 +95,7 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
         	if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             	determineOptimalIF(mediaServer.data());
         }
+    } 
     else {
         ownResource->update(resource);
         result = true;
@@ -103,6 +104,9 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
+
+    return result;
+}
 
 void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaServer)
 {
