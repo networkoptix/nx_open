@@ -80,6 +80,7 @@
 #include "rest/handlers/log_handler.h"
 #include "plugins/storage/dts/vmax480/vmax480_resource_searcher.h"
 #include "business/events/reasoned_business_event.h"
+#include "rest/handlers/favico_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
