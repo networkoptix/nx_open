@@ -2,17 +2,16 @@
 #define QN_BUSINESS_RULES_DIALOG_H
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QModelIndex>
 
 #include <QtGui/QDialog>
-#include <QtCore/QModelIndex>
+#include <QtGui/QMenu>
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
 #include <api/api_fwd.h>
 
-#include <core/resource/resource_fwd.h>
-
-#include <events/business_event_rule.h>
+#include <business/business_event_rule.h>
 
 #include <ui/dialogs/button_box_dialog.h>
 
@@ -39,8 +38,14 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
+
+public Q_SLOTS:
+    virtual void accept() override;
+    virtual void reject() override;
 
 private slots:
+
     void at_context_userChanged();
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
@@ -49,15 +54,22 @@ private slots:
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
+    void at_advancedButton_clicked();
 
     void at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
     void at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
     void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+    void at_tableViewport_resizeEvent();
     void at_model_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
+
+    void createActions();
+
+    bool saveAll();
 
     void saveRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
@@ -67,10 +79,15 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesViewModel* m_rulesViewModel;
+    QnBusinessEventRules m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     QMap<int, QnBusinessRuleViewModel*> m_processing;
+    QMap<int, QnBusinessEventRulePtr> m_deleting;
+
+    QMenu* m_popupMenu;
+    QAction* m_advancedAction;
     int m_loadingHandle;
 };
 

@@ -5,6 +5,7 @@
 #include "../sony/sony_resource.h"
 #include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/flex_watch/flexwatch_resource.h"
+#include "plugins/resources/axis/axis_onvif_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
@@ -65,6 +66,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
     if (existResource)
         soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
+    else if (!info.defaultLogin.isEmpty())
+        soapWrapper.setLoginPassword(info.defaultLogin.toStdString(), info.defaultPassword.toStdString());
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
     //qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
@@ -204,6 +207,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
+    else if (manufacture.toLower().contains(QLatin1String("axis")))
+        resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

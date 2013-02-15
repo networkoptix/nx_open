@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include <utils/common/config.h>
+
 #include "quicksyncvideodecoder.h"
 
 #include <intrin.h>
@@ -28,12 +30,15 @@
 #ifndef XVBA_TEST
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/videodecoderplugintypes.h>
+#include <plugins/videodecoders/abstract_decoder_event_receiver.h>
 #else
 quint64 getUsecTimer()
 {
     return 0;
 }
 #endif
+
+#include "mfxframeinfo_resource_reader.h"
 
 //#define USE_SYSMEM_SURFACE
 #ifndef USE_SYSMEM_SURFACE
@@ -124,10 +129,12 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     IDirect3DDeviceManager9* d3d9manager,
     const QnCompressedVideoDataPtr data,
     PluginUsageWatcher* const pluginUsageWatcher,
+    AbstractDecoderEventReceiver* const eventReceiver,
     unsigned int adapterNumber )
 :
     m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
+    m_eventReceiver( eventReceiver ),
     m_state( notInitialized ),
     m_syncPoint( NULL ),
     m_mfxSessionEstablished( false ),
@@ -148,7 +155,9 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_totalOutputFrames( 0 ),
     m_prevInputFrameMs( (DWORD)-1 ),
     m_prevOutPictureClock( 0 ),
-    m_recursionDepth( 0 )
+    m_recursionDepth( 0 ),
+    m_speed( 1.0 ),
+    m_initializationMode( false )
 #ifdef USE_OPENCL
     ,m_clContext( NULL ),
     m_prevCLStatus( CL_SUCCESS ),
@@ -217,10 +226,12 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     MFXVideoSession* const parentSession,
     IDirect3DDeviceManager9* d3d9manager,
     PluginUsageWatcher* const pluginUsageWatcher,
+    AbstractDecoderEventReceiver* const eventReceiver,
     unsigned int adapterNumber )
 :
     m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
+    m_eventReceiver( eventReceiver ),
     m_state( notInitialized ),
     m_syncPoint( NULL ),
     m_mfxSessionEstablished( false ),
@@ -241,7 +252,9 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_totalOutputFrames( 0 ),
     m_prevInputFrameMs( (DWORD)-1 ),
     m_prevOutPictureClock( 0 ),
-    m_recursionDepth( 0 )
+    m_recursionDepth( 0 ),
+    m_speed( 1.0 ),
+    m_initializationMode( false )
 #ifdef USE_OPENCL
     ,m_clContext( NULL ),
     m_prevCLStatus( CL_SUCCESS ),
@@ -325,90 +338,91 @@ static const int MICROS_IN_SECOND = 1000*1000;
 
 bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    //::Sleep( 60 );
-
-    Q_ASSERT( data->compressionType == CODEC_ID_H264 );
-
-    const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
-    const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;
-    NX_LOG( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4%5").
-        arg(data->data.size()).arg(m_sourceStreamFps).arg(getUsecTimer()/1000).arg(millisSincePrevInputFrame).
-        arg(QString::fromAscii(delayedInputFrame ? ". Delayed input frame" : "")), cl_logDEBUG1 );
-    if( delayedInputFrame )
-        int x = 0;
-
-    ++m_totalInputFrames;
-
-    static const size_t FRAME_COUNT_TO_CALC_FPS = 20;
-    static const size_t MIN_FRAME_COUNT_TO_CALC_FPS = FRAME_COUNT_TO_CALC_FPS / 2;
-
-    //calculating m_sourceStreamFps
-    const double fpsCalcTimestampDiff = m_fpsCalcFrameTimestamps.empty()
-        ? 0
-        : m_fpsCalcFrameTimestamps.back() - m_fpsCalcFrameTimestamps.front(); //TODO overflow?
-    if( (m_fpsCalcFrameTimestamps.size() >= MIN_FRAME_COUNT_TO_CALC_FPS) && (fpsCalcTimestampDiff > 0) )
-        m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() * MICROS_IN_SECOND / fpsCalcTimestampDiff;
-    m_fpsCalcFrameTimestamps.push_back( data->timestamp );
-    if( m_fpsCalcFrameTimestamps.size() > FRAME_COUNT_TO_CALC_FPS )
-        m_fpsCalcFrameTimestamps.pop_front();
-
-#ifdef WRITE_INPUT_STREAM_TO_FILE_1
-    m_inputStreamFile.write( data->data.data(), data->data.size() );
-#endif
+    const DWORD currentClock = GetTickCount();
 
     mfxBitstream inputStream;
     memset( &inputStream, 0, sizeof(inputStream) );
-    //inputStream->TimeStamp = av_rescale_q( data->timestamp, SRC_DATA_TIMESTAMP_RESOLUTION, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION );
-    inputStream.TimeStamp = data->timestamp;
-
-#ifndef XVBA_TEST
-    if( (m_state < decoding) && data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
+    if( data && data->data.size() > 0 )
     {
-        std::basic_string<mfxU8> seqHeader;
-        //sps & pps is in the extradata, parsing it...
-        // prefix is unit len
-        int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
+        Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
-        const mfxU8* curNal = data->context->ctx()->extradata+5;
-        const mfxU8* dataEnd = data->context->ctx()->extradata + data->context->ctx()->extradata_size;
-        while( curNal < dataEnd - reqUnitSize )
+        const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
+        const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;
+        NX_LOG( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4%5").
+            arg(data->data.size()).arg(m_sourceStreamFps).arg(getUsecTimer()/1000).arg(millisSincePrevInputFrame).
+            arg(QString::fromAscii(delayedInputFrame ? ". Delayed input frame" : "")), cl_logDEBUG2 );
+
+        ++m_totalInputFrames;
+
+        static const size_t FRAME_COUNT_TO_CALC_FPS = 20;
+        static const size_t MIN_FRAME_COUNT_TO_CALC_FPS = FRAME_COUNT_TO_CALC_FPS / 2;
+
+        //calculating m_sourceStreamFps
+        const double fpsCalcTimestampDiff = m_fpsCalcFrameTimestamps.empty()
+            ? 0
+            : m_fpsCalcFrameTimestamps.back() - m_fpsCalcFrameTimestamps.front(); //TODO overflow?
+        if( (m_fpsCalcFrameTimestamps.size() >= MIN_FRAME_COUNT_TO_CALC_FPS) && (fpsCalcTimestampDiff > 0) )
+            m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() * MICROS_IN_SECOND / fpsCalcTimestampDiff;
+        m_fpsCalcFrameTimestamps.push_back( data->timestamp );
+        if( m_fpsCalcFrameTimestamps.size() > FRAME_COUNT_TO_CALC_FPS )
+            m_fpsCalcFrameTimestamps.pop_front();
+
+    #ifdef WRITE_INPUT_STREAM_TO_FILE_1
+        m_inputStreamFile.write( data->data.data(), data->data.size() );
+    #endif
+
+        inputStream.TimeStamp = data->timestamp;
+
+    #ifndef XVBA_TEST
+        if( (m_state < decoding) && isH264SeqHeaderInExtraData(data) )
         {
-            unsigned int curSize = 0;
-            for( int i = 0; i < reqUnitSize; ++i ) 
-                curSize = (curSize << 8) + curNal[i];
-            curNal += reqUnitSize;
-            curSize = std::min<>(curSize, (unsigned int)(dataEnd - curNal));
-            seqHeader.append( curNal, curSize );
+            std::basic_string<mfxU8> seqHeader;
+            readH264SeqHeaderFromExtraData( data, &seqHeader );
 
-            curNal += curSize;
+            inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
+            inputStream.DataLength = seqHeader.size();
+            inputStream.MaxLength = seqHeader.size();
+            return decode( &inputStream, outFrame );
         }
+    #endif
 
-        seqHeader.append( (const quint8*)data->data.data(), data->data.size() );
+        //qDebug()<<"Input timestamp: "<<inputStream.TimeStamp;
+        //if( m_prevTimestamp > inputStream.TimeStamp )
+        //    qDebug()<<"Warning! timestamp decreased by "<<(m_prevTimestamp - inputStream.TimeStamp);
+        //m_prevTimestamp = inputStream.TimeStamp;
 
-        inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
-        inputStream.DataLength = seqHeader.size();
-        inputStream.MaxLength = seqHeader.size();
-        return decode( &inputStream, outFrame );
+    #ifndef XVBA_TEST
+        inputStream.Data = reinterpret_cast<mfxU8*>(data->data.data());
+    #else
+        inputStream.Data = reinterpret_cast<mfxU8*>(const_cast<char*>(data->data.data()));
+    #endif
+        inputStream.DataLength = data->data.size();
+        inputStream.MaxLength = data->data.size();
+        //inputStream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
+
+        if( m_prevInputFrameMs == (DWORD)-1 )
+            m_prevOutPictureClock = GetTickCount();
+
+        //saving motion info
+        m_srcMotionInfo[data->timestamp] = data->motion;
+        if( m_srcMotionInfo.size() > m_decodingAllocResponse.NumFrameActual + m_vppAllocResponse.NumFrameActual + 1U )
+        {
+            //removing old motion info
+            for( MotionInfoContainerType::size_type
+                i = 0;
+                i < (m_srcMotionInfo.size() - (m_decodingAllocResponse.NumFrameActual + m_vppAllocResponse.NumFrameActual + 1));
+                ++i )
+            {
+                m_srcMotionInfo.erase( m_srcMotionInfo.begin() );
+            }
+        }
     }
-#endif
-
-    //qDebug()<<"Input timestamp: "<<inputStream.TimeStamp;
-    //if( m_prevTimestamp > inputStream.TimeStamp )
-    //    qDebug()<<"Warning! timestamp decreased by "<<(m_prevTimestamp - inputStream.TimeStamp);
-    //m_prevTimestamp = inputStream.TimeStamp;
-
-#ifndef XVBA_TEST
-    inputStream.Data = reinterpret_cast<mfxU8*>(data->data.data());
-#else
-    inputStream.Data = reinterpret_cast<mfxU8*>(const_cast<char*>(data->data.data()));
-#endif
-    inputStream.DataLength = data->data.size();
-    inputStream.MaxLength = data->data.size();
-    //inputStream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
-
-    if( m_prevInputFrameMs == (DWORD)-1 )
-        m_prevOutPictureClock = GetTickCount();
-    const DWORD currentClock = GetTickCount();
+    else
+    {
+        //NULL input data
+        if( m_state < decoding )
+            return false;
+    }
 
     const bool decoderProducedFrame = decode( &inputStream, outFrame );
     if( decoderProducedFrame )
@@ -419,6 +433,13 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
         if( currentClock - m_prevOutPictureClock > 1000 )
             NX_LOG( QString::fromAscii( "QuickSyncVideoDecoder. Warning! There was no out picture for %1 ms" ).arg(currentClock - m_prevOutPictureClock), cl_logDEBUG1 );
         m_prevOutPictureClock = currentClock;
+
+        if( *outFrame )
+        {
+            MotionInfoContainerType::const_iterator motionIter = m_srcMotionInfo.find( (*outFrame)->pkt_dts );
+            if( motionIter != m_srcMotionInfo.end() )
+                (*outFrame)->metadata = motionIter->second;
+        }
     }
 
     //NX_LOG( QString::fromAscii( "QuickSyncVideoDecoder::decode. exit. timer %1, lr-timer %2" ).arg(currentClock).arg(GetTickCount()), cl_logDEBUG1 );
@@ -431,14 +452,28 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 #ifndef USE_ASYNC_IMPL
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    const bool isSeqHeaderPresent = readSequenceHeader( inputStream ) == MFX_ERR_NONE;
-    if( m_reinitializeNeeded && isSeqHeaderPresent )
+    mfxVideoParam newStreamParams;
+    memset( &newStreamParams, 0, sizeof(newStreamParams) );
+    const bool isSeqHeaderPresent = readSequenceHeader( inputStream, &newStreamParams ) == MFX_ERR_NONE;
+
+    if( m_state > notInitialized && m_reinitializeNeeded && isSeqHeaderPresent )
     {
         //have to wait for a sequence header and I-frame before reinitializing decoder
         closeMFXSession();
         m_reinitializeNeeded = false;
+
+        if( m_eventReceiver )
+        {
+            AbstractDecoderEventReceiver::DecoderBehaviour futherLifeStyle = m_eventReceiver->streamParamsChanged(
+                this, MFXFrameInfoResourceReader(newStreamParams.mfx.FrameInfo) );
+            if( futherLifeStyle == AbstractDecoderEventReceiver::dbStop )
+                return false;
+        }
     }
     if( m_state < decoding && !init( MFX_CODEC_AVC, inputStream ) )
+        return false;
+
+    if( m_initializationMode )
         return false;
 
     bool gotDisplayPicture = false;
@@ -478,6 +513,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                     }
                     Q_ASSERT( workingSurface.data() );
                     Q_ASSERT( workingSurface->mfxSurface.Data.Locked == 0 );
+                    //workingSurface->mfxSurface.Data.TimeStamp = inputStream ? inputStream->TimeStamp : 0;
                     opStatus = m_decoder->DecodeFrameAsync(
                         (inputStream && inputStream->DataLength > 0) ? inputStream : NULL,
                         &workingSurface->mfxSurface,
@@ -489,7 +525,8 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                         m_inputStreamFile.write( (const char*)inputStream->Data + inputStream->DataOffset, inputStream->DataLength );
 #endif
                     NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. starting frame (pts %1) decoding. Result %2").
-                        arg(inputStream->TimeStamp).arg(mfxStatusCodeToString(opStatus)), opStatus == MFX_ERR_NONE ? cl_logDEBUG2 : cl_logDEBUG1 );
+                        arg(inputStream->TimeStamp).arg(mfxStatusCodeToString(opStatus)), 
+                        (opStatus == MFX_ERR_NONE || opStatus == MFX_ERR_MORE_DATA) ? cl_logDEBUG2 : cl_logDEBUG1 );
                     break;  
                 }
 
@@ -576,7 +613,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                 if( !gotDisplayPicture )
                 {
                     NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Providing picture at output. Out frame timestamp %1, frame order %2, corrupted %3").
-                        arg(decodedFrameCtx->mfxSurface.Data.TimeStamp).arg(decodedFrameCtx->mfxSurface.Data.FrameOrder).arg(decodedFrameCtx->mfxSurface.Data.Corrupted), cl_logDEBUG1 );
+                        arg(decodedFrameCtx->mfxSurface.Data.TimeStamp).arg(decodedFrameCtx->mfxSurface.Data.FrameOrder).arg(decodedFrameCtx->mfxSurface.Data.Corrupted), cl_logDEBUG2 );
                     if( m_prevTimestamp > decodedFrameCtx->mfxSurface.Data.TimeStamp )
                     {
                         NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Warning! timestamp decreased by %1. Current 90KHz timestamp %2, previous %3. Ignoring frame...").
@@ -595,6 +632,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                     {
                         saveToAVFrame( outFrame->data(), decodedFrameCtx );
                         m_lastAVFrame = *outFrame;
+                        (*outFrame)->flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
                     }
                 }
                 else
@@ -673,6 +711,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
     return gotDisplayPicture;
 }
 #else   //USE_ASYNC_IMPL
+//NOTE async implementation can increase maximum number of simultaneously decoded streams
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const bool isSeqHeaderPresent = readSequenceHeader( inputStream ) == MFX_ERR_NONE;
@@ -915,7 +954,7 @@ void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSizeVal )
 
     const QSizeF newSizeF( originalSize.width() * compressionRatioToApply, originalSize.height() * compressionRatioToApply );
     //we have to align but keep aspect ratio by using cropping
-    QSize alignedNewPicSize = QSize( ALIGN16_DOWN((unsigned int)newSizeF.width()), ALIGN32_DOWN((unsigned int)newSizeF.height()) );
+    QSize alignedNewPicSize( ALIGN16_DOWN((unsigned int)newSizeF.width()), ALIGN32_DOWN((unsigned int)newSizeF.height()) );
 
     //in case we reached zero by aligning, checking once again
     alignedNewPicSize.setWidth( std::max<int>( alignedNewPicSize.width(), MIN_PICTURE_WIDTH ) );
@@ -1002,6 +1041,14 @@ unsigned int QuickSyncVideoDecoder::getDecoderCaps() const
 #endif
 }
 
+void QuickSyncVideoDecoder::setSpeed( float newValue )
+{
+    if( !m_eventReceiver )
+        return;
+    m_speed = newValue;
+    m_eventReceiver->streamParamsChanged( this, *this );
+}
+
 bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const
 {
     switch( resID )
@@ -1024,10 +1071,22 @@ bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const
         case DecoderParameter::videoMemoryUsage:
             *value = (qlonglong)m_decoderSurfaceSizeInBytes * m_decoderSurfacePool.size() + (qlonglong)m_vppSurfaceSizeInBytes * m_vppOutSurfacePool.size();
             return true;
+        case DecoderParameter::speed:
+            *value = m_speed;
+            return true;
         default:
             return false;
     }
 }
+#endif
+
+static const quint8 H264_START_CODE[] = { 0, 0, 0, 1 };
+
+//dishonorably stolen from libavcodec source
+#ifndef AV_RB16
+#   define AV_RB16(x)                           \
+    ((((const uint8_t*)(x))[0] << 8) |          \
+      ((const uint8_t*)(x))[1])
 #endif
 
 bool QuickSyncVideoDecoder::readSequenceHeader( const QnCompressedVideoDataPtr data, mfxVideoParam* const streamParams )
@@ -1037,28 +1096,10 @@ bool QuickSyncVideoDecoder::readSequenceHeader( const QnCompressedVideoDataPtr d
     //inputStream->TimeStamp = av_rescale_q( data->timestamp, SRC_DATA_TIMESTAMP_RESOLUTION, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION );
     inputStream.TimeStamp = data->timestamp;
 #ifndef XVBA_TEST
-    if( data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
+    if( isH264SeqHeaderInExtraData(data) )
     {
         std::basic_string<mfxU8> seqHeader;
-        //sps & pps is in the extradata, parsing it...
-        // prefix is unit len
-        int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
-
-        const mfxU8* curNal = data->context->ctx()->extradata+5;
-        const mfxU8* dataEnd = data->context->ctx()->extradata + data->context->ctx()->extradata_size;
-        while( curNal < dataEnd - reqUnitSize )
-        {
-            unsigned int curSize = 0;
-            for( int i = 0; i < reqUnitSize; ++i ) 
-                curSize = (curSize << 8) + curNal[i];
-            curNal += reqUnitSize;
-            curSize = std::min<>(curSize, (unsigned int)(dataEnd - curNal));
-            seqHeader.append( curNal, curSize );
-
-            curNal += curSize;
-        }
-
-        seqHeader.append( (const quint8*)data->data.data(), data->data.size() );
+        readH264SeqHeaderFromExtraData( data, &seqHeader );
 
         inputStream.Data = const_cast<mfxU8*>(seqHeader.data());
         inputStream.DataLength = seqHeader.size();
@@ -1111,6 +1152,9 @@ bool QuickSyncVideoDecoder::init( mfxU32 codecID, mfxBitstream* seqHeader )
         return false;
 #else
     initializeScaleSurfacePool();
+
+    if( processingNeeded() && (m_outPictureSize.width() > getOriginalPictureSize().width() || m_outPictureSize.height() > getOriginalPictureSize().height()) )
+        setOutPictureSize( getOriginalPictureSize() );  //it is no use to scale decoded picture to the size greater than original size
 #endif
 #endif  //USE_SYSMEM_SURFACE
 
@@ -1322,6 +1366,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
     //NX_LOG( QString::fromAscii("mark02 %1 ms").arg(GetTickCount()), cl_logERROR );
 
     //decoder uses allocator to create necessary surfaces
+    m_srcStreamParam.mfx.TimeStampCalc = MFX_TIMESTAMPCALC_UNKNOWN;
     status = m_decoder->Init( &m_srcStreamParam );
     if( status < MFX_ERR_NONE )  //ignoring warnings
     {
@@ -1637,6 +1682,9 @@ void QuickSyncVideoDecoder::closeMFXSession()
         ++it )
     {
         (*it)->syncCtx.sequence.ref();
+        //waiting for the surface to become unused (usage counter must drop to zero)
+        while( (*it)->syncCtx.usageCounter > 0 )
+            _mm_pause();    //we're in spin loop
     }
     m_decoderSurfacePool.clear();
     if( m_decodingAllocResponse.NumFrameActual > 0 )
@@ -1648,6 +1696,9 @@ void QuickSyncVideoDecoder::closeMFXSession()
         ++it )
     {
         (*it)->syncCtx.sequence.ref();
+        //waiting for the surface to become unused (usage counter must drop to zero)
+        while( (*it)->syncCtx.usageCounter > 0 )
+            _mm_pause();    //we're in spin loop
     }
     m_vppOutSurfacePool.clear();
     if( m_vppAllocResponse.NumFrameActual > 0 )
@@ -1856,7 +1907,7 @@ QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::fin
         for( size_t i = 0; i < surfacePool->size(); ++i )
             if( surfacePool->at(i)->mfxSurface.Data.Locked == 0 )
                 ++unusedSurfaces;
-        NX_LOG( QString::fromAscii("There are %1 unused decoder surfaces").arg(unusedSurfaces), cl_logDEBUG1 );
+        NX_LOG( QString::fromAscii("There are %1 unused decoder surfaces").arg(unusedSurfaces), cl_logDEBUG2 );
     }
 
     //performing 2 tries because external reference to surface can be unlocked at any time
@@ -1884,7 +1935,7 @@ QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::fin
         }
 
         //could not find unused surface: forcing unlock of used surface...
-        for( int i = 0; i < surfacePool->size(); ++i )
+        for( size_t i = 0; i < surfacePool->size(); ++i )
         {
             SurfaceContext& surfaceCtx = *surfacePool->at(i);
 
@@ -2129,8 +2180,9 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 #endif  //CONVERT_NV12_TO_YV12
 #endif  //RETURN_D3D_SURFACE
 
-    outFrame->width = decodedFrame->Info.Width;
-    outFrame->height = decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual);
+    const QSize& originalPictureSize = getOriginalPictureSize();
+    outFrame->width = originalPictureSize.width();
+    outFrame->height = originalPictureSize.height();
 #ifndef CONVERT_NV12_TO_YV12
     outFrame->format = PIX_FMT_NV12;
 #else
@@ -2310,6 +2362,11 @@ size_t QuickSyncVideoDecoder::estimateSurfaceMemoryUsage() const
             + SCALED_SURFACE_COUNT * m_sps->getWidth() * m_sps->getHeight() //surfaces used for scaling
 #endif
             )* 3 / 2;   //decoder uses NV12 format. Every pixel is 12 bits in size
+}
+
+void QuickSyncVideoDecoder::setInitializationMode( bool val )
+{
+    m_initializationMode = val;
 }
 
 QString QuickSyncVideoDecoder::mfxStatusCodeToString( mfxStatus status ) const
@@ -2570,7 +2627,7 @@ void QuickSyncVideoDecoder::initializeScaleSurfacePool()
     request.Info.Height = m_srcStreamParam.mfx.FrameInfo.Height;
 
     allocateSurfacePool( &m_vppOutSurfacePool, &request, &m_vppAllocResponse );
-    for( int i = 0; i < m_vppOutSurfacePool.size(); ++i )
+    for( size_t i = 0; i < m_vppOutSurfacePool.size(); ++i )
         m_vppOutSurfacePool[i]->mfxSurface.Info = request.Info; // m_processingParams.vpp.Out;
 
     m_vppSurfaceSizeInBytes = request.Info.Width * request.Info.Height * 3 / 2;
@@ -2624,9 +2681,9 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
     dstRect.bottom = m_outPictureSize.height();
 
     NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Scaling decoded frame to %1x%2...").
-        arg(m_outPictureSize.width()).arg(m_outPictureSize.height()), cl_logDEBUG1 );
+        arg(m_outPictureSize.width()).arg(m_outPictureSize.height()), cl_logDEBUG2 );
 
-    const DWORD t1 = GetTickCount();
+    //const DWORD t1 = GetTickCount();
     IDirect3DDevice9* d3d9Device = NULL;
     for( ;; )
     {
@@ -2647,7 +2704,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
         return MFX_ERR_UNKNOWN;
     }
 
-    const DWORD t2 = GetTickCount();
+    //const DWORD t2 = GetTickCount();
 
     res = d3d9Device->StretchRect( surfFrom, &srcRect, surfTo, &dstRect, D3DTEXF_LINEAR );
     d3d9Device->Release();
@@ -2659,12 +2716,66 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
         return MFX_ERR_UNKNOWN;
     }
 
-    const DWORD t3 = GetTickCount();
+    to->Data.TimeStamp = from.Data.TimeStamp;
 
-    NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
-        arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1), cl_logDEBUG1 );
+    //const DWORD t3 = GetTickCount();
+
+    //NX_LOG( QString::fromAscii("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
+    //    arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1), cl_logDEBUG1 );
 
     return MFX_ERR_NONE;
 }
 #endif
 #endif
+
+bool QuickSyncVideoDecoder::isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const
+{
+    return data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1;
+}
+
+bool QuickSyncVideoDecoder::readH264SeqHeaderFromExtraData(
+    const QnCompressedVideoDataPtr data,
+    std::basic_string<mfxU8>* const seqHeader )
+{
+    const unsigned char* p = data->context->ctx()->extradata;
+
+    //sps & pps is in the extradata, parsing it...
+    //following code has been taken from libavcodec/h264.c
+
+    // prefix is unit len
+    //const int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
+    /* sps and pps in the avcC always have length coded with 2 bytes,
+     * so put a fake nal_length_size = 2 while parsing them */
+    //int nal_length_size = 2;
+
+    // Decode sps from avcC
+    int cnt = *(p + 5) & 0x1f; // Number of sps
+    p += 6;
+
+    for( int i = 0; i < cnt; i++ )
+    {
+        const int nalsize = AV_RB16(p);
+        p += 2; //skipping nalusize
+        if( nalsize > data->context->ctx()->extradata_size - (p-data->context->ctx()->extradata) )
+            break;
+        seqHeader->append( H264_START_CODE, sizeof(H264_START_CODE) );
+        seqHeader->append( p, nalsize );
+        p += nalsize;
+    }
+
+    // Decode pps from avcC
+    cnt = *(p++); // Number of pps
+    for( int i = 0; i < cnt; ++i )
+    {
+        const int nalsize = AV_RB16(p);
+        p += 2;
+        if( nalsize > data->context->ctx()->extradata_size - (p-data->context->ctx()->extradata) )
+            break;
+
+        seqHeader->append( H264_START_CODE, sizeof(H264_START_CODE) );
+        seqHeader->append( p, nalsize );
+        p += nalsize;
+    }
+
+    return true;
+}

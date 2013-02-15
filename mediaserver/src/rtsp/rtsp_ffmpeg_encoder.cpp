@@ -29,7 +29,6 @@ QnMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionTy
     if (itr != m_generatedContext.end())
         return itr.value();
     QnMediaContextPtr result(new QnMediaContext(compressionType));
-    AVCodecContext* ctx = result->ctx();
     m_generatedContext.insert(compressionType, result);
     return result;
 }

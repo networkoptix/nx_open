@@ -1,16 +1,17 @@
 #include "sendmail_business_action_widget.h"
 #include "ui_sendmail_business_action_widget.h"
 
-#include <events/sendmail_business_action.h>
+#include <business/actions/sendmail_business_action.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
 QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnSendmailBusinessActionWidget)
 {
     ui->setupUi(this);
@@ -21,7 +22,6 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent, 
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
 {
-    delete ui;
 }
 
 void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -50,4 +50,14 @@ void QnSendmailBusinessActionWidget::paramsChanged() {
 
 void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
     menu()->trigger(Qn::OpenServerSettingsAction);
+}
+
+void QnSendmailBusinessActionWidget::at_selectButton_clicked() {
+    QnSelectCamerasDialog dialog(this, Qn::UsersNode);
+    dialog.setSelectedResources(model()->actionResources());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    //TODO: #GDM use action resources for it
+    model()->setActionResources(dialog.getSelectedResources());
 }

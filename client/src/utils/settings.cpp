@@ -43,7 +43,7 @@ QnSettings::QnSettings():
     m_settings(new QSettings(this)),
     m_loading(true)
 {
-    QnClientMetaTypes::initialize();
+    QnClientMetaTypes::initialize(); // TODO: remove
 
     init();
 

@@ -18,11 +18,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>This action has no specific parameters</string>
-     </property>
-    </widget>
+    <widget class="QLabel" name="label"/>
    </item>
   </layout>
  </widget>

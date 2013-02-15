@@ -167,27 +167,11 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
         return getMetaData();
 
     QnAbstractMediaDataPtr rez;
-    int errorCount = 0;
-    for (int i = 0; i < 10; ++i)
-    {
+    for (int i = 0; i < 2 && !rez; ++i)
         rez = m_multiCodec.getNextData();
-        if (rez) 
-        {
-            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-            //ToDo: if (videoData)
-            //    parseMotionInfo(videoData);
-            
-            //if (!videoData || isGotFrame(videoData))
-            break;
-        }
-        else {
-            errorCount++;
-            if (errorCount > 1) {
-                closeStream();
-                break;
-            }
-        }
-    }
+    
+    if (!rez)
+        closeStream();
     
     return rez;
 }
@@ -510,31 +494,34 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
         }
     }
 
-    if (getRole() == QnResource::Role_LiveVideo && m_onvifRes->getPtzController())
+    if (getRole() == QnResource::Role_LiveVideo)
     {
-        bool ptzMatched = profile && profile->PTZConfiguration;
-        if (!ptzMatched)
+        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: EVIL!
         {
-            AddPTZConfigReq request;
-            AddPTZConfigResp response;
+            bool ptzMatched = profile && profile->PTZConfiguration;
+            if (!ptzMatched)
+            {
+                AddPTZConfigReq request;
+                AddPTZConfigResp response;
 
-            request.ProfileToken = info.profileToken.toStdString();
-            request.ConfigurationToken = m_onvifRes->getPtzController()->getPtzConfigurationToken().toStdString();
+                request.ProfileToken = info.profileToken.toStdString();
+                request.ConfigurationToken = ptzController->getPtzConfigurationToken().toStdString();
 
-            int soapRes = soapWrapper.addPTZConfiguration(request, response);
-            if (soapRes == SOAP_OK) {
-                m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile->token));
+                int soapRes = soapWrapper.addPTZConfiguration(request, response);
+                if (soapRes == SOAP_OK) {
+                    ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
+                }
+                else {
+                    qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
+                        << soapRes << ", description: " << soapWrapper.getLastError() 
+                        << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+
+                    return false;
+                }
             }
             else {
-                qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
-                    << soapRes << ", description: " << soapWrapper.getLastError() 
-                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-
-                return false;
+                ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
             }
-        }
-        else {
-            m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile->token));
         }
     }
 
@@ -720,24 +707,7 @@ void QnOnvifStreamReader::pleaseStop()
     m_multiCodec.pleaseStop();
 }
 
-
-/*
-for (;it != response.Configurations.end(); ++it) 
+bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
 {
-if (!(*it) || !(*it)->Bounds)
-{
-continue;
+    return m_onvifRes->secondaryResolutionIsLarge();
 }
-
-if ((*it)->Name == name) 
-{
-return *it;
-}
-
-unsigned long curSquare = (*it)->Bounds->height * (*it)->Bounds->width;
-if (curSquare > square) {
-square = curSquare;
-result = *it;
-}
-}
-*/

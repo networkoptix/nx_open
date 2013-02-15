@@ -8,10 +8,10 @@ m_livemutex(QMutex::Recursive),
 m_quality(QnQualityNormal),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
-m_role(QnResource::Role_LiveVideo),
 m_softMotionRole(QnResource::Role_Default),
 m_softMotionLastChannel(0)
 {
+    m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
     m_layout = 0;
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
@@ -28,10 +28,9 @@ QnLiveStreamProvider::~QnLiveStreamProvider()
 void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
 {
     bool needUpdate = false;
-    
+    QnAbstractMediaStreamDataProvider::setRole(role);
     {
         QMutexLocker mtx(&m_livemutex);
-        m_role = role;
         updateSoftwareMotion();
 
         if (role == QnResource::Role_SecondaryLiveVideo)
@@ -94,7 +93,7 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
 QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
     if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & QnSecurityCamResource::PrimaryStreamSoftMotionCapability))
+        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
             m_softMotionRole = QnResource::Role_LiveVideo;
         else
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
@@ -104,7 +103,7 @@ QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    if (m_cameraRes->getMotionType() == MT_SoftwareGrid && getRole() == roleForMotionEstimation())
+    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
@@ -169,7 +168,7 @@ bool QnLiveStreamProvider::needMetaData()
 {
     // I assume this function is called once per video frame 
 
-    if (m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
         if (getRole() == roleForMotionEstimation()) {
             for (int i = 0; i < m_layout->numberOfChannels(); ++i)
@@ -183,7 +182,7 @@ bool QnLiveStreamProvider::needMetaData()
         }
         return false;
     }
-    else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == MT_HardwareGrid || m_cameraRes->getMotionType() == MT_MotionWindow))
+    else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
     {
         bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
         if (result)
@@ -201,7 +200,7 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
 {
     m_framesSinceLastMetaData++;
 
-    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         m_motionEstimation[videoData->channelNumber].analizeFrame(videoData);
 }
 
@@ -214,17 +213,19 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     int maxFps = m_cameraRes->getMaxFps();
 
-    StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
+    Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     int newSecFps;
 
-    if (sharingMethod == sharePixels)
+    if (secondaryResolutionIsLarge())
+        newSecFps = MIN_SECOND_STREAM_FPS;
+    else if (sharingMethod == Qn::sharePixels)
     {
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
         if (maxFps - newFps < 2 )
             newSecFps = qMin(DESIRED_SECOND_STREAM_FPS/2,MIN_SECOND_STREAM_FPS);
 
     }
-    else if (sharingMethod == shareFps)
+    else if (sharingMethod == Qn::shareFps)
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps - newFps); //ss; minimum between 5 and what is left;
     else// noSharing
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps);
@@ -239,7 +240,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 {
-    if (m_cameraRes->getMotionType() == MT_SoftwareGrid)
+    if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
         return getCameraMetadata();

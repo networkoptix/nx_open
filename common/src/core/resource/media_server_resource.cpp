@@ -3,6 +3,7 @@
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
+#include "utils/common/sleep.h"
 
 QnLocalMediaServerResource::QnLocalMediaServerResource()
     : QnResource()
@@ -23,7 +24,7 @@ QString QnLocalMediaServerResource::getUniqueId() const
 
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
-    m_panicMode(false)
+    m_panicMode(PM_None)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -56,7 +57,7 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
 
         /* We want the video server connection to be deleted in its associated thread, 
          * no matter where the reference count reached zero. Hence the custom deleter. */
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(restUrl), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(toSharedPointer()), &qnDeleteLater);
     }
 }
 
@@ -117,6 +118,7 @@ void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &sto
 
 // --------------------------------------------------
 
+/*
 class TestConnectionTask: public QRunnable
 {
 public:
@@ -137,6 +139,22 @@ private:
     QnMediaServerResourcePtr m_owner;
     QUrl m_url;
 };
+*/
+
+void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
+{
+    QByteArray guid = getGuid().toUtf8();
+    if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
+    {
+        // server OK
+        QString urlStr = m_runningIfRequests.value(responseNum);
+        if (urlStr == QLatin1String("proxy"))
+            setPrimaryIF(urlStr);
+        else
+            setPrimaryIF(QUrl(urlStr).host());
+        m_runningIfRequests.remove(responseNum);
+    }
+}
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
@@ -145,13 +163,16 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
         return;
     m_primaryIFSelected = true;
     
-    QUrl apiUrl(getApiUrl());
-    apiUrl.setHost(primaryIF);
-    setApiUrl(apiUrl.toString());
+    if (primaryIF != QLatin1String("proxy"))
+    {
+        QUrl apiUrl(getApiUrl());
+        apiUrl.setHost(primaryIF);
+        setApiUrl(apiUrl.toString());
 
-    QUrl url(getUrl());
-    url.setHost(primaryIF);
-    setUrl(url.toString());
+        QUrl url(getUrl());
+        url.setHost(primaryIF);
+        setUrl(url.toString());
+    }
 
     m_primaryIf = primaryIF;
     emit serverIfFound(::toSharedPointer(this), primaryIF);
@@ -174,11 +195,11 @@ bool QnMediaServerResource::getReserve() const
     return m_reserve;
 }
 
-bool QnMediaServerResource::isPanicMode() const {
+QnMediaServerResource::PanicMode QnMediaServerResource::getPanicMode() const {
     return m_panicMode;
 }
 
-void QnMediaServerResource::setPanicMode(bool panicMode) {
+void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
     if(m_panicMode == panicMode)
         return;
 
@@ -199,9 +220,17 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
-        QThreadPool::globalInstance()->start(task);
+        //TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
+        //QThreadPool::globalInstance()->start(task);
+        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+        m_runningIfRequests.insert(requestNum, url.toString());
     }
+
+    // send request via proxy (ping request always send directly, other request are sent via proxy here)
+    QnSleep::msleep(5); // send request slighty latter to preffer direct connect
+    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
+
 }
 
 void QnMediaServerResource::updateInner(QnResourcePtr other) 
@@ -213,7 +242,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
     QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
-        setPanicMode(localOther->isPanicMode());
+        setPanicMode(localOther->getPanicMode());
 
         m_reserve = localOther->m_reserve;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;

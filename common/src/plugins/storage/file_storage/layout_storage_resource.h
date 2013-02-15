@@ -36,6 +36,7 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
+    virtual qint64 getTotalSpace() override;
     virtual void setUrl(const QString& value) override;
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);

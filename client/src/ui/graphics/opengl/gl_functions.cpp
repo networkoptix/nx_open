@@ -47,13 +47,13 @@ namespace QnGl {
     GLboolean APIENTRY glUnmapBuffer(GLenum) { WARN(); return false; }
 
     void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
-    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
+    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); }
+    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); }
 
-    GLsync APIENTRY glFenceSync( GLenum condition, GLbitfield flags ) { WARN(); return NULL; };
-    void APIENTRY glDeleteSync( GLsync sync ) { WARN(); };
-    void APIENTRY glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout ) { WARN(); };
-    GLAPI GLenum APIENTRY glClientWaitSync (GLsync sync, GLbitfield flags, GLuint64 timeout) { WARN(); return 0; };
+    GLsync APIENTRY glFenceSync(GLenum, GLbitfield) { WARN(); return 0; }
+    void APIENTRY glDeleteSync(GLsync) { WARN(); }
+    void APIENTRY glWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); }
+    GLAPI GLenum APIENTRY glClientWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); return 0; }
 
 #undef WARN
 
@@ -160,12 +160,12 @@ public:
             m_features |= QnGlFunctions::OpenGL2_0;
 
         status = true;
-        RESOLVE( PFNGLFENCESYNCPROC, glFenceSync );
-        RESOLVE( PFNGLDELETESYNCPROC, glDeleteSync );
-        RESOLVE( PFNGLCLIENTWAITSYNCPROC, glClientWaitSync );
-        RESOLVE( PFNGLWAITSYNCPROC, glWaitSync );
+        RESOLVE(PFNGLFENCESYNCPROC,                     glFenceSync);
+        RESOLVE(PFNGLDELETESYNCPROC,                    glDeleteSync);
+        RESOLVE(PFNGLCLIENTWAITSYNCPROC,                glClientWaitSync);
+        RESOLVE(PFNGLWAITSYNCPROC,                      glWaitSync);
         if(status)
-            m_features |= QnGlFunctions::OpenGL3_2;
+            m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
 
 #undef RESOLVE
 
@@ -340,19 +340,24 @@ void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
     d->glDisableVertexAttribArray(index);
 }
 
-GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags )
+GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags)
 {
-    return d->glFenceSync( condition, flags );
+    return d->glFenceSync(condition, flags);
 }
 
-void QnGlFunctions::glDeleteSync( GLsync sync )
+void QnGlFunctions::glDeleteSync(GLsync sync)
 {
-    d->glDeleteSync( sync );
+    d->glDeleteSync(sync);
 }
 
-void QnGlFunctions::glWaitSync( GLsync sync, GLbitfield flags, GLuint64 timeout )
+void QnGlFunctions::glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 {
-    d->glWaitSync( sync, flags, timeout );
+    d->glWaitSync(sync, flags, timeout);
+}
+
+GLenum QnGlFunctions::glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+{
+    return d->glClientWaitSync(sync, flags, timeout);
 }
 
 #ifdef Q_OS_WIN
@@ -376,7 +381,7 @@ namespace {
         }
         return result;
     }
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QnGlFunctions::Features, qn_estimatedFeatures, { *x = estimateFeatures(); });
+    Q_GLOBAL_STATIC_WITH_ARGS(QnGlFunctions::Features, qn_estimatedFeatures, (estimateFeatures()));
 }
 #endif
 

@@ -3,15 +3,11 @@
 
 #include "core/resource/camera_resource.h"
 
-class QnServerCameraProcessor : public QObject, public QnResourceProcessor
+class QnLocalFileProcessor : public QObject, public QnResourceProcessor
 {
     Q_OBJECT
 public:
     void processResources(const QnResourceList &resources);
-private:
-    void determineOptimalIF(QnMediaServerResource* mediaServer); // TODO: #VASILENKO please don't use plain pointers with resources. Only shared ones.
-private slots:
-    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
 };
 
 class QnServerCamera: public QnVirtualCameraResource

@@ -183,7 +183,7 @@ static char *extradata2psets(AVCodecContext *c)
             p++;
         }
         if (av_base64_encode(p, MAX_PSET_SIZE - (p - psets), r, r1 - r) == NULL) {
-            qWarning() << "Cannot Base64-encode %td %td!\n", MAX_PSET_SIZE - (p - psets), r1 - r;
+            qWarning() << "Cannot Base64-encode" << MAX_PSET_SIZE - (p - psets) << r1 - r;
             av_free(psets);
 
             return NULL;
@@ -383,9 +383,9 @@ static char *xiph_extradata2config(AVCodecContext *c)
 
     config[0] = config[1] = config[2] = 0;
     config[3] = 1;
-    config[4] = (RTP_XIPH_IDENT >> 16) & 0xff;
-    config[5] = (RTP_XIPH_IDENT >>  8) & 0xff;
-    config[6] = (RTP_XIPH_IDENT      ) & 0xff;
+    config[4] = char((RTP_XIPH_IDENT >> 16) & 0xff);
+    config[5] = char((RTP_XIPH_IDENT >>  8) & 0xff);
+    config[6] = char((RTP_XIPH_IDENT      ) & 0xff);
     config[7] = (headers_len >> 8) & 0xff;
     config[8] = headers_len & 0xff;
     config[9] = 2;
@@ -637,7 +637,7 @@ void QnUniversalRtpEncoder::setDataPacket(QnAbstractMediaDataPtr media)
 bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
     const QVector<int> packets = m_transcoder.getPacketsSize();
-    if (m_outputPos >= m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || packetIndex >= packets.size())
+    if (m_outputPos >= (int) m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || packetIndex >= packets.size())
         return false;
 
 	/*

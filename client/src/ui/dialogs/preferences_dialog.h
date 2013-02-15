@@ -14,7 +14,9 @@ class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
 class QnRecordingSettingsWidget;
 class QnYouTubeSettingsWidget;
-class QnSmtpSettingsWidget; //TODO: temporary, until we have wider server settings widget
+class QnServerSettingsWidget;
+class QnPopupSettingsWidget;
+
 
 namespace Ui {
     class PreferencesDialog;
@@ -31,6 +33,7 @@ public:
 
     void openLicensesPage();
     void openServerSettingsPage();
+    void openPopupSettingsPage();
 
     virtual void accept() override;
 
@@ -50,6 +53,7 @@ private slots:
     void at_extraMediaFoldersList_selectionChanged();
     void at_context_userChanged();
     void at_timeModeComboBox_activated();
+    void at_onDecoderPluginsListChanged();
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
@@ -57,16 +61,19 @@ private:
     QScopedPointer<Ui::PreferencesDialog> ui;
     QnRecordingSettingsWidget *m_recordingSettingsWidget;
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
+    QnPopupSettingsWidget *m_popupSettingsWidget;
     QnLicenseManagerWidget *m_licenseManagerWidget;
-    QnSmtpSettingsWidget *m_smtpSettingsWidget;
+    QnServerSettingsWidget *m_serverSettingsWidget;
 
     QnSettings *m_settings;
 
-    /** Index of "Licenses" tab to open it from outside */
+    /** Index of "Licenses" tab to open it from outside. */
     int m_licenseTabIndex;
 
-    /** Index of "Server Settings" tab to open it from outside */
+    /** Index of "Server Settings" tab to open it from outside. */
     int m_serverSettingsTabIndex;
+
+    int m_popupSettingsTabIndex;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

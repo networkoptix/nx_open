@@ -3,7 +3,7 @@
 
 #include <QtGui/QWidget>
 
-#include <events/abstract_business_event.h>
+#include <business/events/abstract_business_event.h>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
 #include <ui/workbench/workbench_context_aware.h>

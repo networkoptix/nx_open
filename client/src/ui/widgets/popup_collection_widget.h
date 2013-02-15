@@ -2,35 +2,41 @@
 #define POPUP_COLLECTION_WIDGET_H
 
 #include <QWidget>
-#include <events/abstract_business_action.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
+
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class QnPopupCollectionWidget;
 }
 
-class QnPopupCollectionWidget : public QWidget
+class QnPopupWidget;
+
+class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QWidget base_type;
     
 public:
-    explicit QnPopupCollectionWidget(QWidget *parent);
-    ~QnPopupCollectionWidget();
+    explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
+    virtual ~QnPopupCollectionWidget();
 
-    void addExample();
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void at_widget_closed(BusinessActionType::Value actionType);
+    void updatePosition();
+
+    void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
 
 private:
-    Ui::QnPopupCollectionWidget *ui;
+    QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
-    QMap<BusinessActionType::Value, QWidget*> m_widgetsByType;
-    bool m_adding;
+    QMap<BusinessEventType::Value, QnPopupWidget *> m_widgetsByType;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

@@ -383,6 +383,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
+    factory(Qn::OpenPopupSettingsAction).
+        flags(Qn::NoTarget).
+        text(tr("Settings..."));
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
@@ -544,7 +548,7 @@ QnActionManager::QnActionManager(QObject *parent):
     }
 
     factory(Qn::FullscreenAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
         autoRepeat(false).
@@ -564,12 +568,21 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Minimize")).
         icon(qnSkin->icon("titlebar/minimize.png"));
 
+
     factory(Qn::MaximizeAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
+
+
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Advanced Event Rules...")).
+        shortcut(tr("Ctrl+E")).
+        autoRepeat(false);
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
@@ -578,16 +591,14 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
-    factory(Qn::BusinessEventsAction).
-        flags(Qn::Main).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Business Events...")).
-        autoRepeat(false);
-
     factory().
         flags(Qn::Main).
         separator();
     
+    factory(Qn::CheckForUpdatesAction).
+        flags(Qn::Main).
+        text(tr("Check for Updates..."));
+
     factory(Qn::AboutAction).
         flags(Qn::Main).
         text(tr("About...")).
@@ -763,6 +774,33 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("High")).
             condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+    } factory.endSubMenu();
+
+    factory().
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("PTZ..."));
+
+    factory.beginSubMenu(); {
+        factory(Qn::PtzSavePresetAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Save Current Position...")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzGoToPresetMenu).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Go to Position...")).
+            childFactory(new QnPtzGoToPresetActionFactory(this)).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzManagePresetsAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Manage Saved Positions...")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzGoToPresetAction).
+            flags(Qn::SingleTarget | Qn::ResourceTarget).
+            text(tr("Go To Saved Position")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
     } factory.endSubMenu();
 
 #if 0
@@ -1340,7 +1378,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
         return result;
     } else if(parent->childFactory()) {
-        QList<QAction *> actions = parent->childFactory()->newActions(NULL);
+        QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
             QMenu *result = new QMenu();

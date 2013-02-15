@@ -37,8 +37,12 @@ QnArbShaderProgram::~QnArbShaderProgram()
     if( d->context() && (currentContextBak != d->context()) )
         const_cast<QGLContext*>(d->context())->makeCurrent();
     d->glDeleteProgramsARB(1, &d->fragmentProgram);
-    if( d->context() && currentContextBak != d->context() )
-        const_cast<QGLContext*>(currentContextBak)->makeCurrent();
+    if( d->context() && currentContextBak != d->context() ) {
+        if( currentContextBak )
+            const_cast<QGLContext*>(currentContextBak)->makeCurrent();
+        else
+            const_cast<QGLContext*>(d->context())->doneCurrent();
+    }
 }
 
 bool QnArbShaderProgram::isValid() const {

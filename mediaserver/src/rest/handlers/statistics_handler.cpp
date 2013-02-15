@@ -25,6 +25,8 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
+    Q_UNUSED(contentType)
+
     const QnStorageManager::StorageMap storages = qnStorageMan->getAllStorages();
     QString result;
     result.append("<?xml version=\"1.0\"?>\n");

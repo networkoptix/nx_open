@@ -108,6 +108,8 @@ namespace aio
             SocketAddRemoveTask::TaskType taskType,
             AIOEventHandler* const eventHandler )
         {
+            Q_UNUSED(eventHandler)
+
             for( std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
                 it != pollSetModificationQueue.end();

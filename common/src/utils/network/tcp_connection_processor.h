@@ -6,10 +6,10 @@
 
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
-#include "utils/common/pimpl.h"
 #include "utils/common/byte_array.h"
 
 class QnTcpListener;
+class QnTCPConnectionProcessorPrivate;
 
 class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
@@ -42,15 +42,19 @@ protected:
     void sendBuffer(const QnByteArray& sendBuffer);
     //void clearBuffer();
 
-    void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, bool displayDebug = false);
+    void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), bool displayDebug = false);
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
     bool readRequest();
     QUrl getDecodedUrl() const;
 
-    QN_DECLARE_PRIVATE(QnTCPConnectionProcessor);
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
+
+protected:
+    Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
+
+    QnTCPConnectionProcessorPrivate *d_ptr;
 };
 
 #endif // __TCP_CONNECTION_PROCESSOR_H__

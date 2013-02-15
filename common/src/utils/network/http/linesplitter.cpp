@@ -45,7 +45,7 @@ namespace nx_http
         if( lineEnd == data.data()+data.size() )
         {
             //not found, caching input data
-            m_currentLine.append( data.data(), data.size() );
+            m_currentLine.append( data.data(), (int) data.size() );
             if( bytesRead )
                 *bytesRead += data.size();
             return false;

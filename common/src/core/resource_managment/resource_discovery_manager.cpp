@@ -153,22 +153,6 @@ void QnResourceDiscoveryManager::run()
     while (!needToStop() && !m_ready)
         QnSleep::msleep(1);
 
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    while (!needToStop() && !initResourceTypes(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-
-    while (!needToStop() && !initLicenses(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-
-    while (!needToStop() && !initCameraHistory(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-
     m_runNumber = 0;
 
     while (!needToStop())
@@ -250,7 +234,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 
     appendManualDiscoveredResources(resources);
-    if (processDiscoveredResources(resources, true)) 
+    if (processDiscoveredResources(resources)) 
     {
         dtsAssignment();
         //cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
@@ -261,18 +245,19 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
+/*
 QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
 {
     QnResourceList resources;
     appendManualDiscoveredResources(resources);
-    if (processDiscoveredResources(resources, false))
+    if (processDiscoveredResources(resources))
         return resources;
     else
         return QnResourceList();
 }
+*/
 
-
-bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck)
+bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
     QMutexLocker lock(&m_discoveryMutex);
 

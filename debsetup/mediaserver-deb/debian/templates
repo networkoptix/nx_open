@@ -27,15 +27,6 @@ Template: ${deb.customization.company.name}-mediaserver/ecsPassword_invalid
 Type: error
 Description: Enterprise Controller can't be empty
 
-Template: ${deb.customization.company.name}-mediaserver/storage
-Type: string
-Default: /opt/${deb.customization.company.name}/mediaserver/var/data
-Description: Storage folder
-
-Template: ${deb.customization.company.name}-mediaserver/storage_invalid
-Type: error
-Description: Please specify an absolute path (starting with /)
-
 Template: ${deb.customization.company.name}-mediaserver/port
 Type: string
 Default: 7002
@@ -44,10 +35,6 @@ Description: Media Server port:
 Template: ${deb.customization.company.name}-mediaserver/port_invalid
 Type: error
 Description: Media Server port is invalid. Please try again.
-
-Template: ${deb.customization.company.name}-mediaserver/storage_cant_create
-Type: error
-Description: Can't create directory. Please check it's correct and you have appropriate permissions.
 
 Template: ${deb.customization.company.name}-mediaserver/transport
 Type: select

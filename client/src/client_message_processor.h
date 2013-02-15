@@ -30,17 +30,19 @@ public slots:
     void run();
 
 private slots:
-    void at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-    void at_licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
-
     void at_messageReceived(QnMessage message);
     void at_connectionClosed(QString errorString);
-    void at_connectionOpened();
-    void at_connectionReset();
+    void at_connectionOpened(QnMessage message);
+    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url);
 
 private:
     void init();
     void init(const QUrl& url, int reconnectTimeout);
+    void determineOptimalIF(QnMediaServerResource* mediaServer);
+    bool updateResource(QnResourcePtr resource, bool insert = true);
+    void processResources(const QnResourceList& resources);
+    void processLicenses(const QnLicenseList& licenses);
+    void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
 
 private:
     static const int EVENT_RECONNECT_TIMEOUT = 3000;

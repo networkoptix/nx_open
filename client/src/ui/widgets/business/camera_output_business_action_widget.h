@@ -23,7 +23,7 @@ private slots:
     void paramsChanged();
 
 private:
-    Ui::QnCameraOutputBusinessActionWidget *ui;
+    QScopedPointer<Ui::QnCameraOutputBusinessActionWidget> ui;
 };
 
 #endif // CAMERA_OUTPUT_BUSINESS_ACTION_WIDGET_H

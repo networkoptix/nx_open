@@ -5,6 +5,8 @@
 #include <QEvent>
 #include "warnings.h"
 
+// TODO: #Elric add syntax: connect(QObject *, QEvent::Type, QObject *, const char * /* slot (QObject *, QEvent *) */)
+
 template<class Base>
 class QnEventProcessor: public Base {
 public:

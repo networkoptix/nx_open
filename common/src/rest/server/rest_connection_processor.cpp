@@ -7,11 +7,16 @@
 #include "request_handler.h"
 #include <QTime>
 
+extern "C" {
+    quint32 crc32 (quint32 crc, char *buf, quint32 len);
+}
+
+
 static const int CONNECTION_TIMEOUT = 60 * 1000;
 
 QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
 
-class QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 
@@ -25,6 +30,38 @@ QnRestConnectionProcessor::QnRestConnectionProcessor(TCPSocket* socket, QnTcpLis
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
 {
     stop();
+}
+
+QByteArray compressData(const QByteArray& data)
+{
+    QByteArray result;
+
+    static int QT_HEADER_SIZE = 4;
+    static int ZLIB_HEADER_SIZE = 2;
+    static int ZLIB_SUFFIX_SIZE = 4;
+    static int GZIP_HEADER_SIZE = 10;
+    const quint8 GZIP_HEADER[] = {
+        0x1f, 0x8b      // gzip magic number
+        , 8             // compress method "defalte"
+        , 1             // text data
+        , 0, 0, 0, 0    // timestamp is not set
+        , 2             // maximum compression flag
+        , 255           // unknown OS
+    };
+
+
+
+    QByteArray compressedData = qCompress(data);
+    QByteArray cleanData = QByteArray::fromRawData(compressedData.data() + QT_HEADER_SIZE + ZLIB_HEADER_SIZE, 
+        compressedData.size() - (QT_HEADER_SIZE + ZLIB_HEADER_SIZE + ZLIB_SUFFIX_SIZE));
+    result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
+    result.append((const char*) GZIP_HEADER, GZIP_HEADER_SIZE);
+    result.append(cleanData);
+    quint32 tmp = crc32(0, (char*) data.data(), data.size());
+    result.append((const char*) &tmp, sizeof(quint32));
+    tmp = (quint32)data.size();
+    result.append((const char*) &tmp, sizeof(quint32));
+    return result;
 }
 
 void QnRestConnectionProcessor::run()
@@ -49,7 +86,7 @@ void QnRestConnectionProcessor::run()
 
             d->responseBody.clear();
             int rez = CODE_OK;
-            QByteArray encoding = "application/xml";
+            QByteArray contentType = "application/xml";
             QUrl url = getDecodedUrl();
             QnRestRequestHandlerPtr handler = findHandler(url.path());
             if (handler) 
@@ -58,28 +95,27 @@ void QnRestConnectionProcessor::run()
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
                     if (d->requestHeaders.method().toUpper() == QLatin1String("GET")) {
-                        rez = handler->executeGet(url.path(), params, d->responseBody, encoding);
+                        rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
                     }
                     else if (d->requestHeaders.method().toUpper() == QLatin1String("POST")) {
-                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, encoding);
+                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
                     }
                     else {
                         qWarning() << "Unknown REST method " << d->requestHeaders.method();
-                        encoding = "text/plain";
+                        contentType = "text/plain";
                         d->responseBody = "Invalid HTTP method";
                         rez = CODE_NOT_FOUND;
                     }
                 }
                 else {
-                    encoding = "text/html";
+                    contentType = "text/html";
                     d->responseBody = STATIC_UNAUTHORIZED_HTML;
                     rez = CODE_AUTH_REQUIRED;
                 }
             }
             else {
-                if (url.path() != QLatin1String("/api/ping/"))
-                    qWarning() << "Unknown REST path " << url.path();
-                encoding = "text/html";
+                qWarning() << "Unknown REST path " << url.path();
+                contentType = "text/html";
                 d->responseBody.clear();
                 d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
                 d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
@@ -108,7 +144,14 @@ void QnRestConnectionProcessor::run()
                 d->responseBody.append("</html>\n");
                 rez = CODE_NOT_FOUND;
             }
-            sendResponse("HTTP", rez, encoding);
+
+            QByteArray contentEncoding;
+            if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
+                d->responseBody = compressData(d->responseBody);
+                contentEncoding = "gzip";
+            }
+
+            sendResponse("HTTP", rez, contentType, contentEncoding, false);
         }
         if (!isKeepAlive)
             break;

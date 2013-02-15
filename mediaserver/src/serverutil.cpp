@@ -9,15 +9,6 @@
 
 static QnMediaServerResourcePtr m_server;
 
-QString defaultStoragePath()
-{
-#ifdef Q_OS_WIN
-    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString());
-#else
-    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString());
-#endif
-}
-
 void syncStoragesToSettings(QnMediaServerResourcePtr server)
 {
     const QnAbstractStorageResourceList& storages = server->getStorages();
@@ -31,10 +22,6 @@ void syncStoragesToSettings(QnMediaServerResourcePtr server)
     }
 
     qSettings.endArray();
-
-    if (storages.size() == 1) {
-        qSettings.setValue("mediaDir", QDir::toNativeSeparators(storages.at(0)->getUrl()));
-    }
 }
 
 QString authKey()
@@ -44,8 +31,12 @@ QString authKey()
 
 QString serverGuid()
 {
-    QString guid = qSettings.value("serverGuid").toString();
+    static QString guid;
 
+    if (!guid.isEmpty())
+        return guid;
+
+    guid = qSettings.value("serverGuid").toString();
     if (guid.isEmpty())
     {
         if (!qSettings.isWritable())

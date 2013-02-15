@@ -42,11 +42,8 @@ QFileInfoList QnColdStoreMetaData::fileInfoList(const QString& subPath) const
 
     QFileInfoList result;
 
-    QHashIterator<QString, QnCSFileInfo> it(m_hash);
-    while (it.hasNext()) 
-    {
-        it.next();
-        QString fn = it.key();
+    for(QHash<QString, QnCSFileInfo>::const_iterator pos = m_hash.begin(); pos != m_hash.end(); pos++) {
+        QString fn = pos.key();
         
         if (fn.contains(subPath))
             result.push_back(QFileInfo(fn));
@@ -65,12 +62,9 @@ QByteArray QnColdStoreMetaData::toByteArray() const
 
     result.append("1;"); //version
 
-    QHashIterator<QString, QnCSFileInfo> it(m_hash);
-    while (it.hasNext()) 
-    {
-        it.next();
-        QString fn = it.key();
-        QnCSFileInfo fi = it.value();
+    for(QHash<QString, QnCSFileInfo>::const_iterator pos = m_hash.begin(); pos != m_hash.end(); pos++) {
+        QString fn = pos.key();
+        QnCSFileInfo fi = pos.value();
 
         result.append(fn);
         result.append(";");

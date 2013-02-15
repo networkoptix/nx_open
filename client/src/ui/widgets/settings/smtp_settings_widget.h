@@ -17,6 +17,7 @@ public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
 
+    void update();
     void submit();
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
@@ -24,7 +25,7 @@ private slots:
     void at_settings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
 private:
-    Ui::QnSmtpSettingsWidget *ui;
+    QScopedPointer<Ui::QnSmtpSettingsWidget> ui;
 
     int m_requestHandle;
 };

@@ -62,6 +62,7 @@ namespace conn_detail
 class QN_EXPORT QnAppServerConnection
 {
 public:
+
     ~QnAppServerConnection();
 
     void stop();
@@ -77,13 +78,11 @@ public:
     int getBusinessRules(QnBusinessEventRules &businessRules);
 
     int setResourceStatus(const QnId& resourceId, QnResource::Status status);
-    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
+    int saveServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
-    bool setPanicMode(bool value);
-    bool dumpDatabase(QByteArray& data);
-    bool restoreDatabase(const QByteArray& data);
+    bool setPanicMode(QnMediaServerResource::PanicMode value);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
@@ -96,6 +95,7 @@ public:
     int saveSync(const QnVirtualCameraResourcePtr&);
 
     int sendEmail(const QString& to, const QString& subject, const QString& message);
+    int sendEmail(const QStringList& to, const QString& subject, const QString& message);
     qint64 getCurrentTime();
 
     // Asynchronous API
@@ -104,6 +104,7 @@ public:
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int getBusinessRulesAsync(QObject *target, const char *slot);
+    int getKvPairsAsync(QObject* target, const char* slot);
     int getSettingsAsync(QObject *target, const char *slot);
 
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
@@ -111,6 +112,9 @@ public:
 
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
+
+    int dumpDatabase(QObject *target, const char *slot);
+    int restoreDatabase(const QByteArray& data, QObject *target, const char *slot);
 
     // Returns request id
     int saveAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
@@ -153,6 +157,7 @@ private:
 private:
     // By now this is used only by synchronous api.
     // TODO: Make use for asynch API as well
+    // TODO: #Ivan 
     QByteArray m_lastError;
 
     QUrl m_url;

@@ -52,6 +52,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
             continue;
         }
+        if (cameras.isEmpty())
+        {
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
+            continue;
+        }
 
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
@@ -90,6 +95,8 @@ bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &re
 
 void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
 {
+    Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
     else

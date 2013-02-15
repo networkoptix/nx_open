@@ -462,7 +462,6 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellPa
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
     if(qEqual(value, &value[ParamType_Count], localValue)) {
-        emit cellValueNotChanged(cell);
         return;
     }
 

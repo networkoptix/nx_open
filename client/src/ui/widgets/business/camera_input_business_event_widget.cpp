@@ -1,7 +1,9 @@
 #include "camera_input_business_event_widget.h"
 #include "ui_camera_input_business_event_widget.h"
 
-#include <events/camera_input_business_event.h>
+#include <core/resource/camera_resource.h>
+
+#include <business/events/camera_input_business_event.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -11,12 +13,11 @@ QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *pare
 {
     ui->setupUi(this);
 
-    connect(ui->inputIdLineEdit, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
+    connect(ui->relayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
 }
 
 QnCameraInputBusinessEventWidget::~QnCameraInputBusinessEventWidget()
 {
-    delete ui;
 }
 
 void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -26,9 +27,33 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
-    if (fields & QnBusiness::EventParamsField)
-        ui->inputIdLineEdit->setText(BusinessEventParameters::getInputPortId(model->eventParams()));
-    //TODO: #GDM update on resource change
+    if (fields & QnBusiness::EventResourcesField) {
+        QSet<QString> inputPorts;
+        bool inited = false;
+
+        QnVirtualCameraResourceList cameras = model->eventResources().filtered<QnVirtualCameraResource>();
+        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+            QStringList cameraInputs = camera->getInputPortList();
+            if (!inited) {
+                inputPorts = cameraInputs.toSet();
+                inited = true;
+            } else {
+                inputPorts = inputPorts.intersect(cameraInputs.toSet());
+            }
+        }
+
+        ui->relayComboBox->clear();
+        ui->relayComboBox->addItem(tr("<automatic>"), QString());
+        foreach (QString relay, inputPorts)
+            ui->relayComboBox->addItem(relay, relay);
+
+    }
+
+    if (fields & QnBusiness::EventParamsField) {
+        QString text = BusinessEventParameters::getInputPortId(model->eventParams());
+        if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
+            ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
+    }
 }
 
 void QnCameraInputBusinessEventWidget::paramsChanged() {
@@ -36,6 +61,6 @@ void QnCameraInputBusinessEventWidget::paramsChanged() {
         return;
 
     QnBusinessParams params;
-    BusinessEventParameters::setInputPortId(&params, ui->inputIdLineEdit->text());
+    BusinessEventParameters::setInputPortId(&params, ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
     model()->setActionParams(params);
 }

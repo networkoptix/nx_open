@@ -1,5 +1,6 @@
 package pb;
 
+import "resourceType.proto";
 import "resource.proto";
 import "license.proto";
 import "cameraServerItem.proto";
@@ -72,4 +73,16 @@ message BroadcastBusinessActionMessage {
     }
 
     required BusinessAction businessAction = 1;
+}
+
+message InitialMessage {
+    extend Message {
+        required InitialMessage message = 105;
+    }
+
+    repeated ResourceType resourceType = 1;
+    repeated Resource resource = 2;
+    repeated License license = 3;
+    repeated CameraServerItem cameraServerItem = 4;
+    optional string hardwareId = 5;
 }

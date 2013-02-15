@@ -4,13 +4,14 @@
 #include <functional>
 #include <memory>
 
+#include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
-#include "events/business_event_connector.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
+#include <business/business_event_connector.h>
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
-
+#include "axis_ptz_controller.h"
 
 using namespace std;
 
@@ -127,6 +128,12 @@ void QnPlAxisResource::stopInputPortMonitoring()
         httpClient->scheduleForRemoval();
         lk.relock();
     }
+}
+
+bool QnPlAxisResource::isInputPortMonitored() const
+{
+    QMutexLocker lk( &m_inputPortMutex );
+    return !m_inputPortHttpMonitor.empty();
 }
 
 bool QnPlAxisResource::isInitialized() const
@@ -284,54 +291,58 @@ bool QnPlAxisResource::initInternal()
     QByteArray body;
     http.readAll(body);
 
-    QMutexLocker lock(&m_mutex);
-
-    m_resolutionList.clear();
-    int paramValuePos = body.indexOf('=');
-    if (paramValuePos == -1)
     {
-        qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
-        return false;
-    }
+        QMutexLocker lock(&m_mutex);
 
-    m_palntscRes = false;
-
-    m_resolutionList = body.mid(paramValuePos+1).split(',');
-    for (int i = 0; i < m_resolutionList.size(); ++i)
-    {
-        m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
-
-        
-        if (m_resolutionList[i]=="qcif")
+        m_resolutionList.clear();
+        int paramValuePos = body.indexOf('=');
+        if (paramValuePos == -1)
         {
-            m_resolutionList[i] = "176x144";
-            m_palntscRes = true;
+            qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
+            return false;
         }
 
-        else if (m_resolutionList[i]=="cif")
-        {
-            m_resolutionList[i] = "352x288";
-            m_palntscRes = true;
-        }
+        m_palntscRes = false;
 
-        else if (m_resolutionList[i]=="2cif")
+        m_resolutionList = body.mid(paramValuePos+1).split(',');
+        for (int i = 0; i < m_resolutionList.size(); ++i)
         {
-            m_resolutionList[i] = "704x288";
-            m_palntscRes = true;
-        }
+            m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
 
-        else if (m_resolutionList[i]=="4cif")
-        {
-            m_resolutionList[i] = "704x576";
-            m_palntscRes = true;
-        }
+            
+            if (m_resolutionList[i]=="qcif")
+            {
+                m_resolutionList[i] = "176x144";
+                m_palntscRes = true;
+            }
 
-        else if (m_resolutionList[i]=="d1")
-        {
-            m_resolutionList[i] = "720x576";
-            m_palntscRes = true;
+            else if (m_resolutionList[i]=="cif")
+            {
+                m_resolutionList[i] = "352x288";
+                m_palntscRes = true;
+            }
+
+            else if (m_resolutionList[i]=="2cif")
+            {
+                m_resolutionList[i] = "704x288";
+                m_palntscRes = true;
+            }
+
+            else if (m_resolutionList[i]=="4cif")
+            {
+                m_resolutionList[i] = "704x576";
+                m_palntscRes = true;
+            }
+
+            else if (m_resolutionList[i]=="d1")
+            {
+                m_resolutionList[i] = "720x576";
+                m_palntscRes = true;
+            }
         }
-    }
+    }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
+            //m_initMutex is locked up the stack
+    
 
 
     //root.Image.MotionDetection=no
@@ -342,6 +353,15 @@ bool QnPlAxisResource::initInternal()
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
 
     initializeIOPorts( &http );
+
+    initializePtz(&http);
+
+    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
+    {
+        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
+    }
 
     return true;
 }
@@ -596,7 +616,9 @@ bool QnPlAxisResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS )
 {
-    std::map<QString, unsigned int>::const_iterator it = m_outputPortNameToIndex.find( outputID );
+    std::map<QString, unsigned int>::const_iterator it = outputID.isEmpty()
+        ? m_outputPortNameToIndex.begin()
+        : m_outputPortNameToIndex.find( outputID );
     if( it == m_outputPortNameToIndex.end() )
         return false;
 
@@ -620,7 +642,7 @@ bool QnPlAxisResource::setRelayOutputState(
     if( status / 100 != 2 )
     {
         cl_log.log( QString::fromLatin1("Failed to set camera %1 port %2 output state to %3. Result: %4").
-            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+            arg(getHostAddress()).arg(it->first).arg(activate).arg(::toString(status)), cl_logWARNING );
         return false;
     }
 
@@ -688,6 +710,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
     {
         cl_log.log( QString::fromLatin1("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
             arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        forgetHttpClient( httpClient );
+        httpClient->scheduleForRemoval();
         return;
     }
 
@@ -749,7 +773,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
         nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
             nx_http::ConstBufferRefType(msgBodyBuf, offset),
             &bytesProcessed );
-        offset += bytesProcessed;
+        offset += (int) bytesProcessed;
         switch( resultCode )
         {
             case nx_http::MultipartContentParser::partDataDone:
@@ -761,7 +785,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
                 {
                     m_currentMonitorData.append(
                         m_multipartContentParser.prevFoundData().data(),
-                        m_multipartContentParser.prevFoundData().size() );
+                        (int) m_multipartContentParser.prevFoundData().size() );
                     notificationReceived( m_currentMonitorData );
                     m_currentMonitorData.clear();
                 }
@@ -770,7 +794,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
             case nx_http::MultipartContentParser::someDataAvailable:
                 m_currentMonitorData.append(
                     m_multipartContentParser.prevFoundData().data(),
-                    m_multipartContentParser.prevFoundData().size() );
+                    (int) m_multipartContentParser.prevFoundData().size() );
                 break;
 
             case nx_http::MultipartContentParser::eof:
@@ -796,7 +820,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( inputPortCount > 0 )
-        setCameraCapability(QnSecurityCamResource::relayInput, true);
+        setCameraCapability(Qn::relayInput, true);
 
     unsigned int outputPortCount = 0;
     status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
@@ -804,7 +828,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( outputPortCount > 0 )
-        setCameraCapability(QnSecurityCamResource::relayOutput, true);
+        setCameraCapability(Qn::relayOutput, true);
 
     //reading port direction and names
     for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )
@@ -897,4 +921,27 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
             return;
         }
     }
+}
+
+void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
+    Q_UNUSED(http)
+    // TODO: make configurable.
+    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
+
+    // TODO: use QHash here, +^
+    QString localModel = getModel();
+    for(const char **model = brokenPtzCameras; *model; model++)
+        if(localModel == QLatin1String(*model))
+            return;
+
+    m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
+    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoCapabilities)
+        m_ptzController.reset();
+
+    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
+}
+
+QnAbstractPtzController* QnPlAxisResource::getPtzController() {
+    return m_ptzController.data();
 }

@@ -19,9 +19,17 @@
   <property name="windowTitle">
    <string>Select cameras...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QnResourceTreeWidget" name="resourcesWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="QFrame" name="delegateFrame">
+     <layout class="QVBoxLayout" name="delegateLayout"/>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

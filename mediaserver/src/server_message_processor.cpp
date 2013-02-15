@@ -8,7 +8,7 @@
 #include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
-#include "events/business_rule_processor.h"
+#include <business/business_rule_processor.h>
 
 Q_GLOBAL_STATIC(QnServerMessageProcessor, static_instance)
 
@@ -55,9 +55,8 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
     if (event.eventType == Qn::Message_Type_License)
     {
-        // New license added
-        if (event.license->isValid())
-            qnLicensePool->addLicense(event.license);
+        // New license added. LicensePool verifies it.
+        qnLicensePool->addLicense(event.license);
     }
     else if (event.eventType == Qn::Message_Type_CameraServerItem)
     {
@@ -77,8 +76,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
         bool isServer = resource.dynamicCast<QnMediaServerResource>();
         bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
+        bool isUser = resource.dynamicCast<QnUserResource>();
 
-        if (!isServer && !isCamera)
+        if (!isServer && !isCamera && !isUser)
             return;
 
         // If the resource is mediaServer then ignore if not this server

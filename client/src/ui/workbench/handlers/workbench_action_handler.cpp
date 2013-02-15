@@ -11,6 +11,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
 #include <QtGui/QWhatsThis>
+#include <QtGui/QInputDialog>
+#include <QtGui/QLineEdit>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -23,6 +25,12 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <api/session_manager.h>
+
+#include <business/actions/popup_business_action.h>
+
+//TODO: #GDM remove when debug will not be required
+#include <business/events/reasoned_business_event.h>
+#include <business/events/conflict_business_event.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -56,6 +64,8 @@
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
+#include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/ptz_presets_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -78,11 +88,14 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_ptz_preset_manager.h>
+#include <ui/workbench/workbench_ptz_controller.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -95,7 +108,6 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
-#include "../watchers/workbench_server_time_watcher.h"
 
 
 
@@ -189,6 +201,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
     connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
+    connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
@@ -198,6 +211,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::OpenServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_openServerSettingsAction_triggered()));
+    connect(action(Qn::OpenPopupSettingsAction),                SIGNAL(triggered()),    this,   SLOT(at_openPopupSettingsAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
@@ -258,6 +272,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
     connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
     connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
+    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
+    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
+    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -267,6 +284,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
+
+    context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
     /*
     SignalingInstrument *activityInstrument = new SignalingInstrument(
@@ -627,7 +646,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (activeCameras > qnLicensePool->getLicenses().totalCameras()) {
         QString message = tr("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.").arg(activeCameras).arg(qnLicensePool->getLicenses().totalCameras());
-        QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
+        QMessageBox::warning(widget(), tr("Could not enable recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
 
@@ -670,7 +689,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         if (!failedParams.isEmpty()) {
             QMessageBox::warning(
                 widget(),
-                tr("Currently parameters can't be saved."),
+                tr("Could not save parameters"),
                 tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
                 1, 0);
 
@@ -837,17 +856,14 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    qDebug() << "action received" << businessAction;
-
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
-
 
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 
-    popupCollectionWidget()->addBusinessAction(businessAction);
-    popupCollectionWidget()->show();
+    if (popupCollectionWidget()->addBusinessAction(businessAction))
+        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -868,6 +884,75 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+    int total = qnResPool->getAllEnabledCameras().size();
+    if (total == 0)
+        return;
+
+    int n = qrand() % total;
+    int camId = qnResPool->getAllEnabledCameras().at(n)->getId();
+
+    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
+    if (servers.size() == 0)
+        return;
+
+    n = qrand() % servers.size();
+    int srvId = servers.at(n)->getId();
+
+
+    n = qrand() % BusinessEventType::BE_Count;
+    BusinessEventType::Value eventType = (BusinessEventType::Value)n;
+
+    QnBusinessParams params;
+    QnBusinessEventRuntime::setEventType(&params, eventType);
+
+    n = qrand() % 2;
+
+    QStringList conflicts;
+    conflicts << QLatin1String("50:e5:49:43:b2:5A");
+    conflicts << QLatin1String("50:e5:49:43:b2:5B");
+    conflicts << QLatin1String("50:e5:49:43:b2:5C");
+
+    switch (eventType) {
+        case BusinessEventType::BE_Camera_Input:
+        case BusinessEventType::BE_Camera_Motion:
+        case BusinessEventType::BE_Camera_Disconnect:
+            QnBusinessEventRuntime::setEventResourceId(&params, camId);
+            break;
+
+        case BusinessEventType::BE_Storage_Failure:
+            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
+            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::StorageIssueIoError : QnBusiness::StorageIssueNotEnoughSpeed);
+            QnBusinessEventRuntime::setReasonText(&params, QLatin1String("C:\\;D:\\"));
+            break;
+        case BusinessEventType::BE_Network_Issue:
+            QnBusinessEventRuntime::setEventResourceId(&params, camId);
+            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueRtpPacketLoss);
+            QnBusinessEventRuntime::setReasonText(&params, n == 0 ? QLatin1String("10") : QLatin1String("25245;26532"));
+            break;
+        case BusinessEventType::BE_MediaServer_Failure:
+            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
+            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::MServerIssueStarted : QnBusiness::MServerIssueTerminated);
+            break;
+        case BusinessEventType::BE_Camera_Ip_Conflict:
+            QnBusinessEventRuntime::setEventResourceId(&params, camId);
+            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
+            QnBusinessEventRuntime::setConflicts(&params, conflicts);
+            break;
+        case BusinessEventType::BE_MediaServer_Conflict:
+            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
+            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
+            QnBusinessEventRuntime::setConflicts(&params, conflicts);
+            break;
+        default:
+            break;
+    }
+
+
+
+
+    QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
+    at_eventManager_actionReceived(ba);
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -1247,6 +1332,42 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
 }
 
+void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
+    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(update.isNull()) {
+        if(alwaysNotify)
+            QMessageBox::information(widget(), tr("Information"), tr("No updates available."));
+        return;
+    }
+
+    QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
+    bool ignoreThisVersion = update.engineVersion <= ignoredUpdateVersion;
+    bool thisVersionWasIgnored = ignoreThisVersion;
+    if(ignoreThisVersion && !alwaysNotify)
+        return;
+
+    QnCheckableMessageBox::question(
+        widget(), 
+        tr("Software update is available"), 
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
+        tr("Don't notify again about this update."),
+        &ignoreThisVersion,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, 
+        QDialogButtonBox::Ok
+    );
+
+    if(ignoreThisVersion != thisVersionWasIgnored)
+        qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
+}
+
+void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+    notifyAboutUpdate(false);
+}
+
+void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
+    notifyAboutUpdate(true);
+}
+
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -1263,6 +1384,13 @@ void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
 void QnWorkbenchActionHandler::at_openServerSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->openServerSettingsPage();
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_openPopupSettingsAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->openPopupSettingsPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1315,7 +1443,6 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->addExample();
     popupCollectionWidget()->show();
 }
 
@@ -1415,7 +1542,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 #ifndef STANDALONE_MODE
     static const char *appserverAddedPropertyName = "_qn_appserverAdded";
     if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnAppServerResourceSearcher::instance());
         QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
     }
 #endif
@@ -1435,9 +1561,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
-    QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
     QnResourceDiscoveryManager::instance()->start();
-    QnResourceDiscoveryManager::instance()->setReady(true);
+    
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
@@ -1746,13 +1871,13 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
     QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    dialog->exec(); */
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
@@ -1914,6 +2039,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setGuid(QUuid::createUuid());
 
     connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    user->setPassword(QString()); // forget the password now
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
@@ -1996,7 +2122,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
 
-    QSettings settings;
+    QSettings settings; // TODO: #Elric replace with QnSettings
     settings.beginGroup(QLatin1String("screenshots"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -2018,7 +2144,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             filePath += selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         QFile::remove(filePath);
         if (!screenshot.save(filePath)) {
-            QMessageBox::critical(this->widget(), tr("Error"), tr("Could not save screenshot '%1'.").arg(filePath));
+            QMessageBox::critical(this->widget(), tr("Could not save screenshot"), tr("An error has occurred while saving screenshot '%1'.").arg(filePath));
         } else {
             addToResourcePool(filePath);
         }
@@ -2063,17 +2189,23 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
     accessRightsFlags &= flags;
 
+    QnUserSettingsDialog::ElementFlags emailFlags =
+        ((permissions & Qn::ReadEmailPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
+    emailFlags &= flags;
+
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
     dialog->setEditorPermissions(accessController()->globalPermissions());
     
 
     // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-    QString userPassword = qnSettings->lastUsedConnection().url.password();
+    QString currentPassword = qnSettings->lastUsedConnection().url.password();
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
-        dialog->setCurrentPassword(userPassword);
+        dialog->setCurrentPassword(currentPassword);
     } else {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     }
@@ -2085,21 +2217,25 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        if (user->isAdmin() && userPassword != user->getPassword()) {
+        if (user == context()->user()                           // if we
+                && user->isAdmin()                              // are owner
+                && !user->getPassword().isEmpty()               // and have changed our password
+                && currentPassword != user->getPassword()       // to another password
+                )
+        {
             QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
             int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                                  QMessageBox::Ok, QMessageBox::Discard);
             if (button == QMessageBox::Discard) {
-                user->setPassword(QString()); // TODO #gdm ask elric: why the hell we store empty strings?
-                return; // we cannot change anything else for the Owner so we can return safely
+                user->setPassword(QString());
             }
         }
 
-        // TODO #gdm ask elric: should we restore empty user->password at at_resources_saved()?
         connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
-        if(user == context()->user() && newPassword != userPassword) {
+        user->setPassword(QString());
+        if(user == context()->user() && !newPassword.isEmpty() && newPassword != currentPassword) {
             /* Password was changed. Change it in global settings and hope for the best. */
             QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);
@@ -2163,7 +2299,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     if (imageExists) {
         QMessageBox::critical(
             this->widget(), 
-            tr("Can't create local layout"), 
+            tr("Could not save a layout"), 
             tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
             QMessageBox::Ok
             );
@@ -2172,8 +2308,8 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     else if (nonUtcExists && utcExists) {
         QMessageBox::critical(
             this->widget(), 
-            tr("Can't create local layout"), 
-            tr("Current layout contains several cameras and several local files. You have to keep only cameras or only local files"), 
+            tr("Could not save a layout"), 
+            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files"), 
             QMessageBox::Ok
             );
         return false;
@@ -2223,7 +2359,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     else
         return false; // not used
 
-    QSettings settings;
+    QSettings settings; // TODO: replace with QnSettings
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
@@ -2283,7 +2419,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 this->widget(), 
-                tr("Can't overwrite file"), 
+                tr("Could not overwrite file"), 
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
             );
@@ -2311,7 +2447,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     {
         QMessageBox::critical(
             this->widget(), 
-            tr("Another export in progress"),
+            tr("Could not save a layout"),
             tr("Another export in progress. Please wait"), 
             QMessageBox::Ok
         );
@@ -2591,7 +2727,7 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
     if (!failedParams.isEmpty()) {
         QMessageBox::warning(
             widget(),
-            tr("Currently parameters can't be saved."),
+            tr("Could not save parameters"),
             tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
             1, 0);
 
@@ -2615,7 +2751,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         } else {
             QMessageBox::critical(
                 this->widget(), 
-                tr("Cannot export file"), 
+                tr("Could not export file"), 
                 tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
                 QMessageBox::Ok
             );
@@ -2646,7 +2782,7 @@ Do you want to continue?"),
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
     QSettings settings;
-    settings.beginGroup(QLatin1String("export"));
+    settings.beginGroup(QLatin1String("export")); // TODO: replace with QnSettings
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
         previousDir = qnSettings->mediaFolder();
@@ -2702,7 +2838,7 @@ Do you want to continue?"),
                     int result = QMessageBox::warning(
                         this->widget(), 
                         tr("AVI format is not recommended"), 
-                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
+                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"), // TODO: #Elric bad Engrish
                         QMessageBox::Yes | QMessageBox::No
                     );
                     if (result != QMessageBox::Yes)
@@ -2714,7 +2850,7 @@ Do you want to continue?"),
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 this->widget(), 
-                tr("Can't overwrite file"), 
+                tr("Could not overwrite file"), 
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
             );
@@ -2867,6 +3003,75 @@ void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
     setItemsResolutionMode(Qn::HighResolution);
 }
 
+void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
+    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
+
+    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+        QMessageBox::critical(
+            widget(), 
+            tr("Could not get position from camera"), 
+            tr("An error has occurred while trying to get current position from camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
+        );
+        return;
+    }
+
+    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(camera);
+    if(qIsNaN(position)) {
+        QMessageBox::critical(
+            widget(), 
+            tr("Could not get position from camera"), 
+            tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
+        );
+    }
+
+    bool ok = false;
+    QString name = QInputDialog::getText(widget(), tr("Save Position"), tr("Enter position name:"), QLineEdit::Normal, QString(), &ok);
+    if(!ok)
+        return;
+
+    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, name, position);
+}
+
+void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
+
+    QString name = parameters.argument<QString>(Qn::NameParameter);
+    if(name.isEmpty())
+        return;
+
+    QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
+    if(preset.isNull())
+        return;
+
+    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+        QMessageBox::critical(
+            widget(), 
+            tr("Could not set position from camera"), 
+            tr("An error has occurred while trying to set current position for camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
+        );
+        return;
+    }
+
+    action(Qn::JumpToLiveAction)->trigger(); // TODO: ?
+    context()->instance<QnWorkbenchPtzController>()->setPosition(camera, preset.logicalPosition);
+}
+
+void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
+    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
+
+    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget()));
+    dialog->setCamera(camera);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
     Q_UNUSED(handle);
 
@@ -2914,7 +3119,7 @@ void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& resp
     if(response.status == 0)
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
+    QMessageBox::critical(widget(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
@@ -2945,24 +3150,17 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
     QnMediaServerResourceList resources = resourcePool()->getResources().filtered<QnMediaServerResource>();
 
-    foreach(QnMediaServerResourcePtr resource, resources) {
-        if(resource->isPanicMode() != checked) {
-            resource->setPanicMode(checked);
+    foreach(QnMediaServerResourcePtr resource, resources) 
+    {
+        bool isPanicMode = resource->getPanicMode() != QnMediaServerResource::PM_None;
+        if(isPanicMode != checked) {
+            QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+            if (checked)
+                val = QnMediaServerResource::PM_User;
+            resource->setPanicMode(val);
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
         }
     }
-}
-
-void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(update.isNull())
-        return;
-    
-    QMessageBox::information(
-        widget(), 
-        tr("Software Update is Available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString())
-    );
 }
 
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {

@@ -21,12 +21,14 @@ public:
     
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
+
 private slots:
     void at_settingsButton_clicked();
+    void at_selectButton_clicked();
     void paramsChanged();
 
 private:
-    Ui::QnSendmailBusinessActionWidget *ui;
+    QScopedPointer<Ui::QnSendmailBusinessActionWidget> ui;
 };
 
 #endif // SENDMAIL_BUSINESS_ACTION_WIDGET_H

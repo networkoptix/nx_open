@@ -17,6 +17,8 @@
     
 #include "api_fwd.h"
 
+class QnPtzSpaceMapper;
+
 namespace detail {
     class QnMediaServerSimpleReplyProcessor: public QObject
     {
@@ -54,7 +56,7 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
-        void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
+        void finished(int status, qint64 freeSpace, qint64 totalSpace, int handle);
     };
 
     class QnMediaServerStatisticsReplyProcessor: public QObject
@@ -161,6 +163,17 @@ namespace detail {
         void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
     };
 
+    class QnMediaServerPtzGetSpaceMapperReplyProcessor: public QObject {
+        Q_OBJECT
+    public:
+        QnMediaServerPtzGetSpaceMapperReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
+
+    signals:
+        void finished(int status, const QnPtzSpaceMapper &mapper, int handle);
+    };
 
 } // namespace detail
 
@@ -175,7 +188,7 @@ class QN_EXPORT QnMediaServerConnection: public QObject
 {
     Q_OBJECT
 public:
-    QnMediaServerConnection(const QUrl &url, QObject *parent = 0);
+    QnMediaServerConnection(QnResourcePtr mServer, QObject *parent = 0);
     virtual ~QnMediaServerConnection();
 
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
@@ -240,6 +253,7 @@ public:
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
     int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, qreal xPos, qreal yPos, qreal zoomPos, QObject *target, const char *slot);
     int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int asyncGetTime(QObject *target, const char *slot);
 
@@ -254,6 +268,7 @@ private:
 
 private:
     QUrl m_url;
+    QnResourcePtr m_mServer;
     QString m_proxyAddr;
     int m_proxyPort;
 };

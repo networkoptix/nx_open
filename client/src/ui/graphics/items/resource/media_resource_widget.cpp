@@ -32,17 +32,13 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
-#include "ui/workbench/workbench_navigator.h" // TODO: this does not belong here
 
 
 // TODO: remove
-#include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
-#include "plugins/resources/camera_settings/camera_settings.h"
 #include "camera/caching_time_period_loader.h"
+#include "ui/workbench/workbench_navigator.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -69,7 +65,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    updateServerResource();
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
@@ -78,11 +73,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
 
-    const QGLWidget* viewPortAsGLWidget = qobject_cast<const QGLWidget*>(QnWorkbenchContextAware::display()->view()->viewport());
-    m_renderer = new QnResourceWidgetRenderer(
-            channelCount(),
-            NULL,
-            viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL );
+    // TODO: 
+    // Strictly speaking, this is a hack.
+    // We shouldn't be using OpenGL context in class constructor.
+    QGraphicsView *view = QnWorkbenchContextAware::display()->view();
+    const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
+    m_renderer = new QnResourceWidgetRenderer(channelCount(), NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
@@ -119,35 +115,18 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
 
-    QnImageButtonWidget *zoomInButton = new QnImageButtonWidget();
-    zoomInButton->setIcon(qnSkin->icon("item/zoom_in.png"));
-    zoomInButton->setProperty(Qn::NoBlockMotionSelection, true);
-    zoomInButton->setToolTip(tr("Zoom In"));
-    connect(zoomInButton, SIGNAL(pressed()), this, SLOT(at_zoomInButton_pressed()));
-    connect(zoomInButton, SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
-
-    QnImageButtonWidget *zoomOutButton = new QnImageButtonWidget();
-    zoomOutButton->setIcon(qnSkin->icon("item/zoom_out.png"));
-    zoomOutButton->setProperty(Qn::NoBlockMotionSelection, true);
-    zoomOutButton->setToolTip(tr("Zoom Out"));
-    connect(zoomOutButton, SIGNAL(pressed()), this, SLOT(at_zoomOutButton_pressed()));
-    connect(zoomOutButton, SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
-
     buttonBar()->addButton(RadassButton, radassButton);
     buttonBar()->addButton(MotionSearchButton, searchButton);
     buttonBar()->addButton(PtzButton, ptzButton);
-    buttonBar()->addButton(ZoomInButton, zoomInButton);
-    buttonBar()->addButton(ZoomOutButton, zoomOutButton);
     
     if(m_camera) {
         QTimer *timer = new QTimer(this);
         
-        connect(timer,              SIGNAL(timeout()),                                              this,   SLOT(updateIconButton()));
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),        this,   SLOT(updateIconButton()));
-        connect(m_camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(updateIconButton()));
-        connect(m_camera.data(), SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)), this, SLOT(updateIconButton()));
-        connect(m_camera.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(updateServerResource()));
-        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged()),                            this,   SLOT(updateButtonsVisibility()));
+        connect(timer,              SIGNAL(timeout()),                                                  this,   SLOT(updateIconButton()));
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),            this,   SLOT(updateIconButton()));
+        connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
+        connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
+        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateButtonsVisibility()));
 
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
@@ -546,52 +525,6 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
     }
 }
 
-void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
-    if(!m_camera)
-        return;
-
-    // TODO: server may change!
-    if(!m_connection && m_server)
-        m_connection = m_server->apiConnection();
-    if(!m_connection)
-        return;
-
-    QnVirtualCameraResource::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
-    if(capabilities & QnVirtualCameraResource::PtzCapability) {
-        if(qFuzzyIsNull(zoomSpeed)) {
-            m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
-        } else {
-            m_connection->asyncPtzMove(m_camera, 0.0, 0.0, zoomSpeed, this, SLOT(at_replyReceived(int, int)));
-        }
-    } else if(capabilities & QnVirtualCameraResource::ZoomCapability) {
-        CameraSetting setting(
-            QLatin1String("%%Lens%%Zoom"),
-            QLatin1String("Zoom"),
-            CameraSetting::ControlButtonsPair,
-            QString(),
-            QString(),
-            QString(),
-            CameraSettingValue(QLatin1String("zoomOut")),
-            CameraSettingValue(QLatin1String("zoomIn")),
-            CameraSettingValue(QLatin1String("stop")),
-            QString()
-        );
-
-        if(qFuzzyIsNull(zoomSpeed)) {
-            setting.setCurrent(setting.getStep());
-        } else if(zoomSpeed < 0.0) {
-            setting.setCurrent(setting.getMin());
-        } else if(zoomSpeed > 0.0) {
-            setting.setCurrent(setting.getMax());
-        }
-
-        QList<QPair<QString, QVariant> > params;
-        params << qMakePair(setting.getId(), QVariant(setting.serializeToStr()));
-
-        m_connection->asyncSetParam(m_camera, params, this, SLOT(at_replyReceived(int, const QList<QPair<QString, bool> > &)));
-    }
-}
-
 void QnMediaResourceWidget::updateIconButton() {
     if(!m_camera) {
         iconButton()->setVisible(false);
@@ -645,19 +578,6 @@ void QnMediaResourceWidget::updateRadassButton() {
     buttonBar()->button(RadassButton)->setIcon(qnSkin->icon(iconPath));
 }
 
-void QnMediaResourceWidget::updateServerResource() {
-    QnMediaServerResourcePtr server;
-    if(m_camera)
-        server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
-
-    if(m_server == server)
-        return;
-
-    m_server = server;
-
-    updateIconButton();
-}
-
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
         return Qn::RecordingType_Never;
@@ -680,11 +600,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
 // Handlers
 // -------------------------------------------------------------------------- //
 Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    if(options() & ControlPtz) {
-        return Qn::NoSection; /* No resizing when PTZ control is ON. */
-    } else {
-        return base_type::windowFrameSectionsAt(region);
-    }
+    return base_type::windowFrameSectionsAt(region);
 }
 
 int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
@@ -776,8 +692,12 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
         );
     }
-    
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(hqLqString).arg(timeString);
+
+    QString decoderType = m_renderer->isHardwareDecoderUsed(0) ? tr(" HW") : tr(" SW");
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2)
+        .arg(codecString).arg(hqLqString)
+        .arg(decoderType)
+        .arg(timeString);
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
@@ -791,13 +711,10 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if(m_camera) {
         if(
-            (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::PtzCapability | QnVirtualCameraResource::ZoomCapability)) && 
+            (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)) && 
             accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;
-
-            if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here
-                result |= ZoomInButton | ZoomOutButton;
         }
 
         result |= RadassButton;
@@ -815,12 +732,11 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
         return UnauthorizedOverlay;
-    } else if (m_display->camDisplay()->isLongWaiting()) 
-    {
+    } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return NoDataOverlay;
-        QnCachingTimePeriodLoader* loader = context()->navigator()->loader(m_resource);
-        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime()/1000))
+        QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
+        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateChannelOverlay(channel, QnResource::Online);
         else
             return NoDataOverlay;
@@ -843,7 +759,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
     if(!isLive)
-        buttonBar()->setButtonsChecked(PtzButton | ZoomInButton | ZoomOutButton, false);
+        buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
@@ -854,7 +770,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::PtzCapability);
+    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability);
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
@@ -865,39 +781,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     }
 }
 
-void QnMediaResourceWidget::at_zoomInButton_pressed() {
-    sendZoomAsync(1.0);
-}
-
-void QnMediaResourceWidget::at_zoomInButton_released() {
-    sendZoomAsync(0.0);
-    m_connection.clear();
-}
-
-void QnMediaResourceWidget::at_zoomOutButton_pressed() {
-    sendZoomAsync(-1.0);
-}
-
-void QnMediaResourceWidget::at_zoomOutButton_released() {
-    sendZoomAsync(0.0);
-    m_connection.clear();
-}
-
 void QnMediaResourceWidget::at_radassButton_clicked() {
     setResolutionMode(static_cast<Qn::ResolutionMode>((resolutionMode() + 1) % Qn::ResolutionModeCount));
 }
-
-void QnMediaResourceWidget::at_replyReceived(int status, int handle) {
-    Q_UNUSED(status);
-    Q_UNUSED(handle);
-}
-
-void QnMediaResourceWidget::at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult) {
-    Q_UNUSED(status);
-    Q_UNUSED(operationResult);
-}
-
-
-
-
 

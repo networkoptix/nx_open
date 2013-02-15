@@ -42,6 +42,8 @@ public:
 
     void updateSoftwareMotion();
     bool canChangeStatus() const { return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource; }
+
+    virtual bool secondaryResolutionIsLarge() const { return false; }
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -62,7 +64,6 @@ private:
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
-    QnResource::ConnectionRole m_role;
     QnResource::ConnectionRole m_softMotionRole;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;

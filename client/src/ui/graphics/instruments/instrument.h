@@ -9,6 +9,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QList>
 
+#include <utils/common/adl_connective.h>
+
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 
@@ -123,8 +125,10 @@ namespace detail {
  * inside derived class's destructor if it reimplements either 
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public QObject, protected QnGeometry, protected QnSceneTransformations {
+class Instrument: public AdlConnective<QObject>, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT;
+
+    typedef AdlConnective<QObject> base_type;
 
 public:
     /**

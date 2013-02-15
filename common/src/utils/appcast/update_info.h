@@ -1,50 +1,22 @@
 #ifndef QN_UPDATE_INFO_H
 #define QN_UPDATE_INFO_H
 
-#include <QMetaType>
-#include <QString>
-#include <QStringList>
-#include <QList>
-#include <QUrl>
+#include <QtCore/QMetaType>
+#include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtCore/QUrl>
 
-// TODO: use boost to implement operators.
-class QnVersion {
-public:
-    QnVersion();
-    QnVersion(int major, int minor, int bugfix);
-    QnVersion(const QString &versionString);
+#include <boost/operators.hpp>
 
-    bool isNull() const;
-    bool operator<(const QnVersion  &other) const;
-    bool operator==(const QnVersion &other) const;
-
-    QString toString() const;
-
-    int major() const {
-        return m_major;
-    }
-
-    int minor() const {
-        return m_minor;
-    }
-
-    int bugfix() const {
-        return m_bugfix;
-    }
-
-private:
-    int m_major;
-    int m_minor;
-    int m_bugfix;
-};
+#include <utils/common/software_version.h>
 
 
-struct QnUpdateInfoItem {
+struct QnUpdateInfoItem: public boost::equality_comparable1<QnUpdateInfoItem> {
     /** Product version of the update. This is the version to be displayed to the user. */
-    QnVersion productVersion;
+    QnSoftwareVersion productVersion;
 
     /** Engine version of the update. */
-    QnVersion engineVersion;
+    QnSoftwareVersion engineVersion;
 
     /** Update information title. */
     QString title;
@@ -58,13 +30,25 @@ struct QnUpdateInfoItem {
     /** Download url. */
     QUrl url;
 
-    bool isNull() const;
-    bool operator==(const QnUpdateInfoItem &other) const;
+    bool isNull() const {
+        return engineVersion.isNull();
+    }
+
+    bool operator==(const QnUpdateInfoItem &other) const {
+        return 
+            productVersion == other.productVersion && 
+            engineVersion == other.engineVersion &&
+            title == other.title && 
+            description == other.description && 
+            pubDate == other.pubDate && 
+            url == other.url;
+    }
 };
 
 
 typedef QList<QnUpdateInfoItem> QnUpdateInfoItemList;
 
+Q_DECLARE_METATYPE(QnUpdateInfoItem)
 Q_DECLARE_METATYPE(QnUpdateInfoItemList)
 
 #endif // QN_UPDATE_INFO_H

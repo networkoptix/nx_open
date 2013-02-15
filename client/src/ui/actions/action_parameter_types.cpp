@@ -29,22 +29,24 @@ namespace ParameterMetaType {
 } // namespace ParameterMetaType
 
 namespace {
-    typedef QnFlatMap<int, ParameterMetaType::Type, QnValueConstructor<ParameterMetaType::Type, ParameterMetaType::Invalid> > ParameterMetaTypeMap;
+    class QnActionMetaTypeMap: public QnFlatMap<int, ParameterMetaType::Type, QnValueConstructor<ParameterMetaType::Type, ParameterMetaType::Invalid> > {
+    public:
+        QnActionMetaTypeMap() {
+            using namespace ParameterMetaType;
 
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(ParameterMetaTypeMap, qn_actionMetaTypeMap, {
-        using namespace ParameterMetaType;
-
-        x->insert(qMetaTypeId<QnResourcePtr>(),             ResourcePtr);
-        x->insert(qMetaTypeId<QnUserResourcePtr>(),         UserResourcePtr);
-        x->insert(qMetaTypeId<QnLayoutResourcePtr>(),       LayoutResourcePtr);
-        x->insert(qMetaTypeId<QnMediaServerResourcePtr>(),  MediaServerResourcePtr);
-        x->insert(qMetaTypeId<QnResourceList>(),            ResourceList);
-        x->insert(qMetaTypeId<QnResourceWidget *>(),        ResourceWidget);
-        x->insert(qMetaTypeId<QnResourceWidgetList>(),      ResourceWidgetList);
-        x->insert(qMetaTypeId<QnLayoutItemIndexList>(),     LayoutItemIndexList);
-        x->insert(qMetaTypeId<QnWorkbenchLayout *>(),       WorkbenchLayout);
-        x->insert(qMetaTypeId<QnWorkbenchLayoutList>(),     WorkbenchLayoutList);
-    });
+            insert(qMetaTypeId<QnResourcePtr>(),             ResourcePtr);
+            insert(qMetaTypeId<QnUserResourcePtr>(),         UserResourcePtr);
+            insert(qMetaTypeId<QnLayoutResourcePtr>(),       LayoutResourcePtr);
+            insert(qMetaTypeId<QnMediaServerResourcePtr>(),  MediaServerResourcePtr);
+            insert(qMetaTypeId<QnResourceList>(),            ResourceList);
+            insert(qMetaTypeId<QnResourceWidget *>(),        ResourceWidget);
+            insert(qMetaTypeId<QnResourceWidgetList>(),      ResourceWidgetList);
+            insert(qMetaTypeId<QnLayoutItemIndexList>(),     LayoutItemIndexList);
+            insert(qMetaTypeId<QnWorkbenchLayout *>(),       WorkbenchLayout);
+            insert(qMetaTypeId<QnWorkbenchLayoutList>(),     WorkbenchLayoutList);
+        }
+    };
+    Q_GLOBAL_STATIC(QnActionMetaTypeMap, qn_actionMetaTypeMap);
 
     QnResourcePtr singleResource(const QVariant &items) {
         using namespace ParameterMetaType;

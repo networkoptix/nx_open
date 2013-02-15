@@ -2,6 +2,18 @@
 #define QN_COMMON_CONFIG_H
 
 // -------------------------------------------------------------------------- //
+// Application settings. OK to change.
+// -------------------------------------------------------------------------- //
+/** 
+ * \def QN_HAS_PRIVATE_INCLUDES
+ * 
+ * Define if Qt private headers are available on your system.
+ */
+#define QN_HAS_PRIVATE_INCLUDES
+
+
+
+// -------------------------------------------------------------------------- //
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
@@ -12,6 +24,7 @@
 /* 
  * Addition free space at a end of memory block. Some ffmpeg calls requires it */
 #define CL_MEDIA_EXTRA 8
+
 
 
 // -------------------------------------------------------------------------- //
@@ -96,6 +109,7 @@
 #endif
 
 
+
 // -------------------------------------------------------------------------- //
 // Useful utility definitions
 // -------------------------------------------------------------------------- //
@@ -128,6 +142,12 @@ namespace Qn {
 inline QString lit(const char *s) {
     return QLatin1String(s);
 }
+
+/** Helper function to mark characters that are not to be translated. */
+inline QChar lit(char c) {
+    return QLatin1Char(c);
+}
+
 #endif // __cplusplus
 
 

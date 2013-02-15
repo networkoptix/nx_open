@@ -11,24 +11,13 @@
 
 #include "workbench_context_aware.h"
 
-class QnPtzSpaceMapper {
-public:
-    QnPtzSpaceMapper() {}
-    QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper): fromCamera(mapper), toCamera(mapper) {}
-    QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera): fromCamera(fromCamera), toCamera(toCamera) {}
-
-    QnVectorSpaceMapper fromCamera;
-    QnVectorSpaceMapper toCamera;
-};
-
+class QnWorkbenchPtzMapperWatcher;
 
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnWorkbenchPtzController(QObject *parent = NULL);
     virtual ~QnWorkbenchPtzController();
-
-    const QnPtzSpaceMapper *mapper(const QnVirtualCameraResourcePtr &camera) const;
 
     /**
      * \param camera                    Camera to get PTZ position for.
@@ -102,7 +91,7 @@ private:
         int attemptCount[RequestTypeCount];
     };
 
-    QHash<QString, const QnPtzSpaceMapper *> m_mapperByModel;
+    QnWorkbenchPtzMapperWatcher *m_mapperWatcher;
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;

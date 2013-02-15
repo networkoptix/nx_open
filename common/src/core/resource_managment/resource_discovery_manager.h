@@ -55,7 +55,7 @@ public:
 
     QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
     bool registerManualCameras(const QnManualCamerasMap& cameras);
-    QnResourceList processManualAddedResources();
+    //QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
 
@@ -66,10 +66,10 @@ protected:
 protected:
 
     virtual void run();
-    virtual bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
+    virtual bool processDiscoveredResources(QnResourceList& resources);
 signals:
     void localInterfacesChanged();
-    void CameraIPConflict(QHostAddress addr);
+    void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);

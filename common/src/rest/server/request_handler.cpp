@@ -22,7 +22,7 @@ qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime)
         return dateTime.toLongLong();
 }
 
-class QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate {
+class QnRestGUIRequestHandlerPrivate {
 public:
     QnRestGUIRequestHandlerPrivate(): result(0), body(0), code(0) {}
 
@@ -32,6 +32,7 @@ public:
     QString path;
     int code;
     QString method;
+    QByteArray contentType;
 };
 
 QnRestGUIRequestHandler::QnRestGUIRequestHandler(): d_ptr(new QnRestGUIRequestHandlerPrivate)
@@ -46,12 +47,12 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
 
 int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(contentType)
     Q_D(QnRestGUIRequestHandler);
+    d->path = path;
     d->params = params;
     d->result = &result;
     d->method = QLatin1String("GET");
+    d->contentType = contentType;
     QMetaObject::invokeMethod(this, "methodExecutor", Qt::BlockingQueuedConnection);
     return d->code;
 }
@@ -64,6 +65,7 @@ int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestPar
     d->body = &body;
     d->path = path;
     d->method = QLatin1String("POST");
+    d->contentType = contentType;
     QMetaObject::invokeMethod(this, "methodExecutor", Qt::BlockingQueuedConnection);
     return d->code;
 }

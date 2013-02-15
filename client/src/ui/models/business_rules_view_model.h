@@ -9,8 +9,8 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <events/business_event_rule.h>
-#include <events/business_logic_common.h>
+#include <business/business_event_rule.h>
+#include <business/business_logic_common.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -19,6 +19,7 @@
 namespace QnBusiness {
     enum Columns {
         ModifiedColumn,
+        DisabledColumn,
         EventColumn,
         SourceColumn,
         SpacerColumn,
@@ -37,9 +38,25 @@ namespace QnBusiness {
         ActionResourcesField    = 0x00000040,
         ActionParamsField       = 0x00000080,
         AggregationField        = 0x00000100,
+        DisabledField           = 0x00000200,
+        CommentsField           = 0x00000400,
+        ScheduleField           = 0x00000800,
         AllFieldsMask           = 0x0000FFFF
     };
     Q_DECLARE_FLAGS(Fields, Field)
+
+    enum ItemDataRole {
+        ModifiedRole   = Qt::UserRole + 1,
+        DisabledRole,
+        ValidRole,
+        InstantActionRole,
+        ShortTextRole,
+
+        EventTypeRole,
+        EventResourcesRole,
+        ActionTypeRole,
+        ActionResourcesRole
+    };
 
 }
 
@@ -53,13 +70,17 @@ public:
     QnBusinessRuleViewModel(QObject *parent = 0);
 
     QVariant data(const int column, const int role = Qt::DisplayRole) const;
+    bool setData(const int column, const QVariant &value, int role);
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
-    bool actionTypeShouldBeInstant();
+    bool actionTypeShouldBeInstant() const;
     QnBusinessEventRulePtr createRule() const;
 
     QVariant getText(const int column, const bool detailed = true) const;
     QVariant getIcon(const int column) const;
+
+    bool isValid(int column) const;
+    bool isValid() const; //checks validity for all row
 
     QnId id() const;
 
@@ -90,6 +111,16 @@ public:
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
 
+    bool disabled() const;
+    void setDisabled(const bool value);
+
+    // TODO: #VASILENKO Schedule as a string? What is the format? Where are docs?
+    QString schedule() const;
+    void setSchedule(const QString value);
+
+    QString comments() const;
+    void setComments(const QString value);
+
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
@@ -99,6 +130,13 @@ signals:
 private:
     void updateActionTypesModel();
 
+    /**
+     * @brief getSourceText     Get text for the Source field.
+     * @param detailed          Detailed text is used in the table cell.
+     *                          Not detailed - as the button caption and in the advanced view.
+     * @return                  Formatted text.
+     */
+    QString getSourceText(const bool detailed) const;
     QString getTargetText(const bool detailed) const;
 
 private:
@@ -115,6 +153,9 @@ private:
     QnBusinessParams m_actionParams;
 
     int m_aggregationPeriod;
+    bool m_disabled;
+    QString m_comments;
+    QString m_schedule;
 
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
@@ -135,15 +176,19 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void clear();
     void addRules(const QnBusinessEventRules &businessRules);
     void addRule(QnBusinessEventRulePtr rule);
-    void deleteRule(QnBusinessRuleViewModel* ruleModel);
 
-    bool hasModifiedItems() const;
+    void updateRule(QnBusinessEventRulePtr rule);
+
+    void deleteRule(QnBusinessRuleViewModel* ruleModel);
+    void deleteRule(QnId id);
 
     QnBusinessRuleViewModel* getRuleModel(int row);
 private slots:

@@ -16,11 +16,12 @@
 #include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
-#include "events/business_event_rule.h"
-#include "events/business_rule_processor.h"
-#include "events/business_event_connector.h"
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
+#include <business/business_event_connector.h>
+#include "serverutil.h"
 
-QnRecordingManager::QnRecordingManager()
+QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
 }
 
@@ -50,18 +51,21 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders)
 {
-    recorders.recorderHiRes->stop();
+    if (recorders.recorderHiRes)
+        recorders.recorderHiRes->stop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->stop();
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
     if (camera)
     {
-        QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
-        if (reader)
-            reader->removeDataProcessor(recorders.recorderHiRes);
+        if (recorders.recorderHiRes) {
+            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            if (reader)
+                reader->removeDataProcessor(recorders.recorderHiRes);
+        }
 
         if (recorders.recorderLowRes) {
-            reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderLowRes);
         }
@@ -121,12 +125,12 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     QString physicalId = netRes->getPhysicalId();
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == AV_NOPTS_VALUE)
+    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
     {
         // it is first record for camera
         DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId, QnResource::Role_LiveVideo);
         qint64 archiveMinTime = catalogHi->minTime();
-        if (archiveMinTime != AV_NOPTS_VALUE)
+        if (archiveMinTime != (qint64)AV_NOPTS_VALUE)
             currentTime = qMin(currentTime,  archiveMinTime);
     }
 
@@ -140,44 +144,58 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     return true;
 }
 
-bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int maxDuration)
+bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     updateCamera(camRes); // ensure recorders are created
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
     if (!camera)
         return false;
 
-    QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
-    if (itrRec == m_recordMap.end())
+    QMutexLocker lock(&m_mutex);
+
+    QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.find(camRes);
+    if (itrRec == m_recordMap.constEnd())
         return false;
 
     // update current schedule task
     const Recorders& recorders = itrRec.value();
     if (recorders.recorderHiRes)
-        recorders.recorderHiRes->startForcedRecording(quality, fps, maxDuration);
+        recorders.recorderHiRes->startForcedRecording(quality, fps, beforeThreshold, afterThreshold, maxDuration);
     if (recorders.recorderLowRes)
-        recorders.recorderLowRes->startForcedRecording(quality, fps, maxDuration);
+        recorders.recorderLowRes->startForcedRecording(quality, fps, beforeThreshold, afterThreshold, maxDuration);
     
     // start recorder threads
     startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 
     // return true if recording started. if camera is not accessible e.t.c return false
-    return recorders.recorderHiRes->isRunning() || recorders.recorderLowRes->isRunning();
+    return true;
 }
 
-bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes)
+bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck)
 {
     updateCamera(camRes); // ensure recorders are created
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
     if (!camera)
         return false;
 
+    QMutexLocker lock(&m_mutex);
+
     QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
     if (itrRec == m_recordMap.end())
         return false;
 
-    // update current schedule task
     const Recorders& recorders = itrRec.value();
+    if (!recorders.recorderHiRes && !recorders.recorderLowRes)
+        return false;
+
+    int afterThreshold = recorders.recorderHiRes ? recorders.recorderHiRes->getFRAfterThreshold() : recorders.recorderLowRes->getFRAfterThreshold();
+    if (afterThreshold > 0 && afterThresholdCheck) {
+        m_delayedStop.insert(camRes, qnSyncTime->currentUSecsSinceEpoch() + afterThreshold*1000000ll);
+        return true;
+    }
+    m_delayedStop.remove(camRes);
+
+    // update current schedule task
     if (recorders.recorderHiRes)
         recorders.recorderHiRes->stopForcedRecording();
     if (recorders.recorderLowRes)
@@ -197,12 +215,14 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     {
         if (providerHi)
         {
-            if (!recorderHiRes->isRunning()) {
-                if (!updateCameraHistory(res))
-                    return;
-                cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
+            if (recorderHiRes) {
+                if (!recorderHiRes->isRunning()) {
+                    if (!updateCameraHistory(res))
+                        return;
+                    cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
+                }
+                recorderHiRes->start();
             }
-            recorderHiRes->start();
             providerHi->start();
         }
 
@@ -211,7 +231,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
+            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
 
             if (runSecondStream)
             {
@@ -327,16 +347,25 @@ void QnRecordingManager::at_camera_initAsyncFinished(const QnResourcePtr &resour
 
 void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
 {
+    Q_UNUSED(resource)
+
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
         if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->initAsync();
         }
 
+		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
+		if (!mServer || mServer->getGuid() != serverGuid())
+			return; // it is camera from other server
+
         updateCamera(camera);
 
-        QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
-        if (itr != m_recordMap.end()) 
+        // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread
+        //QMutexLocker lock(&m_mutex);
+
+        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
+        if (itr != m_recordMap.constEnd()) 
         {
             if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled()) 
                 itr->recorderHiRes->setNeedReopen();
@@ -367,7 +396,8 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
-    if (camera) {
+    if (camera && !camera->hasFlags(QnResource::foreigner)) 
+    {
         QnResource::Status status = camera->getStatus();
         if(status == QnResource::Online || status == QnResource::Recording)
             m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
@@ -380,8 +410,8 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
-    if (server)
-        connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged()), Qt::QueuedConnection);
+    if (server && server->getGuid() == serverGuid())
+        connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 }
 
 void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource)
@@ -433,7 +463,11 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 void QnRecordingManager::onTimer()
 {
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
-    for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
+
+    // Mutex is not required here because of m_recordMap used in readOnly mode here and m_recordMap modified from this thread only (from other private slot)
+    //QMutexLocker lock(&m_mutex);
+
+    for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(itrRec.key());
         const Recorders& recorders = itrRec.value();
@@ -446,6 +480,14 @@ void QnRecordingManager::onTimer()
         if (recorders.recorderLowRes)
             recorders.recorderLowRes->updateScheduleInfo(time);
         startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
+    }
+
+    QMap<QnSecurityCamResourcePtr, qint64> stopList = m_delayedStop;
+    for (QMap<QnSecurityCamResourcePtr, qint64>::iterator itrDelayedStop = stopList.begin(); itrDelayedStop != stopList.end(); ++itrDelayedStop)
+    {
+        qint64 stopTime = itrDelayedStop.value();
+        if (stopTime <= time*1000ll)
+            stopForcedRecording(itrDelayedStop.key(), false);
     }
 }
 

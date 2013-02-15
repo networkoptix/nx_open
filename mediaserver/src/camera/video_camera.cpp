@@ -65,7 +65,7 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
 
 bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNumber)
 {
-    int ch = channelNumber.toInt();
+    quint32 ch = channelNumber.toUInt();
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     return media && media->channelNumber == ch;
 }
@@ -329,8 +329,10 @@ void QnVideoCamera::stopIfNoActivity()
     if (needStopSecondary)
         m_secondaryReader->pleaseStop();
 
+    /*
     if (needStopPrimary)
         m_primaryReader->stop();
     if (needStopSecondary)
         m_secondaryReader->stop();
+    */
 }

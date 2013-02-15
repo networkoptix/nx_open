@@ -5,7 +5,8 @@
 
 #include "utils/common/util.h"
 #include "utils/common/request_param.h"
-#include "common/common_meta_types.h"
+#include "utils/common/space_mapper.h"
+#include "utils/common/json.h"
 
 #include "media_server_connection.h"
 #include "media_server_connection_p.h"
@@ -31,18 +32,16 @@ public:
     {
     }
 
-    void removeFromProxyList(const QUrl& url)
+    void removeFromProxyList(const QString& mServerId)
     {
         QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.remove(url);
+        m_proxyInfo.remove(mServerId);
     }
 
-    void addToProxyList(const QUrl& url, const QString& addr, int port)
+    void addToProxyList(const QString& mServerId, const QString& addr, int port)
     {
         QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.insert(url, ProxyInfo(addr, port));
+        m_proxyInfo.insert(mServerId, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
@@ -90,13 +89,16 @@ private:
 
 Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(QWeakPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, {
-    QnNetworkProxyFactory *instance = new QnNetworkProxyFactory();
-    *x = instance;
+QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
+    QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
 
     /* Qt will take ownership of the supplied instance. */
-    QNetworkProxyFactory::setApplicationProxyFactory(instance);
-});
+    QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
+    
+    return result;
+}
+
+Q_GLOBAL_STATIC_WITH_ARGS(QWeakPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
 
 QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 {
@@ -236,12 +238,12 @@ namespace detail
 
 // ---------------------------------- QnMediaServerConnection ---------------------
 
-QnMediaServerConnection::QnMediaServerConnection(const QUrl &url, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnResourcePtr mServer, QObject *parent):
     QObject(parent),
-    m_url(url),
+    m_mServer(mServer),
     m_proxyPort(0)
 {
-    QnCommonMetaTypes::initilize();
+    m_url = m_mServer.dynamicCast<QnMediaServerResource>()->getApiUrl();
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {}
@@ -470,16 +472,16 @@ QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int
 void detail::QnMediaServerFreeSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle)
 {
     qint64 freeSpace = -1;
-    qint64 usedSpace = -1;
+    qint64 totalSpace = -1;
 
     if(response.status == 0)
     {
         QByteArray message = extractXmlBody(response.data, "root");
         freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
-        usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
+        totalSpace = extractXmlBody(message, "totalSpace").toLongLong();
     }
 
-    emit finished(response.status, freeSpace, usedSpace, handle);
+    emit finished(response.status, freeSpace, totalSpace, handle);
 
     deleteLater();
 }
@@ -517,9 +519,9 @@ void QnMediaServerConnection::setProxyAddr(const QString& addr, int port)
     m_proxyAddr = addr;
     m_proxyPort = port;
     if (port)
-        QnNetworkProxyFactory::instance()->addToProxyList(m_url, addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(m_mServer->getId().toString(), addr, port);
     else
-        QnNetworkProxyFactory::instance()->removeFromProxyList(m_url);
+        QnNetworkProxyFactory::instance()->removeFromProxyList(m_mServer->getId().toString());
 }
 
 void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int) {
@@ -639,7 +641,16 @@ int QnMediaServerConnection::asyncPtzGetPos(const QnNetworkResourcePtr &camera, 
     requestParams << QnRequestParam("res_id", camera->getPhysicalId());
 
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getPosition"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
-    
+}
+
+int QnMediaServerConnection::asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    detail::QnMediaServerPtzGetSpaceMapperReplyProcessor *processor = new detail::QnMediaServerPtzGetSpaceMapperReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QnPtzSpaceMapper &, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getSpaceMapper"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
 int QnMediaServerConnection::asyncGetTime(QObject *target, const char *slot) {
@@ -680,5 +691,21 @@ void detail::QnMediaServerPtzGetPosReplyProcessor::at_replyReceived(const QnHTTP
 
     emit finished(response.status, xPos, yPos, zoomPos, handle);
     deleteLater();
+}
+
+void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(const QnHTTPRawResponse &response, int handle) {
+    const QByteArray& reply = response.data;
+    int status = response.status;
+
+    QnPtzSpaceMapper mapper;
+    if(response.status == 0) {
+        QVariantMap map;
+        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "mapper", &mapper))
+            status = 1;
+    } else {
+        qnWarning("Could not get ptz space mapper for camera: %1.", response.errorString);
+    }
+
+    emit finished(status, mapper, handle);
 }
 

@@ -155,9 +155,9 @@ QMap<QString, QnRtspTimeHelper::CamSyncInfo*> QnRtspTimeHelper::m_camClock;
 
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     m_lastTime(AV_NOPTS_VALUE),
-    m_resId(resId),
     m_localStartTime(0),
-    m_rtcpReportTimeDiff(INT_MAX)
+    m_rtcpReportTimeDiff(INT_MAX),
+    m_resId(resId)
 {
     {
         QMutexLocker lock(&m_camClockMutex);
@@ -172,7 +172,7 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     m_lastWarnTime = 0;
 }
 
-double QnRtspTimeHelper::cameraTimeToLocalTime(const RtspStatistic& statistics, double cameraTime)
+double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
     double localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
     
@@ -227,7 +227,7 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
     } while (m_timer.elapsed() != elapsed);
     qint64 expectedLocalTime = elapsed + m_localStartTime;
     bool timeChanged = qAbs(expectedLocalTime - ct) > LOCAL_TIME_RESYNC_THRESHOLD;
-    if (!timeChanged && elapsed > 3600) {
+    if (timeChanged || elapsed > 3600) {
         m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
         m_timer.restart();
     }
@@ -277,7 +277,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
     else {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double resultInSecs = cameraTimeToLocalTime(statistics, statistics.nptTime + rtpTimeDiff / double(frequency));
+        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
@@ -318,6 +318,8 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
                 m_lastWarnTime = currentUsecTime;
             }
             reset();
+            if (localTimeChanged)
+                m_lastTime = AV_NOPTS_VALUE;
             return getUsecTime(rtpTime, statistics, frequency, false);
         }
         else {
@@ -326,7 +328,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
             //m_lastResultInSec = resultInSecs;
             qint64 rez = resultInSecs * 1000000ll;
             // check for negative time if camera timings is inaccurate
-            if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)
+            if (m_lastTime != (qint64)AV_NOPTS_VALUE && rez <= m_lastTime)
                 rez = m_lastTime + MIN_FRAME_DURATION;
             m_lastTime = rez;
 

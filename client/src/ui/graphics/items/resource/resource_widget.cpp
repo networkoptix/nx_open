@@ -843,7 +843,6 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     painter->fillRect(rect, QColor(0, 0, 0, 128));
 
     if(overlay == LoadingOverlay || overlay == PausedOverlay || overlay == EmptyOverlay) {
-        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
         qreal unit = qnGlobals->workbenchUnitSize();
 
         painter->beginNativePainting();
@@ -861,6 +860,7 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
+            qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
                 painter->opacity()

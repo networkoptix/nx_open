@@ -8,6 +8,7 @@
 #ifndef PLUGINLOADER_H_
 #define PLUGINLOADER_H_
 
+#include <QObject>
 #include <QList>
 #include <QMutex>
 #include <QMutexLocker>
@@ -28,7 +29,11 @@
     \note Methods of class are thread-safe
 */
 class PluginManager
+:
+    public QObject
 {
+    Q_OBJECT
+
 public:
     PluginManager( const QString& pluginDir = QString() );
     virtual ~PluginManager();
@@ -57,6 +62,10 @@ public:
 
     //!Guess what
     static PluginManager* instance( const QString& pluginDir = QString() );
+
+signals:
+    void pluginLoaded();
+    void pluginUnloaded();
 
 private:
     const QString m_pluginDir;

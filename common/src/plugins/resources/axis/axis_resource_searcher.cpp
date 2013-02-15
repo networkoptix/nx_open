@@ -51,6 +51,8 @@ QString QnPlAxisResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
+
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())
@@ -89,7 +91,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
     }
 
-    name = name.left(name.indexOf(QLatin1Char('-')));
+    name = name.left(name.lastIndexOf(QLatin1Char('-')));
 
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();

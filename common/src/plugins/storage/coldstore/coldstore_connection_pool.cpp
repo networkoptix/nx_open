@@ -318,12 +318,8 @@ QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
 {
     QMutexLocker lock(&m_mutex);
 
-    QHashIterator<QString, QnColdStoreConnection*> it(m_pool);
-    while (it.hasNext()) 
-    {
-        it.next();
-        delete it.value();
-    }
+    qDeleteAll(m_pool);
+    m_pool.clear();
 }
 
 int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 shift, int len)

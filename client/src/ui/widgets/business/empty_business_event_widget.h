@@ -17,7 +17,7 @@ public:
     explicit QnEmptyBusinessEventWidget(QWidget *parent = 0);
     ~QnEmptyBusinessEventWidget();
 private:
-    Ui::QnEmptyBusinessEventWidget *ui;
+    QScopedPointer<Ui::QnEmptyBusinessEventWidget> ui;
 };
 
 #endif // EMPTY_BUSINESS_EVENT_WIDGET_H

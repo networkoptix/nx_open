@@ -9,7 +9,6 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
-#include "common/common_meta_types.h"
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
@@ -31,7 +30,7 @@ QnResource::QnResource():
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
 {
-    QnCommonMetaTypes::initilize();
+    connect(this, SIGNAL(parameterValueChangedQueued(const QnResourcePtr &, const QnParam &)), this, SIGNAL(parameterValueChanged(const QnResourcePtr &, const QnParam &)), Qt::QueuedConnection);
 }
 
 QnResource::~QnResource()
@@ -82,7 +81,7 @@ void QnResource::updateInner(QnResourcePtr other)
     setParentId(other->m_parentId);
 }
 
-void QnResource::update(QnResourcePtr other)
+void QnResource::update(QnResourcePtr other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
@@ -93,7 +92,8 @@ void QnResource::update(QnResourcePtr other)
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 
     }
-    setStatus(other->m_status);
+    silenceMode |= other->hasFlags(QnResource::foreigner);
+    setStatus(other->m_status, silenceMode);
     setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
 
@@ -226,7 +226,18 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 QnResourcePtr QnResource::getParentResource() const
 {
-    return m_resourcePool->getResourceById(getParentId());
+    QnId parentID;
+    QnResourcePool* resourcePool = NULL;
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        parentID = getParentId();
+        resourcePool = m_resourcePool;
+    }
+
+    if (resourcePool)
+        return resourcePool->getResourceById(parentID);
+    else
+        return QnResourcePtr();
 }
 
 
@@ -378,7 +389,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
+                emit parameterValueChangedQueued(::toSharedPointer(this), param);
             }
             emit asyncParamGetDone(toSharedPointer(this), name, newValue, true);
             return true;
@@ -449,7 +460,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
+        emit parameterValueChangedQueued(::toSharedPointer(this), param);
 
     emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;
@@ -574,6 +585,9 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
+
+    Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
     emit statusChanged(toSharedPointer(this));
 
     QMutexLocker mutexLocker(&m_mutex);
@@ -610,7 +624,7 @@ void QnResource::setId(QnId id) {
     if(m_id == id)
         return;
 
-    QnId oldId = m_id;
+    //QnId oldId = m_id;
     m_id = id;
 }
 
@@ -733,6 +747,10 @@ QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionR
     return 0;
 }
 
+void QnResource::initializationDone()
+{
+}
+
 // -----------------------------------------------------------------------------
 // Temporary until real ResourceFactory is implemented
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, commandProcessor)
@@ -788,6 +806,8 @@ void QnResource::init()
     if (!m_initialized) 
     {
         m_initialized = initInternal();
+        if( m_initialized )
+            initializationDone();
         if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
             setStatus(Offline);
     }

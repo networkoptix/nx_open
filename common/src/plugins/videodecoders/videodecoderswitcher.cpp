@@ -4,11 +4,21 @@
 
 #include "videodecoderswitcher.h"
 
+#include <QMutexLocker>
 
-VideoDecoderSwitcher::VideoDecoderSwitcher( QnAbstractVideoDecoder* hwDecoder, const QnCompressedVideoDataPtr& sequenceHeader )
+#include "decoders/abstractvideodecoderplugin.h"
+#include "decoders/video/ffmpeg.h"
+
+
+VideoDecoderSwitcher::VideoDecoderSwitcher(
+    QnAbstractVideoDecoder* hwDecoder,
+    const QnCompressedVideoDataPtr& sequenceHeader,
+    const QnAbstractVideoDecoderPlugin& decoderFactory )
 :
     m_decoder( hwDecoder ),
-    m_mediaSequenceHeader( sequenceHeader )
+    m_mediaSequenceHeader( sequenceHeader ),
+    m_decoderFactory( decoderFactory ),
+    m_switchToSWDecoding( false )
 {
 }
 
@@ -27,7 +37,25 @@ QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType(
 //!Implementation of QnAbstractVideoDecoder::decode
 bool VideoDecoderSwitcher::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    return m_decoder->decode( data, outFrame );
+    QMutexLocker lk( &m_mutex );
+
+    bool res = false;
+    for( int i = 0; i < 2; ++i )
+    {
+        //performing following condition check before and after m_decoder->decode call
+        if( m_switchToSWDecoding && data && (data->flags & AV_PKT_FLAG_KEY) )
+        {
+            m_decoder.reset( new CLFFmpegVideoDecoder( data->compressionType, data, true, NULL ) ); //TODO/IMPL 3rd and 4th params
+            m_switchToSWDecoding = false;
+        }
+
+        if( i == 1 )
+            break;
+
+        res = m_decoder->decode( data, outFrame );
+    }
+
+    return res;
 }
 
 //!Implementation of QnAbstractVideoDecoder::setLightCpuMode
@@ -100,8 +128,38 @@ unsigned int VideoDecoderSwitcher::getDecoderCaps() const
     return m_decoder->getDecoderCaps();
 }
 
+void VideoDecoderSwitcher::setSpeed( float newValue )
+{
+    QMutexLocker lk( &m_mutex );
+
+    if( m_decoder.get() )
+        m_decoder->setSpeed( newValue );
+}
+
+//!Implementation of AbstractDecoderManagerCallback::streamParamsChanged
+AbstractDecoderEventReceiver::DecoderBehaviour VideoDecoderSwitcher::streamParamsChanged(
+    QnAbstractVideoDecoder* /*decoder*/,
+    const stree::AbstractResourceReader& newStreamParams )
+{
+    //NOTE no need to lock mutex, since this method can only be called from decode, so mutex is already locked
+
+    //checking, whether new stream is supported
+    if( m_decoderFactory.isStreamSupported( newStreamParams ) )
+        return AbstractDecoderEventReceiver::dbContinueHardWork;
+
+    //marking HW decoder for release
+    m_switchToSWDecoding = true;
+    return AbstractDecoderEventReceiver::dbStop;
+}
+
+void VideoDecoderSwitcher::setHWDecoder( QnAbstractVideoDecoder* hwDecoder )
+{
+    m_decoder.reset( hwDecoder );
+}
+
 //!Switches to ffmpeg decoder, destroys hardware decoder object
 void VideoDecoderSwitcher::switchToSoftwareDecoding()
 {
-    //TODO/IMPL
+    QMutexLocker lk( &m_mutex );
+    m_switchToSWDecoding = true;
 }

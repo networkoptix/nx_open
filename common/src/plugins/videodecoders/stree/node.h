@@ -142,6 +142,7 @@ namespace stree
             unknown,
             equal,
             greater,
+            less,
             wildcard
         };
 

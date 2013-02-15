@@ -53,7 +53,8 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
     m_currentHeight(-1),
     m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
-    m_swDecoderCount(swDecoderCount)
+    m_swDecoderCount(swDecoderCount),
+    m_prevSampleAspectRatio( 1.0 )
 {
     m_mtDecoding = mtDecoding;
 
@@ -270,6 +271,10 @@ void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
 unsigned int CLFFmpegVideoDecoder::getDecoderCaps() const
 {
     return QnAbstractVideoDecoder::multiThreadedMode;
+}
+
+void CLFFmpegVideoDecoder::setSpeed( float newValue )
+{
 }
 
 int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
@@ -529,12 +534,12 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
 double CLFFmpegVideoDecoder::getSampleAspectRatio() const
 {
     if (!m_context)
-        return 1.0;
+        return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);
 
     if (qAbs(result)< 1e-7) {
-        result = 1.0; // if sample_aspect_ratio==0 it's unknown based on ffmpeg docs. so we assume it's 1.0 then
+        result = m_prevSampleAspectRatio; // if sample_aspect_ratio==0 it's unknown based on ffmpeg docs. so we assume it's same as prev value
         if (m_context->width == 720) { // TODO: add a table!
             if (m_context->height == 480)
                 result = (4.0/3.0) / (720.0/480.0);
@@ -551,6 +556,8 @@ double CLFFmpegVideoDecoder::getSampleAspectRatio() const
                 result = (4.0/3.0) / (704.0/240.0);
         }
     }
+
+    m_prevSampleAspectRatio = result;
 
     return result;
 }

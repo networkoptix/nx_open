@@ -292,7 +292,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         if (ui->cameraMotionButton->isChecked())
             m_camera->setMotionType(m_camera->getCameraBasedMotionType());
         else
-            m_camera->setMotionType(MT_SoftwareGrid);
+            m_camera->setMotionType(Qn::MT_SoftwareGrid);
 
         submitMotionWidgetToResource();
 
@@ -349,8 +349,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
-        ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & MT_SoftwareGrid);
-        if (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
+        ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
+        if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
             ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
         else
             ui->cameraMotionButton->setText(tr("Do not record motion"));
@@ -375,14 +375,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
         ui->cameraScheduleWidget->endUpdate();
 
-        updateMaxFPS();
-
         // TODO: wrong, need to get camera-specific web page
         ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
-        ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
-        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
+        ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
+        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
 
-        m_cameraSupportsMotion = m_camera->supportedMotionType() != MT_NoMotion;
+        m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
         ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
         ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
     }
@@ -393,6 +391,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     setHasDbChanges(false);
     setHasCameraChanges(false);
     m_hasControlsChanges = false;
+
+    if (m_camera)
+        updateMaxFPS();
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
@@ -491,14 +492,14 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget() {
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     if(!m_motionWidget)
         return;
-    bool hwMotion = m_camera && (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow));
+    bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
     bool motionAvailable = true;
     if(ui->cameraMotionButton->isChecked())
-        motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != MT_NoMotion);
+        motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != Qn::MT_NoMotion);
 
     ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
 }
@@ -637,7 +638,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
     if (((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked()) || 
         ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
-        && m_camera->streamFpsSharingMethod() == shareFps )
+        && m_camera->streamFpsSharingMethod() == Qn::shareFps )
     {
         maxDualStreamingFps -= MIN_SECOND_STREAM_FPS;
     }

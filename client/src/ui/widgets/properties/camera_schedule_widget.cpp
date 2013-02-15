@@ -3,8 +3,6 @@
 
 #include <QtGui/QMessageBox>
 
-#include <utils/common/event_processors.h>
-
 //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 
@@ -23,6 +21,8 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include <utils/common/event_processors.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -84,6 +84,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
     ui->recordMotionButton->installEventFilter(releaseSignalizer);
     ui->recordMotionPlusLQButton->installEventFilter(releaseSignalizer);
+
+    QnSingleEventSignalizer* gridMouseReleaseSignalizer = new QnSingleEventSignalizer(this);
+    gridMouseReleaseSignalizer->setEventType(QEvent::MouseButtonRelease);
+    connect(gridMouseReleaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SIGNAL(controlsChangesApplied()));
+    ui->gridWidget->installEventFilter(gridMouseReleaseSignalizer);
     
     connectToGridWidget();
     
@@ -99,13 +104,12 @@ QnCameraScheduleWidget::~QnCameraScheduleWidget() {
 void QnCameraScheduleWidget::connectToGridWidget() 
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
-    connect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
+
 }
 
 void QnCameraScheduleWidget::disconnectFromGridWidget() 
 {
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
-    disconnect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
 }
 
 void QnCameraScheduleWidget::beginUpdate() {
@@ -121,6 +125,7 @@ void QnCameraScheduleWidget::endUpdate() {
     if (m_inUpdate > 0)
         return;
     connectToGridWidget();
+    updateGridParams(); // TODO: does not belong here...
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)
@@ -361,7 +366,7 @@ static inline QString getLongText(const QString &text)
         return QLatin1String("Best");
     return QLatin1String("-");
 }
-
+ 
 int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
 {
     for (int i = 0; i < ui->qualityComboBox->count(); ++i)
@@ -436,12 +441,14 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2").arg(currentMaxFps).arg(value));
+		emit scheduleTasksChanged();
     }
     if (currentMaxDualStreamingFps > dualStreamValue)
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
             tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2")
                              .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
+		emit scheduleTasksChanged();
     }
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
@@ -560,7 +567,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming();
-        hasMotion &= camera->supportedMotionType() != MT_NoMotion;
+        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
     }
 
     bool enabled;
@@ -674,7 +681,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming();
-        hasMotion &= camera->supportedMotionType() != MT_NoMotion;
+        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
     }
 
     if(m_cameras.size() > 1) {
@@ -711,11 +718,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
             // or just use camera->reservedSecondStreamFps();
 
             int decreaseAlways = 0;
-            if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
+            if (camera->streamFpsSharingMethod() == Qn::shareFps && camera->getMotionType() == Qn::MT_SoftwareGrid)
                 decreaseAlways = MIN_SECOND_STREAM_FPS;
 
             int decreaseIfMotionPlusLQ = 0;
-            if (camera->streamFpsSharingMethod() == shareFps)
+            if (camera->streamFpsSharingMethod() == Qn::shareFps)
                 decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
 
             QnScheduleTaskList tasks;

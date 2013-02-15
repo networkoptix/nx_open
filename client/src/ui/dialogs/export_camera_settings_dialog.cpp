@@ -13,7 +13,7 @@
 
 QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::QnExportCameraSettingsDialog()),
     m_recordingEnabled(true),
     m_motionUsed(false),
@@ -122,7 +122,7 @@ void QnExportCameraSettingsDialog::updateMotionStatus(){
     if (m_motionUsed){
         QnVirtualCameraResourceList cameras = getSelectedCameras();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras){
-            bool hasMotion = /*camera->supportedMotionType() != MT_NoMotion &&*/ camera->getMotionType() != MT_NoMotion;
+            bool hasMotion = /*camera->supportedMotionType() != Qn::MT_NoMotion &&*/ camera->getMotionType() != Qn::MT_NoMotion;
             if (!hasMotion) {
                 m_motionOk = false;
                 break;

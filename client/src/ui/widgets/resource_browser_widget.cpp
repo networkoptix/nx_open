@@ -50,7 +50,7 @@ namespace {
 
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
     m_filterTimerId(0)
@@ -81,9 +81,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_renameAction = new QAction(this);
 
     setHelpTopic(this,                              Qn::MainWindow_Tree_Help);
-    setHelpTopic(ui->resourceTreeWidget->model(),   Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab,                     Qn::MainWindow_Tree_Search_Help);
-    setHelpTopic(ui->searchTreeWidget->model(),     Qn::MainWindow_Tree_Search_Help);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
@@ -117,7 +115,7 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget() {
 
     at_workbench_currentLayoutAboutToBeChanged();
 
-    ui->searchTreeWidget->setWorkbench(NULL);\
+    ui->searchTreeWidget->setWorkbench(NULL);
     ui->resourceTreeWidget->setWorkbench(NULL);
 }
 

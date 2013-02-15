@@ -6,30 +6,29 @@
 #ifndef GLCONTEXT_H
 #define GLCONTEXT_H
 
-#ifdef _WIN32
-#include <Wingdi.h>
-#else
-#include <GL/glx.h>
-#endif
+#include <memory>
+
 #include <QString>
 #include <QWidget>
 
-#include <memory>
-
-#define USE_INTERNAL_WIDGET
-
+#ifdef Q_OS_WIN
+#include <WinGDI.h>
+#else
+struct __GLXcontextRec;
+#endif
 
 class QGLContext;
+
 
 //!Cross-platform GL context which can be used in any thread (not in GUI only) unlike QGLContext
 class GLContext
 {
 public:
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     typedef HGLRC SYS_GL_CTX_HANDLE;
     typedef HDC SYS_PAINT_DEVICE_HANDLE;
 #else
-    typedef GLXContext SYS_GL_CTX_HANDLE;
+    typedef __GLXcontextRec *SYS_GL_CTX_HANDLE;
     typedef void* SYS_PAINT_DEVICE_HANDLE;
 #endif
 
@@ -103,12 +102,10 @@ public:
 private:
     SYS_GL_CTX_HANDLE m_handle;
     SYS_PAINT_DEVICE_HANDLE m_dc;
-#ifdef USE_INTERNAL_WIDGET
     std::auto_ptr<QWidget> m_widget;
-#endif
     WId m_winID;
     unsigned int m_previousErrorCode;
-#if defined(USE_INTERNAL_WIDGET) && defined(_WIN32)
+#ifdef Q_OS_WIN
     PIXELFORMATDESCRIPTOR m_pfd;
 #endif
 

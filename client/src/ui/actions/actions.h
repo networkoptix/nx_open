@@ -47,6 +47,11 @@ namespace Qn {
         OpenServerSettingsAction,
 
         /**
+         * Opens popup settings preferences tab.
+         */
+        OpenPopupSettingsAction,
+
+        /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.
          * 
@@ -227,6 +232,11 @@ namespace Qn {
          * Opens about dialog.
          */
         AboutAction,
+
+        /**
+         * Checks for updates.
+         */
+        CheckForUpdatesAction,
 
         /**
          * Closes the client.
@@ -473,6 +483,29 @@ namespace Qn {
          * Toggles next RADASS state.
          */
         ToggleRadassAction,
+
+        /**
+         * Opens preset name editing dialog and saves current position as a new PTZ preset.
+         */
+        PtzSavePresetAction,
+
+        /**
+         * Menu containing all PTZ presets.
+         */
+        PtzGoToPresetMenu,
+
+        /**
+         * Moves camera to the given PTZ preset.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- name of the PTZ preset.
+         */
+        PtzGoToPresetAction,
+
+        /**
+         * Opens PTZ preset management dialog.
+         */
+        PtzManagePresetsAction,
 
 
 

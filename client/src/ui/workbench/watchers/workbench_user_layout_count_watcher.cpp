@@ -4,7 +4,6 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
-#include <client/client_meta_types.h>
 
 #include <ui/workbench/workbench_context.h>
 
@@ -13,8 +12,6 @@ QnWorkbenchUserLayoutCountWatcher::QnWorkbenchUserLayoutCountWatcher(QObject *pa
     QnWorkbenchContextAware(parent),
     m_layoutCount(0)
 {
-    QnClientMetaTypes::initialize();
-
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     connect(context(),      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged()));
