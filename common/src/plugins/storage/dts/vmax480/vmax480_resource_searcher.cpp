@@ -38,6 +38,8 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
     QTextStream stream(&file); // Set the stream to read from myFile
 
+    QnInterfaceAndAddr iface = getAllIPv4Interfaces().first();
+
     while(1)
     {
         line = stream.readLine(); // this reads a line (QString) from the file
@@ -45,7 +47,31 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
         if (line.trimmed().isEmpty())
             break;
 
-        QStringList list = line.split(QLatin1Char(' '), QString::SkipEmptyParts);
+        QStringList params = line.split(QLatin1Char(';'), QString::SkipEmptyParts);
+
+        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+
+        QString name = params[0];
+        QString mac =  params[1];
+        QString host =  params[2];
+        QString port =  params[3];
+        QAuthenticator auth;
+        auth.setUser(QLatin1String("admin"));
+
+        QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+
+        resource->setTypeId(rt);
+        resource->setName(name);
+        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+        resource->setMAC(mac);
+        resource->setUrl(QString(QLatin1String("http://%1:%2")).arg(host).arg(port));
+        resource->setDiscoveryAddr(iface.address);
+        resource->setAuth(auth);
+
+        //resource->setDiscoveryAddr(iface.address);
+        QList<QnResourcePtr> result;
+        result << resource;
+        return result;
 
     }
 

@@ -1,6 +1,7 @@
 #include "vmax480_resource.h"
+#include "vmax480_live_reader.h"
 
-const char* QnPlVmax480Resource::MANUFACTURE = "VMAX480";
+const char* QnPlVmax480Resource::MANUFACTURE = "VMAX";
 
 QnPlVmax480Resource::QnPlVmax480Resource()
 {
@@ -90,10 +91,15 @@ bool QnPlVmax480Resource::shoudResolveConflicts() const
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 {
-    return 0;
+    return new QnVMax480LiveProvider(toSharedPointer());
 }
 
 void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 {
 
+}
+
+bool QnPlVmax480Resource::initInternal()
+{
+    return true;
 }

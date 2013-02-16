@@ -27,9 +27,12 @@ public:
     int videoPort() const;
     int eventPort() const;
 
+    virtual bool hasDualStreaming() const override { return false; }
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping) override;
+    virtual bool initInternal() override;
 };
 
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
