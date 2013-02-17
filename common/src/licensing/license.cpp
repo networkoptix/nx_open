@@ -20,49 +20,6 @@ QT_STATIC_CONST char networkOptixRSAPublicKey[] =
         "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
-static inline QByteArray genMachineHardwareId()
-{
-    QByteArray hwid;
-
-#ifdef Q_OS_MAC
-    #define MAX_HWID_SIZE 1024
-
-    char buf[MAX_HWID_SIZE];
-
-    io_registry_entry_t ioRegistryRoot = IORegistryEntryFromPath(kIOMasterPortDefault, "IOService:/");
-    CFStringRef uuidCf = (CFStringRef) IORegistryEntryCreateCFProperty(ioRegistryRoot, CFSTR(kIOPlatformUUIDKey), kCFAllocatorDefault, 0);
-    IOObjectRelease(ioRegistryRoot);
-    CFStringGetCString(uuidCf, buf, MAX_HWID_SIZE, kCFStringEncodingMacRoman);
-    CFRelease(uuidCf);
-
-    hwid = buf;
-#endif
-
-#ifdef Q_OS_WIN
-    QSettings settings(QLatin1String("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography"), QSettings::NativeFormat);
-    hwid = settings.value(QLatin1String("MachineGuid")).toByteArray();
-#endif
-
-    hwid = hwid.trimmed();
-
-    // If we couldn't obtain hardware id, let's use our own generated value.
-    if (hwid.isEmpty())
-    {
-        QSettings settings;
-        hwid = settings.value(QLatin1String("install-id")).toByteArray();
-        if (hwid.isEmpty())
-        {
-            hwid = QUuid::createUuid().toString().toAscii();
-            settings.setValue(QLatin1String("install-id"), hwid);
-        }
-    }
-
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(hwid);
-
-    return hash.result().toHex();
-}
-
 static bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
 {
     // Calculate SHA1 hash
@@ -93,11 +50,10 @@ namespace {
 
 Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
-QnLicense::QnLicense(const QString &name, const QByteArray &key, int cameraCount, const QByteArray &hwid, const QByteArray &signature)
+QnLicense::QnLicense(const QString &name, const QByteArray &key, int cameraCount, const QByteArray &signature)
     : m_name(name),
       m_key(key),
       m_cameraCount(cameraCount),
-      m_hardwareId(hwid),
       m_signature(signature),
       m_validLicense(-1)
 
@@ -119,17 +75,12 @@ qint32 QnLicense::cameraCount() const
     return m_cameraCount;
 }
 
-const QByteArray &QnLicense::hardwareId() const
-{
-    return m_hardwareId;
-}
-
 const QByteArray &QnLicense::signature() const
 {
     return m_signature;
 }
 
-bool QnLicense::isValid() const
+bool QnLicense::isValid(const QByteArray& hardwareId) const
 {
     if (m_validLicense == -1)
     {
@@ -141,7 +92,7 @@ bool QnLicense::isValid() const
             QByteArray licenseString;
             licenseString += "NAME=" + m_name.toUtf8() + "\n";
             licenseString += "SERIAL=" + m_key + "\n";
-            licenseString += "HWID=" + m_hardwareId + "\n";
+            licenseString += "HWID=" + hardwareId + "\n";
             licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
 
             if (isSignatureMatch(licenseString, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)))
@@ -155,14 +106,11 @@ bool QnLicense::isValid() const
 QByteArray QnLicense::toString() const
 {
     QByteArray licenseString;
-    if (isValid())
-    {
-        licenseString += "NAME=" + m_name.toUtf8() + "\n";
-        licenseString += "SERIAL=" + m_key + "\n";
-        licenseString += "HWID=" + m_hardwareId + "\n";
-        licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
-        licenseString += "SIGNATURE=" + m_signature + "\n";
-    }
+
+    licenseString += "NAME=" + m_name.toUtf8() + "\n";
+    licenseString += "SERIAL=" + m_key + "\n";
+    licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
+    licenseString += "SIGNATURE=" + m_signature + "\n";
 
     return licenseString;
 }
@@ -172,7 +120,6 @@ QnLicense QnLicense::fromString(const QByteArray &licenseString)
     QString name;
     QByteArray key;
     qint32 cameraCount;
-    QByteArray hwid;
     QByteArray signature;
 
     foreach (QByteArray line, licenseString.split('\n'))
@@ -191,8 +138,6 @@ QnLicense QnLicense::fromString(const QByteArray &licenseString)
                 name = QString::fromUtf8(avalue);
             else if (aname == "SERIAL")
                 key = avalue;
-            else if (aname == "HWID")
-                hwid = avalue;
             else if (aname == "COUNT")
                 cameraCount = avalue.toInt();
             else if (aname == "SIGNATURE")
@@ -200,7 +145,7 @@ QnLicense QnLicense::fromString(const QByteArray &licenseString)
         }
     }
 
-    return QnLicense(name, key, cameraCount, hwid, signature);
+    return QnLicense(name, key, cameraCount, signature);
 }
 
 QnLicensePool *QnLicensePool::instance()
@@ -229,6 +174,7 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
     QMutexLocker locker(&m_mutex);
 
     m_licenses.setHardwareId(licenses.hardwareId());
+	m_licenses.setOldHardwareId(licenses.oldHardwareId());
     m_licenses.clear();
     foreach (QnLicensePtr license, licenses.licenses())
         m_licenses.append(license);
@@ -276,12 +222,22 @@ QByteArray QnLicenseList::hardwareId() const
     return m_hardwareId;
 }
 
+void QnLicenseList::setOldHardwareId(const QByteArray &oldHardwareId)
+{
+    m_oldHardwareId = oldHardwareId;
+}
+
+QByteArray QnLicenseList::oldHardwareId() const
+{
+    return m_oldHardwareId;
+}
+
 void QnLicenseList::append(QnLicensePtr license)
 {
     if (m_licenses.contains(license->key()))
         return;
 
-    if (license->isValid() && license->hardwareId() == m_hardwareId)
+    if (license->isValid(m_hardwareId) || license->isValid(m_oldHardwareId))
         m_licenses.insert(license->key(), license);
 }
 

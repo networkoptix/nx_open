@@ -10,12 +10,12 @@
 class QnLicense
 {
 public:
-    QnLicense(const QString& name, const QByteArray& key, int cameraCount, const QByteArray& hardwareId, const QByteArray& signature);
+    QnLicense(const QString& name, const QByteArray& key, int cameraCount, const QByteArray& signature);
 
     /**
       * Check if signature matches other fields
       */
-    bool isValid() const;
+    bool isValid(const QByteArray& hardwareId) const;
 
     const QString &name() const;
     const QByteArray &key() const;
@@ -23,14 +23,13 @@ public:
     const QByteArray &hardwareId() const;
     const QByteArray &signature() const;
 
-    QByteArray toString() const;
+     QByteArray toString() const;
     static QnLicense fromString(const QByteArray &licenseString);
 
 private:
     QString m_name;
     QByteArray m_key;
     qint32 m_cameraCount;
-    QByteArray m_hardwareId;
     QByteArray m_signature;
     mutable int m_validLicense;
 };
@@ -42,6 +41,9 @@ class QnLicenseList
 public:
     void setHardwareId(const QByteArray& hardwareId);
     QByteArray hardwareId() const;
+
+    void setOldHardwareId(const QByteArray& oldHardwareId);
+    QByteArray oldHardwareId() const;
 
     QList<QnLicensePtr> licenses() const;
     void append(QnLicensePtr license);
@@ -55,6 +57,7 @@ public:
 private:
     QMap<QByteArray, QnLicensePtr> m_licenses;
     QByteArray m_hardwareId;
+	QByteArray m_oldHardwareId;
 };
 
 /**

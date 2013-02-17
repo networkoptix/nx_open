@@ -96,7 +96,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     ui->infoLabel->setPalette(palette);
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QString &serialKey, const QString &hardwareId) {
+void QnLicenseManagerWidget::updateFromServer(const QString &serialKey, const QString &hardwareId, const QString &oldHardwareId) {
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
@@ -108,6 +108,7 @@ void QnLicenseManagerWidget::updateFromServer(const QString &serialKey, const QS
     QUrl params;
     params.addQueryItem(QLatin1String("license_key"), serialKey);
     params.addQueryItem(QLatin1String("hwid"), hardwareId);
+	params.addQueryItem(QLatin1String("oldhwid"), oldHardwareId);
 
     QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());
 
@@ -116,7 +117,8 @@ void QnLicenseManagerWidget::updateFromServer(const QString &serialKey, const QS
 }
 
 void QnLicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
-    if (license->isValid()) {
+	// We're checking with new hardwareId only
+	if (license->isValid(qnLicensePool->getLicenses().hardwareId())) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
 
         connection->addLicenseAsync(license, this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
@@ -136,7 +138,7 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
         "Archive Streams Allowed: %4")
         .arg(license->name())
         .arg(QLatin1String(license->key()))
-        .arg(QLatin1String(license->hardwareId()))
+		.arg(QLatin1String(m_licenses.hardwareId()))
         .arg(license->cameraCount());
     QMessageBox::information(this, tr("License Details"), details);
 }
@@ -213,7 +215,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey(), QLatin1String(m_licenses.hardwareId()));
+        updateFromServer(ui->licenseWidget->serialKey(), QLatin1String(m_licenses.hardwareId()), QLatin1String(m_licenses.oldHardwareId()));
     } else {
         validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(ui->licenseWidget->activationKey()))));
         ui->licenseWidget->setState(QnLicenseWidget::Normal);

@@ -665,6 +665,7 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
     }
 
     licenses.setHardwareId(pb_licenses.hwid().c_str());
+	licenses.setOldHardwareId(pb_licenses.oldhardwareid().c_str());
     parseLicenses(licenses, pb_licenses.license());
 }
 
@@ -779,7 +780,7 @@ void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray
     pb_license.set_name(license->name().toUtf8().constData());
     pb_license.set_key(license->key().constData());
     pb_license.set_cameracount(license->cameraCount());
-    pb_license.set_hwid(license->hardwareId().constData());
+    pb_license.set_hwid(""); // We can't remove it, as it's required in .proto
     pb_license.set_signature(license->signature().constData());
 
     std::string str;
@@ -1024,11 +1025,11 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
                             QString::fromUtf8(pb_license.name().c_str()),
                             pb_license.key().c_str(),
                             pb_license.cameracount(),
-                            pb_license.hwid().c_str(),
                             pb_license.signature().c_str()
                             ));
 
-    license = rawLicense->isValid() ? rawLicense : QnLicensePtr();
+	// TODO: #Ivan, verify that's ok to return invalid license
+    license = rawLicense; // ->isValid() ? rawLicense : QnLicensePtr();
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
