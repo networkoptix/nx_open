@@ -163,6 +163,8 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
         return;
     m_primaryIFSelected = true;
     
+    QUrl origApiUrl = getApiUrl();
+
     if (primaryIF != QLatin1String("proxy"))
     {
         QUrl apiUrl(getApiUrl());
@@ -175,7 +177,7 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     }
 
     m_primaryIf = primaryIF;
-    emit serverIfFound(::toSharedPointer(this), primaryIF);
+    emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
 }
 
 QString QnMediaServerResource::getPrimaryIF() const 

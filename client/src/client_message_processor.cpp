@@ -115,16 +115,16 @@ void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaSe
     if (url.isEmpty())
         url = QLatin1String("127.0.0.1");
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    mediaServer->apiConnection()->setProxyAddr(url, port);
+    mediaServer->apiConnection()->setProxyAddr(mediaServer->getApiUrl(), url, port);
     disconnect(mediaServer, NULL, this, NULL);
-    connect(mediaServer, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &)));
+    connect(mediaServer, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
     mediaServer->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url)
+void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl)
 {
     if (url != QLatin1String("proxy"))
-        resource->apiConnection()->setProxyAddr(QString(), 0);
+        resource->apiConnection()->setProxyAddr(origApiUrl, QString(), 0);
 }
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
