@@ -229,7 +229,7 @@ public:
 
     int asyncGetFreeSpace(const QString &path, QObject *target, const char *slot);
 
-    void setProxyAddr(const QString &addr, int port);
+    void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
 
