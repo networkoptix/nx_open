@@ -27,6 +27,7 @@ function read_config {
     LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile\s*=\s*\(.*\)/\1/g')
     ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port\s*=\s*\(.*\)/\1/g')
     ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
+    ECS_PROXY_AUTH_KEY=$(cat $CONFIG_FILE | grep proxyAuthKey | head -1 | sed 's/proxyAuthKey\s*=\s*\(.*\)/\1/g')
 }
 
 function write_config {
@@ -35,6 +36,7 @@ function write_config {
     [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
     [ -z "$ECS_PORT" ] || echo "port=$ECS_PORT" >> $CONFIG_FILE
     [ -z "$ECS_PROXY_PORT" ] || echo "proxyPort=$ECS_PROXY_PORT" >> $CONFIG_FILE
+    [ -z "$ECS_PROXY_AUTH_KEY" ] || echo "proxyAuthKey=$ECS_PROXY_AUTH_KEY" >> $CONFIG_FILE
 }
 
 function to_int {
