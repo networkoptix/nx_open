@@ -112,7 +112,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     DeviceFileCatalogPtr newChunkCatalog;
 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
-    m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, !m_reverseMode); // use precise find if no REW mode
+    bool isePrecSeek = !m_reverseMode &&  m_quality == MEDIA_Quality_High; // do not try short LQ chunk if ForcedHigh quality and do not try short HQ chunk for LQ quality
+    m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, isePrecSeek); // use precise find if no REW mode
     if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
     {
         m_eof = true;
@@ -381,7 +382,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         // no immediate seek is need. change catalog on next i-frame
         
 
-        m_newQualityCatalog = (quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow);
+        m_newQualityCatalog = (quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi);
         m_newQualityChunk = findChunk(m_newQualityCatalog, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         if (m_newQualityChunk.startTimeMs == -1)
             return false; // requested quality is absent at all
