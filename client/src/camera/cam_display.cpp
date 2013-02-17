@@ -118,7 +118,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
-    m_doNotChangeDisplayTime(false)
+    m_doNotChangeDisplayTime(false),
+    m_skippingFramesStarted(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -462,7 +463,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 realSleepTime = m_delay.addQuant(needToSleep);
         }
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
-        if ((quint64)realSleepTime != AV_NOPTS_VALUE)
+        if ((quint64)realSleepTime != AV_NOPTS_VALUE && !m_buffering)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
@@ -522,7 +523,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0 && !m_afterJump)
+            if (m_buffering && m_executingJump == 0 && !m_afterJump && !m_skippingFramesStarted)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
@@ -576,6 +577,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     QMutexLocker lock(&m_timeMutex);
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();
+    m_skippingFramesStarted = true;
 
     if (m_speed >= 0)
         blockTimeValue(qMax(time, getCurrentTime()));
@@ -899,6 +901,10 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         processNewSpeed(speed);
         m_prevSpeed = speed;
     }
+
+    m_timeMutex.lock();
+    m_skippingFramesStarted = false;
+    m_timeMutex.unlock();
 
     if (vd)
     {
