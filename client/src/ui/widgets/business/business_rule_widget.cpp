@@ -115,7 +115,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
 /*        ui->eventTypeComboBox->setModel(NULL);
         ui->eventStatesComboBox->setModel(NULL);
         ui->actionTypeComboBox->setModel(NULL);*/
-        //TODO: clear model? dummy?
+        //TODO: #GDM clear model? dummy?
         return;
     }
 

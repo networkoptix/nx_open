@@ -22,7 +22,7 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
 {
     ui->setupUi(this);
 
-    // TODO: Evil! Layout code does not belong here.
+    // TODO: #GDM Evil! Layout code does not belong here.
     // Layout must be done by widget's parent, not the widget itself.
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);

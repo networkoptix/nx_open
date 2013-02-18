@@ -22,9 +22,8 @@
 
 namespace {
 
-    //TODO: #GDM tr()
-    static QLatin1String prolongedEvent("While %1");
-    static QLatin1String instantEvent("On %1 %2");
+    QString prolongedEvent = QObject::tr("While %1");
+    QString instantEvent = QObject::tr("On %1 %2");
 
     QString toggleStateToModelString(ToggleState::Value value) {
         switch( value )
