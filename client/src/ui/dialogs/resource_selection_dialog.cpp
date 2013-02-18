@@ -1,5 +1,5 @@
-#include "select_cameras_dialog.h"
-#include "ui_select_cameras_dialog.h"
+#include "resource_selection_dialog.h"
+#include "ui_resource_selection_dialog.h"
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
@@ -9,38 +9,13 @@
 
 #include <ui/workbench/workbench_context.h>
 
-
-
 // -------------------------------------------------------------------------- //
-// QnSelectCamerasDialogDelegate 
+// QnResourceSelectionDialog
 // -------------------------------------------------------------------------- //
-QnSelectCamerasDialogDelegate::QnSelectCamerasDialogDelegate(QObject *parent):
-    QObject(parent)
-{
-
-}
-
-QnSelectCamerasDialogDelegate::~QnSelectCamerasDialogDelegate() {
-
-}
-
-void QnSelectCamerasDialogDelegate::init(QWidget* parent) {
-    Q_UNUSED(parent)
-}
-
-bool QnSelectCamerasDialogDelegate::validate(const QnResourceList &selectedResources) {
-    Q_UNUSED(selectedResources)
-    return true;
-}
-
-
-// -------------------------------------------------------------------------- //
-// QnSelectCamerasDialog 
-// -------------------------------------------------------------------------- //
-QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, Qn::NodeType rootNodeType) :
+QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent, Qn::NodeType rootNodeType) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSelectCamerasDialog),
+    ui(new Ui::QnResourceSelectionDialog),
     m_delegate(NULL)
 {
     ui->setupUi(this);
@@ -70,11 +45,11 @@ QnSelectCamerasDialog::QnSelectCamerasDialog(QWidget *parent, Qn::NodeType rootN
     ui->delegateFrame->setVisible(false);
 }
 
-QnSelectCamerasDialog::~QnSelectCamerasDialog()
+QnResourceSelectionDialog::~QnResourceSelectionDialog()
 {
 }
 
-QnResourceList QnSelectCamerasDialog::getSelectedResources() const {
+QnResourceList QnResourceSelectionDialog::getSelectedResources() const {
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
         //root nodes
@@ -104,7 +79,7 @@ QnResourceList QnSelectCamerasDialog::getSelectedResources() const {
     return result;
 }
 
-void QnSelectCamerasDialog::setSelectedResources(const QnResourceList &selected) {
+void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selected) {
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
         //root nodes
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn);
@@ -129,7 +104,7 @@ void QnSelectCamerasDialog::setSelectedResources(const QnResourceList &selected)
     }
 }
 
-void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
+void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
         event->ignore();
         return;
@@ -137,7 +112,7 @@ void QnSelectCamerasDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
-void QnSelectCamerasDialog::setDelegate(QnSelectCamerasDialogDelegate *delegate) {
+void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {
     Q_ASSERT(!m_delegate);
     m_delegate = delegate;
     if (m_delegate) {
@@ -147,11 +122,11 @@ void QnSelectCamerasDialog::setDelegate(QnSelectCamerasDialogDelegate *delegate)
     at_resourceModel_dataChanged();
 }
 
-QnSelectCamerasDialogDelegate* QnSelectCamerasDialog::delegate() {
+QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() {
     return m_delegate;
 }
 
-void QnSelectCamerasDialog::at_resourceModel_dataChanged() {
+void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(getSelectedResources()));
 }
 

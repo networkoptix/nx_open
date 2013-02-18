@@ -254,7 +254,6 @@ protected slots:
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
-    void at_showPopupAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
     void at_openPopupSettingsAction_triggered();
@@ -335,6 +334,8 @@ protected slots:
     void at_cancelExport();
 
     void at_whatsThisAction_triggered();
+
+    void at_checkSystemHealthAction_triggered();
 
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};

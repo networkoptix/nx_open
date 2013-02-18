@@ -402,6 +402,9 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
+    factory(Qn::CheckSystemHealthAction).
+        flags(Qn::NoTarget).
+        text(tr("Check System Health..."));
 
     /* Context menu actions. */
 
@@ -580,7 +583,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::BusinessEventsAction).
         flags(Qn::Main).
         requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Advanced Event Rules...")).
+        text(tr("Alarm/Event Rules...")).
         shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 

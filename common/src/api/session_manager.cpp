@@ -1,9 +1,10 @@
 #include "session_manager.h"
 
-#include <QUrl>
+#include <cassert>
+
+#include <QtCore/QUrl>
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
-
 #include <QtNetwork/QNetworkReply>
 
 #include "utils/common/warnings.h"
@@ -11,9 +12,9 @@
 #include "common/common_meta_types.h"
 #include "app_server_connection.h"
 
-Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManagerInstance);
-QAtomicInt QnSessionManager::m_handle(1);
-
+// -------------------------------------------------------------------------- //
+// Reply processors
+// -------------------------------------------------------------------------- //
 void SessionManagerReplyProcessor::at_replyReceived()
 {
     QNetworkReply *reply = (QNetworkReply *)sender();
@@ -53,16 +54,21 @@ void SyncRequestProcessor::at_destroy()
     m_condition.wakeOne();
 }
 
-QnSessionManager::QnSessionManager()
-    : m_accessManager(0)
+
+// -------------------------------------------------------------------------- //
+// QnSessionManager
+// -------------------------------------------------------------------------- //
+QAtomicInt QnSessionManager::s_handle(1);
+Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManager_instance);
+
+
+QnSessionManager::QnSessionManager(QObject *parent): 
+    QObject(parent),
+    m_accessManager(0)
 {
-    QnCommonMetaTypes::initilize();
-
-    connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QObject*, const char*, int, Qt::ConnectionType)), 
-            this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestHeaderList,QnRequestParamList,QObject*,const char*, int, Qt::ConnectionType)));
-    connect(this, SIGNAL(asyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray, QObject*, const char*, int)), this, SLOT(doSendAsyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestHeaderList,QnRequestParamList,QByteArray,QObject*,const char*, int)));
-    connect(this, SIGNAL(asyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString, int, QObject*, const char*, int)), this, SLOT(doSendAsyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString,int,QObject*,const char*, int)));
-
+    connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList)), this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList)));
+    connect(this, SIGNAL(asyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)), this, SLOT(doSendAsyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)));
+    connect(this, SIGNAL(asyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString, int)), this, SLOT(doSendAsyncDeleteRequest(SessionManagerReplyProcessor*, QUrl, QString, int)));
     connect(this, SIGNAL(aboutToBeStopped()), this, SLOT(doStop()));
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(doStart()));
 }
@@ -70,16 +76,11 @@ QnSessionManager::QnSessionManager()
 QnSessionManager::~QnSessionManager()
 {
     doStop();
-    /*
-    if(QThread::currentThread() != this->thread()) {
-        qnWarning("Deleting session manager from another thread is dangerous and may lead to unexpected crashes.");
-    }
-    */
 }
 
 QnSessionManager *QnSessionManager::instance()
 {
-    return qn_sessionManagerInstance();
+    return qn_sessionManager_instance();
 }
 
 void QnSessionManager::start()
@@ -92,68 +93,10 @@ void QnSessionManager::stop()
     emit aboutToBeStopped();
 }
 
-void QnSessionManager::doStart()
+bool QnSessionManager::isReady() const
 {
     QMutexLocker locker(&m_accessManagerMutex);
-
-    if (m_accessManager)
-        return;
-
-    m_accessManager = new QNetworkAccessManager(this);
-}
-
-void QnSessionManager::doStop()
-{
-    QMutexLocker locker(&m_accessManagerMutex);
-
-    if (m_accessManager)
-    {
-        m_accessManager->setParent(0);
-        m_accessManager->deleteLater();
-        m_accessManager = 0;
-    }
-}
-
-QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
-{
-    QUrl url(baseUrl);
-
-    QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
-    url.setPath(path);
-
-    for (int i = 0; i < params.count(); i++){
-        QPair<QString, QString> param = params[i];
-        url.addQueryItem(param.first, param.second);
-    }
-    return url;
-}
-
-int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data,
-                                      QnHTTPRawResponse& response)
-{
-    return sendPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
-}
-
-int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, 
-                                      const QByteArray& data, QnHTTPRawResponse& response)
-{
-    SyncRequestProcessor syncProcessor;
-    syncProcessor.moveToThread(this->thread());
-
-    {
-        QMutexLocker locker(&m_accessManagerMutex);
-
-        if (!m_accessManager)
-        {
-            response.errorString = "Network client is not ready yet.";
-            return -1;
-        }
-
-        connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
-    }
-
-    sendAsyncPostRequest(url, objectName, headers, params, data, &syncProcessor, SLOT(at_finished(QnHTTPRawResponse,int)));
-    return syncProcessor.wait(response);
+    return m_accessManager != 0;
 }
 
 int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response)
@@ -161,14 +104,7 @@ int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName,
     return sendGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
 }
 
-bool QnSessionManager::isReady() const
-{
-    QMutexLocker locker(&m_accessManagerMutex);
-    return m_accessManager != 0;
-}
-
-int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params,
-                                     QnHTTPRawResponse& response)
+int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QnHTTPRawResponse& response)
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
@@ -189,18 +125,151 @@ int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName,
     return syncProcessor.wait(response);
 }
 
+int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QnHTTPRawResponse& response)
+{
+    return sendPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
+}
+
+int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response)
+{
+    SyncRequestProcessor syncProcessor;
+    syncProcessor.moveToThread(this->thread());
+
+    {
+        QMutexLocker locker(&m_accessManagerMutex);
+
+        if (!m_accessManager)
+        {
+            response.errorString = "Network client is not ready yet.";
+            return -1;
+        }
+
+        connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
+    }
+
+    sendAsyncPostRequest(url, objectName, headers, params, data, &syncProcessor, SLOT(at_finished(QnHTTPRawResponse,int)));
+    return syncProcessor.wait(response);
+}
+
 int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot, Qt::ConnectionType connectionType)
 {
     return sendAsyncGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), target, slot, connectionType);
 }
 
-void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, 
-                                             const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, 
-                                             const char *slot, int handle, Qt::ConnectionType connectionType)
+int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType)
 {
-    Q_UNUSED(target);
-    Q_UNUSED(slot);
-    Q_UNUSED(handle);
+    int handle = s_handle.fetchAndAddAcquire(1);
+
+    // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
+    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(handle);
+    replyProcessor->moveToThread(this->thread());
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
+
+    emit asyncGetRequest(replyProcessor, url, objectName, headers, params);
+
+    return handle;
+}
+
+int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType)
+{
+    return sendAsyncPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, target, slot, connectionType);
+}
+
+int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType)
+{
+    int handle = s_handle.fetchAndAddAcquire(1);
+
+    // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
+    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(handle);
+    replyProcessor->moveToThread(this->thread());
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
+
+    emit asyncPostRequest(replyProcessor, url, objectName, headers, params, data);
+
+    return handle;
+}
+
+int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, Qt::ConnectionType connectionType)
+{
+    int handle = s_handle.fetchAndAddAcquire(1);
+
+    // We need to create reply processor here as target could not exist when doAsyncDeleteRequest gets called
+    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(handle);
+    replyProcessor->moveToThread(this->thread());
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
+
+    emit asyncDeleteRequest(replyProcessor, url, objectName, id);
+
+    return handle;
+}
+
+QByteArray QnSessionManager::formatNetworkError(int error)
+{
+    QByteArray errorValue;
+
+    QMetaObject metaObject = QNetworkReply::staticMetaObject;
+    const int idx = metaObject.indexOfEnumerator("NetworkError");
+    if (idx != -1)
+        errorValue = metaObject.enumerator(idx).valueToKey(error);
+
+    return errorValue;
+}
+
+QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
+{
+    QUrl url(baseUrl);
+
+    QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
+    url.setPath(path);
+
+    for (int i = 0; i < params.count(); i++){
+        QPair<QString, QString> param = params[i];
+        url.addQueryItem(param.first, param.second);
+    }
+    return url;
+}
+
+void QnSessionManager::processReply(const QnHTTPRawResponse& response, int) {
+    emit replyReceived(response.status);
+}
+
+
+// -------------------------------------------------------------------------- //
+// Grunt work handlers
+// -------------------------------------------------------------------------- //
+void QnSessionManager::doStart()
+{
+    assert(QThread::currentThread() == this->thread());
+
+    QMutexLocker locker(&m_accessManagerMutex);
+
+    if (m_accessManager)
+        return;
+
+    m_accessManager = new QNetworkAccessManager(this);
+}
+
+void QnSessionManager::doStop()
+{
+    //assert(QThread::currentThread() == this->thread()); // TODO: #Elric this one is called from dtor, resolve.
+
+    QMutexLocker locker(&m_accessManagerMutex);
+
+    if (!m_accessManager)
+        return;
+
+    m_accessManager->setParent(0);
+    m_accessManager->deleteLater();
+    m_accessManager = 0;
+}
+
+// TODO: #Elric merge into a single method.
+void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params)
+{
+    assert(QThread::currentThread() == this->thread());
 
     if (!m_accessManager)
     {
@@ -219,76 +288,13 @@ void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* reply
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = m_accessManager->get(request);
-    connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()), connectionType);
-    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()), connectionType);
-}
-
-void QnSessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle)
-{
-    Q_UNUSED(target);
-    Q_UNUSED(slot);
-    Q_UNUSED(handle);
-
-    if (!m_accessManager)
-    {
-        qWarning() << "doSendAsyncDeleteRequest is called, while accessManager = 0";
-        return;
-    }
-
-    QNetworkRequest request;
-    request.setUrl(createApiUrl(url, objectName, QnRequestParamList() << QnRequestParam("id", QString::number(id))));
-
-    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
-
-    QNetworkReply* reply = m_accessManager->deleteResource(request);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
-int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, 
-                                          QObject *target, const char *slot, Qt::ConnectionType connectionType)
+void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data)
 {
-    int handle = m_handle.fetchAndAddAcquire(1);
-
-    // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
-    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
-    replyProcessor->moveToThread(thread());
-
-    Qt::ConnectionType ct = connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType;
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, ct);
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
-
-    emit asyncGetRequest(replyProcessor, url, objectName, headers, params, target, slot, handle, connectionType);
-
-    return handle;
-}
-
-int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
-{
-    return sendAsyncPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, target, slot);
-}
-
-int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot)
-{
-    int handle = m_handle.fetchAndAddAcquire(1);
-
-    // We need to create reply processor here as target could not exist when doAsyncDeleteRequest gets called
-    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
-    replyProcessor->moveToThread(thread());
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, Qt::QueuedConnection);
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
-
-    emit asyncDeleteRequest(replyProcessor, url, objectName, id, target, slot, handle);
-
-    return handle;
-}
-
-void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle)
-{
-    Q_UNUSED(target);
-    Q_UNUSED(slot);
-    Q_UNUSED(handle);
+    assert(QThread::currentThread() == this->thread());
 
     if (!m_accessManager)
     {
@@ -311,54 +317,23 @@ void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* repl
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
-int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
+void QnSessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id)
 {
-    int handle = m_handle.fetchAndAddAcquire(1);
+    assert(QThread::currentThread() == this->thread());
 
-    // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
-    SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
-    replyProcessor->moveToThread(thread());
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, Qt::QueuedConnection);
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
-
-    emit asyncPostRequest(replyProcessor, url, objectName, headers, params, data, target, slot, handle);
-
-    return handle;
-}
-
-QByteArray QnSessionManager::formatNetworkError(int error)
-{
-    QByteArray errorValue;
-
-    QMetaObject metaObject = QNetworkReply::staticMetaObject;
-    const int idx = metaObject.indexOfEnumerator("NetworkError");
-    if (idx != -1)
-        errorValue = metaObject.enumerator(idx).valueToKey(error);
-
-    return errorValue;
-}
-
-void QnSessionManager::processReply(const QnHTTPRawResponse& response, int) {
-    emit replyReceived(response.status);
-}
-
-
-bool QnSessionManager::checkIfAppServerIsOld()
-{
-    // Check if that was 1.0/1.1
-    QUrl httpUrl;
-    httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
-    httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
-    httpUrl.setScheme(QLatin1String("https"));
-    httpUrl.setUserName(QLatin1String(""));
-    httpUrl.setPassword(QLatin1String(""));
-
-    QnHTTPRawResponse response;
-    if (QnSessionManager::instance()->sendGetRequest(httpUrl, QLatin1String("resourceEx"), response) == 204)
+    if (!m_accessManager)
     {
-        qWarning() << "Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler";
-        return true;
+        qWarning() << "doSendAsyncDeleteRequest is called, while accessManager = 0";
+        return;
     }
 
-    return false;
+    QNetworkRequest request;
+    request.setUrl(createApiUrl(url, objectName, QnRequestParamList() << QnRequestParam("id", QString::number(id))));
+
+    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
+
+    QNetworkReply* reply = m_accessManager->deleteResource(request);
+    connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
+    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }

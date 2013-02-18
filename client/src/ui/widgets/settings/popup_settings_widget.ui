@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>480</width>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,11 +29,19 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="verticalGroupBox">
+    <widget class="QGroupBox" name="businessEventsGroupBox">
      <property name="title">
-      <string>Notifications to show</string>
+      <string>Show Alarms/Events</string>
      </property>
-     <layout class="QVBoxLayout" name="checkBoxesLayout"/>
+     <layout class="QVBoxLayout" name="businessEventsLayout"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="systemHealthGroupBox">
+     <property name="title">
+      <string>Show System Notifications</string>
+     </property>
+     <layout class="QVBoxLayout" name="systemHealthLayout"/>
     </widget>
    </item>
    <item>

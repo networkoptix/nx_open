@@ -22,9 +22,8 @@
 
 namespace {
 
-    //TODO: #GDM tr()
-    static QLatin1String prolongedEvent("While %1");
-    static QLatin1String instantEvent("On %1 %2");
+    QString prolongedEvent = QObject::tr("While %1");
+    QString instantEvent = QObject::tr("On %1 %2");
 
     QString toggleStateToModelString(ToggleState::Value value) {
         switch( value )
@@ -639,18 +638,9 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
         case QnBusiness::TargetColumn:
             {
                 if (m_actionType == BusinessActionType::BA_SendMail) {
-                    QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
-                    QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
-                    foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
-                        receivers << user->getEmail();
-                    }
-
-                    if (receivers.isEmpty() || !isEmailValid(receivers))
+                    if (!isValid(QnBusiness::TargetColumn))
                         return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                    if (receivers.size() == 1)
-                        return qnResIconCache->icon(QnResourceIconCache::User);
-                    else
-                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                    return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
                     if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
@@ -697,14 +687,23 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         case QnBusiness::TargetColumn:
             {
                 if (m_actionType == BusinessActionType::BA_SendMail) {
-                    QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
-                    QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    bool any = false;
                     foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
-                        receivers << user->getEmail();
+                        QString email = user->getEmail().trimmed();
+                        if (email.isEmpty() || !isEmailValid(email))
+                            return false;
+                        any = true;
                     }
-                    if (receivers.isEmpty() || !isEmailValid(receivers))
-                        return false;
-                    return true;
+
+                    QStringList additional = BusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    foreach(const QString &email, additional) {
+                        if (email.trimmed().isEmpty())
+                            continue;
+                        if (!isEmailValid(email.trimmed()))
+                            return false;
+                        any = true;
+                    }
+                    return any;
                 } else if (m_actionType == BusinessActionType::BA_CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 }
@@ -771,34 +770,34 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     if (m_actionType == BusinessActionType::BA_SendMail) {
 
-        QString userMails;
+        QStringList receivers;
         QnUserResourceList users =  m_actionResources.filtered<QnUserResource>();
         foreach (const QnUserResourcePtr &user, users) {
-            QString userMail = user->getEmail();
+            QString userMail = user->getEmail().trimmed();
             if (userMail.isEmpty())
                 return tr("User %1 has empty email").arg(user->getName());
             if (!isEmailValid(userMail))
                 return tr("User %1 has invalid email address: %2").arg(user->getName()).arg(userMail);
-            if (!userMails.isEmpty())
-                userMails += QLatin1String("; ");
-            userMails += QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+            receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
         }
 
-        QString additional = BusinessActionParameters::getEmailAddress(m_actionParams);
-        QStringList receivers = additional.split(QLatin1Char(';'), QString::SkipEmptyParts);
-        if (receivers.isEmpty() && userMails.isEmpty() )
+        QStringList additional = BusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+        foreach(const QString &email, additional) {
+            QString trimmed = email.trimmed();
+            if (trimmed.isEmpty())
+                continue;
+            if (!isEmailValid(trimmed))
+                return tr("Invalid email address: %1").arg(trimmed);
+            receivers << trimmed;
+        }
+
+        if (receivers.isEmpty())
             return tr("Select at least one user");
-        foreach (QString receiver, receivers) {
-            if (!isEmailValid(receiver))
-                return tr("Invalid email address: %1").arg(receiver);
-        }
 
-        if (!userMails.isEmpty() && !receivers.isEmpty())
-            userMails += QLatin1String("; ");
         if (detailed)
-            return tr("Send mail to %1").arg(userMails + receivers.join(QLatin1String("; ")));
-        if (receivers.size() > 0)
-            return tr("%1 users, %2 additional").arg(users.size()).arg(receivers.size());
+            return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
+        if (additional.size() > 0)
+            return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
         return tr("%1 users").arg(users.size());
 
     } else if (m_actionType == BusinessActionType::BA_ShowPopup) {

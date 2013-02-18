@@ -355,7 +355,7 @@ public:
                 result |= Qt::ItemIsEditable;
             /* Fall through. */
         case Qn::ItemNode:
-            if(m_flags & (QnResource::media | QnResource::layout | QnResource::server))
+            if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user))
                 result |= Qt::ItemIsDragEnabled;
             break;
         default:
