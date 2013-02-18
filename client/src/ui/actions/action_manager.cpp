@@ -402,6 +402,9 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
+    factory(Qn::CheckSystemHealthAction).
+        flags(Qn::NoTarget).
+        text(tr("Check System Health..."));
 
     /* Context menu actions. */
 

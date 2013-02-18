@@ -20,6 +20,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
+#include <utils/common/email.h>
 
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
@@ -29,8 +30,8 @@
 #include <business/actions/popup_business_action.h>
 
 //TODO: #GDM remove when debug will not be required
-#include <business/events/reasoned_business_event.h>
-#include <business/events/conflict_business_event.h>
+//#include <business/events/reasoned_business_event.h>
+//#include <business/events/conflict_business_event.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -76,7 +77,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/widgets/popup_collection_widget.h>
+#include <ui/widgets/popups/popup_collection_widget.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -276,6 +277,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
+    connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -853,6 +855,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
+
+    at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
@@ -1441,13 +1445,6 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
         businessRulesDialog()->setGeometry(oldGeometry);
 }
 
-// can be used for test purposes or for displaying an example for user
-void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->show();
-}
-
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
@@ -1560,6 +1557,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     qnLicensePool->reset();
 
+    if (popupCollectionWidget())
+        popupCollectionWidget()->clear();
+
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
@@ -1599,6 +1599,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
     // TODO: save workbench state on logout.
+
+    if (popupCollectionWidget())
+        popupCollectionWidget()->clear();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -3211,4 +3214,16 @@ void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
     QWhatsThis::enterWhatsThisMode();
 }
 
+void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
+    if (!context()->user())
+        return;
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+
+    if (!isEmailValid(context()->user()->getEmail().trimmed())) {
+        if (popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty))
+            popupCollectionWidget()->show();
+    }
+}
 

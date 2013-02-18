@@ -140,6 +140,11 @@ namespace Qn {
         WhatsThisAction,
 
 
+        /**
+         * Checks system health: licences, storages, email settings, etc
+         */
+        CheckSystemHealthAction,
+
 
 
         /* Main menu actions. */

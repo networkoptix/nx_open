@@ -2,8 +2,11 @@
 #define POPUP_COLLECTION_WIDGET_H
 
 #include <QWidget>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
+
+#include <health/system_health.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -11,7 +14,8 @@ namespace Ui {
     class QnPopupCollectionWidget;
 }
 
-class QnPopupWidget;
+class QnBusinessEventPopupWidget;
+class QnSystemHealthPopupWidget;
 
 class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -23,6 +27,9 @@ public:
     virtual ~QnPopupCollectionWidget();
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    bool addSystemHealthEvent(QnSystemHealth::MessageType message);
+
+    void clear();
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
@@ -31,12 +38,13 @@ protected:
 private slots:
     void updatePosition();
 
-    void at_widget_closed(BusinessEventType::Value actionType, bool ignore);
-
+    void at_businessEventWidget_closed(BusinessEventType::Value actionType, bool ignore);
+    void at_systemHealthWidget_closed(QnSystemHealth::MessageType message, bool ignore);
 private:
     QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
-    QMap<BusinessEventType::Value, QnPopupWidget *> m_widgetsByType;
+    QMap<BusinessEventType::Value, QnBusinessEventPopupWidget *> m_businessEventWidgets;
+    QMap<QnSystemHealth::MessageType, QnSystemHealthPopupWidget *> m_systemHealthWidgets;
 };
 
 #endif // POPUP_COLLECTION_WIDGET_H

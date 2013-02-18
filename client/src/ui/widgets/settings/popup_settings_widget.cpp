@@ -2,7 +2,10 @@
 #include "ui_popup_settings_widget.h"
 
 #include <utils/settings.h>
+
 #include <business/events/abstract_business_event.h>
+
+#include <health/system_health.h>
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -13,8 +16,15 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(BusinessEventType::toString(BusinessEventType::Value(i)));
-        ui->checkBoxesLayout->addWidget(checkbox);
-        m_checkBoxes << checkbox;
+        ui->businessEventsLayout->addWidget(checkbox);
+        m_businessRulesCheckBoxes << checkbox;
+    }
+
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        QCheckBox* checkbox = new QCheckBox(this);
+        checkbox->setText(QnSystemHealth::toString(QnSystemHealth::MessageType(i)));
+        ui->systemHealthLayout->addWidget(checkbox);
+        m_systemHealthCheckBoxes << checkbox;
     }
 
     connect(ui->showAllCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_showAllCheckBox_toggled(bool)));
@@ -25,39 +35,63 @@ QnPopupSettingsWidget::~QnPopupSettingsWidget()
 }
 
 void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
-    quint64 shown = settings->shownPopups();
-    quint64 flag = 1;
     bool all = true;
 
+    quint64 eventsShown = settings->popupBusinessEvents();
+    quint64 eventsFlag = 1;
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        bool checked = shown & flag;
-        m_checkBoxes[i]->setChecked(checked);
+        bool checked = eventsShown & eventsFlag;
+        m_businessRulesCheckBoxes[i]->setChecked(checked);
         all = all && checked;
-        flag = flag << 1;
+        eventsFlag = eventsFlag << 1;
+    }
+
+    quint64 healthShown = settings->popupSystemHealth();
+    quint64 healthFlag = 1;
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        bool checked = healthShown & healthFlag;
+        m_systemHealthCheckBoxes[i]->setChecked(checked);
+        all = all && checked;
+        healthFlag = healthFlag << 1;
     }
 
     ui->showAllCheckBox->setChecked(all);
 }
 
 void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
-    quint64 shown = settings->shownPopups();
-    quint64 flag = 1;
+    quint64 eventsShown = settings->popupBusinessEvents();
+    quint64 eventsFlag = 1;
     for (int i = 0; i < BusinessEventType::BE_Count; i++) {
-        if (m_checkBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
-            shown |= flag;
+        if (m_businessRulesCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
+            eventsShown |= eventsFlag;
         } else {
-            shown &= ~flag;
+            eventsShown &= ~eventsFlag;
         }
-        flag = flag << 1;
+        eventsFlag = eventsFlag << 1;
     }
+    settings->setPopupBusinessEvents(eventsShown);
 
-    settings->setShownPopups(shown);
+    quint64 healthShown = settings->popupSystemHealth();
+    quint64 healthFlag = 1;
+    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        if (m_systemHealthCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
+            healthShown |= eventsFlag;
+        } else {
+            healthShown &= ~eventsFlag;
+        }
+        healthFlag = healthFlag << 1;
+    }
+    settings->setPopupSystemHealth(healthShown);
 }
 
 void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
     // TODO: #GDM also update checked state!
     // TODO: maybe tristate for 'show all' checkbox would be better.
-    foreach (QCheckBox* checkbox, m_checkBoxes) {
+    foreach (QCheckBox* checkbox, m_businessRulesCheckBoxes) {
+        checkbox->setEnabled(!checked);
+    }
+
+    foreach (QCheckBox* checkbox, m_systemHealthCheckBoxes) {
         checkbox->setEnabled(!checked);
     }
 }

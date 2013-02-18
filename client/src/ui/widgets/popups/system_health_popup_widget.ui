@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnPopupWidget</class>
- <widget class="QWidget" name="QnPopupWidget">
+ <class>QnSystemHealthPopupWidget</class>
+ <widget class="QWidget" name="QnSystemHealthPopupWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>247</width>
-    <height>216</height>
+    <height>129</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="autoFillBackground">
-   <bool>true</bool>
+  <property name="windowTitle">
+   <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -99,42 +93,17 @@
     </layout>
    </item>
    <item>
-    <widget class="Line" name="line">
+    <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="eventLabel">
-     <property name="wordWrap">
-      <bool>true</bool>
+    <widget class="QLabel" name="messageLabel">
+     <property name="text">
+      <string/>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QnTreeView" name="eventsTreeView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>84</height>
-      </size>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
     </widget>
    </item>
    <item>
@@ -146,6 +115,13 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="fixButton">
+       <property name="text">
+        <string>&amp;Fix</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -160,29 +136,16 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="okButton">
+      <widget class="QPushButton" name="postponeButton">
        <property name="text">
-        <string>Ok</string>
+        <string>&amp;Postpone</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="Line" name="line_2">
+    <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -190,13 +153,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QnTreeView</class>
-   <extends>QTreeView</extends>
-   <header location="global">ui/widgets/tree_view.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

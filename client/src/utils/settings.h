@@ -62,7 +62,8 @@ public:
 
         DEV_MODE,
 
-        SHOWN_POPUPS,
+        POPUP_BUSINESS_EVENTS,
+        POPUP_SYSTEM_HEALTH,
 
         VARIABLE_COUNT
     };
@@ -111,7 +112,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_RW_PROPERTY(bool,                    isDevMode,              setDevMode,                 DEV_MODE,                   false)
-        QN_DECLARE_RW_PROPERTY(quint64,                 shownPopups,            setShownPopups,             SHOWN_POPUPS,               0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(quint64,                 popupBusinessEvents,    setPopupBusinessEvents,     POPUP_BUSINESS_EVENTS,      0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(quint64,                 popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
     QN_END_PROPERTY_STORAGE()
 
 private:
