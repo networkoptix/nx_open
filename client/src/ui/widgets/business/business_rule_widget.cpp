@@ -171,6 +171,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
         ui->actionResourcesFrame->setVisible(isResourceRequired);
+        ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::BA_SendMail ? tr("to") : tr("at"));
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
         ui->actionAggregationFrame->setVisible(actionIsInstant);

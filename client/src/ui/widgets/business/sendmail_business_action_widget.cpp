@@ -52,12 +52,3 @@ void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
     menu()->trigger(Qn::OpenServerSettingsAction);
 }
 
-void QnSendmailBusinessActionWidget::at_selectButton_clicked() {
-    QnSelectCamerasDialog dialog(this, Qn::UsersNode);
-    dialog.setSelectedResources(model()->actionResources());
-    if (dialog.exec() != QDialog::Accepted)
-        return;
-
-    //TODO: #GDM use action resources for it
-    model()->setActionResources(dialog.getSelectedResources());
-}

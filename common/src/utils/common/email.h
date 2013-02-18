@@ -5,6 +5,5 @@
 #include <QStringList>
 
 bool isEmailValid(const QString &email);
-bool isEmailValid(const QStringList& emails);
 
 #endif // EMAIL_H

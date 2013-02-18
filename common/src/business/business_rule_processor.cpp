@@ -6,6 +6,7 @@
 #include <business/business_event_rule.h>
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
+#include <utils/common/email.h>
 #include "core/resource_managment/resource_pool.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
@@ -315,37 +316,37 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 {
     Q_ASSERT( action );
 
-    QString emailAddress;
+    QStringList recipients;
     foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
-        if (user->getEmail().isEmpty())
-            continue;
-        if (!emailAddress.isEmpty())
-            emailAddress += QLatin1Char(';');
-        emailAddress += user->getEmail();
+        QString email = user->getEmail();
+        if (!email.isEmpty() && isEmailValid(email))
+            recipients << email;
     }
 
-    if (!emailAddress.isEmpty())
-        emailAddress += QLatin1Char(';');
-    emailAddress += BusinessActionParameters::getEmailAddress(action->getParams());
-    if( emailAddress.isEmpty() )
+    QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
+    foreach(const QString &email, additional) {
+        if (isEmailValid(email))
+            recipients << email;
+    }
+
+    if( recipients.isEmpty() )
     {
-        cl_log.log( QString::fromLatin1("Action SendMail missing required parameter \"emailAddress\". Ignoring..."), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Action SendMail missing valid recipients. Ignoring..."), cl_logWARNING );
         return false;
     }
 
     cl_log.log( QString::fromLatin1("Processing action SendMail. Sending mail to %1").
-        arg(emailAddress), cl_logDEBUG1 );
+        arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
-            emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts),
+            recipients,
             action->getSubject(),
             action->getMessageBody()))
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
-            arg(emailAddress).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
+                    arg(recipients.join(QLatin1String("; "))).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
         return false;
     }
     return true;
