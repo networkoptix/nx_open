@@ -16,6 +16,7 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -354,7 +355,14 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
         return;
 
     QnResourceSelectionDialog dialog(this); //TODO: #GDM or servers?
+
+    BusinessEventType::Value eventType = m_model->eventType();
+    if (eventType == BusinessEventType::BE_Camera_Motion)
+        dialog.setDelegate(new QnMotionEnabledDelegate(this));
+    else if (eventType == BusinessEventType::BE_Camera_Input)
+        dialog.setDelegate(new QnInputEnabledDelegate(this));
     dialog.setSelectedResources(m_model->eventResources());
+
     if (dialog.exec() != QDialog::Accepted)
         return;
     m_model->setEventResources(dialog.getSelectedResources());
@@ -372,9 +380,17 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (node == Qn::BastardNode)
         return;
 
-    //TODO: #GDM delegates!!!!
     QnResourceSelectionDialog dialog(this, node);
+
+    BusinessActionType::Value actionType = m_model->actionType();
+    if (actionType == BusinessActionType::BA_CameraRecording)
+        dialog.setDelegate(new QnRecordingEnabledDelegate(this));
+    else if (actionType == BusinessActionType::BA_CameraOutput)
+        dialog.setDelegate(new QnOutputEnabledDelegate(this));
+    else if (actionType == BusinessActionType::BA_SendMail)
+        dialog.setDelegate(new QnEmailValidDelegate(this));
     dialog.setSelectedResources(m_model->actionResources());
+
     if (dialog.exec() != QDialog::Accepted)
         return;
     m_model->setActionResources(dialog.getSelectedResources());

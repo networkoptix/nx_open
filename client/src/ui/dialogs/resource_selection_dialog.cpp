@@ -9,31 +9,6 @@
 
 #include <ui/workbench/workbench_context.h>
 
-
-
-// -------------------------------------------------------------------------- //
-// QnResourceSelectionDialogDelegate
-// -------------------------------------------------------------------------- //
-QnResourceSelectionDialogDelegate::QnResourceSelectionDialogDelegate(QObject *parent):
-    QObject(parent)
-{
-
-}
-
-QnResourceSelectionDialogDelegate::~QnResourceSelectionDialogDelegate() {
-
-}
-
-void QnResourceSelectionDialogDelegate::init(QWidget* parent) {
-    Q_UNUSED(parent)
-}
-
-bool QnResourceSelectionDialogDelegate::validate(const QnResourceList &selectedResources) {
-    Q_UNUSED(selectedResources)
-    return true;
-}
-
-
 // -------------------------------------------------------------------------- //
 // QnResourceSelectionDialog
 // -------------------------------------------------------------------------- //

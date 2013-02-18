@@ -7,6 +7,7 @@
 
 #include <client/client_globals.h>
 
+#include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -30,29 +31,6 @@ public:
     }
 
 };*/
-
-class QnResourceSelectionDialogDelegate: public QObject
-{
-    Q_OBJECT
-public:
-    explicit QnResourceSelectionDialogDelegate(QObject* parent = NULL);
-    ~QnResourceSelectionDialogDelegate();
-
-    /**
-     * @brief init                  This method allows delegate setup custom error or statistics widget
-     *                              that will be displayed below the resources list.
-     * @param parent                Parent container widget.
-     */
-    virtual void init(QWidget* parent);
-
-    /**
-     * @brief validate              This method allows delegate modify message depending on the selection
-     *                              and control the OK button status.
-     * @param selectedResources     List of selected resources.
-     * @return                      True if selection is valid and OK button can be pressed.
-     */
-    virtual bool validate(const QnResourceList &selectedResources);
-};
 
 class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT

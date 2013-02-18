@@ -43,7 +43,9 @@ class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
     Q_OBJECT
 
     typedef QStyledItemDelegate base_type;
-
+public:
+    explicit QnBusinessRuleItemDelegate(QObject *parent = 0);
+    ~QnBusinessRuleItemDelegate();
 protected:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
