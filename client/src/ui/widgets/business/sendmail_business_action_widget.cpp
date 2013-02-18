@@ -4,7 +4,7 @@
 #include <business/actions/sendmail_business_action.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/dialogs/select_cameras_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>

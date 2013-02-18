@@ -10,7 +10,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnSelectCamerasDialog;
+    class QnResourceSelectionDialog;
 }
 
 class QnResourcePoolModel;
@@ -31,12 +31,12 @@ public:
 
 };*/
 
-class QnSelectCamerasDialogDelegate: public QObject
+class QnResourceSelectionDialogDelegate: public QObject
 {
     Q_OBJECT
 public:
-    explicit QnSelectCamerasDialogDelegate(QObject* parent = NULL);
-    ~QnSelectCamerasDialogDelegate();
+    explicit QnResourceSelectionDialogDelegate(QObject* parent = NULL);
+    ~QnResourceSelectionDialogDelegate();
 
     /**
      * @brief init                  This method allows delegate setup custom error or statistics widget
@@ -54,20 +54,19 @@ public:
     virtual bool validate(const QnResourceList &selectedResources);
 };
 
-// TODO: #GDM rename to SelectResourcesDialog
-class QnSelectCamerasDialog : public QDialog, public QnWorkbenchContextAware {
+class QnResourceSelectionDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QDialog base_type;
 
 public:
-    explicit QnSelectCamerasDialog(QWidget *parent, Qn::NodeType rootNodeType = Qn::ServersNode);
-    ~QnSelectCamerasDialog();
+    explicit QnResourceSelectionDialog(QWidget *parent, Qn::NodeType rootNodeType = Qn::ServersNode);
+    ~QnResourceSelectionDialog();
 
     QnResourceList getSelectedResources() const;
     void setSelectedResources(const QnResourceList &selected);
 
-    QnSelectCamerasDialogDelegate* delegate();
-    void setDelegate(QnSelectCamerasDialogDelegate* delegate);
+    QnResourceSelectionDialogDelegate* delegate();
+    void setDelegate(QnResourceSelectionDialogDelegate* delegate);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
@@ -76,9 +75,9 @@ private slots:
     void at_resourceModel_dataChanged();
 
 private:
-    QScopedPointer<Ui::QnSelectCamerasDialog> ui;
+    QScopedPointer<Ui::QnResourceSelectionDialog> ui;
     QnResourcePoolModel *m_resourceModel;
-    QnSelectCamerasDialogDelegate* m_delegate;
+    QnResourceSelectionDialogDelegate* m_delegate;
     bool m_flat;
 };
 

@@ -15,7 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ui/dialogs/select_cameras_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
@@ -353,7 +353,7 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    QnSelectCamerasDialog dialog(this); //TODO: #GDM or servers?
+    QnResourceSelectionDialog dialog(this); //TODO: #GDM or servers?
     dialog.setSelectedResources(m_model->eventResources());
     if (dialog.exec() != QDialog::Accepted)
         return;
@@ -373,7 +373,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
         return;
 
     //TODO: #GDM delegates!!!!
-    QnSelectCamerasDialog dialog(this, node);
+    QnResourceSelectionDialog dialog(this, node);
     dialog.setSelectedResources(m_model->actionResources());
     if (dialog.exec() != QDialog::Accepted)
         return;

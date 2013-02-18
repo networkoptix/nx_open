@@ -22,10 +22,10 @@
 namespace {
 
     template<class T>
-    class QnCheckAndWarnDelegate: public QnSelectCamerasDialogDelegate {
+    class QnCheckAndWarnDelegate: public QnResourceSelectionDialogDelegate {
     public:
         QnCheckAndWarnDelegate(QWidget* parent):
-            QnSelectCamerasDialogDelegate(parent),
+            QnResourceSelectionDialogDelegate(parent),
             m_warningLabel(NULL)
         {}
 
@@ -144,11 +144,11 @@ void QnSelectResourcesDialogButton::setResources(QnResourceList resources) {
     m_resources = resources;
 }
 
-QnSelectCamerasDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() const {
+QnResourceSelectionDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() const {
     return m_dialogDelegate;
 }
 
-void QnSelectResourcesDialogButton::setDialogDelegate(QnSelectCamerasDialogDelegate* delegate) {
+void QnSelectResourcesDialogButton::setDialogDelegate(QnResourceSelectionDialogDelegate* delegate) {
     m_dialogDelegate = delegate;
 }
 
@@ -161,7 +161,7 @@ void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnSelectCamerasDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
+    QnResourceSelectionDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
