@@ -17,7 +17,7 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
 
-#include <ui/delegate/business_rule_item_delegate.h>
+#include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/dialogs/select_cameras_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
