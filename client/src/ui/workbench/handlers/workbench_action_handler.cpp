@@ -3221,9 +3221,18 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 
+    bool any = false;
+
     if (!isEmailValid(context()->user()->getEmail().trimmed())) {
-        if (popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty))
-            popupCollectionWidget()->show();
+        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
+
+    if (qnLicensePool->isEmpty()) {
+        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+    }
+
+    if (any)
+        popupCollectionWidget()->show();
+
 }
 

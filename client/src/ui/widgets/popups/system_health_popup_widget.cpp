@@ -33,15 +33,16 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
 
     m_messageType = message;
     switch (m_messageType) {
-        case QnSystemHealth::NotDefined:
-            return false;
+    case QnSystemHealth::NotDefined:
+        return false;
 
-        case QnSystemHealth::EmailIsEmpty:
-            ui->importantLabel->setVisible(true);
-            break;
-        default:
-            ui->notificationLabel->setVisible(true);
-            break;
+    case QnSystemHealth::EmailIsEmpty:
+    case QnSystemHealth::NoLicenses:
+        ui->importantLabel->setVisible(true);
+        break;
+    default:
+        ui->notificationLabel->setVisible(true);
+        break;
     }
     ui->messageLabel->setText(QnSystemHealth::toString(m_messageType));
 
@@ -53,6 +54,9 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     case QnSystemHealth::EmailIsEmpty:
         menu()->trigger(Qn::UserSettingsAction,
                         QnActionParameters(context()->user()));
+        break;
+    case QnSystemHealth::NoLicenses:
+        menu()->trigger(Qn::GetMoreLicensesAction);
         break;
     default:
         break;
