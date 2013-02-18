@@ -62,7 +62,7 @@ class QnSessionManager: public QObject
     Q_OBJECT
 
 public:
-    QnSessionManager();
+    QnSessionManager(QObject *parent = NULL);
     virtual ~QnSessionManager();
 
     static QnSessionManager *instance();

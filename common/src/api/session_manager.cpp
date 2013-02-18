@@ -58,10 +58,12 @@ void SyncRequestProcessor::at_destroy()
 // -------------------------------------------------------------------------- //
 // QnSessionManager
 // -------------------------------------------------------------------------- //
-Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManager_instance);
 QAtomicInt QnSessionManager::s_handle(1);
+Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManager_instance);
 
-QnSessionManager::QnSessionManager(): 
+
+QnSessionManager::QnSessionManager(QObject *parent): 
+    QObject(parent),
     m_accessManager(0)
 {
     connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList)), this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList)));
@@ -272,7 +274,7 @@ void QnSessionManager::doStart()
 
 void QnSessionManager::doStop()
 {
-    assert(QThread::currentThread() == this->thread());
+    //assert(QThread::currentThread() == this->thread()); // TODO: #Elric this one is called from dtor, resolve.
 
     QMutexLocker locker(&m_accessManagerMutex);
 
@@ -284,6 +286,7 @@ void QnSessionManager::doStop()
     m_accessManager = 0;
 }
 
+// TODO: #Elric merge into a single method.
 void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params)
 {
     assert(QThread::currentThread() == this->thread());
