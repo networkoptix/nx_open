@@ -28,6 +28,13 @@ void QnTreeView::keyPressEvent(QKeyEvent *event) {
             event->ignore();
         }
     }
+    if(event->key() == Qt::Key_Space) {
+        if (state() != EditingState || hasFocus()) {
+            if (currentIndex().isValid())
+                emit spacePressed(currentIndex());
+            event->ignore();
+        }
+    }
 
     QTreeView::keyPressEvent(event);
 }

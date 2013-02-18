@@ -75,9 +75,9 @@ void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
     quint64 healthFlag = 1;
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
         if (m_systemHealthCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
-            healthShown |= eventsFlag;
+            healthShown |= healthFlag;
         } else {
-            healthShown &= ~eventsFlag;
+            healthShown &= ~healthFlag;
         }
         healthFlag = healthFlag << 1;
     }
