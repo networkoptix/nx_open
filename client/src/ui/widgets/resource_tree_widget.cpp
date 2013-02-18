@@ -242,15 +242,14 @@ protected:
         base_type::setData(index, state, Qt::CheckStateRole);
     }
 
-    // TODO: #GDM codestyle, use camelCase, not under_score.
-    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override {
         if (!m_filterEnabled)
             return true;
 
-        QModelIndex root = (source_parent.column() > Qn::NameColumn)
-                ? source_parent.sibling(source_parent.row(), Qn::NameColumn)
-                : source_parent;
-        return base_type::filterAcceptsRow(source_row, root);
+        QModelIndex root = (sourceParent.column() > Qn::NameColumn)
+                ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
+                : sourceParent;
+        return base_type::filterAcceptsRow(sourceRow, root);
     }
 
 private:
