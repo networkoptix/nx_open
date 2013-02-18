@@ -146,6 +146,8 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
     QByteArray guid = getGuid().toUtf8();
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
+        QMutexLocker lock(&m_mutex);
+
         // server OK
         QString urlStr = m_runningIfRequests.value(responseNum);
         if (urlStr == QLatin1String("proxy"))
