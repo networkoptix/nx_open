@@ -30,6 +30,13 @@ signals:
      */
     void enterPressed(const QModelIndex &index);
 
+    /**
+     * This signal is emitted whenever the user presses space on one of the
+     * tree's items.
+     *
+     * \param index                     Index of the item. Is guaranteed to be valid.
+     */
+    void spacePressed(const QModelIndex &index);
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
