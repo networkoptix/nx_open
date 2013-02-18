@@ -885,6 +885,7 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
 
+    /*
     int total = qnResPool->getAllEnabledCameras().size();
     if (total == 0)
         return;
@@ -953,6 +954,7 @@ void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
 
     QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
     at_eventManager_actionReceived(ba);
+    */
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
