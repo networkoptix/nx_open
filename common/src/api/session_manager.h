@@ -11,8 +11,7 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 
-class QnSessionManagerSyncReplyProcessor: public QObject 
-{
+class QnSessionManagerSyncReplyProcessor: public QObject {
     Q_OBJECT
 
 public:
@@ -31,8 +30,7 @@ private:
     QWaitCondition m_condition;
 };
 
-class QnSessionManagerAsyncReplyProcessor: public QObject 
-{
+class QnSessionManagerAsyncReplyProcessor: public QObject {
     Q_OBJECT
 
 public:
@@ -52,8 +50,7 @@ private:
 };
 
 
-class QnSessionManager: public QObject 
-{
+class QnSessionManager: public QObject {
     Q_OBJECT
 
 public:
@@ -94,18 +91,13 @@ private:
 private slots:
     void doStop();
     void doStart();
-
-    void doSendAsyncGetRequest(QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params);
-    void doSendAsyncPostRequest(QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
-    void doSendAsyncDeleteRequest(QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, int id);
+    void doSendAsyncRequest(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
     void processReply(const QnHTTPRawResponse& response, int handle);
 
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
-    void asyncGetRequest(QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params);
-    void asyncPostRequest(QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
-    void asyncDeleteRequest(QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id);
+    void asyncRequest(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
 
 private:
     QNetworkAccessManager *m_accessManager;
