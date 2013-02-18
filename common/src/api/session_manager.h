@@ -68,7 +68,6 @@ public:
     static QnSessionManager *instance();
 
     static QByteArray formatNetworkError(int error);
-    static bool checkIfAppServerIsOld();
 
     void stop();
     void start();
