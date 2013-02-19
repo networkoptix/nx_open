@@ -6,7 +6,7 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/adl_connective.h>
+#include <utils/common/connective.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 

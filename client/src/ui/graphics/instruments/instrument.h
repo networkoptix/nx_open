@@ -9,7 +9,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QList>
 
-#include <utils/common/adl_connective.h>
+#include <utils/common/connective.h>
 
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>

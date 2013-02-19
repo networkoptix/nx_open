@@ -5,7 +5,7 @@
 #include <QtGui/QWidget>
 
 #include <utils/common/request_param.h> /* For QnHTTPRawResponse */
-#include <utils/common/adl_connective.h>
+#include <utils/common/connective.h>
 
 
 struct QnHTTPRawResponse;

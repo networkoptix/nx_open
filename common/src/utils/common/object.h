@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include "adl_connective.h"
+#include "connective.h"
 
 class QnObject: public AdlConnective<QObject> {
     Q_OBJECT;

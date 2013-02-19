@@ -6,7 +6,7 @@
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
 
-#include "utils/common/adl_connective.h"
+#include <utils/common/connective.h>
 
 /**
  * Button box dialog that can be queried for the button that was clicked to close it.
