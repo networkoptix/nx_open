@@ -1,6 +1,8 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
+#include <QMessageBox>
+
 #include <ui/dialogs/progress_dialog.h>
 
 #include "utils/settings.h"
@@ -65,6 +67,13 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for reading.").arg(fileName));
         return;
     }
+
+    if (QMessageBox::warning(this, tr("Warning"), tr("Are you sure you want to start restoring database? All current data will be lost."),
+                             QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+        file.close();
+        return;
+    }
+
     QByteArray data = file.readAll();
     file.close();
 

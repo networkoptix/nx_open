@@ -11,7 +11,7 @@
 #include <ui/style/globals.h>
 
 #ifdef Q_OS_WIN
-#   include "device_plugins/desktop_win_only/win_audio_helper.h"
+#   include "device_plugins/desktop_win/win_audio_helper.h"
 #endif
 
 namespace {
