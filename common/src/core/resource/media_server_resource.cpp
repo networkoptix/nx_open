@@ -251,7 +251,7 @@ void QnMediaServerResource::determineOptimalNetIF()
     timer->setSingleShot(true);
     connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
     connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
-    timer->start(5); // send request slighty later to preffer direct connect
+    timer->start(5); // send request slighty later to preffer direct connect // TODO: #Elric still bad, implement properly
     timer->moveToThread(qApp->thread());
 
     m_runningIfRequests.insert(-1, QString());
