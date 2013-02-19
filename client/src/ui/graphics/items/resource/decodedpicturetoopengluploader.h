@@ -180,6 +180,8 @@ public:
         \return Uploaded picture data, NULL if no picture. Returned object memory is managed by \a DecodedPictureToOpenGLUploader, and MUST NOT be deleted
     */
     UploadedPicture* getUploadedPicture() const;
+    //!Returns timestamp of next frame to display or AV_NOPTS_VALUE if upload queue is empty
+    quint64 nextFrameToDisplayTimestamp() const;
     //!Blocks until all submitted frames have been rendered
     void waitForAllFramesDisplayed();
     void ensureAllFramesWillBeDisplayed();

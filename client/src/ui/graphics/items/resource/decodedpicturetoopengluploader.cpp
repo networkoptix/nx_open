@@ -1395,6 +1395,24 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     return pic;
 }
 
+quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
+{
+    QMutexLocker lk( &m_mutex );
+
+    if( !m_picturesWaitingRendering.empty() )
+        return m_picturesWaitingRendering.front()->pts();
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+    if( !m_framesWaitingUploadInGUIThread.empty() )
+        return m_framesWaitingUploadInGUIThread.front()->picture()->pts();
+#endif
+    //TODO/IMPL async upload case (only when HW decoding enabled)
+    if( !m_picturesBeingRendered.empty() )
+        return m_picturesBeingRendered.front()->pts();
+    if( !m_renderedPictures.empty() )
+        return m_renderedPictures.front()->pts();
+    return AV_NOPTS_VALUE;
+}
+
 void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
     QMutexLocker lk( &m_mutex );
