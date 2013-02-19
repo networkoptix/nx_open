@@ -1,12 +1,12 @@
-#ifndef QN_ADL_CONNECTIVE_H
-#define QN_ADL_CONNECTIVE_H
-
-#include "forward.h"
+#ifndef QN_CONNECTIVE_H
+#define QN_CONNECTIVE_H
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QWeakPointer>
+
+#include "forward.h"
 
 namespace Qn {
     inline QObject *connector(QObject *object) {
@@ -74,4 +74,4 @@ public:
     }
 };
 
-#endif // QN_ADL_CONNECTIVE_H
+#endif // QN_CONNECTIVE_H
