@@ -8,3 +8,15 @@ bool isEmailValid(const QString &email) {
     QRegExp rx(emailPattern);
     return rx.exactMatch(email.toUpper());
 }
+
+QString getEmailDomain(const QString &email) {
+    int idx = email.indexOf(QLatin1Char('@'));
+    return email.mid(idx + 1).trimmed();
+}
+
+QString getEmailUser(const QString &email) {
+    int idx = email.indexOf(QLatin1Char('+'));
+    if (idx < 0)
+        idx = email.indexOf(QLatin1Char('@'));
+    return email.left(idx).trimmed();
+}
