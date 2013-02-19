@@ -153,23 +153,24 @@ private:
 
 void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
 {
+    QMutexLocker lock(&m_mutex);
+
+    QString urlStr = m_runningIfRequests.value(responseNum);
     QByteArray guid = getGuid().toUtf8();
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
-        QMutexLocker lock(&m_mutex);
-
         // server OK
-        QString urlStr = m_runningIfRequests.value(responseNum);
         if (urlStr == QLatin1String("proxy"))
             setPrimaryIF(urlStr);
         else
             setPrimaryIF(QUrl(urlStr).host());
-        m_runningIfRequests.remove(responseNum);
+    }
 
-        if(m_runningIfRequests.isEmpty() && m_guard) {
-            m_guard->deleteLater();
-            m_guard = NULL;
-        }
+    m_runningIfRequests.remove(responseNum);
+
+    if(m_runningIfRequests.isEmpty() && m_guard) {
+        m_guard->deleteLater();
+        m_guard = NULL;
     }
 }
 
