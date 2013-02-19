@@ -246,14 +246,26 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 
     // send request via proxy (ping request always send directly, other request are sent via proxy here)
-    QnSleep::msleep(5); // send request slighty latter to preffer direct connect
-    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
-    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
+    QTimer *timer = new QTimer();
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
+    connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
+    timer->start(5); // send request slighty later to preffer direct connect
+    timer->moveToThread(qApp->thread());
+
+    m_runningIfRequests.insert(-1, QString());
 
     if(!m_guard) {
         m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
         m_guard->moveToThread(qApp->thread());
     }
+}
+
+void QnMediaServerResource::determineOptimalNetIF_testProxy() {
+    QMutexLocker lock(&m_mutex);
+    m_runningIfRequests.remove(-1);
+    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
 }
 
 void QnMediaServerResource::updateInner(QnResourcePtr other) 

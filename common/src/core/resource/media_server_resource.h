@@ -70,6 +70,7 @@ public:
 
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
+    void determineOptimalNetIF_testProxy();
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
