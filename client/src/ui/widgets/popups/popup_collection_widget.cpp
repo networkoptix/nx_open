@@ -128,6 +128,8 @@ void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::V
     QWidget* w = m_businessEventWidgets[eventType];
     ui->verticalLayout->removeWidget(w);
     m_businessEventWidgets.remove(eventType);
+    w->hide();
+    w->deleteLater();
 
     if (ui->verticalLayout->count() == 0)
         hide();
@@ -143,6 +145,8 @@ void QnPopupCollectionWidget::at_systemHealthWidget_closed(QnSystemHealth::Messa
     QWidget* w = m_systemHealthWidgets[message];
     ui->verticalLayout->removeWidget(w);
     m_systemHealthWidgets.remove(message);
+    w->hide();
+    w->deleteLater();
 
     if (ui->verticalLayout->count() == 0)
         hide();
