@@ -28,7 +28,7 @@ const StreamingChunkCacheKey& StreamingChunk::params() const
 
 QString StreamingChunk::mimeType() const
 {
-    //TODO/IMPL
+    //TODO/IMPL/HLS
     return QString();
 }
 
@@ -72,7 +72,11 @@ void StreamingChunk::appendData( const QByteArray& data )
 
 void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 {
-    QMutexLocker lk( &m_mutex );
-    Q_ASSERT( m_isOpenedForModification );
-    m_isOpenedForModification = false;
+    {
+        QMutexLocker lk( &m_mutex );
+        Q_ASSERT( m_isOpenedForModification );
+        m_isOpenedForModification = false;
+    }
+
+    emit newDataIsAvailable( this, 0 );
 }

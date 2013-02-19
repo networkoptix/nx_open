@@ -94,7 +94,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     Q_ASSERT( transcodeParams.startTimestamp() <= transcodeParams.endTimestamp() );
 
     pair<map<int, TranscodeContext>::iterator, bool> p = m_transcodings.insert(
-        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );  //TODO/IMPL
+        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );  //TODO/IMPL/HLS
     Q_ASSERT( p.second );
 
     //checking requested time region:
@@ -243,6 +243,7 @@ bool StreamingChunkTranscoder::startTranscoding(
     //launching transcoding:
         //creating transcoder
     std::auto_ptr<QnFfmpegTranscoder> transcoder( new QnFfmpegTranscoder() );
+    //if( transcoder->setContainer( "flv" ) != 0 )
     if( transcoder->setContainer( transcodeParams.containerFormat() ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4").
@@ -250,23 +251,56 @@ bool StreamingChunkTranscoder::startTranscoding(
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
-    //TODO/IMPL set correct video parameters
-    if( transcoder->setVideoCodec( CODEC_ID_MPEG2VIDEO, /*QnTranscoder::TM_DirectStreamCopy*/ QnTranscoder::TM_FfmpegTranscode ) != 0 )
+    //TODO/IMPL/HLS setting correct video parameters
+    CodecID codecID = CODEC_ID_NONE;
+    QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/IMPL/HLS get codec of resource video stream
+    QSize videoResolution = QSize( 1280, 720 );  //TODO/IMPL/HLS get resolution of resource video stream
+    if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
+    {
+        codecID = resourceVideoStreamCodecID;
+        transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+    }
+    else
+    {
+        //AVOutputFormat* requestedVideoFormat = av_guess_format( transcodeParams.videoCodec().toLatin1().data(), NULL, NULL );
+        codecID = 
+            transcodeParams.videoCodec().isEmpty()
+            ? resourceVideoStreamCodecID
+            : av_guess_codec( NULL, transcodeParams.videoCodec().toLatin1().data(), NULL, NULL, AVMEDIA_TYPE_VIDEO );
+        if( codecID == CODEC_ID_NONE )
+        {
+            NX_LOG( QString::fromLatin1("Cannot start transcoding of streaming chunk of resource %1. No codec %2 found in FFMPEG library").
+                arg(mediaResource->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
+            return false;
+        }
+        transcodeMethod = codecID == resourceVideoStreamCodecID ?
+            QnTranscoder::TM_DirectStreamCopy :
+            QnTranscoder::TM_FfmpegTranscode;
+        if( transcodeParams.pictureSizePixels().isValid() )
+            videoResolution = transcodeParams.pictureSizePixels();
+    }
+    if( transcoder->setVideoCodec( codecID, transcodeMethod, videoResolution ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
-    //if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
-    //{
-    //    NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-    //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
-    //        arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-    //    return false;
-    //}
 
-    //TODO/IMPL selecting least used transcoding thread from pool
+    //TODO/IMPL/HLS audio
+    if( !transcodeParams.audioCodec().isEmpty() )
+    {
+        //if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
+        //{
+        //    NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
+        //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
+        //        arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
+        //    return false;
+        //}
+    }
+
+    //TODO/IMPL/HLS selecting least used transcoding thread from pool
     StreamingChunkTranscoderThread* transcoderThread = m_transcodeThreads[rand() % m_transcodeThreads.size()];
 
     //adding transcoder to transcoding thread
@@ -295,6 +329,6 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
 
 bool StreamingChunkTranscoder::validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams )
 {
-    //TODO/IMPL
+    //TODO/IMPL/HLS
     return true;
 }

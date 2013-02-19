@@ -140,14 +140,14 @@ void StreamingChunkTranscoderThread::run()
         {
             NX_LOG( QString::fromLatin1("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            //TODO/IMPL remove transcoding or consider that data may appear later?
+            //TODO/IMPL/HLS remove transcoding or consider that data may appear later?
         }
 
         QnAbstractMediaDataPtr srcMediaData = srcPacket.dynamicCast<QnAbstractMediaData>();
         Q_ASSERT( srcMediaData );
 
         QnByteArray resultStream( 1, 1024 );
-        //TODO/IMPL releasing mutex lock for transcodePacket call
+        //TODO/IMPL/HLS releasing mutex lock for transcodePacket call
         int res = transcodeIter->second->transcoder->transcodePacket( srcMediaData, resultStream );
         if( res )
         {
@@ -157,7 +157,7 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
-        //TODO/IMPL protect from discontinuity in timestamp
+        //TODO/IMPL/HLS protect from discontinuity in timestamp
         if( transcodeIter->second->prevPacketTimestamp == -1 )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;
         if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000 )
@@ -217,8 +217,13 @@ void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
 {
     transcodingIter->second->chunk->doneModification( transcodingFinishedSuccessfully ? StreamingChunk::rcEndOfData : StreamingChunk::rcError );
 
+    if( !transcodingFinishedSuccessfully )
+    {
+        //TODO/IMPL/HLS MUST remove chunk from cache
+    }
+
     m_dataSourceToID.erase( transcodingIter->second->dataSource.data() );
     m_transcodeContext.erase( transcodingIter );
 
-    //TODO/IMPL emit some signal?
+    //TODO/IMPL/HLS emit some signal?
 }

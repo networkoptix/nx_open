@@ -12,6 +12,6 @@ OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbs
 //!Implementation of AbstractOnDemandDataProvider::tryRead
 bool OnDemandMediaDataProvider::tryRead( QnAbstractDataPacketPtr* const data )
 {
-    //TODO/IMPL
+    //TODO/IMPL/HLS
     return false;
 }

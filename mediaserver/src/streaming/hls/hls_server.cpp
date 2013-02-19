@@ -167,7 +167,7 @@ void QnHttpLiveStreamingProcessor::processRequest( const nx_http::Request& reque
 {
     nx_http::Response response;
     response.statusLine.version = request.requestLine.version;
-    response.headers.insert( std::make_pair( "Date", QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL get timezone
+    response.headers.insert( std::make_pair( "Date", QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL/HLS get timezone
     response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME" "QN_APPLICATION_VERSION ) );
     response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //findRequestedFile can override this
 
@@ -379,7 +379,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getLivePlaylist(
         playlist.mediaSequence = chunkList[0].mediaSequence;
     playlist.closed = false;
 
-    //TODO/IMPL special processing for empty playlist
+    //TODO/IMPL/HLS special processing for empty playlist
     //if( playlist.chunks.empty() )
     //{
     //    //no media data cached yet
@@ -426,7 +426,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getArchivePlaylist(
     const std::multimap<QString, QString>& requestParams,
     nx_http::Response* const response )
 {
-    //TODO/IMPL
+    //TODO/IMPL/HLS
     return nx_http::StatusCode::notImplemented;
 }
 
@@ -463,7 +463,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         if( startDatetimeIter != requestParams.end() )
         {
             QDateTime startDatetime = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate);
-            //TODO/IMPL converting startDatetime to startTimestamp
+            //TODO/IMPL/HLS converting startDatetime to startTimestamp
         }
     }
 

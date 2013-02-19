@@ -51,6 +51,9 @@ public:
     //!startTimestamp() + duration
     quint64 endTimestamp() const;
     //!Video resolution
+    /*!
+        \return If no resolution specified, returns invalid \a QSize.
+    */
     const QSize& pictureSizePixels() const;
     //media format (codec format, container format)
     const QString& containerFormat() const;

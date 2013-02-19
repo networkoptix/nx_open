@@ -6,6 +6,7 @@
 #define MEDIASTREAMCACHE_H
 
 #include <map>
+#include <vector>
 
 #include <QMutex>
 
@@ -24,12 +25,17 @@ class MediaStreamCache
     public QnAbstractDataReceptor
 {
 public:
+    /*!
+        By using this class, one can be sure that old data will not be removed until it has been read
+        \note Class is not thread-safe
+    */
     class SequentialReadContext
     {
     public:
         SequentialReadContext(
             const MediaStreamCache* cache,
             quint64 startTimestamp );
+        ~SequentialReadContext();
 
         //!If no next frame returns NULL
         QnAbstractDataPacketPtr getNextFrame();
@@ -40,9 +46,13 @@ public:
         const MediaStreamCache* m_cache;
         quint64 m_startTimestamp;
         bool m_firstFrame;
+        //!timestamp of previous given frame
         quint64 m_currentTimestamp;
     };
 
+    /*!
+        \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
+    */
     MediaStreamCache(
         unsigned int cacheSizeMillis,
         MediaIndex* const mediaIndex );
@@ -71,7 +81,7 @@ public:
         quint64 desiredTimestamp,
         bool findKeyFrameOnly,
         quint64* const foundTimestamp ) const;
-    //!Returns packet witm min timestamp greater than \a timestamp
+    //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
 private:
@@ -85,6 +95,10 @@ private:
     qint64 m_prevPacketSrcTimestamp;
     //!In micros
     quint64 m_currentPacketTimestamp;
+    mutable std::vector<SequentialReadContext*> m_activeReadContexts;
+
+    void sequentialReadingStarted( SequentialReadContext* const readCtx ) const;
+    void sequentialReadingFinished( SequentialReadContext* const readCtx ) const;
 };
 
 #endif  //MEDIASTREAMCACHE_H

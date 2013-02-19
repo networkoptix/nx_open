@@ -4,6 +4,8 @@
 
 #include "media_stream_cache.h"
 
+#include <algorithm>
+
 #include <QMutexLocker>
 
 #include "mediaindex.h"
@@ -18,8 +20,14 @@ MediaStreamCache::SequentialReadContext::SequentialReadContext(
     m_cache( cache ),
     m_startTimestamp( startTimestamp ),
     m_firstFrame( true ),
-    m_currentTimestamp( 0 )
+    m_currentTimestamp( startTimestamp )
 {
+    cache->sequentialReadingStarted( this );
+}
+
+MediaStreamCache::SequentialReadContext::~SequentialReadContext()
+{
+    m_cache->sequentialReadingFinished( this );
 }
 
 //!If no next frame returns NULL
@@ -65,6 +73,7 @@ bool MediaStreamCache::canAcceptData() const
 }
 
 static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 3600*1000*1000UL;  //1 hour
+static const int MICROS_PER_MS = 1000;
 
 //!Implementation of QnAbstractDataReceptor::putData
 void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
@@ -96,10 +105,19 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
         m_mediaIndex->addPoint( m_currentPacketTimestamp, QDateTime::currentDateTimeUtc(), isKeyFrame );
 
     m_packetsByTimestamp.insert( make_pair( m_currentPacketTimestamp, make_pair( data, isKeyFrame ) ) );
-    if( m_packetsByTimestamp.rbegin()->first - m_packetsByTimestamp.begin()->first > m_cacheSizeMillis*1000 )
+
+    if( !isKeyFrame )
+        return;
+
+    const quint64 maxTimestamp = (--m_packetsByTimestamp.end())->first;
+    if( maxTimestamp - m_packetsByTimestamp.begin()->first > m_cacheSizeMillis*MICROS_PER_MS )
     {
-        //TODO/IMPL removing old packets up to key frame
-            //no sense to perform this operation more than once per GOP
+        //TODO/IMPL/HLS removing old packets up to key frame, but not futher any position of sequential reading
+        PacketCotainerType::iterator lastItToRemove = m_packetsByTimestamp.lower_bound( maxTimestamp - m_cacheSizeMillis*MICROS_PER_MS );
+        if( lastItToRemove != m_packetsByTimestamp.begin() )
+            --lastItToRemove ;
+        m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove  );
+            //TODO/IMPL/HLS no sense to perform this operation more than once per GOP
     }
 }
 
@@ -174,4 +192,16 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
 
     *foundTimestamp = it->first;
     return it->second.first;
+}
+
+void MediaStreamCache::sequentialReadingStarted( SequentialReadContext* const readCtx ) const
+{
+    QMutexLocker lk( &m_mutex );
+    m_activeReadContexts.push_back( readCtx );
+}
+
+void MediaStreamCache::sequentialReadingFinished( SequentialReadContext* const readCtx ) const
+{
+    QMutexLocker lk( &m_mutex );
+    m_activeReadContexts.erase( std::remove( m_activeReadContexts.begin(), m_activeReadContexts.end(), readCtx ), m_activeReadContexts.end() );
 }

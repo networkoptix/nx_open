@@ -15,6 +15,6 @@ StreamingChunk* StreamingChunkProvider::get( const StreamingChunkCacheKey& key, 
     if( !StreamingChunkTranscoder::instance()->transcodeAsync( key, chunk.get() ) )
         return NULL;
 
-    *itemCost = 1;  //TODO/IMPL
+    *itemCost = 1;  //TODO/IMPL/HLS this MUST be chunk size in bytes
     return chunk.release();
 }

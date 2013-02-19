@@ -366,19 +366,7 @@ static unsigned int MEDIA_CACHE_SIZE_MILLIS = 30000;
 */
 bool QnVideoCamera::ensureLiveCacheStarted()
 {
-    if( m_liveCache.get() )
-        return true;
-
-    QnAbstractMediaStreamDataProviderPtr reader = getLiveReader(QnResource::Role_LiveVideo);
-    if( !reader )
-        return false;
-
-    m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
-
-    //connecting live cache to reader
-    reader->addDataProcessor( m_liveCache.get() );
-
-    return true;
+    return getLiveReader(QnResource::Role_LiveVideo);
 }
 
 //!Starts caching live stream, if not started
@@ -389,14 +377,12 @@ bool QnVideoCamera::ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr
 {
     if( m_liveCache.get() )
         return true;
-
     if( !primaryReader )
         return false;
 
     m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
-
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache.get() );
-
+    m_cameraUsers << this;
     return true;
 }
