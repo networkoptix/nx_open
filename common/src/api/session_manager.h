@@ -49,7 +49,16 @@ private:
     int m_handle;
 };
 
+class QnSessionManagerHandler: public QObject {
+    Q_OBJECT
+public:
+    QnSessionManagerHandler(QObject *parent = NULL);
 
+
+
+};
+
+// TODO: #Elric separate into two objects, one object per thread.
 class QnSessionManager: public QObject {
     Q_OBJECT
 
@@ -87,20 +96,22 @@ private:
     int sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType);
 
 private slots:
-    void doStop();
-    void doStart();
-    void doSendAsyncRequest(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
-    void processReply(const QnHTTPRawResponse& response, int handle);
+    void at_aboutToBeStopped();
+    void at_aboutToBeStarted();
+    void at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
+    void at_replyProcessor_finished(const QnHTTPRawResponse& response, int handle);
 
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
-    void asyncRequest(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
+    void asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
 
 private:
     QNetworkAccessManager *m_accessManager;
     mutable QMutex m_accessManagerMutex;
     static QAtomicInt s_handle;
+    
+    QScopedPointer<QThread> m_thread;
 };
 
 #endif // __SESSION_MANAGER_H__
