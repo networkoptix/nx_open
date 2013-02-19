@@ -34,6 +34,10 @@ private:
     ACS_stream_source *m_ACSStream;
     QnNetworkResourcePtr m_networkRes;
     bool m_connected;
+    int m_spsPpsWidth;
+    int m_spsPpsHeight;
+    quint8 m_spsPpsBuffer[128];
+    int m_spsPpsBufferLen;
 };
 
 #endif //vmax480_live_h_1740
