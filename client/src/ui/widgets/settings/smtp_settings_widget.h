@@ -5,13 +5,15 @@
 
 #include <api/model/kvpair.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 namespace Ui {
     class QnSmtpSettingsWidget;
 }
 
 class QDnsLookup;
 
-class QnSmtpSettingsWidget : public QWidget
+class QnSmtpSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     
@@ -29,9 +31,13 @@ private slots:
 
     void at_testButton_clicked();
     void at_autoDetectCheckBox_toggled(bool toggled);
+    void at_setupUserButton_clicked();
 
     void handleServers();
 private:
+    void updateSettings();
+    void updateMailServers();
+
     void updateOverlay();
 
 private:
@@ -41,7 +47,6 @@ private:
     QDnsLookup* m_dns;
 
     QString m_autoMailServer;
-    QString m_autoUser;
 
     bool m_settingsReceived;
     bool m_mailServersReceived;

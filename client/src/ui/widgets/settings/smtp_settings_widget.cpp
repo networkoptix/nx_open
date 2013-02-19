@@ -6,10 +6,15 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <ui/style/globals.h>
 
 #include <utils/settings.h>
 #include <utils/common/email.h>
+
+#include <ui/actions/actions.h>
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_parameters.h>
+#include <ui/workbench/workbench_context.h>
 
 //TODO: #GDM use documentation from http://support.google.com/mail/bin/answer.py?hl=en&answer=1074635
 
@@ -26,6 +31,7 @@ namespace {
 
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnSmtpSettingsWidget),
     m_requestHandle(-1),
     m_dns(NULL),
@@ -35,9 +41,15 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->portComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
+    connect(ui->portComboBox,       SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
     connect(ui->autoDetectCheckBox, SIGNAL(toggled(bool)),          this,   SLOT(at_autoDetectCheckBox_toggled(bool)));
-    connect(ui->testButton,     SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
+    connect(ui->setupUserButton,    SIGNAL(clicked()),                  this,   SLOT(at_setupUserButton_clicked()));
+    connect(ui->testButton,         SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    ui->detectErrorLabel->setPalette(palette);
+
     at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
 }
 
@@ -46,32 +58,10 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 }
 
 void QnSmtpSettingsWidget::update() {
-    m_settingsReceived = false;
-    m_mailServersReceived = false;
+    ui->autoDetectCheckBox->setChecked(qnSettings->autoDetectSmtp());
 
-    m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                this, SLOT(at_settings_received(int,QByteArray,QnKvPairList,int)));
-
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin && isEmailValid(admin->getEmail().trimmed())) {
-        QString hostname = getEmailDomain(admin->getEmail());
-
-        m_dns = new QDnsLookup(this);
-        connect(m_dns, SIGNAL(finished()), this, SLOT(at_mailServers_received()));
-
-        m_dns->setType(QDnsLookup::MX);
-        m_dns->setName(hostname);
-        m_dns->lookup();
-
-        m_autoUser = getEmailUser(admin->getEmail());
-    }
-    else {
-        m_mailServersReceived = true;
-        if (!admin)
-            qWarning() << "Admin is not found";
-        // common case: email field is not filled
-    }
-    updateOverlay();
+    updateSettings();
+    updateMailServers();
 }
 
 void QnSmtpSettingsWidget::submit() {
@@ -88,20 +78,50 @@ void QnSmtpSettingsWidget::submit() {
         << QnKvPair(nameTls, useTls ? QLatin1String("True") : QLatin1String("False"));
 
     QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(settings);
+
+    qnSettings->setAutoDetectSmtp(ui->autoDetectCheckBox->isChecked());
+}
+
+void QnSmtpSettingsWidget::updateSettings() {
+    m_settingsReceived = false;
+
+    m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
+                this, SLOT(at_settings_received(int,QByteArray,QnKvPairList,int)));
+    updateOverlay();
+}
+
+void QnSmtpSettingsWidget::updateMailServers() {
+    m_mailServersReceived = false;
+    m_autoMailServer = QString();
+    ui->detectErrorLabel->setText(QString());
+
+    QString email = context()->user()->getEmail().trimmed();
+    if (isEmailValid(email)) {
+        QString hostname = getEmailDomain(email);
+
+        m_dns = new QDnsLookup(this);
+        connect(m_dns, SIGNAL(finished()), this, SLOT(at_mailServers_received()));
+
+        m_dns->setType(QDnsLookup::MX);
+        m_dns->setName(hostname);
+        m_dns->lookup();
+    }
+    else {
+        m_mailServersReceived = true;
+        ui->detectErrorLabel->setText(tr("Your email is not valid"));
+    }
+    updateOverlay();
 }
 
 void QnSmtpSettingsWidget::updateOverlay() {
     if (!m_settingsReceived || !m_mailServersReceived)
         return; //TODO: #GDM disable all, draw progress bar
 
-    bool autoDetect = qnSettings->autoDetectSmtp() &&
+    bool autoDetect = ui->autoDetectCheckBox->isChecked() &&
             !m_autoMailServer.isEmpty();
 //            &&  ui->serverLineEdit->text() == m_autoMailServer;
     ui->autoDetectCheckBox->setEnabled(!m_autoMailServer.isEmpty());
     ui->autoDetectCheckBox->setChecked(autoDetect);
-
-
-
 }
 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
@@ -155,12 +175,21 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     updateOverlay();
 }
 
+/*
+\value ResolverError        there was an error initializing the system's DNS resolver.
+\value OperationCancelledError  the lookup was aborted using the abort() method.
+\value InvalidRequestError  the requested DNS lookup was invalid.
+\value InvalidReplyError    the reply returned by the server was invalid.
+\value ServerFailureError   the server encountered an internal failure while processing the request (SERVFAIL).
+\value ServerRefusedError   the server refused to process the request for security or policy reasons (REFUSED).
+\value NotFoundError        the requested domain name does not exist (NXDOMAIN).
+*/
+
 void QnSmtpSettingsWidget::at_mailServers_received() {
     m_mailServersReceived = true;
-    m_autoMailServer = QString();
 
     if (m_dns->error() != QDnsLookup::NoError) {
-        qWarning() <<"DNS lookup failed";
+        ui->detectErrorLabel->setText(tr("DNS lookup failed"));
         m_dns->deleteLater();
         updateOverlay();
         return;
@@ -173,9 +202,13 @@ void QnSmtpSettingsWidget::at_mailServers_received() {
             preferred = record.preference();
             m_autoMailServer = record.exchange();
         }
-        qDebug() << record.exchange() << record.preference();
     }
     m_dns->deleteLater();
+
+    if (m_autoMailServer.isEmpty()) {
+        ui->detectErrorLabel->setText(tr("No mail servers found."));
+    }
+
     updateOverlay();
 }
 
@@ -192,11 +225,17 @@ void QnSmtpSettingsWidget::at_autoDetectCheckBox_toggled(bool toggled) {
 
     if (toggled && !m_autoMailServer.isEmpty()) {
         ui->serverLineEdit->setText(m_autoMailServer);
-        ui->userLineEdit->setText(m_autoUser);
+        ui->userLineEdit->setText(context()->user()->getEmail().trimmed());
         ui->portComboBox->setCurrentIndex(0);
         ui->tlsRadioButton->setChecked(true);
         //TODO: #GDM setup other smtp settings
     }
+}
+
+void QnSmtpSettingsWidget::at_setupUserButton_clicked() {
+    menu()->trigger(Qn::UserSettingsAction,
+                    QnActionParameters(context()->user()));
+    updateMailServers();
 }
 
 void QnSmtpSettingsWidget::handleServers() {
