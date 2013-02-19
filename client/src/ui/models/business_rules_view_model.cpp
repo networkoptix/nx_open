@@ -270,7 +270,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
 
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
-    m_id = businessRule->getId();
+    m_id = businessRule->id();
     m_modified = false;
     m_eventType = businessRule->eventType();
 
@@ -292,7 +292,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    m_disabled = businessRule->isDisabled();
+    m_disabled = businessRule->disabled();
     m_comments = businessRule->comments();
     m_schedule = businessRule->schedule();
 
@@ -974,7 +974,7 @@ void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
 
 void QnBusinessRulesViewModel::updateRule(QnBusinessEventRulePtr rule) {
     foreach (QnBusinessRuleViewModel* ruleModel, m_rules) {
-        if (ruleModel->id() == rule->getId()) {
+        if (ruleModel->id() == rule->id()) {
             ruleModel->loadFromRule(rule);
             return;
         }

@@ -277,7 +277,7 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
     QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
-        if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
+        if (rule->disabled() || rule->eventType() != bEvent->getEventType())
             continue;
         bool condOK = checkEventCondition(bEvent, rule);
         if (condOK)
@@ -368,7 +368,7 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
-        if (m_rules[i]->getId() == bRule->getId())
+        if (m_rules[i]->id() == bRule->id())
         {
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             notifyResourcesAboutEventIfNeccessary( bRule, true );
@@ -420,7 +420,7 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
-        if (m_rules[i]->getId() == id)
+        if (m_rules[i]->id() == id)
         {
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             terminateRunningRule(m_rules[i]);

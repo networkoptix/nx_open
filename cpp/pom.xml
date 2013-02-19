@@ -249,7 +249,8 @@
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
 									<exclude name="**/version.h" />
-									<exclude name="**/**_${exclude_platform}_only/**" />		
+									<exclude name="**/*_${exclude_platform}/**" />		
+									<exclude name="**/*_${exclude_platform}.*" />											
 									<exclude name="youtube/**" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
@@ -270,7 +271,8 @@
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
 									<exclude name="youtube/**" />									
-									<exclude name="**/**_${exclude_platform}_only/**" />								
+									<exclude name="**/*_${exclude_platform}/**" />	
+									<exclude name="**/*_${exclude_platform}.*" />																				
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
 									<map from="" to="SOURCES += "/>
@@ -280,7 +282,7 @@
 								<fileset id="forms_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.ui" />
 									<exclude name="youtube/**" />
-									<exclude name="**/**_${exclude_platform}_only/**" />										
+									<exclude name="**/**_${exclude_platform}/**" />										
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="forms" refid="forms_path">
 									<map from="" to="FORMS += "/>
@@ -314,7 +316,7 @@
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
-				<exclude_platform>linux</exclude_platform>
+				<exclude_platform>unix</exclude_platform>
 			</properties>
 			<build>
 				<plugins>					

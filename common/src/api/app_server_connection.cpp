@@ -913,7 +913,7 @@ int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObjec
 
 int QnAppServerConnection::deleteAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(businessRuleObject, rule->getId().toInt(), target, slot);
+    return deleteObjectAsync(businessRuleObject, rule->id(), target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {

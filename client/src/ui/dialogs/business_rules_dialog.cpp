@@ -186,7 +186,7 @@ void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr 
 void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
     m_rulesViewModel->deleteRule(id);
     foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        if (rule->getId() == id) {
+        if (rule->id() == id) {
             m_pendingDeleteRules.removeOne(rule);
             return;
         }

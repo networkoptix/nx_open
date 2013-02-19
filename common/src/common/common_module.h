@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 class QnPtzMapperPool;
+class QnSessionManager;
 
 /**
  * Storage for common module's global state.
@@ -28,9 +29,14 @@ public:
         return m_ptzMapperPool;
     }
 
+    QnSessionManager *sessionManager() const {
+        return m_sessionManager;
+    }
+
 private:
     static QnCommonModule *s_instance;
     QnPtzMapperPool *m_ptzMapperPool;
+    QnSessionManager *m_sessionManager;
 };
 
 #define qnCommon (QnCommonModule::instance())

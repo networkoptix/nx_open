@@ -8,6 +8,7 @@ namespace QnSystemHealth {
     enum MessageType {
         EmailIsEmpty,
         NoLicenses,
+        SmtpIsNotSet,
         NotDefined,
 
         MessageTypeCount = NotDefined

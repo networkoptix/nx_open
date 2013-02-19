@@ -1,4 +1,9 @@
------------------------------------------------ 1.5 - Beta -----------------------------------------------
+----------------------------------------------- 1.4.3 - Beta -----------------------------------------------
+
+Display confirmation window when choosing a file for db restore
+add E-mail servers preset
+
+----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - Axis Encoders
@@ -6,48 +11,49 @@ NEW CAMERAS AND RECORDERS SUPPORTED:
  - Vivotek Encoders 
 
 NEW FEATURES:  
+ - Windows 8 is supported
  - Events and Actions:
    - Events: 
-     - Motion (camera(s) should be specified). Camera(s) should have Recording enabled
-     - Camera Disconnected (camera(s) can be specified). If not, any camera will trigger the event
-     - Storage Failure (if Media Server unable to write file on a storage)
-     - Network Issue: RTP timeout or RTP packet loss
+     - Motion (camera(s) must be specified). Camera(s) must have Recording enabled
+     - Camera Disconnected (specific camera(s) may be specified). If not, any camera will trigger the event
+     - Storage Failure (in case Media Server is unable to write a file on a storage)
+     - Network Issue (RTP timeout or RTP packet loss)
      - Camera IP Conflict (if several cameras or servers have the same IP address)
      - Input Signal on Camera (if supported - ONVIF and Axis only)
-     - Media Server Failure - if a media server goes down or reboots for some reason
-     - Media Servers Conflict - if another Media Server that connected to another EC is pulling video from the same camera
+     - Media Server Failure (in case Media Server goes down or reboots itself)
+     - Media Servers Conflict (if another Media Server that connected to another EC is pulling video from the same camera(s))
    - Actions: 
-     - Camera Recording (camera(s) should be specified). Camera(s) should have Recording enabled
+     - Camera Recording (camera(s) must be specified). Camera(s) must have Recording enabled
      - Panic Recording
-     - Send Mail. recipient(s) should be specified. Mail Server settings should be configured in Global Settings
-     - Show Notification. User roles can be specified. Notification parameters should be configured in Global Settings
+     - Send Mail (recipient(s) must be specified). Mail Server settings should be configured in Global Settings
+     - Show Notification (User roles may be specified). Notification parameters should be configured in Global Settings
      - Camera Output(if supported - ONVIF and Axis only)     
-   - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has common and advanced parameters.
+   - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has standard and advanced parameters
  - Hardware acceleration of video decoding (Intel Quick Sync only). The flag in System Settings will be available only if Intel HD graphics is enabled
  - PTZ is greatly improved:
-   - PTZ is much more user-friendly and precise
-   - PTZ works correctly for rotated/flipped Axis cameras
-   - PTZ positions can be saved/restored (if camera supports positioning)
-   - Current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported for a camera
+   - PTZ is now more intuitive and precise
+   - PTZ now works correctly for rotated/flipped Axis cameras
+   - PTZ positions can be saved/restored (if a camera supports positioning)
+   - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
  
 IMPROVEMENTS:
  - CTRL can be used in Calendar Search to select multiple dates
- - Login is case insensitive now ('admin' and 'Admin' used to be different)
+ - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
  - Domain names are allowed for the "Manual camera addition" form
- - "Do not show again" checkbox is added to the upgrade form. To re-enable it use "Check For Upgrade" Main Menu item
+ - The "Do not show again" checkbox is added to the upgrade form. To re-enable it use "Check For Upgrade" Main Menu item
  - It is possible to view EC and Mediaserver logs via Web Interface. Use https://<EC IP>:<EC Port>/web/servers URL (i.e. https://127.0.0.1:7001/web/servers)
- - Better auto storage selection. While installing a media server every available partition in the system should be added (if a partition has >100 GB free)
+ - Auto storage selection is improved. While installing a media server, every available partition in the system must be added (if the partition has >100 GB free)
  - Manual RADASS Switch is added to the interface but not implemented in the code. We will think about it and maybe remove it
  - If max fps has been reduced for motion+low, it will be reduced for all record modes in schedule (Arecont cameras only)
  
 BUGS FIXED:
- - Items with same names were sorted randomly in Tree each time Client was started. Now not
- - If a password for admin had been changed no changes could be applied on EC until restart. Fixed
+ - Identically named items were sorted randomly in Tree each time Client was started. Fixed
+ - If the password for admin was changed, no changes were applied toEC until system restart. Fixed
  - If a distance between recorded fragments were small (2-3sec), then "Next chunk" button resulted in jump over these chunks. Fixed
  - "Open in a new window" didn't work for items of Multi-Video exported files. Now it works
- - Selection of items was not saved correctly item if a layout was closed and reopened. Fixed
- - If two cameras were playing video near the live position and one of them was closed, than another didn't jump up to live and could stuck. Fixed
- - If open several Multi-Videos and change one another was corrupted. Fixed
+ - The selection of items was not saved correctly after closing and re-opening the layout. Fixed
+ - If two cameras were playing video near the live position (last minute) and one of them was closed, than another didn't jump up to live and could stuck. Fixed
+ - If open several Multi-Videos then change and save one of them, then another was corrupted. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
 

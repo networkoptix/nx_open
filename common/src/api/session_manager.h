@@ -5,23 +5,17 @@
 #include <QtCore/QUrl>
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
-#include <QtCore/QSet>
-#include <QtCore/QTimer>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 
 #include "utils/common/request_param.h"
-#include "utils/common/long_runnable.h"
-
 
 class QNetworkReply;
+class QNetworkAccessManager;
 
-class SyncRequestProcessor : public QObject 
-{
+class QnSessionManagerSyncReplyProcessor: public QObject {
     Q_OBJECT
 
 public:
-    SyncRequestProcessor(QObject *parent = NULL): QObject(parent), m_finished(false) {}
+    QnSessionManagerSyncReplyProcessor(QObject *parent = NULL): QObject(parent), m_finished(false) {}
 
     int wait(QnHTTPRawResponse& response);
 
@@ -36,12 +30,11 @@ private:
     QWaitCondition m_condition;
 };
 
-class SessionManagerReplyProcessor : public QObject 
-{
+class QnSessionManagerAsyncReplyProcessor: public QObject {
     Q_OBJECT
 
 public:
-    SessionManagerReplyProcessor(int handle, QObject *parent = NULL): 
+    QnSessionManagerAsyncReplyProcessor(int handle, QObject *parent = NULL): 
         QObject(parent),
         m_handle(handle)
     {}
@@ -56,9 +49,17 @@ private:
     int m_handle;
 };
 
+class QnSessionManagerHandler: public QObject {
+    Q_OBJECT
+public:
+    QnSessionManagerHandler(QObject *parent = NULL);
 
-class QnSessionManager: public QObject 
-{
+
+
+};
+
+// TODO: #Elric separate into two objects, one object per thread.
+class QnSessionManager: public QObject {
     Q_OBJECT
 
 public:
@@ -66,7 +67,6 @@ public:
     virtual ~QnSessionManager();
 
     static QnSessionManager *instance();
-
     static QByteArray formatNetworkError(int error);
 
     void stop();
@@ -92,27 +92,26 @@ signals:
 
 private:
     QUrl createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
+    int sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response);
+    int sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType);
 
 private slots:
-    void doStop();
-    void doStart();
-
-    void doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params);
-    void doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
-    void doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, int id);
-    void processReply(const QnHTTPRawResponse& response, int handle);
+    void at_aboutToBeStopped();
+    void at_aboutToBeStarted();
+    void at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
+    void at_replyProcessor_finished(const QnHTTPRawResponse& response, int handle);
 
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
-    void asyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params);
-    void asyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
-    void asyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id);
+    void asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
 
 private:
     QNetworkAccessManager *m_accessManager;
     mutable QMutex m_accessManagerMutex;
     static QAtomicInt s_handle;
+    
+    QScopedPointer<QThread> m_thread;
 };
 
 #endif // __SESSION_MANAGER_H__

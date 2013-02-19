@@ -421,6 +421,17 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnId id) const
     return result;
 }
 
+QnUserResourcePtr QnResourcePool::getAdministrator() const {
+    QMutexLocker locker(&m_resourcesMtx);
+
+    foreach(const QnResourcePtr &resource, m_resources) {
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        if (user && user->isAdmin())
+            return user;
+    }
+    return QnUserResourcePtr();
+}
+
 QStringList QnResourcePool::allTags() const
 {
     QStringList result;

@@ -88,6 +88,7 @@ private:
     PanicMode m_panicMode;
     QString m_version;
     QMap<int, QString> m_runningIfRequests;
+    QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory
