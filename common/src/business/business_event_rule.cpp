@@ -4,13 +4,14 @@
 
 #include <core/resource/resource.h>
 
-
 QnBusinessEventRule::QnBusinessEventRule()
 :
+    m_id(0),
     m_eventType(BusinessEventType::BE_NotDefined),
     m_eventState(ToggleState::On), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
     m_actionType(BusinessActionType::BA_NotDefined),
-    m_aggregationPeriod(0)
+    m_aggregationPeriod(0),
+    m_disabled(false)
 {
 }
 
@@ -31,9 +32,17 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
         ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
         result->setToggleState(value);
     }
-    result->setBusinessRuleId(getId());
+    result->setBusinessRuleId(m_id);
 
     return result;
+}
+
+int QnBusinessEventRule::id() const {
+    return m_id;
+}
+
+void QnBusinessEventRule::setId(int value) {
+    m_id = value;
 }
 
 BusinessEventType::Value QnBusinessEventRule::eventType() const {
@@ -105,6 +114,14 @@ void QnBusinessEventRule::setAggregationPeriod(int msecs) {
     m_aggregationPeriod = msecs;
 }
 
+bool QnBusinessEventRule::disabled() const {
+    return m_disabled;
+}
+
+void QnBusinessEventRule::setDisabled(bool value) {
+    m_disabled = value;
+}
+
 QString QnBusinessEventRule::comments() const {
     return m_comments;
 }
@@ -124,7 +141,7 @@ void QnBusinessEventRule::setSchedule(const QString value) {
 
 QString QnBusinessEventRule::getUniqueId() const
 {
-    return QString(QLatin1String("QnBusinessEventRule_")) + getId().toString();
+    return QString(QLatin1String("QnBusinessEventRule_")) + QString::number(m_id);
 }
 
 bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
