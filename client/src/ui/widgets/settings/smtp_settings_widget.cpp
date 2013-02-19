@@ -44,7 +44,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(ui->portComboBox,       SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
     connect(ui->autoDetectCheckBox, SIGNAL(toggled(bool)),          this,   SLOT(at_autoDetectCheckBox_toggled(bool)));
     connect(ui->setupUserButton,    SIGNAL(clicked()),                  this,   SLOT(at_setupUserButton_clicked()));
-    connect(ui->testButton,         SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
+//    connect(ui->testButton,         SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>436</width>
-    <height>240</height>
+    <height>212</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,19 +171,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="testButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>&amp;Test</string>
-     </property>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
