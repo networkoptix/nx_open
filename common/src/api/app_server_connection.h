@@ -127,7 +127,7 @@ public:
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
-    int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
+    int addLicensesAsync(const QList<QnLicensePtr>& licenses, QObject* target, const char* slot);
 
     int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
     int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);

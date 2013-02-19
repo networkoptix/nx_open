@@ -438,13 +438,13 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
     return 0;
 }
 
-int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject *target, const char *slot)
+int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, licenseObject);
     QObject::connect(processor, SIGNAL(finishedLicense(int, const QByteArray&, const QnLicenseList&, int)), target, slot);
 
     QByteArray data;
-    m_serializer.serializeLicense(license, data);
+    m_serializer.serializeLicenses(licenses, data);
 
     return addObjectAsync(licenseObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }

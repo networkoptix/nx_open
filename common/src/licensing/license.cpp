@@ -54,9 +54,7 @@ QnLicense::QnLicense(const QString &name, const QByteArray &key, int cameraCount
     : m_name(name),
       m_key(key),
       m_cameraCount(cameraCount),
-      m_signature(signature),
-      m_validLicense(-1)
-
+      m_signature(signature)
 {
 }
 
@@ -82,25 +80,20 @@ const QByteArray &QnLicense::signature() const
 
 bool QnLicense::isValid(const QByteArray& hardwareId) const
 {
-    if (m_validLicense == -1)
+    // Note, than we do check HWID here as we suppose m_hardwareId is real current ECS hwid
+    if (!m_signature.isEmpty())
     {
-        m_validLicense = 0;
+        QByteArray licenseString;
+        licenseString += "NAME=" + m_name.toUtf8() + "\n";
+        licenseString += "SERIAL=" + m_key + "\n";
+        licenseString += "HWID=" + hardwareId + "\n";
+        licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
 
-        // Note, than we do check HWID here as we suppose m_hardwareId is real current ECS hwid
-        if (!m_signature.isEmpty())
-        {
-            QByteArray licenseString;
-            licenseString += "NAME=" + m_name.toUtf8() + "\n";
-            licenseString += "SERIAL=" + m_key + "\n";
-            licenseString += "HWID=" + hardwareId + "\n";
-            licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
-
-            if (isSignatureMatch(licenseString, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)))
-                m_validLicense = 1;
-        }
+        if (isSignatureMatch(licenseString, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)))
+            return true;
     }
 
-    return m_validLicense == 1;
+	return false;
 }
 
 QByteArray QnLicense::toString() const
@@ -115,7 +108,7 @@ QByteArray QnLicense::toString() const
     return licenseString;
 }
 
-QnLicense QnLicense::fromString(const QByteArray &licenseString)
+QnLicensePtr readLicenseFromString(const QByteArray &licenseString)
 {
     QString name;
     QByteArray key;
@@ -145,7 +138,24 @@ QnLicense QnLicense::fromString(const QByteArray &licenseString)
         }
     }
 
-    return QnLicense(name, key, cameraCount, signature);
+	if (!name.isEmpty() && !key.isEmpty() && cameraCount != 0 && !signature.isEmpty())
+		return QnLicensePtr(new QnLicense(name, key, cameraCount, signature));
+	else
+		return QnLicensePtr();
+}
+
+QnLicensePtr readLicenseFromStream(QTextStream& stream)
+{
+	QByteArray licenseBlock;
+	while (!stream.atEnd()) {
+		QString line = stream.readLine();
+		licenseBlock.append(line + QLatin1String("\n"));
+
+		if (line.startsWith(QLatin1String("SIGNATURE=")))
+			break;
+	}
+
+	return readLicenseFromString(licenseBlock);
 }
 
 QnLicensePool *QnLicensePool::instance()
@@ -212,6 +222,17 @@ QList<QnLicensePtr> QnLicenseList::licenses() const
     return m_licenses.values();
 }
 
+QList<QByteArray> QnLicenseList::allLicenseKeys() const
+{
+	QList<QByteArray> result;
+
+	foreach (const QnLicensePtr& license, m_licenses.values()) {
+		result.append(license->key());
+	}
+
+	return result;
+}
+
 void QnLicenseList::setHardwareId(const QByteArray &hardwareId)
 {
     m_hardwareId = hardwareId;
@@ -234,8 +255,13 @@ QByteArray QnLicenseList::oldHardwareId() const
 
 void QnLicenseList::append(QnLicensePtr license)
 {
-    if (m_licenses.contains(license->key()))
+	if (m_licenses.contains(license->key())) {
+		// Update if resulting license is valid with newHardwareId
+		if (license->isValid(m_hardwareId))
+			m_licenses[license->key()] = license;
+
         return;
+	}
 
     if (license->isValid(m_hardwareId) || license->isValid(m_oldHardwareId))
         m_licenses.insert(license->key(), license);
@@ -269,6 +295,14 @@ int QnLicenseList::totalCameras() const
 bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
 {
     return m_licenses.contains(key);
+}
+
+QnLicensePtr QnLicenseList::getLicenseByKey(const QByteArray& key) const
+{
+	if (m_licenses.contains(key))
+		return m_licenses[key];
+	else
+		return QnLicensePtr();
 }
 
 QnLicensePool::QnLicensePool()

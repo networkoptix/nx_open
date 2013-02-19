@@ -6,6 +6,7 @@
 #include <QList>
 #include <QMutex>
 #include <QSet>
+#include <QTextStream>
 
 class QnLicense
 {
@@ -23,18 +24,19 @@ public:
     const QByteArray &hardwareId() const;
     const QByteArray &signature() const;
 
-     QByteArray toString() const;
-    static QnLicense fromString(const QByteArray &licenseString);
+    QByteArray toString() const;
 
 private:
     QString m_name;
     QByteArray m_key;
     qint32 m_cameraCount;
     QByteArray m_signature;
-    mutable int m_validLicense;
 };
 
 typedef QSharedPointer<QnLicense> QnLicensePtr;
+
+QnLicensePtr readLicenseFromString(const QByteArray &licenseString);
+QnLicensePtr readLicenseFromStream(QTextStream& stream);
 
 class QnLicenseList
 {
@@ -46,6 +48,7 @@ public:
     QByteArray oldHardwareId() const;
 
     QList<QnLicensePtr> licenses() const;
+	QList<QByteArray> allLicenseKeys() const;
     void append(QnLicensePtr license);
     void append(QnLicenseList license);
     bool isEmpty() const;
@@ -53,6 +56,7 @@ public:
 
     int totalCameras() const;
     bool haveLicenseKey(const QByteArray& key) const;
+	QnLicensePtr getLicenseByKey(const QByteArray& key) const;
 
 private:
     QMap<QByteArray, QnLicensePtr> m_licenses;

@@ -32,8 +32,8 @@ private slots:
     void at_licenseWidget_stateChanged();
 
 private:
-    void updateFromServer(const QString &licenseKey, const QString &hardwareId, const QString &oldHardwareId);
-    void validateLicense(const QnLicensePtr &license);
+    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId);
+    void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 
 private:
@@ -42,6 +42,8 @@ private:
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
+	QMap<QNetworkReply*, QByteArray> m_replyKeyMap;
+	QMap<int, QByteArray> m_handleKeyMap;
 };
 
 #endif // QN_LICENSE_MANAGER_WIDGET_H

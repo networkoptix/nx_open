@@ -3,6 +3,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
+#include <QtCore/QTextStream>
 
 #include <QtGui/QAbstractItemView>
 #include <QtGui/QTreeWidgetItem>
@@ -96,36 +97,58 @@ void QnLicenseManagerWidget::updateLicenses() {
     ui->infoLabel->setPalette(palette);
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QString &serialKey, const QString &hardwareId, const QString &oldHardwareId) {
+void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId) {
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
+    // QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
+	QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/vms.dev/activate.php"));
 
     QNetworkRequest request;
     request.setUrl(url);
 
     QUrl params;
-    params.addQueryItem(QLatin1String("license_key"), serialKey);
+	params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
+
+	int n = 1;
+	foreach (const QByteArray& licenseKey, m_licenses.allLicenseKeys() ) {
+		params.addQueryItem(QString(QLatin1String("license_key%1")).arg(n), QLatin1String(licenseKey));
+		n++;
+	}
+
     params.addQueryItem(QLatin1String("hwid"), hardwareId);
 	params.addQueryItem(QLatin1String("oldhwid"), oldHardwareId);
 
-    QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());
+    QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());	
+	m_replyKeyMap[reply] = licenseKey;
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
     connect(reply, SIGNAL(finished()), this, SLOT(at_downloadFinished()));
 }
 
-void QnLicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
-	// We're checking with new hardwareId only
-	if (license->isValid(qnLicensePool->getLicenses().hardwareId())) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
+void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses) {
+	QList<QnLicensePtr> licensesToUpdate;
+	QnLicensePtr keyLicense;
 
-        connection->addLicenseAsync(license, this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
-    } else {
+	foreach (const QnLicensePtr& license, licenses) {
+		if (license->key() == licenseKey)
+			keyLicense = license;
+
+		QnLicensePtr ownLicense = qnLicensePool->getLicenses().getLicenseByKey(license->key());
+		if (!ownLicense || ownLicense->signature() != license->signature())
+			licensesToUpdate.append(license);
+	}
+
+	if (!licensesToUpdate.isEmpty()) {
+        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
+        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
+		m_handleKeyMap[handle] = licenseKey;
+	}
+
+	if (!keyLicense) {
         QMessageBox::warning(this, tr("License Activation"),
             tr("Invalid License. Contact our support team to get a valid License."));
-    }
+	}
 }
 
 void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
@@ -146,21 +169,26 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*errorString*/, QnLicenseList licenses, int /*handle*/)
+void QnLicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*errorString*/, QnLicenseList licenses, int handle)
 {
-    if (status != 0 || licenses.isEmpty())
-    {
-        QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license."));
-        return;
-    }
+	QByteArray licenseKey = m_handleKeyMap[handle];
+	m_handleKeyMap.remove(handle);
 
-    QnLicensePtr license = licenses.licenses().front();
-    QString message = m_licenses.haveLicenseKey(license->key()) ? tr("This license is already activated.") : tr("License was successfully activated.");
+	QnLicensePtr license = licenses.getLicenseByKey(licenseKey);
+		
+	QString message;
+	if (!license || status)
+		message = tr("There was a problem activating your license.");
+	else
+		message = m_licenses.haveLicenseKey(license->key()) ? tr("This license is already activated.") : tr("License was successfully activated.");
 
-    m_licenses.append(license);
-    qnLicensePool->addLicense(license);
+	if (!licenses.isEmpty()) {
+		m_licenses.append(licenses);
+		qnLicensePool->addLicenses(licenses);
+	}
 
-    QMessageBox::information(this, tr("License Activation"), message);
+	QMessageBox::information(this, tr("License Activation"), message);
+
     ui->licenseWidget->setSerialKey(QString());
 
     updateLicenses();
@@ -175,6 +203,7 @@ void QnLicenseManagerWidget::at_downloadError() {
 
         ui->licenseWidget->setOnline(false);
 
+		m_replyKeyMap.remove(reply);
         reply->deleteLater();
     }
 
@@ -183,7 +212,23 @@ void QnLicenseManagerWidget::at_downloadError() {
 
 void QnLicenseManagerWidget::at_downloadFinished() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(reply->readAll()))));
+		QList<QnLicensePtr> licenses;
+
+		QByteArray replyData = reply->readAll();
+		QTextStream is(&replyData);
+
+		for (;;) {
+			QnLicensePtr license = readLicenseFromStream(is);
+			if (!license )
+				break;
+
+			if (license->isValid(qnLicensePool->getLicenses().hardwareId()))
+				licenses.append(license);
+		}
+
+        validateLicenses(m_replyKeyMap[reply], licenses);
+
+		m_replyKeyMap.remove(reply);
 
         reply->deleteLater();
     }
@@ -215,9 +260,12 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey(), QLatin1String(m_licenses.hardwareId()), QLatin1String(m_licenses.oldHardwareId()));
+        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), QLatin1String(m_licenses.hardwareId()), QLatin1String(m_licenses.oldHardwareId()));
     } else {
-        validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(ui->licenseWidget->activationKey()))));
+		QList<QnLicensePtr> licenseList;
+		QnLicensePtr license = readLicenseFromString(ui->licenseWidget->activationKey());
+		licenseList.append(license);
+        validateLicenses(license->key(), licenseList);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
