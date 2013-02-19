@@ -8,6 +8,8 @@
 
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/style/globals.h>
+
 #include <utils/settings.h>
 #include <utils/common/email.h>
 
@@ -38,6 +40,11 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(ui->portComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
     connect(ui->autoDetectCheckBox, SIGNAL(toggled(bool)),          this,   SLOT(at_autoDetectCheckBox_toggled(bool)));
     connect(ui->testButton,     SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    ui->detectErrorLabel->setPalette(palette);
+
     at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
 }
 
@@ -69,7 +76,7 @@ void QnSmtpSettingsWidget::update() {
         m_mailServersReceived = true;
         if (!admin)
             qWarning() << "Admin is not found";
-        // common case: email field is not filled
+        ui->detectErrorLabel->setText(tr("Administrator email is not valid"));
     }
     updateOverlay();
 }
@@ -155,12 +162,28 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     updateOverlay();
 }
 
+/*
+\value ResolverError        there was an error initializing the system's DNS resolver.
+
+\value OperationCancelledError  the lookup was aborted using the abort() method.
+
+\value InvalidRequestError  the requested DNS lookup was invalid.
+
+\value InvalidReplyError    the reply returned by the server was invalid.
+
+\value ServerFailureError   the server encountered an internal failure while processing the request (SERVFAIL).
+
+\value ServerRefusedError   the server refused to process the request for security or policy reasons (REFUSED).
+
+\value NotFoundError        the requested domain name does not exist (NXDOMAIN).
+*/
+
 void QnSmtpSettingsWidget::at_mailServers_received() {
     m_mailServersReceived = true;
     m_autoMailServer = QString();
 
     if (m_dns->error() != QDnsLookup::NoError) {
-        qWarning() <<"DNS lookup failed";
+        ui->detectErrorLabel->setText(tr("DNS lookup failed"));
         m_dns->deleteLater();
         updateOverlay();
         return;
@@ -176,6 +199,11 @@ void QnSmtpSettingsWidget::at_mailServers_received() {
         qDebug() << record.exchange() << record.preference();
     }
     m_dns->deleteLater();
+
+    if (m_autoMailServer.isEmpty()) {
+        ui->detectErrorLabel->setText(tr("No mail servers found."));
+    }
+
     updateOverlay();
 }
 
