@@ -5,10 +5,10 @@
 
 #include "connective.h"
 
-class QnObject: public AdlConnective<QObject> {
+class QnObject: public Connective<QObject> {
     Q_OBJECT;
 
-    typedef AdlConnective<QObject> base_type;
+    typedef Connective<QObject> base_type;
 public:
     QnObject(QObject *parent = NULL): base_type(parent) {}
 };

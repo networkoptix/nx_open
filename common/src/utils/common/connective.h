@@ -59,9 +59,9 @@ namespace Qn {
 
 
 template<class Base>
-class AdlConnective: public Base {
+class Connective: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(AdlConnective, Base, {});
+    QN_FORWARD_CONSTRUCTOR(Connective, Base, {});
 
     template<class T1, class T2>
     static bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection) {

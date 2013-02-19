@@ -11,10 +11,10 @@
 /**
  * Button box dialog that can be queried for the button that was clicked to close it.
  */
-class QnButtonBoxDialog: public AdlConnective<QDialog> {
+class QnButtonBoxDialog: public Connective<QDialog> {
     Q_OBJECT;
 
-    typedef AdlConnective<QDialog> base_type;
+    typedef Connective<QDialog> base_type;
 
 public:
     QnButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0): 

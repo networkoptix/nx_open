@@ -13,10 +13,10 @@
 class QnPtzSpaceMapper;
 class QnWorkbenchPtzCameraWatcher;
 
-class QnWorkbenchPtzMapperWatcher: public AdlConnective<QObject>, public QnWorkbenchContextAware {
+class QnWorkbenchPtzMapperWatcher: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef AdlConnective<QObject> base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     QnWorkbenchPtzMapperWatcher(QObject *parent = NULL);

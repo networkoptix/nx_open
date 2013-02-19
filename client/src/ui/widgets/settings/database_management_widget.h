@@ -38,10 +38,10 @@ public slots:
 };
 
 
-class QnDatabaseManagementWidget: public AdlConnective<QWidget> {
+class QnDatabaseManagementWidget: public Connective<QWidget> {
     Q_OBJECT
 
-    typedef AdlConnective<QWidget> base_type;
+    typedef Connective<QWidget> base_type;
 
 public:
     QnDatabaseManagementWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);

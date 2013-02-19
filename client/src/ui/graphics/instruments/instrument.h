@@ -125,10 +125,10 @@ namespace detail {
  * inside derived class's destructor if it reimplements either 
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public AdlConnective<QObject>, protected QnGeometry, protected QnSceneTransformations {
+class Instrument: public Connective<QObject>, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT;
 
-    typedef AdlConnective<QObject> base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     /**
