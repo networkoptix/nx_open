@@ -3152,7 +3152,8 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
         any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
 
-    if (qnLicensePool->isEmpty()) {
+    if (qnLicensePool->isEmpty() &&
+            accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
     }
 
