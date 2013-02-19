@@ -4,7 +4,25 @@
 #include <QString>
 #include <QStringList>
 
+// TODO: #GDM
+/*
+
+class QnEmail {
+public:
+    QnEmail();
+    QnEmail(const QString &);
+
+    bool isValid();
+
+    QString domain() const;
+    QString user() const;
+}
+
+Would be much nicer than a bunch of free-standing functions.
+
+*/
+
 bool isEmailValid(const QString &email);
-bool isEmailValid(const QStringList& emails);
+QString getEmailDomain(const QString &email);
 
 #endif // EMAIL_H

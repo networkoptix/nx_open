@@ -1,12 +1,12 @@
-#ifndef QN_ADL_CONNECTIVE_H
-#define QN_ADL_CONNECTIVE_H
-
-#include "forward.h"
+#ifndef QN_CONNECTIVE_H
+#define QN_CONNECTIVE_H
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QWeakPointer>
+
+#include "forward.h"
 
 namespace Qn {
     inline QObject *connector(QObject *object) {
@@ -59,9 +59,9 @@ namespace Qn {
 
 
 template<class Base>
-class AdlConnective: public Base {
+class Connective: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(AdlConnective, Base, {});
+    QN_FORWARD_CONSTRUCTOR(Connective, Base, {});
 
     template<class T1, class T2>
     static bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection) {
@@ -74,4 +74,4 @@ public:
     }
 };
 
-#endif // QN_ADL_CONNECTIVE_H
+#endif // QN_CONNECTIVE_H

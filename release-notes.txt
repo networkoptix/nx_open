@@ -6,6 +6,7 @@ NEW CAMERAS AND RECORDERS SUPPORTED:
  - Vivotek Encoders 
 
 NEW FEATURES:  
+ - Windows 8 is supported
  - Events and Actions:
    - Events: 
      - Motion (camera(s) should be specified). Camera(s) should have Recording enabled

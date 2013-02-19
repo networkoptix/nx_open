@@ -9,120 +9,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_criterion.h>
 
-#include <business/events/camera_input_business_event.h>
-#include <business/events/motion_business_event.h>
-#include <business/actions/camera_output_business_action.h>
-#include <business/actions/recording_business_action.h>
-
+#include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
-#include <ui/style/globals.h>
-
-#include <utils/common/email.h>
-
-namespace {
-
-    template<class T>
-    class QnCheckAndWarnDelegate: public QnSelectCamerasDialogDelegate {
-    public:
-        QnCheckAndWarnDelegate(QWidget* parent):
-            QnSelectCamerasDialogDelegate(parent),
-            m_warningLabel(NULL)
-        {}
-
-        virtual void init(QWidget* parent) override {
-            m_warningLabel = new QLabel(parent);
-            QPalette palette = parent->palette();
-            palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-            m_warningLabel->setPalette(palette);
-
-            parent->layout()->addWidget(m_warningLabel);
-        }
-
-        virtual bool validate(const QnResourceList &selected) override {
-            if (!m_warningLabel)
-                return true;
-            int invalid = 0;
-            QnSharedResourcePointerList<T> resources = selected.filtered<T>();
-            foreach (const QnSharedResourcePointer<T> &resource, resources) {
-                if (!isResourceValid(resource)) {
-                    invalid++;
-                }
-            }
-            m_warningLabel->setText(getText(invalid, resources.size()));
-            m_warningLabel->setVisible(invalid > 0);
-            return true;
-        }
-
-    protected:
-        virtual bool isResourceValid(const QnSharedResourcePointer<T> &resource) const = 0;
-        virtual QString getText(int invalid, int total) const = 0;
-
-    private:
-        QLabel* m_warningLabel;
-    };
-
-
-    class QnMotionEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
-    public:
-        QnMotionEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
-    protected:
-        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
-            return QnMotionBusinessEvent::isResourceValid(camera);
-        }
-        virtual QString getText(int invalid, int total) const override {
-            return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
-        }
-    };
-
-    class QnRecordingEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
-    public:
-        QnRecordingEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
-    protected:
-        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
-            return QnRecordingBusinessAction::isResourceValid(camera);
-        }
-        virtual QString getText(int invalid, int total) const override {
-            return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
-        }
-    };
-
-    class QnInputEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
-    public:
-        QnInputEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
-    protected:
-        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
-            return QnCameraInputEvent::isResourceValid(camera);
-        }
-        virtual QString getText(int invalid, int total) const override {
-            return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
-        }
-    };
-
-    class QnOutputEnabledDelegate: public QnCheckAndWarnDelegate<QnVirtualCameraResource> {
-    public:
-        QnOutputEnabledDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
-    protected:
-        virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override {
-            return QnCameraOutputBusinessAction::isResourceValid(camera);
-        }
-        virtual QString getText(int invalid, int total) const override {
-            return tr("%1 of %2 selected cameras have not output relays.").arg(invalid).arg(total);
-        }
-    };
-
-    class QnEmailValidDelegate: public QnCheckAndWarnDelegate<QnUserResource> {
-    public:
-        QnEmailValidDelegate(QWidget* parent): QnCheckAndWarnDelegate(parent){}
-    protected:
-        virtual bool isResourceValid(const QnUserResourcePtr &user) const override {
-            return isEmailValid(user->getEmail());
-        }
-        virtual QString getText(int invalid, int total) const override {
-            return tr("%1 of %2 selected users have invalid email.").arg(invalid).arg(total);
-        }
-    };
-
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnSelectResourcesDialogButton ------------------------------------//
@@ -144,11 +32,11 @@ void QnSelectResourcesDialogButton::setResources(QnResourceList resources) {
     m_resources = resources;
 }
 
-QnSelectCamerasDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() const {
+QnResourceSelectionDialogDelegate* QnSelectResourcesDialogButton::dialogDelegate() const {
     return m_dialogDelegate;
 }
 
-void QnSelectResourcesDialogButton::setDialogDelegate(QnSelectCamerasDialogDelegate* delegate) {
+void QnSelectResourcesDialogButton::setDialogDelegate(QnResourceSelectionDialogDelegate* delegate) {
     m_dialogDelegate = delegate;
 }
 
@@ -161,7 +49,7 @@ void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnSelectCamerasDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
+    QnResourceSelectionDialog dialog(this, m_nodeType); //TODO: #GDM servers dialog?
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
@@ -182,6 +70,14 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event) {
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnBusinessRuleItemDelegate ---------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
+QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
+    base_type(parent) {
+
+}
+
+QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
+
+}
 
 QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QSize sh = base_type::sizeHint(option, index);

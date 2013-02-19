@@ -72,7 +72,7 @@ private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
 
 signals:
-    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
+    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnMediaServerResourcePtr &resource);
 
 private:
@@ -88,6 +88,7 @@ private:
     PanicMode m_panicMode;
     QString m_version;
     QMap<int, QString> m_runningIfRequests;
+    QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

@@ -17,10 +17,10 @@ namespace Ui {
     class PtzPresetsDialog;
 }
 
-class QnPtzPresetsDialog: public AdlConnective<QnButtonBoxDialog>, public QnWorkbenchContextAware {
+class QnPtzPresetsDialog: public Connective<QnButtonBoxDialog>, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef AdlConnective<QnButtonBoxDialog> base_type;
+    typedef Connective<QnButtonBoxDialog> base_type;
 
 public:
     QnPtzPresetsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);

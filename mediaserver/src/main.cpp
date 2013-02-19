@@ -515,7 +515,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("proxyAuthKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -793,21 +793,11 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     // Create SessionManager
-    QnSessionManager* sm = QnSessionManager::instance();
-
-    QThread *thread = new QThread();
-    sm->moveToThread(thread);
-
-    QThread *connectorThread = new QThread();
+    QnSessionManager::instance()->start();
+    
+    QThread *connectorThread = new QThread(); // TODO: #Elric leaking thread
     qnBusinessRuleConnector->moveToThread(connectorThread);
-
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-    QObject::connect(connectorThread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-    thread->start();
     connectorThread->start();
-    sm->start();
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
     initAppServerConnection(qSettings);

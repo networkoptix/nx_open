@@ -26,6 +26,7 @@ public:
     QnMessageSource(QUrl url, int retryTimeout = 3000);
     virtual ~QnMessageSource();
 
+	void setAuthKey(const QString& authKey);
     void stop();
 
 signals:
@@ -53,6 +54,7 @@ private:
     bool m_timeoutFlag;
     QUrl m_url;
     int m_retryTimeout;
+	QString m_authKey;
     QNetworkAccessManager m_manager;
     QNetworkReply *m_reply;
 

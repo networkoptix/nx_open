@@ -27,9 +27,9 @@ namespace BusinessEventType
             case BE_Camera_Ip_Conflict:
                 return QObject::tr("Camera IP Conflict");
             case BE_MediaServer_Failure:
-                return QObject::tr("Mediaserver failure");
+                return QObject::tr("Media Server Failure");
             case BE_MediaServer_Conflict:
-                return QObject::tr("Mediaservers conflict");
+                return QObject::tr("Media Server Conflict");
             case BE_UserDefined:
                 return QObject::tr("User Defined");
             //warning should be raised on unknown enumeration values

@@ -9,9 +9,7 @@ bool isEmailValid(const QString &email) {
     return rx.exactMatch(email.toUpper());
 }
 
-bool isEmailValid(const QStringList &emails) {
-    foreach (const QString &email, emails)
-        if (!isEmailValid(email))
-            return false;
-    return true;
+QString getEmailDomain(const QString &email) {
+    int idx = email.indexOf(QLatin1Char('@'));
+    return email.mid(idx + 1).trimmed();
 }

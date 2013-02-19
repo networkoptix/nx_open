@@ -6,7 +6,9 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ui/widgets/popup_widget.h>
+#include <ui/widgets/popups/business_event_popup_widget.h>
+#include <ui/widgets/popups/system_health_popup_widget.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -20,7 +22,7 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
 {
     ui->setupUi(this);
 
-    // TODO: Evil! Layout code does not belong here.
+    // TODO: #GDM Evil! Layout code does not belong here.
     // Layout must be done by widget's parent, not the widget itself.
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
@@ -47,7 +49,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
-    if (!(qnSettings->shownPopups() & (1 << eventType))) {
+    if (!(qnSettings->popupBusinessEvents() & (1 << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return false;
     }
@@ -58,19 +60,46 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
 
     qDebug() << "popup received" << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
 
-    if (m_widgetsByType.contains(eventType)) {
-        QnPopupWidget* pw = m_widgetsByType[eventType];
+    if (m_businessEventWidgets.contains(eventType)) {
+        QnBusinessEventPopupWidget* pw = m_businessEventWidgets[eventType];
         pw->addBusinessAction(businessAction);
     } else {
-        QnPopupWidget* pw = new QnPopupWidget(this);
+        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(this);
         if (!pw->addBusinessAction(businessAction))
             return false;
         ui->verticalLayout->addWidget(pw);
-        m_widgetsByType[eventType] = pw;
-        connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_widget_closed(BusinessEventType::Value, bool)));
+        m_businessEventWidgets[eventType] = pw;
+        connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_businessEventWidget_closed(BusinessEventType::Value, bool)));
     }
 
     return true;
+}
+
+bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message) {
+    if (!(qnSettings->popupSystemHealth() & (1 << message)))
+        return false;
+
+    if (m_systemHealthWidgets.contains(message)) {
+        QnSystemHealthPopupWidget* pw = m_systemHealthWidgets[message];
+        pw->show();
+    } else {
+        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(this);
+        if (!pw->showSystemHealthMessage(message))
+            return false;
+        ui->verticalLayout->addWidget(pw);
+        m_systemHealthWidgets[message] = pw;
+        connect(pw, SIGNAL(closed(QnSystemHealth::MessageType, bool)), this, SLOT(at_systemHealthWidget_closed(QnSystemHealth::MessageType, bool)));
+    }
+
+    return true;
+}
+
+void QnPopupCollectionWidget::clear() {
+    while (!ui->verticalLayout->isEmpty())
+        ui->verticalLayout->removeItem(ui->verticalLayout->itemAt(0));
+    m_businessEventWidgets.clear();
+    m_systemHealthWidgets.clear();
+    hide();
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
@@ -89,16 +118,35 @@ void QnPopupCollectionWidget::updatePosition() {
     move(parentSize.width() - size.width(), parentSize.height() - size.height());
 }
 
-void QnPopupCollectionWidget::at_widget_closed(BusinessEventType::Value eventType, bool ignore) {
+void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {
     if (ignore)
-        qnSettings->setShownPopups(qnSettings->shownPopups() & ~(1 << eventType));
+        qnSettings->setPopupBusinessEvents(qnSettings->popupBusinessEvents() & ~(1 << eventType));
 
-    if (!m_widgetsByType.contains(eventType))
+    if (!m_businessEventWidgets.contains(eventType))
         return;
 
-    QWidget* w = m_widgetsByType[eventType];
+    QWidget* w = m_businessEventWidgets[eventType];
     ui->verticalLayout->removeWidget(w);
-    m_widgetsByType.remove(eventType);
+    m_businessEventWidgets.remove(eventType);
+    w->hide();
+    w->deleteLater();
+
+    if (ui->verticalLayout->count() == 0)
+        hide();
+}
+
+void QnPopupCollectionWidget::at_systemHealthWidget_closed(QnSystemHealth::MessageType message, bool ignore) {
+    if (ignore)
+        qnSettings->setPopupSystemHealth(qnSettings->popupSystemHealth() & ~(1 << message));
+
+    if (!m_systemHealthWidgets.contains(message))
+        return;
+
+    QWidget* w = m_systemHealthWidgets[message];
+    ui->verticalLayout->removeWidget(w);
+    m_systemHealthWidgets.remove(message);
+    w->hide();
+    w->deleteLater();
 
     if (ui->verticalLayout->count() == 0)
         hide();

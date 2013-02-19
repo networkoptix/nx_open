@@ -956,6 +956,16 @@ public:
         m_success( false )
     {
         setAutoDelete( false );
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+        m_src->setDisplaying( true );
+#endif
+    }
+
+    ~AVPacketUploader()
+    {
+#ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
+        m_src->setDisplaying( false );
+#endif
     }
 
     virtual void run()
@@ -1333,14 +1343,14 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     if( !m_framesWaitingUploadInGUIThread.empty() )
     {
         //uploading
-        AVPacketUploader* frameToUpload = m_framesWaitingUploadInGUIThread.front();
-        frameToUpload->markAsRunning();
-        frameToUpload->picture()->m_skippingForbidden = true;   //otherwise, we could come to situation that there is no data to display
+        AVPacketUploader* frameUploader = m_framesWaitingUploadInGUIThread.front();
+        frameUploader->markAsRunning();
+        frameUploader->picture()->m_skippingForbidden = true;   //otherwise, we could come to situation that there is no data to display
         lk.unlock();
-        frameToUpload->run();
+        frameUploader->run();
         lk.relock();
         m_framesWaitingUploadInGUIThread.pop_front();
-        delete frameToUpload;
+        delete frameUploader;
         m_cond.wakeAll();   //notifying that upload is completed
     }
 #endif

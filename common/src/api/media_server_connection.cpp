@@ -516,12 +516,11 @@ int QnMediaServerConnection::asyncRecordedTimePeriods(const QnRequestParamList &
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("RecordedTimePeriods"), QnRequestHeaderList(), params, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
-void QnMediaServerConnection::setProxyAddr(const QString& addr, int port)
+void QnMediaServerConnection::setProxyAddr(const QUrl& apiUrl, const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
 
-    QUrl apiUrl = m_mServer.dynamicCast<QnMediaServerResource>()->getApiUrl();
     if (port)
         QnNetworkProxyFactory::instance()->addToProxyList(apiUrl, addr, port);
     else

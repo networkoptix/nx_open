@@ -33,7 +33,7 @@ private slots:
     void at_messageReceived(QnMessage message);
     void at_connectionClosed(QString errorString);
     void at_connectionOpened(QnMessage message);
-    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url);
+    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
 
 private:
     void init();
