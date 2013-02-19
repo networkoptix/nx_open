@@ -60,7 +60,7 @@ class QDnsMailExchangeRecordPrivate;
 class QDnsServiceRecordPrivate;
 class QDnsTextRecordPrivate;
 
-class Q_NETWORK_EXPORT QDnsDomainNameRecord
+class QDnsDomainNameRecord
 {
 public:
     QDnsDomainNameRecord();
@@ -82,7 +82,7 @@ private:
 
 //Q_DECLARE_SHARED(QDnsDomainNameRecord)
 
-class Q_NETWORK_EXPORT QDnsHostAddressRecord
+class QDnsHostAddressRecord
 {
 public:
     QDnsHostAddressRecord();
@@ -104,7 +104,7 @@ private:
 
 //Q_DECLARE_SHARED(QDnsHostAddressRecord)
 
-class Q_NETWORK_EXPORT QDnsMailExchangeRecord
+class QDnsMailExchangeRecord
 {
 public:
     QDnsMailExchangeRecord();
@@ -127,7 +127,7 @@ private:
 
 //Q_DECLARE_SHARED(QDnsMailExchangeRecord)
 
-class Q_NETWORK_EXPORT QDnsServiceRecord
+class QDnsServiceRecord
 {
 public:
     QDnsServiceRecord();
@@ -152,7 +152,7 @@ private:
 
 //Q_DECLARE_SHARED(QDnsServiceRecord)
 
-class Q_NETWORK_EXPORT QDnsTextRecord
+class QDnsTextRecord
 {
 public:
     QDnsTextRecord();
@@ -174,7 +174,7 @@ private:
 
 //Q_DECLARE_SHARED(QDnsTextRecord)
 
-class Q_NETWORK_EXPORT QDnsLookup : public QObject
+class QDnsLookup : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Error Type)

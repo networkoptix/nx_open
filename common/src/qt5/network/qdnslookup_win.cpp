@@ -44,10 +44,12 @@
 
 #include <qurl.h>
 #include <private/qmutexpool_p.h>
-#include <private/qsystemerror_p.h>
+//#include <private/qsystemerror_p.h>
 
 #include <qt_windows.h>
 #include <windns.h>
+
+#pragma comment(lib, "Dnsapi.lib")
 
 QT_BEGIN_NAMESPACE
 
@@ -78,7 +80,7 @@ void QDnsLookupRunnable::query(const int requestType, const QByteArray &requestN
         return;
     default:
         reply->error = QDnsLookup::InvalidReplyError;
-        reply->errorString = QSystemError(status, QSystemError::NativeError).toString();
+        reply->errorString = QLatin1String("X");//QSystemError(status, QSystemError::NativeError).toString();
         return;
     }
 
