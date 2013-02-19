@@ -29,7 +29,7 @@
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #ifdef Q_OS_WIN
-    #include "device_plugins/desktop_win_only/device/desktop_resource_searcher.h"
+    #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
 #endif
 #include "libavformat/avio.h"
 #include "utils/common/util.h"

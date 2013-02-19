@@ -82,6 +82,8 @@ public:
     QnResourceList getResourcesWithParentId(QnId id) const;
     QnResourceList getResourcesWithTypeId(QnId id) const;
 
+    QnUserResourcePtr getAdministrator() const;
+
     QStringList allTags() const;
 
     int activeCameras() const;
