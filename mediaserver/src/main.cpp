@@ -259,10 +259,10 @@ static QStringList listRecordFolders()
 {
     QStringList folderPaths;
 
+#ifdef Q_OS_WIN
     QString maxFreeSpaceDrive;
     int maxFreeSpace = 0;
 
-#ifdef Q_OS_WIN
     foreach (QFileInfo drive, QDir::drives()) {
         if (!drive.isWritable())
             continue;

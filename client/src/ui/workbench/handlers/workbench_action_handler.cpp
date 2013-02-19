@@ -177,6 +177,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
     m_exportedCamera(0),
+    m_healthRequestHandle(0),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
@@ -846,6 +847,8 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
+
+    m_healthRequestHandle = 0; //TODO: #GDM doubling code in disconnect/reconnect
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -3153,8 +3156,13 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     }
 
     if (qnLicensePool->isEmpty() &&
-            accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
+            (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+    }
+
+    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
+        m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
+                       this, SLOT(at_serverSettings_received(int,QByteArray,QnKvPairList,int)));
     }
 
     if (any)
@@ -3162,3 +3170,38 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
 
 }
 
+void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
+
+    if (handle != m_healthRequestHandle)
+        return;
+
+    Q_UNUSED(errorString)
+    if(status != 0)
+        return;
+
+    const QLatin1String nameHost("EMAIL_HOST");
+    const QLatin1String nameUser("EMAIL_HOST_USER");
+    const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
+
+    QString hostname;
+    QString user;
+    QString password;
+
+    foreach (const QnKvPair &setting, settings) {
+        if (setting.name() == nameHost) {
+            hostname = setting.value();
+        } else if (setting.name() == nameUser) {
+            user = setting.value();
+        } else if (setting.name() == namePassword) {
+            password = setting.value();
+        }
+    }
+
+    if (!hostname.isEmpty() && !user.isEmpty() && !password.isEmpty())
+        return;
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
+    popupCollectionWidget()->show();
+}

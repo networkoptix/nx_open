@@ -5,23 +5,23 @@
 #include <business/actions/abstract_business_action.h>
 #include "business_logic_common.h"
 
-#include "core/resource/resource.h"
-
 /**
 * This class define relation between business event and action
 */
-class QnBusinessEventRule: public QnResource
+class QnBusinessEventRule: public QObject
 {
     Q_OBJECT
 
 public:
     QnBusinessEventRule();
 
-    virtual QString getUniqueId() const override;
+    QString getUniqueId() const;
 
     // TODO: move to some factory
     QnAbstractBusinessActionPtr instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined) const;
 
+    int id() const;
+    void setId(int value);
 
     BusinessEventType::Value eventType() const;
     void setEventType(const BusinessEventType::Value value);
@@ -48,6 +48,9 @@ public:
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
 
+    bool disabled() const;
+    void setDisabled(bool value);
+
     QString schedule() const;
     void setSchedule(const QString value);
 
@@ -59,6 +62,8 @@ public:
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
+    int m_id;
+
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;
     QnBusinessParams m_eventParams;
@@ -69,14 +74,15 @@ private:
     QnBusinessParams m_actionParams;
 
     int m_aggregationPeriod;
+    bool m_disabled;
 
     QString m_schedule;
     QByteArray m_binSchedule;
     QString m_comments;
 };
 
-typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;
-typedef QnSharedResourcePointerList<QnBusinessEventRule> QnBusinessEventRules;
+typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRules;
 
 Q_DECLARE_METATYPE(QnBusinessEventRulePtr)
 

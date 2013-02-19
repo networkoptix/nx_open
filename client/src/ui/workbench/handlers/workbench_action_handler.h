@@ -337,6 +337,8 @@ protected slots:
 
     void at_checkSystemHealthAction_triggered();
 
+    void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -382,7 +384,7 @@ private:
     QnMediaResourcePtr m_exportedMediaRes;
     //QString m_layoutExportMessage;
     LayoutExportMode m_layoutExportMode;
-
+    int m_healthRequestHandle;
 
     QTimer *m_tourTimer;
 };

@@ -40,6 +40,9 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
     case QnSystemHealth::NoLicenses:
         ui->importantLabel->setVisible(true);
         break;
+    case QnSystemHealth::SmtpIsNotSet:
+        ui->warningLabel->setVisible(true);
+        break;
     default:
         ui->notificationLabel->setVisible(true);
         break;
@@ -57,6 +60,9 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
         break;
     case QnSystemHealth::NoLicenses:
         menu()->trigger(Qn::GetMoreLicensesAction);
+        break;
+    case QnSystemHealth::SmtpIsNotSet:
+        menu()->trigger(Qn::OpenServerSettingsAction);
         break;
     default:
         break;
