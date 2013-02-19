@@ -251,6 +251,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
+    QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
     QnClientModule client(argc, argv);
     
 #ifdef Q_WS_X11
@@ -314,17 +315,10 @@ int qnMain(int argc, char *argv[])
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
-    /* Create application instance. */
-    QtSingleApplication *singleApplication = NULL;
-    QScopedPointer<QApplication> application;
-    if(noSingleApplication) {
-        application.reset(new QApplication(argc, argv));
-    } else {
-        singleApplication = new QtSingleApplication(argc, argv);
-        application.reset(singleApplication);
-    }
+    /* Initialize application instance. */
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
+    application->setStartDragDistance(20);
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
 
@@ -339,13 +333,13 @@ int qnMain(int argc, char *argv[])
     Q_UNUSED(iexploreUrlHanderWorkaround)
 #endif
 
-    if(singleApplication) {
+    if(!noSingleApplication) {
         QString argsMessage;
         for (int i = 1; i < argc; ++i)
             argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
 
-        while (singleApplication->isRunning()) {
-            if (singleApplication->sendMessage(argsMessage))
+        while (application->isRunning()) {
+            if (application->sendMessage(argsMessage))
                 return 0;
         }
     }
@@ -355,9 +349,6 @@ int qnMain(int argc, char *argv[])
     qnSettings->save();
     cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
-
-    /* Initialize application instance. */
-    application->setStartDragDistance(20);
     QnWorkbenchTranslationManager::installTranslation(translationPath);
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
@@ -387,13 +378,7 @@ int qnMain(int argc, char *argv[])
 
 
     // Create and start SessionManager
-    QnSessionManager* sm = QnSessionManager::instance();
-    QThread *thread = new QThread(); // TODO: leaking thread.
-    sm->moveToThread(thread);
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-    sm->start();
+    QnSessionManager::instance()->start();
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
@@ -480,8 +465,8 @@ int qnMain(int argc, char *argv[])
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
-    if(singleApplication)
-        QObject::connect(singleApplication, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
+    if(!noSingleApplication)
+        QObject::connect(application.data(), SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
 #ifdef TEST_RTSP_SERVER
     addTestData();
