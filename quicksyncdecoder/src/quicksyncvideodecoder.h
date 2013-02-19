@@ -37,7 +37,7 @@
 
 //!if defined, scale is performed with MFX, otherwise - by directx means (by rendering to surface with scaling)
 //#define SCALE_WITH_MFX
-#define WRITE_INPUT_STREAM_TO_FILE_1
+//#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
 
@@ -135,6 +135,11 @@ public:
     bool readSequenceHeader( const QnCompressedVideoDataPtr data, mfxVideoParam* const streamParams );
     //!Returns estimate in bytes of required frame surface memory to decode stream. Estimaion based on previously parsed header (by method \a readSequenceHeader)
     size_t estimateSurfaceMemoryUsage() const;
+    /*!
+        In initialization mode, decoder does not decode frames, only reads sequence header and initializes internal data, if needed
+        \todo Some refactoring would be appropriate (e.g., add initialize method)
+    */
+    void setInitializationMode( bool val );
 
 private:
     enum DecoderState
@@ -307,6 +312,7 @@ private:
     int m_recursionDepth;
     MotionInfoContainerType m_srcMotionInfo;
     float m_speed;
+    bool m_initializationMode;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;

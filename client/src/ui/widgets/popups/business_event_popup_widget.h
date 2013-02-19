@@ -1,5 +1,5 @@
-#ifndef POPUP_WIDGET_H
-#define POPUP_WIDGET_H
+#ifndef BUSINESS_EVENT_POPUP_WIDGET_H
+#define BUSINESS_EVENT_POPUP_WIDGET_H
 
 #include <QtGui/QWidget>
 #include <QtGui/QStandardItemModel>
@@ -7,17 +7,19 @@
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 
+#include <health/system_health.h>
+
 namespace Ui {
-    class QnPopupWidget;
+    class QnBusinessEventPopupWidget;
 }
 
-class QnPopupWidget : public QWidget
+class QnBusinessEventPopupWidget : public QWidget
 {
     Q_OBJECT
     
 public:
-    explicit QnPopupWidget(QWidget *parent = 0);
-    virtual ~QnPopupWidget();
+    explicit QnBusinessEventPopupWidget(QWidget *parent = 0);
+    virtual ~QnBusinessEventPopupWidget();
     
     /**
      * @brief addBusinessAction     Update widget with new action received.
@@ -25,7 +27,6 @@ public:
      * @return                      True if addition was successful, false otherwise.
      */
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
-
 signals:
     void closed(BusinessEventType::Value eventType, bool ignore);
 
@@ -88,7 +89,7 @@ private:
     QStandardItem* updateConflictTree(const QnBusinessParams& eventParams);
 
 private:
-    QScopedPointer<Ui::QnPopupWidget> ui;
+    QScopedPointer<Ui::QnBusinessEventPopupWidget> ui;
 
     BusinessEventType::Value m_eventType;
 
@@ -98,4 +99,4 @@ private:
     bool m_showAll;
 };
 
-#endif // POPUP_WIDGET_H
+#endif // BUSINESS_EVENT_POPUP_WIDGET_H

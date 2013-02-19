@@ -20,6 +20,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
+#include <utils/common/email.h>
 
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
@@ -27,10 +28,6 @@
 #include <api/session_manager.h>
 
 #include <business/actions/popup_business_action.h>
-
-//TODO: #GDM remove when debug will not be required
-#include <business/events/reasoned_business_event.h>
-#include <business/events/conflict_business_event.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -76,7 +73,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/widgets/popup_collection_widget.h>
+#include <ui/widgets/popups/popup_collection_widget.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -276,6 +273,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
+    connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -853,6 +851,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
+
+    at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
@@ -884,75 +884,6 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-
-    int total = qnResPool->getAllEnabledCameras().size();
-    if (total == 0)
-        return;
-
-    int n = qrand() % total;
-    int camId = qnResPool->getAllEnabledCameras().at(n)->getId();
-
-    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
-    if (servers.size() == 0)
-        return;
-
-    n = qrand() % servers.size();
-    int srvId = servers.at(n)->getId();
-
-
-    n = qrand() % BusinessEventType::BE_Count;
-    BusinessEventType::Value eventType = (BusinessEventType::Value)n;
-
-    QnBusinessParams params;
-    QnBusinessEventRuntime::setEventType(&params, eventType);
-
-    n = qrand() % 2;
-
-    QStringList conflicts;
-    conflicts << QLatin1String("50:e5:49:43:b2:5A");
-    conflicts << QLatin1String("50:e5:49:43:b2:5B");
-    conflicts << QLatin1String("50:e5:49:43:b2:5C");
-
-    switch (eventType) {
-        case BusinessEventType::BE_Camera_Input:
-        case BusinessEventType::BE_Camera_Motion:
-        case BusinessEventType::BE_Camera_Disconnect:
-            QnBusinessEventRuntime::setEventResourceId(&params, camId);
-            break;
-
-        case BusinessEventType::BE_Storage_Failure:
-            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
-            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::StorageIssueIoError : QnBusiness::StorageIssueNotEnoughSpeed);
-            QnBusinessEventRuntime::setReasonText(&params, QLatin1String("C:\\;D:\\"));
-            break;
-        case BusinessEventType::BE_Network_Issue:
-            QnBusinessEventRuntime::setEventResourceId(&params, camId);
-            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueRtpPacketLoss);
-            QnBusinessEventRuntime::setReasonText(&params, n == 0 ? QLatin1String("10") : QLatin1String("25245;26532"));
-            break;
-        case BusinessEventType::BE_MediaServer_Failure:
-            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
-            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::MServerIssueStarted : QnBusiness::MServerIssueTerminated);
-            break;
-        case BusinessEventType::BE_Camera_Ip_Conflict:
-            QnBusinessEventRuntime::setEventResourceId(&params, camId);
-            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
-            QnBusinessEventRuntime::setConflicts(&params, conflicts);
-            break;
-        case BusinessEventType::BE_MediaServer_Conflict:
-            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
-            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
-            QnBusinessEventRuntime::setConflicts(&params, conflicts);
-            break;
-        default:
-            break;
-    }
-
-
-
-
-    QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
-    at_eventManager_actionReceived(ba);
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -1439,13 +1370,6 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
         businessRulesDialog()->setGeometry(oldGeometry);
 }
 
-// can be used for test purposes or for displaying an example for user
-void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->show();
-}
-
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
@@ -1558,6 +1482,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     qnLicensePool->reset();
 
+    if (popupCollectionWidget())
+        popupCollectionWidget()->clear();
+
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
@@ -1597,6 +1524,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
     // TODO: save workbench state on logout.
+
+    if (popupCollectionWidget())
+        popupCollectionWidget()->clear();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -1857,17 +1787,17 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
-    if(resources.size() != 1)
+    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
+    if(!server)
         return;
 
-    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(resources[0], widget()));
+    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
 
     // TODO: move submitToResources here.
-    connection()->saveAsync(resources[0], this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
@@ -2039,6 +1969,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setGuid(QUuid::createUuid());
 
     connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    user->setPassword(QString()); // forget the password now
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
@@ -2188,17 +2119,23 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
     accessRightsFlags &= flags;
 
+    QnUserSettingsDialog::ElementFlags emailFlags =
+        ((permissions & Qn::ReadEmailPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
+    emailFlags &= flags;
+
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
     dialog->setEditorPermissions(accessController()->globalPermissions());
     
 
     // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-    QString userPassword = qnSettings->lastUsedConnection().url.password();
+    QString currentPassword = qnSettings->lastUsedConnection().url.password();
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
-        dialog->setCurrentPassword(userPassword);
+        dialog->setCurrentPassword(currentPassword);
     } else {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     }
@@ -2210,21 +2147,25 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        if (user->isAdmin() && userPassword != user->getPassword()) {
+        if (user == context()->user()                           // if we
+                && user->isAdmin()                              // are owner
+                && !user->getPassword().isEmpty()               // and have changed our password
+                && currentPassword != user->getPassword()       // to another password
+                )
+        {
             QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
             int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                                  QMessageBox::Ok, QMessageBox::Discard);
             if (button == QMessageBox::Discard) {
-                user->setPassword(QString()); // TODO #gdm ask elric: why the hell we store empty strings?
-                return; // we cannot change anything else for the Owner so we can return safely
+                user->setPassword(QString());
             }
         }
 
-        // TODO #gdm ask elric: should we restore empty user->password at at_resources_saved()?
         connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
-        if(user == context()->user() && newPassword != userPassword) {
+        user->setPassword(QString());
+        if(user == context()->user() && !newPassword.isEmpty() && newPassword != currentPassword) {
             /* Password was changed. Change it in global settings and hope for the best. */
             QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);
@@ -3198,4 +3139,25 @@ void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
     QWhatsThis::enterWhatsThisMode();
 }
 
+void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
+    if (!context()->user())
+        return;
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+
+    bool any = false;
+
+    if (!isEmailValid(context()->user()->getEmail().trimmed())) {
+        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
+    }
+
+    if (qnLicensePool->isEmpty()) {
+        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+    }
+
+    if (any)
+        popupCollectionWidget()->show();
+
+}
 

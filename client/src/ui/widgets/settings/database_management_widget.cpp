@@ -61,8 +61,8 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
 
     QFile file(fileName);
-    if(!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for writing.").arg(fileName));
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for reading.").arg(fileName));
         return;
     }
     QByteArray data = file.readAll();

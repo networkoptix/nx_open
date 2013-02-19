@@ -52,6 +52,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
             continue;
         }
+        if (cameras.isEmpty())
+        {
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
+            continue;
+        }
 
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());

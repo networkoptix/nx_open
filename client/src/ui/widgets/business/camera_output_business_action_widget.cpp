@@ -33,23 +33,23 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionResourcesField) {
-        QSet<QString> total_relays; // TODO: #GDM codestyle, use camelCase, not under_scores in local variable names.
+        QSet<QString> totalRelays;
         bool inited = false;
 
         QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            QStringList camera_relays = camera->getRelayOutputList();
+            QStringList cameraRelays = camera->getRelayOutputList();
             if (!inited) {
-                total_relays = camera_relays.toSet();
+                totalRelays = cameraRelays.toSet();
                 inited = true;
             } else {
-                total_relays = total_relays.intersect(camera_relays.toSet());
+                totalRelays = totalRelays.intersect(cameraRelays.toSet());
             }
         }
 
         ui->relayComboBox->clear();
         ui->relayComboBox->addItem(tr("<automatic>"), QString());
-        foreach (QString relay, total_relays)
+        foreach (QString relay, totalRelays)
             ui->relayComboBox->addItem(relay, relay);
 
     }

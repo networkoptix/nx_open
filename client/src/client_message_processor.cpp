@@ -63,8 +63,13 @@ void QnClientMessageProcessor::stop()
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 {
+    QnResourceList newResources;
+
     foreach (const QnResourcePtr& resource, resources)
-        replaceResource(resource);
+        if(!updateResource(resource, false))
+            newResources.push_back(resource);
+
+    qnResPool->addResources(newResources);
 }
 
 void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
@@ -72,8 +77,9 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnClientMessageProcessor::replaceResource(QnResourcePtr resource)
+bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: 'insert' parameter is hacky. Get rid of it and write some nicer code.
 {
+    bool result = false;
     QnResourcePtr ownResource;
 
     QString guid = resource->getGuid();
@@ -82,13 +88,43 @@ void QnClientMessageProcessor::replaceResource(QnResourcePtr resource)
     else
         ownResource = qnResPool->getResourceById(resource->getId());
 
-    if (ownResource.isNull())
-        qnResPool->addResource(resource); // TODO: #Ivan
-    else
+    if (ownResource.isNull()) {
+        if(insert) {
+            qnResPool->addResource(resource);
+            result = true;
+        }
+        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
+            determineOptimalIF(mediaServer.data());
+    } 
+    else {
         ownResource->update(resource);
+        result = true;
+    }
 
-    if(QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
+
+    if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
+
+    return result;
+}
+
+void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaServer)
+{
+    // set proxy. If some media server IF will be found, proxy address will be cleared
+    QString url = QnAppServerConnectionFactory::defaultUrl().host();
+    if (url.isEmpty())
+        url = QLatin1String("127.0.0.1");
+    int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
+    mediaServer->apiConnection()->setProxyAddr(mediaServer->getApiUrl(), url, port);
+    disconnect(mediaServer, NULL, this, NULL);
+    connect(mediaServer, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
+    mediaServer->determineOptimalNetIF();
+}
+
+void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl)
+{
+    if (url != QLatin1String("proxy"))
+        resource->apiConnection()->setProxyAddr(origApiUrl, QString(), 0);
 }
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
@@ -135,7 +171,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             return;
         }
 
-        replaceResource(message.resource);
+        updateResource(message.resource);
     }
     else if (message.eventType == Qn::Message_Type_ResourceDelete)
     {

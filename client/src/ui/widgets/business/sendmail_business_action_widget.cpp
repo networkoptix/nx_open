@@ -4,6 +4,7 @@
 #include <business/actions/sendmail_business_action.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -50,3 +51,4 @@ void QnSendmailBusinessActionWidget::paramsChanged() {
 void QnSendmailBusinessActionWidget::at_settingsButton_clicked() {
     menu()->trigger(Qn::OpenServerSettingsAction);
 }
+

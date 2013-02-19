@@ -6,6 +6,7 @@
 #include <business/business_event_rule.h>
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
+#include <utils/common/email.h>
 #include "core/resource_managment/resource_pool.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
@@ -37,7 +38,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources();
+    QnResourceList resList = action->getResources().filtered<QnVirtualCameraResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -150,7 +151,10 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
-    if (runtimeRule.isActionRunning)
+    if (bEvent->getToggleState() == ToggleState::Off && !runtimeRule.resources.isEmpty())
+        return QnAbstractBusinessActionPtr(); // ignore 'Off' event if some event resources still running
+
+    if (!runtimeRule.isActionRunning.isEmpty())
     {
         // Toggle event repeated with some interval with state 'on'.
         // if toggled action is used and condition is no longer valid - stop action
@@ -163,7 +167,11 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
     else if (condOK)
         action = rule->instantiateAction(bEvent);
 
-    runtimeRule.isActionRunning = action && action->getToggleState() == ToggleState::On;
+    bool isActionRunning = action && action->getToggleState() == ToggleState::On;
+    if (isActionRunning)
+        runtimeRule.isActionRunning.insert(QnId());
+    else
+        runtimeRule.isActionRunning.clear();
 
     return action;
 }
@@ -176,14 +184,16 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     {
         // instant action connected to continue event. update stats to prevent multiple action for repeation 'on' event state
         RunningRuleInfo& runtimeRule = itr.value();
+        QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
+
         if (condOK && bEvent->getToggleState() == ToggleState::On) {
-            if (runtimeRule.isActionRunning)
-                return QnAbstractBusinessActionPtr(); // action by rule already was ran. ingore repeated event
+            if (runtimeRule.isActionRunning.contains(resId))
+                return QnAbstractBusinessActionPtr(); // action by rule already was ran. Allow separate action for each resource of source event but ingore repeated 'on' state
             else
-                runtimeRule.isActionRunning = true;
+                runtimeRule.isActionRunning.insert(resId);
         }
         else
-            runtimeRule.isActionRunning = false;
+            runtimeRule.isActionRunning.remove(resId);
     }
 
     if (!condOK)
@@ -253,19 +263,12 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     // for continue event put information to m_eventsInProgress
     QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
-	runtimeRule.bEvent = bEvent;
     if (bEvent->getToggleState() == ToggleState::On)
-    {
-        runtimeRule.resources.insert(resId);
-        return true;
-    }
-    else if (bEvent->getToggleState() == ToggleState::Off) {
+        runtimeRule.resources[resId] = bEvent;
+    else 
         runtimeRule.resources.remove(resId);
-        bool isFinished = runtimeRule.resources.isEmpty(); // true if no more running resources by event
-        return isFinished;
-    }
 
-    return false; // toggle event without state?
+    return true;
 }
 
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
@@ -289,8 +292,9 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
             if (action)
                 result << action;
 
-            if (bEvent->getToggleState() == ToggleState::Off)
-                m_rulesInProgress.remove(rule->getUniqueId()); // clear running info if event is finished (all running event resources actually finished)
+            RunningRuleMap::Iterator itr = m_rulesInProgress.find(rule->getUniqueId());
+            if (itr != m_rulesInProgress.end() && itr->resources.isEmpty())
+                m_rulesInProgress.erase(itr); // clear running info if event is finished (all running event resources actually finished)
         }
     }
     return result;
@@ -312,26 +316,37 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 {
     Q_ASSERT( action );
 
-    QString emailAddress = BusinessActionParameters::getEmailAddress(action->getParams());
-    if( emailAddress.isEmpty() )
+    QStringList recipients;
+    foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
+        QString email = user->getEmail();
+        if (!email.isEmpty() && isEmailValid(email))
+            recipients << email;
+    }
+
+    QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
+    foreach(const QString &email, additional) {
+        if (isEmailValid(email))
+            recipients << email;
+    }
+
+    if( recipients.isEmpty() )
     {
-        cl_log.log( QString::fromLatin1("Action SendMail missing required parameter \"emailAddress\". Ignoring..."), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Action SendMail missing valid recipients. Ignoring..."), cl_logWARNING );
         return false;
     }
 
     cl_log.log( QString::fromLatin1("Processing action SendMail. Sending mail to %1").
-        arg(emailAddress), cl_logDEBUG1 );
+        arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
-            emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts),
+            recipients,
             action->getSubject(),
             action->getMessageBody()))
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
-            arg(emailAddress).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
+                    arg(recipients.join(QLatin1String("; "))).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
         return false;
     }
     return true;
@@ -370,11 +385,23 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 {
     QString ruleId = rule->getUniqueId();
     RunningRuleInfo runtimeRule = m_rulesInProgress.value(ruleId);
-    if (runtimeRule.isActionRunning) {
-        QnAbstractBusinessEventPtr bEvent = runtimeRule.bEvent;
-        QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
-        if (action)
-            executeAction(action);
+    bool isToggledAction = BusinessActionType::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
+    if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
+    {
+        foreach(const QnId& resId, runtimeRule.isActionRunning)
+        {
+            // terminate all actions. If instant action, terminate all resources on which it was started
+            QnAbstractBusinessEventPtr bEvent;
+            if (resId.isValid())
+                bEvent = runtimeRule.resources.value(resId);
+            else
+                bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
+            if (bEvent) {
+                QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent, ToggleState::Off);
+                if (action)
+                    executeAction(action);
+            }
+        }
     }
     m_rulesInProgress.remove(ruleId);
 

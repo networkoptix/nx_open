@@ -20,7 +20,12 @@
 
 struct AVCodecContext;
 
-enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_None};
+enum MediaQuality { MEDIA_Quality_High,  // high quality
+                    MEDIA_Quality_Low,   // low quality
+                    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
+                    // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
+                    MEDIA_Quality_ForceHigh,
+                    MEDIA_Quality_None};
 
 class QnMediaContext: public QnAbstractMediaContext {
 public:

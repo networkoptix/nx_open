@@ -33,11 +33,13 @@ private slots:
     void at_messageReceived(QnMessage message);
     void at_connectionClosed(QString errorString);
     void at_connectionOpened(QnMessage message);
+    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
 
 private:
     void init();
     void init(const QUrl& url, int reconnectTimeout);
-    void replaceResource(QnResourcePtr resource);
+    void determineOptimalIF(QnMediaServerResource* mediaServer);
+    bool updateResource(QnResourcePtr resource, bool insert = true);
     void processResources(const QnResourceList& resources);
     void processLicenses(const QnLicenseList& licenses);
     void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);

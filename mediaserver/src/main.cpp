@@ -516,7 +516,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("proxyAuthKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -651,6 +651,17 @@ void QnMain::loadResourcesFromECS()
     }
 
     //loading business rules
+    QnUserResourceList users;
+    while( appServerConnection->getUsers(users) != 0 )
+    {
+        qDebug() << "QnMain::run(): Can't get users. Reason: " << appServerConnection->getLastError();
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    foreach(const QnUserResourcePtr &user, users)
+        qnResPool->addResource(user);
+
+    //loading business rules
     QnBusinessEventRules rules;
     while( appServerConnection->getBusinessRules(rules) != 0 )
     {
@@ -658,7 +669,7 @@ void QnMain::loadResourcesFromECS()
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
-    foreach(QnBusinessEventRulePtr rule, rules)
+    foreach(const QnBusinessEventRulePtr &rule, rules)
         qnBusinessRuleProcessor->addBusinessRule( rule );
 }
 

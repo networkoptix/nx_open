@@ -109,11 +109,12 @@ protected:
         /* Draw 'recording' icon. */
         bool recording = false, scheduled = false;
         if(resource) {
-            if(resource->getStatus() == QnResource::Recording) {
-                recording = true;
+            if(!resource->isDisabled()) {
+                if(resource->getStatus() == QnResource::Recording)
+                    recording = true;
             } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
                 foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                    if(otherCamera->getStatus() == QnResource::Recording) {
+                    if(!otherCamera->isDisabled() && otherCamera->getStatus() == QnResource::Recording) {
                         recording = true;
                         break;
                     }
@@ -193,6 +194,19 @@ public:
         invalidateFilter();
     }
 
+
+    /*!
+      \reimp
+    */
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
+        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole){
+            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
+            setCheckStateRecursive(index, checkState);
+            return true;
+        } else
+            return base_type::setData(index, value, role);
+    }
+
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
         /* Local node must be the last one in a list. */
@@ -221,18 +235,6 @@ protected:
         }
     }
 
-    /*!
-      \reimp
-    */
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole){
-            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
-            setCheckStateRecursive(index, checkState);
-            return true;
-        } else
-            return base_type::setData(index, value, role);
-    }
-
     void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state) {
         QModelIndex root = index.sibling(index.row(), Qn::NameColumn);
         for (int i = 0; i < rowCount(root); ++i)
@@ -240,15 +242,14 @@ protected:
         base_type::setData(index, state, Qt::CheckStateRole);
     }
 
-    // TODO: #GDM codestyle, use camelCase, not under_score.
-    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override {
         if (!m_filterEnabled)
             return true;
 
-        QModelIndex root = (source_parent.column() > Qn::NameColumn)
-                ? source_parent.sibling(source_parent.row(), Qn::NameColumn)
-                : source_parent;
-        return base_type::filterAcceptsRow(source_row, root);
+        QModelIndex root = (sourceParent.column() > Qn::NameColumn)
+                ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
+                : sourceParent;
+        return base_type::filterAcceptsRow(sourceRow, root);
     }
 
 private:
@@ -278,6 +279,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->resourcesTreeView->setStyle(treeStyle);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(spacePressed(QModelIndex)),  this,               SLOT(at_treeView_spacePressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
 
     connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
@@ -488,6 +490,17 @@ void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
     if (resource)
         emit activated(resource);
 }
+
+void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index) {
+    if (!m_checkboxesVisible)
+        return;
+    QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
+
+    bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+    int inverted = checked ? Qt::Unchecked : Qt::Checked;
+    m_resourceProxyModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
+}
+
 
 void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();

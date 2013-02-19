@@ -51,18 +51,21 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders)
 {
-    recorders.recorderHiRes->stop();
+    if (recorders.recorderHiRes)
+        recorders.recorderHiRes->stop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->stop();
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
     if (camera)
     {
-        QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
-        if (reader)
-            reader->removeDataProcessor(recorders.recorderHiRes);
+        if (recorders.recorderHiRes) {
+            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            if (reader)
+                reader->removeDataProcessor(recorders.recorderHiRes);
+        }
 
         if (recorders.recorderLowRes) {
-            reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderLowRes);
         }
@@ -150,8 +153,8 @@ bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, Q
 
     QMutexLocker lock(&m_mutex);
 
-    QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
-    if (itrRec == m_recordMap.end())
+    QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.find(camRes);
+    if (itrRec == m_recordMap.constEnd())
         return false;
 
     // update current schedule task
@@ -358,10 +361,11 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
 
         updateCamera(camera);
 
-        QMutexLocker lock(&m_mutex);
+        // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread
+        //QMutexLocker lock(&m_mutex);
 
-        QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
-        if (itr != m_recordMap.end()) 
+        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
+        if (itr != m_recordMap.constEnd()) 
         {
             if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled()) 
                 itr->recorderHiRes->setNeedReopen();
@@ -460,9 +464,10 @@ void QnRecordingManager::onTimer()
 {
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
 
-    QMutexLocker lock(&m_mutex);
+    // Mutex is not required here because of m_recordMap used in readOnly mode here and m_recordMap modified from this thread only (from other private slot)
+    //QMutexLocker lock(&m_mutex);
 
-    for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
+    for (QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.constBegin(); itrRec != m_recordMap.constEnd(); ++itrRec)
     {
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(itrRec.key());
         const Recorders& recorders = itrRec.value();

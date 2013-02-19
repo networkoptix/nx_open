@@ -17,8 +17,8 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
 
-#include <ui/delegate/business_rule_item_delegate.h>
-#include <ui/dialogs/select_cameras_dialog.h>
+#include <ui/delegates/business_rule_item_delegate.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -119,17 +119,16 @@ void QnBusinessRulesDialog::reject() {
                       QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                       QMessageBox::Cancel);
 
-    // TODO: #GDM codestyle, indentation. See how its done in other places for switch-case.
     switch (btn) {
-        case QMessageBox::Yes:
-            if (!saveAll())
-                return;
-            break;
-        case QMessageBox::No:
-            at_context_userChanged();
-            break;
-        default:
+    case QMessageBox::Yes:
+        if (!saveAll())
             return;
+        break;
+    case QMessageBox::No:
+        at_context_userChanged();
+        break;
+    default:
+        return;
     }
     base_type::reject();
 }
@@ -151,12 +150,12 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
 
 void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-            event->ignore();
-            return;
-        default:
-            break;
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        event->ignore();
+        return;
+    default:
+        break;
     }
     base_type::keyPressEvent(event);
 }
@@ -333,15 +332,15 @@ bool QnBusinessRulesDialog::saveAll() {
                           QMessageBox::Cancel);
 
         switch (btn) {
-            case QMessageBox::Yes:
-                foreach (QModelIndex idx, invalid_modified) {
-                    m_rulesViewModel->getRuleModel(idx.row())->setDisabled(true);
-                }
-                break;
-            case QMessageBox::No:
-                break;
-            default:
-                return false;
+        case QMessageBox::Yes:
+            foreach (QModelIndex idx, invalid_modified) {
+                m_rulesViewModel->getRuleModel(idx.row())->setDisabled(true);
+            }
+            break;
+        case QMessageBox::No:
+            break;
+        default:
+            return false;
         }
     }
 

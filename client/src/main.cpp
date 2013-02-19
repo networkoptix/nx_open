@@ -402,9 +402,9 @@ int qnMain(int argc, char *argv[])
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
-    QnServerCameraProcessor serverCameraProcessor;
+    QnLocalFileProcessor localFileProcessor;
     QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&serverCameraProcessor);
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
 
     //============================
     //QnResourceDirectoryBrowser

@@ -779,22 +779,25 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
             case nx_http::MultipartContentParser::partDataDone:
                 if( m_currentMonitorData.isEmpty() )
                 {
-                    notificationReceived( m_multipartContentParser.prevFoundData() );
+                    if( !m_multipartContentParser.prevFoundData().isEmpty() )
+                        notificationReceived( m_multipartContentParser.prevFoundData() );
                 }
                 else
                 {
-                    m_currentMonitorData.append(
-                        m_multipartContentParser.prevFoundData().data(),
-                        (int) m_multipartContentParser.prevFoundData().size() );
+                    if( !m_multipartContentParser.prevFoundData().isEmpty() )
+                        m_currentMonitorData.append(
+                            m_multipartContentParser.prevFoundData().data(),
+                            (int) m_multipartContentParser.prevFoundData().size() );
                     notificationReceived( m_currentMonitorData );
                     m_currentMonitorData.clear();
                 }
                 break;
 
             case nx_http::MultipartContentParser::someDataAvailable:
-                m_currentMonitorData.append(
-                    m_multipartContentParser.prevFoundData().data(),
-                    (int) m_multipartContentParser.prevFoundData().size() );
+                if( !m_multipartContentParser.prevFoundData().isEmpty() )
+                    m_currentMonitorData.append(
+                        m_multipartContentParser.prevFoundData().data(),
+                        (int) m_multipartContentParser.prevFoundData().size() );
                 break;
 
             case nx_http::MultipartContentParser::eof:

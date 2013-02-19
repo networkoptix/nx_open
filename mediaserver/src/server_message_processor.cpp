@@ -17,9 +17,10 @@ QnServerMessageProcessor* QnServerMessageProcessor::instance()
     return static_instance();
 }
 
-void QnServerMessageProcessor::init(const QUrl& url, int timeout)
+void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)
 {
     m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
+	m_source->setAuthKey(authKey);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
@@ -76,8 +77,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
         bool isServer = resource.dynamicCast<QnMediaServerResource>();
         bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
+        bool isUser = resource.dynamicCast<QnUserResource>();
 
-        if (!isServer && !isCamera)
+        if (!isServer && !isCamera && !isUser)
             return;
 
         // If the resource is mediaServer then ignore if not this server

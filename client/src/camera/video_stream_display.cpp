@@ -412,12 +412,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
          scaleFactor != QnFrameScaler::factor_1);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
+    if (outFrame->isDisplaying()) 
+        m_drawer->waitForFrameDisplayed(data->channelNumber);
+
     outFrame->channel = data->channelNumber;
     outFrame->flags = 0;
 
-    if (outFrame->isDisplaying()) 
-        m_drawer->waitForFrameDisplayed(data->channelNumber);
-    
     if (!useTmpFrame)
         outFrame->setUseExternalData(!enableFrameQueue);
 
@@ -574,9 +574,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     PixelFormat pixFmt = dec->GetPixelFormat();
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
-    outFrame->channel = channel;
 
     m_drawer->finishPostedFramesRender(channel);
+    outFrame->channel = channel;
     
     m_mtx.lock();
 

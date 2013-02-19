@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/select_cameras_dialog.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 
 class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
@@ -16,12 +16,14 @@ class QnSelectResourcesDialogButton: public QPushButton {
 public:
     explicit QnSelectResourcesDialogButton(QWidget* parent=NULL);
 
-    QnResourceList resources();
+    QnResourceList resources() const;
     void setResources(QnResourceList resources);
 
-    QnSelectCamerasDialogDelegate* dialogDelegate();
-    void setDialogDelegate(QnSelectCamerasDialogDelegate* delegate);
+    QnResourceSelectionDialogDelegate* dialogDelegate() const;
+    void setDialogDelegate(QnResourceSelectionDialogDelegate* delegate);
 
+    Qn::NodeType nodeType() const;
+    void setNodeType(Qn::NodeType nodeType);
 signals:
     void commit();
 
@@ -33,14 +35,17 @@ private slots:
     void at_clicked();
 private:
     QnResourceList m_resources;
-    QnSelectCamerasDialogDelegate* m_dialogDelegate;
+    QnResourceSelectionDialogDelegate* m_dialogDelegate;
+    Qn::NodeType m_nodeType;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
     Q_OBJECT
 
     typedef QStyledItemDelegate base_type;
-
+public:
+    explicit QnBusinessRuleItemDelegate(QObject *parent = 0);
+    ~QnBusinessRuleItemDelegate();
 protected:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -50,10 +55,6 @@ protected:
 
 private slots:
     void at_editor_commit();
-
-private:
-    int m_editingRow;
-    int m_editingColumn;
 
 };
 

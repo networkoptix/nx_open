@@ -36,7 +36,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Database</string>
+      <string>System Configuration Backup</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>

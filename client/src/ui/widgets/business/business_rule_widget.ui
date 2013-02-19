@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>919</width>
+    <width>955</width>
     <height>240</height>
    </rect>
   </property>
@@ -29,7 +29,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
-         <number>6</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1,0">
@@ -97,13 +97,6 @@
              </property>
             </spacer>
            </item>
-           <item>
-            <widget class="QLabel" name="eventDropLabel">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;Drop resources here&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -139,7 +132,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>1</height>
            </size>
           </property>
          </spacer>
@@ -187,7 +180,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
-         <number>6</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
@@ -248,13 +241,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="actionDropLabel">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt; font-style:italic;&quot;&gt;Drop resources here&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>

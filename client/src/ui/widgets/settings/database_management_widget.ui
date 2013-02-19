@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>You can create a database backup and restore the database later if something goes wrong. </string>
+      <string>You can create a system configuration backup and restore it later if something goes wrong. </string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -42,14 +42,14 @@
      <item>
       <widget class="QPushButton" name="backupButton">
        <property name="text">
-        <string>Create Backup</string>
+        <string>Create Backup...</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="restoreButton">
        <property name="text">
-        <string>Restore from Backup</string>
+        <string>Restore from Backup...</string>
        </property>
       </widget>
      </item>

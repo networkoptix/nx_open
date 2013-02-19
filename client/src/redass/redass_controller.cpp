@@ -79,7 +79,7 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
             itr.previous();
         QnCamDisplay* display = itr.value();
         QnArchiveStreamReader* reader = display->getArchiveReader();
-        bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High;
+        bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High || reader->getQuality() == MEDIA_Quality_ForceHigh;
         if (isReaderHQ == findHQ && (!cond || (this->*cond)(display))) {
             if (displaySize)
                 *displaySize = itr.key() >> 32;
@@ -142,7 +142,7 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
 
-    if (reader->getQuality() == MEDIA_Quality_High)
+    if (reader->getQuality() == MEDIA_Quality_High || reader->getQuality() == MEDIA_Quality_ForceHigh)
         return; // reader already at HQ
     
     QnCamDisplay* display = getDisplayByReader(reader);

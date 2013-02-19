@@ -155,7 +155,8 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
             rtspClient->setResource(m_resource);
             rtspClient->setPlayNowModeAllowed(false); 
         }
-        
+        if (role == QnStreamRecorder::Role_FileExport)
+            m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
         m_exportRecorder = new QnStreamRecorder(m_resource);
         m_exportRecorder->disconnect(this);

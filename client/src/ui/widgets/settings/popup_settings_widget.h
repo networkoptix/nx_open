@@ -26,7 +26,8 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnPopupSettingsWidget> ui;
-    QList<QCheckBox* > m_checkBoxes;
+    QList<QCheckBox* > m_businessRulesCheckBoxes;
+    QList<QCheckBox* > m_systemHealthCheckBoxes;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H

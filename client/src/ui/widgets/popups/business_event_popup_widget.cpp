@@ -1,5 +1,5 @@
-#include "popup_widget.h"
-#include "ui_popup_widget.h"
+#include "business_event_popup_widget.h"
+#include "ui_business_event_popup_widget.h"
 
 #include <business/events/conflict_business_event.h>
 #include <business/events/reasoned_business_event.h>
@@ -48,9 +48,9 @@ namespace {
     }
 }
 
-QnPopupWidget::QnPopupWidget(QWidget *parent) :
+QnBusinessEventPopupWidget::QnBusinessEventPopupWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::QnPopupWidget),
+    ui(new Ui::QnBusinessEventPopupWidget),
     m_eventType(BusinessEventType::BE_NotDefined),
     m_showAllItem(NULL),
     m_showAll(false)
@@ -70,15 +70,15 @@ QnPopupWidget::QnPopupWidget(QWidget *parent) :
     ui->eventsTreeView->setPalette(pal);
 }
 
-QnPopupWidget::~QnPopupWidget()
+QnBusinessEventPopupWidget::~QnBusinessEventPopupWidget()
 {
 }
 
-void QnPopupWidget::at_okButton_clicked() {
+void QnBusinessEventPopupWidget::at_okButton_clicked() {
     emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
 }
 
-void QnPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
+void QnBusinessEventPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
     if (m_showAll)
         return;
 
@@ -106,7 +106,7 @@ void QnPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
 
 }
 
-void QnPopupWidget::updateTreeSize() {
+void QnBusinessEventPopupWidget::updateTreeSize() {
     int height = 0;
     QStandardItem* root = m_model->invisibleRootItem();
     QModelIndex rootIndex = m_model->indexFromItem(root);
@@ -127,7 +127,7 @@ void QnPopupWidget::updateTreeSize() {
     ui->eventsTreeView->setMaximumHeight(height);
 }
 
-bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+bool QnBusinessEventPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     if (m_eventType == BusinessEventType::BE_NotDefined) //not initialized
         initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
     if (!updateTreeModel(businessAction))
@@ -168,7 +168,7 @@ bool QnPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &busines
     return true;
 }
 
-void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {
+void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) {
     QList<QWidget*> headerLabels;
     headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
 
@@ -202,7 +202,7 @@ void QnPopupWidget::initWidget(BusinessEventType::Value eventType) {
     ui->eventLabel->setText(BusinessEventType::toString(eventType));
 }
 
-bool QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
+bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
     QStandardItem* item;
     switch (m_eventType) {
         case BusinessEventType::BE_Camera_Disconnect:
@@ -237,7 +237,7 @@ bool QnPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessA
     return true;
 }
 
-QString QnPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
+QString QnBusinessEventPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
     qint64 eventTimestamp = QnBusinessEventRuntime::getEventTimestamp(eventParams);
     if (eventTimestamp == 0)
         eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
@@ -245,7 +245,7 @@ QString QnPopupWidget::getEventTime(const QnBusinessParams &eventParams) {
     return QDateTime::fromMSecsSinceEpoch(eventTimestamp/1000).toString(QLatin1String("hh:mm:ss"));
 }
 
-QStandardItem* QnPopupWidget::findOrCreateItem(const QnBusinessParams& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::findOrCreateItem(const QnBusinessParams& eventParams) {
     int resourceId = QnBusinessEventRuntime::getEventResourceId(eventParams);
     int eventReasonCode = QnBusinessEventRuntime::getReasonCode(eventParams);
 
@@ -276,7 +276,7 @@ QStandardItem* QnPopupWidget::findOrCreateItem(const QnBusinessParams& eventPara
     return item;
 }
 
-QStandardItem* QnPopupWidget::updateSimpleTree(const QnBusinessParams& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessParams& eventParams) {
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
@@ -285,7 +285,7 @@ QStandardItem* QnPopupWidget::updateSimpleTree(const QnBusinessParams& eventPara
     return item;
 }
 
-QStandardItem* QnPopupWidget::updateReasonTree(const QnBusinessParams& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessParams& eventParams) {
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)
         return NULL;
@@ -337,7 +337,7 @@ QStandardItem* QnPopupWidget::updateReasonTree(const QnBusinessParams& eventPara
     return item;
 }
 
-QStandardItem* QnPopupWidget::updateConflictTree(const QnBusinessParams& eventParams) {
+QStandardItem* QnBusinessEventPopupWidget::updateConflictTree(const QnBusinessParams& eventParams) {
 
     QStandardItem *item = findOrCreateItem(eventParams);
     if (!item)

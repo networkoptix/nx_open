@@ -67,10 +67,12 @@ public:
 
     QString getVersion() const;
     void setVersion(const QString& version);
+
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
+
 signals:
-    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &);
+    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnMediaServerResourcePtr &resource);
 
 private:
@@ -85,7 +87,7 @@ private:
     bool m_reserve;
     PanicMode m_panicMode;
     QString m_version;
-    QMap<int, QUrl> m_runningIfRequests;
+    QMap<int, QString> m_runningIfRequests;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory
