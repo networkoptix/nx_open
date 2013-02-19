@@ -6,7 +6,5 @@
 
 bool isEmailValid(const QString &email);
 QString getEmailDomain(const QString &email);
-QString getEmailUser(const QString &email);
-
 
 #endif // EMAIL_H
