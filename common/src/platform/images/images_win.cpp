@@ -1,4 +1,4 @@
-#include "windows_images.h"
+#include "images_win.h"
 
 #ifdef Q_OS_WIN
 

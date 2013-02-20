@@ -15,6 +15,10 @@ QnBusinessMessageBus::QnBusinessMessageBus()
     connect(&m_transport, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyFinished(QNetworkReply*)));
 }
 
+QnBusinessMessageBus::~QnBusinessMessageBus() {
+
+}
+
 /*
 int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url)
 {
@@ -22,7 +26,7 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 }
 */
 
-int QnBusinessMessageBus::deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, QnResourcePtr res, const QUrl& url)
+int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnResourcePtr &res, const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
     QNetworkRequest request;
@@ -61,7 +65,7 @@ void QnBusinessMessageBus::at_replyFinished(QNetworkReply* reply)
         emit actionDeliveryFail(action);
 }
 
-void QnBusinessMessageBus::at_actionReceived(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+void QnBusinessMessageBus::at_actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res)
 {
     emit actionReceived(action, res);
 }

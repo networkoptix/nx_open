@@ -49,7 +49,7 @@ private slots:
     void at_context_userChanged();
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
-    void at_message_ruleDeleted(QnId id);
+    void at_message_ruleDeleted(int id);
 
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
@@ -79,12 +79,12 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesViewModel* m_rulesViewModel;
-    QnBusinessEventRules m_pendingDeleteRules;
+    QList<int> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
     QMap<int, QnBusinessRuleViewModel*> m_processing;
-    QMap<int, QnBusinessEventRulePtr> m_deleting;
+    QMap<int, int> m_deleting;
 
     QMenu* m_popupMenu;
     QAction* m_advancedAction;

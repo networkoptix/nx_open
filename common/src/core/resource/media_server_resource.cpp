@@ -153,23 +153,24 @@ private:
 
 void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
 {
+    QMutexLocker lock(&m_mutex);
+
+    QString urlStr = m_runningIfRequests.value(responseNum);
     QByteArray guid = getGuid().toUtf8();
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
-        QMutexLocker lock(&m_mutex);
-
         // server OK
-        QString urlStr = m_runningIfRequests.value(responseNum);
         if (urlStr == QLatin1String("proxy"))
             setPrimaryIF(urlStr);
         else
             setPrimaryIF(QUrl(urlStr).host());
-        m_runningIfRequests.remove(responseNum);
+    }
 
-        if(m_runningIfRequests.isEmpty() && m_guard) {
-            m_guard->deleteLater();
-            m_guard = NULL;
-        }
+    m_runningIfRequests.remove(responseNum);
+
+    if(m_runningIfRequests.isEmpty() && m_guard) {
+        m_guard->deleteLater();
+        m_guard = NULL;
     }
 }
 
@@ -246,14 +247,26 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 
     // send request via proxy (ping request always send directly, other request are sent via proxy here)
-    QnSleep::msleep(5); // send request slighty latter to preffer direct connect
-    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
-    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
+    QTimer *timer = new QTimer();
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
+    connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
+    timer->start(5); // send request slighty later to preffer direct connect // TODO: #Elric still bad, implement properly
+    timer->moveToThread(qApp->thread());
+
+    m_runningIfRequests.insert(-1, QString());
 
     if(!m_guard) {
         m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
         m_guard->moveToThread(qApp->thread());
     }
+}
+
+void QnMediaServerResource::determineOptimalNetIF_testProxy() {
+    QMutexLocker lock(&m_mutex);
+    m_runningIfRequests.remove(-1);
+    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
 }
 
 void QnMediaServerResource::updateInner(QnResourcePtr other) 

@@ -101,10 +101,8 @@ public:
      */
     virtual void onNoVideo() {}
 
-    /**
-     * Returns last displayed time
-     */
-    virtual qint64 lastDisplayedTime(int channelNumber) const  = 0;
+    //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
+    virtual qint64 getTimestampOfNextFrameToRender(int channelNumber) const  = 0;
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
     virtual void unblockTimeValue(int channelNumber) const = 0;
     virtual bool isTimeBlocked(int channelNumber) const  = 0;

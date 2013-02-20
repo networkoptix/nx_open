@@ -154,7 +154,7 @@ public:
 protected:
     QnAppServerConnectionPtr connection() const;
 
-    QString newLayoutName(const QnUserResourcePtr &user) const;
+    QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
@@ -349,6 +349,14 @@ private:
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
+
+    /**
+     * @brief checkLayoutName       Check if layout with such name already exists before creating of the new.
+     * @param name                  Suggested name of the new layout.
+     * @param user                  User that will own the layout.
+     * @return                      Name layout should be saved with or empty string if process should be cancelled.
+     */
+    QString checkLayoutName(const QString &name, const QnUserResourcePtr &user);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;

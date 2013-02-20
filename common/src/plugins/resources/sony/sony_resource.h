@@ -49,6 +49,6 @@ private slots:
     void onMonitorConnectionClosed( nx_http::AsyncHttpClient* httpClient );
 };
 
-typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
+//typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
 
 #endif //sony_resource_h_1855

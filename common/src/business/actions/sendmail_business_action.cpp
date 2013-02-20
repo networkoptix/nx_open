@@ -73,7 +73,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
     QString additional = BusinessActionParameters::getEmailAddress(getParams());
     QStringList receivers = additional.split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach (const QString &receiver, receivers)
-        text += receiver + QLatin1Char('\n');
+        text += receiver.trimmed() + QLatin1Char('\n');
 
     return text;
 }

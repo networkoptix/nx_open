@@ -25,25 +25,26 @@ class QnBusinessMessageBus: public QThread
     Q_OBJECT
 public:
     QnBusinessMessageBus();
+    virtual ~QnBusinessMessageBus();
 
     static QnBusinessMessageBus* instance();
 
     //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
 
     /** Delivery action to other module */
-    int deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, QnResourcePtr res, const QUrl& url);
+    int deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnResourcePtr &res, const QUrl& url);
 signals:
     /** Action successfully delivered to other module*/
-    void actionDelivered(QnAbstractBusinessActionPtr action);
+    void actionDelivered(const QnAbstractBusinessActionPtr &action);
 
     /** Fail to delivery action to other module*/
-    void actionDeliveryFail(QnAbstractBusinessActionPtr action);
+    void actionDeliveryFail(const QnAbstractBusinessActionPtr &action);
 
     /** Action received from other module */
-    void actionReceived(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    void actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res);
 public slots:
     /** Action received from other module */
-    void at_actionReceived(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    void at_actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res);
 private slots:
     void at_replyFinished(QNetworkReply* reply);
 private:

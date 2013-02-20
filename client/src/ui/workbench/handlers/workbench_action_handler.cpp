@@ -346,16 +346,15 @@ QWidget *QnWorkbenchActionHandler::widget() const {
     return m_widget.data();
 }
 
-QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user) const {
-    const QString zeroName = tr("New layout");
-    const QString nonZeroName = tr("New layout %1");
-    QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
+QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user, const QString &baseName) const {
+    const QString nonZeroName = baseName + QString(QLatin1String(" %1"));
+    QRegExp pattern = QRegExp(baseName + QLatin1String(" ?([0-9]+)?"));
 
     QStringList layoutNames;
 
     QnUserResourcePtr parent = !user.isNull() ? user : context()->user();
     QnId parentId = parent ? parent->getId() : QnId();
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(parentId))
+    foreach(const QnLayoutResourcePtr &resource, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
         if(resource->flags() & QnResource::layout)
             layoutNames.push_back(resource->getName());
 
@@ -369,7 +368,7 @@ QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user) c
     }
     layoutNumber++;
 
-    return layoutNumber == 0 ? zeroName : nonZeroName.arg(layoutNumber);
+    return layoutNumber == 0 ? baseName : nonZeroName.arg(layoutNumber);
 }
 
 bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
@@ -1039,6 +1038,10 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
             name = dialog->name();
         }
 
+        name = checkLayoutName(name, user);
+        if (name.isEmpty())
+            return; // Cancel pressed
+
         QnLayoutResourcePtr newLayout;
 
         newLayout = QnLayoutResourcePtr(new QnLayoutResource());
@@ -1292,6 +1295,38 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
 
     if(ignoreThisVersion != thisVersionWasIgnored)
         qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
+}
+
+QString QnWorkbenchActionHandler::checkLayoutName(const QString &name, const QnUserResourcePtr &user) {
+
+    QMessageBox::StandardButton button = QMessageBox::NoButton;
+
+    foreach (const QnLayoutResourcePtr &existingLayout, resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+        if (existingLayout->getName().toLower() != name.toLower())
+            continue;
+
+        if (button == QMessageBox::NoButton)
+            button = QMessageBox::warning(widget(),
+                                          tr("Layout already exists"),
+                                          tr("Layout with the same name already exists. Overwrite it?"),
+                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                          QMessageBox::Yes);
+        switch(button) {
+        case QMessageBox::Cancel:
+            return QString();
+        case QMessageBox::No:
+            return newLayoutName(user, name);
+        case QMessageBox::Yes:
+            if(snapshotManager()->isLocal(existingLayout))
+                resourcePool()->removeResource(existingLayout); /* This one can be simply deleted from resource pool. */
+            else
+                connection()->deleteAsync(existingLayout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+            break;
+        default:
+            break;
+        }
+    }
+    return name;
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -1899,6 +1934,11 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         return;
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId()).dynamicCast<QnUserResource>();
+        name = checkLayoutName(name, user);
+        if (name.isEmpty())
+            return;
+
         bool changed = snapshotManager()->isChanged(layout);
 
         resource->setName(name);
@@ -1988,9 +2028,13 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     if(!dialog->exec())
         return;
 
+    QString name = checkLayoutName(dialog->name(), user);
+    if (name.isEmpty())
+        return; // Cancel pressed
+
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    layout->setName(dialog->name());
+    layout->setName(name);
     layout->setParentId(user->getId());
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     resourcePool()->addResource(layout);
@@ -2682,13 +2726,16 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         if(parameters.size() == 0 && display()->widgets().size() == 1) {
             widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
         } else {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Could not export file"), 
-                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
-                QMessageBox::Ok
-            );
-            return;
+            widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
+            if (!widget) {
+                QMessageBox::critical(
+                            this->widget(),
+                            tr("Could not export file"),
+                            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()),
+                            QMessageBox::Ok
+                            );
+                return;
+            }
         }
     } else {
         widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());

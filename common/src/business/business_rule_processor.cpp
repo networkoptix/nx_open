@@ -320,13 +320,13 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
         QString email = user->getEmail();
         if (!email.isEmpty() && isEmailValid(email))
-            recipients << email;
+            recipients << email.trimmed();
     }
 
     QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
         if (isEmailValid(email))
-            recipients << email;
+            recipients << email.trimmed();
     }
 
     if( recipients.isEmpty() )
@@ -415,7 +415,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     }
 }
 
-void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
+void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
 {
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)

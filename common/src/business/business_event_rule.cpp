@@ -15,6 +15,10 @@ QnBusinessEventRule::QnBusinessEventRule()
 {
 }
 
+QnBusinessEventRule::~QnBusinessEventRule() {
+
+}
+
 QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
     if (BusinessActionType::requiresCameraResource(m_actionType) && m_actionResources.isEmpty())
         return QnAbstractBusinessActionPtr(); //camera is not exists anymore
