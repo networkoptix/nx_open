@@ -98,12 +98,7 @@ public:
             GLuint id;
             size_t sizeBytes;
 
-            PBOData()
-            :
-                id( (GLuint)-1 ),
-                sizeBytes( 0 )
-            {
-            }
+            PBOData();
         };
 
         static const size_t TEXTURE_COUNT = 3;
