@@ -20,7 +20,7 @@ public:
 signals:
     void connectionReset();
     void businessRuleChanged(QnBusinessEventRulePtr bEvent);
-    void businessRuleDeleted(QnId id);
+    void businessRuleDeleted(int id);
     void businessActionReceived(QnAbstractBusinessActionPtr bAction);
 public slots:
     void run();

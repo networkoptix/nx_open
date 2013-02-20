@@ -5,6 +5,8 @@
 #include <business/actions/abstract_business_action.h>
 #include "business_logic_common.h"
 
+#include <core/resource/resource_fwd.h>
+
 /**
 * This class define relation between business event and action
 */
@@ -14,6 +16,7 @@ class QnBusinessEventRule: public QObject
 
 public:
     QnBusinessEventRule();
+    ~QnBusinessEventRule();
 
     QString getUniqueId() const;
 
