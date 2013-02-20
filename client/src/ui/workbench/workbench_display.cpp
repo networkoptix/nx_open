@@ -624,6 +624,14 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgets;
 }
 
+QnResourceWidget* QnWorkbenchDisplay::activeWidget() const {
+    foreach (QnResourceWidget * widget, m_widgets) {
+        if (widget->isLocalActive())
+            return widget;
+    }
+    return NULL;
+}
+
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const {
     return m_widgetsByResource.value(resource);
 }

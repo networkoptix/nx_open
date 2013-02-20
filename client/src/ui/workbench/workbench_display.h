@@ -179,6 +179,8 @@ public:
 
     QList<QnResourceWidget *> widgets() const;
 
+    QnResourceWidget* activeWidget() const;
+
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
     QnVideoCamera *camera(QnWorkbenchItem *item) const;
