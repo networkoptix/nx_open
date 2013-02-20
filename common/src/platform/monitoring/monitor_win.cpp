@@ -1,4 +1,4 @@
-#include "windows_monitor.h"
+#include "monitor_win.h"
 
 #ifdef Q_OS_WIN
 
