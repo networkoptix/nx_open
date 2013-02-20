@@ -46,15 +46,15 @@ public:
         AbsolutePtzCapability               = 0x020,
         ContinuousPanTiltCapability         = 0x040,
         ContinuousZoomCapability            = 0x080,
+        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
 
         /* Shortcuts */
-        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability,
+        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
 
         /* Deprecated capabilities. */
         DeprecatedContinuousPtzCapability   = 0x001,
         DeprecatedZoomCapability            = 0x002,
 
-        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
