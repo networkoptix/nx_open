@@ -9,7 +9,9 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0)
 {}
 
-QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
+QnPhysicalCameraResource::QnPhysicalCameraResource(): 
+    QnVirtualCameraResource(),
+    m_channelNumer(0)
 {
     setFlags(local_live_cam);
 }
@@ -33,6 +35,24 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
 
     return qMax(128,result);
 }
+
+int QnPhysicalCameraResource::getChannel() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_channelNumer;
+}
+
+void QnPhysicalCameraResource::setUrl(const QString &url)
+{
+    QUrl u(url);
+
+    QMutexLocker lock(&m_mutex);
+    QnVirtualCameraResource::setUrl(url);
+    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
+    if (m_channelNumer > 0)
+        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+}
+
 
 void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {
@@ -148,3 +168,4 @@ QString QnVirtualCameraResource::getUniqueId() const
 		return getPhysicalId();
 
 }
+

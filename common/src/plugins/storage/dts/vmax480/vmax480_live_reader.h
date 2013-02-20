@@ -38,6 +38,11 @@ private:
     int m_spsPpsHeight;
     quint8 m_spsPpsBuffer[128];
     int m_spsPpsBufferLen;
+
+    QMutex m_callbackMutex;
+    QWaitCondition m_callbackCond;
+    bool m_connectedInternal;
+    CLDataQueue m_internalQueue;
 };
 
 #endif //vmax480_live_h_1740

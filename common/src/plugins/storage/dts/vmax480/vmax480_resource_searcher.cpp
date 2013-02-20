@@ -49,8 +49,6 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
         QStringList params = line.split(QLatin1Char(';'), QString::SkipEmptyParts);
 
-        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
-
         QString name = params[0];
         QString mac =  params[1];
         QString host =  params[2];
@@ -58,20 +56,22 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
         QAuthenticator auth;
         auth.setUser(QLatin1String("admin"));
 
-        QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+        for (int i = 0; i < 16; ++i)
+        {
+            QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
-        resource->setTypeId(rt);
-        resource->setName(name);
-        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
-        resource->setMAC(mac);
-        resource->setUrl(QString(QLatin1String("http://%1:%2")).arg(host).arg(port));
-        resource->setDiscoveryAddr(iface.address);
-        resource->setAuth(auth);
+            resource->setTypeId(rt);
+            resource->setName(name);
+            (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+            resource->setMAC(mac);
+            resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(port).arg(i+1));
+            resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
+            resource->setDiscoveryAddr(iface.address);
+            resource->setAuth(auth);
 
-        //resource->setDiscoveryAddr(iface.address);
-        QList<QnResourcePtr> result;
-        result << resource;
-        return result;
+            result << resource;
+        }
 
     }
 

@@ -200,7 +200,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
-    m_channelNumer(0),
     m_maxChannels(1)
 {
     connect(
@@ -1352,7 +1351,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     if (m_maxChannels > 1)
     {
         // determine amount encoder configurations per each video source
-        confRangeStart = confRangeEnd/m_maxChannels * m_channelNumer;
+        confRangeStart = confRangeEnd/m_maxChannels * getChannel();
         confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
     }
 
@@ -1664,9 +1663,9 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        if ((int)response.Configurations.size() > m_channelNumer)
+        if ((int)response.Configurations.size() > getChannel())
         {
-            onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(m_channelNumer);
+            onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
             //TODO:UTF unuse std::string
@@ -1764,7 +1763,7 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
 
     m_maxChannels = (int) response.VideoSources.size();
 
-    if (m_maxChannels <= m_channelNumer) {
+    if (m_maxChannels <= getChannel()) {
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
@@ -1772,7 +1771,7 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
         return false;
     } 
 
-    onvifXsd__VideoSource* conf = response.VideoSources.at(m_channelNumer);
+    onvifXsd__VideoSource* conf = response.VideoSources.at(getChannel());
 
         if (conf) {
             QMutexLocker lock(&m_mutex);
@@ -1877,14 +1876,14 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
 
     }
 
-    if ((int)response.Configurations.size() <= m_channelNumer) {
+    if ((int)response.Configurations.size() <= getChannel()) {
         qWarning() << "QnPlOnvifResource::fetchAndSetAudioSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(m_channelNumer);
+        onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
             //TODO:UTF unuse std::string
@@ -2169,11 +2168,6 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
 QnAbstractPtzController* QnPlOnvifResource::getPtzController()
 {
     return m_ptzController.data();
-}
-
-int QnPlOnvifResource::getChannel() const
-{
-    return m_channelNumer;
 }
 
 bool QnPlOnvifResource::startInputPortMonitoring()
@@ -2639,17 +2633,6 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
     }
 
     return true;
-}
-
-void QnPlOnvifResource::setUrl(const QString &url)
-{
-    QUrl u(url);
-
-    QMutexLocker lock(&m_mutex);
-    QnPhysicalCameraResource::setUrl(url);
-    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
-    if (m_channelNumer > 0)
-        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
 }
 
 int QnPlOnvifResource::getMaxChannels() const
