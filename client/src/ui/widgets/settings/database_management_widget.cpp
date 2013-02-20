@@ -95,7 +95,8 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     if(processor->response.status == 0) {
         QMessageBox::information(this, tr("Information"), tr("Database was successfully restored from file '%1'.").arg(fileName));
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'. Error description: '%2'.").arg(fileName).arg(QString::fromLatin1(processor->response.errorString)));
+        QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'.")
+                              .arg(fileName));
     }
 }
 
