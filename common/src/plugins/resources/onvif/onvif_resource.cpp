@@ -53,7 +53,7 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 
 /* Some cameras declare invalid max resolution */
 struct StrictResolution {
-    char* model;
+    const char* model;
     QSize maxRes;
 };
 
@@ -222,7 +222,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     QString someMacAddress;
     std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
 
-    for (int i = 0; i < ifaces.size(); ++i)
+    for (uint i = 0; i < ifaces.size(); ++i)
     {
         onvifXsd__NetworkInterface* ifacePtr = ifaces[i];
 
@@ -494,7 +494,7 @@ QSize QnPlOnvifResource::getNearestResolution(const QSize& resolution, float asp
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
 {
-    for (int i = 0; i < sizeof(strictResolutionList) / sizeof(StrictResolution); ++i)
+    for (uint i = 0; i < sizeof(strictResolutionList) / sizeof(StrictResolution); ++i)
     {
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
@@ -2386,7 +2386,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
     std::string initialTerminationTime( buf );
     request.InitialTerminationTime = &initialTerminationTime;
-    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
 
     //creating filter
     //oasisWsnB2__FilterType topicFilter;
@@ -2402,6 +2401,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         return false;
     }
 
+    //TODO: #ak if this variable is unused following code may be deleted as well
+    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     if( response.oasisWsnB2__TerminationTime )
     {
         if( response.oasisWsnB2__CurrentTime )
@@ -2410,6 +2411,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             utcTerminationTime = *response.oasisWsnB2__TerminationTime; //hoping local and cam clocks are synchronized
     }
     //else: considering, that onvif device processed initialTerminationTime
+    Q_UNUSED(utcTerminationTime)
 
     std::string subscriptionID;
     if( response.SubscriptionReference &&
