@@ -45,8 +45,9 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    qint64 getLastDisplayedTime() const;
-    void setLastDisplayedTime(qint64 value);
+    //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
+    qint64 getTimestampOfNextFrameToRender() const;
+    void overrideTimestampOfNextFrameToRender(qint64 value);
     void afterJump();
     QImage getScreenshot();
     void blockTimeValue(qint64 time);

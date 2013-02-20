@@ -89,7 +89,7 @@ void QnResourceWidgetRenderer::update() {
     //}
 }
 
-qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const { 
+qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) const { 
     const RenderingTools& ctx = m_channelRenderers[channel];
     //return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
     if( !ctx.uploader || !ctx.renderer )

@@ -2720,13 +2720,16 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         if(parameters.size() == 0 && display()->widgets().size() == 1) {
             widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
         } else {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Could not export file"), 
-                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
-                QMessageBox::Ok
-            );
-            return;
+            widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
+            if (!widget) {
+                QMessageBox::critical(
+                            this->widget(),
+                            tr("Could not export file"),
+                            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()),
+                            QMessageBox::Ok
+                            );
+                return;
+            }
         }
     } else {
         widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
