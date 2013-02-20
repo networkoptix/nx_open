@@ -184,7 +184,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     }
     else if (message.eventType == Qn::Message_Type_BusinessRuleDelete)
     {
-        emit businessRuleDeleted(message.resourceId);
+        emit businessRuleDeleted(message.resourceId.toInt());
     }
     else if (message.eventType == Qn::Message_Type_BroadcastBusinessAction)
     {

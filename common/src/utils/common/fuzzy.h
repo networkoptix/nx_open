@@ -8,6 +8,19 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
+#define QN_DEFINE_INTEGER_FUZZY_IS_NULL(TYPE)                                   \
+inline bool qFuzzyIsNull(TYPE p) { return p == 0; }
+
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(short)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned short)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(int)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned int)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(long)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned long)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(long long)
+QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned long long)
+#undef QN_DEFINE_INTEGER_FUZZY_IS_NULL
+
 inline bool qFuzzyIsNull(const QPointF &p) {
     return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
 }

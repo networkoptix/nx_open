@@ -52,7 +52,7 @@ public slots:
     static void init(QnBusinessRuleProcessor* instance);
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
-    void at_businessRuleDeleted(QnId id);
+    void at_businessRuleDeleted(int id);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed

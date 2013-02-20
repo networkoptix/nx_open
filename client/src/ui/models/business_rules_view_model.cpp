@@ -140,6 +140,10 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     updateActionTypesModel();
 }
 
+QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
+
+}
+
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
 
@@ -336,7 +340,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-QnId QnBusinessRuleViewModel::id() const {
+int QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 
@@ -853,6 +857,10 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchC
     m_fieldsByColumn[QnBusiness::TargetColumn] = QnBusiness::ActionTypeField | QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField;
 }
 
+QnBusinessRulesViewModel::~QnBusinessRulesViewModel() {
+
+}
+
 QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelIndex &parent) const {
     return hasIndex(row, column, parent) ? createIndex(row, column, 0) : QModelIndex();
 }
@@ -994,7 +1002,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
-void QnBusinessRulesViewModel::deleteRule(QnId id) {
+void QnBusinessRulesViewModel::deleteRule(int id) {
     foreach (QnBusinessRuleViewModel* rule, m_rules) {
         if (rule->id() == id) {
             deleteRule(rule);

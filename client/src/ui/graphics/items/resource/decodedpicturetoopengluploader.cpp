@@ -190,17 +190,17 @@ public:
         m_internalFormat(-1),
         m_textureSize(QSize(0, 0)),
         m_contentSize(QSize(0, 0)),
-        m_id(-1),
+        m_id(std::numeric_limits<GLuint>::max()),
         m_fillValue(-1),
         m_renderer(renderer)
     {}
 
     ~QnGlRendererTexture() {
         //NOTE we do not delete texture here because it belongs to auxiliary gl context which will be removed when these textures are not needed anymore
-        if( m_id != (unsigned int)-1 )
+        if( m_id != std::numeric_limits<GLuint>::max() )
         {
             glDeleteTextures(1, &m_id);
-            m_id = -1;
+            m_id = std::numeric_limits<GLuint>::max();
         }
     }
 
@@ -337,6 +337,14 @@ private:
 //////////////////////////////////////////////////////////
 // DecodedPictureToOpenGLUploader::UploadedPicture
 //////////////////////////////////////////////////////////
+DecodedPictureToOpenGLUploader::UploadedPicture::PBOData::PBOData()
+:
+    id( std::numeric_limits<GLuint>::max() ),
+    sizeBytes( 0 )
+{
+}
+
+
 PixelFormat DecodedPictureToOpenGLUploader::UploadedPicture::colorFormat() const
 {
     return m_colorFormat;
@@ -619,7 +627,8 @@ public:
         m_pictureBuf( NULL ),
         m_uploader( uploader ),
         m_yv12Buffer( NULL ),
-        m_yv12BufferCapacity( 0 )
+        m_yv12BufferCapacity( 0 ),
+        m_pts( 0 )
     {
         setAutoDelete( false );
         memset( m_planes, 0, sizeof(m_planes) );
@@ -692,6 +701,12 @@ public:
     {
         m_pictureBuf = pictureBuf;
         m_picDataRef = picDataRef;
+        m_pts = pictureBuf->pts();
+    }
+
+    quint64 pts() const
+    {
+        return m_pts;
     }
 
     //!Cancelles uploading of picture: sets pointer to picture buffer to NULL and returns previous value
@@ -733,6 +748,7 @@ private:
     uint8_t* m_yv12Buffer;
     size_t m_yv12BufferCapacity;
     QMutex m_mutex;
+    quint64 m_pts;
 
     /*!
         \return false, if method has been interrupted (m_picDataRef->isValid() returned false). true, otherwise
@@ -1399,17 +1415,19 @@ quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
 {
     QMutexLocker lk( &m_mutex );
 
+    if( !m_picturesBeingRendered.empty() )
+        return m_picturesBeingRendered.front()->pts();
     if( !m_picturesWaitingRendering.empty() )
         return m_picturesWaitingRendering.front()->pts();
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     if( !m_framesWaitingUploadInGUIThread.empty() )
         return m_framesWaitingUploadInGUIThread.front()->picture()->pts();
 #endif
-    //TODO/IMPL async upload case (only when HW decoding enabled)
-    if( !m_picturesBeingRendered.empty() )
-        return m_picturesBeingRendered.front()->pts();
+    //async upload case (only when HW decoding enabled)
+    if( !m_usedUploaders.empty() )
+        return m_usedUploaders.front()->pts();
     if( !m_renderedPictures.empty() )
-        return m_renderedPictures.front()->pts();
+        return m_renderedPictures.back()->pts();
     return AV_NOPTS_VALUE;
 }
 
@@ -2031,10 +2049,10 @@ void DecodedPictureToOpenGLUploader::releaseDecodedPicturePool( std::deque<Uploa
     {
         for( size_t i = 0; i < pic->m_pbo.size(); ++i )
         {
-            if( pic->m_pbo[i].id == (GLuint)-1 )
+            if( pic->m_pbo[i].id == std::numeric_limits<GLuint>::max() )
                 continue;
             d->glDeleteBuffers( 1, &pic->m_pbo[i].id );
-            pic->m_pbo[i].id = (GLuint)-1;
+            pic->m_pbo[i].id = std::numeric_limits<GLuint>::max();
         }
         delete pic;
     }
@@ -2057,7 +2075,7 @@ void DecodedPictureToOpenGLUploader::ensurePBOInitialized(
     if( picBuf->m_pbo.size() <= pboIndex )
         picBuf->m_pbo.resize( pboIndex+1 );
 
-    if( picBuf->m_pbo[pboIndex].id == -1 )
+    if( picBuf->m_pbo[pboIndex].id == std::numeric_limits<GLuint>::max() )
     {
         d->glGenBuffers( 1, &picBuf->m_pbo[pboIndex].id );
         DEBUG_CODE(glCheckError("glGenBuffers"));

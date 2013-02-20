@@ -9,7 +9,7 @@
 class QnLinuxMonitorPrivate;
 
 class QnLinuxMonitor: public QnSigarMonitor {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnSigarMonitor base_type;
 
@@ -20,7 +20,7 @@ public:
     virtual QList<HddLoad> totalHddLoad() override;
 
 private:
-    Q_DECLARE_PRIVATE(QnLinuxMonitor);
+    Q_DECLARE_PRIVATE(QnLinuxMonitor)
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;
 };
 #endif // Q_OS_LINUX

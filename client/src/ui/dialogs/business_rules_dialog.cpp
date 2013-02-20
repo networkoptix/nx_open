@@ -81,8 +81,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
-            this, SLOT(at_message_ruleDeleted(QnId)));
+    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
+            this, SLOT(at_message_ruleDeleted(int)));
 
     at_context_userChanged();
     updateControlButtons();
@@ -183,14 +183,9 @@ void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr 
     //TODO: ask user
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
     m_rulesViewModel->deleteRule(id);
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        if (rule->id() == id) {
-            m_pendingDeleteRules.removeOne(rule);
-            return;
-        }
-    }
+    m_pendingDeleteRules.removeOne(id);
     //TODO: ask user
 }
 
@@ -348,9 +343,10 @@ bool QnBusinessRulesDialog::saveAll() {
     foreach (QModelIndex idx, modified) {
         saveRule(m_rulesViewModel->getRuleModel(idx.row()));
     }
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection()->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
-        m_deleting[handle] = rule;
+    foreach (int id, m_pendingDeleteRules) {
+        int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
+                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+        m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();
     return true;
@@ -367,9 +363,8 @@ void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
-    if (ruleModel->id()) {
-        m_pendingDeleteRules.append(ruleModel->createRule());
-    }
+    if (ruleModel->id() > 0)
+        m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
     updateControlButtons();
 }

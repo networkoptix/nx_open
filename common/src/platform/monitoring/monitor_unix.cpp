@@ -1,4 +1,4 @@
-#include "linux_monitor.h"
+#include "monitor_unix.h"
 
 #ifdef Q_OS_LINUX
 

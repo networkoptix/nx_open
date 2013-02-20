@@ -29,17 +29,10 @@ private slots:
     void at_settings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
     void at_mailServers_received();
 
-    void at_testButton_clicked();
-    void at_autoDetectCheckBox_toggled(bool toggled);
-    void at_setupUserButton_clicked();
-
-    void handleServers();
+    void at_advancedCheckBox_toggled(bool toggled);
+    void at_simpleEmail_editingFinished();
 private:
-    void updateSettings();
     void updateMailServers();
-
-    void updateOverlay();
-
 private:
     QScopedPointer<Ui::QnSmtpSettingsWidget> ui;
 
