@@ -95,7 +95,7 @@ qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const {
     if( !ctx.uploader || !ctx.renderer )
         return AV_NOPTS_VALUE;
     qint64 ts = ctx.uploader->nextFrameToDisplayTimestamp();
-    if( ts == AV_NOPTS_VALUE )
+    if( ts == (qint64)AV_NOPTS_VALUE )
         ts = ctx.renderer->lastDisplayedTime();
     return ts;
 }

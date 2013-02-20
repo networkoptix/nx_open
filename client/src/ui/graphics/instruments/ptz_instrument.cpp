@@ -755,6 +755,7 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     disconnect(object, NULL, this, NULL);
 
     PtzData &data = m_dataByWidget[object];
+    //TODO: #elric fix unused variable warning. Is it really unused?
     m_dataByWidget.remove(object);
 }
 

@@ -184,7 +184,7 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
     m_lockedRectCount( 0 ),
     m_planeCount( 0 )
 {
-    for( int i = 0; i < MAX_PLANE_COUNT; ++i )
+    for( uint i = 0; i < MAX_PLANE_COUNT; ++i )
     {
         m_textures[i].reset(new QnGlRendererTexture1());
         //m_textures[i]->ensureAllocated();

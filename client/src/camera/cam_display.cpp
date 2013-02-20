@@ -107,6 +107,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_emptyPacketCounter(0),
     m_isStillImage(false),
     m_isLongWaiting(false),
+    m_skippingFramesStarted(false),
     m_executingChangeSpeed(false),
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
@@ -118,8 +119,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
-    m_doNotChangeDisplayTime(false),
-    m_skippingFramesStarted(false)
+    m_doNotChangeDisplayTime(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
