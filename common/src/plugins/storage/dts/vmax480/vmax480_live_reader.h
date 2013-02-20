@@ -21,6 +21,9 @@ protected:
 
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
+    virtual void beforeRun() override;
+    virtual void afterRun() override;
+
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
     static void receiveVideoStramCallback(PS_ACS_VIDEO_STREAM _stream, long long _user);
@@ -43,6 +46,7 @@ private:
     QWaitCondition m_callbackCond;
     bool m_connectedInternal;
     CLDataQueue m_internalQueue;
+    QTime m_aliveTimer;
 };
 
 #endif //vmax480_live_h_1740
