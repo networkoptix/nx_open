@@ -1934,7 +1934,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         return;
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-        QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId());
+        QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId()).dynamicCast<QnUserResource>();
         name = checkLayoutName(name, user);
         if (name.isEmpty())
             return;
