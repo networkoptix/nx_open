@@ -436,6 +436,8 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
 
     qSort(availableProfiles);
     int profileIndex = isPrimary ? 0 : 1;
+    profileIndex += m_onvifRes->getChannel()* (m_onvifRes->hasDualStreaming() ? 2 : 1);
+
     if (availableProfiles.size() <= profileIndex)
         return 0; // no existing profile matched
 
