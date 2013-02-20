@@ -63,7 +63,7 @@ typedef struct dvdcss_s* dvdcss_t;
 /*
  * Our version number. The variable name contains the interface version.
  */
-LIBDVDCSS_EXPORT const char *        dvdcss_interface_2;
+LIBDVDCSS_EXPORT char *        dvdcss_interface_2;
 
 
 /*

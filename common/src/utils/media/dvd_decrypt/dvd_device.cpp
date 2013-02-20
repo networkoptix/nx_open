@@ -203,7 +203,7 @@ void _dvdcss_check ( dvdcss_t dvdcss )
 
     int i;
 #else
-    const char *ppsz_devices[] = { "/dev/dvd", "/dev/cdrom", "/dev/hdc", NULL };
+    char *ppsz_devices[] = { "/dev/dvd", "/dev/cdrom", "/dev/hdc", NULL };
     int i, i_fd;
 #endif
 

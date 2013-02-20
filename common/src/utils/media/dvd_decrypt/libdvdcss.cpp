@@ -140,7 +140,7 @@
  * The variable itself contains the exact version number of the library,
  * which can be useful for specific feature needs.
  */
-const char * dvdcss_interface_2 = "1.0";
+char * dvdcss_interface_2 = "1.0";
 
 /**
  * \brief Open a DVD device or directory and return a dvdcss instance.
@@ -402,7 +402,7 @@ LIBDVDCSS_EXPORT dvdcss_t dvdcss_open ( char *psz_target )
     /* If the cache is enabled, write the cache directory tag */
     if( psz_cache )
     {
-        const char *psz_tag = "Signature: 8a477f597d28d172789f06886806bc55\r\n"
+        char *psz_tag = "Signature: 8a477f597d28d172789f06886806bc55\r\n"
             "# This file is a cache directory tag created by libdvdcss.\r\n"
             "# For information about cache directory tags, see:\r\n"
             "#   http://www.brynosaurus.com/cachedir/\r\n";
