@@ -1319,7 +1319,8 @@ QString QnWorkbenchActionHandler::checkLayoutName(const QString &name, const QnU
         case QMessageBox::Yes:
             if(snapshotManager()->isLocal(existingLayout))
                 resourcePool()->removeResource(existingLayout); /* This one can be simply deleted from resource pool. */
-            connection()->deleteAsync(existingLayout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+            else
+                connection()->deleteAsync(existingLayout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
             break;
         default:
             break;
@@ -1933,6 +1934,11 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         return;
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId());
+        name = checkLayoutName(name, user);
+        if (name.isEmpty())
+            return;
+
         bool changed = snapshotManager()->isChanged(layout);
 
         resource->setName(name);
