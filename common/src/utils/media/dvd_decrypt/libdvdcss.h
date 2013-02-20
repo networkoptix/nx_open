@@ -108,6 +108,6 @@ __forceinline void print_debug(dvdcss_t dvdcss, const char *msg,...)
     }
 #endif
 
-void _print_error ( dvdcss_t, const char * );
+void _print_error ( dvdcss_t, char * );
 
 #endif /* DVDCSS_LIBDVDCSS_H */
