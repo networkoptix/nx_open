@@ -18,9 +18,9 @@
 			<url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>	
-	
+
 	<properties>
-        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
+		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
@@ -143,6 +143,7 @@
 			</activation>
 			<modules>
 				<module>quicksyncdecoder</module>	
+				<module>vmaxproxy</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
@@ -184,7 +185,7 @@
 				</os> 
 			</activation>
 			<modules>
-			  <!--<module>xvbadecoder</module>-->
+				<!--<module>xvbadecoder</module>-->
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
