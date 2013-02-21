@@ -121,7 +121,7 @@ public:
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
     int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
+    int saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot);
 
     int saveAsync(const QnLayoutResourceList&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
@@ -136,7 +136,8 @@ public:
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int deleteAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
+
+    int deleteRuleAsync(int ruleId, QObject* target, const char* slot);
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 

@@ -472,7 +472,7 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
 
 void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRulePtr& businessRulePtr)
 {
-    pb_businessRule.set_id(businessRulePtr->getId().toInt());
+    pb_businessRule.set_id(businessRulePtr->id());
 
     pb_businessRule.set_eventtype((pb::BusinessEventType) serializeBusinessEventType(businessRulePtr->eventType()));
     foreach(QnResourcePtr res, businessRulePtr->eventResources())
@@ -486,7 +486,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 
     pb_businessRule.set_aggregationperiod(businessRulePtr->aggregationPeriod());
-    pb_businessRule.set_disabled(businessRulePtr->isDisabled());
+    pb_businessRule.set_disabled(businessRulePtr->disabled());
     pb_businessRule.set_comments(businessRulePtr->comments().toUtf8());
     pb_businessRule.set_schedule(businessRulePtr->schedule().toUtf8());
 }

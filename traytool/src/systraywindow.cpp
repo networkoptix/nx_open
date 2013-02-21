@@ -451,7 +451,7 @@ void QnSystrayWindow::at_mediaServerStopAction()
             StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
             connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
             QThreadPool::globalInstance()->start(stopTask);
-            m_mediaServerStopAction->setEnabled(false);
+            updateServiceInfoInternal(m_mediaServerHandle, SERVICE_STOP_PENDING, MEDIA_SERVER_NAME, m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
         }
     }
 }
@@ -472,7 +472,7 @@ void QnSystrayWindow::at_appServerStopAction()
             StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_appServerHandle);
             connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
             QThreadPool::globalInstance()->start(stopTask);
-            m_appServerStartAction->setEnabled(false);
+            updateServiceInfoInternal(m_appServerHandle, SERVICE_STOP_PENDING,  APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
         }
     }
 }

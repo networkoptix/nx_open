@@ -94,6 +94,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
 
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
     connect(ui->resolutionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
+    connect(ui->fullscreenButton, SIGNAL(toggled(bool)), ui->screenComboBox, SLOT(setEnabled(bool)));
 
     updateDisableAeroCheckbox();
 }

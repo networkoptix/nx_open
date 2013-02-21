@@ -41,9 +41,8 @@ struct coord_type<QPointF> {
     typedef qreal type;
 };
 
-
 template<class T> 
-inline T polarToCartesian(typename coord_type<T>::type alpha, typename coord_type<T>::type r);
+inline T polarToCartesian(typename coord_type<T>::type r, typename coord_type<T>::type alpha);
 
 template<>
 inline QVector2D polarToCartesian<QVector2D>(float r, float alpha) {
@@ -53,6 +52,14 @@ inline QVector2D polarToCartesian<QVector2D>(float r, float alpha) {
 template<>
 inline QPointF polarToCartesian<QPointF>(qreal r, qreal alpha) {
     return QPointF(r * std::cos(alpha), r * std::sin(alpha));
+}
+
+template<class T>
+inline QnPolarPoint<typename coord_type<T>::type> cartesianToPolar(const T &vector) {
+    QnPolarPoint<typename coord_type<T>::type> result;
+    result.r = std::sqrt(vector.x() * vector.x() + vector.y() * vector.y());
+    result.alpha = std::atan2(vector.y(), vector.x());
+    return result;
 }
 
 

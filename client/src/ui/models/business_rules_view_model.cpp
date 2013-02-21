@@ -140,6 +140,10 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     updateActionTypesModel();
 }
 
+QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
+
+}
+
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
 
@@ -270,7 +274,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
 
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
-    m_id = businessRule->getId();
+    m_id = businessRule->id();
     m_modified = false;
     m_eventType = businessRule->eventType();
 
@@ -292,7 +296,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    m_disabled = businessRule->isDisabled();
+    m_disabled = businessRule->disabled();
     m_comments = businessRule->comments();
     m_schedule = businessRule->schedule();
 
@@ -336,7 +340,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-QnId QnBusinessRuleViewModel::id() const {
+int QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 
@@ -853,6 +857,10 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchC
     m_fieldsByColumn[QnBusiness::TargetColumn] = QnBusiness::ActionTypeField | QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField;
 }
 
+QnBusinessRulesViewModel::~QnBusinessRulesViewModel() {
+
+}
+
 QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelIndex &parent) const {
     return hasIndex(row, column, parent) ? createIndex(row, column, 0) : QModelIndex();
 }
@@ -974,7 +982,7 @@ void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
 
 void QnBusinessRulesViewModel::updateRule(QnBusinessEventRulePtr rule) {
     foreach (QnBusinessRuleViewModel* ruleModel, m_rules) {
-        if (ruleModel->id() == rule->getId()) {
+        if (ruleModel->id() == rule->id()) {
             ruleModel->loadFromRule(rule);
             return;
         }
@@ -994,7 +1002,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
-void QnBusinessRulesViewModel::deleteRule(QnId id) {
+void QnBusinessRulesViewModel::deleteRule(int id) {
     foreach (QnBusinessRuleViewModel* rule, m_rules) {
         if (rule->id() == id) {
             deleteRule(rule);

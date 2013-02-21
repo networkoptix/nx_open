@@ -178,11 +178,11 @@ inline double qMod(double l, double r) {
  * \param step                          Rounding step, must be positive.
  * \returns                             Rounded value.
  */
-template<class T>
-T qCeil(T value, T step) {
+template<class T, class Step>
+T qCeil(T value, Step step) {
     DEBUG_CODE(assert(step > 0));
-    value = value + step - 1;
-    return value - qMod(value, step);
+    T mod = qMod(value, static_cast<T>(step));
+    return qFuzzyIsNull(mod) ? value : static_cast<T>(value + step);
 }
 
 /**
@@ -190,10 +190,10 @@ T qCeil(T value, T step) {
  * \param step                          Rounding step, must be positive.
  * \returns                             Rounded value.
  */
-template<class T>
-T qFloor(T value, T step) {
+template<class T, class Step>
+T qFloor(T value, Step step) {
     DEBUG_CODE(assert(step > 0));
-    return qCeil(value - step + 1, step);
+    return value - qMod(value, static_cast<T>(step));
 }
 
 /**
@@ -201,10 +201,10 @@ T qFloor(T value, T step) {
  * \param step                          Rounding step, must be positive.
  * \returns                             Rounded value.
  */
-template<class T>
-T qRound(T value, T step) {
+template<class T, class Step>
+T qRound(T value, Step step) {
     DEBUG_CODE(assert(step > 0));
-    return qCeil(value - step / 2, step);
+    return qFloor(value + static_cast<T>(step) / 2, step);
 }
 
 /**

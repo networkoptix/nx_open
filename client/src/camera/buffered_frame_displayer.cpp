@@ -63,13 +63,13 @@ void QnBufferedFrameDisplayer::clear() {
     start();
 }
 
-qint64 QnBufferedFrameDisplayer::getLastDisplayedTime() 
+qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() 
 {
     QMutexLocker lock(&m_sync);
     return m_lastDisplayedTime;
 }
 
-void QnBufferedFrameDisplayer::setLastDisplayedTime(qint64 value)
+void QnBufferedFrameDisplayer::overrideTimestampOfNextFrameToRender(qint64 value)
 {
     QMutexLocker lock(&m_sync);
     m_lastDisplayedTime = value;

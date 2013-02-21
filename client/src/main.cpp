@@ -251,19 +251,19 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
-    QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
-    QnClientModule client(argc, argv);
-    
 #ifdef Q_WS_X11
-	XInitThreads();
+    XInitThreads();
 #endif
-
-    QTextStream out(stdout);
-    QThread::currentThread()->setPriority(QThread::HighestPriority);
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
+
+    QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
+    QnClientModule client(argc, argv);
+
+    QTextStream out(stdout);
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));

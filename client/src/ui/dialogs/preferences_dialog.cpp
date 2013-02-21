@@ -296,9 +296,11 @@ void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &co
 }
 
 void QnPreferencesDialog::at_context_userChanged() {
-    ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
-    ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission);
-    if (accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission) {
+    bool isAdmin = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+
+    ui->tabWidget->setTabEnabled(m_licenseTabIndex, isAdmin);
+    ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, isAdmin);
+    if (isAdmin) {
         m_serverSettingsWidget->update();
     }
 }

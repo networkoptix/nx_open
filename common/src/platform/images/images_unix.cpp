@@ -1,4 +1,4 @@
-#include "x11_images.h"
+#include "images_unix.h"
 
 #ifdef Q_WS_X11
 

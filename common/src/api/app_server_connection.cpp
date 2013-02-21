@@ -432,9 +432,6 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
         return saveAsync(user, target, slot);
     else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return saveAsync(layout, target, slot);
-    else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>())
-        return saveAsync(rule, target, slot);
-
     return 0;
 }
 
@@ -911,9 +908,9 @@ int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObjec
     return deleteObjectAsync(layoutObject, layout->getId().toInt(), target, slot);
 }
 
-int QnAppServerConnection::deleteAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
+int QnAppServerConnection::deleteRuleAsync(int ruleId, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(businessRuleObject, rule->getId().toInt(), target, slot);
+    return deleteObjectAsync(businessRuleObject, ruleId, target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {
@@ -925,8 +922,6 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
         return deleteAsync(user, target, slot);
     } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         return deleteAsync(layout, target, slot);
-    } else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>()) {
-        return deleteAsync(rule, target, slot);
     } else {
         qWarning() << "Cannot delete resources of type" << resource->metaObject()->className();
         return 0;

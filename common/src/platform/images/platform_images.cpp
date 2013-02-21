@@ -1,9 +1,9 @@
 #include "platform_images.h"
 
 #if defined Q_OS_WIN
-#   include "windows_images.h"
+#   include "images_win.h"
 #elif defined Q_WS_X11
-#   include "x11_images.h"
+#   include "images_unix.h"
 #else
 #   include "generic_images.h"
 #endif

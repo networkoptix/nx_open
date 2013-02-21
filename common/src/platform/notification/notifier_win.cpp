@@ -1,4 +1,4 @@
-#include "windows_notifier.h"
+#include "notifier_win.h"
 
 #ifdef Q_OS_WIN
 
