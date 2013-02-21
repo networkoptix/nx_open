@@ -400,7 +400,7 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
             }
             else
             {
-                for (int y = yPos; y < yPos + cursorHeight; ++y)
+                for (int y = yPos - cursorHeight; y < yPos; ++y)
                 {
                     for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
                     {
@@ -461,7 +461,7 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                 }
                 else
                 {
-                    for (int y = yPos; y < yPos + cursorHeight; ++y)
+                    for (int y = yPos-cursorHeight; y < yPos; ++y)
                     {
                         for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
                         {
@@ -500,7 +500,7 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                 }
                 else
                 {
-                    for (int y = yPos; y < yPos + cursorHeight; ++y)
+                    for (int y = yPos-cursorHeight; y < yPos; ++y)
                     {
                         for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
                         {
