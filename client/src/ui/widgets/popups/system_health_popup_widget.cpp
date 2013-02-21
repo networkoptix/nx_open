@@ -69,8 +69,10 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     }
 
     emit closed(m_messageType, ui->ignoreCheckBox->isChecked());
+    hide();
 }
 
 void QnSystemHealthPopupWidget::at_postponeButton_clicked() {
     emit closed(m_messageType, ui->ignoreCheckBox->isChecked());
+    hide();
 }
