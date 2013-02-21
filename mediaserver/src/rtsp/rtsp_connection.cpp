@@ -37,6 +37,8 @@
 
 class QnTcpListener;
 
+static const QByteArray ENDL("\r\n");
+
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------

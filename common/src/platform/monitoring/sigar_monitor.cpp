@@ -70,17 +70,17 @@ public:
         return result;
     }
 
-    QnPlatformMonitor::PartitionSpace partitionUsage(const QString &dir) {
+    QnPlatformMonitor::PartitionSpace partitionUsage(const QString &path) {
         QnPlatformMonitor::PartitionSpace result;
 
         if(!sigar)
             return result;
 
         sigar_file_system_usage_t usage;
-        if(INVOKE(sigar_file_system_usage_get(sigar, dir.toLatin1().constData(), &usage)) != SIGAR_OK)
+        if(INVOKE(sigar_file_system_usage_get(sigar, path.toLatin1().constData(), &usage)) != SIGAR_OK)
             return result;
 
-        result.partition = dir; // TODO
+        result.path = path; // TODO
         result.freeBytes = usage.free * 1024;
         result.sizeBytes = usage.total * 1024;
 

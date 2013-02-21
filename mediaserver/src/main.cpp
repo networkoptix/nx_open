@@ -707,7 +707,7 @@ void QnMain::initTcpListener()
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true));
+    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true)); // TODO: deprecated
     QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());

@@ -65,12 +65,11 @@ public:
      */
     struct PartitionSpace {
         PartitionSpace(): freeBytes(0), sizeBytes(0) {}
-        PartitionSpace(const QString &partition, quint64 freeBytes, quint64 sizeBytes):
-            partition(partition), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
+        PartitionSpace(const QString &path, quint64 freeBytes, quint64 sizeBytes):
+            path(path), freeBytes(freeBytes), sizeBytes(sizeBytes) {}
 
-        /** Platform-specific string describing this logical partition,
-         *  suitable to be shown to the user. */
-        QString partition;
+        /** Partition's root path. */
+        QString path;
 
         /** Free space of this partition in bytes */
         quint64 freeBytes;
