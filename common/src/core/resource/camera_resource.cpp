@@ -1,5 +1,6 @@
 #include "camera_resource.h"
 #include "resource_consumer.h"
+#include "api/app_server_connection.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_scheduleDisabled(true),
@@ -167,5 +168,14 @@ QString QnVirtualCameraResource::getUniqueId() const
 	else 
 		return getPhysicalId();
 
+}
+
+void QnVirtualCameraResource::save()
+{
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
+        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
+            << getPhysicalId() << ". Description: " << conn->getLastError();
+    }
 }
 

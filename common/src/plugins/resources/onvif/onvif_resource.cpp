@@ -1111,15 +1111,6 @@ QString QnPlOnvifResource::getPtzfUrl() const
     return m_ptzUrl;
 }
 
-void QnPlOnvifResource::save()
-{
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
-        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-                    << getPhysicalId() << ". Description: " << conn->getLastError();
-    }
-}
-
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
 {
     int netoptixDelta = QnQualityHighest - QnQualityLowest;

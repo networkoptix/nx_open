@@ -195,3 +195,9 @@ void* QnTcpListener::getOpenSSLContext()
     Q_D(QnTcpListener);
     return d->ctx;
 }
+
+int QnTcpListener::getPort() const
+{
+    Q_D(const QnTcpListener);
+    return d->serverSocket ? d->serverSocket->getLocalPort() : 0;
+}

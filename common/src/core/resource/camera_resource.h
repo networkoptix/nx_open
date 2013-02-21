@@ -48,7 +48,8 @@ public:
     void setFirmware(QString firmware);
 
 	virtual QString getUniqueId() const override;
-
+protected:
+    void save();
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource metaobject support
 // -------------------------------------------------------------------------- //

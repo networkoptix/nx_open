@@ -25,6 +25,8 @@ public:
     void* getOpenSSLContext();
     bool enableSSLMode();
 
+    int getPort() const;
+
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;

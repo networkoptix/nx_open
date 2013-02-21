@@ -245,8 +245,6 @@ private:
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
 
-    void save();
-
     int round(float value);
     QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList);
