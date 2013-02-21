@@ -958,7 +958,11 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+
+#ifdef Q_OS_WIN
+    if (QString(QN_CUSTOMIZATION_NAME) == "digitalwatchdog")
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+#endif
 
     //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
