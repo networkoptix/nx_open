@@ -29,6 +29,15 @@ QnVMax480LiveProvider::~QnVMax480LiveProvider()
 
 QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 {
+    if (!isStreamOpened()) {
+        openStream();
+        if (!isStreamOpened())
+            return QnAbstractMediaDataPtr(0);
+    }
+
+    if (needMetaData())
+        return getMetaData();
+
     QnAbstractDataPacketPtr result;
     QTime getTimer;
     getTimer.restart();
