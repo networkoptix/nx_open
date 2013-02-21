@@ -980,11 +980,6 @@ void PtzInstrument::startDrag(DragInfo *) {
         manipulator()->setCursor(Qt::BlankCursor);
         target()->setCursor(Qt::BlankCursor);
         opacityAnimator(overlayWidget(target())->arrowItem(), 0.5)->animateTo(1.0);
-
-        const PtzData &data = m_dataByWidget[target()]; // TODO
-        if(data.capabilities & Qn::OctagonalPtzCapability)
-            opacityAnimator(overlayWidget(target())->pointerItem(), 0.5)->animateTo(1.0);
-
         /* Everything else will be initialized in the first call to drag(). */
     }
 
@@ -1037,15 +1032,11 @@ void PtzInstrument::dragMove(DragInfo *info) {
         }
 
         qreal speedMagnitude = length(speed);
-        QPointF arrowPos = QPointF(speed.x() * scale, -speed.y() * scale) + target()->rect().center();
         qreal arrowSize = scale / 16.0 * (0.4 + 2.6 * speedMagnitude);
 
         PtzArrowItem *arrowItem = overlayWidget(target())->arrowItem();
-        arrowItem->moveTo(target()->rect().center(), arrowPos);
+        arrowItem->moveTo(target()->rect().center(), info->mouseItemPos());
         arrowItem->setSize(QSize(arrowSize, arrowSize));
-
-        if(data.capabilities & Qn::OctagonalPtzCapability)
-            overlayWidget(target())->pointerItem()->setPos(info->mouseItemPos());
 
         ptzMove(target(), QVector3D(speed));
     }
@@ -1070,7 +1061,6 @@ void PtzInstrument::finishDrag(DragInfo *) {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
             opacityAnimator(overlayWidget(target())->arrowItem())->animateTo(0.0);
-            opacityAnimator(overlayWidget(target())->pointerItem())->animateTo(0.0);
         }
     }
 

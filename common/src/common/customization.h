@@ -45,7 +45,7 @@ namespace Qn {
 
 /**
  * \returns                             Customization with which this software
- *                                      version was built with.
+ *                                      version was built.
  */
 inline Qn::Customization qnCustomization() {
     /* Note that Q_GLOBAL_STATIC and other synchronization is not needed here. */
