@@ -155,8 +155,13 @@ void QnPreferencesDialog::initLanguages() {
 void QnPreferencesDialog::accept() {
     QString oldLanguage = m_settings->translationPath();
     submitToSettings();
-    if (oldLanguage != m_settings->translationPath())
-        QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
+    if (oldLanguage != m_settings->translationPath()) {
+        QMessageBox::StandardButton button =
+            QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart. Press OK to close application now."),
+                                     QMessageBox::Ok, QMessageBox::Cancel);
+        if (button == QMessageBox::Ok)
+            qApp->exit();
+    }
     //m_youTubeSettingsWidget->accept();
     base_type::accept();
 }
