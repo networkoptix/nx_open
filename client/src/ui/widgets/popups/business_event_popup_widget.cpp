@@ -76,6 +76,7 @@ QnBusinessEventPopupWidget::~QnBusinessEventPopupWidget()
 
 void QnBusinessEventPopupWidget::at_okButton_clicked() {
     emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
+    hide();
 }
 
 void QnBusinessEventPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
