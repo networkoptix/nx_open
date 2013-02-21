@@ -242,7 +242,8 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
     VMaxHeader[2] = (quint8) _stream->mSrcType;
     VMaxHeader[3] = (quint8) isIFrame;
     *(quint32*)(VMaxHeader+4) = dataSize;
-    *(quint64*)(VMaxHeader+8) = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000; //packetTimestamp.toMSecsSinceEpoch() * 1000;;
+    //*(quint64*)(VMaxHeader+8) = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+    *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
     m_socket->send(VMaxHeader, sizeof(VMaxHeader));
     if (isIFrame)
         m_socket->send(m_spsPpsBuffer, m_spsPpsBufferLen);
