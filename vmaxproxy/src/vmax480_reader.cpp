@@ -128,7 +128,7 @@ void QnVMax480Provider::connect(VMaxParamList params, quint8 sequence)
 
     create_acs_source(&m_ACSStream);
 
-    //m_ACSStream->setRecvAudioStreamCallback(receiveAudioStramCallback , (long long)this);
+    m_ACSStream->setRecvAudioStreamCallback(receiveAudioStramCallback , (long long)this);
     m_ACSStream->setRecvVideoStreamCallback(receiveVideoStramCallback , (long long)this);
     m_ACSStream->setRecvResultCallback(receiveResultCallback , (long long)this);
 
@@ -270,7 +270,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
             if( _result->mResult == true )
             {
                 m_ACSStream->openChannel(1 << m_channelNum);
-                //m_ACSStream->openAudioChannel(1 << m_channelNum);
+                m_ACSStream->openAudioChannel(1 << m_channelNum);
             }
             break;
         }
@@ -384,4 +384,25 @@ void QnVMax480Provider::receiveAudioStream(S_ACS_AUDIO_STREAM* _stream)
 {
     QMutexLocker lock(&m_callbackMutex);
 
+    ACS_audio_codec::A_CODEC_TYPE codec = (ACS_audio_codec::A_CODEC_TYPE) _stream->mSrcType;
+
+    QDateTime packetTimestamp = fromNativeTimestamp(_stream->mDate, _stream->mTime, _stream->mMillisec);
+
+    quint8 VMaxHeader[16];
+    VMaxHeader[0] = m_sequence;
+    VMaxHeader[1] = VMAXDT_GotAudioPacket;
+    VMaxHeader[2] = (quint8) _stream->mSrcType;
+    VMaxHeader[3] = 0;
+    *(quint32*)(VMaxHeader+4) = _stream->mSrcSize;
+    *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
+    
+    quint8 VMaxAudioHeader[4];
+
+    VMaxAudioHeader[0] = (quint8) _stream->mChannels;
+    VMaxAudioHeader[1] = (quint8) _stream->mSamplingbits;
+    *(quint16*)(VMaxHeader+2) = (quint16) _stream->mSamplingrate;
+
+    //m_socket->send(VMaxHeader, sizeof(VMaxHeader));
+    //m_socket->send(VMaxAudioHeader, sizeof(VMaxAudioHeader));
+    //m_socket->send(_stream->mSrc, _stream->mSrcSize);
 }
