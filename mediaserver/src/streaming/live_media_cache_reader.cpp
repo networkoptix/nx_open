@@ -5,7 +5,7 @@
 #include "live_media_cache_reader.h"
 
 
-LiveMediaCacheReader::LiveMediaCacheReader( const MediaStreamCache* mediaCache, quint64 startTimestamp )
+LiveMediaCacheReader::LiveMediaCacheReader( MediaStreamCache* mediaCache, quint64 startTimestamp )
 :
     m_mediaCache( mediaCache ),
     m_readCtx( mediaCache, startTimestamp )

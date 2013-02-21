@@ -1,0 +1,29 @@
+////////////////////////////////////////////////////////////
+// 20 feb 2012    Andrey Kolesnikov
+////////////////////////////////////////////////////////////
+
+#include "abstract_media_data_filter.h"
+
+
+AbstractMediaDataFilter::AbstractMediaDataFilter( const QSharedPointer<AbstractOnDemandDataProvider>& dataSource )
+:
+    m_dataSource( dataSource )
+{
+    Q_ASSERT( m_dataSource );
+}
+
+bool AbstractMediaDataFilter::tryRead( QnAbstractDataPacketPtr* const data )
+{
+    if( !m_dataSource->tryRead( data ) )
+        return false;
+    if( !data )
+        return true;
+    *data = processData( data );
+    return true;
+}
+
+//!Implementation of AbstractOnDemandDataProvider::currentPos
+quint64 AbstractMediaDataFilter::currentPos() const
+{
+    return m_dataSource->currentPos();
+}

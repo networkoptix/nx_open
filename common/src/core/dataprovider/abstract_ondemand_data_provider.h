@@ -39,4 +39,6 @@ signals:
     void dataAvailable( AbstractOnDemandDataProvider* pThis );
 };
 
+typedef QSharedPointer<AbstractOnDemandDataProvider> AbstractOnDemandDataProviderPtr;
+
 #endif  //ABSTRACTONDEMANDDATAPROVIDER_H

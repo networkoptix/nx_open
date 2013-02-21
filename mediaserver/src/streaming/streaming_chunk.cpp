@@ -29,7 +29,7 @@ const StreamingChunkCacheKey& StreamingChunk::params() const
 QString StreamingChunk::mimeType() const
 {
     //TODO/IMPL/HLS
-    return QString();
+    return QLatin1String("video/mp2t");
 }
 
 //!Returns whole chunk data
@@ -79,4 +79,16 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
     }
 
     emit newDataIsAvailable( this, 0 );
+}
+
+bool StreamingChunk::isClosed() const
+{
+    QMutexLocker lk( &m_mutex );
+    return !m_isOpenedForModification;
+}
+
+size_t StreamingChunk::sizeInBytes() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_data.size();
 }

@@ -89,6 +89,8 @@ public:
     void appendData( const QByteArray& data );
     //!
     void doneModification( ResultCode result );
+    bool isClosed() const;
+    size_t sizeInBytes() const;
 
 signals:
     /*!

@@ -6,6 +6,7 @@
 
 #include <QMutexLocker>
 
+#include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
@@ -25,9 +26,8 @@ using namespace std;
 
 //!Maximum time (in micros) by which requested chunk start time may be in future
 static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30000000;
-static const int TRANSCODE_THREAD_COUNT = 4;
+static const int TRANSCODE_THREAD_COUNT = 1;
 static const int MICROS_IN_SECOND = 1000000;
-
 
 StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
 :
@@ -139,7 +139,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         }
     }
 
-#if 0
+#if 0   //TODO/IMPL creating archive reader
     //checking archive
     QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->createDataProvider( QnResource::Role_Archive ) );
     if( !dp )
@@ -307,7 +307,7 @@ bool StreamingChunkTranscoder::startTranscoding(
     transcoderThread->startTranscoding(
         transcodingID,
         chunk,
-        dataSource,
+        AbstractOnDemandDataProviderPtr( new H264Mp4ToAnnexB( dataSource ) ),
         transcodeParams,
         transcoder.release() );
 

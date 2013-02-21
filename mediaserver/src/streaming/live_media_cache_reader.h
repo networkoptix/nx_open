@@ -16,13 +16,13 @@ class LiveMediaCacheReader
     public AbstractOnDemandDataProvider
 {
 public:
-    LiveMediaCacheReader( const MediaStreamCache* mediaCache, quint64 startTimestamp );
+    LiveMediaCacheReader( MediaStreamCache* mediaCache, quint64 startTimestamp );
 
     virtual bool tryRead( QnAbstractDataPacketPtr* const data ) override;
     virtual quint64 currentPos() const override;
 
 private:
-    const MediaStreamCache* m_mediaCache;
+    MediaStreamCache* m_mediaCache;
     MediaStreamCache::SequentialReadContext m_readCtx;
 };
 

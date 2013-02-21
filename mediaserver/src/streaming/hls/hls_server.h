@@ -10,9 +10,11 @@
 #include <QWaitCondition>
 
 #include <core/resource/media_resource.h>
+#include <utils/media/mediaindex.h>
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
 
+#include "hls_live_playlist_manager.h"
 #include "../streaming_chunk.h"
 #include "../streaming_chunk_cache_key.h"
 
@@ -76,18 +78,19 @@ private:
     */
     bool prepareDataToSend();
     nx_http::StatusCode::Value getHLSPlaylist(
+        const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response );
-    nx_http::StatusCode::Value getLivePlaylist(
+    nx_http::StatusCode::Value getLiveChunkPlaylist(
         QnMediaResourcePtr mediaResource,
         const std::multimap<QString, QString>& requestParams,
-        nx_http::Response* const response );
-    nx_http::StatusCode::Value getArchivePlaylist(
+        std::vector<HLSLivePlaylistManager::ChunkData>* const chunkList );
+    nx_http::StatusCode::Value getArchiveChunkPlaylist(
         const QnMediaResourcePtr& mediaResource,
         const QDateTime& startTimestamp,
         const std::multimap<QString, QString>& requestParams,
-        nx_http::Response* const response );
+        std::vector<HLSLivePlaylistManager::ChunkData>* const chunkList );
     nx_http::StatusCode::Value getResourceChunk(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,

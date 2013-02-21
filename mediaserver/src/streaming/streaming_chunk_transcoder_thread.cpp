@@ -4,6 +4,8 @@
 
 #include "streaming_chunk_transcoder_thread.h"
 
+#include <fstream>
+
 #include <QMutexLocker>
 
 #include <transcoding/ffmpeg_transcoder.h>
@@ -11,15 +13,20 @@
 
 #include "streaming_chunk.h"
 
+#ifdef _DEBUG
+#define SAVE_INPUT_STREAM_TO_FILE
+#endif
+
 
 using namespace std;
 
 StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext()
 :
     chunk( NULL ),
-    transcoder( 0 ),
-    dataAvailable( false ),
+    transcoder( NULL ),
+    dataAvailable( true ),
     msTranscoded( 0 ),
+    packetsTranscoded( 0 ),
     prevPacketTimestamp( -1 )
 {
 }
@@ -33,7 +40,11 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
     chunk( _chunk ),
     dataSource( _dataSource ),
     transcodeParams( _transcodeParams ),
-    transcoder( _transcoder )
+    transcoder( _transcoder ),
+    dataAvailable( true ),
+    msTranscoded( 0 ),
+    packetsTranscoded( 0 ),
+    prevPacketTimestamp( -1 )
 {
 }
 
@@ -106,6 +117,10 @@ void StreamingChunkTranscoderThread::run()
 {
     NX_LOG( QLatin1String("StreamingChunkTranscoderThread started"), cl_logDEBUG1 );
 
+#ifdef SAVE_INPUT_STREAM_TO_FILE
+    std::ofstream m_inputFile( "c:\\Temp\\chunk.264", std::ios_base::binary );
+#endif
+
     int prevReadTranscodingID = 0;
     while( !needToStop() )
     {
@@ -113,7 +128,7 @@ void StreamingChunkTranscoderThread::run()
 
         //taking context with data - trying to find context different from previous one
         std::map<int, TranscodeContext*>::iterator transcodeIter = m_transcodeContext.upper_bound( prevReadTranscodingID );
-        for( int i = 0; i < m_transcodeContext.size(); ++i )
+        for( size_t i = 0; i < m_transcodeContext.size(); ++i )
         {
             if( transcodeIter == m_transcodeContext.end() )
                 transcodeIter = m_transcodeContext.begin();
@@ -134,7 +149,10 @@ void StreamingChunkTranscoderThread::run()
         //performing transcode
         QnAbstractDataPacketPtr srcPacket;
         if( !transcodeIter->second->dataSource->tryRead( &srcPacket ) )
+        {
+            transcodeIter->second->dataAvailable = false;
             continue;
+        }
 
         if( !srcPacket )
         {
@@ -148,6 +166,9 @@ void StreamingChunkTranscoderThread::run()
 
         QnByteArray resultStream( 1, 1024 );
         //TODO/IMPL/HLS releasing mutex lock for transcodePacket call
+#ifdef SAVE_INPUT_STREAM_TO_FILE
+        m_inputFile.write( srcMediaData->data.constData(), srcMediaData->data.size() );
+#endif
         int res = transcodeIter->second->transcoder->transcodePacket( srcMediaData, resultStream );
         if( res )
         {
@@ -157,10 +178,12 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
+        ++transcodeIter->second->packetsTranscoded;
+
         //TODO/IMPL/HLS protect from discontinuity in timestamp
         if( transcodeIter->second->prevPacketTimestamp == -1 )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;
-        if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000 )
+        if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000UL )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;   //discontinuity
         if( srcMediaData->timestamp > transcodeIter->second->prevPacketTimestamp )
         {
@@ -172,9 +195,11 @@ void StreamingChunkTranscoderThread::run()
         if( resultStream.size() > 0 )
             transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );
 
-        //if( transcodeIter->second->msTranscoded >= transcodeIter->second->transcodeParams.duration() )
         if( transcodeIter->second->dataSource->currentPos() >= transcodeIter->second->transcodeParams.endTimestamp() )
         {
+#ifdef SAVE_INPUT_STREAM_TO_FILE
+            m_inputFile.close();
+#endif
             //neccessary source data has been processed, depleting transcoder buffer
             for( ;; )
             {

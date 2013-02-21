@@ -147,6 +147,8 @@ namespace nx_http
                     return StringType("OK");
                 case noContent:
                     return StringType("No Content");
+                case partialContent:
+                    return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
                 case badRequest:
@@ -385,6 +387,21 @@ namespace nx_http
             delete response;
         request = NULL;
         type = MessageType::none;
+    }
+
+    BufferType Message::toString() const
+    {
+        BufferType str;
+        switch( type )
+        {
+            case MessageType::request:
+                request->serialize( &str );
+                break;
+            case MessageType::response:
+                response->serialize( &str );
+                break;
+        }
+        return str;
     }
 
 

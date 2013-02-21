@@ -56,6 +56,7 @@ private:
         QnFfmpegTranscoder* transcoder;
         bool dataAvailable;
         quint64 msTranscoded; 
+        quint64 packetsTranscoded;
         //!-1, if no prev packet
         qint64 prevPacketTimestamp;
 

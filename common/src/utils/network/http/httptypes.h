@@ -150,6 +150,7 @@ namespace nx_http
             _continue = 100,
             ok = 200,
             noContent = 204,
+            partialContent = 206,
             multipleChoices = 300,
             badRequest = 400,
             unauthorized = 401,
@@ -253,6 +254,7 @@ namespace nx_http
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };
         const HttpHeaders& headers() const { return type == MessageType::request ? request->headers : response->headers; };
+        BufferType toString() const;
     };
 
     //!Contains http header structures

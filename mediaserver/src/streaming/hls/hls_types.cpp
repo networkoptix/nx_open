@@ -4,6 +4,8 @@
 
 #include "hls_types.h"
 
+#include <cmath>
+
 
 namespace nx_hls
 {
@@ -28,8 +30,8 @@ namespace nx_hls
             i < chunks.size();
             ++i )
         {
-            if( chunks[i].duration > targetDuration )
-                targetDuration = chunks[i].duration;
+            if( std::ceil(chunks[i].duration) > targetDuration )
+                targetDuration = std::ceil(chunks[i].duration);
         }
 
         QByteArray playlistStr;

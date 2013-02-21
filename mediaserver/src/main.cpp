@@ -395,6 +395,11 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler(type, msg);
 }
 
+#ifdef _DEBUG
+#define ENABLE_HTTP_LOGGING
+#endif
+QnLog* requestsLog = NULL;
+
 int serverMain(int argc, char *argv[])
 {
     Q_UNUSED(argc)
@@ -428,6 +433,11 @@ int serverMain(int argc, char *argv[])
 
         return 0;
     }
+
+#ifdef ENABLE_HTTP_LOGGING
+    requestsLog = new QnLog();
+    requestsLog->create( dataLocation + QLatin1String("/log/msg_log"), 1024*1024*10, 5, cl_logDEBUG1 );
+#endif
 
     QString logLevel;
 

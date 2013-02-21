@@ -145,6 +145,22 @@ void QnByteArray::removeTrailingZeros()
         --m_size;
 }
 
+QnByteArray& QnByteArray::operator=( const QnByteArray& right )
+{
+    if( m_ownBuffer )
+        qFreeAligned(m_data);
+
+    m_alignment = right.m_alignment;
+    m_capacity = right.m_size;
+    m_size = right.m_size;
+    m_data = (char*)qMallocAligned( m_capacity + QN_BYTE_ARRAY_PADDING, m_alignment ); 
+    memcpy( m_data, right.constData(), right.size() );
+    m_ignore = 0;
+    m_ownBuffer = true;
+
+    return *this;
+}
+
 bool QnByteArray::reallocate(unsigned int capacity)
 {
     Q_ASSERT(capacity > 0);

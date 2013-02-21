@@ -6,12 +6,14 @@
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/resource/resource_consumer.h>
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "streaming/hls/hls_live_playlist_manager.h"
 #include "utils/media/media_stream_cache.h"
 #include "utils/media/mediaindex.h"
 
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
+class HLSLivePlaylistManager;
 
 class QnVideoCamera: public QObject
 {
@@ -50,6 +52,8 @@ public:
     const MediaIndex* mediaIndex() const;
     MediaIndex* mediaIndex();
 
+    const HLSLivePlaylistManager* hlsLivePlaylistManager() const;
+
     //!Starts caching live stream, if not started
     /*!
         \return true, if started, false if failed to start
@@ -71,6 +75,7 @@ private:
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     std::auto_ptr<MediaStreamCache> m_liveCache;
+    std::auto_ptr<HLSLivePlaylistManager> m_hlsLivePlaylistManager;
     MediaIndex m_mediaIndex;
 
     bool ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader );

@@ -168,7 +168,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 videoHeight = decoder.getHeight();
                 if (videoWidth < 1 || videoHeight < 1)
                 {
-                    m_lastErrMessage = tr("Transcoder error: for direct stream copy video frame size must exists");
+                    m_lastErrMessage = tr("Transcoder error: for direct stream copy video frame size must exist");
                     return -3;
                 }
             }
