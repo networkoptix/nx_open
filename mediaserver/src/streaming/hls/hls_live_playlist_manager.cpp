@@ -73,7 +73,7 @@ void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
         {
             const quint64 playlistDurationBak = m_totalPlaylistDuration;
 
-            //TODO/IMPL try not to exceed m_targetDurationUSec
+            //TODO/IMPL/HLS try not to exceed m_targetDurationUSec
             m_chunks.push_back( m_currentChunk );
             m_totalPlaylistDuration += m_currentChunk.duration;
             m_currentChunk.mediaSequence = 0;   //using media sequence 0 for NULL chunk

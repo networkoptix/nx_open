@@ -21,6 +21,10 @@ StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
 {
 }
 
+StreamingChunk::~StreamingChunk()
+{
+}
+
 const StreamingChunkCacheKey& StreamingChunk::params() const
 {
     return m_params;

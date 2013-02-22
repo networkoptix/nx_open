@@ -8,6 +8,8 @@
 #include <map>
 
 #include <QCache>
+#include <QMutex>
+#include <QMutexLocker>
 
 
 template<class KeyType, class CachedType>
@@ -24,9 +26,8 @@ public:
     Caches items of \a CachedType.
     Takes ownership of stored items, so any item could be deleted on item insertion.
     \param KeyType MUST have operator < defined
-    \note Not thread-safe
+    \note All methods are thread-safe
     \note operator== and qHash(KeyType) is required for \a KeyType
-    \todo cost should have \a quint64 type
     \todo make cache 2-level: introduce persistent storage
 */
 template<class KeyType, class CachedType, class ItemProviderType = DummyItemProvider<KeyType, CachedType> >
@@ -56,7 +57,8 @@ public:
     :
         m_cache( maxCost ),
         m_itemProvider( itemProvider ),
-        m_usedItemsTotalCost( 0 )
+        m_usedItemsTotalCost( 0 ),
+        m_maxCost( maxCost )
     {
     }
 
@@ -67,19 +69,8 @@ public:
     */
     bool insert( const KeyType& key, CachedType* item, unsigned int cost = 1 ) throw()
     {
-        if( cost > m_cache.maxCost() )
-            return false;
-
-        if( m_usedItems.find( key ) != m_usedItems.end() )
-            return false;   //item exists and is used, cannot replace it
-        CacheItemData* itemData = new CacheItemData( item, cost );
-        if( !m_cache.insert( key, itemData, cost ) )
-        {
-            itemData.item = NULL;
-            delete itemData;
-            return false;
-        }
-        return true;
+        QMutexLocker lk( &m_mutex );
+        return insertNonSafe( key, item, cost );
     }
 
     /*!
@@ -89,6 +80,8 @@ public:
     */
     CachedType* get( const KeyType& key ) throw()
     {
+        QMutexLocker lk( &m_mutex );
+
         CacheItemData* itemData = m_cache.object( key );
         if( itemData )
             return itemData->item;
@@ -102,7 +95,7 @@ public:
         if( !item )
             return NULL;
 
-        if( !insert( key, item, itemCost ) )
+        if( !insertNonSafe( key, item, itemCost ) )
         {
             delete item;
             return NULL;
@@ -116,6 +109,8 @@ public:
     */
     bool remove( const KeyType& key ) throw()
     {
+        QMutexLocker lk( &m_mutex );
+
         if( m_usedItems.find( key ) != m_usedItems.end() )
             return false;   //item exists and is used, cannot remove it
 
@@ -125,6 +120,8 @@ public:
 
     unsigned int totalCost() const throw()
     {
+        QMutexLocker lk( &m_mutex );
+
         return m_cache.totalCost() + m_usedItemsTotalCost;
     }
 
@@ -133,6 +130,8 @@ public:
     */
     CachedType* takeForUse( const KeyType& key ) throw()
     {
+        QMutexLocker lk( &m_mutex );
+
         std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter != m_usedItems.end() )
         {
@@ -141,7 +140,17 @@ public:
         }
 
         CacheItemData* itemData = m_cache.take( key );
-        if( !itemData )
+        if( itemData )
+        {
+            //reserving space for tajen item in cache
+            const int cacheSizeBak = m_cache.size();
+            m_cache.setMaxCost( m_cache.maxCost()-itemData->cost );
+            Q_ASSERT_X(
+                cacheSizeBak == m_cache.size(),
+                "ItemCache::takeForUse",
+                QString("cacheSizeBak = %1, m_cache.size() = %2, m_cache.maxCost() = %3").arg(cacheSizeBak).arg(m_cache.size()).arg(m_cache.maxCost()).toLatin1().data() );
+        }
+        else
         {
             if( !m_itemProvider )
                 return NULL;
@@ -152,15 +161,12 @@ public:
             if( !item )
                 return NULL;
             itemData = new CacheItemData( item, itemCost );
+
+            if( m_cache.maxCost() > itemData->cost )
+                m_cache.setMaxCost( m_cache.maxCost() - itemData->cost );
         }
 
         m_usedItemsTotalCost += itemData->cost;
-        const int cacheSizeBak = m_cache.size();
-        m_cache.setMaxCost( m_cache.maxCost()-itemData->cost );
-        Q_ASSERT_X(
-            cacheSizeBak == m_cache.size(),
-            "ItemCache::takeForUse",
-            QString("cacheSizeBak = %1, m_cache.size() = %2, m_cache.maxCost() = %3").arg(cacheSizeBak).arg(m_cache.size()).arg(m_cache.maxCost()).toLatin1().data() );
 
         ++itemData->usageCount;
         m_usedItems.insert( std::make_pair( key, itemData ) );
@@ -172,6 +178,8 @@ public:
     */
     bool putBackUsedItem( const KeyType& key, CachedType* /*item*/ ) throw()
     {
+        QMutexLocker lk( &m_mutex );
+
         std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter == m_usedItems.end() )
             return false;
@@ -183,10 +191,19 @@ public:
 
         //returning item back to the cache
         m_usedItemsTotalCost -= usedItemIter->second->cost;
-        m_cache.setMaxCost( m_cache.maxCost() + usedItemIter->second->cost );
+        if( m_cache.maxCost() + usedItemIter->second->cost <= m_maxCost )
+        {
+            m_cache.setMaxCost( m_cache.maxCost() + usedItemIter->second->cost );
+        }
+        else if( usedItemIter->second->cost < m_maxCost )
+        {
+            //freeing space for an item
+            m_cache.setMaxCost( m_maxCost - usedItemIter->second->cost );
+            m_cache.setMaxCost( m_maxCost );
+        }
         if( !m_cache.insert( key, usedItemIter->second, usedItemIter->second->cost ) )
         {
-            Q_ASSERT( false );
+            //this can happen in case when item cost is greater than allowed cache cost
         }
         m_usedItems.erase( usedItemIter );
         return true;
@@ -194,6 +211,7 @@ public:
 
     ItemProviderType* itemProvider() const
     {
+        QMutexLocker lk( &m_mutex );
         return m_itemProvider;
     }
 
@@ -234,6 +252,25 @@ private:
     std::map<KeyType, CacheItemData*> m_usedItems;
     ItemProviderType* const m_itemProvider;
     qint64 m_usedItemsTotalCost;
+    mutable QMutex m_mutex;
+    const qint64 m_maxCost;
+
+    bool insertNonSafe( const KeyType& key, CachedType* item, unsigned int cost = 1 ) throw()
+    {
+        if( cost > m_cache.maxCost() )
+            return false;
+
+        if( m_usedItems.find( key ) != m_usedItems.end() )
+            return false;   //item exists and is used, cannot replace it
+        CacheItemData* itemData = new CacheItemData( item, cost );
+        if( !m_cache.insert( key, itemData, cost ) )
+        {
+            itemData.item = NULL;
+            delete itemData;
+            return false;
+        }
+        return true;
+    }
 };
 
 #endif  //ITEMCACHE_H

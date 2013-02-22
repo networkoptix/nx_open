@@ -58,6 +58,7 @@ public:
     };
 
     StreamingChunk( const StreamingChunkCacheKey& params );
+    virtual ~StreamingChunk();
 
     const StreamingChunkCacheKey& params() const;
 
