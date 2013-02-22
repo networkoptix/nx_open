@@ -2,7 +2,6 @@
 #include "ui_smtp_settings_widget.h"
 
 #include <QtGui/QMessageBox>
-#include <qt5/network/qdnslookup.h>
 
 #include <api/app_server_connection.h>
 
@@ -28,9 +27,6 @@ namespace {
     const QLatin1String nameSimple("EMAIL_SIMPLE");
     const QLatin1String nameTimeout("EMAIL_TIMEOUT");
 
-    const int PORT_UNSECURE = 25;
-    const int PORT_TLS = 587;
-
     const int TIMEOUT = 10;
 }
 
@@ -42,21 +38,20 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     m_testHandle(-1),
     m_dns(NULL),
     m_autoMailServer(QString()),
-    m_timeoutTimer(this),
-    m_settingsReceived(false),
-    m_mailServersReceived(false)
+    m_timeoutTimer(new QTimer(this)),
+    m_settingsReceived(false)
 {
     ui->setupUi(this);
 
     connect(ui->portComboBox,           SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
     connect(ui->advancedCheckBox,       SIGNAL(toggled(bool)),              this,   SLOT(at_advancedCheckBox_toggled(bool)));
-    connect(ui->simpleEmailLineEdit,    SIGNAL(editingFinished()),          this,   SLOT(at_simpleEmail_editingFinished()));
+    connect(ui->simpleEmailLineEdit,    SIGNAL(textChanged(QString)),       this,   SLOT(at_simpleEmail_textChanged(QString)));
     connect(ui->testButton,             SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
     connect(ui->testResultButton,       SIGNAL(clicked()),                  this,   SLOT(at_testResultButton_clicked()));
-    connect(&m_timeoutTimer,            SIGNAL(timeout()),                  this,   SLOT(at_timer_timeout()));
+    connect(m_timeoutTimer,             SIGNAL(timeout()),                  this,   SLOT(at_timer_timeout()));
 
-    m_timeoutTimer.setInterval(100);
-    m_timeoutTimer.setSingleShot(false);
+    m_timeoutTimer->setInterval(100);
+    m_timeoutTimer->setSingleShot(false);
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
@@ -64,8 +59,8 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     ui->testingProgressWidget->setVisible(false);
 
-    ui->portComboBox->addItem(QString::number(PORT_TLS));
-    ui->portComboBox->addItem(QString::number(PORT_UNSECURE));
+    ui->portComboBox->addItem(QString::number(QnEmail::securePort));
+    ui->portComboBox->addItem(QString::number(QnEmail::unsecurePort));
     ui->portComboBox->setCurrentIndex(0);
     at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
 }
@@ -88,11 +83,12 @@ void QnSmtpSettingsWidget::submit() {
 QnKvPairList QnSmtpSettingsWidget::settings() {
     bool simple = !ui->advancedCheckBox->isChecked();
     QString hostname = simple ? m_autoMailServer : ui->serverLineEdit->text();
-    int port = simple ? PORT_UNSECURE
-                      : ui->portComboBox->currentIndex() == 0 ? PORT_TLS : PORT_UNSECURE;
+    int port = QnEmail::unsecurePort;
+    if (simple || ui->portComboBox->currentIndex() == 0)
+        port = QnEmail::securePort;
     QString username = simple ? ui->simpleEmailLineEdit->text() : ui->userLineEdit->text();
     QString password = simple ? ui->simplePasswordLineEdit->text() : ui->passwordLineEdit->text();
-    bool useTls = simple ? false : ui->tlsRadioButton->isChecked();
+    bool useTls = simple ? true : ui->tlsRadioButton->isChecked();
 
     QnKvPairList result;
     result
@@ -107,27 +103,6 @@ QnKvPairList QnSmtpSettingsWidget::settings() {
     return result;
 }
 
-void QnSmtpSettingsWidget::updateMailServers() {
-    m_mailServersReceived = false;
-    m_autoMailServer = QString();
-    ui->detectErrorLabel->setText(QString());
-
-    QString email = ui->simpleEmailLineEdit->text();
-    if (isEmailValid(email)) {
-        QString hostname = getEmailDomain(email);
-
-        m_dns = new QDnsLookup(this);
-        connect(m_dns, SIGNAL(finished()), this, SLOT(at_mailServers_received()));
-
-        m_dns->setType(QDnsLookup::MX);
-        m_dns->setName(hostname);
-        m_dns->lookup();
-    }
-    else {
-        m_mailServersReceived = true;
-        ui->detectErrorLabel->setText(tr("Email is not valid"));
-    }
-}
 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 
@@ -149,14 +124,14 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     ui->testProgressBar->setMaximum(TIMEOUT * 10); //timer interval is 100ms
     ui->testProgressBar->setFormat(QLatin1String("%p%"));
     ui->testProgressBar->setValue(0);
-    m_timeoutTimer.start();
+    m_timeoutTimer->start();
 
     m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(settings(),
                     this, SLOT(at_finishedTestEmailSettings(int, QByteArray, bool, int)));
 }
 
 void QnSmtpSettingsWidget::at_testResultButton_clicked() {
-    m_timeoutTimer.stop();
+    m_timeoutTimer->stop();
     m_testHandle = -1;
 
     ui->controlsWidget->setEnabled(true);
@@ -171,7 +146,7 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
         return;
     }
 
-    m_timeoutTimer.stop();
+    m_timeoutTimer->stop();
     m_testHandle = -1;
     ui->testProgressBar->setFormat(tr("Timeout"));
     ui->testResultButton->setText(tr("OK"));
@@ -188,7 +163,7 @@ void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteA
 
     qDebug() << status << errorString << result << handle;
 
-    m_timeoutTimer.stop();
+    m_timeoutTimer->stop();
     m_testHandle = -1;
     ui->testProgressBar->setValue(ui->testProgressBar->maximum());
     ui->testProgressBar->setFormat(result ? tr("Success") : tr("Error"));
@@ -217,7 +192,7 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
         } else if (setting.name() == namePort) {
             bool ok;
             int port = setting.value().toInt(&ok);
-            int idx = (ok && port == PORT_UNSECURE) ? 1 : 0;
+            int idx = (ok && port == QnEmail::unsecurePort) ? 1 : 0;
             ui->portComboBox->setCurrentIndex(idx);
         } else if (setting.name() == nameUser) {
             ui->userLineEdit->setText(setting.value());
@@ -234,40 +209,26 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
         } else if (setting.name() == nameSimple) {
             bool simple = setting.value() == QLatin1String("True");
             ui->advancedCheckBox->setChecked(!simple);
-            if (simple)
-                updateMailServers();
         }
     }
 }
 
-void QnSmtpSettingsWidget::at_mailServers_received() {
-    m_mailServersReceived = true;
 
-    if (m_dns->error() != QDnsLookup::NoError) {
-        ui->detectErrorLabel->setText(tr("DNS lookup failed"));
-        m_dns->deleteLater();
+void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
+    ui->detectErrorLabel->setText(QString());
+
+    QnEmail email(value);
+    if (!email.isValid()) {
+        ui->detectErrorLabel->setText(tr("Email is not valid"));
         return;
     }
-
-    int preferred = -1;
-    // Handle the results.
-    foreach (const QDnsMailExchangeRecord &record, m_dns->mailExchangeRecords()) {
-        if (preferred < 0 || record.preference() < preferred) {
-            preferred = record.preference();
-            m_autoMailServer = record.exchange();
-        }
-    }
-    m_dns->deleteLater();
-
+    QnSmptServerPreset preset = email.smptServer();
+    m_autoMailServer = preset.server;
     if (m_autoMailServer.isEmpty()) {
-        ui->detectErrorLabel->setText(tr("No mail servers found."));
+        ui->detectErrorLabel->setText(tr("No preset found. Use 'Advanced' option."));
     } else if (!ui->advancedCheckBox->isChecked()) {
         ui->serverLineEdit->setText(m_autoMailServer);
     }
-}
-
-void QnSmtpSettingsWidget::at_simpleEmail_editingFinished() {
-    updateMailServers();
 }
 
 void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
