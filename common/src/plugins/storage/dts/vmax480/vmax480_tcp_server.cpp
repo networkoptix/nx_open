@@ -90,6 +90,16 @@ void QnVMax480ConnectionProcessor::run()
 
         QnAbstractMediaData* media = 0;
 
+        if (dataType == VMAXDT_GotArchiveRange)
+        {
+            quint32 startDateTime = *(quint32*)(vMaxHeader+8);
+            quint32 endDateTime = *(quint32*)(vMaxHeader+12);
+            static_cast<QnVMax480Server*>(d->owner)->onGotArchiveRange(d->tcpID, startDateTime, endDateTime);
+            continue;
+        }
+
+        // media data
+
         if (dataType == VMAXDT_GotVideoPacket)
         {
             QnCompressedVideoData* video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize);
@@ -266,4 +276,12 @@ void QnVMax480Server::onGotData(const QString& tcpID, QnAbstractMediaDataPtr med
     QnVMax480LiveProvider* provider = m_providers.value(tcpID);
     if (provider)
         provider->onGotData(media);
+}
+
+void QnVMax480Server::onGotArchiveRange(const QString& tcpID, quint32 startDateTime, quint32 endDateTime)
+{
+    QMutexLocker lock(&m_mutexProvider);
+    QnVMax480LiveProvider* provider = m_providers.value(tcpID);
+    if (provider)
+        provider->onGotArchiveRange(startDateTime, endDateTime);
 }

@@ -56,6 +56,12 @@ void QnVMax480LiveProvider::onGotData(QnAbstractMediaDataPtr mediaData)
     m_internalQueue.push(mediaData);
 }
 
+void QnVMax480LiveProvider::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
+{
+    int gg = 4;
+}
+
+
 void QnVMax480LiveProvider::openStream()
 {
     if (m_connected)

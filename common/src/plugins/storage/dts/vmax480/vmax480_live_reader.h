@@ -13,6 +13,7 @@ public:
     virtual ~QnVMax480LiveProvider();
 
     void onGotData(QnAbstractMediaDataPtr mediaData);
+    void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;

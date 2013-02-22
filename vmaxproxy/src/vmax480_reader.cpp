@@ -253,8 +253,6 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 
 void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
 {
-    QString gg = QDir::currentPath();
-
     QMutexLocker lock(&m_callbackMutex);
 
     int openChannel = 0;
@@ -269,6 +267,8 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
         {
             if( _result->mResult == true )
             {
+                m_ACSStream->requestRecordDateTime();
+
                 m_ACSStream->openChannel(1 << m_channelNum);
                 m_ACSStream->openAudioChannel(1 << m_channelNum);
             }
@@ -321,6 +321,17 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
 
                 QDateTime startDateTime = fromNativeTimestamp(startDate, startTime, 0);
                 QDateTime endDateTime = fromNativeTimestamp(endDate, endTime, 0);
+
+                quint8 vMaxHeader[16];
+                vMaxHeader[0] = m_sequence;
+                vMaxHeader[1] = VMAXDT_GotArchiveRange;
+                
+                vMaxHeader[2] = 0;
+                vMaxHeader[3] = 0;
+                *(quint32*)(vMaxHeader+4) = 0;
+                *(quint32*)(vMaxHeader+8) = startDateTime.toMSecsSinceEpoch()/1000;
+                *(quint32*)(vMaxHeader+12) = endDateTime.toMSecsSinceEpoch()/1000;
+                m_socket->send(vMaxHeader, sizeof(vMaxHeader));
 
                 if( m_ACSStream )
                 {

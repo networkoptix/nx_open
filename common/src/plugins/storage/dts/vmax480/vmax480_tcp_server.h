@@ -30,6 +30,7 @@ public:
     void vMaxDisconnect(const QString& tcpID);
 
     void onGotData(const QString& tcpID, QnAbstractMediaDataPtr media);
+    void onGotArchiveRange(const QString& tcpID, quint32 startDateTime, quint32 endDateTime);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) override;
 private:
