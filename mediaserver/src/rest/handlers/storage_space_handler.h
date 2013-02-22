@@ -5,11 +5,10 @@
 
 class QnPlatformMonitor;
 
-// TODO: rename QnStorageSpaceHandler?
-class QnStorageStatisticsHandler: public QnRestRequestHandler {
+class QnStorageSpaceHandler: public QnRestRequestHandler {
     Q_OBJECT
 public:
-    QnStorageStatisticsHandler();
+    QnStorageSpaceHandler();
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override;

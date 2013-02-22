@@ -80,6 +80,7 @@
 #include "rest/handlers/log_handler.h"
 #include "rest/handlers/favico_handler.h"
 #include "business/events/reasoned_business_event.h"
+#include "rest/handlers/storage_space_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -709,6 +710,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true)); // TODO: deprecated
     QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());

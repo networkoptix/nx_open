@@ -3,52 +3,18 @@
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/common/json.h>
 
+#include <api/model/storage_space_data.h>
+
 #include <platform/platform_abstraction.h>
 
 #include <recorder/storage_manager.h>
 
-// TODO: move out
-struct QnStorageSpaceData {
-    QString path;
-    int storageId;
-    qint64 totalSpace;
-    qint64 freeSpace;
-};
 
-void serialize(const QnStorageSpaceData &value, QVariant *target) {
-    QVariantMap result;
-    QJson::serialize(value.path, "path", &result);
-    QJson::serialize(value.storageId, "storageId", &result);
-    QJson::serialize(value.totalSpace, "totalSpace", &result);
-    QJson::serialize(value.freeSpace, "freeSpace", &result);
-    *target = result;
-}
-
-bool deserialize(const QVariant &value, QnStorageSpaceData *target) {
-    if(value.type() != QVariant::Map)
-        return false;
-    QVariantMap map = value.toMap();
-
-    QnStorageSpaceData result;
-    if(
-        !QJson::deserialize(map, "path", &result.path) || 
-        !QJson::deserialize(map, "storageId", &result.storageId) ||
-        !QJson::deserialize(map, "totalSpace", &result.totalSpace) || 
-        !QJson::deserialize(map, "freeSpace", &result.freeSpace)
-    ) {
-        return false;
-    }
-
-    *target = result;
-    return true;
-}
-
-
-QnStorageStatisticsHandler::QnStorageStatisticsHandler():
+QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageStatisticsHandler::executeGet(const QString &path, const QnRequestParamList &, QByteArray &result, QByteArray &contentType) {
+int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamList &, QByteArray &result, QByteArray &contentType) {
     QList<QnStorageSpaceData> infos;
 
     QList<QString> storagePaths;
@@ -56,8 +22,15 @@ int QnStorageStatisticsHandler::executeGet(const QString &path, const QnRequestP
         QnStorageSpaceData info;
         info.path = storage->getUrl();
         info.storageId = storage->getId();
-        info.totalSpace = storage->getTotalSpace(); // TODO: wrong results for coldstore.
+        info.totalSpace = storage->getTotalSpace();
         info.freeSpace = storage->getFreeSpace();
+
+        // TODO: #Elric remove once UnknownSize is dropped.
+        if(info.totalSpace == QnStorageResource::UnknownSize)
+            info.totalSpace = -1;
+        if(info.freeSpace == QnStorageResource::UnknownSize)
+            info.freeSpace = -1;
+
         infos.push_back(info);
 
         storagePaths.push_back(storage->getUrl());
@@ -90,10 +63,10 @@ int QnStorageStatisticsHandler::executeGet(const QString &path, const QnRequestP
     return CODE_OK;
 }
 
-int QnStorageStatisticsHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &, QByteArray &result, QByteArray &contentType) {
+int QnStorageSpaceHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &, QByteArray &result, QByteArray &contentType) {
     return executeGet(path, params, result, contentType);
 }
 
-QString QnStorageStatisticsHandler::description(TCPSocket *tcpSocket) const {
+QString QnStorageSpaceHandler::description(TCPSocket *tcpSocket) const {
     return QString();
 }
