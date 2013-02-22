@@ -54,7 +54,7 @@
 					<artifactId>vmaxproxy</artifactId>
 					<version>${project.version}</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
+					<classifier>${platform}-x86</classifier>
 				</dependency>	
 			</dependencies>			
 		</profile>		

@@ -155,9 +155,6 @@
 		<profile>
 			<id>vmax</id>
 			<activation>
-				<os>
-					<family>Windows</family>
-				</os>
 				<property>
 					<name>vmax</name>
 					<value>true</value>
