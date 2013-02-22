@@ -6,6 +6,7 @@
 #include "core/datapacket/media_data_packet.h"
 
 class QnArchiveStreamReader;
+class QnAviArchiveDelegate;
 
 class QnAviResource : public QnAbstractArchiveResource
 {
@@ -34,7 +35,7 @@ public:
 
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
-
+    QnAviArchiveDelegate* createArchiveDelegate() const;
 protected:
 
 private:
