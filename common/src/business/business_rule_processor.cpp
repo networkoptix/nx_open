@@ -320,14 +320,17 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     QStringList recipients;
     foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
         QString email = user->getEmail();
-        if (!email.isEmpty() && isEmailValid(email))
-            recipients << email.trimmed();
+        if (!email.isEmpty() && QnEmail::isValid(email))
+            recipients << email;
     }
 
     QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
-        if (isEmailValid(email))
-            recipients << email.trimmed();
+        QString trimmed = email.trimmed();
+        if (trimmed.isEmpty())
+            continue;
+        if (QnEmail::isValid(trimmed))
+            recipients << email;
     }
 
     if( recipients.isEmpty() )
@@ -341,6 +344,9 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
+    //TODO: #GDM or #rvasilenko - make call async
+    //TODO: #GDM or #rvasilenko - in case of unsuccessful sending, execute business action:
+    //  ActionType = BA_Popup, runtime params[eventType] = BE_SendMailError.
     if( appServerConnection->sendEmail(
             recipients,
             action->getSubject(),

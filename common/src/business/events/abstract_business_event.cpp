@@ -30,6 +30,8 @@ namespace BusinessEventType
                 return QObject::tr("Media Server Failure");
             case BE_MediaServer_Conflict:
                 return QObject::tr("Media Server Conflict");
+            case BE_EmailSendError:
+                return QObject::tr("Email could not be sent.");
             case BE_UserDefined:
                 return QObject::tr("User Defined");
             //warning should be raised on unknown enumeration values
@@ -65,6 +67,8 @@ namespace BusinessEventType
                 return false;
             case BE_MediaServer_Conflict:
                 return false;
+            case BE_EmailSendError:
+                return false;
             case BE_UserDefined:
                 return false;
         }
@@ -96,6 +100,8 @@ namespace BusinessEventType
                 return false;
             case BE_MediaServer_Conflict:
                 return false;
+            case BE_EmailSendError:
+                return false;
             case BE_UserDefined:
                 return false;
             //warning should be raised on unknown enumeration values
@@ -126,6 +132,8 @@ namespace BusinessEventType
             case BE_MediaServer_Failure:
                 return false;
             case BE_MediaServer_Conflict:
+                return false;
+            case BE_EmailSendError:
                 return false;
             case BE_UserDefined:
                 return false;

@@ -4,25 +4,34 @@
 #include <QString>
 #include <QStringList>
 
-// TODO: #GDM
-/*
+struct QnSmptServerPreset {
+    QnSmptServerPreset() {}
+    QnSmptServerPreset(const QString &server, const bool useTls = true, const int port = 0);
+
+    bool isNull() const {
+        return server.isEmpty();
+    }
+
+    QString server;
+    bool useTls;
+    int port;
+};
 
 class QnEmail {
 public:
-    QnEmail();
-    QnEmail(const QString &);
+    QnEmail(const QString &email);
 
-    bool isValid();
+    static bool isValid(const QString &email);
 
+    static const int securePort = 587;
+    static const int unsecurePort = 25;
+
+    bool isValid() const;
+    QnSmptServerPreset smptServer() const;
     QString domain() const;
-    QString user() const;
-}
+private:
+    QString m_email;
+};
 
-Would be much nicer than a bunch of free-standing functions.
-
-*/
-
-bool isEmailValid(const QString &email);
-QString getEmailDomain(const QString &email);
 
 #endif // EMAIL_H

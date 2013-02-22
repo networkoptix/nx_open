@@ -162,7 +162,7 @@ QnEmailValidDelegate::~QnEmailValidDelegate() {
 }
 
 bool QnEmailValidDelegate::isResourceValid(const QnUserResourcePtr &user) const {
-    return isEmailValid(user->getEmail());
+    return QnEmail::isValid(user->getEmail());
 }
 QString QnEmailValidDelegate::getText(int invalid, int total) const {
     return tr("%1 of %2 selected users have invalid email.").arg(invalid).arg(total);

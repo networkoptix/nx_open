@@ -3225,7 +3225,7 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
 
     bool any = false;
 
-    if (!isEmailValid(context()->user()->getEmail().trimmed())) {
+    if (!QnEmail::isValid(context()->user()->getEmail())) {
         any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
 
