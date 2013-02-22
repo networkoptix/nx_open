@@ -206,20 +206,20 @@ __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target);
  */
 #define QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
 __VA_ARGS__ void serialize(const TYPE &value, QVariant *target) {               \
-	QVariantMap result;                                                         \
+    QVariantMap result;                                                         \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_SERIALIZATION_STEP_I, ~, FIELD_SEQ)  \
-	*target = result;                                                           \
+    *target = result;                                                           \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             \
-	if(value.type() != QVariant::Map)                                           \
-		return false;                                                           \
-	QVariantMap map = value.toMap();                                            \
+    if(value.type() != QVariant::Map)                                           \
+        return false;                                                           \
+    QVariantMap map = value.toMap();                                            \
                                                                                 \
-	QnStorageSpaceData result;                                                  \
+    QnStorageSpaceData result;                                                  \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
-	*target = result;                                                           \
-	return true;                                                                \
+    *target = result;                                                           \
+    return true;                                                                \
 }
 
 #endif // QN_JSON_H
