@@ -16,6 +16,7 @@ enum BusinessEventType {
     Camera_Ip_Conflict = 6;
     MediaServer_Failure= 7;
     MediaServer_Conflict=8;
+    EmailSendError     = 9;
     UserDefinedEvent   = 1000;
 }
 

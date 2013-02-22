@@ -7,6 +7,7 @@
 #include <utils/common/request_param.h> /* For QnHTTPRawResponse */
 #include <utils/common/connective.h>
 
+#include <ui/workbench/workbench_context_aware.h>
 
 struct QnHTTPRawResponse;
 
@@ -16,7 +17,7 @@ namespace Ui {
 
 // TODO: #qt5 replace with proper functor
 class QnDatabaseManagementWidgetReplyProcessor: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnDatabaseManagementWidgetReplyProcessor(QObject *parent = NULL): QObject(parent), handle(-1) {}
 
@@ -38,7 +39,7 @@ public slots:
 };
 
 
-class QnDatabaseManagementWidget: public Connective<QWidget> {
+class QnDatabaseManagementWidget: public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
 
     typedef Connective<QWidget> base_type;

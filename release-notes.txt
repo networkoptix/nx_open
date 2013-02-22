@@ -1,7 +1,21 @@
 ----------------------------------------------- 1.4.3 - Beta -----------------------------------------------
 
+Do not ask to select an item before export (at least one item is always selected (selection can be grey)) - since 1.4
+If two cameras had the same password, it was displayed in - since 1.4
+If show cursor on screen position then the position of the cursor is incorrect in the recorded video, especially if recording application Window only - since 1.4
+
 Display confirmation window when choosing a file for db restore
 add E-mail servers preset
+Notifications if Mail Addresses/Servers/Licenses/Storages are not configured
+If FF/RW a camera in archive and the resolution was switching to low (RADASS) the speed was increased dramatically. Fixed
+Space didn't not work for selecting/deselecting cameras in event rules editing dialog.
+Add notifications about the following:
+1) Mail Server Parameters are not specified (for Administrator)
+2) E-Mail is not specified:
+   - own e-mail - for Viewer
+   - own and all Users - for Administrator
+3) Licenses are not registered (for Administrator)
+4) Storages are not properly configured (for Administrator)
 
 ----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 

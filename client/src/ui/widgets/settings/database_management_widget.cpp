@@ -3,13 +3,18 @@
 
 #include <QMessageBox>
 
-#include <ui/dialogs/progress_dialog.h>
-
 #include "utils/settings.h"
 #include "api/app_server_connection.h"
 
+#include <ui/actions/actions.h>
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_parameters.h>
+#include <ui/dialogs/progress_dialog.h>
+#include <ui/workbench/workbench_context.h>
+
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
@@ -93,7 +98,10 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         return; // TODO: #Elric make non-cancellable.
 
     if(processor->response.status == 0) {
-        QMessageBox::information(this, tr("Information"), tr("Database was successfully restored from file '%1'.").arg(fileName));
+        QMessageBox::information(this,
+                                 tr("Information"),
+                                 tr("Database was successfully restored from file '%1'.").arg(fileName));
+        menu()->trigger(Qn::ReconnectAction);
     } else {
         QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'.")
                               .arg(fileName));

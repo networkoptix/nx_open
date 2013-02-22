@@ -59,6 +59,7 @@ protected:
     qint64 m_startMksec;
     int m_selectedAudioChannel;
     bool m_initialized;
+    QnStorageResourcePtr m_storage;
 private:
     int m_audioStreamIndex;
     int m_firstVideoIndex;
@@ -73,14 +74,12 @@ private:
     qint64 m_duration;
 
     friend class QnAviAudioLayout;
-    QnStorageResourcePtr m_storage;
     AVIOContext* m_ioContext;
     bool m_eofReached;
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
 
-    //QVector<QnAbstractMotionArchiveConnectionPtr> m_motionConnections;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

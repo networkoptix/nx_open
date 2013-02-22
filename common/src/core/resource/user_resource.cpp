@@ -58,7 +58,7 @@ QString QnUserResource::getEmail() const
 void QnUserResource::setEmail(const QString& email)
 {
     QMutexLocker locker(&m_mutex);
-    m_email = email;
+    m_email = email.trimmed();
 }
 
 void QnUserResource::updateInner(QnResourcePtr other) 

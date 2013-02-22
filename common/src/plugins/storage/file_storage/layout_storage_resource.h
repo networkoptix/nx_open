@@ -5,6 +5,7 @@
 
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
+#include "recording/time_period_list.h"
 
 /*
 * QnLayoutFileStorageResource uses for layout export
@@ -40,6 +41,8 @@ public:
     virtual void setUrl(const QString& value) override;
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
+
+    QnTimePeriodList getTimePeriods(QnResourcePtr res);
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 

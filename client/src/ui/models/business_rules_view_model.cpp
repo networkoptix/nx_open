@@ -693,8 +693,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                 if (m_actionType == BusinessActionType::BA_SendMail) {
                     bool any = false;
                     foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
-                        QString email = user->getEmail().trimmed();
-                        if (email.isEmpty() || !isEmailValid(email))
+                        QString email = user->getEmail();
+                        if (email.isEmpty() || !QnEmail::isValid(email))
                             return false;
                         any = true;
                     }
@@ -703,7 +703,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     foreach(const QString &email, additional) {
                         if (email.trimmed().isEmpty())
                             continue;
-                        if (!isEmailValid(email.trimmed()))
+                        if (!QnEmail::isValid(email))
                             return false;
                         any = true;
                     }
@@ -777,10 +777,10 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         QStringList receivers;
         QnUserResourceList users =  m_actionResources.filtered<QnUserResource>();
         foreach (const QnUserResourcePtr &user, users) {
-            QString userMail = user->getEmail().trimmed();
+            QString userMail = user->getEmail();
             if (userMail.isEmpty())
                 return tr("User %1 has empty email").arg(user->getName());
-            if (!isEmailValid(userMail))
+            if (!QnEmail::isValid(userMail))
                 return tr("User %1 has invalid email address: %2").arg(user->getName()).arg(userMail);
             receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
         }
@@ -790,7 +790,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             QString trimmed = email.trimmed();
             if (trimmed.isEmpty())
                 continue;
-            if (!isEmailValid(trimmed))
+            if (!QnEmail::isValid(trimmed))
                 return tr("Invalid email address: %1").arg(trimmed);
             receivers << trimmed;
         }

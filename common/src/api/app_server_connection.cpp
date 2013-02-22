@@ -29,6 +29,7 @@ namespace {
     const QLatin1String dumpdbObject("dumpdb");
     const QLatin1String restoredbObject("restoredb");
     const QLatin1String settingObject("setting");
+	const QLatin1String testEmailSettingsObject("testEmailSettings");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -169,7 +170,9 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedSetting(status, errorString, settings, handle);
-    }
+	} else if (m_objectName == testEmailSettingsObject) {
+		emit finishedTestEmailSettings(status, errorString, result.toInt(), handle);
+	}
 }
 
 QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString &guid,
@@ -938,6 +941,17 @@ qint64 QnAppServerConnection::getCurrentTime()
     }
 
     return response.data.toLongLong();
+}
+
+int QnAppServerConnection::testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, testEmailSettingsObject);
+    QObject::connect(processor, SIGNAL(finishedTestEmailSettings(int, const QByteArray&, bool, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeSettings(settings, data);
+
+    return addObjectAsync(testEmailSettingsObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::sendEmail(const QString& addr, const QString& subject, const QString& message)

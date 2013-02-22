@@ -8,7 +8,6 @@
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
 #include <QtGui/QImage>
 #include <QtGui/QWhatsThis>
 #include <QtGui/QInputDialog>
@@ -1025,51 +1024,64 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
     if(snapshotManager()->isFile(layout)) {
         doAskNameAndExportLocalLayout(layout->getLocalRange(), layout, LayoutExport_LocalSaveAs);
-    } else {
-        QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
-        if(name.isEmpty()) {
-            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
-            dialog->setWindowTitle(tr("Save Layout As"));
-            dialog->setText(tr("Enter layout name:"));
-            dialog->setName(layout->getName());
+        return;
+    }
+
+    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString().trimmed();
+    if(name.isEmpty()) {
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+        dialog->setWindowTitle(tr("Save Layout As"));
+        dialog->setText(tr("Enter layout name:"));
+        dialog->setName(layout->getName());
+
+        QMessageBox::Button button = QMessageBox::Yes;
+        do {
             dialog->exec();
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
             name = dialog->name();
-        }
 
-        name = checkLayoutName(name, user);
-        if (name.isEmpty())
-            return; // Cancel pressed
-
-        QnLayoutResourcePtr newLayout;
-
-        newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-        newLayout->setGuid(QUuid::createUuid());
-        newLayout->setName(name);
-        newLayout->setParentId(user->getId());
-        newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
-        newLayout->setCellSpacing(layout->cellSpacing());
-        newLayout->setCellAspectRatio(layout->cellAspectRatio());
-        context()->resourcePool()->addResource(newLayout);
-
-        QnLayoutItemDataList items = layout->getItems().values();
-        for(int i = 0; i < items.size(); i++)
-            items[i].uuid = QUuid::createUuid();
-        newLayout->setItems(items);
-
-        /* If it is current layout, then roll it back and open the new one instead. */
-        if(layout == workbench()->currentLayout()->resource()) {
-            int index = workbench()->currentLayoutIndex();
-            workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
-            workbench()->setCurrentLayoutIndex(index);
-            workbench()->removeLayout(index + 1);
-
-            snapshotManager()->restore(layout);
-        }
-
-        snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+            if (!existing.isEmpty()) {
+                button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+                if (button == QMessageBox::Cancel)
+                    return;
+                if (button == QMessageBox::Yes) {
+                    removeLayouts(existing);
+                }
+            }
+        } while (button != QMessageBox::Yes);
     }
+
+    QnLayoutResourcePtr newLayout;
+
+    newLayout = QnLayoutResourcePtr(new QnLayoutResource());
+    newLayout->setGuid(QUuid::createUuid());
+    newLayout->setName(name);
+    newLayout->setParentId(user->getId());
+    newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+    newLayout->setCellSpacing(layout->cellSpacing());
+    newLayout->setCellAspectRatio(layout->cellAspectRatio());
+    context()->resourcePool()->addResource(newLayout);
+
+    QnLayoutItemDataList items = layout->getItems().values();
+    for(int i = 0; i < items.size(); i++)
+        items[i].uuid = QUuid::createUuid();
+    newLayout->setItems(items);
+
+    /* If it is current layout, then roll it back and open the new one instead. */
+    if(layout == workbench()->currentLayout()->resource()) {
+        int index = workbench()->currentLayoutIndex();
+        workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
+        workbench()->setCurrentLayoutIndex(index);
+        workbench()->removeLayout(index + 1);
+
+        snapshotManager()->restore(layout);
+    }
+
+    snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    if (name == layout->getName())
+        removeLayouts(QnLayoutResourceList() << layout);
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
@@ -1297,36 +1309,37 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
 }
 
-QString QnWorkbenchActionHandler::checkLayoutName(const QString &name, const QnUserResourcePtr &user) {
+QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QString &name,
+                                                   const QnUserResourcePtr &user,
+                                                   const QnLayoutResourcePtr &layout) {
 
-    QMessageBox::StandardButton button = QMessageBox::NoButton;
-
+    QnLayoutResourceList result;
     foreach (const QnLayoutResourcePtr &existingLayout, resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+        if (existingLayout == layout)
+            continue;
         if (existingLayout->getName().toLower() != name.toLower())
             continue;
-
-        if (button == QMessageBox::NoButton)
-            button = QMessageBox::warning(widget(),
-                                          tr("Layout already exists"),
-                                          tr("Layout with the same name already exists. Overwrite it?"),
-                                          QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                                          QMessageBox::Yes);
-        switch(button) {
-        case QMessageBox::Cancel:
-            return QString();
-        case QMessageBox::No:
-            return newLayoutName(user, name);
-        case QMessageBox::Yes:
-            if(snapshotManager()->isLocal(existingLayout))
-                resourcePool()->removeResource(existingLayout); /* This one can be simply deleted from resource pool. */
-            else
-                connection()->deleteAsync(existingLayout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
-            break;
-        default:
-            break;
-        }
+        result << existingLayout;
     }
-    return name;
+    return result;
+}
+
+QMessageBox::StandardButton QnWorkbenchActionHandler::askOverrideLayout(QMessageBox::StandardButtons buttons,
+                                                                        QMessageBox::StandardButton defaultButton) {
+    return QMessageBox::warning(widget(),
+                                tr("Layout already exists"),
+                                tr("Layout with the same name already exists. Overwrite it?"),
+                                buttons,
+                                defaultButton);
+}
+
+void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts) {
+    foreach(const QnLayoutResourcePtr &layout, layouts) {
+        if(snapshotManager()->isLocal(layout))
+            resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
+        else
+            connection()->deleteAsync(layout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -1918,7 +1931,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(!resource)
         return;
 
-    QString name = parameters.argument(Qn::NameParameter).toString();
+    QString name = parameters.argument(Qn::NameParameter).toString().trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Rename"));
@@ -1935,9 +1948,13 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId()).dynamicCast<QnUserResource>();
-        name = checkLayoutName(name, user);
-        if (name.isEmpty())
-            return;
+
+        QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        if (!existing.isEmpty()) {
+            if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
+                return;
+            removeLayouts(existing);
+        }
 
         bool changed = snapshotManager()->isChanged(layout);
 
@@ -2025,16 +2042,26 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     dialog->setText(tr("Enter the name of the layout to create:"));
     dialog->setName(newLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
-    if(!dialog->exec())
-        return;
 
-    QString name = checkLayoutName(dialog->name(), user);
-    if (name.isEmpty())
-        return; // Cancel pressed
+    QMessageBox::Button button = QMessageBox::Yes;
+    do {
+        if(!dialog->exec())
+            return;
+
+        QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
+        if (!existing.isEmpty()) {
+            button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+            if (button == QMessageBox::Cancel)
+                return;
+            if (button == QMessageBox::Yes) {
+                removeLayouts(existing);
+            }
+        }
+    } while (button != QMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    layout->setName(name);
+    layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     resourcePool()->addResource(layout);
@@ -3198,7 +3225,7 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
 
     bool any = false;
 
-    if (!isEmailValid(context()->user()->getEmail().trimmed())) {
+    if (!QnEmail::isValid(context()->user()->getEmail())) {
         any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
 

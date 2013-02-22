@@ -5,7 +5,7 @@
 #   include <QtCore/QThread>
 #   include <QtCore/private/qthread_p.h>
 #else
-class QThread
+class QThread;
 #endif
 
 /**

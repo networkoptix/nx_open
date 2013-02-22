@@ -5,6 +5,7 @@
 #include <QtCore/QWeakPointer>
 
 #include <QtGui/QDialogButtonBox>
+#include <QtGui/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
@@ -351,12 +352,23 @@ private:
     void notifyAboutUpdate(bool alwaysNotify);
 
     /**
-     * @brief checkLayoutName       Check if layout with such name already exists before creating of the new.
-     * @param name                  Suggested name of the new layout.
-     * @param user                  User that will own the layout.
-     * @return                      Name layout should be saved with or empty string if process should be cancelled.
+     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
+     * @param name                      Suggested new name.
+     * @param user                      User that will own the layout.
+     * @param layout                    Layout that we want to rename (if any).
+     * @return                          List of existing layouts with same name.
      */
-    QString checkLayoutName(const QString &name, const QnUserResourcePtr &user);
+    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
+
+    /**
+     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
+     * @param buttons               Messagebox buttons.
+     * @param defaultButton         Default button.
+     * @return                      Selected button.
+     */
+    QMessageBox::StandardButton askOverrideLayout(QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton);
+
+    void removeLayouts(const QnLayoutResourceList &layouts);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;

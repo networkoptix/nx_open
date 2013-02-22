@@ -52,6 +52,7 @@ namespace conn_detail
         void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
         void finishedBusinessRule(int status, const QByteArray &errorString, QnBusinessEventRules businessRules, int handle);
         void finishedSetting(int status, const QByteArray& errorString, QnKvPairList settings, int handle);
+		void finishedTestEmailSettings(int status, const QByteArray& errorString, bool result, int handle);
     private:
         QnResourceFactory& m_resourceFactory;
         QnApiSerializer& m_serializer;
@@ -93,6 +94,16 @@ public:
 
     int saveSync(const QnMediaServerResourcePtr&);
     int saveSync(const QnVirtualCameraResourcePtr&);
+
+	/**
+	  * Test if email settings are valid
+	  * 
+	  * Slot is (int status, const QByteArray& errorString, bool result, int handle),
+	  * where result is true if settings are valid
+	  * 
+	  * @return connection handle
+	  */
+	int testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot);
 
     int sendEmail(const QString& to, const QString& subject, const QString& message);
     int sendEmail(const QStringList& to, const QString& subject, const QString& message);
