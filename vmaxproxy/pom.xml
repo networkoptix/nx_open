@@ -9,7 +9,7 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.1</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
