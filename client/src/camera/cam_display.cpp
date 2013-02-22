@@ -418,7 +418,12 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
-                    displayedTime = getCurrentTime(); // new VideoStreamDisplay update time async! So, currentTime possible may be changed during waiting (it is was not possible before v1.5)
+                    qint64 newDisplayedTime = getCurrentTime();
+                    if (newDisplayedTime != displayedTime) {
+                        // new VideoStreamDisplay update time async! So, currentTime possible may be changed during waiting (it is was not possible before v1.5)
+                        displayedTime = newDisplayedTime;
+                        firstWait = true;
+                    }
                     if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
                     {
                         if (firstWait)
