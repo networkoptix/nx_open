@@ -146,9 +146,6 @@
 		<profile>
 			<id>vmax</id>
 			<activation>
-				<os>
-					<family>Windows</family>
-				</os>			
 				<property>
 					<name>vmax</name>
 					<value>true</value>
@@ -168,7 +165,6 @@
 				</os>
 			</activation>
 			<modules>
-				<module>vmaxproxy</module>
 				<module>quicksyncdecoder</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
@@ -194,7 +190,7 @@
 									<goal>unpack-dependencies</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
+									<outputDirectory>${libdir}</outputDirectory>
 									<skip>${unpack.skip}</skip>
 								</configuration>
 							</execution>

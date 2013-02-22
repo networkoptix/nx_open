@@ -14,7 +14,7 @@
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.2</version>
+	<version>1.4.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vmaxproxy</artifactId>
 	<packaging>pom</packaging>
@@ -59,45 +59,4 @@
 			</plugin>
 		</plugins>
 	</build>	
-	<profiles>
-		<!--<profile>
-			<id>vmax</id>
-			<activation>
-				<os>
-					<family>Windows</family>
-				</os>
-				<property>
-					<name>vmax</name>
-					<value>true</value>
-				</property>	 				
-			</activation>
-			<build>	
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>build-vmax</id>
-								<phase>package</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>_rebuild.bat</executable>
-									<workingDirectory>${basedir}\..\vmaxproxy</workingDirectory>		
-									<arguments>
-										<commandlineArgs>${customization}</commandlineArgs>
-										<commandlineArgs>x86</commandlineArgs>
-									</arguments>
-								</configuration>
-							</execution>	
-						</executions>
-					</plugin>	
-				</plugins>	
-			</build>	
-		</profile>-->
-
-	</profiles>	
 </project>
