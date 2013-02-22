@@ -4,8 +4,10 @@
 #include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
+#include <api/model/storage_space_data.h>
 
 #include "button_box_dialog.h"
+
 
 namespace Ui {
     class ServerSettingsDialog;
@@ -67,26 +69,32 @@ public slots:
     virtual void reject() override;
 
 private:
+    struct StorageItem;
+
     void updateFromResources();
     void submitToResources();
 
+    void addTableItem(const StorageItem &item);
+    void setTableItems(const QList<StorageItem> &items);
+    QList<StorageItem> &items() const;
+
     int addTableRow(int id, const QString &url, int spaceLimitGb);
 
-    void setTableStorages(const QnAbstractStorageResourceList &storages);
-    QnAbstractStorageResourceList tableStorages() const;
+    //void setTableStorages(const QnAbstractStorageResourceList &storages);
+    //QnAbstractStorageResourceList tableStorages() const;
 
-    bool validateStorages(const QnAbstractStorageResourceList &storages);
+    //bool validateStorages(const QnAbstractStorageResourceList &storages);
 
-    void updateSpaceLimitCell(int row, bool force = false);
+    //void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
     void at_storageAddButton_clicked();
     void at_storageRemoveButton_clicked();
     void at_storagesTable_cellChanged(int row, int column);
 
-private:
-    Q_DISABLE_COPY(QnServerSettingsDialog);
+    void at_replyReceived(int status, const QnStorageSpaceDataList &dataList, int handle);
 
+private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
 

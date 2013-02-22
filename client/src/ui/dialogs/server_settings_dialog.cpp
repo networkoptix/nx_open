@@ -12,6 +12,7 @@
 #include <QtGui/QSpinBox>
 
 #include <utils/common/counter.h>
+#include <utils/common/string.h>
 
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -19,11 +20,12 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
-
 namespace {
-    const int defaultSpaceLimitGb = 5;
-    const qint64 BILLION = 1000000000LL;
+    QString formatGbStr(qint64 value) {
+        return QString::number(value/1000000000.0, 'f', 2);
+    }
+
+    const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
 
     class StorageSettingsItemEditorFactory: public QItemEditorFactory {
     public:
@@ -39,6 +41,14 @@ namespace {
 
 } // anonymous namespace
 
+struct QnServerSettingsDialog::StorageItem: public QnStorageSpaceData {
+    StorageItem() {}
+    StorageItem(const QnStorageSpaceData &data): QnStorageSpaceData(data) {}
+
+    qint64 reservedSpace;
+};
+
+
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
@@ -47,8 +57,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 {
     ui->setupUi(this);
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->storagesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-    ui->storagesTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+    for(int col = 0; col < ui->storagesTable->columnCount(); col++)
+        ui->storagesTable->horizontalHeader()->setResizeMode(col, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
 
     QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
@@ -69,8 +79,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
 
     updateFromResources();
-
-    server->apiConnection()->asyncGetStorageSpace(NULL, NULL);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() {
@@ -81,7 +89,7 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    bool valid = m_hasStorageChanges ? validateStorages(tableStorages()) : true;
+    bool valid = true;//m_hasStorageChanges ? validateStorages(tableStorages()) : true;
     if (valid) {
         submitToResources(); 
 
@@ -96,6 +104,47 @@ void QnServerSettingsDialog::reject() {
     base_type::reject();
 }
 
+void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
+    int row = ui->storagesTable->rowCount();
+    ui->storagesTable->insertRow(row);
+
+    QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
+    checkBoxItem->setFlags(checkBoxItem->flags() | Qt::ItemIsUserCheckable);
+    checkBoxItem->setCheckState(item.storageId == -1 ? Qt::Unchecked : Qt::Checked);
+
+    QTableWidgetItem *pathItem = new QTableWidgetItem(item.path);
+
+    QTableWidgetItem *spaceItem = new QTableWidgetItem();
+    if(item.freeSpace == -1 || item.totalSpace == -1) {
+        spaceItem->setText(tr("Not available"));
+    } else {
+        /*: This text refers to storage's free space. E.g. "2Gb of 30Gb". */
+        spaceItem->setText(tr("%1 of %2").arg(formatFileSize(item.freeSpace)).arg(formatFileSize(item.totalSpace)));
+    }
+
+    QTableWidgetItem *reservedItem = new QTableWidgetItem();
+    if(item.reservedSpace == -1) {
+        reservedItem->setText(tr("Not applicable"));
+    } else {
+        reservedItem->setText(formatFileSize(item.reservedSpace));
+    }
+
+    ui->storagesTable->setItem(row, 0, checkBoxItem);
+    ui->storagesTable->setItem(row, 1, pathItem);
+    ui->storagesTable->setItem(row, 2, spaceItem);
+    ui->storagesTable->setItem(row, 3, reservedItem);
+}
+
+void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
+    ui->storagesTable->clearContents();
+    foreach(const StorageItem &item, items)
+        addTableItem(item);
+}
+
+QList<QnServerSettingsDialog::StorageItem> &QnServerSettingsDialog::items() const {
+    return QList<QnServerSettingsDialog::StorageItem>();
+}
+
 int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
     int row = ui->storagesTable->rowCount();
     ui->storagesTable->insertRow(row);
@@ -108,11 +157,13 @@ int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLim
     ui->storagesTable->setItem(row, 0, urlItem);
     ui->storagesTable->setItem(row, 1, spaceItem);
 
-    updateSpaceLimitCell(row, true);
+    //updateSpaceLimitCell(row, true);
 
     return row;
 }
 
+
+#if 0
 void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
     ui->storagesTable->setRowCount(0);
     ui->storagesTable->setColumnCount(2);
@@ -143,8 +194,13 @@ QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
 
     return result;
 }
+#endif
 
 void QnServerSettingsDialog::updateFromResources() {
+    m_server->apiConnection()->asyncGetStorageSpace(this, SLOT(at_replyReceived(int, const QnStorageSpaceDataList &, int)));
+    ui->storagesTable->clearContents();
+    // TODO: Loading...
+
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -158,25 +214,18 @@ void QnServerSettingsDialog::updateFromResources() {
         ui->panicModeLabel->setPalette(palette);
     }
 
-    setTableStorages(m_server->getStorages());
-
     m_hasStorageChanges = false;
 }
 
 void QnServerSettingsDialog::submitToResources() {
-    m_server->setStorages(tableStorages());
+    //m_server->setStorages(tableStorages());
     m_server->setName(ui->nameLineEdit->text());
 }
 
-QString formatGbStr(qint64 value)
-{
-    return QString::number(value/1000000000.0, 'f', 2);
-}
-
+#if 0
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages) {
     return true;
 
-#if 0
     if(storages.isEmpty()) {
         QMessageBox::critical(this, tr("No storages specified"), tr("At least one storage must be specified."));
         return false;
@@ -257,7 +306,6 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     }
 
     return true;
-#endif
 }
 
 void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
@@ -292,13 +340,14 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
         }
     }
 }
+#endif
 
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_storageAddButton_clicked() {
-    addTableRow(0, QString(), defaultSpaceLimitGb);
+    //addTableRow(0, QString(), defaultSpaceLimitGb);
 
     m_hasStorageChanges = true;
 }
@@ -317,7 +366,45 @@ void QnServerSettingsDialog::at_storageRemoveButton_clicked() {
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
     Q_UNUSED(column)
-    updateSpaceLimitCell(row);
+    //updateSpaceLimitCell(row);
 
     m_hasStorageChanges = true;
+}
+
+void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDataList &dataList, int handle) {
+    QList<StorageItem> items;
+
+    QnAbstractStorageResourceList storages = m_server->getStorages();
+    foreach(const QnStorageSpaceData &data, dataList) {
+        StorageItem item = data;
+
+        item.reservedSpace = -1;
+        foreach(const QnAbstractStorageResourcePtr &storage, storages) {
+            if(storage->getId() == item.storageId) {
+                item.reservedSpace = storage->getSpaceLimit();
+                break;
+            }
+        }
+
+        /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
+        if(item.reservedSpace == -1)
+            item.reservedSpace = qMin(defaultReservedSpace, item.freeSpace);
+
+        items.push_back(item);
+    }
+
+    struct StorageItemLess {
+        bool operator()(const StorageItem &l, const StorageItem &r) {
+            bool lLocal = l.path.contains(lit("://"));
+            bool rLocal = r.path.contains(lit("://"));
+
+            if(lLocal != rLocal)
+                return lLocal;
+
+            return l.path < r.path;
+        }
+    };
+    qSort(items.begin(), items.end(), StorageItemLess());
+
+    setTableItems(items);
 }

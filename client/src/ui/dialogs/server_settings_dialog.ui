@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Server settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
    <item>
     <layout class="QFormLayout" name="settingsFormLayout">
      <property name="fieldGrowthPolicy">
@@ -100,7 +100,7 @@
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>2</number>
+         <number>4</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -122,12 +122,22 @@
         </attribute>
         <column>
          <property name="text">
+          <string>In Use</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>Path</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Reserved free storage space (Gb)</string>
+          <string>Free Space</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Reserved Space</string>
          </property>
         </column>
        </widget>
@@ -177,19 +187,6 @@
        </layout>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QSlider" name="spaceSlider">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::NoTicks</enum>
-     </property>
-     <property name="tickInterval">
-      <number>10</number>
-     </property>
     </widget>
    </item>
    <item>

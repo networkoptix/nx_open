@@ -101,6 +101,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnAbstractDataPacketPtr>();
 
     qRegisterMetaType<QnStorageSpaceData>();
+    qRegisterMetaType<QnStorageSpaceDataList>();
     
     qn_commonMetaTypes_initialized = true;
 }

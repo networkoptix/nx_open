@@ -1,5 +1,7 @@
 #include "storage_space_handler.h"
 
+#include <QtCore/QDir>
+
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/common/json.h>
 
@@ -17,12 +19,12 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
 {}
 
 int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamList &, QByteArray &result, QByteArray &contentType) {
-    QList<QnStorageSpaceData> infos;
+    QnStorageSpaceDataList infos;
 
     QList<QString> storagePaths;
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
         QnStorageSpaceData info;
-        info.path = storage->getUrl();
+        info.path = QDir::toNativeSeparators(storage->getUrl());
         info.storageId = storage->getId();
         info.totalSpace = storage->getTotalSpace();
         info.freeSpace = storage->getFreeSpace();
@@ -34,14 +36,17 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
             info.freeSpace = -1;
 
         infos.push_back(info);
-
-        storagePaths.push_back(storage->getUrl());
+        storagePaths.push_back(info.path);
     }
 
     foreach(const QnPlatformMonitor::PartitionSpace &partition, m_monitor->totalPartitionSpaceInfo()) {
+        QString path = QDir::toNativeSeparators(partition.path);
+        if(!path.endsWith(QDir::separator()))
+            path.append(QDir::separator());
+
         bool hasStorage = false;
         foreach(const QString &storagePath, storagePaths) {
-            if(storagePath.startsWith(partition.path)) {
+            if(storagePath.startsWith(path)) {
                 hasStorage = true;
                 break;
             }
@@ -50,7 +55,7 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
             continue;
 
         QnStorageSpaceData info;
-        info.path = partition.path + lit(QN_MEDIA_FOLDER_NAME);
+        info.path = path + lit(QN_MEDIA_FOLDER_NAME);
         info.storageId = -1;
         info.totalSpace = partition.sizeBytes;
         info.freeSpace = partition.freeBytes;

@@ -174,7 +174,7 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse &response, int handle);
 
     signals:
-        void finished(int status, const QnStorageSpaceData &data, int handle);
+        void finished(int status, const QnStorageSpaceDataList &data, int handle);
     };
 
 

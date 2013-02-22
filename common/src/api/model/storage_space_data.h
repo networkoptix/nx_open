@@ -15,6 +15,9 @@ struct QnStorageSpaceData {
 void serialize(const QnStorageSpaceData &value, QVariant *target);
 bool deserialize(const QVariant &value, QnStorageSpaceData *target);
 
+typedef QList<QnStorageSpaceData> QnStorageSpaceDataList;
+
 Q_DECLARE_METATYPE(QnStorageSpaceData);
+Q_DECLARE_METATYPE(QnStorageSpaceDataList);
 
 #endif // QN_STORAGE_SPACE_DATA_H
