@@ -1,0 +1,16 @@
+ <assembly>
+	<id>windows-x86</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${libdir}</directory>
+			<outputDirectory>../</outputDirectory>
+			<includes>
+				<include>bin/${build.configuration}/${artifactId}.exe</include>
+			</includes>
+		</fileSet>			
+	</fileSets>
+</assembly>

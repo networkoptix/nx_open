@@ -2,12 +2,6 @@
 #include "utils/network/socket.h"
 #include "acs_codec.h"
 
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_stream_source_mdd.lib")
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_codec_mdd.lib")
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_post_processing_mdd.lib")
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_export_mdd.lib")
-
-
 #include "plugins/resources/arecontvision/tools/nalconstructor.cpp"
 
 int create_vmax_sps_pps(

@@ -20,6 +20,15 @@
 	</distributionManagement>	
 
 	<properties>
+		<release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+		<appserver.name>Enterprise Controller</appserver.name>
+		<client.name>${company.name} ${product.name} Client</client.name>
+		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
+		<mediaserver.name>${company.name} Media Server</mediaserver.name>
+		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
+		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+		<testcamera.name>${company.name} Test Camera</testcamera.name>
+		<traytool.name>${product.name} Tray Assistant</traytool.name>	
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
@@ -50,10 +59,10 @@
 		<module>build-environment</module>
 		<module>appserver</module>
 		<module>common</module>
-		<module>mediaserver</module>
 		<module>mediaproxy</module>
-		<module>client</module>		
 		<module>testcamera</module>
+		<module>mediaserver</module>
+		<module>client</module>		
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -135,6 +144,23 @@
 
 	<profiles>
 		<profile>
+			<id>vmax</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>			
+				<property>
+					<name>vmax</name>
+					<value>true</value>
+				</property>	 			
+			</activation>
+
+			<modules>
+				<module>vmaxproxy</module>
+			</modules>
+		</profile>	
+
+		<profile>
 			<id>windows</id>
 			<activation>
 				<os>
@@ -142,8 +168,8 @@
 				</os>
 			</activation>
 			<modules>
+				<module>vmaxproxy</module>
 				<module>quicksyncdecoder</module>	
-				<module>vmaxproxy</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
@@ -231,7 +257,7 @@
 				<module>android-client/protobuf-classes</module>
 				<module>android-client/android-main</module>
 			</modules>
-		</profile>			
+		</profile>		
 	</profiles>	
 </project>
 

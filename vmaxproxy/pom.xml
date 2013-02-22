@@ -18,12 +18,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vmaxproxy</artifactId>
 	<packaging>pom</packaging>
-	<name>HD Witness VMAX Proxy</name>	
+	<name>HD Witness VMax Proxy</name>	
 
 	<properties>
 		<product.title>${vmaxproxy.name}</product.title>	
 		<!--Global libs-->
-		<global.libs></global.libs>
+		<global.libs/>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lz</linux.oslibs>
@@ -36,4 +36,68 @@
 		<linux.defines/>
 		<mac.defines/>		
 	</properties>  
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.2</version>
+				<executions>
+					<execution>
+						<id>pack-binaries</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${basedir}/binaries.xml</descriptor>
+							</descriptors>	
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>	
+	<profiles>
+		<!--<profile>
+			<id>vmax</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+				<property>
+					<name>vmax</name>
+					<value>true</value>
+				</property>	 				
+			</activation>
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>build-vmax</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>_rebuild.bat</executable>
+									<workingDirectory>${basedir}\..\vmaxproxy</workingDirectory>		
+									<arguments>
+										<commandlineArgs>${customization}</commandlineArgs>
+										<commandlineArgs>x86</commandlineArgs>
+									</arguments>
+								</configuration>
+							</execution>	
+						</executions>
+					</plugin>	
+				</plugins>	
+			</build>	
+		</profile>-->
+
+	</profiles>	
 </project>

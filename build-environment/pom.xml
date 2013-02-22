@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>help</artifactId>
-			<version>${project.version}-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>zip</type>
 			<classifier>${customization}</classifier>
 		</dependency>
@@ -153,6 +153,27 @@
 	</build>
 	<profiles>
 		<profile>
+			<id>vmax</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+				<property>
+					<name>vmax</name>
+					<value>true</value>
+				</property>	 				
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.digitalwatchdog.dvr</groupId>
+					<artifactId>vmax-integration</artifactId>
+					<version>1.0-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>	
+			</dependencies>				
+		</profile>	
+		<profile>
 			<id>windows</id>
 			<activation>
 				<os>
@@ -167,13 +188,6 @@
 					<type>zip</type>
 					<classifier>${platform}</classifier>	
 				</dependency>	-->	
-				<dependency>
-					<groupId>com.digitalwatchdog.dvr</groupId>
-					<artifactId>vmax-integration</artifactId>
-					<version>1.0-SNAPSHOT</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
-				</dependency>
 				<dependency>
 					<groupId>com.creativelabs</groupId>
 					<artifactId>openal</artifactId>
