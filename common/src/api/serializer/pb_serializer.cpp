@@ -455,17 +455,18 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
         return (pb::UserDefinedEvent + userEvent);
 
     switch(value) {
-        case BusinessEventType::BE_NotDefined:          return pb::NotDefinedEvent;
-        case BusinessEventType::BE_Camera_Motion:       return pb::Camera_Motion;
-        case BusinessEventType::BE_Camera_Input:        return pb::Camera_Input;
-        case BusinessEventType::BE_Camera_Disconnect:   return pb::Camera_Disconnect;
-        case BusinessEventType::BE_Storage_Failure:     return pb::Storage_Failure;
-        case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
-        case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
-        case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
-        case BusinessEventType::BE_MediaServer_Conflict:return pb::MediaServer_Conflict;
-        default:
-            break;
+    case BusinessEventType::BE_NotDefined:          return pb::NotDefinedEvent;
+    case BusinessEventType::BE_Camera_Motion:       return pb::Camera_Motion;
+    case BusinessEventType::BE_Camera_Input:        return pb::Camera_Input;
+    case BusinessEventType::BE_Camera_Disconnect:   return pb::Camera_Disconnect;
+    case BusinessEventType::BE_Storage_Failure:     return pb::Storage_Failure;
+    case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
+    case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
+    case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
+    case BusinessEventType::BE_MediaServer_Conflict:return pb::MediaServer_Conflict;
+    case BusinessEventType::BE_EmailSendError:      return pb::EmailSendError;
+    default:
+        break;
     }
     return pb::NotDefinedEvent;
 }
@@ -543,15 +544,16 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
         return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
 
     switch(pbValue) {
-        case pb::NotDefinedEvent:       return BusinessEventType::BE_NotDefined;
-        case pb::Camera_Motion:         return BusinessEventType::BE_Camera_Motion;
-        case pb::Camera_Input:          return BusinessEventType::BE_Camera_Input;
-        case pb::Camera_Disconnect:     return BusinessEventType::BE_Camera_Disconnect;
-        case pb::Storage_Failure:       return BusinessEventType::BE_Storage_Failure;
-        case pb::Network_Issue:         return BusinessEventType::BE_Network_Issue;
-        case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
-        case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
-        case pb::MediaServer_Conflict:  return BusinessEventType::BE_MediaServer_Conflict;
+    case pb::NotDefinedEvent:       return BusinessEventType::BE_NotDefined;
+    case pb::Camera_Motion:         return BusinessEventType::BE_Camera_Motion;
+    case pb::Camera_Input:          return BusinessEventType::BE_Camera_Input;
+    case pb::Camera_Disconnect:     return BusinessEventType::BE_Camera_Disconnect;
+    case pb::Storage_Failure:       return BusinessEventType::BE_Storage_Failure;
+    case pb::Network_Issue:         return BusinessEventType::BE_Network_Issue;
+    case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
+    case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
+    case pb::MediaServer_Conflict:  return BusinessEventType::BE_MediaServer_Conflict;
+    case pb::EmailSendError:        return BusinessEventType::BE_EmailSendError;
     }
     return BusinessEventType::BE_NotDefined;
 }

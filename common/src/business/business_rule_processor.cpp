@@ -341,6 +341,9 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
+    //TODO: #GDM or #rvasilenko - make call async
+    //TODO: #GDM or #rvasilenko - in case of unsuccessful sending, execute business action:
+    //  ActionType = BA_Popup, runtime params[eventType] = BE_SendMailError.
     if( appServerConnection->sendEmail(
             recipients,
             action->getSubject(),
