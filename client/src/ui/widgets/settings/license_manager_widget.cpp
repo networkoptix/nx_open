@@ -131,6 +131,9 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
 	QnLicensePtr keyLicense;
 
 	foreach (const QnLicensePtr& license, licenses) {
+		if (!license)
+			continue;
+
 		if (license->key() == licenseKey)
 			keyLicense = license;
 
@@ -265,7 +268,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
 		QList<QnLicensePtr> licenseList;
 		QnLicensePtr license = readLicenseFromString(ui->licenseWidget->activationKey());
 		licenseList.append(license);
-        validateLicenses(license->key(), licenseList);
+		validateLicenses(license ? license->key() : "", licenseList);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
