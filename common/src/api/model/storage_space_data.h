@@ -5,6 +5,8 @@
 #include <QtCore/QVariant>
 #include <QtCore/QMetaType>
 
+#include <utils/common/json.h>
+
 struct QnStorageSpaceData {
 	QString path;
 	int storageId;
@@ -12,8 +14,7 @@ struct QnStorageSpaceData {
 	qint64 freeSpace;
 };
 
-void serialize(const QnStorageSpaceData &value, QVariant *target);
-bool deserialize(const QVariant &value, QnStorageSpaceData *target);
+QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace), inline)
 
 typedef QList<QnStorageSpaceData> QnStorageSpaceDataList;
 
