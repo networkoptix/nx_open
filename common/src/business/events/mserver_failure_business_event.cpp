@@ -28,6 +28,6 @@ QString QnMServerFailureBusinessEvent::toString() const
 
 
     QString text = QnAbstractBusinessEvent::toString();
-    text += QObject::tr(". Reason: %1").arg(reasonText);
+    text += QObject::tr(". Reason: %1.\n").arg(reasonText);
     return text;
 }

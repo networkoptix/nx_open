@@ -485,3 +485,19 @@ void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
     const quint64 magic = FileTypeSupport::NOV_EXE_MAGIC;
     file.write((char*) &magic, sizeof(qint64));
 }
+
+QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
+{
+    QString url = res->getUrl();
+    url = url.mid(url.lastIndexOf(L'?')+1);
+    QFileInfo fi(url);
+    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
+    if (!chunkData)
+        return QnTimePeriodList();
+    QnTimePeriodList chunks;
+    QByteArray chunkDataArray(chunkData->readAll());
+    chunks.decode(chunkDataArray);
+    delete chunkData;
+
+    return chunks;
+}

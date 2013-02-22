@@ -6,6 +6,8 @@
 #include "../archive_stream_reader.h"
 #include "../filetypesupport.h"
 #include "../single_shot_file_reader.h"
+#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "nov_archive_delegate.h"
 
 QnAviResource::QnAviResource(const QString& file)
 {
@@ -39,6 +41,15 @@ QString QnAviResource::toString() const
     return getName();
 }
 
+QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
+{
+    QnLayoutFileStorageResourcePtr layoutFile = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    QnAviArchiveDelegate* aviDelegate = layoutFile ? new QnNovArchiveDelegate() : new QnAviArchiveDelegate();
+    if (m_storage)
+        aviDelegate->setStorage(m_storage);
+    return aviDelegate;
+}
+
 QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     if (FileTypeSupport::isImageFileExt(getUrl())) {
@@ -46,10 +57,8 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     }
 
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-    QnAviArchiveDelegate* aviDelegate = new QnAviArchiveDelegate();
-    if (m_storage)
-        aviDelegate->setStorage(m_storage);
-    result->setArchiveDelegate(aviDelegate);
+
+    result->setArchiveDelegate(createArchiveDelegate());
     if (hasFlags(still_image) || hasFlags(utc))
         result->setCycleMode(false);
 
