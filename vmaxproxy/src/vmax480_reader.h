@@ -1,11 +1,12 @@
-#ifndef vmax480_live_h_1740
-#define vmax480_live_h_1740
+#ifndef _VMAX480_READER_H__
+#define _VMAX480_READER_H__
 
 #include <QMutex>
 #include <QWaitCondition>
 #include "acs_stream_source.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "plugins/storage/dts/vmax480/vmax480_helper.h"
+
 
 class ACS_stream_source;
 class TCPSocket;
@@ -46,4 +47,4 @@ private:
     int m_channelNum;
 };
 
-#endif //vmax480_live_h_1740
+#endif // _VMAX480_READER_H__

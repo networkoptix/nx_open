@@ -30,7 +30,8 @@ private:
     bool m_connected;
     CLDataQueue m_internalQueue;
     QProcess* m_vMaxProxy;
-    QnVMax480ConnectionProcessor* m_processor;
+    QString m_tcpID;
+    //QnVMax480ConnectionProcessor* m_processor;
 };
 
 #endif //vmax480_live_h_1740

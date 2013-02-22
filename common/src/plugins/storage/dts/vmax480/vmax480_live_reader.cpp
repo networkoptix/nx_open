@@ -71,15 +71,15 @@ void QnVMax480LiveProvider::openStream()
 
     QStringList args;
     args << QString::number(port);
-    QString tcpID = QnVMax480Server::instance()->registerProvider(this);
-    args << tcpID;
+    m_tcpID = QnVMax480Server::instance()->registerProvider(this);
+    args << m_tcpID;
     m_vMaxProxy = new QProcess();
     m_vMaxProxy->start(QLatin1String("vmaxproxy"), args);
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
     {
-        m_processor = QnVMax480Server::instance()->waitForConnection(tcpID, PROCESS_TIMEOUT);
-        if (m_processor) {
-            m_processor->connect(m_networkRes->getUrl(), m_networkRes->getAuth());
+        bool rez = QnVMax480Server::instance()->waitForConnection(m_tcpID, PROCESS_TIMEOUT);
+        if (rez) {
+            QnVMax480Server::instance()->vMaxConnect(m_tcpID, m_networkRes->getUrl(), m_networkRes->getAuth());
             m_connected = true;
         }
     }
@@ -93,11 +93,9 @@ void QnVMax480LiveProvider::closeStream()
 {
     if (!m_connected)
         return;
-    if (m_processor)
-    {
-        m_processor->disconnect();
-        m_processor = 0;
-    }
+
+
+    QnVMax480Server::instance()->vMaxDisconnect(m_tcpID);
 
     if (m_vMaxProxy)
     {
@@ -105,7 +103,7 @@ void QnVMax480LiveProvider::closeStream()
         delete m_vMaxProxy;
         m_vMaxProxy = 0;
     }
-    
+    QnVMax480Server::instance()->unregisterProvider(this);
     m_connected = false;
 }
 

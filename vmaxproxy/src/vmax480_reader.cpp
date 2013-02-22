@@ -400,7 +400,7 @@ void QnVMax480Provider::receiveAudioStream(S_ACS_AUDIO_STREAM* _stream)
 
     VMaxAudioHeader[0] = (quint8) _stream->mChannels;
     VMaxAudioHeader[1] = (quint8) _stream->mSamplingbits;
-    *(quint16*)(VMaxHeader+2) = (quint16) _stream->mSamplingrate;
+    *(quint16*)(VMaxAudioHeader+2) = (quint16) _stream->mSamplingrate;
 
     //m_socket->send(VMaxHeader, sizeof(VMaxHeader));
     //m_socket->send(VMaxAudioHeader, sizeof(VMaxAudioHeader));
