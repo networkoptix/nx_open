@@ -7,6 +7,7 @@
 		<Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
 		<?define arch = "${arch}"?>
+		<?define vmax = "${vmax}"?>
 
 		<?include ControlPanel.wxi ?>
 
@@ -945,13 +946,15 @@
 			<ComponentRef Id="TrayToolOpenSSL"/>
 		</Feature>
 
-		<Feature Id="VMaxFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
-			<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !VMaxFeature <> 3 ]]> </Condition>-->
+		<?if $(var.vmax) = true?>	
+			<Feature Id="VMaxFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
+				<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !VMaxFeature <> 3 ]]> </Condition>-->
 
-			<ComponentRef Id="vmaxproxy.exe"/>
-			<ComponentRef Id="VmaxProxyQTLibraries"/>
-			<ComponentRef Id="VmaxProxySDK"/>
-		</Feature>		
+				<ComponentRef Id="vmaxproxy.exe"/>
+				<ComponentRef Id="VmaxProxyQTLibraries"/>
+				<ComponentRef Id="VmaxProxySDK"/>
+			</Feature>		
+		<?endif?>		
 		
 		<Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
