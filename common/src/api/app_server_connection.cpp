@@ -11,6 +11,7 @@
 #include <business/actions/abstract_business_action.h>
 
 namespace {
+    // TODO: #Elric use enum and an enum->string conversion function.
     const QLatin1String cameraObject("camera");
     const QLatin1String resourceObject("resource");
     const QLatin1String serverObject("server");

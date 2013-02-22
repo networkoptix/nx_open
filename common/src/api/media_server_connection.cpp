@@ -367,16 +367,6 @@ int QnMediaServerConnection::setParamList(const QnNetworkResourcePtr &camera, co
     return status;
 }
 
-int QnMediaServerConnection::asyncGetFreeSpace(const QString &path, QObject *target, const char *slot)
-{
-    detail::QnMediaServerFreeSpaceReplyProcessor *processor = new detail::QnMediaServerFreeSpaceReplyProcessor();
-    connect(processor, SIGNAL(finished(int, qint64, qint64, int)), target, slot);
-
-    QnRequestParamList params;
-    params << QnRequestParam("path", path);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("GetFreeSpace"), QnRequestHeaderList(), params, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
-}
-
 int QnMediaServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::QnMediaServerStatisticsReplyProcessor *processor = new detail::QnMediaServerStatisticsReplyProcessor();
     connect(processor, SIGNAL(finished(const QnStatisticsDataList &/* data */)), target, slot, Qt::QueuedConnection);
@@ -469,23 +459,6 @@ QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int
     }
     else
         return QByteArray();
-}
-
-void detail::QnMediaServerFreeSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle)
-{
-    qint64 freeSpace = -1;
-    qint64 totalSpace = -1;
-
-    if(response.status == 0)
-    {
-        QByteArray message = extractXmlBody(response.data, "root");
-        freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
-        totalSpace = extractXmlBody(message, "totalSpace").toLongLong();
-    }
-
-    emit finished(response.status, freeSpace, totalSpace, handle);
-
-    deleteLater();
 }
 
 int QnMediaServerConnection::recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &result, QByteArray &errorString)
@@ -703,7 +676,7 @@ void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(cons
     QnPtzSpaceMapper mapper;
     if(response.status == 0) {
         QVariantMap map;
-        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "mapper", &mapper))
+        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "data", &mapper))
             status = 1;
     } else {
         qnWarning("Could not get ptz space mapper for camera: %1.", response.errorString);
@@ -712,3 +685,26 @@ void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(cons
     emit finished(status, mapper, handle);
 }
 
+int QnMediaServerConnection::asyncGetStorageSpace(QObject *target, const char *slot) {
+    detail::QnMediaServerStorageSpaceReplyProcessor *processor = new detail::QnMediaServerStorageSpaceReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QnStorageSpaceData &, int)), target, slot, Qt::QueuedConnection);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("storageSpace"), QnRequestHeaderList(), QnRequestParamList(), processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
+}
+
+
+void detail::QnMediaServerStorageSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse &response, int handle) {
+    const QByteArray& reply = response.data;
+    int status = response.status;
+
+    QnStorageSpaceData data;
+    if(response.status == 0) {
+        QVariantMap map;
+        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "data", &data))
+            status = 1;
+    } else {
+        qnWarning("Could not get storage spaces.", response.errorString);
+    }
+
+    emit finished(status, data, handle);
+}

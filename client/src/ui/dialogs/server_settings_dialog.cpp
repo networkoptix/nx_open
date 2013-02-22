@@ -69,6 +69,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
 
     updateFromResources();
+
+    server->apiConnection()->asyncGetStorageSpace(NULL, NULL);
 }
 
 QnServerSettingsDialog::~QnServerSettingsDialog() {
@@ -172,6 +174,9 @@ QString formatGbStr(qint64 value)
 }
 
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages) {
+    return true;
+
+#if 0
     if(storages.isEmpty()) {
         QMessageBox::critical(this, tr("No storages specified"), tr("At least one storage must be specified."));
         return false;
@@ -252,6 +257,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     }
 
     return true;
+#endif
 }
 
 void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {

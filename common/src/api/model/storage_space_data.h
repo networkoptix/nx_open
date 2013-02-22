@@ -3,6 +3,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QVariant>
+#include <QtCore/QMetaType>
 
 struct QnStorageSpaceData {
 	QString path;
@@ -13,5 +14,7 @@ struct QnStorageSpaceData {
 
 void serialize(const QnStorageSpaceData &value, QVariant *target);
 bool deserialize(const QVariant &value, QnStorageSpaceData *target);
+
+Q_DECLARE_METATYPE(QnStorageSpaceData);
 
 #endif // QN_STORAGE_SPACE_DATA_H

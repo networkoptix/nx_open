@@ -1,4 +1,4 @@
-#include "storage_statistics_handler.h"
+#include "storage_space_handler.h"
 
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/common/json.h>
@@ -9,6 +9,8 @@
 
 #include <recorder/storage_manager.h>
 
+#include <version.h>
+
 
 QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
@@ -18,7 +20,7 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
     QList<QnStorageSpaceData> infos;
 
     QList<QString> storagePaths;
-    foreach(const QnStorageResourcePtr &storage, qnStorageMan->getAllStorages()) {
+    foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
         QnStorageSpaceData info;
         info.path = storage->getUrl();
         info.storageId = storage->getId();
@@ -48,7 +50,7 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
             continue;
 
         QnStorageSpaceData info;
-        info.path = partition.path + lit("Media"); // TODO: customization-based name
+        info.path = partition.path + lit(QN_MEDIA_FOLDER_NAME);
         info.storageId = -1;
         info.totalSpace = partition.sizeBytes;
         info.freeSpace = partition.freeBytes;
@@ -56,7 +58,7 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
     }
 
     QVariantMap root;
-    QJson::serialize(infos, "storages", &root);
+    QJson::serialize(infos, "data", &root);
     QJson::serialize(root, &result);
     contentType = "application/json";
 
