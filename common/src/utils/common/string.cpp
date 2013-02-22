@@ -39,6 +39,16 @@ QString formatFileSize(qint64 size, const QString pattern) {
 
         suffix = lit(sizeSuffixes[unit]);
         number = (size < 0 ? lit("-") : QString()) + QString::number(absSize / std::pow(1000.0, unit), 'f', 1);
+
+        /* Chop trailing zeros. */
+        for(int i = number.size() - 1; ;i--) {
+            QChar c = number[i];
+            if(c != L'0' && c != L'.') {
+                number.chop(number.size() - i - 1);
+                break;
+            }
+        }
+
     }
 
     return pattern.arg(number).arg(suffix);
