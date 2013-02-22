@@ -182,7 +182,7 @@ template<class T, class Step>
 T qCeil(T value, Step step) {
     DEBUG_CODE(assert(step > 0));
     T mod = qMod(value, static_cast<T>(step));
-    return qFuzzyIsNull(mod) ? value : static_cast<T>(value + step);
+    return qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
 }
 
 /**

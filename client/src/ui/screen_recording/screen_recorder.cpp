@@ -74,7 +74,7 @@ namespace {
         switch(captureMode) {
         case Qn::WindowMode:             return QnScreenGrabber::CaptureMode_Application;
         case Qn::FullScreenMode:         return QnScreenGrabber::CaptureMode_DesktopWithAero;
-        case Qn::FullScreenNoeroMode:    return QnScreenGrabber::CaptureMode_DesktopWithoutAero;
+        case Qn::FullScreenNoAeroMode:    return QnScreenGrabber::CaptureMode_DesktopWithoutAero;
         default:
             qnWarning("Invalid capture mode value '%1', treating as window mode.", static_cast<int>(captureMode));
             return QnScreenGrabber::CaptureMode_Application;

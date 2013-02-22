@@ -35,6 +35,7 @@ public:
         Flag_CanProcessNegativeSpeed = 2, // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
         Flag_CanProcessMediaStep = 4,      // flag inform that delegate is going to process media step itself.
         Flag_CanSendMotion       = 8,      // motion supported
+        Flag_CanSeekImmediatly   = 16,      // delegate can perform seek operation immediatly, without 'open' function call
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 

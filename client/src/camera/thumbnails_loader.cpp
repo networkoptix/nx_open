@@ -26,6 +26,7 @@
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
@@ -381,7 +382,14 @@ void QnThumbnailsLoader::process() {
         }
     }
     else {
-        QnAviArchiveDelegatePtr aviDelegate(new QnAviArchiveDelegate());
+        QnAviArchiveDelegatePtr aviDelegate;
+
+        QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
+        if (aviFile)
+            aviDelegate = QnAviArchiveDelegatePtr(aviFile->createArchiveDelegate());
+        else
+            aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate);
+
         QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(aviDelegate));
         if (thumbnailDelegate->open(m_resource))
             delegates << thumbnailDelegate;
@@ -409,7 +417,7 @@ void QnThumbnailsLoader::process() {
             outFrame->setUseExternalData(false);
 
             while (frame) {
-                if (!camera)
+                if (!m_resource->hasFlags(QnResource::utc))
                     frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
 
                 timingsQueue << frame->timestamp;

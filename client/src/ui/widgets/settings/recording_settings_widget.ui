@@ -50,7 +50,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="captureModeGroupBox">
      <property name="title">
       <string>Capture Mode</string>
      </property>
@@ -98,7 +98,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_5">
+    <widget class="QGroupBox" name="additionalGroupBox">
      <property name="title">
       <string>Additional Options</string>
      </property>
@@ -127,7 +127,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="qualityGroupBox">
      <property name="title">
       <string>Quality</string>
      </property>
@@ -136,7 +136,7 @@
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="resoulitionLabel">
         <property name="text">
          <string>Resolution:</string>
         </property>
@@ -192,7 +192,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="qualityLabel">
         <property name="text">
          <string>Recording Quality:</string>
         </property>
@@ -236,13 +236,13 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_4">
+    <widget class="QGroupBox" name="audioGroupBox">
      <property name="title">
       <string>Audio Grabbing</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,1">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_primaryDeviceIcon">
+       <widget class="QLabel" name="primaryDeviceIconLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -255,7 +255,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label_primaryDeviceText">
+       <widget class="QLabel" name="primaryDeviceTextLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -292,7 +292,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_secondaryDeviceIcon">
+       <widget class="QLabel" name="secondaryDeviceIconLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -305,7 +305,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="label_secondaryDeviceText">
+       <widget class="QLabel" name="secondaryDeviceTextLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
