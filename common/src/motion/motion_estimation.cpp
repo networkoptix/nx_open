@@ -854,7 +854,6 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         }
     }
 #endif
-
     // 6. remove motion if motion square is not enough and write result to bitarray
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
     {
@@ -1033,8 +1032,9 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         int iLineNum = (scaledLineNum+32768) >> 16;
         if (iLineNum > prevILineNum) 
         {
-            for (int i = 0; i < iLineNum - prevILineNum; ++i)
-                dst[y] = m_resultMotion[iLineNum+i];
+            dst[y] = m_resultMotion[iLineNum];
+            for (int i = 1; i < iLineNum - prevILineNum; ++i)
+                dst[y] |= m_resultMotion[iLineNum+i];
         }
         else {
             dst[y] |= m_resultMotion[iLineNum];
