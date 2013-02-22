@@ -16,6 +16,10 @@ QnSystemHealthPopupWidget::QnSystemHealthPopupWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::Window, QColor(85, 0, 0)); //TODO: #elric skin color
+    this->setPalette(palette);
+
     connect(ui->fixButton,      SIGNAL(clicked()), this, SLOT(at_fixButton_clicked()));
     connect(ui->postponeButton, SIGNAL(clicked()), this, SLOT(at_postponeButton_clicked()));
 }
@@ -25,13 +29,16 @@ QnSystemHealthPopupWidget::~QnSystemHealthPopupWidget()
 }
 
 bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageType message) {
-    QList<QWidget*> headerLabels;
-    headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
+//    QList<QWidget*> headerLabels;
+//    headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
 
-    foreach (QWidget* w, headerLabels)
-        w->setVisible(false);
+//    foreach (QWidget* w, headerLabels)
+//        w->setVisible(false);
 
     m_messageType = message;
+    if (message == QnSystemHealth::NotDefined)
+        return false;
+    /*
     switch (m_messageType) {
     case QnSystemHealth::NotDefined:
         return false;
@@ -47,6 +54,7 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
         ui->notificationLabel->setVisible(true);
         break;
     }
+    */
     ui->messageLabel->setText(QnSystemHealth::toString(m_messageType));
 
     return true;

@@ -67,7 +67,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(this);
         if (!pw->addBusinessAction(businessAction))
             return false;
-        ui->verticalLayout->addWidget(pw);
+        ui->verticalLayout->insertWidget(0, pw);
         m_businessEventWidgets[eventType] = pw;
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_businessEventWidget_closed(BusinessEventType::Value, bool)));
     }
