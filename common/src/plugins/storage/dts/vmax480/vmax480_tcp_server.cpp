@@ -1,7 +1,7 @@
 #include "vmax480_tcp_server.h"
 #include "vmax480_live_reader.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "vmax480_helper.h"
+#include "../../../../vmaxproxy/src/vmax480_helper.h"
 
 static const int UUID_LEN = 38;
 

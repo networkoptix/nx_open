@@ -3,9 +3,10 @@
 
 #include <QMutex>
 #include <QWaitCondition>
+#include <QDateTime>
+
 #include "acs_stream_source.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "plugins/storage/dts/vmax480/vmax480_helper.h"
+#include "vmax480_helper.h"
 
 
 class ACS_stream_source;
@@ -40,7 +41,6 @@ private:
     QMutex m_callbackMutex;
     QWaitCondition m_callbackCond;
     bool m_connectedInternal;
-    CLDataQueue m_internalQueue;
     QTime m_aliveTimer;
     TCPSocket* m_socket;
     quint8 m_sequence;

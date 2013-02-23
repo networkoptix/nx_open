@@ -94,6 +94,11 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
     return new QnVMax480LiveProvider(toSharedPointer());
 }
 
+QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider() 
+{ 
+    return 0; 
+}
+
 void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 {
 

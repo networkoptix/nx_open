@@ -1,9 +1,9 @@
 #include <QDebug>
 #include <QByteArray>
 #include <QList>
-#include "utils/network/socket.h"
+#include "socket.h"
 #include "vmax480_reader.h"
-#include "plugins/storage/dts/vmax480/vmax480_helper.h"
+#include "vmax480_helper.h"
 
 
 QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& params, quint8 sequence)

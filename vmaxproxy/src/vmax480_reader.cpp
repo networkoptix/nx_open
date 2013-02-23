@@ -1,14 +1,10 @@
+#include <QUrl>
+
 #include "vmax480_reader.h"
-#include "utils/network/socket.h"
+#include "socket.h"
 #include "acs_codec.h"
 
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_stream_source_mdd.lib")
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_codec_mdd.lib")
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_post_processing_mdd.lib")
-#pragma comment(lib, "c:/develop/netoptix_vmax/vmax/bin/lib/Multithreaded_Debug_DLL/acs_export_mdd.lib")
-
-
-#include "plugins/resources/arecontvision/tools/nalconstructor.cpp"
+#include "nalconstructor.h"
 
 int create_vmax_sps_pps(
                    int frameWidth,
@@ -109,7 +105,6 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_spsPpsHeight(-1),
     m_spsPpsBufferLen(0),
     m_connectedInternal(false),
-    m_internalQueue(16),
     m_socket(socket),
     m_channelNum(0),
     m_sequence(0)

@@ -31,6 +31,8 @@ public:
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
+
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool initInternal() override;
 };
