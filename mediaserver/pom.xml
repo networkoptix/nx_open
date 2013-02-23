@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.1</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.1</version>
+	<version>1.4.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>mediaserver</artifactId>
 	<packaging>pom</packaging>
@@ -22,8 +22,8 @@
 
 	<properties>
 		<product.title>${mediaserver.name}</product.title>  
-        <!--Global libs-->		
-		<global.libs></global.libs>
+		<!--Global libs-->		
+		<global.libs/>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lz</linux.oslibs>
@@ -35,4 +35,28 @@
 		<linux.defines/>
 		<mac.defines/>      
 	</properties>	
+
+	<profiles>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+				<property>
+					<name>vmax</name>
+					<value>true</value>
+				</property>	 				
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.networkoptix.hdwitness</groupId>
+					<artifactId>vmaxproxy</artifactId>
+					<version>${project.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-x86</classifier>
+				</dependency>	
+			</dependencies>			
+		</profile>		
+	</profiles>		
 </project>

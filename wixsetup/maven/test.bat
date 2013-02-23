@@ -9,7 +9,7 @@ SET SERVER_DIRECTORY=c:\records
 SET SERVER_RTSP_PORT=7101
 SET SERVER_API_PORT=7201
 
-SET VERSION=${project.version}.${buildNumber}
+SET VERSION=${release.version}.${buildNumber}
 SET "CURRENTDIR=${project.build.directory}"
 SET ARTIFACTID=${project.parent.artifactId}
 

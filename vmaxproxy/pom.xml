@@ -9,21 +9,21 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.1</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.2</version>
+	<version>1.4.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vmaxproxy</artifactId>
 	<packaging>pom</packaging>
-	<name>HD Witness VMAX Proxy</name>	
+	<name>HD Witness VMax Proxy</name>	
 
 	<properties>
 		<product.title>${vmaxproxy.name}</product.title>	
 		<!--Global libs-->
-		<global.libs></global.libs>
+		<global.libs/>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lz</linux.oslibs>
@@ -36,4 +36,27 @@
 		<linux.defines/>
 		<mac.defines/>		
 	</properties>  
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.2</version>
+				<executions>
+					<execution>
+						<id>pack-binaries</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${basedir}/binaries.xml</descriptor>
+							</descriptors>	
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>	
 </project>
