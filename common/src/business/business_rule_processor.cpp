@@ -9,6 +9,8 @@
 #include <utils/common/email.h>
 #include "core/resource_managment/resource_pool.h"
 
+const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
+
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
 QnBusinessRuleProcessor::QnBusinessRuleProcessor()
@@ -343,20 +345,37 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
+    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
     //TODO: #GDM or #rvasilenko - make call async
     //TODO: #GDM or #rvasilenko - in case of unsuccessful sending, execute business action:
     //  ActionType = BA_Popup, runtime params[eventType] = BE_SendMailError.
-    if( appServerConnection->sendEmail(
-            recipients,
-            action->getSubject(),
-            action->getMessageBody()))
-    {
-        cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
-                    arg(recipients.join(QLatin1String("; "))).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
-        return false;
-    }
+    appServerConnection->sendEmailAsync(
+                recipients,
+                action->getSubject(),
+                action->getMessageBody(),
+                EMAIL_SEND_TIMEOUT,
+                this,
+                SLOT(at_sendEmailFinished(int,QByteArray,bool,int)));
+
     return true;
+}
+
+void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray &errorString, bool result, int handle)
+{
+    if (!result)
+    {
+        QnBusinessParams params;
+        params[QLatin1String("eventType")] = BusinessEventType::BE_EmailSendError;
+        params[QLatin1String("userGroup")] = QLatin1String("admin");
+        params[QLatin1String("eventTimestamp")] = qnSyncTime->currentUSecsSinceEpoch();
+        params[QLatin1String("eventDescription")] = QString(QLatin1String("Error sending email: %1")).arg(QString::fromUtf8(errorString));
+
+        QnPopupBusinessActionPtr action(new QnPopupBusinessAction(params));
+        showPopup(action);
+
+        cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
+                    arg(QString::fromUtf8(errorString)), cl_logWARNING );
+    }
 }
 
 bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
