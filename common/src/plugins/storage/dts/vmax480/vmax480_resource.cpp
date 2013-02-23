@@ -1,9 +1,13 @@
 #include "vmax480_resource.h"
 #include "vmax480_live_reader.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
+#include "vmax480_archive_delegate.h"
 
 const char* QnPlVmax480Resource::MANUFACTURE = "VMAX";
 
-QnPlVmax480Resource::QnPlVmax480Resource()
+QnPlVmax480Resource::QnPlVmax480Resource():
+    m_startTime(AV_NOPTS_VALUE),
+    m_endTime(AV_NOPTS_VALUE)
 {
 
 }
@@ -96,7 +100,9 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider() 
 { 
-    return 0; 
+    QnArchiveStreamReader* reader = new QnArchiveStreamReader(toSharedPointer());
+    reader->setArchiveDelegate(new QnVMax480ArchiveDelegate(toSharedPointer()));
+    return reader; 
 }
 
 void QnPlVmax480Resource::setCropingPhysical(QRect croping)
@@ -112,4 +118,35 @@ bool QnPlVmax480Resource::initInternal()
     save();
 
     return true;
+}
+
+qint64 QnPlVmax480Resource::startTime() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_startTime;
+}
+
+qint64 QnPlVmax480Resource::endTime() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_endTime;
+}
+
+void QnPlVmax480Resource::setStartTime(qint64 valueUsec)
+{
+    QMutexLocker lock(&m_mutex);
+    m_startTime = valueUsec;
+}
+
+void QnPlVmax480Resource::setEndTime(qint64 valueUsec)
+{
+    QMutexLocker lock(&m_mutex);
+    m_endTime = valueUsec;
+}
+
+void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec)
+{
+    QMutexLocker lock(&m_mutex);
+    m_startTime = startTimeUsec;
+    m_endTime = endTimeUsec;
 }

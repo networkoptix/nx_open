@@ -29,12 +29,23 @@ public:
 
     virtual bool hasDualStreaming() const override { return false; }
 
+    void setStartTime(qint64 valueUsec);
+    qint64 startTime() const;
+
+    void setEndTime(qint64 valueUsec);
+    qint64 endTime() const;
+
+    void setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec);
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool initInternal() override;
+private:
+    qint64 m_startTime;
+    qint64 m_endTime;
 };
 
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;

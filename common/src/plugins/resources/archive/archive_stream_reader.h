@@ -74,6 +74,9 @@ public:
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
+    
+    /* Return true if archvie range is accessible immedeatly without opening an archive */
+    bool offlineRangeSupported() const;
 protected:
     virtual bool init();
 

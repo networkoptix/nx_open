@@ -18,8 +18,9 @@ public:
     QnVMax480Provider(TCPSocket* socket);
     virtual ~QnVMax480Provider();
 
-    void connect(VMaxParamList params, quint8 sequence);
+    void connect(const VMaxParamList& params, quint8 sequence, bool isLive);
     void disconnect();
+    void archivePlay(const VMaxParamList& params);
     bool isConnected() const;
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
@@ -43,7 +44,8 @@ private:
     bool m_connectedInternal;
     QTime m_aliveTimer;
     TCPSocket* m_socket;
-    quint8 m_sequence;
+    quint8 m_reqSequence;
+    quint8 m_curSequence;
     int m_channelNum;
 };
 

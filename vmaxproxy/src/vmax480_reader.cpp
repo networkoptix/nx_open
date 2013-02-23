@@ -96,6 +96,28 @@ int create_vmax_sps_pps(
 }
 
 
+QDateTime QnVMax480Provider::fromNativeTimestamp(int mDate, int mTime, int mMillisec)
+{
+    int _year	= mDate / 10000;
+    int _month  = (mDate % 10000) / 100;
+    int _day	= (mDate % 10000) % 100;
+
+    int hour	=	mTime /10000;
+    int min		=	(mTime%10000)/100;
+    int sec		=	(mTime%10000)%100;
+    int milli	=	(mMillisec);
+
+    return QDateTime(QDate(_year, _month, _day), QTime(hour, min, sec, milli));
+}
+
+void toNativeTimestamp(QDateTime timestamp, quint32* date, quint32* time, quint32* ms)
+{
+    *date = timestamp.date().year() * 10000 + timestamp.date().month()  * 100 + timestamp.date().day();
+    *time = timestamp.time().hour() * 10000 + timestamp.time().minute() * 100 + timestamp.time().second();
+    if (ms)
+        *ms = timestamp.time().msec();
+}
+
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
 QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
@@ -107,7 +129,8 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_connectedInternal(false),
     m_socket(socket),
     m_channelNum(0),
-    m_sequence(0)
+    m_reqSequence(0),
+    m_curSequence(0)
 {
 }
 
@@ -116,7 +139,7 @@ QnVMax480Provider::~QnVMax480Provider()
 
 }
 
-void QnVMax480Provider::connect(VMaxParamList params, quint8 sequence)
+void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bool isLive)
 {
     if (m_connected)
         return;
@@ -136,10 +159,10 @@ void QnVMax480Provider::connect(VMaxParamList params, quint8 sequence)
     connectParam.mUserID	=	QString::fromUtf8(params.value("login")).toStdWString();
     connectParam.mUserPwd	=	QString::fromUtf8(params.value("password")).toStdWString();
 
-    connectParam.mIsLive	=	true;
+    connectParam.mIsLive	=	isLive;
 
     //call connect function
-    m_sequence = sequence;
+    m_reqSequence = m_curSequence = sequence;
     m_ACSStream->connect(&connectParam);
 
     m_connected = true;
@@ -175,6 +198,19 @@ void QnVMax480Provider::disconnect()
     }
 }
 
+void QnVMax480Provider::archivePlay(const VMaxParamList& params)
+{
+    if (!m_ACSStream)
+        return;
+
+    qint64 posUsec = params.value("pos").toLongLong();
+    quint32 startDate;
+    quint32 startTime;
+    toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(posUsec/1000), &startDate, &startTime, 0);
+
+    m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, startDate, startTime, false);
+}
+
 bool QnVMax480Provider::isConnected() const
 {
     return m_connected;
@@ -197,25 +233,12 @@ void QnVMax480Provider::receiveResultCallback(PS_ACS_RESULT _result, long long _
     object->receiveResult(_result);
 }
 
-QDateTime QnVMax480Provider::fromNativeTimestamp(int mDate, int mTime, int mMillisec)
-{
-    int _year	= mDate / 10000;
-    int _month  = (mDate % 10000) / 100;
-    int _day	= (mDate % 10000) % 100;
-
-    int hour	=	mTime /10000;
-    int min		=	(mTime%10000)/100;
-    int sec		=	(mTime%10000)%100;
-    int milli	=	(mMillisec);
-
-    return QDateTime(QDate(_year, _month, _day), QTime(hour, min, sec, milli));
-}
-
 void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 {
     QMutexLocker lock(&m_callbackMutex);
 
-    QString tempStr;
+    if (m_reqSequence != m_curSequence)
+        return;
 
     if(!m_connected)
         return;
@@ -232,7 +255,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
     int dataSize = _stream->mSrcSize + (isIFrame ? m_spsPpsBufferLen : 0);
 
     quint8 VMaxHeader[16];
-    VMaxHeader[0] = m_sequence;
+    VMaxHeader[0] = m_reqSequence;
     VMaxHeader[1] = VMAXDT_GotVideoPacket;
     VMaxHeader[2] = (quint8) _stream->mSrcType;
     VMaxHeader[3] = (quint8) isIFrame;
@@ -305,6 +328,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     case RESULT_SEARCH_PLAY:
         {
             //OutputDebugString(_T("Answer reqeustPlaymode from device.\n"));
+            m_curSequence++;
             break;
         }
     case RESULT_REC_DATE_TIME :
@@ -318,7 +342,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                 QDateTime endDateTime = fromNativeTimestamp(endDate, endTime, 0);
 
                 quint8 vMaxHeader[16];
-                vMaxHeader[0] = m_sequence;
+                vMaxHeader[0] = m_curSequence;
                 vMaxHeader[1] = VMAXDT_GotArchiveRange;
                 
                 vMaxHeader[2] = 0;
@@ -390,12 +414,15 @@ void QnVMax480Provider::receiveAudioStream(S_ACS_AUDIO_STREAM* _stream)
 {
     QMutexLocker lock(&m_callbackMutex);
 
+    if (m_curSequence != m_reqSequence)
+        return;
+
     ACS_audio_codec::A_CODEC_TYPE codec = (ACS_audio_codec::A_CODEC_TYPE) _stream->mSrcType;
 
     QDateTime packetTimestamp = fromNativeTimestamp(_stream->mDate, _stream->mTime, _stream->mMillisec);
 
     quint8 VMaxHeader[16];
-    VMaxHeader[0] = m_sequence;
+    VMaxHeader[0] = m_reqSequence;
     VMaxHeader[1] = VMAXDT_GotAudioPacket;
     VMaxHeader[2] = (quint8) _stream->mSrcType;
     VMaxHeader[3] = 0;

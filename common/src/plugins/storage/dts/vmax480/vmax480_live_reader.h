@@ -3,17 +3,17 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "core/resource/resource_fwd.h"
+#include "vmax480_stream_fetcher.h"
 
 class QnVMax480ConnectionProcessor;
 
-class QnVMax480LiveProvider: public CLServerPushStreamreader
+class QnVMax480LiveProvider: public CLServerPushStreamreader, public VMaxStreamFetcher
 {
 public:
     QnVMax480LiveProvider(QnResourcePtr dev );
     virtual ~QnVMax480LiveProvider();
 
-    void onGotData(QnAbstractMediaDataPtr mediaData);
-    void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime);
+    virtual void onGotData(QnAbstractMediaDataPtr mediaData) override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;
@@ -30,8 +30,6 @@ private:
     QnNetworkResourcePtr m_networkRes;
     bool m_connected;
     CLDataQueue m_internalQueue;
-    QProcess* m_vMaxProxy;
-    QString m_tcpID;
     //QnVMax480ConnectionProcessor* m_processor;
 };
 

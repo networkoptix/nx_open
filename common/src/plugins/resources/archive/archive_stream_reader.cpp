@@ -246,6 +246,11 @@ bool QnArchiveStreamReader::init()
     return true;
 }
 
+bool QnArchiveStreamReader::offlineRangeSupported() const
+{
+    return m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineRange;
+}
+
 qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
 {
     QnlTimeSource* timeSource = 0;

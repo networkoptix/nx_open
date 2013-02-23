@@ -6,10 +6,10 @@
 #include "vmax480_helper.h"
 
 
-QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& params, quint8 sequence)
+QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& params, quint8 sequence, bool isLive)
 {
     QnVMax480Provider* result = new QnVMax480Provider(socket);
-    result->connect(params, sequence);
+    result->connect(params, sequence, isLive);
     return result;
 }
 
@@ -64,7 +64,15 @@ int main(int argc, char* argv[])
         switch(command)
         {
             case Command_OpenLive:
-                connection = openVMaxConnection(&mServerConnect, params, sequence);
+                connection = openVMaxConnection(&mServerConnect, params, sequence, true);
+                break;
+            case Command_OpenArchive:
+                connection = openVMaxConnection(&mServerConnect, params, sequence, false);
+                break;
+            case Command_ArchivePlay:
+                if (connection) {
+                    connection->archivePlay(params);
+                }
                 break;
             case Command_CloseConnect:
                 if (connection) {

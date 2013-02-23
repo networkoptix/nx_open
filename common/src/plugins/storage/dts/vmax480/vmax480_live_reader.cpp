@@ -5,19 +5,16 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
-#include "plugins/resources/arecontvision/tools/nalconstructor.cpp"
-#include "vmax480_tcp_server.h"
+#include "vmax480_resource.h"
 
-
-static const int PROCESS_TIMEOUT = 1000;
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
 QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
     CLServerPushStreamreader(dev),
+    VMaxStreamFetcher(dev),
     m_connected(false),
-    m_internalQueue(16),
-    m_vMaxProxy(0)
+    m_internalQueue(16)
 {
     m_networkRes = dev.dynamicCast<QnNetworkResource>();
 }
@@ -56,60 +53,19 @@ void QnVMax480LiveProvider::onGotData(QnAbstractMediaDataPtr mediaData)
     m_internalQueue.push(mediaData);
 }
 
-void QnVMax480LiveProvider::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
-{
-    int gg = 4;
-}
-
-
 void QnVMax480LiveProvider::openStream()
 {
     if (m_connected)
         return;
 
-    int port = 0;
-    for (int i = 0; i < 1000 && port == 0; ++i)
-    {
-        port = QnVMax480Server::instance()->getPort();
-        if (port == 0)
-            msleep(1); // waiting for TCP server started
-    }
-
-    QStringList args;
-    args << QString::number(port);
-    m_tcpID = QnVMax480Server::instance()->registerProvider(this);
-    args << m_tcpID;
-    m_vMaxProxy = new QProcess();
-    m_vMaxProxy->start(QLatin1String("vmaxproxy"), args);
-    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
-    {
-        bool rez = QnVMax480Server::instance()->waitForConnection(m_tcpID, PROCESS_TIMEOUT);
-        if (rez) {
-            QnVMax480Server::instance()->vMaxConnect(m_tcpID, m_networkRes->getUrl(), m_networkRes->getAuth());
-            m_connected = true;
-        }
-    }
-    else {
-        delete m_vMaxProxy;
-        m_vMaxProxy = 0;
-    }
+    m_connected = vmaxConnect(true);
 }
 
 void QnVMax480LiveProvider::closeStream()
 {
     if (!m_connected)
         return;
-
-
-    QnVMax480Server::instance()->vMaxDisconnect(m_tcpID);
-
-    if (m_vMaxProxy)
-    {
-        m_vMaxProxy->waitForFinished(PROCESS_TIMEOUT);
-        delete m_vMaxProxy;
-        m_vMaxProxy = 0;
-    }
-    QnVMax480Server::instance()->unregisterProvider(this);
+    vmaxDisconnect();
     m_connected = false;
 }
 

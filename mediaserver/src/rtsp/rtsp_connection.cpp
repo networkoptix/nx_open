@@ -407,7 +407,8 @@ QString QnRtspConnectionProcessor::getRangeStr()
     QString range;
     if (d->archiveDP) 
     {
-        d->archiveDP->open();
+        if (!d->archiveDP->offlineRangeSupported())
+            d->archiveDP->open();
         d->prevStartTime = d->archiveDP->startTime();
         qint64 archiveEndTime = d->archiveDP->endTime();
         //bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;

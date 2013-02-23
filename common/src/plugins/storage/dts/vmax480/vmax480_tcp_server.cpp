@@ -1,5 +1,5 @@
 #include "vmax480_tcp_server.h"
-#include "vmax480_live_reader.h"
+#include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
 
@@ -10,7 +10,6 @@ static const int UUID_LEN = 38;
 class QnVMax480ConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    quint8 sequence;
     QString tcpID;
     QnMediaContextPtr context;
 };
@@ -19,7 +18,6 @@ QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, Qn
     QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner)
 {
     Q_D(QnVMax480ConnectionProcessor);
-    d->sequence = 0;
 }
 
 QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()
@@ -27,7 +25,7 @@ QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()
     stop();
 }
 
-void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, const QAuthenticator& auth)
+void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, const QAuthenticator& auth, bool isLive)
 {
     Q_D(QnVMax480ConnectionProcessor);
 
@@ -35,16 +33,30 @@ void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, const QAuthen
     params["url"] = url.toUtf8();
     params["login"] = auth.user().toUtf8();
     params["password"] = auth.password().toUtf8();
-    QByteArray command = QnVMax480Helper::serializeCommand(Command_OpenLive, d->sequence, params);
+    MServerCommand command = isLive ? Command_OpenLive : Command_OpenArchive;
+    QByteArray data = QnVMax480Helper::serializeCommand(command, 0, params);
 
-    d->socket->send(command);
+    d->socket->send(data);
 }
+
 
 void QnVMax480ConnectionProcessor::vMaxDisconnect()
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->socket->close();
 }
+
+void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 sequence)
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    VMaxParamList params;
+    params["pos"] = QString::number(timeUsec).toUtf8();
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_ArchivePlay, sequence, params);
+
+    d->socket->send(data);
+}
+
 
 bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
 {
@@ -177,6 +189,7 @@ void QnVMax480ConnectionProcessor::run()
             media->flags = AV_PKT_FLAG_KEY;
         media->timestamp = timestamp;
         media->compressionType = codecID;
+        media->opaque = sequence;
 
         static_cast<QnVMax480Server*>(d->owner)->onGotData(d->tcpID, QnAbstractMediaDataPtr(media));
     }
@@ -200,7 +213,7 @@ QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("12
     start();
 }
 
-QString QnVMax480Server::registerProvider(QnVMax480LiveProvider* provider)
+QString QnVMax480Server::registerProvider(VMaxStreamFetcher* provider)
 {
     QMutexLocker lock(&m_mutexProvider);
     QString result = QUuid::createUuid();
@@ -208,10 +221,10 @@ QString QnVMax480Server::registerProvider(QnVMax480LiveProvider* provider)
     return result;
 }
 
-void QnVMax480Server::unregisterProvider(QnVMax480LiveProvider* provider)
+void QnVMax480Server::unregisterProvider(VMaxStreamFetcher* provider)
 {
     QMutexLocker lock(&m_mutexProvider);
-    for (QMap<QString, QnVMax480LiveProvider*>::iterator itr = m_providers.begin(); itr != m_providers.end(); ++itr)
+    for (QMap<QString, VMaxStreamFetcher*>::iterator itr = m_providers.begin(); itr != m_providers.end(); ++itr)
     {
         if (itr.value() == provider) {
             m_providers.erase(itr);
@@ -254,12 +267,20 @@ QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(TCPSocket* cli
     return new QnVMax480ConnectionProcessor(clientSocket, owner);
 }
 
-void QnVMax480Server::vMaxConnect(const QString& tcpID, const QString& url, const QAuthenticator& auth)
+void QnVMax480Server::vMaxConnect(const QString& tcpID, const QString& url, const QAuthenticator& auth, bool isLive)
 {
     QMutexLocker lock(&m_mutexConnection);
     QnVMax480ConnectionProcessor* connection = m_connections.value(tcpID);
     if (connection)
-        connection->vMaxConnect(url, auth);
+        connection->vMaxConnect(url, auth, isLive);
+}
+
+void QnVMax480Server::vMaxArchivePlay(const QString& tcpID, qint64 timeUsec, quint8 sequence)
+{
+    QMutexLocker lock(&m_mutexConnection);
+    QnVMax480ConnectionProcessor* connection = m_connections.value(tcpID);
+    if (connection)
+        connection->vMaxArchivePlay(timeUsec, sequence);
 }
 
 void QnVMax480Server::vMaxDisconnect(const QString& tcpID)
@@ -273,7 +294,7 @@ void QnVMax480Server::vMaxDisconnect(const QString& tcpID)
 void QnVMax480Server::onGotData(const QString& tcpID, QnAbstractMediaDataPtr media)
 {
     QMutexLocker lock(&m_mutexProvider);
-    QnVMax480LiveProvider* provider = m_providers.value(tcpID);
+    VMaxStreamFetcher* provider = m_providers.value(tcpID);
     if (provider)
         provider->onGotData(media);
 }
@@ -281,7 +302,7 @@ void QnVMax480Server::onGotData(const QString& tcpID, QnAbstractMediaDataPtr med
 void QnVMax480Server::onGotArchiveRange(const QString& tcpID, quint32 startDateTime, quint32 endDateTime)
 {
     QMutexLocker lock(&m_mutexProvider);
-    QnVMax480LiveProvider* provider = m_providers.value(tcpID);
+    VMaxStreamFetcher* provider = m_providers.value(tcpID);
     if (provider)
         provider->onGotArchiveRange(startDateTime, endDateTime);
 }

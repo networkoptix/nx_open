@@ -6,7 +6,7 @@
 
 typedef QMap<QByteArray, QByteArray> VMaxParamList;
 
-enum MServerCommand {Command_OpenLive, Command_OpenArchive, Command_CloseConnect};
+enum MServerCommand {Command_OpenLive, Command_OpenArchive, Command_ArchivePlay, Command_CloseConnect};
 enum VMaxDataType { VMAXDT_GotVideoPacket, VMAXDT_GotAudioPacket, VMAXDT_GotArchiveRange };
 
 enum VMaxVideoCodec { CODEC_VSTREAM_H264 , CODEC_VSTREAM_JPEG , CODEC_VSTREAM_MPEG4};
