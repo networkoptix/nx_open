@@ -915,9 +915,11 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data)
 {
     pb::Emails pb_emails;
+    pb_emails.set_timeout(timeout);
+
     pb::Email& email = *(pb_emails.add_email());
 
     foreach (const QString& addr, to)

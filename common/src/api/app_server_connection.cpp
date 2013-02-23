@@ -172,7 +172,9 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         emit finishedSetting(status, errorString, settings, handle);
 	} else if (m_objectName == testEmailSettingsObject) {
 		emit finishedTestEmailSettings(status, errorString, result.toInt(), handle);
-	}
+    } else if (m_objectName == emailObject) {
+        emit finishedSendEmail(status, errorString, result.toInt(), handle);
+    }
 }
 
 QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString &guid,
@@ -954,27 +956,20 @@ int QnAppServerConnection::testEmailSettingsAsync(const QnKvPairList &settings, 
     return addObjectAsync(testEmailSettingsObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
-int QnAppServerConnection::sendEmail(const QString& addr, const QString& subject, const QString& message)
+int QnAppServerConnection::sendEmailAsync(const QString& addr, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot)
 {
-    return sendEmail(QStringList() << addr, subject, message);
+    return sendEmailAsync(QStringList() << addr, subject, message, timeout, target, slot);
 }
 
-int QnAppServerConnection::sendEmail(const QStringList& to, const QString& subject, const QString& message)
+int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot)
 {
-    QnRequestParamList requestParams(m_requestParams);
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, emailObject);
+    QObject::connect(processor, SIGNAL(finishedSendEmail(int, const QByteArray&, bool, int)), target, slot);
 
-    QnHTTPRawResponse response;
-    QByteArray body;
-    m_serializer.serializeEmail(to, subject, message, body);
-    int status = QnSessionManager::instance()->sendPostRequest(m_url,emailObject, QnRequestHeaderList(), requestParams, body, response);
+    QByteArray data;
+    m_serializer.serializeEmail(to, subject, message, timeout, data);
 
-    if (status == 0) {
-        return 0;
-    } else {
-        m_lastError = response.errorString;
-        qWarning() << "Can't send email " << m_lastError;
-        return status;
-    }
+    return addObjectAsync(emailObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
