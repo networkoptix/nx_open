@@ -171,7 +171,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
 
         emit finishedSetting(status, errorString, settings, handle);
 	} else if (m_objectName == testEmailSettingsObject) {
-		emit finishedTestEmailSettings(status, errorString, result.toInt(), handle);
+		emit finishedTestEmailSettings(status, errorString, result == "OK", handle);
     } else if (m_objectName == emailObject) {
         emit finishedSendEmail(status, errorString, result.toInt(), handle);
     }
