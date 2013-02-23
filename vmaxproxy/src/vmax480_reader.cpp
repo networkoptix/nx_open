@@ -3,6 +3,7 @@
 #include "vmax480_reader.h"
 #include "socket.h"
 #include "acs_codec.h"
+#include "nalconstructor.h"
 
 
 int create_vmax_sps_pps(
