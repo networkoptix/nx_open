@@ -152,6 +152,8 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
 
     QUrl url(params.value("url"));
     m_channelNum = url.queryItemValue("channel").toInt();
+    if (m_channelNum > 0)
+        m_channelNum--;
 
     S_CONNECT_PARAM	connectParam;
     connectParam.mUrl	=	url.host().toStdWString();
