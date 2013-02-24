@@ -7,11 +7,12 @@ message License {
     required string name        = 1;
     required string key         = 2;
     required int32  cameraCount = 3;
-    required string hwid        = 4;
+    required string hwid        = 4; // obsolete, should be empty for sw version >= 1.5
     required string signature   = 5;
 }
 
 message Licenses {
     repeated License license = 1;
     optional string  hwid    = 2;
+    optional string  oldHardwareId = 3;
 }

@@ -53,6 +53,7 @@ namespace conn_detail
         void finishedBusinessRule(int status, const QByteArray &errorString, QnBusinessEventRules businessRules, int handle);
         void finishedSetting(int status, const QByteArray& errorString, QnKvPairList settings, int handle);
 		void finishedTestEmailSettings(int status, const QByteArray& errorString, bool result, int handle);
+        void finishedSendEmail(int status, const QByteArray& errorString, bool result, int handle);
     private:
         QnResourceFactory& m_resourceFactory;
         QnApiSerializer& m_serializer;
@@ -105,8 +106,8 @@ public:
 	  */
 	int testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot);
 
-    int sendEmail(const QString& to, const QString& subject, const QString& message);
-    int sendEmail(const QStringList& to, const QString& subject, const QString& message);
+    int sendEmailAsync(const QString& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
+    int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     qint64 getCurrentTime();
 
     // Asynchronous API
@@ -138,7 +139,7 @@ public:
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
-    int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
+    int addLicensesAsync(const QList<QnLicensePtr>& licenses, QObject* target, const char* slot);
 
     int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
     int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);
