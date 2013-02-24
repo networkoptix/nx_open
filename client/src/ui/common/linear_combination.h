@@ -2,8 +2,8 @@
 #define QN_LINEAR_COMBINATION_H
 
 #include <typeinfo>
+#include <QtCore/QVariant>
 #include <utils/common/warnings.h>
-#include <QVariant>
 
 class QPointF;
 class QSizeF;
@@ -37,6 +37,8 @@ T linearCombine(qreal a, const T &x) {
     return linearCombine(a, x, 0.0, T());
 }
 
+template<class T>
+class TypedLinearCombinator;
 
 class LinearCombinator {
 public:
@@ -87,6 +89,14 @@ public:
         return m_zero;
     }
 
+    template<class T>
+    inline const TypedLinearCombinator<T> *typed() const;
+
+    template<class T>
+    TypedLinearCombinator<T> *typed() {
+        return const_cast<TypedLinearCombinator<T> *>(static_cast<const TypedLinearCombinator *>(this)->typed<T>());
+    }
+
 protected:
     /**
      * \param value                     Value to combine magnitude for.
@@ -100,5 +110,73 @@ private:
     int m_type;
     QVariant m_zero;
 };
+
+
+template<class T>
+class TypedLinearCombinator: public LinearCombinator {
+    typedef LinearCombinator base_type;
+public:
+    TypedLinearCombinator(): base_type(qMetaTypeId<T>()) {}
+
+    using base_type::combine;
+
+    T combine(qreal a, const T &x, qreal b, const T &y) const {
+        T result;
+        base_type::combine(a, &x, b, &y, &result);
+        return result;
+    }
+
+    T combine(qreal a, const T &x) const {
+        T result;
+        base_type::combine(a, &x, &result);
+        return result;
+    }
+
+    T zero() const {
+        return *static_cast<T *>(base_type::zero().data());
+    }
+};
+
+
+template<class T>
+const TypedLinearCombinator<T> *LinearCombinator::typed() const {
+    if(qMetaTypeId<T>() == m_type) {
+        return static_cast<const TypedLinearCombinator<T> *>(this);
+    } else {
+        return NULL;
+    }
+}
+
+
+/**
+ * Linear combinator class that directly calls free-standing <tt>linearCombine</tt>
+ * functions without a virtual call overhead while implementing the same interface
+ * as <tt>TypedLinearCombinator</tt>.
+ */
+template<class T>
+class FastTypedLinearCombinator {
+public:
+    FastTypedLinearCombinator() {
+        m_type = qMetaTypeId<T>();
+        m_zero = combine(0.0, T());
+    }
+
+    T combine(qreal a, const T &x, qreal b, const T &y) const {
+        return linearCombine(a, x, b, y);
+    }
+
+    T combine(qreal a, const T &x) const {
+        return linearCombine(a, x);
+    }
+
+    T zero() const {
+        m_zero;
+    }
+
+private:
+    int m_type;
+    T m_zero;
+};
+
 
 #endif // QN_LINEAR_COMBINATION_H

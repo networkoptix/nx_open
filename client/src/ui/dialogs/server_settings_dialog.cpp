@@ -39,6 +39,28 @@ namespace {
         }
     };
 
+    const int SpaceRole = Qt::UserRole;
+    const int TotalSpaceRole = Qt::UserRole;
+
+    class FreeSpaceItemDelegate: public QStyledItemDelegate {
+        typedef QStyledItemDelegate base_type;
+    public:
+        FreeSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
+
+        virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
+            qint64 freeSpace = index.data(SpaceRole).toLongLong();
+            if(totalSpace > 0) {
+                double fill = qBound(0.0, static_cast<double>(totalSpace - freeSpace) / totalSpace, 1.0);
+
+                
+
+            }
+
+            base_type::paint(painter, option, index);
+        }
+    };
+
 } // anonymous namespace
 
 struct QnServerSettingsDialog::StorageItem: public QnStorageSpaceData {
@@ -109,24 +131,36 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
-    checkBoxItem->setFlags(checkBoxItem->flags() | Qt::ItemIsUserCheckable);
+    checkBoxItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
     checkBoxItem->setCheckState(item.storageId == -1 ? Qt::Unchecked : Qt::Checked);
 
-    QTableWidgetItem *pathItem = new QTableWidgetItem(item.path);
+    QTableWidgetItem *pathItem = new QTableWidgetItem();
+    pathItem->setData(Qt::DisplayRole, item.path);
+    pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
     QTableWidgetItem *spaceItem = new QTableWidgetItem();
+    spaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     if(item.freeSpace == -1 || item.totalSpace == -1) {
-        spaceItem->setText(tr("Not available"));
+        spaceItem->setData(Qt::DisplayRole, tr("Not available"));
+        spaceItem->setData(SpaceRole, 0);
+        spaceItem->setData(TotalSpaceRole, 0);
     } else {
         /*: This text refers to storage's free space. E.g. "2Gb of 30Gb". */
-        spaceItem->setText(tr("%1 of %2").arg(formatFileSize(item.freeSpace)).arg(formatFileSize(item.totalSpace)));
+        spaceItem->setData(Qt::DisplayRole, tr("%1 of %2").arg(formatFileSize(item.freeSpace)).arg(formatFileSize(item.totalSpace)));
+        spaceItem->setData(SpaceRole, item.freeSpace);
+        spaceItem->setData(TotalSpaceRole, item.totalSpace);
     }
 
     QTableWidgetItem *reservedItem = new QTableWidgetItem();
+    reservedItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     if(item.reservedSpace == -1) {
-        reservedItem->setText(tr("Not applicable"));
+        reservedItem->setData(Qt::DisplayRole, tr("Not applicable"));
+        reservedItem->setData(SpaceRole, 0);
+        reservedItem->setData(TotalSpaceRole, 0);
     } else {
-        reservedItem->setText(formatFileSize(item.reservedSpace));
+        reservedItem->setData(Qt::DisplayRole, formatFileSize(item.reservedSpace));
+        reservedItem->setData(SpaceRole, item.reservedSpace);
+        reservedItem->setData(TotalSpaceRole, item.totalSpace);
     }
 
     ui->storagesTable->setItem(row, 0, checkBoxItem);
