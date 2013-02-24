@@ -1034,13 +1034,14 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         dialog->setText(tr("Enter layout name:"));
         dialog->setName(layout->getName());
 
-        QMessageBox::Button button = QMessageBox::Yes;
+        QMessageBox::Button button;
         do {
             dialog->exec();
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
             name = dialog->name();
 
+            button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
             if (!existing.isEmpty()) {
                 button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
@@ -2043,11 +2044,12 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     dialog->setName(newLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    QMessageBox::Button button = QMessageBox::Yes;
+    QMessageBox::Button button;
     do {
         if(!dialog->exec())
             return;
 
+        button = QMessageBox::Yes;
         QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
         if (!existing.isEmpty()) {
             button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
@@ -3237,6 +3239,18 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(at_serverSettings_received(int,QByteArray,QnKvPairList,int)));
+
+        QnUserResourceList usersWithNoEmail;
+        QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
+        foreach (const QnUserResourcePtr &user, users) {
+            if (user == context()->user())
+                continue; // we are displaying separate notification for us
+            if (QnEmail::isValid(user->getEmail()))
+                continue;
+            usersWithNoEmail << user;
+        }
+        if (!usersWithNoEmail.isEmpty())
+            any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
     }
 
     if (any)

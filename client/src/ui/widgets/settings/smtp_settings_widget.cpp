@@ -16,6 +16,7 @@
 
 //TODO: #GDM use documentation from http://support.google.com/mail/bin/answer.py?hl=en&answer=1074635
 
+
 namespace {
 
     const QLatin1String nameFrom("EMAIL_FROM");
@@ -24,6 +25,7 @@ namespace {
     const QLatin1String nameUser("EMAIL_HOST_USER");
     const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
     const QLatin1String nameTls("EMAIL_USE_TLS");
+    const QLatin1String nameSsl("EMAIL_USE_SSL");
     const QLatin1String nameSimple("EMAIL_SIMPLE");
     const QLatin1String nameTimeout("EMAIL_TIMEOUT");
 
@@ -59,10 +61,12 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     ui->testingProgressWidget->setVisible(false);
 
-    ui->portComboBox->addItem(QString::number(QnEmail::securePort));
-    ui->portComboBox->addItem(QString::number(QnEmail::unsecurePort));
-    ui->portComboBox->setCurrentIndex(0);
-    at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
+    for (int i = 0; i < QnEmail::ConnectionTypeCount; i++) {
+        int port = QnEmail::defaultPort(static_cast<QnEmail::ConnectionType>(i));
+        ui->portComboBox->addItem(QString::number(port), port);
+    }
+//    ui->portComboBox->setCurrentIndex(0);
+//    at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
@@ -77,45 +81,76 @@ void QnSmtpSettingsWidget::update() {
 }
 
 void QnSmtpSettingsWidget::submit() {
-    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(settings());
+    bool ok = true;
+    QnKvPairList pairs = settings(&ok);
+    if (ok)
+        QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(pairs);
+    //TODO: #GDM else?
 }
 
-QnKvPairList QnSmtpSettingsWidget::settings() {
+QnKvPairList QnSmtpSettingsWidget::settings(bool *ok) {
+    *ok = true;
+    QnKvPairList result;
+
     bool simple = !ui->advancedCheckBox->isChecked();
-    QString hostname = simple ? m_autoMailServer : ui->serverLineEdit->text();
-    int port = QnEmail::unsecurePort;
-    if (simple || ui->portComboBox->currentIndex() == 0)
-        port = QnEmail::securePort;
+    QnEmail::SmtpServerPreset preset;
+    if (simple) {
+        QnEmail email(ui->simpleEmailLineEdit->text());
+        preset = email.smtpServer();
+        if (preset.isNull()) {
+            *ok = false;
+            return result;
+        }
+    }
+
+    QString hostname = simple ? preset.server : ui->serverLineEdit->text();
+    int port = simple
+            ? preset.port == 0
+              ? QnEmail::defaultPort(preset.connectionType)
+              : preset.port
+            : ui->portComboBox->currentText().toInt();
     QString username = simple ? ui->simpleEmailLineEdit->text() : ui->userLineEdit->text();
     QString password = simple ? ui->simplePasswordLineEdit->text() : ui->passwordLineEdit->text();
-    bool useTls = simple ? true : ui->tlsRadioButton->isChecked();
 
-    QnKvPairList result;
+    bool useTls = simple ? preset.connectionType == QnEmail::Tls : ui->tlsRadioButton->isChecked();
+    bool useSsl = simple ? preset.connectionType == QnEmail::Ssl : ui->sslRadioButton->isChecked();
+
     result
         << QnKvPair(nameHost, hostname)
-        << QnKvPair(namePort, QString::number(port))
+        << QnKvPair(namePort, port)
         << QnKvPair(nameUser, username)
         << QnKvPair(nameFrom, username)
         << QnKvPair(namePassword, password)
-        << QnKvPair(nameTls, useTls ? QLatin1String("True") : QLatin1String("False"))
-        << QnKvPair(nameSimple, simple ? QLatin1String("True") : QLatin1String("False"))
-        << QnKvPair(nameTimeout, QString::number(TIMEOUT));
+        << QnKvPair(nameTls, useTls)
+        << QnKvPair(nameSsl, useSsl)
+        << QnKvPair(nameSimple, simple)
+        << QnKvPair(nameTimeout, TIMEOUT);
     return result;
 }
 
 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 
-    /*
-     * index = 0: port 587, default for TLS
-     * index = 1: port 25,  default for unsecured, often supports TLS
-     */
-
-    if (index == 0)
+    int port = ui->portComboBox->itemData(index).toInt();
+    if (port == QnEmail::defaultPort(QnEmail::Ssl)) {
+        ui->sslRadioButton->setChecked(true);
+        ui->tlsRecommendedLabel->hide();
+        ui->sslRecommendedLabel->show();
+    } else {
         ui->tlsRadioButton->setChecked(true);
+        ui->tlsRecommendedLabel->show();
+        ui->sslRecommendedLabel->hide();
+    }
 }
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
+    bool ok = true;
+    QnKvPairList pairs = settings(&ok);
+    if (!ok) {
+        QMessageBox::warning(this, tr("Invalid data"), tr("Cannot test such parameters"));
+        return;
+    }
+
     ui->controlsWidget->setEnabled(false);
     ui->stackedWidget->setEnabled(false);
     ui->testResultButton->setText(tr("Cancel"));
@@ -126,8 +161,8 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     ui->testProgressBar->setValue(0);
     m_timeoutTimer->start();
 
-    m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(settings(),
-                    this, SLOT(at_finishedTestEmailSettings(int, QByteArray, bool, int)));
+    m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(pairs,
+                                                                                            this, SLOT(at_finishedTestEmailSettings(int, QByteArray, bool, int)));
 }
 
 void QnSmtpSettingsWidget::at_testResultButton_clicked() {
@@ -186,14 +221,26 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
         return;
     }
 
+    bool useTls = true;
+    bool useSsl = false;
+
     foreach (const QnKvPair &setting, settings) {
         if (setting.name() == nameHost) {
             ui->serverLineEdit->setText(setting.value());
         } else if (setting.name() == namePort) {
-            bool ok;
-            int port = setting.value().toInt(&ok);
-            int idx = (ok && port == QnEmail::unsecurePort) ? 1 : 0;
-            ui->portComboBox->setCurrentIndex(idx);
+            int port = setting.value().toInt();
+            bool found = false;
+            for (int i = 0; i < ui->portComboBox->count(); i++) {
+                if (ui->portComboBox->itemData(i).toInt() == port) {
+                    ui->portComboBox->setCurrentIndex(i);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                ui->portComboBox->setEditText(QString::number(port));
+                at_portComboBox_currentIndexChanged(ui->portComboBox->count());
+            }
         } else if (setting.name() == nameUser) {
             ui->userLineEdit->setText(setting.value());
             ui->simpleEmailLineEdit->setText(setting.value());
@@ -201,16 +248,22 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
             ui->passwordLineEdit->setText(setting.value());
             ui->simplePasswordLineEdit->setText(setting.value());
         } else if (setting.name() == nameTls) {
-            bool useTls = setting.value() == QLatin1String("True");
-            if (useTls)
-                ui->tlsRadioButton->setChecked(true);
-            else
-                ui->unsecuredRadioButton->setChecked(true);
+            useTls = setting.value() == QLatin1String("True");
+        } else if (setting.name() == nameSsl) {
+            useSsl = setting.value() == QLatin1String("True");
         } else if (setting.name() == nameSimple) {
             bool simple = setting.value() == QLatin1String("True");
             ui->advancedCheckBox->setChecked(!simple);
         }
     }
+
+    if (useTls)
+        ui->tlsRadioButton->setChecked(true);
+    else if (useSsl)
+        ui->sslRadioButton->setChecked(true);
+    else
+        ui->unsecuredRadioButton->setChecked(true);
+
 }
 
 
@@ -222,7 +275,7 @@ void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
         ui->detectErrorLabel->setText(tr("Email is not valid"));
         return;
     }
-    QnSmptServerPreset preset = email.smptServer();
+    QnEmail::SmtpServerPreset preset = email.smtpServer();
     m_autoMailServer = preset.server;
     if (m_autoMailServer.isEmpty()) {
         ui->detectErrorLabel->setText(tr("No preset found. Use 'Advanced' option."));

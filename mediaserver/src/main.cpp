@@ -1026,12 +1026,16 @@ public:
     }
 
 protected:
-    void start()
+    virtual int executeApplication() override { 
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+
+        return application()->exec();
+    }
+
+    virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
-
-        new QnPlatformAbstraction(application);
-        new QnMediaServerModule(m_argc, m_argv, application);
 
         QString guid = serverGuid();
         if (guid.isEmpty())
@@ -1052,7 +1056,7 @@ protected:
         m_main.start();
     }
 
-    void stop()
+    virtual void stop() override
     {
         m_main.exit();
         m_main.wait();

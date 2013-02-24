@@ -346,9 +346,6 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
-    //TODO: #GDM or #rvasilenko - make call async
-    //TODO: #GDM or #rvasilenko - in case of unsuccessful sending, execute business action:
-    //  ActionType = BA_Popup, runtime params[eventType] = BE_SendMailError.
     appServerConnection->sendEmailAsync(
                 recipients,
                 action->getSubject(),
@@ -362,24 +359,27 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 
 void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray &errorString, bool result, int handle)
 {
-    if (!result)
-    {
-        QnBusinessParams runtimeParams;
-        runtimeParams[QLatin1String("eventType")] = BusinessEventType::BE_EmailSendError;
-        runtimeParams[QLatin1String("eventTimestamp")] = qnSyncTime->currentUSecsSinceEpoch();
-        runtimeParams[QLatin1String("eventDescription")] = QString(QLatin1String("Error sending email: %1")).arg(QString::fromUtf8(errorString));
+    Q_UNUSED(status)
+    Q_UNUSED(handle)
+    if (result)
+        return;
 
-		QnBusinessParams actionParams;
-        actionParams[QLatin1String("userGroup")] = QLatin1String("admin");
+    QnBusinessParams runtimeParams;
+    QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::BE_EmailSendError);
+    QnBusinessEventRuntime::setEventTimestamp(&runtimeParams, qnSyncTime->currentUSecsSinceEpoch());
+    QnBusinessEventRuntime::setEventDescription(&runtimeParams,
+                                                QString(QLatin1String("Error sending email: %1")).arg(QString::fromUtf8(errorString)));
+    QnPopupBusinessActionPtr action(new QnPopupBusinessAction(runtimeParams));
 
-        QnPopupBusinessActionPtr action(new QnPopupBusinessAction(runtimeParams));
-		action->setParams(actionParams);
+    QnBusinessParams actionParams;
+    BusinessActionParameters::setUserGroup(&actionParams, 1);
+    action->setParams(actionParams);
 
-        showPopup(action);
+    showPopup(action);
 
-        cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
-                    arg(QString::fromUtf8(errorString)), cl_logWARNING );
-    }
+    cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
+                arg(QString::fromUtf8(errorString)), cl_logWARNING );
+
 }
 
 bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)

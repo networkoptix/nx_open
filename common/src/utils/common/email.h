@@ -4,30 +4,37 @@
 #include <QString>
 #include <QStringList>
 
-struct QnSmptServerPreset {
-    QnSmptServerPreset() {}
-    QnSmptServerPreset(const QString &server, const bool useTls = true, const int port = 0);
-
-    bool isNull() const {
-        return server.isEmpty();
-    }
-
-    QString server;
-    bool useTls;
-    int port;
-};
-
 class QnEmail {
 public:
+    enum ConnectionType {
+        Unsecure,
+        Ssl,
+        Tls,
+        ConnectionTypeCount
+    };
+
+    struct SmtpServerPreset {
+        SmtpServerPreset() {}
+        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0):
+            server(server), connectionType(connectionType), port(port) {}
+
+        bool isNull() const {
+            return server.isEmpty();
+        }
+
+        QString server;
+        ConnectionType connectionType;
+        int port;
+    };
+
+
     QnEmail(const QString &email);
 
     static bool isValid(const QString &email);
-
-    static const int securePort = 587;
-    static const int unsecurePort = 25;
+    static int defaultPort(ConnectionType connectionType);
 
     bool isValid() const;
-    QnSmptServerPreset smptServer() const;
+    SmtpServerPreset smtpServer() const;
     QString domain() const;
 private:
     QString m_email;

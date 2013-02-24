@@ -178,27 +178,28 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
 
     m_eventType = eventType;
     switch (m_eventType) {
-        case BusinessEventType::BE_NotDefined:
-            return;
+    case BusinessEventType::BE_NotDefined:
+        return;
 
-        case BusinessEventType::BE_Camera_Input:
-        case BusinessEventType::BE_Camera_Disconnect:
-            ui->importantLabel->setVisible(true);
-            break;
+    case BusinessEventType::BE_Camera_Input:
+    case BusinessEventType::BE_Camera_Disconnect:
+        ui->importantLabel->setVisible(true);
+        break;
 
-        case BusinessEventType::BE_Storage_Failure:
-        case BusinessEventType::BE_Network_Issue:
-        case BusinessEventType::BE_Camera_Ip_Conflict:
-        case BusinessEventType::BE_MediaServer_Failure:
-        case BusinessEventType::BE_MediaServer_Conflict:
-            ui->warningLabel->setVisible(true);
-            break;
+    case BusinessEventType::BE_Storage_Failure:
+    case BusinessEventType::BE_Network_Issue:
+    case BusinessEventType::BE_Camera_Ip_Conflict:
+    case BusinessEventType::BE_MediaServer_Failure:
+    case BusinessEventType::BE_MediaServer_Conflict:
+    case BusinessEventType::BE_EmailSendError:
+        ui->warningLabel->setVisible(true);
+        break;
 
         //case BusinessEventType::BE_Camera_Motion:
         //case BusinessEventType::BE_UserDefined:
-        default:
-            ui->notificationLabel->setVisible(true);
-            break;
+    default:
+        ui->notificationLabel->setVisible(true);
+        break;
     }
     ui->eventLabel->setText(BusinessEventType::toString(eventType));
 }
@@ -209,6 +210,7 @@ bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionP
         case BusinessEventType::BE_Camera_Disconnect:
         case BusinessEventType::BE_Camera_Input:
         case BusinessEventType::BE_Camera_Motion:
+        case BusinessEventType::BE_EmailSendError:
             item = updateSimpleTree(businessAction->getRuntimeParams());
             break;
         case BusinessEventType::BE_Storage_Failure:

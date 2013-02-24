@@ -222,3 +222,6 @@ void QnSettings::save() {
     submitToSettings(m_settings);
 }
 
+bool QnSettings::isWritable() const {
+    return m_settings->isWritable();
+}

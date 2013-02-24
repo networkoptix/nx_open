@@ -29,32 +29,10 @@ QnSystemHealthPopupWidget::~QnSystemHealthPopupWidget()
 }
 
 bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageType message) {
-//    QList<QWidget*> headerLabels;
-//    headerLabels << ui->warningLabel << ui->importantLabel << ui->notificationLabel;
-
-//    foreach (QWidget* w, headerLabels)
-//        w->setVisible(false);
 
     m_messageType = message;
     if (message == QnSystemHealth::NotDefined)
         return false;
-    /*
-    switch (m_messageType) {
-    case QnSystemHealth::NotDefined:
-        return false;
-
-    case QnSystemHealth::EmailIsEmpty:
-    case QnSystemHealth::NoLicenses:
-        ui->importantLabel->setVisible(true);
-        break;
-    case QnSystemHealth::SmtpIsNotSet:
-        ui->warningLabel->setVisible(true);
-        break;
-    default:
-        ui->notificationLabel->setVisible(true);
-        break;
-    }
-    */
     ui->messageLabel->setText(QnSystemHealth::toString(m_messageType));
 
     return true;
