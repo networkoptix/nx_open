@@ -33,6 +33,13 @@ namespace {
     const int SpaceRole = Qt::UserRole;
     const int TotalSpaceRole = Qt::UserRole + 1;
 
+    enum Column {
+        CheckBoxColumn,
+        PathColumn,
+        UsedSpaceColumn,
+        ArchiveSpaceColumn
+    };
+
     class StorageSettingsItemEditorFactory: public QItemEditorFactory {
     public:
         virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
@@ -83,9 +90,9 @@ namespace {
         UsedSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
             QVector<QPair<qreal, QColor> > points;
             points 
-                << qMakePair( 0.8, QColor(0, 255, 0, 32))
-                << qMakePair(0.85, QColor(255, 255, 0, 32))
-                << qMakePair( 0.9, QColor(255, 0, 0, 32));
+                << qMakePair( 0.8, QColor(0, 255, 0, 48))
+                << qMakePair(0.85, QColor(255, 255, 0, 48))
+                << qMakePair( 0.9, QColor(255, 0, 0, 48));
             setGradient(points);
         }
     };
@@ -212,8 +219,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     /*QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
     itemDelegate->setItemEditorFactory(new StorageSettingsItemEditorFactory());
     ui->storagesTable->setItemDelegate(itemDelegate);*/
-    ui->storagesTable->setItemDelegateForColumn(2, new UsedSpaceItemDelegate(this));
-    ui->storagesTable->setItemDelegateForColumn(3, new ArchiveSpaceItemDelegate(this));
+    ui->storagesTable->setItemDelegateForColumn(UsedSpaceColumn, new UsedSpaceItemDelegate(this));
+    ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
 
     setButtonBox(ui->buttonBox);
 
@@ -266,35 +273,36 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
     pathItem->setData(Qt::DisplayRole, item.path);
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    QTableWidgetItem *spaceItem = new QTableWidgetItem();
-    spaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    QTableWidgetItem *usedSpaceItem = new QTableWidgetItem();
+    usedSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     if(item.freeSpace == -1 || item.totalSpace == -1) {
-        spaceItem->setData(Qt::DisplayRole, tr("Not available"));
-        spaceItem->setData(SpaceRole, 0);
-        spaceItem->setData(TotalSpaceRole, 0);
+        usedSpaceItem->setData(Qt::DisplayRole, tr("Not available"));
+        usedSpaceItem->setData(SpaceRole, 0);
+        usedSpaceItem->setData(TotalSpaceRole, 0);
     } else {
         /*: This text refers to storage's used space. E.g. "2Gb of 30Gb". */
-        spaceItem->setData(Qt::DisplayRole, tr("%1 of %2").arg(formatFileSize(item.totalSpace - item.freeSpace)).arg(formatFileSize(item.totalSpace)));
-        spaceItem->setData(SpaceRole, item.totalSpace - item.freeSpace);
-        spaceItem->setData(TotalSpaceRole, item.totalSpace);
+        usedSpaceItem->setData(Qt::DisplayRole, tr("%1 of %2").arg(formatFileSize(item.totalSpace - item.freeSpace)).arg(formatFileSize(item.totalSpace)));
+        usedSpaceItem->setData(SpaceRole, item.totalSpace - item.freeSpace);
+        usedSpaceItem->setData(TotalSpaceRole, item.totalSpace);
     }
 
-    QTableWidgetItem *reservedItem = new QTableWidgetItem();
-    reservedItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+    QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
+    archiveSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     if(item.reservedSpace == -1) {
-        reservedItem->setData(Qt::DisplayRole, tr("Not applicable"));
-        reservedItem->setData(SpaceRole, 0);
-        reservedItem->setData(TotalSpaceRole, 0);
+        archiveSpaceItem->setData(Qt::DisplayRole, tr("Not applicable"));
+        archiveSpaceItem->setData(SpaceRole, 0);
+        archiveSpaceItem->setData(TotalSpaceRole, 0);
     } else {
-        reservedItem->setData(Qt::DisplayRole, formatFileSize(item.totalSpace - item.reservedSpace));
-        reservedItem->setData(SpaceRole, item.totalSpace - item.reservedSpace);
-        reservedItem->setData(TotalSpaceRole, item.totalSpace);
+        archiveSpaceItem->setData(Qt::DisplayRole, formatFileSize(item.totalSpace - item.reservedSpace));
+        archiveSpaceItem->setData(SpaceRole, item.totalSpace - item.reservedSpace);
+        archiveSpaceItem->setData(TotalSpaceRole, item.totalSpace);
     }
 
-    ui->storagesTable->setItem(row, 0, checkBoxItem);
-    ui->storagesTable->setItem(row, 1, pathItem);
-    ui->storagesTable->setItem(row, 2, spaceItem);
-    ui->storagesTable->setItem(row, 3, reservedItem);
+    ui->storagesTable->setItem(row, CheckBoxColumn, checkBoxItem);
+    ui->storagesTable->setItem(row, PathColumn, pathItem);
+    ui->storagesTable->setItem(row, UsedSpaceColumn, usedSpaceItem);
+    ui->storagesTable->setItem(row, ArchiveSpaceColumn, archiveSpaceItem);
+    ui->storagesTable->openPersistentEditor(archiveSpaceItem);
 }
 
 void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
@@ -304,7 +312,19 @@ void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
 }
 
 QList<QnServerSettingsDialog::StorageItem> &QnServerSettingsDialog::items() const {
-    return QList<QnServerSettingsDialog::StorageItem>();
+    QList<StorageItem> result;
+
+    for(int row = 0; row < ui->storagesTable->rowCount(); row++) {
+        StorageItem item;
+
+        if(ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Unchecked) {
+            item.storageId = -1;
+        } else {
+            // XXX
+        }
+    }
+
+    return result;
 }
 
 int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
