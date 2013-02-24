@@ -364,13 +364,17 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray 
 {
     if (!result)
     {
-        QnBusinessParams params;
-        params[QLatin1String("eventType")] = BusinessEventType::BE_EmailSendError;
-        params[QLatin1String("userGroup")] = QLatin1String("admin");
-        params[QLatin1String("eventTimestamp")] = qnSyncTime->currentUSecsSinceEpoch();
-        params[QLatin1String("eventDescription")] = QString(QLatin1String("Error sending email: %1")).arg(QString::fromUtf8(errorString));
+        QnBusinessParams runtimeParams;
+        runtimeParams[QLatin1String("eventType")] = BusinessEventType::BE_EmailSendError;
+        runtimeParams[QLatin1String("eventTimestamp")] = qnSyncTime->currentUSecsSinceEpoch();
+        runtimeParams[QLatin1String("eventDescription")] = QString(QLatin1String("Error sending email: %1")).arg(QString::fromUtf8(errorString));
 
-        QnPopupBusinessActionPtr action(new QnPopupBusinessAction(params));
+		QnBusinessParams actionParams;
+        actionParams[QLatin1String("userGroup")] = QLatin1String("admin");
+
+        QnPopupBusinessActionPtr action(new QnPopupBusinessAction(runtimeParams));
+		action->setParams(actionParams);
+
         showPopup(action);
 
         cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
