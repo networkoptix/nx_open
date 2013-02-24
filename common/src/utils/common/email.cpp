@@ -19,6 +19,7 @@ namespace {
 
         presets.insert(_("hotmail.co.uk"),      server(_("smtp.live.com")));
         presets.insert(_("hotmail.com"),        server(_("smtp.live.com")));
+        presets.insert(_("outlook.com"),        server(_("smtp.live.com")));
 
         presets.insert(_("dwcc.tv"),            server(_("mail.dwcc.tv")));
 
@@ -31,10 +32,15 @@ namespace {
         presets.insert(_("o2.co.uk"),           server(_("smtp.o2.co.uk"), QnEmail::Unsecure));
 
         presets.insert(_("inbox.com"),          server(_("my.inbox.com")));
+        presets.insert(_("aol.com"),            server(_("smtp.aol.com")));
+
+        presets.insert(_("sympatico.ca"),       server(_("smtphm.sympatico.ca"), QnEmail::Ssl, 25));
+        presets.insert(_("bell.net"),           server(_("smtphm.sympatico.ca"), QnEmail::Ssl, 25));
+
+
 /*
-        presets.insert(_("outlook.com"),        SmtpServerPreset(_("")));
-        presets.insert(_("msn"),                SmtpServerPreset(_("")));
-        presets.insert(_("sympatico.ca"),       SmtpServerPreset(_("")));
+
+
         presets.insert(_("telus.net"),          SmtpServerPreset(_("")));
         presets.insert(_("shaw.ca"),            SmtpServerPreset(_("")));*/
 

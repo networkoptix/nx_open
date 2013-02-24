@@ -105,8 +105,10 @@ QnKvPairList QnSmtpSettingsWidget::settings(bool *ok) {
 
     QString hostname = simple ? preset.server : ui->serverLineEdit->text();
     int port = simple
-            ? QnEmail::defaultPort(preset.connectionType)
-            : ui->portComboBox->itemData(ui->portComboBox->currentIndex()).toInt();
+            ? preset.port == 0
+              ? QnEmail::defaultPort(preset.connectionType)
+              : preset.port
+            : ui->portComboBox->currentText().toInt();
     QString username = simple ? ui->simpleEmailLineEdit->text() : ui->userLineEdit->text();
     QString password = simple ? ui->simplePasswordLineEdit->text() : ui->passwordLineEdit->text();
 
@@ -139,8 +141,6 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
         ui->tlsRecommendedLabel->show();
         ui->sslRecommendedLabel->hide();
     }
-    ui->unsecuredRadioButton->setEnabled(port == QnEmail::defaultPort(QnEmail::Unsecure));
-
 }
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
@@ -229,11 +229,17 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
             ui->serverLineEdit->setText(setting.value());
         } else if (setting.name() == namePort) {
             int port = setting.value().toInt();
+            bool found = false;
             for (int i = 0; i < ui->portComboBox->count(); i++) {
                 if (ui->portComboBox->itemData(i).toInt() == port) {
                     ui->portComboBox->setCurrentIndex(i);
+                    found = true;
                     break;
                 }
+            }
+            if (!found) {
+                ui->portComboBox->setEditText(QString::number(port));
+                at_portComboBox_currentIndexChanged(ui->portComboBox->count());
             }
         } else if (setting.name() == nameUser) {
             ui->userLineEdit->setText(setting.value());

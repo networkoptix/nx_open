@@ -15,8 +15,8 @@ public:
 
     struct SmtpServerPreset {
         SmtpServerPreset() {}
-        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls):
-            server(server), connectionType(connectionType) {}
+        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0):
+            server(server), connectionType(connectionType), port(port) {}
 
         bool isNull() const {
             return server.isEmpty();
@@ -24,6 +24,7 @@ public:
 
         QString server;
         ConnectionType connectionType;
+        int port;
     };
 
 
