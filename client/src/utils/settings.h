@@ -76,6 +76,12 @@ public:
     void load();
     void save();
 
+    /**
+     * @brief isWritable    Check if settings storage is available for writing.
+     * @return              True if settings can be saved.
+     */
+    bool isWritable() const;
+
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
 

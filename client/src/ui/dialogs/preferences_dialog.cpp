@@ -22,6 +22,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/globals.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
@@ -115,6 +116,24 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     initLanguages();
     updateFromSettings();
     at_context_userChanged();
+
+    if (m_settings->isWritable()) {
+        ui->readOnlyWarningLabel->hide();
+    }
+    else {
+        QPalette palette = this->palette();
+        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        ui->readOnlyWarningLabel->setPalette(palette);
+        ui->readOnlyWarningLabel->setText(
+                     #ifdef Q_OS_LINUX
+                             tr("Settings file is read-only. Please contact your system administrator.\n" \
+                                "All changes will be lost after program exit.")
+                     #else
+                             tr("Settings cannot be saved. Please contact your system administrator.\n" \
+                                "All changes will be lost after program exit.")
+                     #endif
+                             );
+    }
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {
