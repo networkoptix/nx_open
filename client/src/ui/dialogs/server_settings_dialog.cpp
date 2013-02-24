@@ -9,6 +9,7 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QSlider>
+#include <QtGui/QLabel>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
@@ -217,14 +218,17 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
+    m_tableBottomLabel(NULL),
     m_hasStorageChanges(false)
 {
     ui->setupUi(this);
-    ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    for(int col = 0; col < ui->storagesTable->columnCount(); col++)
-        ui->storagesTable->horizontalHeader()->setResizeMode(col, QHeaderView::ResizeToContents);
+    
+    ui->storagesTable->resizeColumnsToContents();
     ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
-
+    ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
+    ui->storagesTable->horizontalHeader()->setResizeMode(PathColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setResizeMode(UsedSpaceColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->setItemDelegateForColumn(UsedSpaceColumn, new UsedSpaceItemDelegate(this));
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
 
@@ -266,7 +270,7 @@ void QnServerSettingsDialog::reject() {
 }
 
 void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
-    int row = ui->storagesTable->rowCount();
+    int row = ui->storagesTable->rowCount() - 1;
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
@@ -311,7 +315,13 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
 }
 
 void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
-    ui->storagesTable->clearContents();
+    ui->storagesTable->setRowCount(0);
+    ui->storagesTable->insertRow(0);
+    ui->storagesTable->setSpan(0, 0, 1, 4);
+    m_tableBottomLabel = new QLabel();
+    m_tableBottomLabel->setAlignment(Qt::AlignCenter);
+    ui->storagesTable->setCellWidget(0, 0, m_tableBottomLabel);
+
     foreach(const StorageItem &item, items)
         addTableItem(item);
 }
@@ -339,8 +349,8 @@ QList<QnServerSettingsDialog::StorageItem> QnServerSettingsDialog::tableItems() 
 
 void QnServerSettingsDialog::updateFromResources() {
     m_server->apiConnection()->asyncGetStorageSpace(this, SLOT(at_replyReceived(int, const QnStorageSpaceDataList &, int)));
-    ui->storagesTable->clearContents();
-    // TODO: Loading... label
+    setTableItems(QList<StorageItem>());
+    m_tableBottomLabel->setText(tr("Loading..."));
 
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
@@ -519,6 +529,11 @@ void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
 }
 
 void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDataList &dataList, int handle) {
+    if(status != 0) {
+        m_tableBottomLabel->setText(tr("Could not load storages from server."));
+        return;
+    }
+
     QList<StorageItem> items;
 
     QnAbstractStorageResourceList storages = m_server->getStorages();
@@ -557,4 +572,5 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
     qSort(items.begin(), items.end(), StorageItemLess());
 
     setTableItems(items);
+    m_tableBottomLabel->setText(tr("<a href='1'>Add external storage...</a>"));
 }

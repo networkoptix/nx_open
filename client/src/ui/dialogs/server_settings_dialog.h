@@ -8,6 +8,7 @@
 
 #include "button_box_dialog.h"
 
+class QLabel;
 
 namespace Ui {
     class ServerSettingsDialog;
@@ -96,6 +97,7 @@ private slots:
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
+    QLabel *m_tableBottomLabel;
 
     bool m_hasStorageChanges;
 };
