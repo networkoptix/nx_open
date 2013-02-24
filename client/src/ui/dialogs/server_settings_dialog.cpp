@@ -4,16 +4,15 @@
 #include <functional>
 
 #include <QtCore/QUuid>
-#include <QtGui/QDataWidgetMapper>
+#include <QtCore/QDir>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStyledItemDelegate>
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QSpinBox>
 #include <QtGui/QSlider>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
+#include <utils/common/variant.h>
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
@@ -32,24 +31,13 @@ namespace {
 
     const int SpaceRole = Qt::UserRole;
     const int TotalSpaceRole = Qt::UserRole + 1;
+    const int StorageIdRole = Qt::UserRole + 2;
 
     enum Column {
         CheckBoxColumn,
         PathColumn,
         UsedSpaceColumn,
         ArchiveSpaceColumn
-    };
-
-    class StorageSettingsItemEditorFactory: public QItemEditorFactory {
-    public:
-        virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
-            QWidget *result = QItemEditorFactory::createEditor(type, parent);
-
-            if(QSpinBox *spinBox = dynamic_cast<QSpinBox *>(result))
-                spinBox->setRange(0, 10000); /* That's for space limit. */
-
-            return result;
-        }
     };
 
     class SpaceItemDelegate: public QStyledItemDelegate {
@@ -105,6 +93,7 @@ namespace {
             m_color(Qt::white)
         {
             setOrientation(Qt::Horizontal);
+            setMouseTracking(true);
             setProperty(Qn::SliderLength, 0);
         }
 
@@ -117,30 +106,49 @@ namespace {
         }
 
     protected:
+        virtual void mouseMoveEvent(QMouseEvent *event) override {
+            base_type::mouseMoveEvent(event);
+
+            int x = handlePos();
+            if(qAbs(x - event->pos().x()) < 6) {
+                setCursor(Qt::SplitHCursor);
+            } else {
+                unsetCursor();
+            }
+        }
+
+        virtual void leaveEvent(QEvent *event) override {
+            unsetCursor();
+            
+            base_type::leaveEvent(event);
+        }
+
         virtual void paintEvent(QPaintEvent *) override {
             QPainter painter(this);
             QRect rect = this->rect();
 
             painter.fillRect(rect, palette().color(backgroundRole()));
 
-            int value = this->sliderPosition();
-            int min = this->minimum();
-            int max = this->maximum();
-
-            if(max > min) {
-                qreal fill = static_cast<double>(value - min) / (max - min);
-                
-                int w = rect.width() * fill;
-                painter.fillRect(QRect(rect.topLeft(), QSize(rect.width() * fill, rect.height())), m_color);
+            if(minimum() != maximum()) {
+                int x = handlePos();
+                painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
                 
                 painter.setPen(withAlpha(m_color.lighter(), 128));
-                painter.drawLine(QPoint(w, 0), QPoint(w, rect.bottom()));
+                painter.drawLine(QPoint(x, 0), QPoint(x, rect.bottom()));
             }
 
             const int textMargin = style()->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
             QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
             painter.setPen(palette().color(QPalette::WindowText));
-            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, formatFileSize(value * bytesInMib));
+            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, formatFileSize(sliderPosition() * bytesInMib));
+        }
+
+    private:
+        int handlePos() const {
+            if(minimum() == maximum())
+                return 0;
+
+            return rect().width() * static_cast<double>(sliderPosition() - minimum()) / (maximum() - minimum());
         }
 
     private:
@@ -201,6 +209,7 @@ struct QnServerSettingsDialog::StorageItem: public QnStorageSpaceData {
     StorageItem(const QnStorageSpaceData &data): QnStorageSpaceData(data) {}
 
     qint64 reservedSpace;
+    bool inUse;
 };
 
 
@@ -216,9 +225,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
         ui->storagesTable->horizontalHeader()->setResizeMode(col, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
 
-    /*QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
-    itemDelegate->setItemEditorFactory(new StorageSettingsItemEditorFactory());
-    ui->storagesTable->setItemDelegate(itemDelegate);*/
     ui->storagesTable->setItemDelegateForColumn(UsedSpaceColumn, new UsedSpaceItemDelegate(this));
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
 
@@ -231,8 +237,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->panicModeTextLabel,  ui->panicModeLabel,                 Qn::ServerSettings_Panic_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
-    connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
-    connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
 
     updateFromResources();
@@ -267,7 +271,8 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
     checkBoxItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
-    checkBoxItem->setCheckState(item.storageId == -1 ? Qt::Unchecked : Qt::Checked);
+    checkBoxItem->setCheckState(item.inUse ? Qt::Checked : Qt::Unchecked);
+    checkBoxItem->setData(StorageIdRole, item.storageId);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setData(Qt::DisplayRole, item.path);
@@ -311,77 +316,31 @@ void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
         addTableItem(item);
 }
 
-QList<QnServerSettingsDialog::StorageItem> &QnServerSettingsDialog::items() const {
+QList<QnServerSettingsDialog::StorageItem> QnServerSettingsDialog::tableItems() const {
     QList<StorageItem> result;
 
     for(int row = 0; row < ui->storagesTable->rowCount(); row++) {
         StorageItem item;
 
-        if(ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Unchecked) {
-            item.storageId = -1;
-        } else {
-            // XXX
-        }
+        item.inUse = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
+        item.storageId = qvariant_cast<int>(ui->storagesTable->item(row, CheckBoxColumn)->data(StorageIdRole), -1);
+
+        item.path = ui->storagesTable->item(row, PathColumn)->text();
+
+        item.totalSpace = ui->storagesTable->item(row, UsedSpaceColumn)->data(TotalSpaceRole).toLongLong();
+        item.freeSpace = item.totalSpace - ui->storagesTable->item(row, UsedSpaceColumn)->data(SpaceRole).toLongLong();
+        item.reservedSpace = item.totalSpace - ui->storagesTable->item(row, ArchiveSpaceColumn)->data(SpaceRole).toLongLong();
+
+        result.push_back(item);
     }
 
     return result;
 }
-
-int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
-    int row = ui->storagesTable->rowCount();
-    ui->storagesTable->insertRow(row);
-
-    QTableWidgetItem *urlItem = new QTableWidgetItem(url);
-    urlItem->setData(Qt::UserRole, id);
-    QTableWidgetItem *spaceItem = new QTableWidgetItem();
-    spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
-
-    ui->storagesTable->setItem(row, 0, urlItem);
-    ui->storagesTable->setItem(row, 1, spaceItem);
-
-    //updateSpaceLimitCell(row, true);
-
-    return row;
-}
-
-
-#if 0
-void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
-    ui->storagesTable->setRowCount(0);
-    ui->storagesTable->setColumnCount(2);
-
-    foreach (const QnAbstractStorageResourcePtr &storage, storages)
-        addTableRow(storage->getId().toInt(), storage->getUrl(), storage->getSpaceLimit() / BILLION);
-}
-
-QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
-    QnAbstractStorageResourceList result;
-
-    int rowCount = ui->storagesTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
-        int id = ui->storagesTable->item(row, 0)->data(Qt::UserRole).toInt();
-        QString path = ui->storagesTable->item(row, 0)->text();
-        int spaceLimit = ui->storagesTable->item(row, 1)->data(Qt::DisplayRole).toInt();
-
-        QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
-        if (id)
-            storage->setId(id);
-        storage->setName(QUuid::createUuid().toString());
-        storage->setParentId(m_server->getId());
-        storage->setUrl(path.trimmed());
-        storage->setSpaceLimit(spaceLimit * BILLION);
-
-        result.append(storage);
-    }
-
-    return result;
-}
-#endif
 
 void QnServerSettingsDialog::updateFromResources() {
     m_server->apiConnection()->asyncGetStorageSpace(this, SLOT(at_replyReceived(int, const QnStorageSpaceDataList &, int)));
     ui->storagesTable->clearContents();
-    // TODO: Loading...
+    // TODO: Loading... label
 
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
@@ -400,7 +359,25 @@ void QnServerSettingsDialog::updateFromResources() {
 }
 
 void QnServerSettingsDialog::submitToResources() {
-    //m_server->setStorages(tableStorages());
+    if(m_hasStorageChanges) {
+        QnAbstractStorageResourceList storages;
+        foreach(const StorageItem &item, tableItems()) {
+            if(!item.inUse)
+                continue;
+
+            QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+            if (item.storageId != -1)
+                storage->setId(item.storageId);
+            storage->setName(QUuid::createUuid().toString());
+            storage->setParentId(m_server->getId());
+            storage->setUrl(item.path);
+            storage->setSpaceLimit(item.reservedSpace);
+
+            storages.push_back(storage);
+        }
+        m_server->setStorages(storages);
+    }
+
     m_server->setName(ui->nameLineEdit->text());
 }
 
@@ -529,26 +506,14 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_storageAddButton_clicked() {
-    //addTableRow(0, QString(), defaultSpaceLimitGb);
-
-    m_hasStorageChanges = true;
-}
-
-void QnServerSettingsDialog::at_storageRemoveButton_clicked() {
-    QList<int> rows;
-    foreach (QModelIndex index, ui->storagesTable->selectionModel()->selectedRows())
-        rows.push_back(index.row());
-
-    qSort(rows.begin(), rows.end(), std::greater<int>()); /* Sort in descending order. */
-    foreach(int row, rows)
-        ui->storagesTable->removeRow(row);
+    // XXX
 
     m_hasStorageChanges = true;
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
     Q_UNUSED(column)
-    //updateSpaceLimitCell(row);
+    Q_UNUSED(row)
 
     m_hasStorageChanges = true;
 }
@@ -561,16 +526,19 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
         StorageItem item = data;
 
         item.reservedSpace = -1;
-        foreach(const QnAbstractStorageResourcePtr &storage, storages) {
-            if(storage->getId() == item.storageId) {
-                item.reservedSpace = storage->getSpaceLimit();
-                break;
+        if(item.storageId != -1) {
+            foreach(const QnAbstractStorageResourcePtr &storage, storages) {
+                if(storage->getId() == item.storageId) {
+                    item.reservedSpace = storage->getSpaceLimit();
+                    break;
+                }
             }
         }
-
         /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
         if(item.reservedSpace == -1)
             item.reservedSpace = qMin(defaultReservedSpace, item.freeSpace);
+
+        item.inUse = item.storageId != -1;
 
         items.push_back(item);
     }

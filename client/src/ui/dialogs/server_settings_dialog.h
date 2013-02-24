@@ -76,9 +76,9 @@ private:
 
     void addTableItem(const StorageItem &item);
     void setTableItems(const QList<StorageItem> &items);
-    QList<StorageItem> &items() const;
+    QList<StorageItem> tableItems() const;
 
-    int addTableRow(int id, const QString &url, int spaceLimitGb);
+    //int addTableRow(int id, const QString &url, int spaceLimitGb);
 
     //void setTableStorages(const QnAbstractStorageResourceList &storages);
     //QnAbstractStorageResourceList tableStorages() const;
@@ -89,7 +89,6 @@ private:
 
 private slots: 
     void at_storageAddButton_clicked();
-    void at_storageRemoveButton_clicked();
     void at_storagesTable_cellChanged(int row, int column);
 
     void at_replyReceived(int status, const QnStorageSpaceDataList &dataList, int handle);
