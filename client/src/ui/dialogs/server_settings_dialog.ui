@@ -96,6 +96,12 @@
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
         <property name="rowCount">
          <number>0</number>
         </property>
@@ -132,12 +138,12 @@
         </column>
         <column>
          <property name="text">
-          <string>Free Space</string>
+          <string>Used Space</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Reserved Space</string>
+          <string>Archive Space</string>
          </property>
         </column>
        </widget>

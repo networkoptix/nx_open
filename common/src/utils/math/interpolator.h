@@ -17,9 +17,15 @@ class QnInterpolator: public std::unary_function<qreal, T> {
 public:
     typedef QPair<qreal, T> point_type;
 
-    QnInterpolator(): 
-        m_extrapolationMode(Qn::ConstantExtrapolation)
+    explicit QnInterpolator(Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation): 
+        m_extrapolationMode(extrapolationMode)
     {}
+
+    QnInterpolator(const QVector<point_type> &points, Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation): 
+        m_extrapolationMode(extrapolationMode)
+    {
+        setPoints(points);
+    }
 
     bool isNull() const {
         return m_points.isEmpty() && m_extrapolationMode == Qn::ConstantExtrapolation;

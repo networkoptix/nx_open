@@ -10,23 +10,28 @@
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QItemEditorFactory>
 #include <QtGui/QSpinBox>
+#include <QtGui/QSlider>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
 #include <utils/math/interpolator.h>
+#include <utils/math/color_transformations.h>
 
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/globals.h>
+#include <ui/style/noptix_style.h>
 
 namespace {
-    QString formatGbStr(qint64 value) {
-        return QString::number(value/1000000000.0, 'f', 2);
-    }
-
     const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
+
+    const qint64 bytesInMib = 1024 * 1024;
+
+    const int SpaceRole = Qt::UserRole;
+    const int TotalSpaceRole = Qt::UserRole + 1;
 
     class StorageSettingsItemEditorFactory: public QItemEditorFactory {
     public:
@@ -40,36 +45,146 @@ namespace {
         }
     };
 
-    const int SpaceRole = Qt::UserRole;
-    const int TotalSpaceRole = Qt::UserRole;
-
-    class FreeSpaceItemDelegate: public QStyledItemDelegate {
+    class SpaceItemDelegate: public QStyledItemDelegate {
         typedef QStyledItemDelegate base_type;
     public:
-        FreeSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
-            QVector<QPair<qreal, QColor> > points;
-            points 
-                << qMakePair(0.0, QColor(0, 255, 0, 128))
-                << qMakePair(0.5, QColor(255, 255, 0, 128))
-                << qMakePair(1.0, QColor(255, 0, 0, 128));
-            m_gradient.setPoints()
-        }
+        SpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
 
         virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-            qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
-            qint64 freeSpace = index.data(SpaceRole).toLongLong();
-            if(totalSpace > 0) {
-                double fill = qBound(0.0, static_cast<double>(totalSpace - freeSpace) / totalSpace, 1.0);
-                QColor color = m_gradient(fill);
-                
-                painter->fillRect(QRect(option.rect.topLeft(), QSize(option.rect.width() * fill, option.rect.height())), color);
+            if(!m_gradient.isNull()) {
+                qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
+                qint64 space = index.data(SpaceRole).toLongLong();
+                if(totalSpace > 0) {
+                    double fill = qBound(0.0, static_cast<double>(space) / totalSpace, 1.0);
+                    QColor color = m_gradient(fill);
+
+                    painter->fillRect(QRect(option.rect.topLeft(), QSize(option.rect.width() * fill, option.rect.height())), color);
+                }
             }
 
             base_type::paint(painter, option, index);
         }
 
+        const QnInterpolator<QColor> &gradient() {
+            return m_gradient;
+        }
+
+        void setGradient(const QnInterpolator<QColor> &gradient) {
+            m_gradient = gradient;
+        }
+
     private:
         QnInterpolator<QColor> m_gradient;
+    };
+
+    class UsedSpaceItemDelegate: public SpaceItemDelegate {
+        typedef SpaceItemDelegate base_type;
+    public:
+        UsedSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
+            QVector<QPair<qreal, QColor> > points;
+            points 
+                << qMakePair( 0.8, QColor(0, 255, 0, 32))
+                << qMakePair(0.85, QColor(255, 255, 0, 32))
+                << qMakePair( 0.9, QColor(255, 0, 0, 32));
+            setGradient(points);
+        }
+    };
+
+    class ArchiveSpaceSlider: public QSlider {
+        typedef QSlider base_type;
+    public:
+        ArchiveSpaceSlider(QWidget *parent = NULL): 
+            base_type(parent),
+            m_color(Qt::white)
+        {
+            setOrientation(Qt::Horizontal);
+            setProperty(Qn::SliderLength, 0);
+        }
+
+        const QColor &color() const {
+            return m_color;
+        }
+
+        void setColor(const QColor &color) {
+            m_color = color;
+        }
+
+    protected:
+        virtual void paintEvent(QPaintEvent *) override {
+            QPainter painter(this);
+            QRect rect = this->rect();
+
+            painter.fillRect(rect, palette().color(backgroundRole()));
+
+            int value = this->sliderPosition();
+            int min = this->minimum();
+            int max = this->maximum();
+
+            if(max > min) {
+                qreal fill = static_cast<double>(value - min) / (max - min);
+                
+                int w = rect.width() * fill;
+                painter.fillRect(QRect(rect.topLeft(), QSize(rect.width() * fill, rect.height())), m_color);
+                
+                painter.setPen(withAlpha(m_color.lighter(), 128));
+                painter.drawLine(QPoint(w, 0), QPoint(w, rect.bottom()));
+            }
+
+            const int textMargin = style()->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
+            QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
+            painter.setPen(palette().color(QPalette::WindowText));
+            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, formatFileSize(value * bytesInMib));
+        }
+
+    private:
+        QColor m_color;
+    };
+
+    class ArchiveSpaceItemDelegate: public SpaceItemDelegate {
+        typedef SpaceItemDelegate base_type;
+    public:
+        ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
+            m_color = toTransparent(withAlpha(qnGlobals->selectionColor(), 255), 0.25);
+
+            QVector<QPair<qreal, QColor> > points;
+            points << qMakePair(0.0, m_color);
+            setGradient(points);
+        }
+
+        virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+            ArchiveSpaceSlider *result = new ArchiveSpaceSlider(parent);
+            result->setColor(m_color);
+            return result;
+        }
+
+        virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
+            ArchiveSpaceSlider *slider = dynamic_cast<ArchiveSpaceSlider *>(editor);
+            if(!slider) {
+                base_type::setEditorData(editor, index);
+                return;
+            }
+
+            qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
+            qint64 space = index.data(SpaceRole).toLongLong();
+
+            slider->setRange(0, totalSpace / bytesInMib);
+            slider->setValue(space / bytesInMib);
+        }
+
+        virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+            ArchiveSpaceSlider *slider = dynamic_cast<ArchiveSpaceSlider *>(editor);
+            if(!slider) {
+                base_type::setModelData(editor, model, index);
+                return;
+            }
+
+            qint64 value = slider->value() * bytesInMib;
+            model->setData(index, value, SpaceRole);
+            model->setData(index, formatFileSize(value), Qt::DisplayRole);
+        }
+
+    private:
+        QColor m_color;
     };
 
 } // anonymous namespace
@@ -97,7 +212,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     /*QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
     itemDelegate->setItemEditorFactory(new StorageSettingsItemEditorFactory());
     ui->storagesTable->setItemDelegate(itemDelegate);*/
-    //ui->storagesTable->setItemDelegateForRow(2, new FreeSpaceItemDelegate(this));
+    ui->storagesTable->setItemDelegateForColumn(2, new UsedSpaceItemDelegate(this));
+    ui->storagesTable->setItemDelegateForColumn(3, new ArchiveSpaceItemDelegate(this));
 
     setButtonBox(ui->buttonBox);
 
@@ -157,9 +273,9 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
         spaceItem->setData(SpaceRole, 0);
         spaceItem->setData(TotalSpaceRole, 0);
     } else {
-        /*: This text refers to storage's free space. E.g. "2Gb of 30Gb". */
-        spaceItem->setData(Qt::DisplayRole, tr("%1 of %2").arg(formatFileSize(item.freeSpace)).arg(formatFileSize(item.totalSpace)));
-        spaceItem->setData(SpaceRole, item.freeSpace);
+        /*: This text refers to storage's used space. E.g. "2Gb of 30Gb". */
+        spaceItem->setData(Qt::DisplayRole, tr("%1 of %2").arg(formatFileSize(item.totalSpace - item.freeSpace)).arg(formatFileSize(item.totalSpace)));
+        spaceItem->setData(SpaceRole, item.totalSpace - item.freeSpace);
         spaceItem->setData(TotalSpaceRole, item.totalSpace);
     }
 
@@ -170,8 +286,8 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
         reservedItem->setData(SpaceRole, 0);
         reservedItem->setData(TotalSpaceRole, 0);
     } else {
-        reservedItem->setData(Qt::DisplayRole, formatFileSize(item.reservedSpace));
-        reservedItem->setData(SpaceRole, item.reservedSpace);
+        reservedItem->setData(Qt::DisplayRole, formatFileSize(item.totalSpace - item.reservedSpace));
+        reservedItem->setData(SpaceRole, item.totalSpace - item.reservedSpace);
         reservedItem->setData(TotalSpaceRole, item.totalSpace);
     }
 
