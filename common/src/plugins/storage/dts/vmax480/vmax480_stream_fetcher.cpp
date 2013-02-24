@@ -6,9 +6,15 @@
 
 static const int PROCESS_TIMEOUT = 1000;
 
-VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev)
+VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev):
+    m_vMaxProxy(0)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
+}
+
+VMaxStreamFetcher::~VMaxStreamFetcher()
+{
+    //vmaxDisconnect();
 }
 
 int VMaxStreamFetcher::getPort()
@@ -41,8 +47,8 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive)
     m_tcpID = QnVMax480Server::instance()->registerProvider(this);
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
-    m_vMaxProxy->start(QLatin1String("vmaxproxy"), args);
-    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
+    m_vMaxProxy->startDetached(QLatin1String("vmaxproxy"), args);
+    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)
     {
         bool rez = QnVMax480Server::instance()->waitForConnection(m_tcpID, PROCESS_TIMEOUT);
         if (rez) {

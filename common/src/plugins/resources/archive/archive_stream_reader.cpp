@@ -59,7 +59,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_pausedStart(false),
     m_sendMotion(false),
     m_prevSendMotion(false),
-    m_outOfPlaybackMask(false)
+    m_outOfPlaybackMask(false),
+    m_jumpMtx(QMutex::Recursive)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -389,6 +390,8 @@ begin_label:
         m_oldQualityFastSwitch = qualityFastSwitch;
     }
 
+    m_dataMarker = m_newDataMarker;
+
     m_jumpMtx.unlock();
 
     // change quality checking
@@ -484,7 +487,6 @@ begin_label:
         if (jumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(displayTime);
     }
-    m_dataMarker = m_newDataMarker;
 
     if (m_outOfPlaybackMask)
         return createEmptyPacket(reverseMode); // EOF reached
@@ -951,6 +953,7 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
     channeljumpToUnsync(mksec, 0, mksec);
 }
 
+/*
 void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int marker)
 {
     bool useMutex = !m_externalLocked;
@@ -963,6 +966,7 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int ma
     if (useMutex)
         m_jumpMtx.unlock();
 }
+*/
 
 void QnArchiveStreamReader::setMarker(int marker)
 {

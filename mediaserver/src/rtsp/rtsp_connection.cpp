@@ -987,8 +987,8 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->liveDpLow)
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
 
-        if (d->liveMode == Mode_Archive && d->archiveDP)
-            d->archiveDP->stop();
+        //if (d->liveMode == Mode_Archive && d->archiveDP)
+        //    d->archiveDP->stop();
         if (d->liveMode == Mode_ThumbNails && d->thumbnailsDP)
             d->thumbnailsDP->stop();
     }
@@ -1043,10 +1043,12 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
         QString sendMotion = d->requestHeaders.value("x-send-motion");
+
+        d->archiveDP->lock();
+
         if (!sendMotion.isNull()) 
             d->archiveDP->setSendMotion(sendMotion == "1" || sendMotion == "true");
 
-        d->archiveDP->lock();
         d->archiveDP->setSpeed(d->rtspScale);
         d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
         if (d->startTime > 0)
@@ -1054,7 +1056,11 @@ int QnRtspConnectionProcessor::composePlay()
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
             d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
             bool findIFrame = d->requestHeaders.value("x-no-find-iframe").isNull();
-            d->archiveDP->jumpWithMarker(d->startTime, findIFrame, d->lastPlayCSeq);
+            d->archiveDP->setMarker(d->lastPlayCSeq);
+            if (findIFrame)
+                d->archiveDP->jumpTo(d->startTime, 0);
+            else
+                d->archiveDP->directJumpToNonKeyFrame(d->startTime);
         }
         else {
             d->archiveDP->setMarker(d->lastPlayCSeq);

@@ -21,7 +21,7 @@ QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
 
 QnVMax480LiveProvider::~QnVMax480LiveProvider()
 {
-
+    vmaxDisconnect();
 }
 
 QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()

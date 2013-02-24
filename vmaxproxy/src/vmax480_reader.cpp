@@ -1,4 +1,5 @@
 #include <QUrl>
+#include <qDebug>
 
 #include "vmax480_reader.h"
 #include "socket.h"
@@ -200,7 +201,7 @@ void QnVMax480Provider::disconnect()
     }
 }
 
-void QnVMax480Provider::archivePlay(const VMaxParamList& params)
+void QnVMax480Provider::archivePlay(const VMaxParamList& params, quint8 sequence)
 {
     if (!m_ACSStream)
         return;
@@ -210,6 +211,8 @@ void QnVMax480Provider::archivePlay(const VMaxParamList& params)
     quint32 startTime;
     toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(posUsec/1000), &startDate, &startTime, 0);
 
+    qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString();
+    m_reqSequence = sequence;
     m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, startDate, startTime, false);
 }
 
@@ -237,10 +240,16 @@ void QnVMax480Provider::receiveResultCallback(PS_ACS_RESULT _result, long long _
 
 void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 {
+
+    //qDebug() << "receiveVideoStream";
+
     QMutexLocker lock(&m_callbackMutex);
 
-    if (m_reqSequence != m_curSequence)
+    if (m_reqSequence != m_curSequence) {
+        qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
         return;
+    }
+
 
     if(!m_connected)
         return;
@@ -271,9 +280,44 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 
 }
 
+QString codeToString(int code)
+{
+    switch(code)
+    {
+    case RESULT_CONNECT:
+            return "RESULT_CONNECT";
+    case RESULT_LOGIN:
+        return "RESULT_LOGIN";
+    case RESULT_ERROR:
+        return "RESULT_ERROR";
+    case RESULT_ALIVECHK:
+        return "RESULT_ALIVECHK";
+    case RESULT_SEARCH_PLAY:
+        return "RESULT_SEARCH_PLAY";
+    case RESULT_REC_DATE_TIME:
+        return "RESULT_REC_DATE_TIME";
+    case  RESULT_REC_INFO_MONTH:
+        return "RESULT_REC_INFO_MONTH";
+    case  RESULT_REC_TIME_TABLE:
+        return "RESULT_REC_TIME_TABLE";
+    case RESULT_OPEN_VIDEO:
+        return "RESULT_OPEN_VIDEO";
+    case RESULT_OPEN_AUDIO:
+        return "RESULT_OPEN_AUDIO";
+    case RESULT_CLOSE_VIDEO:
+        return "RESULT_CLOSE_VIDEO";
+    case RESULT_CLOSE_AUDIO:
+        return "RESULT_CLOSE_AUDIO";
+    }
+    return "Unknown";
+}
+
+
 void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
 {
     QMutexLocker lock(&m_callbackMutex);
+
+    qDebug() << "got result callback. code=" << codeToString(_result->mType);
 
     int openChannel = 0;
     int recordInfoMonth;

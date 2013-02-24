@@ -30,12 +30,18 @@ int main(int argc, char* argv[])
     int port = QString(argv[1]).toInt();
     QByteArray connectionID = argv[2];
 
+    qWarning() << "proxy started";
+
     TCPSocket mServerConnect;
     bool connected = mServerConnect.connect("127.0.0.1", port);
     if (!connected)
         return -1;
 
+    qWarning() << "proxy connected";
+
     mServerConnect.send(connectionID.data(), connectionID.size());
+
+    qWarning() << "after send ID";
 
     bool shouldTerminate = false;
     while(!shouldTerminate)
@@ -64,14 +70,17 @@ int main(int argc, char* argv[])
         switch(command)
         {
             case Command_OpenLive:
+                qDebug() << "before exec Command_OpenLive";
                 connection = openVMaxConnection(&mServerConnect, params, sequence, true);
                 break;
             case Command_OpenArchive:
+                qDebug() << "before exec Command_OpenArchive";
                 connection = openVMaxConnection(&mServerConnect, params, sequence, false);
                 break;
             case Command_ArchivePlay:
                 if (connection) {
-                    connection->archivePlay(params);
+                    qDebug() << "before exec Command_ArchivePlay";
+                    connection->archivePlay(params, sequence);
                 }
                 break;
             case Command_CloseConnect:

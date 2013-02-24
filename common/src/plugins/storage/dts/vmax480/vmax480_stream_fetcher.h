@@ -8,6 +8,7 @@ class VMaxStreamFetcher
 {
 public:
     VMaxStreamFetcher(QnResourcePtr dev );
+    virtual ~VMaxStreamFetcher();
 
     virtual void onGotData(QnAbstractMediaDataPtr mediaData) = 0;
 

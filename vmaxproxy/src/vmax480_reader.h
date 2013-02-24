@@ -20,7 +20,7 @@ public:
 
     void connect(const VMaxParamList& params, quint8 sequence, bool isLive);
     void disconnect();
-    void archivePlay(const VMaxParamList& params);
+    void archivePlay(const VMaxParamList& params, quint8 sequence);
     bool isConnected() const;
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);

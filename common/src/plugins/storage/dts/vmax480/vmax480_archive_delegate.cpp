@@ -15,6 +15,12 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_flags |= Flag_CanOfflineRange;
 }
 
+QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
+{
+    vmaxDisconnect();
+
+}
+
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
     m_needStop = false;
@@ -24,7 +30,13 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 
     m_sequence = 0;
 
-    return vmaxConnect(false);
+    m_connected = vmaxConnect(false);
+    return m_connected;
+}
+
+void QnVMax480ArchiveDelegate::beforeClose()
+{
+    m_needStop = true;
 }
 
 qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
@@ -38,14 +50,11 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
     return time;
 }
 
-void QnVMax480ArchiveDelegate::beforeClose()
-{
-    m_needStop = true;
-}
-
 void QnVMax480ArchiveDelegate::close()
 {
+    m_needStop = true;
     vmaxDisconnect();
+    m_connected =false;
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime()
@@ -69,7 +78,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         result = tmp.dynamicCast<QnAbstractMediaData>();
         if (result && result->opaque == m_sequence)
             break;
-        if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION)
+        if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*1000)
             break;
     }
     if (result)

@@ -9,6 +9,8 @@ class QnVMax480ArchiveDelegate: public QnAbstractArchiveDelegate, public VMaxStr
 {
 public:
     QnVMax480ArchiveDelegate(QnResourcePtr res);
+    virtual ~QnVMax480ArchiveDelegate();
+
 
     virtual bool open(QnResourcePtr resource)override;
     virtual void close()override;
