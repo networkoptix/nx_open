@@ -6,47 +6,42 @@
 namespace {
     const QLatin1String emailPattern("\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b");
 
-    typedef QLatin1String _;
+    static const int tlsPort = 587;
+    static const int sslPort = 465;
+    static const int unsecurePort = 25;
 
-    static QHash<QString, QnSmptServerPreset> initSmtpPresets() {
-        QHash<QString, QnSmptServerPreset> presets;
-        presets.insert(_("gmail.com"),          QnSmptServerPreset(_("smtp.gmail.com")));
+    static QHash<QString, QnEmail::SmtpServerPreset> initSmtpPresets() {
+        typedef QLatin1String _;
+        typedef QnEmail::SmtpServerPreset server;
 
-        presets.insert(_("hotmail.co.uk"),      QnSmptServerPreset(_("smtp.live.com")));
-        presets.insert(_("hotmail.com"),        QnSmptServerPreset(_("smtp.live.com")));
+        QHash<QString, QnEmail::SmtpServerPreset> presets;
+        presets.insert(_("gmail.com"),          server(_("smtp.gmail.com")));
 
-        presets.insert(_("dwcc.tv"),            QnSmptServerPreset(_("mail.dwcc.tv")));
+        presets.insert(_("hotmail.co.uk"),      server(_("smtp.live.com")));
+        presets.insert(_("hotmail.com"),        server(_("smtp.live.com")));
 
-        presets.insert(_("yahoo.com"),          QnSmptServerPreset(_("smtp.mail.yahoo.com"), true, 465));
-        presets.insert(_("yahoo.co.uk"),        QnSmptServerPreset(_("smtp.mail.yahoo.co.uk"), true, 465));
-        presets.insert(_("yahoo.de"),           QnSmptServerPreset(_("smtp.mail.yahoo.de"), true, 465));
-        presets.insert(_("yahoo.com.au"),       QnSmptServerPreset(_("smtp.mail.yahoo.com.au"), true, 465));
+        presets.insert(_("dwcc.tv"),            server(_("mail.dwcc.tv")));
 
-        presets.insert(_("o2.ie"),              QnSmptServerPreset(_("smtp.o2.ie"), false));
-        presets.insert(_("o2.co.uk"),           QnSmptServerPreset(_("smtp.o2.co.uk"), false));
+        presets.insert(_("yahoo.com"),          server(_("smtp.mail.yahoo.com"), QnEmail::Ssl));
+        presets.insert(_("yahoo.co.uk"),        server(_("smtp.mail.yahoo.co.uk"), QnEmail::Ssl));
+        presets.insert(_("yahoo.de"),           server(_("smtp.mail.yahoo.de"), QnEmail::Ssl));
+        presets.insert(_("yahoo.com.au"),       server(_("smtp.mail.yahoo.com.au"), QnEmail::Ssl));
 
-        presets.insert(_("inbox.com"),          QnSmptServerPreset(_("my.inbox.com")));
+        presets.insert(_("o2.ie"),              server(_("smtp.o2.ie"), QnEmail::Unsecure));
+        presets.insert(_("o2.co.uk"),           server(_("smtp.o2.co.uk"), QnEmail::Unsecure));
+
+        presets.insert(_("inbox.com"),          server(_("my.inbox.com")));
 /*
-        presets.insert(_("outlook.com"),        QnSmptServerPreset(_("")));
-        presets.insert(_("msn"),                QnSmptServerPreset(_("")));
-        presets.insert(_("sympatico.ca"),       QnSmptServerPreset(_("")));
-        presets.insert(_("telus.net"),          QnSmptServerPreset(_("")));
-        presets.insert(_("shaw.ca"),            QnSmptServerPreset(_("")));*/
+        presets.insert(_("outlook.com"),        SmtpServerPreset(_("")));
+        presets.insert(_("msn"),                SmtpServerPreset(_("")));
+        presets.insert(_("sympatico.ca"),       SmtpServerPreset(_("")));
+        presets.insert(_("telus.net"),          SmtpServerPreset(_("")));
+        presets.insert(_("shaw.ca"),            SmtpServerPreset(_("")));*/
 
         return presets;
     }
 
-    static const QHash<QString, QnSmptServerPreset> smtpServerPresets = initSmtpPresets();
-}
-
-QnSmptServerPreset::QnSmptServerPreset(const QString &server, const bool useTls, const int port) :
-    server(server), useTls(useTls), port(port) {
-    if (port != 0)
-        return;
-    if (useTls)
-        this->port = QnEmail::securePort;
-    else
-        this->port = QnEmail::unsecurePort;
+    static const QHash<QString, QnEmail::SmtpServerPreset> SmtpServerPresetPresets = initSmtpPresets();
 }
 
 QnEmail::QnEmail(const QString &email):
@@ -63,14 +58,26 @@ bool QnEmail::isValid(const QString &email) {
     return rx.exactMatch(email.trimmed().toUpper());
 }
 
+int QnEmail::defaultPort(QnEmail::ConnectionType connectionType) {
+    switch (connectionType) {
+    case Ssl: return sslPort;
+    case Tls: return tlsPort;
+    default:
+        return unsecurePort;
+    }
+}
+
 QString QnEmail::domain() const {
     int idx = m_email.indexOf(QLatin1Char('@'));
     return m_email.mid(idx + 1).trimmed();
 }
 
-QnSmptServerPreset QnEmail::smptServer() const {
+QnEmail::SmtpServerPreset QnEmail::smtpServer() const {
+    if (!isValid())
+        return SmtpServerPreset();
+
     QString key = domain();
-    if (smtpServerPresets.contains(key))
-        return smtpServerPresets[key];
-    return QnSmptServerPreset(QLatin1String("smtp.") + key, false);
+    if (SmtpServerPresetPresets.contains(key))
+        return SmtpServerPresetPresets[key];
+    return SmtpServerPreset(QLatin1String("smtp.") + key, Unsecure);
 }

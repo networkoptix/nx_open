@@ -37,7 +37,7 @@ private slots:
     void at_advancedCheckBox_toggled(bool toggled);
     void at_simpleEmail_textChanged(const QString &value);
 private:
-    QnKvPairList settings();
+    QnKvPairList settings(bool *ok);
     void updateMailServers();
 private:
     QScopedPointer<Ui::QnSmtpSettingsWidget> ui;

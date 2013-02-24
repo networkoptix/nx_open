@@ -4,6 +4,14 @@ QnKvPair::QnKvPair(const QString &name, const QString &value):
     m_name(name), m_value(value) 
 {}
 
+QnKvPair::QnKvPair(const QString& name, const int value):
+    m_name(name), m_value(QString::number(value))
+{}
+
+QnKvPair::QnKvPair(const QString& name, const bool value):
+    m_name(name), m_value(value ? QLatin1String("True") : QLatin1String("False"))
+{}
+
 void QnKvPair::setName(const QString &name)
 {
     m_name = name;
