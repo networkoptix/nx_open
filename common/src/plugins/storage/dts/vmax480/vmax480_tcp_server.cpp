@@ -25,12 +25,13 @@ QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()
     stop();
 }
 
-void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, const QAuthenticator& auth, bool isLive)
+void QnVMax480ConnectionProcessor::vMaxConnect(const QString& url, int channel, const QAuthenticator& auth, bool isLive)
 {
     Q_D(QnVMax480ConnectionProcessor);
 
     VMaxParamList params;
     params["url"] = url.toUtf8();
+    params["channel"] = QByteArray::number(channel);
     params["login"] = auth.user().toUtf8();
     params["password"] = auth.password().toUtf8();
     MServerCommand command = isLive ? Command_OpenLive : Command_OpenArchive;
@@ -53,6 +54,29 @@ void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 seque
     VMaxParamList params;
     params["pos"] = QString::number(timeUsec).toUtf8();
     QByteArray data = QnVMax480Helper::serializeCommand(Command_ArchivePlay, sequence, params);
+
+    d->socket->send(data);
+}
+
+void QnVMax480ConnectionProcessor::vMaxRequestMonthInfo(const QDate& month)
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    int internalMonthFormat = month.year()*10000 + month.month()*100;
+    VMaxParamList params;
+    params["month"] = QString::number(internalMonthFormat).toUtf8();
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_RecordedMonth, 0, params);
+
+    d->socket->send(data);
+}
+
+void QnVMax480ConnectionProcessor::vMaxRequestDayInfo(int dayNum)
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    VMaxParamList params;
+    params["day"] = QString::number(dayNum).toUtf8();
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_RecordedTime, 0, params);
 
     d->socket->send(data);
 }
@@ -107,6 +131,26 @@ void QnVMax480ConnectionProcessor::run()
             quint32 startDateTime = *(quint32*)(vMaxHeader+8);
             quint32 endDateTime = *(quint32*)(vMaxHeader+12);
             static_cast<QnVMax480Server*>(d->owner)->onGotArchiveRange(d->tcpID, startDateTime, endDateTime);
+            continue;
+        }
+        else if (dataType == VMAXDT_GotMonthInfo)
+        {
+            quint32 monthInfo = *(quint32*)(vMaxHeader+8);
+            quint32 monthNum = *(quint32*)(vMaxHeader+12);
+            QDate monthDate(monthNum/10000, (monthNum%10000)/100, 1);
+            qDebug() << "month=" << monthDate.toString();
+            static_cast<QnVMax480Server*>(d->owner)->onGotMonthInfo(d->tcpID, monthDate, monthInfo);
+            continue;
+        }
+        else if (dataType == VMAXDT_GotDayInfo)
+        {
+            quint32 dayNum = *(quint32*)(vMaxHeader+12);
+            QByteArray data;
+            data.resize(VMAX_MAX_CH * (1440+60));
+            if (!readBuffer((quint8*) data.data(), data.size()))
+                break;
+
+            static_cast<QnVMax480Server*>(d->owner)->onGotDayInfo(d->tcpID, dayNum, data);
             continue;
         }
 
@@ -267,12 +311,12 @@ QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(TCPSocket* cli
     return new QnVMax480ConnectionProcessor(clientSocket, owner);
 }
 
-void QnVMax480Server::vMaxConnect(const QString& tcpID, const QString& url, const QAuthenticator& auth, bool isLive)
+void QnVMax480Server::vMaxConnect(const QString& tcpID, const QString& url, int channel, const QAuthenticator& auth, bool isLive)
 {
     QMutexLocker lock(&m_mutexConnection);
     QnVMax480ConnectionProcessor* connection = m_connections.value(tcpID);
     if (connection)
-        connection->vMaxConnect(url, auth, isLive);
+        connection->vMaxConnect(url, channel, auth, isLive);
 }
 
 void QnVMax480Server::vMaxArchivePlay(const QString& tcpID, qint64 timeUsec, quint8 sequence)
@@ -281,6 +325,22 @@ void QnVMax480Server::vMaxArchivePlay(const QString& tcpID, qint64 timeUsec, qui
     QnVMax480ConnectionProcessor* connection = m_connections.value(tcpID);
     if (connection)
         connection->vMaxArchivePlay(timeUsec, sequence);
+}
+
+void QnVMax480Server::vMaxRequestMonthInfo(const QString& tcpID, const QDate& month)
+{
+    QMutexLocker lock(&m_mutexConnection);
+    QnVMax480ConnectionProcessor* connection = m_connections.value(tcpID);
+    if (connection)
+        connection->vMaxRequestMonthInfo(month);
+}
+
+void QnVMax480Server::vMaxRequestDayInfo(const QString& tcpID, int dayNum)
+{
+    QMutexLocker lock(&m_mutexConnection);
+    QnVMax480ConnectionProcessor* connection = m_connections.value(tcpID);
+    if (connection)
+        connection->vMaxRequestDayInfo(dayNum);
 }
 
 void QnVMax480Server::vMaxDisconnect(const QString& tcpID)
@@ -305,4 +365,20 @@ void QnVMax480Server::onGotArchiveRange(const QString& tcpID, quint32 startDateT
     VMaxStreamFetcher* provider = m_providers.value(tcpID);
     if (provider)
         provider->onGotArchiveRange(startDateTime, endDateTime);
+}
+
+void QnVMax480Server::onGotMonthInfo(const QString& tcpID, QDate month, int monthInfo)
+{
+    QMutexLocker lock(&m_mutexProvider);
+    VMaxStreamFetcher* provider = m_providers.value(tcpID);
+    if (provider)
+        provider->onGotMonthInfo(month, monthInfo);
+}
+
+void QnVMax480Server::onGotDayInfo(const QString& tcpID, int dayNum, const QByteArray& data)
+{
+    QMutexLocker lock(&m_mutexProvider);
+    VMaxStreamFetcher* provider = m_providers.value(tcpID);
+    if (provider)
+        provider->onGotDayInfo(dayNum, data);
 }

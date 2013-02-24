@@ -30,7 +30,10 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 
     m_sequence = 0;
 
-    m_connected = vmaxConnect(false);
+    int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
+    if (channel > 0)
+        channel--;
+    m_connected = vmaxConnect(false, channel);
     return m_connected;
 }
 

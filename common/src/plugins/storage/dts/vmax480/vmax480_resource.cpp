@@ -2,14 +2,23 @@
 #include "vmax480_live_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "vmax480_archive_delegate.h"
+#include "vmax480_chunk_reader.h"
+#include "core/resource_managment/resource_pool.h"
 
 const char* QnPlVmax480Resource::MANUFACTURE = "VMAX";
 
 QnPlVmax480Resource::QnPlVmax480Resource():
     m_startTime(AV_NOPTS_VALUE),
-    m_endTime(AV_NOPTS_VALUE)
+    m_endTime(AV_NOPTS_VALUE),
+    m_chunkReader(0),
+    m_chunksReady(false)
 {
+    addFlags(dts_storage);
+}
 
+QnPlVmax480Resource::~QnPlVmax480Resource()
+{
+    delete m_chunkReader;
 }
 
 int QnPlVmax480Resource::getMaxFps() 
@@ -149,4 +158,57 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     QMutexLocker lock(&m_mutex);
     m_startTime = startTimeUsec;
     m_endTime = endTimeUsec;
+}
+
+void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
+{
+    Status oldStatus = getStatus();
+    bool isOldOnline = oldStatus == QnResource::Online || oldStatus == QnResource::Recording;
+
+    QnPhysicalCameraResource::setStatus(newStatus, silenceMode);
+    if (getChannel() == 0)
+    {
+        if (!m_chunkReader) {
+            m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
+            connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
+        }
+        bool isNewOnline = getStatus() == QnResource::Online || getStatus() == QnResource::Recording;
+        if (isNewOnline && !isOldOnline)
+            m_chunkReader->start();
+        else
+            m_chunkReader->stop();
+    }
+}
+
+void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
+{
+    if (channel == getChannel())
+        setChunks(chunks);
+    else {
+        QString suffix = QString(QLatin1String("?channel=%1")).arg(channel+1);
+        QString url = getUrl();
+        url = url.left(url.indexOf(L'?')+1) + suffix;
+        QnPlVmax480ResourcePtr otherRes = qnResPool->getResourceByUrl(url).dynamicCast<QnPlVmax480Resource>();
+        if (otherRes)
+            otherRes->setChunks(chunks);
+    }
+}
+
+void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
+{
+    QMutexLocker lock(&m_mutexChunks);
+    m_chunks = chunks;
+    m_chunksReady = true;
+    m_chunksCond.wakeAll();
+}
+
+QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
+{
+    QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
+    
+    QMutexLocker lock(&m_mutexChunks);
+    while (!m_chunksReady)
+        m_chunksCond.wait(&m_mutexChunks);
+
+    return m_chunks.intersected(period);
 }

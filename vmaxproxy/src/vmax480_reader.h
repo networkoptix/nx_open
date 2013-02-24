@@ -1,6 +1,7 @@
 #ifndef _VMAX480_READER_H__
 #define _VMAX480_READER_H__
 
+#include <QQueue>
 #include <QMutex>
 #include <QWaitCondition>
 #include <QDateTime>
@@ -22,6 +23,8 @@ public:
     void disconnect();
     void archivePlay(const VMaxParamList& params, quint8 sequence);
     bool isConnected() const;
+    void requestMonthInfo(const VMaxParamList& params, quint8 sequence);
+    void requestDayInfo(const VMaxParamList& params, quint8 sequence);
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
     static void receiveVideoStramCallback(PS_ACS_VIDEO_STREAM _stream, long long _user);
@@ -47,6 +50,9 @@ private:
     quint8 m_reqSequence;
     quint8 m_curSequence;
     int m_channelNum;
+    QQueue<int> m_monthRequests;
+    QQueue<int> m_daysRequests;
+    unsigned char recordedDayInfo[VMAX_MAX_CH][1440+60];
 };
 
 #endif // _VMAX480_READER_H__

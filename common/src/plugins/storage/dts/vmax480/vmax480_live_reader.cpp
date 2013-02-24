@@ -58,7 +58,10 @@ void QnVMax480LiveProvider::openStream()
     if (m_connected)
         return;
 
-    m_connected = vmaxConnect(true);
+    int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
+    if (channel > 0)
+        channel--;
+    m_connected = vmaxConnect(true, channel);
 }
 
 void QnVMax480LiveProvider::closeStream()

@@ -257,18 +257,24 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
-    QVector<QnTimePeriodList> cameras;
+    QVector<QnTimePeriodList> periods;
     for (int i = 0; i < resList.size(); ++i)
     {
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
         if (camera) {
-            QString physicalId = camera->getPhysicalId();
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
+            if (camera->hasFlags(QnResource::dts_storage))
+            {
+                periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
+            }
+            else {
+                QString physicalId = camera->getPhysicalId();
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
+            }
         }
     }
 
-    return QnTimePeriod::mergeTimePeriods(cameras);
+    return QnTimePeriod::mergeTimePeriods(periods);
 }
 
 void QnStorageManager::clearSpace()

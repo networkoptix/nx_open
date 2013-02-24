@@ -10,21 +10,26 @@ public:
     VMaxStreamFetcher(QnResourcePtr dev );
     virtual ~VMaxStreamFetcher();
 
-    virtual void onGotData(QnAbstractMediaDataPtr mediaData) = 0;
+    virtual void onGotData(QnAbstractMediaDataPtr mediaData) {}
 
-    void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime);
+    virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime);
+    virtual void onGotMonthInfo(const QDate& month, int monthInfo) {}
+    virtual void onGotDayInfo(int dayNum, const QByteArray& data) {}
 
     bool isOpened() const;
 protected:
-    bool vmaxConnect(bool isLive);
+    bool vmaxConnect(bool isLive, int channel);
     void vmaxDisconnect();
     void vmaxArchivePlay(qint64 timeUsec, quint8 sequence);
+    void vmaxRequestMonthInfo(const QDate& month);
+    void vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
 private:
     int getPort();
+protected:
+    QnNetworkResourcePtr m_res;
 private:
     QProcess* m_vMaxProxy;
     QString m_tcpID;
-    QnNetworkResourcePtr m_res;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

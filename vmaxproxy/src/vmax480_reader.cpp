@@ -152,9 +152,13 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
     m_ACSStream->setRecvResultCallback(receiveResultCallback , (long long)this);
 
     QUrl url(params.value("url"));
+
+    /*
     m_channelNum = url.queryItemValue("channel").toInt();
     if (m_channelNum > 0)
         m_channelNum--;
+    */
+    m_channelNum = params.value("channel").toInt();
 
     S_CONNECT_PARAM	connectParam;
     connectParam.mUrl	=	url.host().toStdWString();
@@ -214,6 +218,36 @@ void QnVMax480Provider::archivePlay(const VMaxParamList& params, quint8 sequence
     qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString();
     m_reqSequence = sequence;
     m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, startDate, startTime, false);
+}
+
+void QnVMax480Provider::requestMonthInfo(const VMaxParamList& params, quint8 sequence)
+{
+    if (!m_ACSStream)
+        return;
+
+    int month = params.value("month").toInt();
+
+    {
+        QMutexLocker lock(&m_callbackMutex);
+        m_monthRequests << month;
+    }
+
+    m_ACSStream->requestRecordMonth(month);
+}
+
+void QnVMax480Provider::requestDayInfo(const VMaxParamList& params, quint8 sequence)
+{
+    if (!m_ACSStream)
+        return;
+
+    int dayNum = params.value("day").toInt();
+
+    {
+        QMutexLocker lock(&m_callbackMutex);
+        m_daysRequests << dayNum;
+    }
+
+    m_ACSStream->requestRecordDay(dayNum);
 }
 
 bool QnVMax480Provider::isConnected() const
@@ -332,9 +366,10 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
             if( _result->mResult == true )
             {
                 m_ACSStream->requestRecordDateTime();
-
-                m_ACSStream->openChannel(1 << m_channelNum);
-                m_ACSStream->openAudioChannel(1 << m_channelNum);
+                if (m_channelNum != -1) {
+                    m_ACSStream->openChannel(1 << m_channelNum);
+                    m_ACSStream->openAudioChannel(1 << m_channelNum);
+                }
             }
             break;
         }
@@ -397,38 +432,30 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                 *(quint32*)(vMaxHeader+8) = startDateTime.toMSecsSinceEpoch()/1000;
                 *(quint32*)(vMaxHeader+12) = endDateTime.toMSecsSinceEpoch()/1000;
                 m_socket->send(vMaxHeader, sizeof(vMaxHeader));
-
-                if( m_ACSStream )
-                {
-
-                    //requestrandom_seek(int _eventChannel, ACS_stream_source::PLAYMODE _playmode, int _speed, int _date, int _time) = 0;
-                    //mACSStream->openChannel(65535);
-                    //m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, startDate, startTime, false);
-                    //mACSStream->requestrandom_seek(65535,ACS_stream_source::FORWARDPLAY, 1, startDate, startTime, false );
-                }
-
             }
             break;
         }
 
     case  RESULT_REC_INFO_MONTH:
         {
-            if (_result->mResult == true)
+            if (_result->mResult == true && m_ACSStream && !m_monthRequests.isEmpty())
             {
-                if( m_ACSStream )
-                {
-                    int gg = 4;
-                    /*
-                    SYSTEMTIME _stcurtime;
-                    m_calendar.GetCurSel(&_stcurtime);
-                    int searchDate = _stcurtime.wYear*10000 + _stcurtime.wMonth*100 + 1;
-                    recordInfoMonth = m_ACSStream->getRecordMonth(searchDate);
+                int monthNum = m_monthRequests.dequeue();
+                int monthInfo = m_ACSStream->getRecordMonth(monthNum + 1);
 
-                    OutputDebugString(L"get Days success!!\n");
-                    setCalendarDate(recordInfoMonth);
-                    */
-                }
+                QDate monthDate(monthNum/10000, (monthNum%10000)/100, 1);
+                qDebug() << "month=" << monthNum + 1 << "info=" << monthInfo;
 
+                quint8 vMaxHeader[16];
+                vMaxHeader[0] = m_curSequence;
+                vMaxHeader[1] = VMAXDT_GotMonthInfo;
+
+                vMaxHeader[2] = 0;
+                vMaxHeader[3] = 0;
+                *(quint32*)(vMaxHeader+4) = 0;
+                *(quint32*)(vMaxHeader+8) = monthInfo;
+                *(quint32*)(vMaxHeader+12) = monthNum;
+                m_socket->send(vMaxHeader, sizeof(vMaxHeader));
             }
 
             break;
@@ -436,9 +463,23 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
 
     case  RESULT_REC_TIME_TABLE:
         {
-            if (_result->mResult == true)
+            if (_result->mResult == true && m_ACSStream && !m_daysRequests.isEmpty())
             {
-                int gg = 4;
+                int dayNum = m_daysRequests.dequeue();
+                m_ACSStream->getRecordDayInfo(dayNum, &recordedDayInfo[0][0]);
+
+                quint8 vMaxHeader[16];
+                vMaxHeader[0] = m_curSequence;
+                vMaxHeader[1] = VMAXDT_GotDayInfo;
+
+                vMaxHeader[2] = 0;
+                vMaxHeader[3] = 0;
+                *(quint32*)(vMaxHeader+4) = sizeof(recordedDayInfo);
+                *(quint32*)(vMaxHeader+8) = 0;
+                *(quint32*)(vMaxHeader+12) = dayNum;
+                m_socket->send(vMaxHeader, sizeof(vMaxHeader));
+                m_socket->send(recordedDayInfo, sizeof(recordedDayInfo));
+
                 /*
                 if (m_ACSStream)
                 {

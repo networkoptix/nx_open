@@ -6,13 +6,17 @@
 
 typedef QMap<QByteArray, QByteArray> VMaxParamList;
 
-enum MServerCommand {Command_OpenLive, Command_OpenArchive, Command_ArchivePlay, Command_CloseConnect};
-enum VMaxDataType { VMAXDT_GotVideoPacket, VMAXDT_GotAudioPacket, VMAXDT_GotArchiveRange };
+enum MServerCommand {Command_OpenLive, Command_OpenArchive, Command_ArchivePlay, Command_RecordedMonth, Command_RecordedTime, Command_CloseConnect};
+enum VMaxDataType { VMAXDT_GotVideoPacket, VMAXDT_GotAudioPacket, VMAXDT_GotArchiveRange, VMAXDT_GotMonthInfo, VMAXDT_GotDayInfo };
 
 enum VMaxVideoCodec { CODEC_VSTREAM_H264 , CODEC_VSTREAM_JPEG , CODEC_VSTREAM_MPEG4};
 enum VMaxAudioCodec{ CODEC_ASTREAM_MULAW , CODEC_ASTREAM_G723, CODEC_ASTREAM_IMAACPCM, CODEC_ASTREAM_MSADPCM, CODEC_ASTREAM_PCM, CODEC_ASTREAM_CG726, CODEC_ASTREAM_CG711A, CODEC_ASTREAM_CG711U};
 
 static const char VMAX_PARAM_DELIMITER = '\\';
+
+static const int VMAX_MAX_CH = 16;
+static const int VMAX_SLICE_OF_HOUR	= 60;
+static const int VMAX_MAX_SLICE_DAY = VMAX_SLICE_OF_HOUR*24;
 
 
 class QnVMax480Helper {

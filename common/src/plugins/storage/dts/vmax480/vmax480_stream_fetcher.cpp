@@ -39,7 +39,7 @@ void VMaxStreamFetcher::vmaxArchivePlay(qint64 timeUsec, quint8 sequence)
     QnVMax480Server::instance()->vMaxArchivePlay(m_tcpID, timeUsec, sequence);
 }
 
-bool VMaxStreamFetcher::vmaxConnect(bool isLive)
+bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
 {
     int port = getPort();
     QStringList args;
@@ -52,7 +52,7 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive)
     {
         bool rez = QnVMax480Server::instance()->waitForConnection(m_tcpID, PROCESS_TIMEOUT);
         if (rez) {
-            QnVMax480Server::instance()->vMaxConnect(m_tcpID, m_res->getUrl(), m_res->getAuth(), isLive);
+            QnVMax480Server::instance()->vMaxConnect(m_tcpID, m_res->getUrl(), channel, m_res->getAuth(), isLive);
             return true;
         }
     }
@@ -80,4 +80,14 @@ void VMaxStreamFetcher::vmaxDisconnect()
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
 {
     m_res.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
+}
+
+void VMaxStreamFetcher::vmaxRequestMonthInfo(const QDate& month)
+{
+    QnVMax480Server::instance()->vMaxRequestMonthInfo(m_tcpID, month);
+}
+
+void VMaxStreamFetcher::vmaxRequestDayInfo(int dayNum)
+{
+    QnVMax480Server::instance()->vMaxRequestDayInfo(m_tcpID, dayNum);
 }

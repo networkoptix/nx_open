@@ -21,6 +21,8 @@ int main(int argc, char* argv[])
         qWarning() << "This utility for internal use only!";
         qWarning() << "Usage:";
         qWarning() << "vmaxproxy <mediaServer vmax TCP port> <connection ID>";
+
+        return -1;
     }
 
     //QMessageBox::warning(0, "test", "test");
@@ -76,6 +78,18 @@ int main(int argc, char* argv[])
             case Command_OpenArchive:
                 qDebug() << "before exec Command_OpenArchive";
                 connection = openVMaxConnection(&mServerConnect, params, sequence, false);
+                break;
+            case Command_RecordedMonth:
+                if (connection) {
+                    qDebug() << "before request month info";
+                    connection->requestMonthInfo(params, sequence);
+                }
+                break;
+            case Command_RecordedTime:
+                if (connection) {
+                    qDebug() << "before request day info";
+                    connection->requestDayInfo(params, sequence);
+                }
                 break;
             case Command_ArchivePlay:
                 if (connection) {

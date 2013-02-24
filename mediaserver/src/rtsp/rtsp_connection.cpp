@@ -989,8 +989,8 @@ int QnRtspConnectionProcessor::composePlay()
 
         //if (d->liveMode == Mode_Archive && d->archiveDP)
         //    d->archiveDP->stop();
-        if (d->liveMode == Mode_ThumbNails && d->thumbnailsDP)
-            d->thumbnailsDP->stop();
+        //if (d->liveMode == Mode_ThumbNails && d->thumbnailsDP)
+        //    d->thumbnailsDP->stop();
     }
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
