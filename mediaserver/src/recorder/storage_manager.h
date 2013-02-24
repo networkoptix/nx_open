@@ -57,8 +57,11 @@ public:
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
-    const StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
+    // TODO: #VASILENKO!!! This function returns DUPLICATES in storage map, but callers assume that there are none.
+    StorageMap getAllStorages() const;
+    QnStorageResourceList getStorages() const;
     void clearSpace();
+
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:

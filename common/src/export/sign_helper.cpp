@@ -2,7 +2,7 @@
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/scoped_painter_rollback.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 extern "C" {
 #ifdef WIN32

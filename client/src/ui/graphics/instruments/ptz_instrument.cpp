@@ -10,9 +10,10 @@
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/fuzzy.h>
-#include <utils/common/math.h>
-#include <utils/common/space_mapper.h>
+#include <utils/math/fuzzy.h>
+#include <utils/math/math.h>
+#include <utils/math/space_mapper.h>
+#include <utils/math/color_transformations.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -20,7 +21,7 @@
 
 #include <api/media_server_connection.h>
 
-#include <ui/common/coordinate_transformations.h>
+#include <utils/math/coordinate_transformations.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>

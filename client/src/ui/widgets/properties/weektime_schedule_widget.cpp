@@ -4,7 +4,7 @@
 #include <QtGui/QMessageBox>
 
 #include <core/resource_managment/resource_pool.h>
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
 #include "utils/media/bitStream.h"
 

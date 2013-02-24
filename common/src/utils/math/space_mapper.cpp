@@ -11,16 +11,17 @@ namespace {
 // QnScalarSpaceMapper
 // -------------------------------------------------------------------------- //
 QnScalarSpaceMapper::QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal physical0, qreal physical1, Qn::ExtrapolationMode extrapolationMode) {
-    QVector<QPointF> logicalToPhysical;
-    logicalToPhysical.push_back(QPointF(logical0, physical0));
-    logicalToPhysical.push_back(QPointF(logical1, physical1));
+    QVector<QPair<qreal, qreal> > logicalToPhysical;
+    logicalToPhysical.push_back(qMakePair(logical0, physical0));
+    logicalToPhysical.push_back(qMakePair(logical1, physical1));
     init(logicalToPhysical, extrapolationMode);
 }
 
-void QnScalarSpaceMapper::init(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
-    QVector<QPointF> physicalToLogical;
-    foreach(const QPointF &point, logicalToPhysical)
-        physicalToLogical.push_back(QPointF(point.y(), point.x()));
+void QnScalarSpaceMapper::init(const QVector<QPair<qreal, qreal> > &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
+    QVector<QPair<qreal, qreal> > physicalToLogical;
+    typedef QPair<qreal, qreal> PairType; // TODO: #Elric #C++11 replace with auto
+    foreach(const PairType &point, logicalToPhysical)
+        physicalToLogical.push_back(qMakePair(point.second, point.first));
 
     m_logicalToPhysical.setPoints(logicalToPhysical);
     m_logicalToPhysical.setExtrapolationMode(extrapolationMode);
@@ -34,10 +35,10 @@ void QnScalarSpaceMapper::init(const QVector<QPointF> &logicalToPhysical, Qn::Ex
     } else {
         int last = logicalToPhysical.size() - 1;
 
-        logicalA = m_logicalToPhysical.point(0).x();
-        logicalB = m_logicalToPhysical.point(last).x();
-        physicalA = m_physicalToLogical.point(0).x();
-        physicalB = m_physicalToLogical.point(last).x();
+        logicalA = m_logicalToPhysical.point(0).first;
+        logicalB = m_logicalToPhysical.point(last).first;
+        physicalA = m_physicalToLogical.point(0).first;
+        physicalB = m_physicalToLogical.point(last).first;
     }
 
     m_logicalMinimum = qMin(logicalA, logicalB);
@@ -50,9 +51,10 @@ void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
     QString extrapolationMode = qn_extrapolationMode_enumNameMapper()->name(value.logicalToPhysical().extrapolationMode());
 
     QVariantList logical, physical;
-    foreach(const QPointF &point, value.logicalToPhysical().points()) {
-        logical.push_back(point.x());
-        physical.push_back(point.y());
+    typedef QPair<qreal, qreal> PairType; // TODO: #Elric #C++11 replace with auto
+    foreach(const PairType &point, value.logicalToPhysical().points()) {
+        logical.push_back(point.first);
+        physical.push_back(point.second);
     }
 
     QVariantMap result;
@@ -84,14 +86,14 @@ bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
     if(extrapolationMode == -1)
         return false;
 
-    QVector<QPointF> logicalToPhysical;
+    QVector<QPair<qreal, qreal> > logicalToPhysical;
     for(int i = 0; i < logical.size(); i++) {
         bool success = true;
         qreal x = logical[i].toReal(&success);
         qreal y = physical[i].toReal(&success);
         if(!success)
             return false;
-        logicalToPhysical.push_back(QPointF(x, y));
+        logicalToPhysical.push_back(qMakePair(x, y));
     }
 
     *target = QnScalarSpaceMapper(logicalToPhysical, static_cast<Qn::ExtrapolationMode>(extrapolationMode));

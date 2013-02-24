@@ -2,7 +2,7 @@
 #define QN_MAGNITUDE_H
 
 #include <typeinfo>
-#include <QMetaType>
+#include <QtCore/QMetaType>
 #include <utils/common/warnings.h>
 
 class QPoint;
@@ -100,7 +100,7 @@ public:
     qreal calculate(const void *value) const;
 
     template<class T>
-    inline const TypedMagnitudeCalculator<T> *typed() const;;
+    inline const TypedMagnitudeCalculator<T> *typed() const;
 
     template<class T>
     TypedMagnitudeCalculator<T> *typed() {
@@ -121,13 +121,14 @@ private:
 
 template<class T>
 class TypedMagnitudeCalculator: public MagnitudeCalculator {
+    typedef MagnitudeCalculator base_type;
 public:
-    TypedMagnitudeCalculator(): MagnitudeCalculator(qMetaTypeId<T>()) {}
+    TypedMagnitudeCalculator(): base_type(qMetaTypeId<T>()) {}
 
-    using MagnitudeCalculator::calculate;
+    using base_type::calculate;
 
     qreal calculate(const T &value) const {
-        return MagnitudeCalculator::calculate(static_cast<const void *>(&value));
+        return base_type::calculate(static_cast<const void *>(&value));
     }
 };
 

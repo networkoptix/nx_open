@@ -5,10 +5,11 @@
 #include "err.h"
 
 #ifndef Q_OS_WIN
-#include <netinet/tcp.h>
+#   include <netinet/tcp.h>
 #endif
 
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
+
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)

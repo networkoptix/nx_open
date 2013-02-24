@@ -2,8 +2,8 @@
 #include <cassert>
 #include <limits>
 #include <utils/common/warnings.h>
-#include <ui/common/linear_combination.h>
-#include <ui/common/magnitude.h>
+#include <utils/math/linear_combination.h>
+#include <utils/math/magnitude.h>
 
 VariantAnimator::VariantAnimator(QObject *parent):
     AbstractAnimator(parent),

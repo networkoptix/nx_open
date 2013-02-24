@@ -203,10 +203,9 @@ int QnManualCameraAdditionHandler::executePost(const QString& path, const QnRequ
         return executeGet(path, params, result, contentType);
 }
 
-QString QnManualCameraAdditionHandler::description(TCPSocket* tcpSocket) const
+QString QnManualCameraAdditionHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
-        QString rez;
+    QString rez;
     rez += "Search or manual add cameras found in the specified range.<BR>\n";
     rez += "<BR><b>api/manualCamera/search</b> - start camera searching";
     rez += "<BR>Param <b>start_ip</b> - first ip address in range.";

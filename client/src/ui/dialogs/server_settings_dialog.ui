@@ -96,11 +96,17 @@
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::NoSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
         <property name="rowCount">
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>2</number>
+         <number>4</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -122,12 +128,22 @@
         </attribute>
         <column>
          <property name="text">
+          <string>In Use</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>Path</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Reserved free storage space (Gb)</string>
+          <string>Used Space</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Archive Space</string>
          </property>
         </column>
        </widget>

@@ -22,7 +22,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/help/help_topics.h>
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/help/help_topic_accessor.h>
