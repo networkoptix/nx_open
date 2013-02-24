@@ -136,7 +136,7 @@ public:
 
 private:
     QnVectorSpaceMapper m_fromCamera, m_toCamera;
-    QStringList m_models;
+    QStringList m_models; // TODO: #Elric remove
 };
 
 void serialize(const QnPtzSpaceMapper &value, QVariant *target);

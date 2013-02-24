@@ -12,13 +12,13 @@ namespace std { typedef __int32 intptr_t; }
 #   include <cstdint> /* For std::intptr_t. */
 #endif
 
+#include <boost/preprocessor/stringize.hpp>
+
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
-
-#include "preprocessor.h"
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -184,7 +184,7 @@ namespace detail {
 
 #define QN_NULL_PARAMETER_I(MACRO, PARAMETER) {                                 \
     (void) (PARAMETER); /* Show compilation error if parameter name is mistyped. */ \
-    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), QN_STRINGIZE(PARAMETER)); \
+    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), BOOST_PP_STRINGIZE(PARAMETER)); \
 }
 
 /**

@@ -20,6 +20,8 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
+// TODO: #Elric move to string.h
+
 int qnNaturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 QStringList qnNaturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 
