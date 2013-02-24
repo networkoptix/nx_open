@@ -9,6 +9,7 @@ namespace QnSystemHealth {
         EmailIsEmpty,
         NoLicenses,
         SmtpIsNotSet,
+        UsersEmailIsEmpty,
         NotDefined,
 
         MessageTypeCount = NotDefined

@@ -94,6 +94,12 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
     return true;
 }
 
+bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnUserResourceList &users) {
+    if (!(qnSettings->popupSystemHealth() & (1 << message)))
+        return false;
+    return false;
+}
+
 void QnPopupCollectionWidget::clear() {
     while (!ui->verticalLayout->isEmpty())
         ui->verticalLayout->removeItem(ui->verticalLayout->itemAt(0));

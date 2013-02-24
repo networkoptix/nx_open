@@ -3239,6 +3239,18 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(at_serverSettings_received(int,QByteArray,QnKvPairList,int)));
+
+        QnUserResourceList usersWithNoEmail;
+        QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
+        foreach (const QnUserResourcePtr &user, users) {
+            if (user == context()->user())
+                continue; // we are displaying separate notification for us
+            if (QnEmail::isValid(user->getEmail()))
+                continue;
+            usersWithNoEmail << user;
+        }
+        if (!usersWithNoEmail.isEmpty())
+            any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
     }
 
     if (any)
