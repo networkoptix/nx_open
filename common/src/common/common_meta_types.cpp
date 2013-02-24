@@ -6,7 +6,7 @@
 #include <utils/common/request_param.h>
 #include <utils/appcast/update_info.h>
 #include <utils/network/networkoptixmodulerevealcommon.h>
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_data.h>
 #include <api/message.h>

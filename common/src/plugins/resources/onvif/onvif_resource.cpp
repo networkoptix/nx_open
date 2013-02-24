@@ -17,7 +17,7 @@
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
 #include "utils/common/synctime.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 #include "utils/common/timermanager.h"
 #include "api/app_server_connection.h"
 #include <business/business_event_connector.h>

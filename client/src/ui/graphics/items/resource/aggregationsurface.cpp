@@ -10,7 +10,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/glext.h>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/log.h>
 #include <utils/media/sse_helper.h>
 #include <utils/color_space/yuvconvert.h>

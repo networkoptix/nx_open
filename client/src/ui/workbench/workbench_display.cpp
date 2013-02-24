@@ -13,7 +13,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/toggle.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>

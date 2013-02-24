@@ -148,35 +148,4 @@ const TypedLinearCombinator<T> *LinearCombinator::typed() const {
 }
 
 
-/**
- * Linear combinator class that directly calls free-standing <tt>linearCombine</tt>
- * functions without a virtual call overhead while implementing the same interface
- * as <tt>TypedLinearCombinator</tt>.
- */
-template<class T>
-class FastTypedLinearCombinator {
-public:
-    FastTypedLinearCombinator() {
-        m_type = qMetaTypeId<T>();
-        m_zero = combine(0.0, T());
-    }
-
-    T combine(qreal a, const T &x, qreal b, const T &y) const {
-        return linearCombine(a, x, b, y);
-    }
-
-    T combine(qreal a, const T &x) const {
-        return linearCombine(a, x);
-    }
-
-    T zero() const {
-        m_zero;
-    }
-
-private:
-    int m_type;
-    T m_zero;
-};
-
-
 #endif // QN_LINEAR_COMBINATION_H

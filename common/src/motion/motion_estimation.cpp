@@ -9,7 +9,7 @@
 #include <QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 static const unsigned char BitReverseTable256[] = 
 {

@@ -10,6 +10,7 @@
 #include <QtCore/QPointF>
 
 #include "math.h"
+#include "linear_combination.h"
 
 template<class T>
 class QnInterpolator: public std::unary_function<qreal, T> {
@@ -72,7 +73,8 @@ protected:
     }
 
     T interpolate(const point_type &a, const point_type &b, qreal x) const {
-        return (a.y() * (b.x() - x) + b.y() * (x - a.x())) / (b.x() - a.x());
+        qreal divisor = b.first - a.first;
+        return linearCombine((b.first - x) / divisor, a.second, (x - a.first) / divisor, b.second);
     }
 
     T extrapolateStart(qreal x, Qn::ExtrapolationMode extrapolationMode) const {

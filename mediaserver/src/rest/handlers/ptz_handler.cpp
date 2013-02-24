@@ -4,7 +4,7 @@
 #include "rest/server/rest_server.h"
 #include "utils/common/util.h"
 #include "utils/common/json.h"
-#include "utils/common/space_mapper.h"
+#include "utils/math/space_mapper.h"
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"

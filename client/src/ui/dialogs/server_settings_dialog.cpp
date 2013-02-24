@@ -13,6 +13,7 @@
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
+#include <utils/math/interpolator.h>
 
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -45,20 +46,30 @@ namespace {
     class FreeSpaceItemDelegate: public QStyledItemDelegate {
         typedef QStyledItemDelegate base_type;
     public:
-        FreeSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
+        FreeSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
+            QVector<QPair<qreal, QColor> > points;
+            points 
+                << qMakePair(0.0, QColor(0, 255, 0, 128))
+                << qMakePair(0.5, QColor(255, 255, 0, 128))
+                << qMakePair(1.0, QColor(255, 0, 0, 128));
+            m_gradient.setPoints()
+        }
 
         virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
             qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
             qint64 freeSpace = index.data(SpaceRole).toLongLong();
             if(totalSpace > 0) {
                 double fill = qBound(0.0, static_cast<double>(totalSpace - freeSpace) / totalSpace, 1.0);
-
+                QColor color = m_gradient(fill);
                 
-
+                painter->fillRect(QRect(option.rect.topLeft(), QSize(option.rect.width() * fill, option.rect.height())), color);
             }
 
             base_type::paint(painter, option, index);
         }
+
+    private:
+        QnInterpolator<QColor> m_gradient;
     };
 
 } // anonymous namespace
@@ -83,9 +94,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
         ui->storagesTable->horizontalHeader()->setResizeMode(col, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
 
-    QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
+    /*QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
     itemDelegate->setItemEditorFactory(new StorageSettingsItemEditorFactory());
-    ui->storagesTable->setItemDelegate(itemDelegate);
+    ui->storagesTable->setItemDelegate(itemDelegate);*/
+    //ui->storagesTable->setItemDelegateForRow(2, new FreeSpaceItemDelegate(this));
 
     setButtonBox(ui->buttonBox);
 

@@ -4,7 +4,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 
 
 QnPtzMapperPool::QnPtzMapperPool(QObject *parent):

@@ -17,8 +17,8 @@
 #include <utils/common/util.h>
 
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/linear_combination.h>
-#include <ui/common/color_transformations.h>
+#include <utils/math/linear_combination.h>
+#include <utils/math/color_transformations.h>
 #include <ui/common/geometry.h>
 
 #include <ui/widgets/palette_widget.h>

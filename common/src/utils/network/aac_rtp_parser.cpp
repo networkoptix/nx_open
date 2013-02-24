@@ -3,7 +3,6 @@
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
 #include "core/datapacket/media_data_packet.h"
-#include "../common/math.h"
 
 QnAacRtpParser::QnAacRtpParser():
     QnRtpAudioStreamParser()

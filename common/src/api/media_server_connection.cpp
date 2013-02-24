@@ -5,7 +5,7 @@
 
 #include "utils/common/util.h"
 #include "utils/common/request_param.h"
-#include "utils/common/space_mapper.h"
+#include "utils/math/space_mapper.h"
 #include "utils/common/json.h"
 
 #include "media_server_connection.h"

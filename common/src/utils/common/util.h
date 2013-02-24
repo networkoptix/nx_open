@@ -5,7 +5,7 @@
 
 #include <QtCore/QString>
 
-#include "math.h" /* For INT64_MAX. */
+#include <utils/math/math.h> /* For INT64_MAX. */
 
 template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];

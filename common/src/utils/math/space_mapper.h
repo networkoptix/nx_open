@@ -16,12 +16,12 @@
 class QnScalarSpaceMapper {
 public:
     QnScalarSpaceMapper() {
-        init(QVector<QPointF>(), m_logicalToPhysical.extrapolationMode());
+        init(QVector<QPair<qreal, qreal> >(), m_logicalToPhysical.extrapolationMode());
     }
 
     QnScalarSpaceMapper(qreal logical0, qreal logical1, qreal physical0, qreal physical1, Qn::ExtrapolationMode extrapolationMode);
 
-    QnScalarSpaceMapper(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
+    QnScalarSpaceMapper(const QVector<QPair<qreal, qreal> > &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode) {
         init(logicalToPhysical, extrapolationMode);
     }
 
@@ -38,14 +38,14 @@ public:
     qreal logicalToPhysical(qreal logicalValue) const { return m_logicalToPhysical(logicalValue); }
     qreal physicalToLogical(qreal physicalValue) const { return m_physicalToLogical(physicalValue); }
 
-    const QnInterpolator &logicalToPhysical() const { return m_logicalToPhysical; }
-    const QnInterpolator &physicalToLogical() const { return m_physicalToLogical; }
+    const QnInterpolator<qreal> &logicalToPhysical() const { return m_logicalToPhysical; }
+    const QnInterpolator<qreal> &physicalToLogical() const { return m_physicalToLogical; }
 
 private:
-    void init(const QVector<QPointF> &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode);
+    void init(const QVector<QPair<qreal, qreal> > &logicalToPhysical, Qn::ExtrapolationMode extrapolationMode);
 
 private:
-    QnInterpolator m_physicalToLogical, m_logicalToPhysical;
+    QnInterpolator<qreal> m_physicalToLogical, m_logicalToPhysical;
     qreal m_logicalMinimum, m_logicalMaximum, m_physicalMinimum, m_physicalMaximum;
 };
 
