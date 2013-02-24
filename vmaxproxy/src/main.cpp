@@ -41,6 +41,8 @@ int main(int argc, char* argv[])
 
     qWarning() << "proxy connected";
 
+    mServerConnect.setReadTimeOut(1000 * 10);
+
     mServerConnect.send(connectionID.data(), connectionID.size());
 
     qWarning() << "after send ID";
@@ -52,10 +54,18 @@ int main(int argc, char* argv[])
         int bufferLen = 0;
 
         do {
+            QTime t;
+            t.restart();
             int readed = mServerConnect.recv(buffer + bufferLen, sizeof(buffer) - bufferLen);
-            if (readed < 1) {
-                shouldTerminate = true;
-                break;
+            if (readed < 1) 
+            {
+                if (t.elapsed() < 10) {
+                    shouldTerminate = true;
+                    break;
+                }
+                if (connection)
+                    connection->keepAlive();
+                continue;
             }
             bufferLen += readed;
         } while (!QnVMax480Helper::isFullMessage(QByteArray::fromRawData((const char*) buffer, bufferLen)));

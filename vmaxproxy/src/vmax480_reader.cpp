@@ -179,6 +179,12 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
     m_aliveTimer.restart();
 }
 
+void QnVMax480Provider::keepAlive()
+{
+    if (isConnected())
+        m_ACSStream->checkAlive();
+}
+
 void QnVMax480Provider::disconnect()
 {
     if (!m_connected)

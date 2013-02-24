@@ -25,6 +25,8 @@ public:
     bool isConnected() const;
     void requestMonthInfo(const VMaxParamList& params, quint8 sequence);
     void requestDayInfo(const VMaxParamList& params, quint8 sequence);
+
+    void keepAlive();
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
     static void receiveVideoStramCallback(PS_ACS_VIDEO_STREAM _stream, long long _user);
