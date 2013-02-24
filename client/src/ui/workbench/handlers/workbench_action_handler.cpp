@@ -1034,13 +1034,14 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         dialog->setText(tr("Enter layout name:"));
         dialog->setName(layout->getName());
 
-        QMessageBox::Button button = QMessageBox::Yes;
+        QMessageBox::Button button;
         do {
             dialog->exec();
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
             name = dialog->name();
 
+            button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
             if (!existing.isEmpty()) {
                 button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
@@ -2043,11 +2044,12 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     dialog->setName(newLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    QMessageBox::Button button = QMessageBox::Yes;
+    QMessageBox::Button button;
     do {
         if(!dialog->exec())
             return;
 
+        button = QMessageBox::Yes;
         QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
         if (!existing.isEmpty()) {
             button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
