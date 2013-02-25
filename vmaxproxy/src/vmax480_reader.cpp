@@ -415,14 +415,12 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
         {
             if( _result->mResult == false )
             {
-                //OutputDebugString(_T("Disconnected"));
-                m_connected = false;
+                m_connectedInternal = false;
             }
             break;
         }
     case RESULT_SEARCH_PLAY:
         {
-            //OutputDebugString(_T("Answer reqeustPlaymode from device.\n"));
             m_curSequence++;
             break;
         }
@@ -493,18 +491,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                 *(quint32*)(vMaxHeader+12) = dayNum;
                 m_socket->send(vMaxHeader, sizeof(vMaxHeader));
                 m_socket->send(recordedDayInfo, sizeof(recordedDayInfo));
-
-                /*
-                if (m_ACSStream)
-                {
-                    memset(&recordDisplayMode, 0, MAX_CH*(1440+60));
-                    m_ACSStream->getRecordDayInfo(mRecDay, &recordDisplayMode[0][0]);
-                    OutputDebugString(L"get TimeEvent  success!!\n");
-                    setRecData();
-                }
-                */
             }
-
 
             break;
         }
