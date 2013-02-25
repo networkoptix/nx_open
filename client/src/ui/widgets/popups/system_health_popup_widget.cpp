@@ -91,6 +91,9 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     case QnSystemHealth::EmailSendError:
         menu()->trigger(Qn::OpenServerSettingsAction);
         break;
+    case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::StoragesNotConfigured:
+        menu()->trigger(Qn::OpenServerSettingsAction);
     default:
         break;
     }
