@@ -30,7 +30,7 @@ namespace {
     const QLatin1String dumpdbObject("dumpdb");
     const QLatin1String restoredbObject("restoredb");
     const QLatin1String settingObject("setting");
-	const QLatin1String testEmailSettingsObject("testEmailSettings");
+    const QLatin1String testEmailSettingsObject("testEmailSettings");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -171,10 +171,16 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedSetting(status, errorString, settings, handle);
-	} else if (m_objectName == testEmailSettingsObject) {
-		emit finishedTestEmailSettings(status, errorString, result == "OK", handle);
+    } else if (m_objectName == testEmailSettingsObject) {
+        if (result != "OK")
+            errorString += result;
+
+        emit finishedTestEmailSettings(status, errorString, result == "OK", handle);
     } else if (m_objectName == emailObject) {
-        emit finishedSendEmail(status, errorString, result.toInt(), handle);
+        if (result != "OK")
+            errorString += result;
+
+        emit finishedSendEmail(status, errorString, result == "OK", handle);
     }
 }
 
