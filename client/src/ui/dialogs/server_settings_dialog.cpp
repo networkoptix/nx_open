@@ -329,7 +329,7 @@ void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
 QList<QnServerSettingsDialog::StorageItem> QnServerSettingsDialog::tableItems() const {
     QList<StorageItem> result;
 
-    for(int row = 0; row < ui->storagesTable->rowCount(); row++) {
+    for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++) {
         StorageItem item;
 
         item.inUse = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
