@@ -95,3 +95,8 @@ void VMaxStreamFetcher::vmaxRequestDayInfo(int dayNum)
 {
     m_vmaxConnection->vMaxRequestDayInfo(dayNum);
 }
+
+void VMaxStreamFetcher::vmaxRequestRange()
+{
+    m_vmaxConnection->vMaxRequestRange();
+}

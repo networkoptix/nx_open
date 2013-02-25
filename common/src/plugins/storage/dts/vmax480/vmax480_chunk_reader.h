@@ -22,20 +22,21 @@ signals:
 protected:
     virtual void run() override;
 private:
-    void updateRecordedDays();
+    void updateRecordedDays(quint32 startDateTime, quint32 endDateTime);
     void addChunk(QnTimePeriodList& chunks, const QnTimePeriod& period);
 private:
-    enum State {State_Started, State_ReadDays, State_ReadTime, State_Ready};
+    enum State {State_Started, State_ReadDays, State_ReadTime, State_ReadRange, State_UpdateData};
 
     QMutex m_mutex;
-    quint32 m_startDateTime;
-    quint32 m_endDateTime;
     QQueue<int> m_reqMonths;
     QnTimePeriodList m_chunks[VMAX_MAX_CH];
     QQueue<QDate> m_monthToRequest;
     QQueue<int> m_daysToRequest;
     bool m_waitingAnswer;
     State m_state;
+    QTime m_updateTimer;
+    bool m_firstRange;
+    QnTimePeriod m_archiveRange;
 };
 
 #endif // __VMAX480_CHUNK_READER_H__

@@ -101,6 +101,12 @@ int main(int argc, char* argv[])
                     connection->requestDayInfo(params, sequence);
                 }
                 break;
+            case Command_GetRange:
+                if (connection) {
+                    qDebug() << "before request range info";
+                    connection->requestRange(params, sequence);
+                }
+                break;
             case Command_ArchivePlay:
                 if (connection) {
                     qDebug() << "before exec Command_ArchivePlay";

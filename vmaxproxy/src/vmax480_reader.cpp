@@ -256,6 +256,14 @@ void QnVMax480Provider::requestDayInfo(const VMaxParamList& params, quint8 seque
     m_ACSStream->requestRecordDay(dayNum);
 }
 
+void QnVMax480Provider::requestRange(const VMaxParamList&, quint8)
+{
+    if (!m_ACSStream)
+        return;
+
+    m_ACSStream->requestRecordDateTime();
+}
+
 bool QnVMax480Provider::isConnected() const
 {
     return m_connected;

@@ -84,6 +84,15 @@ void QnVMax480ConnectionProcessor::vMaxRequestDayInfo(int dayNum)
     d->socket->send(data);
 }
 
+void QnVMax480ConnectionProcessor::vMaxRequestRange()
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    VMaxParamList params;
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_GetRange, 0, params);
+
+    d->socket->send(data);
+}
 
 bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
 {

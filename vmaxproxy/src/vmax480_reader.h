@@ -25,6 +25,7 @@ public:
     bool isConnected() const;
     void requestMonthInfo(const VMaxParamList& params, quint8 sequence);
     void requestDayInfo(const VMaxParamList& params, quint8 sequence);
+    void requestRange(const VMaxParamList& params, quint8 sequence);
 
     void keepAlive();
 private:

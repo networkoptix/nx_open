@@ -43,8 +43,6 @@ public:
 
     virtual void setStatus(Status newStatus, bool silenceMode = false);
 
-    void setChunks(const QnTimePeriodList& chunks);
-
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -52,6 +50,7 @@ protected:
 
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool initInternal() override;
+    void setChunks(const QnTimePeriodList& chunks);
 private slots:
     void at_gotChunks(int channel, QnTimePeriodList chunks);
 private:

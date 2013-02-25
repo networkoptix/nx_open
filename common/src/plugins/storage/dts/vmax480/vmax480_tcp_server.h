@@ -43,6 +43,7 @@ public:
     void vMaxArchivePlay(qint64 timeUsec, quint8 newSequence);
     void vMaxRequestMonthInfo(const QDate& month);
     void vMaxRequestDayInfo(int dayNum);
+    void vMaxRequestRange();
 protected:
     virtual void run() override;
 private:

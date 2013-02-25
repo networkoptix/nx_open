@@ -27,6 +27,7 @@ protected:
     void vmaxArchivePlay(qint64 timeUsec, quint8 sequence);
     void vmaxRequestMonthInfo(const QDate& month);
     void vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
+    void vmaxRequestRange();
 private:
     int getPort();
 protected:
