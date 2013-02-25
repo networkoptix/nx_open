@@ -91,9 +91,13 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     case QnSystemHealth::EmailSendError:
         menu()->trigger(Qn::OpenServerSettingsAction);
         break;
+    case QnSystemHealth::ConnectionLost:
+        menu()->trigger(Qn::ConnectToServerAction);
+        break;
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::StoragesNotConfigured:
-        menu()->trigger(Qn::OpenServerSettingsAction);
+        //TODO: #GDM read resource list and open dialog clicking on "Fix" url.
+        break;
     default:
         break;
     }
