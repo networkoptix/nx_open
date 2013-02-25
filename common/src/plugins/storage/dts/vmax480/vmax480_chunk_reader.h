@@ -37,6 +37,7 @@ private:
     QTime m_updateTimer;
     bool m_firstRange;
     QnTimePeriod m_archiveRange;
+    QTime m_waitTimer;
 };
 
 #endif // __VMAX480_CHUNK_READER_H__

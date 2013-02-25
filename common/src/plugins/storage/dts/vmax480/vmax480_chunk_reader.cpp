@@ -31,6 +31,10 @@ void QnVMax480ChunkReader::run()
 
         if (m_waitingAnswer) 
         {
+            if (m_waitTimer.elapsed() > 1000*10) {
+                vmaxDisconnect();
+                m_state = State_Started;
+            }
             msleep(1);
             continue;
         }
@@ -42,6 +46,7 @@ void QnVMax480ChunkReader::run()
         case State_ReadDays:
             if (!m_monthToRequest.isEmpty()) {
                 m_waitingAnswer = true;
+                m_waitTimer.restart();
                 vmaxRequestMonthInfo(m_monthToRequest.dequeue());
                 break;
             }
@@ -49,6 +54,7 @@ void QnVMax480ChunkReader::run()
 
         case State_ReadTime:
             m_waitingAnswer = true;
+            m_waitTimer.restart();
             if (!m_daysToRequest.isEmpty()) {
                 vmaxRequestDayInfo(m_daysToRequest.dequeue());
             }
@@ -73,8 +79,9 @@ void QnVMax480ChunkReader::run()
                 QDate date = qnSyncTime->currentDateTime().date();
                 int dayNum = date.year()*10000 + date.month()*100 + date.day();
                 m_waitingAnswer = true;
+                m_waitTimer.restart();
                 vmaxRequestDayInfo(dayNum);
-                m_state == State_ReadTime;
+                m_state = State_ReadTime;
             }
             break;
         }
