@@ -79,7 +79,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     return true;
 }
 
-bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message) {
+bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnUserResourceList &users) {
     if (!(qnSettings->popupSystemHealth() & (1 << message)))
         return false;
 
@@ -88,7 +88,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         pw->show();
     } else {
         QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(this);
-        if (!pw->showSystemHealthMessage(message))
+        if (!pw->showSystemHealthMessage(message, users))
             return false;
         ui->verticalLayout->addWidget(pw);
         m_systemHealthWidgets[message] = pw;
@@ -96,12 +96,6 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
     }
 
     return true;
-}
-
-bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnUserResourceList &users) {
-    if (!(qnSettings->popupSystemHealth() & (1 << message)))
-        return false;
-    return false;
 }
 
 void QnPopupCollectionWidget::clear() {
