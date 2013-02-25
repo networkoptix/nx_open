@@ -4,6 +4,7 @@
 #include <business/actions/popup_business_action.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/widgets/popups/business_event_popup_widget.h>
