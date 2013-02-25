@@ -56,6 +56,8 @@ namespace {
     const qreal instantSpeedUpdateThreshold = 0.1;
     const qreal speedUpdateThreshold = 0.001;
     const int speedUpdateIntervalMSec = 500;
+
+    const qreal minPtzZoomRectSize = 0.04;
 }
 
 
@@ -1050,14 +1052,20 @@ void PtzInstrument::finishDrag(DragInfo *) {
             opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
             QRectF selectionRect = selectionItem()->boundingRect();
+            QSizeF targetSize = target()->size();
 
-            PtzSplashItem *splashItem = newSplashItem(target());
-            splashItem->setSplashType(PtzSplashItem::Rectangular);
-            splashItem->setPos(selectionRect.center());
-            splashItem->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
-            m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+            qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
+            if(relativeSize < minPtzZoomRectSize) {
+                m_isClick = true; /* Handle it as a click. */
+            } else {
+                PtzSplashItem *splashItem = newSplashItem(target());
+                splashItem->setSplashType(PtzSplashItem::Rectangular);
+                splashItem->setPos(selectionRect.center());
+                splashItem->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
+                m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
-            ptzMoveTo(target(), selectionRect);
+                ptzMoveTo(target(), selectionRect);
+            }
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
