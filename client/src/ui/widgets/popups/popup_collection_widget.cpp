@@ -65,7 +65,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
     QString resource = res ? res->getName() : QString();
 
-    qDebug() << "popup received" << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
+    qDebug() << "popup received" << eventType << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
 
     if (m_businessEventWidgets.contains(eventType)) {
         QnBusinessEventPopupWidget* pw = m_businessEventWidgets[eventType];
