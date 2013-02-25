@@ -67,7 +67,7 @@ protected:
     };
 
     T valueInternal(qreal x, Qn::ExtrapolationMode extrapolationMode) const {
-        QVector<point_type>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
+        typename QVector<point_type>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
 
         if(pos == m_points.begin()) {
             return extrapolateStart(x, extrapolationMode);

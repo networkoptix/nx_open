@@ -574,3 +574,4 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
     setTableItems(items);
     m_tableBottomLabel->setText(tr("<a href='1'>Add external storage...</a>"));
 }
+

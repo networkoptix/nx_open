@@ -94,7 +94,7 @@ public:
 
     template<class T>
     TypedLinearCombinator<T> *typed() {
-        return const_cast<TypedLinearCombinator<T> *>(static_cast<const TypedLinearCombinator *>(this)->typed<T>());
+        return const_cast<TypedLinearCombinator<T> *>(static_cast<const LinearCombinator *>(this)->typed<T>());
     }
 
 protected:
