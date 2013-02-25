@@ -80,6 +80,10 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     return true;
 }
 
+bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message) {
+    return addSystemHealthEvent(message, QnUserResourceList());
+}
+
 bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnUserResourceList &users) {
     if (!(qnSettings->popupSystemHealth() & (1 << message)))
         return false;
