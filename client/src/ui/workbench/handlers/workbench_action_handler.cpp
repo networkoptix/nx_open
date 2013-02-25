@@ -926,8 +926,11 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
-        foreach(const QnResourceWidget *widget, widgets)
-            layout->addItem(widget->item()->data());
+        foreach(const QnResourceWidget *widget, widgets) {
+            QnLayoutItemData data = widget->item()->data();
+            data.uuid = QUuid::createUuid();
+            layout->addItem(data);
+        }
         return;
     }
 
@@ -943,7 +946,7 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
     menu()->trigger(Qn::OpenInLayoutAction, parameters);
-};
+}
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(Qn::OpenNewTabAction);
