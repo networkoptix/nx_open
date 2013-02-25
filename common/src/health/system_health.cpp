@@ -16,6 +16,9 @@ namespace QnSystemHealth {
         case UsersEmailIsEmpty:
             return QObject::tr("Some users have not set their E-Mail addresses.\n"\
                                "They cannot receive system notifications via E-Mail");
+        case ConnectionLost:
+            return QObject::tr("Connection to Enterprise Controller lost.");
+
         case EmailSendError:
             return QObject::tr("Error while sending E-Mail.");
         case StoragesAreFull:

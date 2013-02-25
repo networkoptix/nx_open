@@ -11,6 +11,7 @@ namespace QnSystemHealth {
         NoLicenses,
         SmtpIsNotSet,
         UsersEmailIsEmpty,
+        ConnectionLost,
 
         // These messages are sent from mediaserver
         EmailSendError,

@@ -847,6 +847,14 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 
     m_healthRequestHandle = 0; //TODO: #GDM doubling code in disconnect/reconnect
+
+    if (!widget())
+        return;
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    if (popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost))
+        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -3224,6 +3232,7 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
 
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->clear();
 
     bool any = false;
 
