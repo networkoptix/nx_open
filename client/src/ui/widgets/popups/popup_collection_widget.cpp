@@ -23,6 +23,8 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
 {
     ui->setupUi(this);
 
+    this->setAutoFillBackground(true);
+
     // TODO: #GDM Evil! Layout code does not belong here.
     // Layout must be done by widget's parent, not the widget itself.
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
@@ -65,7 +67,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::rfAllResources);
     QString resource = res ? res->getName() : QString();
 
-    qDebug() << "popup received" << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
+    qDebug() << "popup received" << eventType << BusinessEventType::toString(eventType) << "from" << resource << "(" << id << ")";
 
     if (m_businessEventWidgets.contains(eventType)) {
         QnBusinessEventPopupWidget* pw = m_businessEventWidgets[eventType];
@@ -106,8 +108,12 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
 }
 
 void QnPopupCollectionWidget::clear() {
-    while (!ui->verticalLayout->isEmpty())
-        ui->verticalLayout->removeItem(ui->verticalLayout->itemAt(0));
+    while (!ui->verticalLayout->isEmpty()) {
+        QLayoutItem* item = ui->verticalLayout->itemAt(0);
+        if (item->widget())
+            item->widget()->hide();
+        ui->verticalLayout->removeItem(item);
+    }
     m_businessEventWidgets.clear();
     m_systemHealthWidgets.clear();
     hide();
