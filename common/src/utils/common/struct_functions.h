@@ -2,6 +2,8 @@
 #define QN_STRUCT_FUNCTIONS_H
 
 #include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/seq/to_list.hpp>
+#include <boost/preprocessor/list/for_each.hpp>
 #include <boost/preprocessor/cat.hpp>
 
 #include <QtCore/QDataStream>
@@ -19,8 +21,8 @@
 
 // TODO: #Elric doxydocs
 #define QN_DEFINE_STRUCT_FUNCTIONS(TYPE, FUNCTION_SEQ, FIELD_SEQ, ... /* PREFIX */) \
-    BOOST_PP_SEQ_FOR_EACH_R(128, QN_DEFINE_STRUCT_FUNCTIONS_STEP_I, (TYPE, FIELD_SEQ, ##__VA_ARGS__), FUNCTION_SEQ)
-// TODO: #Elric             ^^^ HACK
+    BOOST_PP_LIST_FOR_EACH(QN_DEFINE_STRUCT_FUNCTIONS_STEP_I, (TYPE, FIELD_SEQ, ##__VA_ARGS__), BOOST_PP_SEQ_TO_LIST(FUNCTION_SEQ))
+// TODO: #Elric ^^^ HACK
 
 #define QN_DEFINE_STRUCT_QHASH_STEP_I(R, DATA, FIELD) ^ qHash(value.FIELD)
 
