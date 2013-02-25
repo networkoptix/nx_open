@@ -1,10 +1,12 @@
-#ifndef CLIENT_CONNECTION_DATA_H
-#define CLIENT_CONNECTION_DATA_H
+#ifndef QN_CLIENT_CONNECTION_DATA_H
+#define QN_CLIENT_CONNECTION_DATA_H
 
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
+
+// TODO: #Elric rename header to match class names
 
 struct QnConnectionData {
     QnConnectionData(): readOnly(false) {}

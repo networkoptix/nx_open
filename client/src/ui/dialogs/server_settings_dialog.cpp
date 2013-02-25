@@ -20,6 +20,9 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <client/client_model_types.h>
+#include <utils/settings.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -167,7 +170,7 @@ namespace {
             setGradient(points);
         }
 
-        virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+        virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
             ArchiveSpaceSlider *result = new ArchiveSpaceSlider(parent);
             result->setColor(m_color);
             return result;
@@ -370,10 +373,14 @@ void QnServerSettingsDialog::updateFromResources() {
 
 void QnServerSettingsDialog::submitToResources() {
     if(m_hasStorageChanges) {
+        QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
+
         QnAbstractStorageResourceList storages;
         foreach(const StorageItem &item, tableItems()) {
-            if(!item.inUse)
+            if(!item.inUse) {
+                serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
                 continue;
+            }
 
             QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
             if (item.storageId != -1)
@@ -386,6 +393,8 @@ void QnServerSettingsDialog::submitToResources() {
             storages.push_back(storage);
         }
         m_server->setStorages(storages);
+
+        qnSettings->setServerStorageStates(serverStorageStates);
     }
 
     m_server->setName(ui->nameLineEdit->text());
@@ -536,6 +545,8 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
 
     QList<StorageItem> items;
 
+    QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
+
     QnAbstractStorageResourceList storages = m_server->getStorages();
     foreach(const QnStorageSpaceData &data, dataList) {
         StorageItem item = data;
@@ -549,6 +560,8 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
                 }
             }
         }
+        if(item.reservedSpace == -1)
+            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getGuid(), item.path) , -1);
         /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
         if(item.reservedSpace == -1)
             item.reservedSpace = qMin(defaultReservedSpace, item.freeSpace);
@@ -572,6 +585,6 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
     qSort(items.begin(), items.end(), StorageItemLess());
 
     setTableItems(items);
-    m_tableBottomLabel->setText(tr("<a href='1'>Add external storage...</a>"));
+    m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
 }
 

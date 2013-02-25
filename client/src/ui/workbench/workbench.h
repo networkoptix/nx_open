@@ -6,8 +6,8 @@
 #include <core/resource/layout_resource.h>
 
 #include <client/client_globals.h>
+#include <client/client_model_types.h>
 
-#include "workbench_state.h"
 #include "workbench_context_aware.h"
 
 class QnWorkbenchLayout;
