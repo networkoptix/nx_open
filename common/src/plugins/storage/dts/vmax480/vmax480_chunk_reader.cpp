@@ -29,52 +29,54 @@ void QnVMax480ChunkReader::run()
             continue;
         }
 
-        if (!m_waitingAnswer) 
+        if (m_waitingAnswer) 
         {
-            QMutexLocker lock(&m_mutex);
+            msleep(1);
+            continue;
+        }
 
-            if (m_state == State_ReadDays)
-            {
-                if (!m_monthToRequest.isEmpty()) {
-                    m_waitingAnswer = true;
-                    vmaxRequestMonthInfo(m_monthToRequest.dequeue());
-                }
-                else {
-                    m_state = State_ReadTime;
-                }
-            }
+        QMutexLocker lock(&m_mutex);
 
-            if (m_state == State_ReadTime)
-            {
-                if (!m_daysToRequest.isEmpty()) {
-                    m_waitingAnswer = true;
-                    vmaxRequestDayInfo(m_daysToRequest.dequeue());
-                }
-                else {
-                    m_state = State_ReadRange;
-                    m_waitingAnswer = true;
-                    vmaxRequestRange();
-                }
-            }
-
-            if (m_state == State_ReadRange)
-            {
-                for (int i = 0; i < VMAX_MAX_CH; ++i) {
-                    m_chunks[i] = m_chunks[i].intersected(m_archiveRange);
-                    emit gotChunks(i, m_chunks[i]);
-                }
-                m_updateTimer.restart();
-                m_state = State_UpdateData;
-            }
-            
-            if (m_state == State_UpdateData && m_updateTimer.elapsed() > 60*1000)
-            {
+        switch (m_state)
+        {
+        case State_ReadDays:
+            if (!m_monthToRequest.isEmpty()) {
                 m_waitingAnswer = true;
+                vmaxRequestMonthInfo(m_monthToRequest.dequeue());
+                break;
+            }
+            m_state = State_ReadTime;
+
+        case State_ReadTime:
+            m_waitingAnswer = true;
+            if (!m_daysToRequest.isEmpty()) {
+                vmaxRequestDayInfo(m_daysToRequest.dequeue());
+            }
+            else {
+                vmaxRequestRange();
+                m_state = State_ReadRange;
+            }
+            break;
+
+        case State_ReadRange:
+            for (int i = 0; i < VMAX_MAX_CH; ++i) {
+                m_chunks[i] = m_chunks[i].intersected(m_archiveRange);
+                emit gotChunks(i, m_chunks[i]);
+            }
+            m_updateTimer.restart();
+            m_state = State_UpdateData;
+            break;
+            
+        case State_UpdateData: 
+            if (m_updateTimer.elapsed() > 60*1000)
+            {
                 QDate date = qnSyncTime->currentDateTime().date();
                 int dayNum = date.year()*10000 + date.month()*100 + date.day();
+                m_waitingAnswer = true;
                 vmaxRequestDayInfo(dayNum);
                 m_state == State_ReadTime;
             }
+            break;
         }
 
         msleep(1);
