@@ -181,7 +181,7 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
 
 void QnVMax480Provider::keepAlive()
 {
-    if (isConnected())
+    if (isConnected() && m_connectedInternal)
         m_ACSStream->checkAlive();
 }
 
@@ -191,12 +191,9 @@ void QnVMax480Provider::disconnect()
         return;
 
 
-    QMutexLocker lock(&m_callbackMutex);
+    m_ACSStream->disconnect();
 
-    if(m_ACSStream) {
-        //m_ACSStream->closeChannel(1 << m_networkRes->getChannel());
-        m_ACSStream->disconnect();
-    }
+    QMutexLocker lock(&m_callbackMutex);
 
     if (m_connectedInternal) {
         m_callbackCond.wait(&m_callbackMutex, 100);
@@ -334,6 +331,8 @@ QString codeToString(int code)
     {
     case RESULT_CONNECT:
             return "RESULT_CONNECT";
+    case RESULT_DISCONNECTED:
+            return "RESULT_DISCONNECTED";
     case RESULT_LOGIN:
         return "RESULT_LOGIN";
     case RESULT_ERROR:
@@ -373,8 +372,11 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     switch(_result->mType)
     {
     case RESULT_CONNECT:
-            m_connectedInternal = true;
-            break;
+        m_connectedInternal = true;
+        break;
+    case RESULT_DISCONNECTED:
+        m_connectedInternal = false;
+        m_callbackCond.wakeOne();
     case RESULT_LOGIN:
         {
             if( _result->mResult == true )
@@ -404,8 +406,8 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     ; //OutputDebugString(_T("Exceeded visitor\n"));
                 if( error->mErrorCode	== 0xEFFFFFFF ) 
                 {
-                    m_callbackCond.wakeOne();
                     m_connectedInternal = false;
+                    m_callbackCond.wakeOne();
                 }
             }
             break;
@@ -416,6 +418,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
             if( _result->mResult == false )
             {
                 m_connectedInternal = false;
+                m_callbackCond.wakeOne();
             }
             break;
         }

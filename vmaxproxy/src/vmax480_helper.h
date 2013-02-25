@@ -63,7 +63,8 @@ public:
             result.append('\n');
         }
         result.append('\n');
-
+        if (params.isEmpty())
+            result.append('\n');
         return result;
     }
 };

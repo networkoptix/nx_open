@@ -25,7 +25,7 @@ void QnVMax480ChunkReader::run()
         if (!isOpened())
             vmaxConnect(false, -1);
         if (!isOpened()) {
-            msleep(1000);
+            msleep(10000);
             continue;
         }
 
@@ -149,7 +149,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     for (int ch = 0; ch < VMAX_MAX_CH; ++ch)
     {
         int startIdx = 0;
-        if (!m_chunks->isEmpty()) {
+        if (!m_chunks[ch].isEmpty()) {
             qint64 lastTime = m_chunks[ch].last().endTimeMs();
             startIdx = qMax(0ll, (lastTime - dayBase)/60/1000);
             curPtr += startIdx;
