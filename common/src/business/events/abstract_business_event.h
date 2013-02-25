@@ -44,8 +44,8 @@ namespace BusinessEventType
          */
         BE_Count = BE_NotDefined,
 
-        /** EC could not send an email. */
-        BE_EmailSendError,
+        /** System health message. */
+        BE_SystemHealthMessage = 500,
 
         /** Base index for the user defined events. */
         BE_UserDefined = 1000

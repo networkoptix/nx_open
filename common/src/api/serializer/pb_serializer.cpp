@@ -454,6 +454,9 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
     if (int userEvent = value - BusinessEventType::BE_UserDefined >= 0)
         return (pb::UserDefinedEvent + userEvent);
 
+    if (int healthMessage = value - BusinessEventType::BE_SystemHealthMessage >= 0)
+        return (pb::SystemHealthMessage + healthMessage);
+
     switch(value) {
     case BusinessEventType::BE_NotDefined:          return pb::NotDefinedEvent;
     case BusinessEventType::BE_Camera_Motion:       return pb::Camera_Motion;
@@ -464,7 +467,6 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
     case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
     case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
     case BusinessEventType::BE_MediaServer_Conflict:return pb::MediaServer_Conflict;
-    case BusinessEventType::BE_EmailSendError:      return pb::EmailSendError;
     default:
         break;
     }
@@ -551,6 +553,9 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     if (int userEvent = pbValue - pb::UserDefinedEvent >= 0)
         return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
 
+    if (int healthMessage = pbValue - pb::SystemHealthMessage >= 0)
+        return BusinessEventType::Value((BusinessEventType::BE_SystemHealthMessage + healthMessage));
+
     switch(pbValue) {
     case pb::NotDefinedEvent:       return BusinessEventType::BE_NotDefined;
     case pb::Camera_Motion:         return BusinessEventType::BE_Camera_Motion;
@@ -561,7 +566,6 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
     case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
     case pb::MediaServer_Conflict:  return BusinessEventType::BE_MediaServer_Conflict;
-    case pb::EmailSendError:        return BusinessEventType::BE_EmailSendError;
     }
     return BusinessEventType::BE_NotDefined;
 }

@@ -4,6 +4,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/media_server_resource.h"
 #include <business/business_event_rule.h>
+#include <business/actions/system_health_business_action.h>
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
@@ -364,16 +365,7 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray 
     if (result)
         return;
 
-    QnBusinessParams runtimeParams;
-    QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::BE_EmailSendError);
-    QnBusinessEventRuntime::setEventTimestamp(&runtimeParams, qnSyncTime->currentUSecsSinceEpoch());
-    QnBusinessEventRuntime::setEventDescription(&runtimeParams,
-                                                QString(QLatin1String("Error sending email: %1")).arg(QString::fromUtf8(errorString)));
-    QnPopupBusinessActionPtr action(new QnPopupBusinessAction(runtimeParams));
-
-    QnBusinessParams actionParams;
-    BusinessActionParameters::setUserGroup(&actionParams, 1);
-    action->setParams(actionParams);
+    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
 
     showPopup(action);
 

@@ -15,7 +15,7 @@ namespace QnSystemHealth {
         case UsersEmailIsEmpty:
             return QObject::tr("Some users have not set email.");
         case EmailSendError:
-            return QObject::tr("Email could not be sent.");
+            return QObject::tr("Error while sending email.");
         default:
             break;
         }
