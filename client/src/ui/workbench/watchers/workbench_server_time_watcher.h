@@ -6,7 +6,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QBasicTimer>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>

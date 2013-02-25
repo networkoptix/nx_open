@@ -6,12 +6,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "platform/platform_abstraction.h"
 
-#include "core/resource_managment/resource_pool.h"
-
-#include "api/serializer/serializer.h"
-
 #include "rest/server/rest_server.h"
-#include "recorder/storage_manager.h"
 
 QnStatisticsHandler::QnStatisticsHandler() {
     m_monitor = qnPlatform->monitor();
@@ -27,7 +22,6 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
     Q_UNUSED(path)
     Q_UNUSED(contentType)
 
-    const QnStorageManager::StorageMap storages = qnStorageMan->getAllStorages();
     QString result;
     result.append("<?xml version=\"1.0\"?>\n");
     result.append("<root>\n");

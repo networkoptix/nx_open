@@ -1,6 +1,6 @@
 #include "isd_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 #include "api/app_server_connection.h"
 #include "isd_stream_reader.h"
 

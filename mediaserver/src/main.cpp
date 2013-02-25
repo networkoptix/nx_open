@@ -80,6 +80,7 @@
 #include "rest/handlers/log_handler.h"
 #include "rest/handlers/favico_handler.h"
 #include "business/events/reasoned_business_event.h"
+#include "rest/handlers/storage_space_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -707,8 +708,9 @@ void QnMain::initTcpListener()
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true));
+    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true)); // TODO: deprecated
     QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
@@ -1024,12 +1026,16 @@ public:
     }
 
 protected:
-    void start()
+    virtual int executeApplication() override { 
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+
+        return application()->exec();
+    }
+
+    virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
-
-        new QnPlatformAbstraction(application);
-        new QnMediaServerModule(m_argc, m_argv, application);
 
         QString guid = serverGuid();
         if (guid.isEmpty())
@@ -1050,7 +1056,7 @@ protected:
         m_main.start();
     }
 
-    void stop()
+    virtual void stop() override
     {
         m_main.exit();
         m_main.wait();

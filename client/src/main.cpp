@@ -321,6 +321,7 @@ int qnMain(int argc, char *argv[])
     application->setStartDragDistance(20);
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+    platform->monitor()->totalPartitionSpaceInfo();
 
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;

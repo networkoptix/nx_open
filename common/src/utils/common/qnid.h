@@ -4,6 +4,8 @@
 #include <QString>
 #include <QMetaType>
 
+// TODO: #Elric rename header id.h
+
 class QN_EXPORT QnId
 {
 public:

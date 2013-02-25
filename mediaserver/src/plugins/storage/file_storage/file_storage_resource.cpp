@@ -104,10 +104,9 @@ QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
     return dir.entryInfoList(QDir::Files);
 }
 
-qint64 QnFileStorageResource::getFileSize(const QString& fillName) const
+qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
-    QFile f(fillName);
-    return f.size();
+    return QFileInfo(url).size();
 }
 
 bool QnFileStorageResource::isStorageAvailableForWriting()

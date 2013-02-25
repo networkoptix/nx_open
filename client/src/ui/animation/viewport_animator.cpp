@@ -6,8 +6,8 @@
 #include <ui/common/geometry.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <ui/common/linear_combination.h>
-#include <ui/common/magnitude.h>
+#include <utils/math/linear_combination.h>
+#include <utils/math/magnitude.h>
 #include "viewport_geometry_accessor.h"
 
 ViewportAnimator::ViewportAnimator(QObject *parent):
