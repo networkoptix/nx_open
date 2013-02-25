@@ -18,7 +18,8 @@ public:
     TCPServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
-    QMutex portMutex;
+    mutable QMutex portMutex;
+    QMutex connectionMtx;
     int newPort;
     QHostAddress serverAddress;
     const SSL_METHOD *method;
@@ -80,6 +81,7 @@ QnTcpListener::~QnTcpListener()
 void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
+    QMutexLocker lock(&d->connectionMtx);
     for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
     {
         QnLongRunnable* processor = *itr;
@@ -93,9 +95,24 @@ void QnTcpListener::removeDisconnectedConnections()
     //qWarning() << "after erase connections size=" << d->connections.size();
 }
 
+void QnTcpListener::removeOwnership(QnLongRunnable* processor)
+{
+    Q_D(QnTcpListener);
+    QMutexLocker lock(&d->connectionMtx);
+    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    {
+        if (processor == *itr) {
+            d->connections.erase(itr);
+            break;
+        }
+    }
+}
+
 void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
+
+    QMutexLocker lock(&d->connectionMtx);
 
     for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
@@ -181,7 +198,8 @@ void QnTcpListener::run()
             QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
             clientSocket->setReadTimeOut(processor->getSocketTimeout());
             clientSocket->setWriteTimeOut(processor->getSocketTimeout());
-
+            
+            QMutexLocker lock(&d->connectionMtx);
             d->connections << processor;
             processor->start();
         }
@@ -199,5 +217,6 @@ void* QnTcpListener::getOpenSSLContext()
 int QnTcpListener::getPort() const
 {
     Q_D(const QnTcpListener);
-    return d->serverSocket ? d->serverSocket->getLocalPort() : 0;
+    QMutexLocker lock(&d->portMutex);
+    return d->serverSocket->getLocalPort();
 }

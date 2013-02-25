@@ -7,7 +7,8 @@
 static const int PROCESS_TIMEOUT = 1000;
 
 VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev):
-    m_vMaxProxy(0)
+    m_vMaxProxy(0),
+    m_vmaxConnection(0)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
 }
@@ -17,18 +18,6 @@ VMaxStreamFetcher::~VMaxStreamFetcher()
     //vmaxDisconnect();
 }
 
-int VMaxStreamFetcher::getPort()
-{
-    int port = 0;
-    for (int i = 0; i < 1000 && port == 0; ++i)
-    {
-        port = QnVMax480Server::instance()->getPort();
-        if (port == 0)
-            QnSleep::msleep(1); // waiting for TCP server started
-    }
-    return port;
-}
-
 bool VMaxStreamFetcher::isOpened() const
 {
     return m_vMaxProxy && !m_tcpID.isEmpty();
@@ -36,37 +25,52 @@ bool VMaxStreamFetcher::isOpened() const
 
 void VMaxStreamFetcher::vmaxArchivePlay(qint64 timeUsec, quint8 sequence)
 {
-    QnVMax480Server::instance()->vMaxArchivePlay(m_tcpID, timeUsec, sequence);
+    m_vmaxConnection->vMaxArchivePlay(timeUsec, sequence);
+}
+
+void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* connection)
+{
+    QMutexLocker lock(&m_connectMtx);
+    m_vmaxConnection = connection;
+    m_vmaxConnectionCond.wakeOne();
 }
 
 bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
 {
-    int port = getPort();
     QStringList args;
-    args << QString::number(port);
+    args << QString::number(QnVMax480Server::instance()->getPort());
     m_tcpID = QnVMax480Server::instance()->registerProvider(this);
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
+    
+
     m_vMaxProxy->startDetached(QLatin1String("vmaxproxy"), args);
-    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)
+    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
     {
-        bool rez = QnVMax480Server::instance()->waitForConnection(m_tcpID, PROCESS_TIMEOUT);
-        if (rez) {
-            QnVMax480Server::instance()->vMaxConnect(m_tcpID, m_res->getUrl(), channel, m_res->getAuth(), isLive);
+        QMutexLocker lock(&m_connectMtx);
+        while (!m_vmaxConnection)
+            m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
+
+        if (m_vmaxConnection) {
+            m_vmaxConnection->vMaxConnect(m_res->getUrl(), channel, m_res->getAuth(), isLive);
             return true;
         }
     }
-    else {
-        delete m_vMaxProxy;
-        m_vMaxProxy = 0;
-    }
+    
 
+    delete m_vMaxProxy;
+    m_vMaxProxy = 0;
+    QnVMax480Server::instance()->unregisterProvider(this);
     return false;
 }
 
 void VMaxStreamFetcher::vmaxDisconnect()
 {
-    QnVMax480Server::instance()->vMaxDisconnect(m_tcpID);
+    if (m_vmaxConnection) {
+        m_vmaxConnection->vMaxDisconnect();
+        delete m_vmaxConnection;
+    }
+    m_vmaxConnection = 0;
 
     if (m_vMaxProxy)
     {
@@ -84,10 +88,10 @@ void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDate
 
 void VMaxStreamFetcher::vmaxRequestMonthInfo(const QDate& month)
 {
-    QnVMax480Server::instance()->vMaxRequestMonthInfo(m_tcpID, month);
+    m_vmaxConnection->vMaxRequestMonthInfo(month);
 }
 
 void VMaxStreamFetcher::vmaxRequestDayInfo(int dayNum)
 {
-    QnVMax480Server::instance()->vMaxRequestDayInfo(m_tcpID, dayNum);
+    m_vmaxConnection->vMaxRequestDayInfo(dayNum);
 }

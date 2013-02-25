@@ -4,6 +4,8 @@
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"
 
+class QnVMax480ConnectionProcessor;
+
 class VMaxStreamFetcher
 {
 public:
@@ -17,6 +19,8 @@ public:
     virtual void onGotDayInfo(int dayNum, const QByteArray& data) {}
 
     bool isOpened() const;
+
+    void onConnectionEstablished(QnVMax480ConnectionProcessor* conection);
 protected:
     bool vmaxConnect(bool isLive, int channel);
     void vmaxDisconnect();
@@ -30,6 +34,10 @@ protected:
 private:
     QProcess* m_vMaxProxy;
     QString m_tcpID;
+
+    QMutex m_connectMtx;
+    QWaitCondition m_vmaxConnectionCond;
+    QnVMax480ConnectionProcessor* m_vmaxConnection;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

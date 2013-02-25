@@ -7,7 +7,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
     VMaxStreamFetcher(res),
     m_connected(false),
-    m_internalQueue(50),
+    m_internalQueue(20),
     m_needStop(false),
     m_sequence(0)
 {
@@ -47,8 +47,8 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (!isOpened())
         return -1;
 
-    m_internalQueue.clear();
     m_sequence++;
+    m_internalQueue.clear();
     vmaxArchivePlay(time, m_sequence);
     return time;
 }
@@ -82,26 +82,28 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         if (result && result->opaque == m_sequence)
             break;
         if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*1000)
-            break;
+            return QnAbstractMediaDataPtr();
     }
     if (result)
         result->opaque = 0;
     return result;
 }
 
-static QnDefaultResourceVideoLayout m_defaultVideoLayout;
-
+static QnDefaultResourceVideoLayout videoLayout;
 QnResourceVideoLayout* QnVMax480ArchiveDelegate::getVideoLayout()
 {
-    return &m_defaultVideoLayout;
+    return &videoLayout;
 }
 
+static QnEmptyResourceAudioLayout audioLayout;
 QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
 {
-    return 0;
+    return &audioLayout;
 }
 
 void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
 {
+    while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize())
+        QnSleep::msleep(1);
     m_internalQueue.push(mediaData);
 }
