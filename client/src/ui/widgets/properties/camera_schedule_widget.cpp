@@ -12,7 +12,7 @@
 
 #include <licensing/license.h>
 
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/export_camera_settings_dialog.h>
 #include <ui/style/globals.h>

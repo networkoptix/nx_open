@@ -21,6 +21,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
+#include <utils/math/color_transformations.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>

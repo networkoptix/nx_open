@@ -7,7 +7,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QImage>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
 

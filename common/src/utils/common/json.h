@@ -3,6 +3,8 @@
 
 #include <cassert>
 
+#include <boost/preprocessor/seq/for_each.hpp>
+
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
 #include <QtCore/QList>
@@ -175,5 +177,49 @@ bool deserialize(const QVariant &value, QVariantList *target);
 
 void serialize(const QVariantMap &value, QVariant *target);
 bool deserialize(const QVariant &value, QVariantMap *target);
+
+#define QN_DEFINE_STRUCT_SERIALIZATION_STEP_I(R, DATA, FIELD)                   \
+    QJson::serialize(value.FIELD, BOOST_PP_STRINGIZE(FIELD), &result);
+
+#define QN_DEFINE_STRUCT_DESERIALIZATION_STEP_I(R, DATA, FIELD)                 \
+    if(!QJson::deserialize(map, BOOST_PP_STRINGIZE(FIELD), &result.FIELD))      \
+        return false;
+
+/**
+ * \param TYPE                          Type to declare (de)serialization functions for.
+ * \param PREFIX                        Optional function declaration prefix, e.g. <tt>inline</tt>.
+ * \note                                This macro generates function declarations only.
+ *                                      Definitions still have to be supplied.
+ */
+#define QN_DECLARE_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)              \
+__VA_ARGS__ void serialize(const TYPE &value, QVariant *target);                \
+__VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target);
+
+/**
+ * This macro generates the necessary boilerplate to (de)serialize struct types.
+ * It uses field names for JSON keys.
+ *
+ * \param TYPE                          Struct type to define (de)serialization functions for.
+ * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
+ *                                      given type that are to be (de)serialized.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
+ */
+#define QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+__VA_ARGS__ void serialize(const TYPE &value, QVariant *target) {               \
+    QVariantMap result;                                                         \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_SERIALIZATION_STEP_I, ~, FIELD_SEQ)  \
+    *target = result;                                                           \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             \
+    if(value.type() != QVariant::Map)                                           \
+        return false;                                                           \
+    QVariantMap map = value.toMap();                                            \
+                                                                                \
+    QnStorageSpaceData result;                                                  \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
+    *target = result;                                                           \
+    return true;                                                                \
+}
 
 #endif // QN_JSON_H

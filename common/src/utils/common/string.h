@@ -9,30 +9,18 @@
  * \param replacement                   Character to use as a replacement.
  * \returns                             String with all characters from \a symbols replaced with \a replacement.
  */
-inline QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement) {
-    if(!symbols)
-        return string;
-
-    bool mask[256];
-    memset(mask, 0, sizeof(mask));
-    while(*symbols)
-        mask[static_cast<int>(*symbols++)] = true; /* Static cast is here to silence GCC's -Wchar-subscripts. */
-
-    QString result = string;
-    for(int i = 0; i < result.size(); i++) {
-        ushort c = result[i].unicode();
-        if(c >= 256 || !mask[c])
-            continue;
-
-        result[i] = replacement;
-    }
-
-    return result;
-}
+QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement);
 
 inline QString replaceNonFileNameCharacters(const QString &string, const QChar &replacement) {
     return replaceCharacters(string, "\\/:*?\"<>|", replacement);
 }
+
+/**
+ * \param size                          File size to format. Can be negative.
+ * \param pattern                       Pattern to use for result construction. 
+                                        <tt>%1</tt> will be replaced with size in resulting units, and <tt>%2</tt> with unit name.
+ */
+QString formatFileSize(qint64 size, const QString pattern = lit("%1 %2"));
 
 #endif // QN_STRING_H
 

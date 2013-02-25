@@ -5,9 +5,8 @@
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 
-#include "color_transformations.h"
 #include "margins.h"
 
 class QRect;

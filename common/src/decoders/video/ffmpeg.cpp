@@ -4,7 +4,7 @@
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 
 //extern QMutex global_ffmpeg_mutex;

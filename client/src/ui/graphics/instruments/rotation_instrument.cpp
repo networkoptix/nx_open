@@ -12,7 +12,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
 
-#include <ui/common/coordinate_transformations.h>
+#include <utils/math/coordinate_transformations.h>
 
 namespace {
     const QColor arrowColor(255, 0, 0, 96);
