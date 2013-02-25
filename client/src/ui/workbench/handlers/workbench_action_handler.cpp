@@ -1060,6 +1060,13 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
                 }
             }
         } while (button != QMessageBox::Yes);
+    } else {
+        QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        if (!existing.isEmpty()) {
+            if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
+                return;
+            removeLayouts(existing);
+        }
     }
 
     QnLayoutResourcePtr newLayout;
@@ -1089,7 +1096,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     }
 
     snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
-    if (name == layout->getName())
+    if (name == layout->getName() && snapshotManager()->isLocal(layout))
         removeLayouts(QnLayoutResourceList() << layout);
 }
 
