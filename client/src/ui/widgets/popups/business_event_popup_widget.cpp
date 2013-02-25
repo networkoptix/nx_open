@@ -191,7 +191,6 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
     case BusinessEventType::BE_Camera_Ip_Conflict:
     case BusinessEventType::BE_MediaServer_Failure:
     case BusinessEventType::BE_MediaServer_Conflict:
-    case BusinessEventType::BE_EmailSendError:
         ui->warningLabel->setVisible(true);
         break;
 
@@ -210,7 +209,6 @@ bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionP
         case BusinessEventType::BE_Camera_Disconnect:
         case BusinessEventType::BE_Camera_Input:
         case BusinessEventType::BE_Camera_Motion:
-        case BusinessEventType::BE_EmailSendError:
             item = updateSimpleTree(businessAction->getRuntimeParams());
             break;
         case BusinessEventType::BE_Storage_Failure:

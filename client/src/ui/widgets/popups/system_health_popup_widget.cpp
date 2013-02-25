@@ -48,6 +48,7 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
         menu()->trigger(Qn::GetMoreLicensesAction);
         break;
     case QnSystemHealth::SmtpIsNotSet:
+    case QnSystemHealth::EmailSendError:
         menu()->trigger(Qn::OpenServerSettingsAction);
         break;
     default:

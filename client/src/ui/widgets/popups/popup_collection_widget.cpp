@@ -49,6 +49,10 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
+    if (eventType == BusinessEventType::BE_EmailSendError) {
+        return addSystemHealthEvent(QnSystemHealth::EmailSendError);
+    }
+
     if (!(qnSettings->popupBusinessEvents() & (1 << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return false;
