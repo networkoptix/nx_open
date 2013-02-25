@@ -23,9 +23,9 @@ bool VMaxStreamFetcher::isOpened() const
     return m_vMaxProxy && !m_tcpID.isEmpty();
 }
 
-void VMaxStreamFetcher::vmaxArchivePlay(qint64 timeUsec, quint8 sequence)
+void VMaxStreamFetcher::vmaxArchivePlay(qint64 timeUsec, quint8 sequence, int speed)
 {
-    m_vmaxConnection->vMaxArchivePlay(timeUsec, sequence);
+    m_vmaxConnection->vMaxArchivePlay(timeUsec, sequence, speed);
 }
 
 void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* connection)
@@ -43,7 +43,7 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
     
-#if 1
+#if 0
     m_vMaxProxy->start(QLatin1String("vmaxproxy"), args);
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
 #else

@@ -33,7 +33,9 @@ void QnVMax480ChunkReader::run()
         {
             if (m_waitTimer.elapsed() > 1000*10) {
                 vmaxDisconnect();
-                m_state = State_Started;
+                m_state = State_UpdateData;
+                m_waitTimer.restart();
+                m_waitingAnswer = false;
             }
             msleep(1);
             continue;

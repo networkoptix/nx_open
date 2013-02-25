@@ -56,6 +56,7 @@ private:
     QQueue<int> m_monthRequests;
     QQueue<int> m_daysRequests;
     unsigned char recordedDayInfo[VMAX_MAX_CH][1440+60];
+    QQueue<int> m_reqSequenceList;
 };
 
 #endif // _VMAX480_READER_H__

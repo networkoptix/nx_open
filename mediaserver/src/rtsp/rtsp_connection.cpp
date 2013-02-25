@@ -851,7 +851,6 @@ void QnRtspConnectionProcessor::createDataProvider()
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
     if (camera)    
     {
-        camera->inUse(d);
         if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
@@ -974,7 +973,10 @@ int QnRtspConnectionProcessor::composePlay()
     else 
         d->dataProcessor->clearUnprocessedData();
 
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
     if (d->liveMode == Mode_Live) {
+        if (camera)
+            camera->inUse(d);
         if (d->archiveDP)
             d->archiveDP->stop();
         if (d->thumbnailsDP)
@@ -982,6 +984,8 @@ int QnRtspConnectionProcessor::composePlay()
     }
     else
     {
+        if (camera)
+            camera->notInUse(d);
         if (d->liveDpHi)
             d->liveDpHi->removeDataProcessor(d->dataProcessor);
         if (d->liveDpLow)

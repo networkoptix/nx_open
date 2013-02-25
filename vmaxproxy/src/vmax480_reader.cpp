@@ -214,13 +214,23 @@ void QnVMax480Provider::archivePlay(const VMaxParamList& params, quint8 sequence
         return;
 
     qint64 posUsec = params.value("pos").toLongLong();
+    int speed = params.value("speed").toInt();
     quint32 startDate;
     quint32 startTime;
     toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(posUsec/1000), &startDate, &startTime, 0);
 
     qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString();
     m_reqSequence = sequence;
-    m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, startDate, startTime, false);
+    ACS_stream_source::PLAYMODE playMode;
+    if (speed > 0)
+        playMode = ACS_stream_source::FORWARDPLAY;
+    else if (speed == 0)
+        playMode = ACS_stream_source::STOP;
+    else
+        playMode = ACS_stream_source::BACKWARDPLAY;
+
+    m_reqSequenceList << m_reqSequence;
+    m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
 }
 
 void QnVMax480Provider::requestMonthInfo(const VMaxParamList& params, quint8 sequence)
@@ -287,37 +297,40 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 {
 
     //qDebug() << "receiveVideoStream";
-
-    QMutexLocker lock(&m_callbackMutex);
-
-    if (m_reqSequence != m_curSequence) {
-        qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
-        return;
-    }
-
-
-    if(!m_connected)
-        return;
-
-    QDateTime packetTimestamp = fromNativeTimestamp(_stream->mDate, _stream->mTime, _stream->mMillisec);
-
-    if (_stream->mWidth != m_spsPpsWidth || _stream->mHeight != m_spsPpsHeight) {
-        m_spsPpsBufferLen = create_vmax_sps_pps(_stream->mWidth, _stream->mHeight, m_spsPpsBuffer, sizeof(m_spsPpsBuffer));
-        m_spsPpsWidth = _stream->mWidth;
-        m_spsPpsHeight = _stream->mHeight;
-    }
-    bool isIFrame = _stream->mSrcSize >= 5 && (_stream->mSrc[4] & 0x1f) == 5;
-
-    int dataSize = _stream->mSrcSize + (isIFrame ? m_spsPpsBufferLen : 0);
-
     quint8 VMaxHeader[16];
-    VMaxHeader[0] = m_reqSequence;
-    VMaxHeader[1] = VMAXDT_GotVideoPacket;
-    VMaxHeader[2] = (quint8) _stream->mSrcType;
-    VMaxHeader[3] = (quint8) isIFrame;
-    *(quint32*)(VMaxHeader+4) = dataSize;
-    //*(quint64*)(VMaxHeader+8) = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
-    *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
+    bool isIFrame = false;
+    {
+        QMutexLocker lock(&m_callbackMutex);
+
+        if (m_reqSequence != m_curSequence) {
+            qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
+            return;
+        }
+
+
+        if(!m_connected)
+            return;
+
+        QDateTime packetTimestamp = fromNativeTimestamp(_stream->mDate, _stream->mTime, _stream->mMillisec);
+
+        if (_stream->mWidth != m_spsPpsWidth || _stream->mHeight != m_spsPpsHeight) {
+            m_spsPpsBufferLen = create_vmax_sps_pps(_stream->mWidth, _stream->mHeight, m_spsPpsBuffer, sizeof(m_spsPpsBuffer));
+            m_spsPpsWidth = _stream->mWidth;
+            m_spsPpsHeight = _stream->mHeight;
+        }
+        isIFrame = _stream->mSrcSize >= 5 && (_stream->mSrc[4] & 0x1f) == 5;
+
+        int dataSize = _stream->mSrcSize + (isIFrame ? m_spsPpsBufferLen : 0);
+
+        VMaxHeader[0] = m_reqSequence;
+        VMaxHeader[1] = VMAXDT_GotVideoPacket;
+        VMaxHeader[2] = (quint8) _stream->mSrcType;
+        VMaxHeader[3] = (quint8) isIFrame;
+        *(quint32*)(VMaxHeader+4) = dataSize;
+        //*(quint64*)(VMaxHeader+8) = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+        *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
+    }
+
     m_socket->send(VMaxHeader, sizeof(VMaxHeader));
     if (isIFrame)
         m_socket->send(m_spsPpsBuffer, m_spsPpsBufferLen);
@@ -424,7 +437,8 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
         }
     case RESULT_SEARCH_PLAY:
         {
-            m_curSequence++;
+            if (!m_reqSequenceList.isEmpty())
+                m_curSequence = m_reqSequenceList.dequeue();
             break;
         }
     case RESULT_REC_DATE_TIME :

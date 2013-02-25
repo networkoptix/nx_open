@@ -7,9 +7,12 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
     VMaxStreamFetcher(res),
     m_connected(false),
-    m_internalQueue(20),
+    m_internalQueue(100),
     m_needStop(false),
-    m_sequence(0)
+    m_sequence(0),
+    m_vmaxPaused(false),
+    m_lastMediaTime(AV_NOPTS_VALUE),
+    m_singleShotMode(false)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
@@ -49,7 +52,7 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 
     m_sequence++;
     m_internalQueue.clear();
-    vmaxArchivePlay(time, m_sequence);
+    vmaxArchivePlay(time, m_sequence, 1);
     return time;
 }
 
@@ -73,6 +76,12 @@ qint64 QnVMax480ArchiveDelegate::endTime()
 QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
+
+    if (!m_singleShotMode && m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
+        vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
+        m_vmaxPaused = false;
+    }
+
     QTime getTimer;
     getTimer.restart();
     while (1) {
@@ -103,7 +112,21 @@ QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
 
 void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
 {
-    while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize())
-        QnSleep::msleep(1);
+    QTime waitTimer;
+    waitTimer.restart();
+    while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize() && !m_vmaxPaused)
+    {
+        if (waitTimer.elapsed() > MAX_FRAME_DURATION) {
+            if (!m_vmaxPaused) {
+                vmaxArchivePlay(m_lastMediaTime, m_sequence, 0);
+                m_vmaxPaused = true;
+            }
+        }
+        else {
+            QnSleep::msleep(1);
+        }
+    }
+
     m_internalQueue.push(mediaData);
+    m_lastMediaTime = mediaData->timestamp;
 }

@@ -30,6 +30,9 @@ private:
     CLDataQueue m_internalQueue;
     bool m_needStop;
     quint8 m_sequence;
+    bool m_vmaxPaused;
+    qint64 m_lastMediaTime;
+    bool m_singleShotMode;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

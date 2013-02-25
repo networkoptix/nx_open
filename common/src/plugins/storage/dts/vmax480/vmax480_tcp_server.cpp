@@ -50,12 +50,13 @@ void QnVMax480ConnectionProcessor::vMaxDisconnect()
     d->socket->close();
 }
 
-void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 sequence)
+void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 sequence, int speed)
 {
     Q_D(QnVMax480ConnectionProcessor);
 
     VMaxParamList params;
     params["pos"] = QString::number(timeUsec).toUtf8();
+    params["speed"] = QString::number(speed).toUtf8();
     QByteArray data = QnVMax480Helper::serializeCommand(Command_ArchivePlay, sequence, params);
 
     d->socket->send(data);
