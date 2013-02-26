@@ -1,5 +1,5 @@
-export OLD_VERSION=1.4.1
-export NEW_VERSION=1.4.2
+export OLD_VERSION=1.4.2
+export NEW_VERSION=1.4.2-SNAPSHOT
 
 OLD_VERSION=${OLD_VERSION//./\\.}
 
