@@ -3,6 +3,7 @@
 
 #include <QtCore/QThread>
 #include <QAuthenticator>
+#include <QTimer>
 #include "utils/common/long_runnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
@@ -24,6 +25,27 @@ struct QnManualCameraInfo
 typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
 
 class QnAbstractResourceSearcher;
+
+class QnResourceDiscoveryManager;
+/*!
+    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread, 
+    since we cannot move QnResourceDiscoveryManager object to QnResourceDiscoveryManager thread (weird...)
+*/
+class QnResourceDiscoveryManagerTimeoutDelegate
+:
+    public QObject
+{
+    Q_OBJECT
+
+public:
+    QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager );
+
+public slots:
+    void onTimeout();
+
+private:
+    QnResourceDiscoveryManager* m_discoveryManager;
+};
 
 // this class just searches for new resources
 // it uses others plugins
@@ -59,21 +81,35 @@ public:
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
 
+    //!This method MUST be called from non-GUI thread, since it can block for some time
+    void doResourceDiscoverIteration();
+
     static void init(QnResourceDiscoveryManager* instance);
+
+public slots:
+    virtual void start( Priority priority = InheritPriority ) override;
+
 protected:
     QMutex m_discoveryMutex;
     unsigned int m_runNumber;
-protected:
 
     virtual void run();
     virtual bool processDiscoveredResources(QnResourceList& resources);
+
 signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
+
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
+
 private:
+    enum State
+    {
+        initialSearch,
+        periodicSearch
+    };
 
     void updateLocalNetworkInterfaces();
 
@@ -82,7 +118,7 @@ private:
 
     void appendManualDiscoveredResources(QnResourceList& resources);
     void dtsAssignment();
-private:
+
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
@@ -97,6 +133,9 @@ private:
     QVector<QnAbstractDTSSearcher*> m_dstList;
     QSet<QString> m_disabledVendorsForAutoSearch;
     static QnResourceDiscoveryManager* m_instance;
+
+    std::auto_ptr<QTimer> m_timer;
+    State m_state;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H
