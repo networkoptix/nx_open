@@ -23,6 +23,25 @@ namespace {
     };
 }
 
+QValidator::State QnPortNumberValidator::validate(QString &input, int &pos) const {
+    if (input == tr("Auto"))
+        return QValidator::Acceptable;
+
+    QValidator::State result = base_type::validate(input, pos);
+    if (result == QValidator::Acceptable &&
+            (input.toInt() == 0 || input.toInt() > 65535)
+            )
+        return QValidator::Intermediate;
+    return result;
+}
+
+void QnPortNumberValidator::fixup(QString &input) const {
+    if (input == tr("Auto"))
+        return;
+    if (input.toInt() == 0 || input.toInt() > 65535)
+        input = tr("Auto");
+}
+
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     QWidget(parent),
     QnWorkbenchContextAware(parent),
@@ -49,10 +68,12 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     ui->detectErrorLabel->setPalette(palette);
 
+    ui->portComboBox->addItem(tr("Auto"), 0);
     for (int i = 0; i < QnEmail::ConnectionTypeCount; i++) {
         int port = QnEmail::defaultPort(static_cast<QnEmail::ConnectionType>(i));
         ui->portComboBox->addItem(QString::number(port), port);
     }
+    ui->portComboBox->setValidator(new QnPortNumberValidator(this));
 //    ui->portComboBox->setCurrentIndex(0);
 //    at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
 }
@@ -97,6 +118,8 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
             : ui->sslRadioButton->isChecked()
               ? QnEmail::Ssl
               : QnEmail::Unsecure;
+    if (result.port == 0)
+        result.port = QnEmail::defaultPort(result.connectionType);
     result.simple = false;
     return result;
 }
@@ -111,9 +134,36 @@ void QnSmtpSettingsWidget::stopTesting(QString result) {
     ui->okTestButton->setVisible(true);
 }
 
+void QnSmtpSettingsWidget::loadSettings(QString server, QnEmail::ConnectionType connectionType, int port) {
+    ui->serverLineEdit->setText(server);
+
+    bool portFound = false;
+    for (int i = 0; i < ui->portComboBox->count(); i++) {
+        if (ui->portComboBox->itemData(i).toInt() == port) {
+            ui->portComboBox->setCurrentIndex(i);
+            portFound = true;
+            break;
+        }
+    }
+    if (!portFound) {
+        ui->portComboBox->setEditText(QString::number(port));
+        at_portComboBox_currentIndexChanged(ui->portComboBox->count());
+    }
+
+    switch(connectionType) {
+    case QnEmail::Tls:
+        ui->tlsRadioButton->setChecked(true);
+        break;
+    case QnEmail::Ssl:
+        ui->sslRadioButton->setChecked(true);
+        break;
+    default:
+        ui->unsecuredRadioButton->setChecked(true);
+        break;
+    }
+}
 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
-
     int port = ui->portComboBox->itemData(index).toInt();
     if (port == QnEmail::defaultPort(QnEmail::Ssl)) {
         ui->sslRadioButton->setChecked(true);
@@ -123,6 +173,41 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
         ui->tlsRadioButton->setChecked(true);
         ui->tlsRecommendedLabel->show();
         ui->sslRecommendedLabel->hide();
+    }
+}
+
+void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
+    ui->detectErrorLabel->setText(QString());
+
+    QnEmail email(value);
+    if (!email.isValid()) {
+        ui->detectErrorLabel->setText(tr("Email is not valid"));
+    } else
+    if (email.smtpServer().isNull()) {
+        ui->detectErrorLabel->setText(tr("No preset found. Use 'Advanced' option."));
+    }
+}
+
+void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
+    if (!m_settingsReceived)
+        return;
+
+    ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
+    if (toggled) {
+        QString value = ui->simpleEmailLineEdit->text();
+        QnEmail email(value);
+
+        QnEmail::SmtpServerPreset preset = email.smtpServer();
+        if (preset.isNull()) {
+            loadSettings(QLatin1String("smtp.") + email.domain(), QnEmail::Unsecure);
+        } else {
+            loadSettings(preset.server, preset.connectionType, preset.port);
+        }
+        ui->userLineEdit->setText(value);
+        ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
+    } else {
+        ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
+        ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
     }
 }
 
@@ -144,9 +229,6 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
                                      ? tr("SSL")
                                      : tr("Unsecured"));
 
-
-    ui->stackedWidget->setCurrentIndex(TestingPage);
-
     ui->cancelTestButton->setVisible(true);
     ui->okTestButton->setVisible(false);
 
@@ -158,6 +240,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
     m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
                                                                                             this, SLOT(at_finishedTestEmailSettings(int, QByteArray, bool, int)));
+    ui->stackedWidget->setCurrentIndex(TestingPage);
 }
 
 void QnSmtpSettingsWidget::at_cancelTestButton_clicked() {
@@ -175,8 +258,6 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
 }
 
 void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteArray &errorString, bool result, int handle) {
-    qDebug() << status << errorString << result << handle;
-
     if (handle != m_testHandle)
         return;
 
@@ -186,7 +267,6 @@ void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteA
               ? tr("Success")
               : tr("Error") + QString::fromLatin1(errorString)
                 );
-    //TODO: #GDM error string?
 }
 
 void QnSmtpSettingsWidget::at_okTestButton_clicked() {
@@ -204,74 +284,20 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     m_requestHandle = -1;
 
     bool success = (status == 0);
-    m_settingsReceived = true;
     if(!success) {
         //TODO: #GDM remove password from error message
         //QMessageBox::critical(this, tr("Error while receiving settings"), QString::fromLatin1(errorString));
+        m_settingsReceived = true;
         return;
     }
 
     QnEmail::Settings settings(values);
-    ui->serverLineEdit->setText(settings.server);
-
-    bool portFound = false;
-    for (int i = 0; i < ui->portComboBox->count(); i++) {
-        if (ui->portComboBox->itemData(i).toInt() == settings.port) {
-            ui->portComboBox->setCurrentIndex(i);
-            portFound = true;
-            break;
-        }
-    }
-    if (!portFound) {
-        ui->portComboBox->setEditText(QString::number(settings.port));
-        at_portComboBox_currentIndexChanged(ui->portComboBox->count());
-    }
-
+    loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);
     ui->simpleEmailLineEdit->setText(settings.user);
     ui->passwordLineEdit->setText(settings.password);
     ui->simplePasswordLineEdit->setText(settings.password);
     ui->advancedCheckBox->setChecked(!settings.simple);
 
-    switch(settings.connectionType) {
-    case QnEmail::Tls:
-        ui->tlsRadioButton->setChecked(true);
-        break;
-    case QnEmail::Ssl:
-        ui->sslRadioButton->setChecked(true);
-        break;
-    default:
-        ui->unsecuredRadioButton->setChecked(true);
-        break;
-    }
+    m_settingsReceived = true;
 }
-
-
-void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
-    ui->detectErrorLabel->setText(QString());
-
-    QnEmail email(value);
-    if (!email.isValid()) {
-        ui->detectErrorLabel->setText(tr("Email is not valid"));
-        return;
-    }
-    QnEmail::SmtpServerPreset preset = email.smtpServer();
-    if (preset.isNull()) {
-        ui->detectErrorLabel->setText(tr("No preset found. Use 'Advanced' option."));
-    } else if (!ui->advancedCheckBox->isChecked()) {
-        ui->serverLineEdit->setText(preset.server);
-        ui->userLineEdit->setText(value);
-    }
-}
-
-void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
-    ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
-    if (toggled) {
-        ui->userLineEdit->setText(ui->simpleEmailLineEdit->text());
-        ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
-    } else {
-        ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
-        ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
-    }
-}
-

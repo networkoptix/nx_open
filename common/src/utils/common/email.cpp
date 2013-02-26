@@ -22,6 +22,8 @@ namespace {
     const int TIMEOUT = 10; //seconds
 
     //TODO: #GDM check authorization login: use domain or not
+    // Actual list here:
+    // https://noptix.enk.me/redmine/projects/vms/wiki/SMTP_Server_Presets
     static QHash<QString, QnEmail::SmtpServerPreset> initSmtpPresets() {
         typedef QLatin1String _;
         typedef QnEmail::SmtpServerPreset server;
@@ -41,7 +43,7 @@ namespace {
         presets.insert(_("yahoo.de"),           server(_("smtp.mail.yahoo.de"), QnEmail::Ssl));
         presets.insert(_("yahoo.com.au"),       server(_("smtp.mail.yahoo.com.au"), QnEmail::Ssl));
 
-        presets.insert(_("att.yahoo.com"),       server(_("smtp.att.yahoo.com"), QnEmail::Ssl));
+        presets.insert(_("att.yahoo.com"),      server(_("smtp.att.yahoo.com"), QnEmail::Ssl));
 
         presets.insert(_("o2.ie"),              server(_("smtp.o2.ie"), QnEmail::Unsecure));
         presets.insert(_("o2.co.uk"),           server(_("smtp.o2.co.uk"), QnEmail::Unsecure));
@@ -125,7 +127,7 @@ QnEmail::SmtpServerPreset QnEmail::smtpServer() const {
     QString key = domain();
     if (SmtpServerPresetPresets.contains(key))
         return SmtpServerPresetPresets[key];
-    return SmtpServerPreset(QLatin1String("smtp.") + key, Unsecure);
+    return SmtpServerPreset();
 }
 
 QnEmail::Settings QnEmail::settings() const {
@@ -133,9 +135,10 @@ QnEmail::Settings QnEmail::settings() const {
     SmtpServerPreset preset = smtpServer();
 
     result.server = preset.server;
-    result.port = preset.port == 0
-            ? QnEmail::defaultPort(preset.connectionType)
-            : preset.port;
+    result.port = preset.port;
+//    == 0
+//            ? QnEmail::defaultPort(preset.connectionType)
+//            : preset.port;
     result.connectionType = preset.connectionType;
 
     return result;
@@ -173,6 +176,8 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
             : useSsl
               ? QnEmail::Ssl
               : QnEmail::Unsecure;
+    if (port == defaultPort(connectionType))
+        port = 0;
 }
 
 QnKvPairList QnEmail::Settings::serialized() const {
@@ -183,7 +188,7 @@ QnKvPairList QnEmail::Settings::serialized() const {
 
     result
     << QnKvPair(nameHost, server)
-    << QnKvPair(namePort, port)
+    << QnKvPair(namePort, port == 0 ? defaultPort(connectionType) : port)
     << QnKvPair(nameUser, user)
     << QnKvPair(nameFrom, user)
     << QnKvPair(namePassword, password)

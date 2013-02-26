@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QIntValidator>
 
 #include <api/model/kvpair.h>
 
@@ -14,7 +15,18 @@ namespace Ui {
     class QnSmtpSettingsWidget;
 }
 
-class QDnsLookup;
+class QnPortNumberValidator: public QIntValidator {
+    typedef QIntValidator base_type;
+
+    Q_OBJECT
+public:
+    QnPortNumberValidator(QObject* parent = 0):
+        base_type(parent) {}
+
+    virtual QValidator::State validate(QString &input, int &pos) const override;
+
+    virtual void fixup(QString &input) const override;
+};
 
 class QnSmtpSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -29,6 +41,7 @@ public:
 private:
     QnEmail::Settings settings();
     void stopTesting(QString result);
+    void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
     void at_testButton_clicked();
