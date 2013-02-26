@@ -35,28 +35,4 @@
 		<linux.defines/>
 		<mac.defines/>      
 	</properties>	
-
-	<profiles>
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>Windows</family>
-				</os>
-				<property>
-					<name>vmax</name>
-					<value>true</value>
-				</property>	 				
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.networkoptix.hdwitness</groupId>
-					<artifactId>vmaxproxy</artifactId>
-					<version>${project.version}</version>
-					<type>zip</type>
-					<classifier>${platform}-x86</classifier>
-				</dependency>	
-			</dependencies>			
-		</profile>		
-	</profiles>		
 </project>
