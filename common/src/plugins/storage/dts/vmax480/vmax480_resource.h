@@ -43,7 +43,7 @@ public:
 
     virtual void setStatus(Status newStatus, bool silenceMode = false);
 
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeUsec, qint64 endTimeUsec, int detailLevel) override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;

@@ -201,8 +201,11 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
     m_chunksCond.wakeAll();
 }
 
-QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
+QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeUSec, qint64 endTimeUsec, int detailLevel) 
 {
+    qint64 startTimeMs = startTimeUSec/1000;
+    qint64 endTimeMs = endTimeUsec / 1000;
+
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     
     QMutexLocker lock(&m_mutexChunks);

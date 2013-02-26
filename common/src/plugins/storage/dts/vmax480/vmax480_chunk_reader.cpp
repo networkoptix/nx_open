@@ -3,6 +3,8 @@
 #include "vmax480_chunk_reader.h"
 #include "utils/common/synctime.h"
 
+static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
+
 QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
     VMaxStreamFetcher(res),
     QnLongRunnable(),
@@ -123,6 +125,8 @@ void QnVMax480ChunkReader::onGotArchiveRange(quint32 startDateTime, quint32 endD
         updateRecordedDays(startDateTime, endDateTime);
         m_firstRange = false;
     }
+
+    endDateTime = QDateTime(MAX_ARCHIVE_DATE).toMSecsSinceEpoch();
     m_archiveRange = QnTimePeriod(startDateTime * 1000ll, (endDateTime-startDateTime) * 1000ll);
     m_waitingAnswer = false;
 }
