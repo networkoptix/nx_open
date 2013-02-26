@@ -127,7 +127,7 @@ QnEmail::SmtpServerPreset QnEmail::smtpServer() const {
     QString key = domain();
     if (SmtpServerPresetPresets.contains(key))
         return SmtpServerPresetPresets[key];
-    return SmtpServerPreset(QLatin1String("smtp.") + key, Unsecure);
+    return SmtpServerPreset();
 }
 
 QnEmail::Settings QnEmail::settings() const {
@@ -135,9 +135,10 @@ QnEmail::Settings QnEmail::settings() const {
     SmtpServerPreset preset = smtpServer();
 
     result.server = preset.server;
-    result.port = preset.port == 0
-            ? QnEmail::defaultPort(preset.connectionType)
-            : preset.port;
+    result.port = preset.port;
+//    == 0
+//            ? QnEmail::defaultPort(preset.connectionType)
+//            : preset.port;
     result.connectionType = preset.connectionType;
 
     return result;
@@ -175,6 +176,8 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
             : useSsl
               ? QnEmail::Ssl
               : QnEmail::Unsecure;
+    if (port == defaultPort(connectionType))
+        port = 0;
 }
 
 QnKvPairList QnEmail::Settings::serialized() const {
@@ -185,7 +188,7 @@ QnKvPairList QnEmail::Settings::serialized() const {
 
     result
     << QnKvPair(nameHost, server)
-    << QnKvPair(namePort, port)
+    << QnKvPair(namePort, port == 0 ? defaultPort(connectionType) : port)
     << QnKvPair(nameUser, user)
     << QnKvPair(nameFrom, user)
     << QnKvPair(namePassword, password)
