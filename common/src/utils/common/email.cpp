@@ -10,6 +10,17 @@ namespace {
     static const int sslPort = 465;
     static const int unsecurePort = 25;
 
+    const QLatin1String nameFrom("EMAIL_FROM");
+    const QLatin1String nameHost("EMAIL_HOST");
+    const QLatin1String namePort("EMAIL_PORT");
+    const QLatin1String nameUser("EMAIL_HOST_USER");
+    const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
+    const QLatin1String nameTls("EMAIL_USE_TLS");
+    const QLatin1String nameSsl("EMAIL_USE_SSL");
+    const QLatin1String nameSimple("EMAIL_SIMPLE");
+    const QLatin1String nameTimeout("EMAIL_TIMEOUT");
+    const int TIMEOUT = 10; //seconds
+
     //TODO: #GDM check authorization login: use domain or not
     static QHash<QString, QnEmail::SmtpServerPreset> initSmtpPresets() {
         typedef QLatin1String _;
@@ -21,6 +32,7 @@ namespace {
         presets.insert(_("hotmail.co.uk"),      server(_("smtp.live.com")));
         presets.insert(_("hotmail.com"),        server(_("smtp.live.com")));
         presets.insert(_("outlook.com"),        server(_("smtp.live.com")));
+        presets.insert(_("msn.com"),            server(_("smtp.live.com")));
 
         presets.insert(_("dwcc.tv"),            server(_("mail.dwcc.tv")));
 
@@ -59,7 +71,6 @@ namespace {
         presets.insert(_("1und1.de"),           server(_("smtp.1und1.de")));
         presets.insert(_("comcast.net"),        server(_("smtp.comcast.net")));
 
-
         presets.insert(_("t-online.de"),        server(_("securesmtp.t-online.de"), QnEmail::Ssl));
         presets.insert(_("verizon.net"),        server(_("outgoing.verizon.net"), QnEmail::Ssl));
         presets.insert(_("yahoo.verizon.net"),  server(_("outgoing.yahoo.verizon.net"), QnEmail::Ssl));
@@ -70,6 +81,8 @@ namespace {
         presets.insert(_("orange.co.uk"),       server(_("smtp.orange.co.uk"), QnEmail::Unsecure));
         presets.insert(_("wanadoo.co.uk"),      server(_("smtp.wanadoo.co.uk"), QnEmail::Unsecure));
 
+        presets.insert(_("mail.ru"),            server(_("smtp.mail.ru"), QnEmail::Ssl));
+        presets.insert(_("yandex.ru"),          server(_("smtp.yandex.ru"), QnEmail::Ssl));
 
         return presets;
     }
@@ -113,4 +126,71 @@ QnEmail::SmtpServerPreset QnEmail::smtpServer() const {
     if (SmtpServerPresetPresets.contains(key))
         return SmtpServerPresetPresets[key];
     return SmtpServerPreset(QLatin1String("smtp.") + key, Unsecure);
+}
+
+QnEmail::Settings QnEmail::settings() const {
+    Settings result;
+    SmtpServerPreset preset = smtpServer();
+
+    result.server = preset.server;
+    result.port = preset.port == 0
+            ? QnEmail::defaultPort(preset.connectionType)
+            : preset.port;
+    result.connectionType = preset.connectionType;
+
+    return result;
+}
+
+QnEmail::Settings::Settings():
+    timeout(TIMEOUT) {}
+
+QnEmail::Settings::Settings(const QnKvPairList &values):
+    timeout(TIMEOUT)
+{
+    bool useTls = true;
+    bool useSsl = false;
+
+    foreach (const QnKvPair &setting, values) {
+        if (setting.name() == nameHost) {
+            server = setting.value();
+        } else if (setting.name() == namePort) {
+            port = setting.value().toInt();
+        } else if (setting.name() == nameUser) {
+            user = setting.value();
+        } else if (setting.name() == namePassword) {
+            password = setting.value();
+        } else if (setting.name() == nameTls) {
+            useTls = setting.value() == QLatin1String("True");
+        } else if (setting.name() == nameSsl) {
+            useSsl = setting.value() == QLatin1String("True");
+        } else if (setting.name() == nameSimple) {
+            simple = setting.value() == QLatin1String("True");
+        }
+    }
+
+    connectionType = useTls
+            ? QnEmail::Tls
+            : useSsl
+              ? QnEmail::Ssl
+              : QnEmail::Unsecure;
+}
+
+QnKvPairList QnEmail::Settings::serialized() const {
+    QnKvPairList result;
+
+    bool useTls = connectionType == QnEmail::Tls;
+    bool useSsl = connectionType == QnEmail::Ssl;
+
+    result
+    << QnKvPair(nameHost, server)
+    << QnKvPair(namePort, port)
+    << QnKvPair(nameUser, user)
+    << QnKvPair(nameFrom, user)
+    << QnKvPair(namePassword, password)
+    << QnKvPair(nameTls, useTls)
+    << QnKvPair(nameSsl, useSsl)
+    << QnKvPair(nameSimple, simple)
+    << QnKvPair(nameTimeout, TIMEOUT);
+    return result;
+
 }

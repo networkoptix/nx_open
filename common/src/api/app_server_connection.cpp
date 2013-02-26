@@ -172,6 +172,12 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
 
         emit finishedSetting(status, errorString, settings, handle);
     } else if (m_objectName == testEmailSettingsObject) {
+        //TODO: #GDM bad result here:
+        // Unknown error[Errno -2] Name or service not known
+        // Unknown error(535, '5.0.0 Authentication Failed')
+        // Unknown error[Errno 110] Connection timed out
+        // Unknown error(530, 'Access denied')
+        // Unknown error(535, '5.7.1 Username and Password not accepted. Learn more at\n5.7.1 http://support.google.com/mail/bin/answer.py?answer=14257 fz10sm351687lbb.12 - gsmtp')
         if (result != "OK")
             errorString += result;
 
