@@ -85,8 +85,6 @@ public:
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
 
         foreigner = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
-        dts_storage = 0x80000,      /**< Resource based (foreign system) archive */
-        analog_camera = 0x100000,      /**< Analog camera (other license type) */
 
         local_media = local | media,
         local_layout = local | layout,

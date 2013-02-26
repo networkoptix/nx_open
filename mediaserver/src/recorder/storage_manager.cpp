@@ -7,6 +7,7 @@
 #include "recording_manager.h"
 #include "serverutil.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
+#include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 
@@ -260,9 +261,9 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
     QVector<QnTimePeriodList> periods;
     for (int i = 0; i < resList.size(); ++i)
     {
-        QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
+        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resList[i]);
         if (camera) {
-            if (camera->hasFlags(QnResource::dts_storage))
+            if (camera->getCameraCapabilities() & Qn::DtsBasedCamera)
             {
                 periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
             }

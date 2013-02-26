@@ -13,7 +13,6 @@ QnPlVmax480Resource::QnPlVmax480Resource():
     m_chunkReader(0),
     m_chunksReady(false)
 {
-    addFlags(dts_storage | analog_camera);
 }
 
 QnPlVmax480Resource::~QnPlVmax480Resource()
@@ -122,7 +121,7 @@ void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 bool QnPlVmax480Resource::initInternal()
 {
 
-    Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
+    Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability | Qn::DtsBasedCamera | Qn::AnalogCamera;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
 
