@@ -173,7 +173,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         emit finishedSetting(status, errorString, settings, handle);
     } else if (m_objectName == testEmailSettingsObject) {
         if (result != "OK")
-            errorString += result;
+            errorString = result;
 
         emit finishedTestEmailSettings(status, errorString, result == "OK", handle);
     } else if (m_objectName == emailObject) {

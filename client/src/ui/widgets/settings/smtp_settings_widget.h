@@ -3,16 +3,30 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QIntValidator>
 
 #include <api/model/kvpair.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/email.h>
+
 namespace Ui {
     class QnSmtpSettingsWidget;
 }
 
-class QDnsLookup;
+class QnPortNumberValidator: public QIntValidator {
+    typedef QIntValidator base_type;
+
+    Q_OBJECT
+public:
+    QnPortNumberValidator(QObject* parent = 0):
+        base_type(parent) {}
+
+    virtual QValidator::State validate(QString &input, int &pos) const override;
+
+    virtual void fixup(QString &input) const override;
+};
 
 class QnSmtpSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -24,29 +38,31 @@ public:
 
     void update();
     void submit();
+private:
+    QnEmail::Settings settings();
+    void stopTesting(QString result);
+    void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
     void at_testButton_clicked();
-    void at_testResultButton_clicked();
+
+    void at_cancelTestButton_clicked();
+    void at_okTestButton_clicked();
+
     void at_timer_timeout();
 
-    void at_settings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
+    void at_settings_received(int status, const QByteArray& errorString, const QnKvPairList& values, int handle);
 
     void at_finishedTestEmailSettings(int status, const QByteArray& errorString, bool result, int handle);
 
     void at_advancedCheckBox_toggled(bool toggled);
     void at_simpleEmail_textChanged(const QString &value);
 private:
-    QnKvPairList settings(bool *ok);
-    void updateMailServers();
-private:
     QScopedPointer<Ui::QnSmtpSettingsWidget> ui;
 
     int m_requestHandle;
     int m_testHandle;
-    QDnsLookup* m_dns;
 
-    QString m_autoMailServer;
     QTimer* m_timeoutTimer;
 
     bool m_settingsReceived;

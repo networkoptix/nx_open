@@ -19,7 +19,13 @@ public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
     virtual ~QnScheduleGridWidget();
 
-    enum ParamType { FirstParam, SecondParam, RecordTypeParam, ParamType_Count };
+    enum ParamType {
+        FirstParam,
+        SecondParam,
+        RecordTypeParam,
+        DiffersFlagParam,
+
+        ParamType_Count };
 
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);

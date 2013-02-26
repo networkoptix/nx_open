@@ -295,7 +295,9 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
 
     ui->gridWidget->resetCellValues();
 
-    if (!tasks.isEmpty()) {
+    // emptySource means that cameras with different schedules are selected
+    bool emptySource = tasks.isEmpty();
+    if (!emptySource) {
         const QnScheduleTask::Data &task = tasks.first();
 
         ui->recordBeforeSpinBox->setValue(task.m_beforeThreshold);
@@ -333,6 +335,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             ui->gridWidget->setCellRecordingType(cell, task.m_recordType);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, shortQuality);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::DiffersFlagParam, emptySource);
         }
     }
 
@@ -405,6 +408,7 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
 
     if(!(m_readOnly && fromUserInput)) {
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::RecordTypeParam, recordType);
+        ui->gridWidget->setDefaultParam(QnScheduleGridWidget::DiffersFlagParam, false);
         if (ui->noRecordButton->isChecked())
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
