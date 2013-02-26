@@ -10,7 +10,27 @@ QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& pa
 {
     QnVMax480Provider* result = new QnVMax480Provider(socket);
     result->connect(params, sequence, isLive);
+
+    if (!result->waitForConnected(1000 * 5))
+    {
+        result->disconnect();
+        delete result;
+        result = 0;
+    }
+
     return result;
+}
+
+static int isFullMessage(quint8* data, int msgLen)
+{
+    if (msgLen < 6)
+        return 0;
+
+    const QByteArray message = QByteArray::fromRawData((const char*)data + 6, msgLen -6);
+    int eofIdx = message.indexOf("\n\n");
+    if (eofIdx == -1)
+        return 0;
+    return eofIdx + 2 + 6;
 }
 
 int main(int argc, char* argv[])
@@ -47,13 +67,15 @@ int main(int argc, char* argv[])
 
     qWarning() << "after send ID";
 
+    quint8 buffer[1024*4];
+    int bufferLen = 0;
+
     bool shouldTerminate = false;
     while(!shouldTerminate)
     {
-        quint8 buffer[1024*4];
-        int bufferLen = 0;
-
-        do {
+        int msgLen = isFullMessage(buffer, bufferLen);
+        while(!msgLen) 
+        {
             QTime t;
             t.restart();
             int readed = mServerConnect.recv(buffer + bufferLen, sizeof(buffer) - bufferLen);
@@ -68,7 +90,8 @@ int main(int argc, char* argv[])
                 continue;
             }
             bufferLen += readed;
-        } while (!QnVMax480Helper::isFullMessage(QByteArray::fromRawData((const char*) buffer, bufferLen)));
+            msgLen = isFullMessage(buffer, bufferLen);
+        };
 
         if (shouldTerminate)
             break;
@@ -76,8 +99,11 @@ int main(int argc, char* argv[])
         quint8 sequence;
         MServerCommand command;
         VMaxParamList params;
-        QByteArray ba = QByteArray::fromRawData((const char*) buffer, bufferLen);
+        QByteArray ba((const char*) buffer, msgLen);
         QnVMax480Helper::deserializeCommand(ba, &command, &sequence, &params);
+
+        memmove(buffer, buffer + msgLen, bufferLen - msgLen);
+        bufferLen -= msgLen;
 
         switch(command)
         {
@@ -109,7 +135,7 @@ int main(int argc, char* argv[])
                 break;
             case Command_ArchivePlay:
                 if (connection) {
-                    qDebug() << "before exec Command_ArchivePlay";
+                    qDebug() << "before exec Command_ArchivePlay" <<  "seq=" << sequence << "speed=" << params.value("speed").toInt();
                     connection->archivePlay(params, sequence);
                 }
                 break;
@@ -121,6 +147,8 @@ int main(int argc, char* argv[])
                 }
                 break;
         }
+        if (!connection)
+            break;
     }
 
     if (connection) {

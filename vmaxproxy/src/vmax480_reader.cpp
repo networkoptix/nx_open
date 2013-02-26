@@ -131,7 +131,8 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_socket(socket),
     m_channelNum(0),
     m_reqSequence(0),
-    m_curSequence(0)
+    m_curSequence(0),
+    m_archivePlayProcessing(false)
 {
 }
 
@@ -139,6 +140,17 @@ QnVMax480Provider::~QnVMax480Provider()
 {
 
 }
+
+bool QnVMax480Provider::waitForConnected(int timeoutMs)
+{
+    QMutexLocker lock(&m_callbackMutex);
+    QTime t;
+    t.restart();
+    while (!m_connectedInternal && t.elapsed() < timeoutMs)
+        m_callbackCond.wait(&m_callbackMutex, timeoutMs);
+    return m_connectedInternal;
+}
+
 
 void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bool isLive)
 {
@@ -213,13 +225,18 @@ void QnVMax480Provider::archivePlay(const VMaxParamList& params, quint8 sequence
     if (!m_ACSStream)
         return;
 
+    QMutexLocker lock(&m_callbackMutex);
+    archivePlayInternal(params, sequence);
+}
+
+void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 sequence)
+{
     qint64 posUsec = params.value("pos").toLongLong();
     int speed = params.value("speed").toInt();
     quint32 startDate;
     quint32 startTime;
     toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(posUsec/1000), &startDate, &startTime, 0);
 
-    qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString();
     m_reqSequence = sequence;
     ACS_stream_source::PLAYMODE playMode;
     if (speed > 0)
@@ -229,8 +246,15 @@ void QnVMax480Provider::archivePlay(const VMaxParamList& params, quint8 sequence
     else
         playMode = ACS_stream_source::BACKWARDPLAY;
 
-    m_reqSequenceList << m_reqSequence;
-    m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
+    qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
+
+    if (!m_archivePlayProcessing) {
+        m_archivePlayProcessing = true;
+        m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
+    }
+    else {
+        m_newPlayCommand = params;
+    }
 }
 
 void QnVMax480Provider::requestMonthInfo(const VMaxParamList& params, quint8 sequence)
@@ -385,7 +409,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     switch(_result->mType)
     {
     case RESULT_CONNECT:
-        m_connectedInternal = true;
+        //m_connectedInternal = true;
         break;
     case RESULT_DISCONNECTED:
         m_connectedInternal = false;
@@ -400,6 +424,8 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_ACSStream->openAudioChannel(1 << m_channelNum);
                 }
             }
+            m_connectedInternal = true;
+            m_callbackCond.wakeOne();
             break;
         }
 
@@ -437,8 +463,11 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
         }
     case RESULT_SEARCH_PLAY:
         {
-            if (!m_reqSequenceList.isEmpty())
-                m_curSequence = m_reqSequenceList.dequeue();
+            m_archivePlayProcessing = false;
+            if (m_newPlayCommand.isEmpty())
+                m_curSequence = m_reqSequence;
+            else
+                archivePlayInternal(m_newPlayCommand, m_reqSequence);
             break;
         }
     case RESULT_REC_DATE_TIME :

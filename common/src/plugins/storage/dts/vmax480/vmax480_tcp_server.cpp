@@ -58,7 +58,7 @@ void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 seque
     params["pos"] = QString::number(timeUsec).toUtf8();
     params["speed"] = QString::number(speed).toUtf8();
     QByteArray data = QnVMax480Helper::serializeCommand(Command_ArchivePlay, sequence, params);
-
+    qDebug () << "before send command vMaxArchivePlay" << "time=" << timeUsec << "sequence=" << sequence << "speed=" << speed;
     d->socket->send(data);
 }
 

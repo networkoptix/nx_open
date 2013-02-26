@@ -12,10 +12,11 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_sequence(0),
     m_vmaxPaused(false),
     m_lastMediaTime(AV_NOPTS_VALUE),
-    m_singleShotMode(false)
+    m_reverseMode(false)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
+    m_flags |= Flag_CanProcessNegativeSpeed;
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
@@ -36,6 +37,9 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
         channel--;
+
+    qDebug() << "before vmaxConnect";
+
     m_connected = vmaxConnect(false, channel);
     return m_connected;
 }
@@ -51,8 +55,11 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
         return -1;
 
     m_sequence++;
+
+    qDebug() << "QnVMax480ArchiveDelegate::seek" << "m_sequence" << m_sequence;
+
     m_internalQueue.clear();
-    vmaxArchivePlay(time, m_sequence, 1);
+    vmaxArchivePlay(time, m_sequence, m_reverseMode ? -1 : 1);
     return time;
 }
 
@@ -77,7 +84,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
 
-    if (!m_singleShotMode && m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
+    if (m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
         vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
         m_vmaxPaused = false;
     }
@@ -93,8 +100,13 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*1000)
             return QnAbstractMediaDataPtr();
     }
-    if (result)
+    if (result) {
         result->opaque = 0;
+        if (m_reverseMode) {
+            result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+            result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        }
+    }
     return result;
 }
 
@@ -114,6 +126,9 @@ void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
 {
     QTime waitTimer;
     waitTimer.restart();
+
+    //qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(mediaData->timestamp/1000).toString(QLatin1String("dd.MM.yyyy hh:mm.ss"));
+
     while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize() && !m_vmaxPaused)
     {
         if (waitTimer.elapsed() > MAX_FRAME_DURATION) {
@@ -129,4 +144,9 @@ void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
 
     m_internalQueue.push(mediaData);
     m_lastMediaTime = mediaData->timestamp;
+}
+
+void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+{
+    m_reverseMode = value;
 }

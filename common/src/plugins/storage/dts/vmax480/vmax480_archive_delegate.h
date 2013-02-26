@@ -24,6 +24,8 @@ public:
     virtual void onGotData(QnAbstractMediaDataPtr mediaData) override;
 
     virtual void beforeClose() override;
+
+    virtual void onReverseMode(qint64 displayTime, bool value);
 private:
     QnPlVmax480ResourcePtr m_res;
     bool m_connected;
@@ -32,7 +34,7 @@ private:
     quint8 m_sequence;
     bool m_vmaxPaused;
     qint64 m_lastMediaTime;
-    bool m_singleShotMode;
+    bool m_reverseMode;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

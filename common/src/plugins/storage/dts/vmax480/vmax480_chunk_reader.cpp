@@ -49,6 +49,7 @@ void QnVMax480ChunkReader::run()
             if (!m_monthToRequest.isEmpty()) {
                 m_waitingAnswer = true;
                 m_waitTimer.restart();
+                m_updateTimer.restart();
                 vmaxRequestMonthInfo(m_monthToRequest.dequeue());
                 break;
             }

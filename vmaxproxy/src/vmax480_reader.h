@@ -28,6 +28,7 @@ public:
     void requestRange(const VMaxParamList& params, quint8 sequence);
 
     void keepAlive();
+    bool waitForConnected(int timeoutMs);
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
     static void receiveVideoStramCallback(PS_ACS_VIDEO_STREAM _stream, long long _user);
@@ -37,6 +38,7 @@ private:
     void receiveResult(PS_ACS_RESULT _result);
     void receiveAudioStream(PS_ACS_AUDIO_STREAM _stream);
     QDateTime fromNativeTimestamp(int mDate, int mTime, int mMillisec);
+    void archivePlayInternal(const VMaxParamList& params, quint8 sequence);
 private:
     ACS_stream_source *m_ACSStream;
     bool m_connected;
@@ -56,7 +58,8 @@ private:
     QQueue<int> m_monthRequests;
     QQueue<int> m_daysRequests;
     unsigned char recordedDayInfo[VMAX_MAX_CH][1440+60];
-    QQueue<int> m_reqSequenceList;
+    bool m_archivePlayProcessing;
+    VMaxParamList m_newPlayCommand;
 };
 
 #endif // _VMAX480_READER_H__

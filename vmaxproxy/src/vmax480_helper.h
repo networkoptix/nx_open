@@ -21,11 +21,6 @@ static const int VMAX_MAX_SLICE_DAY = VMAX_SLICE_OF_HOUR*24;
 
 class QnVMax480Helper {
 public:
-    static bool isFullMessage(const QByteArray& message)
-    {
-        return message.size() >= 6 && message.indexOf("\n\n") > 0;
-    }
-
     static bool deserializeCommand(const QByteArray& ba, MServerCommand* command, quint8* sequence, VMaxParamList* params)
     {
         if (ba.size() < 6)
