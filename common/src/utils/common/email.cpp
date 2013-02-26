@@ -22,6 +22,8 @@ namespace {
     const int TIMEOUT = 10; //seconds
 
     //TODO: #GDM check authorization login: use domain or not
+    // Actual list here:
+    // https://noptix.enk.me/redmine/projects/vms/wiki/SMTP_Server_Presets
     static QHash<QString, QnEmail::SmtpServerPreset> initSmtpPresets() {
         typedef QLatin1String _;
         typedef QnEmail::SmtpServerPreset server;
