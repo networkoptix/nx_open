@@ -144,9 +144,6 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
                                      ? tr("SSL")
                                      : tr("Unsecured"));
 
-
-    ui->stackedWidget->setCurrentIndex(TestingPage);
-
     ui->cancelTestButton->setVisible(true);
     ui->okTestButton->setVisible(false);
 
@@ -158,6 +155,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
     m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
                                                                                             this, SLOT(at_finishedTestEmailSettings(int, QByteArray, bool, int)));
+    ui->stackedWidget->setCurrentIndex(TestingPage);
 }
 
 void QnSmtpSettingsWidget::at_cancelTestButton_clicked() {

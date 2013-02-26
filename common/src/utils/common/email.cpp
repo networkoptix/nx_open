@@ -41,7 +41,7 @@ namespace {
         presets.insert(_("yahoo.de"),           server(_("smtp.mail.yahoo.de"), QnEmail::Ssl));
         presets.insert(_("yahoo.com.au"),       server(_("smtp.mail.yahoo.com.au"), QnEmail::Ssl));
 
-        presets.insert(_("att.yahoo.com"),       server(_("smtp.att.yahoo.com"), QnEmail::Ssl));
+        presets.insert(_("att.yahoo.com"),      server(_("smtp.att.yahoo.com"), QnEmail::Ssl));
 
         presets.insert(_("o2.ie"),              server(_("smtp.o2.ie"), QnEmail::Unsecure));
         presets.insert(_("o2.co.uk"),           server(_("smtp.o2.co.uk"), QnEmail::Unsecure));
