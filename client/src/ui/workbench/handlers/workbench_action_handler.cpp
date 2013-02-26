@@ -788,9 +788,13 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         //QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
         //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     //}
-    QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
-    workbench()->update(state);
-    
+
+    // we should not restore state when using "Open in New Window"
+    if (m_delayedDrops.size() == 0) {
+        QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
+        workbench()->update(state);
+    }
+
     /* Delete empty orphaned layouts, move non-empty to the new user. */
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
