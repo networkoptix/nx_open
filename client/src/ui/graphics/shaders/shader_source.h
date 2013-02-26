@@ -1,9 +1,9 @@
 #ifndef QN_SHADER_SOURCE_H
 #define QN_SHADER_SOURCE_H
 
-#include <QtCore/QByteArray>
+#include <boost/preprocessor/stringize.hpp>
 
-#include <utils/common/preprocessor.h>
+#include <QtCore/QByteArray>
 
 inline QByteArray qnUnparenthesize(const char *parenthesized) {
     QByteArray result(parenthesized);

@@ -3,7 +3,7 @@
 
 #include <QtOpenGL>
 
-#include <ui/common/coordinate_transformations.h>
+#include <utils/math/coordinate_transformations.h>
 
 inline void glColor(float r, float g, float b, float a) {
     glColor4f(r, g, b, a);

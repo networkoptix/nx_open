@@ -5,6 +5,7 @@
 #include <QtCore/QWeakPointer>
 
 #include <QtGui/QDialogButtonBox>
+#include <QtGui/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
@@ -154,7 +155,7 @@ public:
 protected:
     QnAppServerConnectionPtr connection() const;
 
-    QString newLayoutName(const QnUserResourcePtr &user) const;
+    QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
@@ -254,7 +255,6 @@ protected slots:
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
-    void at_showPopupAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
     void at_openPopupSettingsAction_triggered();
@@ -336,6 +336,10 @@ protected slots:
 
     void at_whatsThisAction_triggered();
 
+    void at_checkSystemHealthAction_triggered();
+
+    void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -346,6 +350,25 @@ private:
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
+
+    /**
+     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
+     * @param name                      Suggested new name.
+     * @param user                      User that will own the layout.
+     * @param layout                    Layout that we want to rename (if any).
+     * @return                          List of existing layouts with same name.
+     */
+    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
+
+    /**
+     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
+     * @param buttons               Messagebox buttons.
+     * @param defaultButton         Default button.
+     * @return                      Selected button.
+     */
+    QMessageBox::StandardButton askOverrideLayout(QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton);
+
+    void removeLayouts(const QnLayoutResourceList &layouts);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -381,7 +404,7 @@ private:
     QnMediaResourcePtr m_exportedMediaRes;
     //QString m_layoutExportMessage;
     LayoutExportMode m_layoutExportMode;
-
+    int m_healthRequestHandle;
 
     QTimer *m_tourTimer;
 };

@@ -30,7 +30,7 @@ public:
     virtual bool isNeedControlFreeSpace() override;
 
     virtual QFileInfoList getFileList(const QString& dirName) override;
-    virtual qint64 getFileSize(const QString& fillName) const override;
+    virtual qint64 getFileSize(const QString& url) const override;
 
     virtual bool removeFile(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;

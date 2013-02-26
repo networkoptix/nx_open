@@ -35,7 +35,7 @@ QnLayoutNameDialog::~QnLayoutNameDialog() {
 }
 
 QString QnLayoutNameDialog::name() const {
-    return ui->nameLineEdit->text();
+    return ui->nameLineEdit->text().trimmed();
 }
 
 void QnLayoutNameDialog::setName(const QString &name) {

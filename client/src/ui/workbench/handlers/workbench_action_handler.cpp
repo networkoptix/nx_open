@@ -8,7 +8,6 @@
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
 #include <QtGui/QImage>
 #include <QtGui/QWhatsThis>
 #include <QtGui/QInputDialog>
@@ -20,6 +19,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
+#include <utils/common/email.h>
 
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
@@ -27,10 +27,6 @@
 #include <api/session_manager.h>
 
 #include <business/actions/popup_business_action.h>
-
-//TODO: #GDM remove when debug will not be required
-#include <business/events/reasoned_business_event.h>
-#include <business/events/conflict_business_event.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -76,7 +72,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/widgets/popup_collection_widget.h>
+#include <ui/widgets/popups/popup_collection_widget.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -180,6 +176,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
     m_exportedCamera(0),
+    m_healthRequestHandle(0),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
@@ -276,6 +273,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
+    connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -347,16 +345,15 @@ QWidget *QnWorkbenchActionHandler::widget() const {
     return m_widget.data();
 }
 
-QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user) const {
-    const QString zeroName = tr("New layout");
-    const QString nonZeroName = tr("New layout %1");
-    QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
+QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user, const QString &baseName) const {
+    const QString nonZeroName = baseName + QString(QLatin1String(" %1"));
+    QRegExp pattern = QRegExp(baseName + QLatin1String(" ?([0-9]+)?"));
 
     QStringList layoutNames;
 
     QnUserResourcePtr parent = !user.isNull() ? user : context()->user();
     QnId parentId = parent ? parent->getId() : QnId();
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(parentId))
+    foreach(const QnLayoutResourcePtr &resource, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
         if(resource->flags() & QnResource::layout)
             layoutNames.push_back(resource->getName());
 
@@ -370,7 +367,7 @@ QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user) c
     }
     layoutNumber++;
 
-    return layoutNumber == 0 ? zeroName : nonZeroName.arg(layoutNumber);
+    return layoutNumber == 0 ? baseName : nonZeroName.arg(layoutNumber);
 }
 
 bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
@@ -848,11 +845,23 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
+
+    m_healthRequestHandle = 0; //TODO: #GDM doubling code in disconnect/reconnect
+
+    if (!widget())
+        return;
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    if (popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost))
+        popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
+
+    at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
@@ -884,75 +893,6 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-
-    int total = qnResPool->getAllEnabledCameras().size();
-    if (total == 0)
-        return;
-
-    int n = qrand() % total;
-    int camId = qnResPool->getAllEnabledCameras().at(n)->getId();
-
-    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
-    if (servers.size() == 0)
-        return;
-
-    n = qrand() % servers.size();
-    int srvId = servers.at(n)->getId();
-
-
-    n = qrand() % BusinessEventType::BE_Count;
-    BusinessEventType::Value eventType = (BusinessEventType::Value)n;
-
-    QnBusinessParams params;
-    QnBusinessEventRuntime::setEventType(&params, eventType);
-
-    n = qrand() % 2;
-
-    QStringList conflicts;
-    conflicts << QLatin1String("50:e5:49:43:b2:5A");
-    conflicts << QLatin1String("50:e5:49:43:b2:5B");
-    conflicts << QLatin1String("50:e5:49:43:b2:5C");
-
-    switch (eventType) {
-        case BusinessEventType::BE_Camera_Input:
-        case BusinessEventType::BE_Camera_Motion:
-        case BusinessEventType::BE_Camera_Disconnect:
-            QnBusinessEventRuntime::setEventResourceId(&params, camId);
-            break;
-
-        case BusinessEventType::BE_Storage_Failure:
-            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
-            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::StorageIssueIoError : QnBusiness::StorageIssueNotEnoughSpeed);
-            QnBusinessEventRuntime::setReasonText(&params, QLatin1String("C:\\;D:\\"));
-            break;
-        case BusinessEventType::BE_Network_Issue:
-            QnBusinessEventRuntime::setEventResourceId(&params, camId);
-            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueRtpPacketLoss);
-            QnBusinessEventRuntime::setReasonText(&params, n == 0 ? QLatin1String("10") : QLatin1String("25245;26532"));
-            break;
-        case BusinessEventType::BE_MediaServer_Failure:
-            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
-            QnBusinessEventRuntime::setReasonCode(&params, n == 0 ? QnBusiness::MServerIssueStarted : QnBusiness::MServerIssueTerminated);
-            break;
-        case BusinessEventType::BE_Camera_Ip_Conflict:
-            QnBusinessEventRuntime::setEventResourceId(&params, camId);
-            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
-            QnBusinessEventRuntime::setConflicts(&params, conflicts);
-            break;
-        case BusinessEventType::BE_MediaServer_Conflict:
-            QnBusinessEventRuntime::setEventResourceId(&params, srvId);
-            QnBusinessEventRuntime::setSource(&params, QLatin1String("50:e5:49:43:b2:59"));
-            QnBusinessEventRuntime::setConflicts(&params, conflicts);
-            break;
-        default:
-            break;
-    }
-
-
-
-
-    QnAbstractBusinessActionPtr ba(new QnPopupBusinessAction(params));
-    at_eventManager_actionReceived(ba);
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -986,8 +926,11 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
-        foreach(const QnResourceWidget *widget, widgets)
-            layout->addItem(widget->item()->data());
+        foreach(const QnResourceWidget *widget, widgets) {
+            QnLayoutItemData data = widget->item()->data();
+            data.uuid = QUuid::createUuid();
+            layout->addItem(data);
+        }
         return;
     }
 
@@ -1003,7 +946,7 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
     menu()->trigger(Qn::OpenInLayoutAction, parameters);
-};
+}
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(Qn::OpenNewTabAction);
@@ -1092,47 +1035,72 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
     if(snapshotManager()->isFile(layout)) {
         doAskNameAndExportLocalLayout(layout->getLocalRange(), layout, LayoutExport_LocalSaveAs);
-    } else {
-        QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
-        if(name.isEmpty()) {
-            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
-            dialog->setWindowTitle(tr("Save Layout As"));
-            dialog->setText(tr("Enter layout name:"));
-            dialog->setName(layout->getName());
+        return;
+    }
+
+    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString().trimmed();
+    if(name.isEmpty()) {
+        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+        dialog->setWindowTitle(tr("Save Layout As"));
+        dialog->setText(tr("Enter layout name:"));
+        dialog->setName(layout->getName());
+
+        QMessageBox::Button button;
+        do {
             dialog->exec();
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
             name = dialog->name();
+
+            button = QMessageBox::Yes;
+            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+            if (!existing.isEmpty()) {
+                button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+                if (button == QMessageBox::Cancel)
+                    return;
+                if (button == QMessageBox::Yes) {
+                    removeLayouts(existing);
+                }
+            }
+        } while (button != QMessageBox::Yes);
+    } else {
+        QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        if (!existing.isEmpty()) {
+            if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
+                return;
+            removeLayouts(existing);
         }
-
-        QnLayoutResourcePtr newLayout;
-
-        newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-        newLayout->setGuid(QUuid::createUuid());
-        newLayout->setName(name);
-        newLayout->setParentId(user->getId());
-        newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
-        newLayout->setCellSpacing(layout->cellSpacing());
-        newLayout->setCellAspectRatio(layout->cellAspectRatio());
-        context()->resourcePool()->addResource(newLayout);
-
-        QnLayoutItemDataList items = layout->getItems().values();
-        for(int i = 0; i < items.size(); i++)
-            items[i].uuid = QUuid::createUuid();
-        newLayout->setItems(items);
-
-        /* If it is current layout, then roll it back and open the new one instead. */
-        if(layout == workbench()->currentLayout()->resource()) {
-            int index = workbench()->currentLayoutIndex();
-            workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
-            workbench()->setCurrentLayoutIndex(index);
-            workbench()->removeLayout(index + 1);
-
-            snapshotManager()->restore(layout);
-        }
-
-        snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
     }
+
+    QnLayoutResourcePtr newLayout;
+
+    newLayout = QnLayoutResourcePtr(new QnLayoutResource());
+    newLayout->setGuid(QUuid::createUuid());
+    newLayout->setName(name);
+    newLayout->setParentId(user->getId());
+    newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+    newLayout->setCellSpacing(layout->cellSpacing());
+    newLayout->setCellAspectRatio(layout->cellAspectRatio());
+    context()->resourcePool()->addResource(newLayout);
+
+    QnLayoutItemDataList items = layout->getItems().values();
+    for(int i = 0; i < items.size(); i++)
+        items[i].uuid = QUuid::createUuid();
+    newLayout->setItems(items);
+
+    /* If it is current layout, then roll it back and open the new one instead. */
+    if(layout == workbench()->currentLayout()->resource()) {
+        int index = workbench()->currentLayoutIndex();
+        workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
+        workbench()->setCurrentLayoutIndex(index);
+        workbench()->removeLayout(index + 1);
+
+        snapshotManager()->restore(layout);
+    }
+
+    snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    if (name == layout->getName() && snapshotManager()->isLocal(layout))
+        removeLayouts(QnLayoutResourceList() << layout);
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
@@ -1360,6 +1328,39 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
 }
 
+QnLayoutResourceList QnWorkbenchActionHandler::alreadyExistingLayouts(const QString &name,
+                                                   const QnUserResourcePtr &user,
+                                                   const QnLayoutResourcePtr &layout) {
+
+    QnLayoutResourceList result;
+    foreach (const QnLayoutResourcePtr &existingLayout, resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+        if (existingLayout == layout)
+            continue;
+        if (existingLayout->getName().toLower() != name.toLower())
+            continue;
+        result << existingLayout;
+    }
+    return result;
+}
+
+QMessageBox::StandardButton QnWorkbenchActionHandler::askOverrideLayout(QMessageBox::StandardButtons buttons,
+                                                                        QMessageBox::StandardButton defaultButton) {
+    return QMessageBox::warning(widget(),
+                                tr("Layout already exists"),
+                                tr("Layout with the same name already exists. Overwrite it?"),
+                                buttons,
+                                defaultButton);
+}
+
+void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts) {
+    foreach(const QnLayoutResourcePtr &layout, layouts) {
+        if(snapshotManager()->isLocal(layout))
+            resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
+        else
+            connection()->deleteAsync(layout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+    }
+}
+
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     notifyAboutUpdate(false);
 }
@@ -1437,13 +1438,6 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     businessRulesDialog()->show();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
-}
-
-// can be used for test purposes or for displaying an example for user
-void QnWorkbenchActionHandler::at_showPopupAction_triggered() {
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    popupCollectionWidget()->show();
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
@@ -1558,6 +1552,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     qnLicensePool->reset();
 
+    if (popupCollectionWidget())
+        popupCollectionWidget()->clear();
+
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
@@ -1597,6 +1594,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
     // TODO: save workbench state on logout.
+
+    if (popupCollectionWidget())
+        popupCollectionWidget()->clear();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -1857,17 +1857,17 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
-    if(resources.size() != 1)
+    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
+    if(!server)
         return;
 
-    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(resources[0], widget()));
+    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
 
     // TODO: move submitToResources here.
-    connection()->saveAsync(resources[0], this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
@@ -1950,7 +1950,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(!resource)
         return;
 
-    QString name = parameters.argument(Qn::NameParameter).toString();
+    QString name = parameters.argument(Qn::NameParameter).toString().trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Rename"));
@@ -1966,6 +1966,15 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         return;
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId()).dynamicCast<QnUserResource>();
+
+        QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        if (!existing.isEmpty()) {
+            if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
+                return;
+            removeLayouts(existing);
+        }
+
         bool changed = snapshotManager()->isChanged(layout);
 
         resource->setName(name);
@@ -2052,8 +2061,23 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     dialog->setText(tr("Enter the name of the layout to create:"));
     dialog->setName(newLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
-    if(!dialog->exec())
-        return;
+
+    QMessageBox::Button button;
+    do {
+        if(!dialog->exec())
+            return;
+
+        button = QMessageBox::Yes;
+        QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
+        if (!existing.isEmpty()) {
+            button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+            if (button == QMessageBox::Cancel)
+                return;
+            if (button == QMessageBox::Yes) {
+                removeLayouts(existing);
+            }
+        }
+    } while (button != QMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
@@ -2749,13 +2773,16 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         if(parameters.size() == 0 && display()->widgets().size() == 1) {
             widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
         } else {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Could not export file"), 
-                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
-                QMessageBox::Ok
-            );
-            return;
+            widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
+            if (!widget) {
+                QMessageBox::critical(
+                            this->widget(),
+                            tr("Could not export file"),
+                            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()),
+                            QMessageBox::Ok
+                            );
+                return;
+            }
         }
     } else {
         widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
@@ -3209,4 +3236,79 @@ void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
     QWhatsThis::enterWhatsThisMode();
 }
 
+void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
+    if (!context()->user())
+        return;
 
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->clear();
+
+    bool any = false;
+
+    if (!QnEmail::isValid(context()->user()->getEmail())) {
+        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
+    }
+
+    if (qnLicensePool->isEmpty() &&
+            (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
+        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+    }
+
+    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
+        m_healthRequestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
+                       this, SLOT(at_serverSettings_received(int,QByteArray,QnKvPairList,int)));
+
+        QnUserResourceList usersWithNoEmail;
+        QnUserResourceList users = qnResPool->getResources().filtered<QnUserResource>();
+        foreach (const QnUserResourcePtr &user, users) {
+            if (user == context()->user())
+                continue; // we are displaying separate notification for us
+            if (QnEmail::isValid(user->getEmail()))
+                continue;
+            usersWithNoEmail << user;
+        }
+        if (!usersWithNoEmail.isEmpty())
+            any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
+    }
+
+    if (any)
+        popupCollectionWidget()->show();
+
+}
+
+void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
+
+    if (handle != m_healthRequestHandle)
+        return;
+
+    Q_UNUSED(errorString)
+    if(status != 0)
+        return;
+
+    const QLatin1String nameHost("EMAIL_HOST");
+    const QLatin1String nameUser("EMAIL_HOST_USER");
+    const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
+
+    QString hostname;
+    QString user;
+    QString password;
+
+    foreach (const QnKvPair &setting, settings) {
+        if (setting.name() == nameHost) {
+            hostname = setting.value();
+        } else if (setting.name() == nameUser) {
+            user = setting.value();
+        } else if (setting.name() == namePassword) {
+            password = setting.value();
+        }
+    }
+
+    if (!hostname.isEmpty() && !user.isEmpty() && !password.isEmpty())
+        return;
+
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
+    popupCollectionWidget()->show();
+}

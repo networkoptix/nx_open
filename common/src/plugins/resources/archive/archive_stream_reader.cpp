@@ -214,6 +214,9 @@ bool QnArchiveStreamReader::init()
         // It is optimization: open and jump at same time
         while (1)
         {
+            if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
+                m_delegate->open(m_resource);
+
 			m_delegate->setQuality(quality, true);
             qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
             bool seekOk = m_delegate->seek(jumpTime, true) >= 0;

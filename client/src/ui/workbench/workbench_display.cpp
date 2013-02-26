@@ -13,7 +13,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/toggle.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
@@ -622,6 +622,14 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgets;
+}
+
+QnResourceWidget* QnWorkbenchDisplay::activeWidget() const {
+    foreach (QnResourceWidget * widget, m_widgets) {
+        if (widget->isLocalActive())
+            return widget;
+    }
+    return NULL;
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const {

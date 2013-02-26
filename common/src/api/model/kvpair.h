@@ -8,6 +8,8 @@ class QnKvPair {
 public:
     QnKvPair() {}
     QnKvPair(const QString& name, const QString& value);
+    QnKvPair(const QString& name, const int value);
+    QnKvPair(const QString& name, const bool value);
     ~QnKvPair() {}
 
     void setName(const QString& name);

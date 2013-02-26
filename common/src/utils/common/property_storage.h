@@ -76,6 +76,8 @@ public:
     bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
     bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
 
+    // TODO: also need string-based interface
+
 signals:
     void valueChanged(int id);
 

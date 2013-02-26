@@ -17,8 +17,8 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
 
-#include <ui/delegate/business_rule_item_delegate.h>
-#include <ui/dialogs/select_cameras_dialog.h>
+#include <ui/delegates/business_rule_item_delegate.h>
+#include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -81,8 +81,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
-            this, SLOT(at_message_ruleDeleted(QnId)));
+    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
+            this, SLOT(at_message_ruleDeleted(int)));
 
     at_context_userChanged();
     updateControlButtons();
@@ -119,17 +119,16 @@ void QnBusinessRulesDialog::reject() {
                       QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                       QMessageBox::Cancel);
 
-    // TODO: #GDM codestyle, indentation. See how its done in other places for switch-case.
     switch (btn) {
-        case QMessageBox::Yes:
-            if (!saveAll())
-                return;
-            break;
-        case QMessageBox::No:
-            at_context_userChanged();
-            break;
-        default:
+    case QMessageBox::Yes:
+        if (!saveAll())
             return;
+        break;
+    case QMessageBox::No:
+        at_context_userChanged();
+        break;
+    default:
+        return;
     }
     base_type::reject();
 }
@@ -151,12 +150,12 @@ bool QnBusinessRulesDialog::eventFilter(QObject *object, QEvent *event) {
 
 void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-            event->ignore();
-            return;
-        default:
-            break;
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        event->ignore();
+        return;
+    default:
+        break;
     }
     base_type::keyPressEvent(event);
 }
@@ -184,14 +183,9 @@ void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr 
     //TODO: ask user
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
     m_rulesViewModel->deleteRule(id);
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        if (rule->getId() == id) {
-            m_pendingDeleteRules.removeOne(rule);
-            return;
-        }
-    }
+    m_pendingDeleteRules.removeOne(id);
     //TODO: ask user
 }
 
@@ -333,15 +327,15 @@ bool QnBusinessRulesDialog::saveAll() {
                           QMessageBox::Cancel);
 
         switch (btn) {
-            case QMessageBox::Yes:
-                foreach (QModelIndex idx, invalid_modified) {
-                    m_rulesViewModel->getRuleModel(idx.row())->setDisabled(true);
-                }
-                break;
-            case QMessageBox::No:
-                break;
-            default:
-                return false;
+        case QMessageBox::Yes:
+            foreach (QModelIndex idx, invalid_modified) {
+                m_rulesViewModel->getRuleModel(idx.row())->setDisabled(true);
+            }
+            break;
+        case QMessageBox::No:
+            break;
+        default:
+            return false;
         }
     }
 
@@ -349,9 +343,10 @@ bool QnBusinessRulesDialog::saveAll() {
     foreach (QModelIndex idx, modified) {
         saveRule(m_rulesViewModel->getRuleModel(idx.row()));
     }
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection()->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
-        m_deleting[handle] = rule;
+    foreach (int id, m_pendingDeleteRules) {
+        int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
+                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+        m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();
     return true;
@@ -368,9 +363,8 @@ void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
-    if (ruleModel->id()) {
-        m_pendingDeleteRules.append(ruleModel->createRule());
-    }
+    if (ruleModel->id() > 0)
+        m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
     updateControlButtons();
 }

@@ -199,6 +199,7 @@ protected:
     int m_emptyPacketCounter;
     bool m_isStillImage;
     bool m_isLongWaiting;
+    bool m_skippingFramesStarted;
     
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;

@@ -68,6 +68,7 @@ class QnBusinessRuleViewModel: public QObject {
 
 public:
     QnBusinessRuleViewModel(QObject *parent = 0);
+    virtual ~QnBusinessRuleViewModel();
 
     QVariant data(const int column, const int role = Qt::DisplayRole) const;
     bool setData(const int column, const QVariant &value, int role);
@@ -82,7 +83,7 @@ public:
     bool isValid(int column) const;
     bool isValid() const; //checks validity for all row
 
-    QnId id() const;
+    int id() const;
 
     bool isModified() const;
     void setModified(bool value);
@@ -140,7 +141,7 @@ private:
     QString getTargetText(const bool detailed) const;
 
 private:
-    QnId m_id;
+    int m_id;
     bool m_modified;
 
     BusinessEventType::Value m_eventType;
@@ -170,6 +171,7 @@ class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchCo
     typedef QAbstractItemModel base_type;
 public:
     explicit QnBusinessRulesViewModel(QObject *parent = 0, QnWorkbenchContext *context = NULL);
+    virtual ~QnBusinessRulesViewModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     virtual QModelIndex parent(const QModelIndex &child) const override;
@@ -188,7 +190,7 @@ public:
     void updateRule(QnBusinessEventRulePtr rule);
 
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
-    void deleteRule(QnId id);
+    void deleteRule(int id);
 
     QnBusinessRuleViewModel* getRuleModel(int row);
 private slots:

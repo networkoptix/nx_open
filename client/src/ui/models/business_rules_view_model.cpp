@@ -22,9 +22,8 @@
 
 namespace {
 
-    //TODO: #GDM tr()
-    static QLatin1String prolongedEvent("While %1");
-    static QLatin1String instantEvent("On %1 %2");
+    QString prolongedEvent = QObject::tr("While %1");
+    QString instantEvent = QObject::tr("On %1 %2");
 
     QString toggleStateToModelString(ToggleState::Value value) {
         switch( value )
@@ -139,6 +138,10 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_actionTypesModel->appendRow(row);
     }
     updateActionTypesModel();
+}
+
+QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
+
 }
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
@@ -271,7 +274,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
 
 void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) {
-    m_id = businessRule->getId();
+    m_id = businessRule->id();
     m_modified = false;
     m_eventType = businessRule->eventType();
 
@@ -293,7 +296,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    m_disabled = businessRule->isDisabled();
+    m_disabled = businessRule->disabled();
     m_comments = businessRule->comments();
     m_schedule = businessRule->schedule();
 
@@ -337,7 +340,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-QnId QnBusinessRuleViewModel::id() const {
+int QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 
@@ -639,18 +642,9 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
         case QnBusiness::TargetColumn:
             {
                 if (m_actionType == BusinessActionType::BA_SendMail) {
-                    QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
-                    QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
-                    foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
-                        receivers << user->getEmail();
-                    }
-
-                    if (receivers.isEmpty() || !isEmailValid(receivers))
+                    if (!isValid(QnBusiness::TargetColumn))
                         return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                    if (receivers.size() == 1)
-                        return qnResIconCache->icon(QnResourceIconCache::User);
-                    else
-                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                    return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
                     if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
@@ -697,14 +691,23 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         case QnBusiness::TargetColumn:
             {
                 if (m_actionType == BusinessActionType::BA_SendMail) {
-                    QString email = BusinessActionParameters::getEmailAddress(m_actionParams);
-                    QStringList receivers = email.split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    bool any = false;
                     foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
-                        receivers << user->getEmail();
+                        QString email = user->getEmail();
+                        if (email.isEmpty() || !QnEmail::isValid(email))
+                            return false;
+                        any = true;
                     }
-                    if (receivers.isEmpty() || !isEmailValid(receivers))
-                        return false;
-                    return true;
+
+                    QStringList additional = BusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    foreach(const QString &email, additional) {
+                        if (email.trimmed().isEmpty())
+                            continue;
+                        if (!QnEmail::isValid(email))
+                            return false;
+                        any = true;
+                    }
+                    return any;
                 } else if (m_actionType == BusinessActionType::BA_CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 }
@@ -771,34 +774,34 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     if (m_actionType == BusinessActionType::BA_SendMail) {
 
-        QString userMails;
+        QStringList receivers;
         QnUserResourceList users =  m_actionResources.filtered<QnUserResource>();
         foreach (const QnUserResourcePtr &user, users) {
             QString userMail = user->getEmail();
             if (userMail.isEmpty())
                 return tr("User %1 has empty email").arg(user->getName());
-            if (!isEmailValid(userMail))
+            if (!QnEmail::isValid(userMail))
                 return tr("User %1 has invalid email address: %2").arg(user->getName()).arg(userMail);
-            if (!userMails.isEmpty())
-                userMails += QLatin1String("; ");
-            userMails += QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+            receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
         }
 
-        QString additional = BusinessActionParameters::getEmailAddress(m_actionParams);
-        QStringList receivers = additional.split(QLatin1Char(';'), QString::SkipEmptyParts);
-        if (receivers.isEmpty() && userMails.isEmpty() )
+        QStringList additional = BusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+        foreach(const QString &email, additional) {
+            QString trimmed = email.trimmed();
+            if (trimmed.isEmpty())
+                continue;
+            if (!QnEmail::isValid(trimmed))
+                return tr("Invalid email address: %1").arg(trimmed);
+            receivers << trimmed;
+        }
+
+        if (receivers.isEmpty())
             return tr("Select at least one user");
-        foreach (QString receiver, receivers) {
-            if (!isEmailValid(receiver))
-                return tr("Invalid email address: %1").arg(receiver);
-        }
 
-        if (!userMails.isEmpty() && !receivers.isEmpty())
-            userMails += QLatin1String("; ");
         if (detailed)
-            return tr("Send mail to %1").arg(userMails + receivers.join(QLatin1String("; ")));
-        if (receivers.size() > 0)
-            return tr("%1 users, %2 additional").arg(users.size()).arg(receivers.size());
+            return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
+        if (additional.size() > 0)
+            return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
         return tr("%1 users").arg(users.size());
 
     } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
@@ -852,6 +855,10 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent, QnWorkbenchC
     m_fieldsByColumn[QnBusiness::SpacerColumn] = 0;
     m_fieldsByColumn[QnBusiness::ActionColumn] = QnBusiness::ActionTypeField;
     m_fieldsByColumn[QnBusiness::TargetColumn] = QnBusiness::ActionTypeField | QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField;
+}
+
+QnBusinessRulesViewModel::~QnBusinessRulesViewModel() {
+
 }
 
 QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelIndex &parent) const {
@@ -975,7 +982,7 @@ void QnBusinessRulesViewModel::addRule(QnBusinessEventRulePtr rule) {
 
 void QnBusinessRulesViewModel::updateRule(QnBusinessEventRulePtr rule) {
     foreach (QnBusinessRuleViewModel* ruleModel, m_rules) {
-        if (ruleModel->id() == rule->getId()) {
+        if (ruleModel->id() == rule->id()) {
             ruleModel->loadFromRule(rule);
             return;
         }
@@ -995,7 +1002,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 
-void QnBusinessRulesViewModel::deleteRule(QnId id) {
+void QnBusinessRulesViewModel::deleteRule(int id) {
     foreach (QnBusinessRuleViewModel* rule, m_rules) {
         if (rule->id() == id) {
             deleteRule(rule);

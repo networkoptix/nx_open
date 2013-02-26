@@ -202,7 +202,7 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
-        QnResourcePtr resource,
+        const QnResourcePtr &resource,
         const QString& inputPortID,
         bool value,
         qint64 timestamp);

@@ -311,9 +311,9 @@ QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
     return dir.entryInfoList(QDir::Files);
 }
 
-qint64 QnLayoutFileStorageResource::getFileSize(const QString& fillName) const
+qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 {
-    Q_UNUSED(fillName)
+    Q_UNUSED(url)
     return 0; // not implemented
 }
 
@@ -484,4 +484,20 @@ void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
 
     const quint64 magic = FileTypeSupport::NOV_EXE_MAGIC;
     file.write((char*) &magic, sizeof(qint64));
+}
+
+QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
+{
+    QString url = res->getUrl();
+    url = url.mid(url.lastIndexOf(L'?')+1);
+    QFileInfo fi(url);
+    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
+    if (!chunkData)
+        return QnTimePeriodList();
+    QnTimePeriodList chunks;
+    QByteArray chunkDataArray(chunkData->readAll());
+    chunks.decode(chunkDataArray);
+    delete chunkData;
+
+    return chunks;
 }

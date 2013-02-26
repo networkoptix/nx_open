@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -73,7 +73,7 @@ void QnWorkbenchPtzMapperWatcher::at_ptzWatcher_ptzCameraAdded(const QnVirtualCa
 
     connect(camera, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
     if(QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>()) {
-        connect(server, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
+        connect(server, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
         connect(server, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_server_statusChanged(const QnResourcePtr &)));
     } else {
         qnWarning("Total fuck up in resource tree: no server for camera '%1'.", camera->getName()); // TODO: #Elric remove once the bug is tracked down.

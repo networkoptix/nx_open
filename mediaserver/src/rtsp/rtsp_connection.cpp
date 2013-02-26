@@ -37,6 +37,8 @@
 
 class QnTcpListener;
 
+static const QByteArray ENDL("\r\n");
+
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
@@ -253,6 +255,8 @@ void QnRtspConnectionProcessor::parseRequest()
     QString q = d->requestHeaders.value("x-media-quality");
     if (q == QString("low"))
         d->quality = MEDIA_Quality_Low;
+    else if (q == QString("force-high"))
+        d->quality = MEDIA_Quality_ForceHigh;
     else
         d->quality = MEDIA_Quality_High;
     d->qualityFastSwitch = true;
@@ -518,7 +522,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
 
     QnAbstractMediaDataPtr rez;
     
-    bool isHQ = d->quality == MEDIA_Quality_High;
+    bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_ForceHigh;
  
     // 1. check packet in GOP keeper
     // Do not check audio for live point if not proprietary client
@@ -1136,6 +1140,8 @@ int QnRtspConnectionProcessor::composeSetParameter()
         {
             if (vals[1].trimmed() == "low")
                 d->quality = MEDIA_Quality_Low;
+            else if (vals[1].trimmed() == "force-high")
+                d->quality = MEDIA_Quality_ForceHigh;
             else
                 d->quality = MEDIA_Quality_High;
 

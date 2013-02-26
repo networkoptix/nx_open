@@ -3,7 +3,7 @@
 
 #include <QtGui/QFontMetricsF>
 
-#include <utils/common/fuzzy.h>
+#include <utils/math/fuzzy.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 void GraphicsLabelPrivate::init() {

@@ -14,13 +14,13 @@ public:
 
     QnServerMessageProcessor();
 
-    void init(const QUrl& url, int reconnectTimeout);
+    void init(const QUrl& url, const QByteArray& authKey, int reconnectTimeout);
     void stop();
 
 signals:
     void connectionReset();
     void businessRuleChanged(QnBusinessEventRulePtr bEvent);
-    void businessRuleDeleted(QnId id);
+    void businessRuleDeleted(int id);
     void businessActionReceived(QnAbstractBusinessActionPtr bAction);
 public slots:
     void run();

@@ -286,6 +286,18 @@ void QnStorageManager::clearSpace()
         clearSpace(storage);
 }
 
+QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
+{ 
+    QMutexLocker lock(&m_mutexStorages); 
+    return m_storageRoots; 
+} 
+
+QnStorageResourceList QnStorageManager::getStorages() const 
+{
+    QMutexLocker lock(&m_mutexStorages); 
+    return m_storageRoots.values().toSet().toList(); // TODO: #Elric totally evil. Store storage list as a member.
+}
+
 void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 {
     if (storage->getSpaceLimit() == 0)

@@ -1,7 +1,7 @@
 #include "platform_notifier.h"
 
 #ifdef Q_OS_WIN
-#   include "windows_notifier.h"
+#   include "notifier_win.h"
 #else
 #   include "generic_notifier.h"
 #endif

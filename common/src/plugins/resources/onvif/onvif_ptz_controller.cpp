@@ -85,6 +85,11 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_capabilities = Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability; // TODO
     m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
 
+    // TODO: #Elric make configurable
+    if(m_resource->getModel() == lit("FW3471-PS-E")) {
+        m_capabilities |= Qn::OctagonalPtzCapability;
+    }
+
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
 

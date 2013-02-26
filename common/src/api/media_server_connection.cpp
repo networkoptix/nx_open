@@ -5,7 +5,7 @@
 
 #include "utils/common/util.h"
 #include "utils/common/request_param.h"
-#include "utils/common/space_mapper.h"
+#include "utils/math/space_mapper.h"
 #include "utils/common/json.h"
 
 #include "media_server_connection.h"
@@ -32,16 +32,18 @@ public:
     {
     }
 
-    void removeFromProxyList(const QString& mServerId)
+    void removeFromProxyList(const QUrl& url)
     {
         QMutexLocker locker(&m_mutex);
-        m_proxyInfo.remove(mServerId);
+
+        m_proxyInfo.remove(url);
     }
 
-    void addToProxyList(const QString& mServerId, const QString& addr, int port)
+    void addToProxyList(const QUrl& url, const QString& addr, int port)
     {
         QMutexLocker locker(&m_mutex);
-        m_proxyInfo.insert(mServerId, ProxyInfo(addr, port));
+
+        m_proxyInfo.insert(url, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
@@ -365,16 +367,6 @@ int QnMediaServerConnection::setParamList(const QnNetworkResourcePtr &camera, co
     return status;
 }
 
-int QnMediaServerConnection::asyncGetFreeSpace(const QString &path, QObject *target, const char *slot)
-{
-    detail::QnMediaServerFreeSpaceReplyProcessor *processor = new detail::QnMediaServerFreeSpaceReplyProcessor();
-    connect(processor, SIGNAL(finished(int, qint64, qint64, int)), target, slot);
-
-    QnRequestParamList params;
-    params << QnRequestParam("path", path);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("GetFreeSpace"), QnRequestHeaderList(), params, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
-}
-
 int QnMediaServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::QnMediaServerStatisticsReplyProcessor *processor = new detail::QnMediaServerStatisticsReplyProcessor();
     connect(processor, SIGNAL(finished(const QnStatisticsDataList &/* data */)), target, slot, Qt::QueuedConnection);
@@ -469,23 +461,6 @@ QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int
         return QByteArray();
 }
 
-void detail::QnMediaServerFreeSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle)
-{
-    qint64 freeSpace = -1;
-    qint64 totalSpace = -1;
-
-    if(response.status == 0)
-    {
-        QByteArray message = extractXmlBody(response.data, "root");
-        freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
-        totalSpace = extractXmlBody(message, "totalSpace").toLongLong();
-    }
-
-    emit finished(response.status, freeSpace, totalSpace, handle);
-
-    deleteLater();
-}
-
 int QnMediaServerConnection::recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &result, QByteArray &errorString)
 {
     QnHTTPRawResponse response;
@@ -514,14 +489,15 @@ int QnMediaServerConnection::asyncRecordedTimePeriods(const QnRequestParamList &
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("RecordedTimePeriods"), QnRequestHeaderList(), params, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
-void QnMediaServerConnection::setProxyAddr(const QString& addr, int port)
+void QnMediaServerConnection::setProxyAddr(const QUrl& apiUrl, const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
+
     if (port)
-        QnNetworkProxyFactory::instance()->addToProxyList(m_mServer->getId().toString(), addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl, addr, port);
     else
-        QnNetworkProxyFactory::instance()->removeFromProxyList(m_mServer->getId().toString());
+        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl);
 }
 
 void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int) {
@@ -700,7 +676,7 @@ void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(cons
     QnPtzSpaceMapper mapper;
     if(response.status == 0) {
         QVariantMap map;
-        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "mapper", &mapper))
+        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "data", &mapper))
             status = 1;
     } else {
         qnWarning("Could not get ptz space mapper for camera: %1.", response.errorString);
@@ -709,3 +685,26 @@ void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(cons
     emit finished(status, mapper, handle);
 }
 
+int QnMediaServerConnection::asyncGetStorageSpace(QObject *target, const char *slot) {
+    detail::QnMediaServerStorageSpaceReplyProcessor *processor = new detail::QnMediaServerStorageSpaceReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QnStorageSpaceDataList &, int)), target, slot, Qt::QueuedConnection);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("storageSpace"), QnRequestHeaderList(), QnRequestParamList(), processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
+}
+
+
+void detail::QnMediaServerStorageSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse &response, int handle) {
+    const QByteArray& reply = response.data;
+    int status = response.status;
+
+    QnStorageSpaceDataList data;
+    if(response.status == 0) {
+        QVariantMap map;
+        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "data", &data))
+            status = 1;
+    } else {
+        qnWarning("Could not get storage spaces.", response.errorString);
+    }
+
+    emit finished(status, data, handle);
+}

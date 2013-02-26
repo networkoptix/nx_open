@@ -3,7 +3,9 @@
 #define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
 #include <GL/glext.h> /* Pull in all non-standard OpenGL defines. */
 
-#include <QMutex>
+#include <boost/preprocessor/stringize.hpp>
+
+#include <QtCore/QMutex>
 
 #include <utils/common/warnings.h>
 
@@ -125,7 +127,7 @@ public:
 
         bool status;
 #define RESOLVE(FUNCTION_TYPE, FUNCTION_NAME)                                   \
-        status &= resolve<FUNCTION_TYPE>(QN_STRINGIZE(FUNCTION_NAME), &QnGl::FUNCTION_NAME, &FUNCTION_NAME)
+        status &= resolve<FUNCTION_TYPE>(BOOST_PP_STRINGIZE(FUNCTION_NAME), &QnGl::FUNCTION_NAME, &FUNCTION_NAME)
 
         status = true;
         RESOLVE(PFNGLPROGRAMSTRINGARBPROC,              glProgramStringARB);
