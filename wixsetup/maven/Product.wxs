@@ -7,6 +7,7 @@
 		<Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
 		<?define arch = "${arch}"?>
+		<?define vmax = "${vmax}"?>
 
 		<?include ControlPanel.wxi ?>
 
@@ -626,7 +627,7 @@
 								<File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 							</Component>                            
 						</Directory>
-
+						
 						<Directory Id="${installer.customization}ProxyServerDir" Name="MediaProxy">
 							<Component Id="ProxyExecutable" Guid="{7BD9B32D-BE6E-417F-B301-E07657F09B35}">
 								<File Id="ProxyExe" Name="mediaproxy.exe" Source="${libdir}/bin/${build.configuration}/mediaproxy.exe" KeyPath="yes">
@@ -738,6 +739,28 @@
 							<Component Id="ServerSigar" Guid="{15E53052-24D8-4c7f-ACBB-2D404BE06A03}">
 								<File Id="ServerSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
 							</Component>
+							
+							<Directory Id="${installer.customization}VmaxDir" Name="VmaxProxy">
+								<Component Id="vmaxproxy.exe" Guid="{bba4418d-42db-4100-8712-a04d64886c9c}">
+									<File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="${libdir}/bin/${build.configuration}/vmaxproxy/vmaxproxy.exe" KeyPath="yes">
+										<fire:FirewallException Id="FirewallException${installer.customization}VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
+									</File>
+								</Component>
+							
+								<Component Id="VmaxProxyQTLibraries" Guid="1dd15ce6-ca14-48d1-ae72-d2b0194847f2">
+									<File Id="VmaxProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/QtCore$(var.suffix)4.dll"  />
+								</Component>
+							
+								<Component Id="VmaxProxySDK" Guid="{6f159b73-68e0-4709-a91f-ef341cd34be2}">
+									<File Id="VmaxProxyacscodecmr.dll" Name="acs_codec_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_codec_mr.dll"/>
+									<File Id="VmaxProxyacseventmr.dll" Name="acs_event_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_event_mr.dll"/>
+									<File Id="VmaxProxyacsexportmr.dll" Name="acs_export_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_export_mr.dll"/>
+									<File Id="VmaxProxyacspostprocessingmr.dll" Name="acs_post_processing_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_post_processing_mr.dll"/>
+									<File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_mr.dll"/>
+									<File Id="VmaxProxyPid.dat" Name="pid.dat" Source="${libdir}/bin/${build.configuration}/vmaxproxy/pid.dat"/>
+								</Component>                            
+							</Directory>
+						
 						</Directory>
 
 						<Directory Id="${installer.customization}ClientDir" Name="Client">
@@ -923,6 +946,16 @@
 			<ComponentRef Id="TrayToolOpenSSL"/>
 		</Feature>
 
+		<?if $(var.vmax) = true?>	
+			<Feature Id="VMaxFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
+				<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !VMaxFeature <> 3 ]]> </Condition>-->
+
+				<ComponentRef Id="vmaxproxy.exe"/>
+				<ComponentRef Id="VmaxProxyQTLibraries"/>
+				<ComponentRef Id="VmaxProxySDK"/>
+			</Feature>		
+		<?endif?>		
+		
 		<Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 			<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->

@@ -52,6 +52,8 @@ namespace conn_detail
         void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
         void finishedBusinessRule(int status, const QByteArray &errorString, QnBusinessEventRules businessRules, int handle);
         void finishedSetting(int status, const QByteArray& errorString, QnKvPairList settings, int handle);
+		void finishedTestEmailSettings(int status, const QByteArray& errorString, bool result, int handle);
+        void finishedSendEmail(int status, const QByteArray& errorString, bool result, int handle);
     private:
         QnResourceFactory& m_resourceFactory;
         QnApiSerializer& m_serializer;
@@ -94,8 +96,18 @@ public:
     int saveSync(const QnMediaServerResourcePtr&);
     int saveSync(const QnVirtualCameraResourcePtr&);
 
-    int sendEmail(const QString& to, const QString& subject, const QString& message);
-    int sendEmail(const QStringList& to, const QString& subject, const QString& message);
+	/**
+	  * Test if email settings are valid
+	  * 
+	  * Slot is (int status, const QByteArray& errorString, bool result, int handle),
+	  * where result is true if settings are valid
+	  * 
+	  * @return connection handle
+	  */
+	int testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot);
+
+    int sendEmailAsync(const QString& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
+    int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     qint64 getCurrentTime();
 
     // Asynchronous API
@@ -121,13 +133,13 @@ public:
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
     int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
+    int saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot);
 
     int saveAsync(const QnLayoutResourceList&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
-    int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
+    int addLicensesAsync(const QList<QnLicensePtr>& licenses, QObject* target, const char* slot);
 
     int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
     int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);
@@ -136,7 +148,8 @@ public:
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int deleteAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
+
+    int deleteRuleAsync(int ruleId, QObject* target, const char* slot);
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 

@@ -464,7 +464,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
                     setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
                     m_newLiveQuality = MEDIA_Quality_None;
                 }
-                else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
+                else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_ForceHigh) && !isSecondaryProvider) {
                     setLiveQualityInternal(m_newLiveQuality);
                     m_newLiveQuality = MEDIA_Quality_None;
                 }

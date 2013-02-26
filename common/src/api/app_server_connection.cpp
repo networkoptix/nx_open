@@ -11,6 +11,7 @@
 #include <business/actions/abstract_business_action.h>
 
 namespace {
+    // TODO: #Elric use enum and an enum->string conversion function.
     const QLatin1String cameraObject("camera");
     const QLatin1String resourceObject("resource");
     const QLatin1String serverObject("server");
@@ -29,6 +30,7 @@ namespace {
     const QLatin1String dumpdbObject("dumpdb");
     const QLatin1String restoredbObject("restoredb");
     const QLatin1String settingObject("setting");
+    const QLatin1String testEmailSettingsObject("testEmailSettings");
 }
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
@@ -169,6 +171,16 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedSetting(status, errorString, settings, handle);
+    } else if (m_objectName == testEmailSettingsObject) {
+        if (result != "OK")
+            errorString += result;
+
+        emit finishedTestEmailSettings(status, errorString, result == "OK", handle);
+    } else if (m_objectName == emailObject) {
+        if (result != "OK")
+            errorString += result;
+
+        emit finishedSendEmail(status, errorString, result == "OK", handle);
     }
 }
 
@@ -432,19 +444,16 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
         return saveAsync(user, target, slot);
     else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return saveAsync(layout, target, slot);
-    else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>())
-        return saveAsync(rule, target, slot);
-
     return 0;
 }
 
-int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject *target, const char *slot)
+int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, licenseObject);
     QObject::connect(processor, SIGNAL(finishedLicense(int, const QByteArray&, const QnLicenseList&, int)), target, slot);
 
     QByteArray data;
-    m_serializer.serializeLicense(license, data);
+    m_serializer.serializeLicenses(licenses, data);
 
     return addObjectAsync(licenseObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
@@ -911,9 +920,9 @@ int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObjec
     return deleteObjectAsync(layoutObject, layout->getId().toInt(), target, slot);
 }
 
-int QnAppServerConnection::deleteAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
+int QnAppServerConnection::deleteRuleAsync(int ruleId, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(businessRuleObject, rule->getId().toInt(), target, slot);
+    return deleteObjectAsync(businessRuleObject, ruleId, target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {
@@ -925,8 +934,6 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
         return deleteAsync(user, target, slot);
     } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         return deleteAsync(layout, target, slot);
-    } else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>()) {
-        return deleteAsync(rule, target, slot);
     } else {
         qWarning() << "Cannot delete resources of type" << resource->metaObject()->className();
         return 0;
@@ -945,27 +952,31 @@ qint64 QnAppServerConnection::getCurrentTime()
     return response.data.toLongLong();
 }
 
-int QnAppServerConnection::sendEmail(const QString& addr, const QString& subject, const QString& message)
+int QnAppServerConnection::testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot)
 {
-    return sendEmail(QStringList() << addr, subject, message);
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, testEmailSettingsObject);
+    QObject::connect(processor, SIGNAL(finishedTestEmailSettings(int, const QByteArray&, bool, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serializeSettings(settings, data);
+
+    return addObjectAsync(testEmailSettingsObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
-int QnAppServerConnection::sendEmail(const QStringList& to, const QString& subject, const QString& message)
+int QnAppServerConnection::sendEmailAsync(const QString& addr, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot)
 {
-    QnRequestParamList requestParams(m_requestParams);
+    return sendEmailAsync(QStringList() << addr, subject, message, timeout, target, slot);
+}
 
-    QnHTTPRawResponse response;
-    QByteArray body;
-    m_serializer.serializeEmail(to, subject, message, body);
-    int status = QnSessionManager::instance()->sendPostRequest(m_url,emailObject, QnRequestHeaderList(), requestParams, body, response);
+int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, emailObject);
+    QObject::connect(processor, SIGNAL(finishedSendEmail(int, const QByteArray&, bool, int)), target, slot);
 
-    if (status == 0) {
-        return 0;
-    } else {
-        m_lastError = response.errorString;
-        qWarning() << "Can't send email " << m_lastError;
-        return status;
-    }
+    QByteArray data;
+    m_serializer.serializeEmail(to, subject, message, timeout, data);
+
+    return addObjectAsync(emailObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

@@ -8,8 +8,8 @@
 #include <QtCore/QDateTime>
 
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/common/magnitude.h>
-#include <ui/common/linear_combination.h>
+#include <utils/math/magnitude.h>
+#include <utils/math/linear_combination.h>
 
 #include "kinetic_process_handler.h"
 

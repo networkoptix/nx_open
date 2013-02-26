@@ -34,7 +34,7 @@ public:
     static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
-    void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
+    //void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
     void setMarker(int marker);
 
     // jump to frame directly ignoring start of GOP
@@ -74,6 +74,9 @@ public:
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
+    
+    /* Return true if archvie range is accessible immedeatly without opening an archive */
+    bool offlineRangeSupported() const;
 protected:
     virtual bool init();
 

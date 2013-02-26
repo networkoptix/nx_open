@@ -44,6 +44,9 @@ namespace BusinessEventType
          */
         BE_Count = BE_NotDefined,
 
+        /** System health message. */
+        BE_SystemHealthMessage = 500,
+
         /** Base index for the user defined events. */
         BE_UserDefined = 1000
 

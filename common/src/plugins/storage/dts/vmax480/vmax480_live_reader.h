@@ -3,15 +3,17 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "core/resource/resource_fwd.h"
-#include "acs_stream_source.h"
+#include "vmax480_stream_fetcher.h"
 
-class ACS_stream_source;
+class QnVMax480ConnectionProcessor;
 
-class QnVMax480LiveProvider: public CLServerPushStreamreader
+class QnVMax480LiveProvider: public CLServerPushStreamreader, public VMaxStreamFetcher
 {
 public:
     QnVMax480LiveProvider(QnResourcePtr dev );
     virtual ~QnVMax480LiveProvider();
+
+    virtual void onGotData(QnAbstractMediaDataPtr mediaData) override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;
@@ -21,28 +23,14 @@ protected:
 
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
-private:
-    static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
-    static void receiveVideoStramCallback(PS_ACS_VIDEO_STREAM _stream, long long _user);
-    static void receiveResultCallback(PS_ACS_RESULT _result, long long _user);
+    virtual void beforeRun() override;
+    virtual void afterRun() override;
 
-    void receiveVideoStream(PS_ACS_VIDEO_STREAM _stream);
-    void receiveResult(PS_ACS_RESULT _result);
-    void receiveAudioStream(PS_ACS_AUDIO_STREAM _stream);
-    QDateTime fromNativeTimestamp(int mDate, int mTime, int mMillisec);
 private:
-    ACS_stream_source *m_ACSStream;
     QnNetworkResourcePtr m_networkRes;
     bool m_connected;
-    int m_spsPpsWidth;
-    int m_spsPpsHeight;
-    quint8 m_spsPpsBuffer[128];
-    int m_spsPpsBufferLen;
-
-    QMutex m_callbackMutex;
-    QWaitCondition m_callbackCond;
-    bool m_connectedInternal;
     CLDataQueue m_internalQueue;
+    //QnVMax480ConnectionProcessor* m_processor;
 };
 
 #endif //vmax480_live_h_1740

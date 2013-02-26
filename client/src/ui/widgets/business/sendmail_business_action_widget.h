@@ -24,7 +24,6 @@ protected slots:
 
 private slots:
     void at_settingsButton_clicked();
-    void at_selectButton_clicked();
     void paramsChanged();
 
 private:

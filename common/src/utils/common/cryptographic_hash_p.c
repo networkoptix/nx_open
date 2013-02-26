@@ -7,6 +7,7 @@
 #undef HASH_TRANSFORM
 #undef HASH_FINAL
 #undef HASH_BLOCK_DATA_ORDER
+#undef HASH_MAKE_STRING
 #undef G
 #undef R0
 #undef R1
@@ -23,6 +24,7 @@
 #undef HASH_TRANSFORM
 #undef HASH_FINAL
 #undef HASH_BLOCK_DATA_ORDER
+#undef HASH_MAKE_STRING
 #undef G
 #undef R0
 #undef R1

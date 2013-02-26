@@ -1,8 +1,8 @@
 #include "workbench_ptz_controller.h"
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 
 #include <api/media_server_connection.h>
 

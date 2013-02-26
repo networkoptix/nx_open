@@ -7,7 +7,7 @@
 
 #include "ui/style/globals.h"
 #include "utils/settings.h"
-#include "ui/common/color_transformations.h"
+#include "utils/math/color_transformations.h"
 
 namespace {
 

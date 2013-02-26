@@ -97,16 +97,14 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
 
 
-
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    QnId typeId = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!typeId.isValid())
         return QList<QnResourcePtr>();
 
-    QnNetworkResourcePtr resource ( new QnPlAxisResource() );
-
-    resource->setTypeId(rt);
+    QnPlAxisResourcePtr resource(new QnPlAxisResource());
+    resource->setTypeId(typeId);
     resource->setName(name);
-    (resource.dynamicCast<QnPlAxisResource>())->setModel(name);
+    resource->setModel(name);
     resource->setMAC(mac);
     resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);

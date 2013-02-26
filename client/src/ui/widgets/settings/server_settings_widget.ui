@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>SMTP</string>
+      <string>Outgoing E-Mail Settings</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -36,7 +36,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>System Configuration Backup</string>
+      <string>System Configuration Backup and Restore</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>

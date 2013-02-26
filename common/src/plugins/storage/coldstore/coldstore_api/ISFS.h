@@ -122,7 +122,7 @@ namespace Veracity
 							  bool return_first_ms,
 							  u32 string_start,
 							  u32 string_length,
-							  char* file_name,
+                              const char* file_name,
 							  u32 channel,
 							  bool use_channel,
 							  u32 limit,

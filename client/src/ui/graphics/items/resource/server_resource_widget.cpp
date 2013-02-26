@@ -2,7 +2,8 @@
 
 #include <iterator> /* For std::advance. */
 
-#include <utils/common/math.h> /* For M_PI. */
+#include <utils/math/math.h> /* For M_PI. */
+#include <utils/math/color_transformations.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>

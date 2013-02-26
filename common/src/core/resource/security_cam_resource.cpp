@@ -119,6 +119,12 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         return result;
 
     }
+    else if (role == QnResource::Role_Archive) {
+        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
+        if (result)
+            return result;
+    }
+
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;

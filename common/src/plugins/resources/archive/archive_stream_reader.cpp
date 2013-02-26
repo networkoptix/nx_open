@@ -208,7 +208,8 @@ bool QnArchiveStreamReader::init()
     qint64 requiredJumpTime = m_requiredJumpTime;
 	MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode)
+    bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
+    if (imSeek && (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode))
     {
         // It is optimization: open and jump at same time
         while (1)
@@ -244,6 +245,11 @@ bool QnArchiveStreamReader::init()
         emit slowSourceHint();
 
     return true;
+}
+
+bool QnArchiveStreamReader::offlineRangeSupported() const
+{
+    return m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineRange;
 }
 
 qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
@@ -384,6 +390,8 @@ begin_label:
         m_oldQualityFastSwitch = qualityFastSwitch;
     }
 
+    m_dataMarker = m_newDataMarker;
+
     m_jumpMtx.unlock();
 
     // change quality checking
@@ -479,7 +487,6 @@ begin_label:
         if (jumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(displayTime);
     }
-    m_dataMarker = m_newDataMarker;
 
     if (m_outOfPlaybackMask)
         return createEmptyPacket(reverseMode); // EOF reached
@@ -946,6 +953,7 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
     channeljumpToUnsync(mksec, 0, mksec);
 }
 
+/*
 void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int marker)
 {
     bool useMutex = !m_externalLocked;
@@ -958,6 +966,7 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int ma
     if (useMutex)
         m_jumpMtx.unlock();
 }
+*/
 
 void QnArchiveStreamReader::setMarker(int marker)
 {
@@ -998,17 +1007,25 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         skipTime = 0;
 
 
-    m_jumpMtx.lock();
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
+
     bool needJump = newTime != m_lastJumpTime || m_lastSkipTime != skipTime;
     m_lastJumpTime = newTime;
     m_lastSkipTime = skipTime;
-    m_jumpMtx.unlock();
+
+    if(useMutex)
+        m_jumpMtx.unlock();
 
     if (needJump)
     {
-        QMutexLocker mutex(&m_jumpMtx);
+        if (useMutex)
+            m_jumpMtx.lock();
         beforeJumpInternal(newTime);
         channeljumpToUnsync(newTime, 0, skipTime);
+        if (useMutex)
+            m_jumpMtx.unlock();
     }
 
     //start(QThread::HighPriority);

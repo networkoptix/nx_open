@@ -43,6 +43,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMotion;
+    m_flags |= Flag_CanSeekImmediatly;
 
     if (reader)
         connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
@@ -824,7 +825,9 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_qualityFastSwitch = fastSwitch;
 
     QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
-    if (quality == MEDIA_Quality_High)
+    if (quality == MEDIA_Quality_ForceHigh)
+        value = "force-high";
+    else if (quality == MEDIA_Quality_High)
         value = "high";
     else
         value = "low";

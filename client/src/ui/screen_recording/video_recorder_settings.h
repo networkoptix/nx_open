@@ -10,7 +10,7 @@
 namespace Qn {
     enum CaptureMode { 
         FullScreenMode, 
-        FullScreenNoeroMode, 
+        FullScreenNoAeroMode,
         WindowMode 
     };
 

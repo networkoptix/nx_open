@@ -90,6 +90,11 @@ QnMessageSource::~QnMessageSource() {
     return;
 }
 
+void QnMessageSource::setAuthKey(const QString& authKey)
+{
+	m_authKey = authKey;
+}
+
 void QnMessageSource::stop()
 {
     emit stopped();
@@ -111,6 +116,9 @@ void QnMessageSource::startRequest()
 
     QNetworkRequest request(m_url);
     request.setRawHeader("Authorization", "Basic " + m_url.userInfo().toLatin1().toBase64());
+	if (!m_authKey.isEmpty())
+		request.setRawHeader("X-NetworkOptix-AuthKey", m_authKey.toLatin1());
+
     m_reply = m_manager.post(request, "");
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));

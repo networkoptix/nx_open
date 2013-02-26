@@ -81,6 +81,7 @@
 #include "plugins/storage/dts/vmax480/vmax480_resource_searcher.h"
 #include "business/events/reasoned_business_event.h"
 #include "rest/handlers/favico_handler.h"
+#include "rest/handlers/storage_space_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -260,10 +261,10 @@ static QStringList listRecordFolders()
 {
     QStringList folderPaths;
 
+#ifdef Q_OS_WIN
     QString maxFreeSpaceDrive;
     int maxFreeSpace = 0;
 
-#ifdef Q_OS_WIN
     foreach (QFileInfo drive, QDir::drives()) {
         if (!drive.isWritable())
             continue;
@@ -516,7 +517,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("proxyAuthKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -708,8 +709,9 @@ void QnMain::initTcpListener()
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true));
+    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true)); // TODO: deprecated
     QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
@@ -794,21 +796,11 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     // Create SessionManager
-    QnSessionManager* sm = QnSessionManager::instance();
-
-    QThread *thread = new QThread();
-    sm->moveToThread(thread);
-
-    QThread *connectorThread = new QThread();
+    QnSessionManager::instance()->start();
+    
+    QThread *connectorThread = new QThread(); // TODO: #Elric leaking thread
     qnBusinessRuleConnector->moveToThread(connectorThread);
-
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-    QObject::connect(connectorThread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-    thread->start();
     connectorThread->start();
-    sm->start();
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
     initAppServerConnection(qSettings);
@@ -958,7 +950,11 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+
+#ifdef Q_OS_WIN
+    if (QString(QN_CUSTOMIZATION_NAME) == "digitalwatchdog")
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+#endif
 
     //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
@@ -1038,12 +1034,16 @@ public:
     }
 
 protected:
-    void start()
+    virtual int executeApplication() override { 
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+
+        return application()->exec();
+    }
+
+    virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
-
-        new QnPlatformAbstraction(application);
-        new QnMediaServerModule(m_argc, m_argv, application);
 
         QString guid = serverGuid();
         if (guid.isEmpty())
@@ -1064,7 +1064,7 @@ protected:
         m_main.start();
     }
 
-    void stop()
+    virtual void stop() override
     {
         m_main.exit();
         m_main.wait();

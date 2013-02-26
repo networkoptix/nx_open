@@ -5,7 +5,7 @@
 #include <QtCore/QHash>
 #include <QtGui/QVector3D>
 
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 
 #include <core/resource/resource_fwd.h>
 

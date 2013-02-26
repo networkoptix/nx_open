@@ -2,7 +2,7 @@
 #define QN_WORKBENCH_UTILITY_H
 
 #include <ui/common/geometry.h>
-#include <ui/common/magnitude.h>
+#include <utils/math/magnitude.h>
 #include <cmath>
 #include "workbench_grid_mapper.h"
 

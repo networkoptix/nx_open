@@ -178,7 +178,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
         QAuthenticator auth;
         auth.setUser(QLatin1String("admin"));
 
-        for (int i = 0; i < 16; ++i)
+        for (int i = 0; i < 8; ++i)
         {
             QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);

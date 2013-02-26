@@ -19,6 +19,8 @@ public:
 
     virtual QList<HddLoad> totalHddLoad() override;
 
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
+
 private:
     Q_DECLARE_PRIVATE(QnSigarMonitor);
     QScopedPointer<QnSigarMonitorPrivate> d_ptr;

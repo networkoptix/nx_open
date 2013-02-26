@@ -202,7 +202,7 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
-        QnResourcePtr resource,
+        const QnResourcePtr &resource,
         const QString& inputPortID,
         bool value,
         qint64 timestamp);
@@ -244,8 +244,6 @@ private:
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
-
-    void save();
 
     int round(float value);
     QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;

@@ -85,4 +85,5 @@ message InitialMessage {
     repeated License license = 3;
     repeated CameraServerItem cameraServerItem = 4;
     optional string hardwareId = 5;
+    optional string oldHardwareId = 6;
 }

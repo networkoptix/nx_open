@@ -3,7 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include <utils/common/warnings.h>
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/time.h>
 
 

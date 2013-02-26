@@ -11,10 +11,9 @@
 #include <utils/common/property_storage.h>
 #include <utils/common/software_version.h>
 
-#include <ui/workbench/workbench_state.h>
-
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>
+#include <client/client_model_types.h>
 
 class QSettings;
 
@@ -33,6 +32,7 @@ public:
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
         USER_WORKBENCH_STATES,
+        SERVER_STORAGE_STATES,
 
         LAST_DATABASE_BACKUP_DIR,
 
@@ -62,7 +62,8 @@ public:
 
         DEV_MODE,
 
-        SHOWN_POPUPS,
+        POPUP_BUSINESS_EVENTS,
+        POPUP_SYSTEM_HEALTH,
 
         VARIABLE_COUNT
     };
@@ -74,6 +75,12 @@ public:
 
     void load();
     void save();
+
+    /**
+     * @brief isWritable    Check if settings storage is available for writing.
+     * @return              True if settings can be saved.
+     */
+    bool isWritable() const;
 
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
@@ -97,6 +104,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
         QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateHash,    userWorkbenchStates,    setUserWorkbenchStates,     USER_WORKBENCH_STATES,      QnWorkbenchStateHash())
+        QN_DECLARE_RW_PROPERTY(QnServerStorageStateHash,serverStorageStates,    setServerStorageStates,     SERVER_STORAGE_STATES,      QnServerStorageStateHash())
         QN_DECLARE_R_PROPERTY (QnConnectionData,        defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
@@ -111,7 +119,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_RW_PROPERTY(bool,                    isDevMode,              setDevMode,                 DEV_MODE,                   false)
-        QN_DECLARE_RW_PROPERTY(quint64,                 shownPopups,            setShownPopups,             SHOWN_POPUPS,               0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(quint64,                 popupBusinessEvents,    setPopupBusinessEvents,     POPUP_BUSINESS_EVENTS,      0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(quint64,                 popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
     QN_END_PROPERTY_STORAGE()
 
 private:

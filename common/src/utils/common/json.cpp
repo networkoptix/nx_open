@@ -27,6 +27,30 @@ bool QJson_detail::deserialize_json(const QByteArray &value, QVariant *target) {
     return true;
 }
 
+void serialize(const QUuid &value, QVariant *target) {
+    *target = value.toString();
+}
+
+bool deserialize(const QVariant &value, QUuid *target) {
+    /* Support JSON null for QUuid, even though we don't generate it on
+     * serialization. */
+    if(value.type() == QVariant::Invalid) {
+        *target = QUuid();
+        return true;
+    }
+
+    if(value.type() != QVariant::String)
+        return false;
+
+    QString string = value.toString();
+    QUuid result(string);
+    if(result.isNull() && string != QLatin1String("00000000-0000-0000-0000-000000000000") && string != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
+        return false;
+
+    *target = result;
+    return true;
+}
+
 void serialize(const QVariant &value, QVariant *target) {
     switch(value.userType()) {
     case QVariant::Invalid:         *target = QVariant(); break;

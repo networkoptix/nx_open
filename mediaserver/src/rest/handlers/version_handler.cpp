@@ -20,9 +20,8 @@ int QnVersionHandler::executePost(const QString& path, const QnRequestParamList&
     return executeGet(path, params, result, contentType);
 }
 
-QString QnVersionHandler::description(TCPSocket* tcpSocket) const
+QString QnVersionHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Returns server version";
     return rez;

@@ -5,8 +5,17 @@
 #include "api/session_manager.h"
 #include "utils/common/sleep.h"
 
-QnLocalMediaServerResource::QnLocalMediaServerResource()
-    : QnResource()
+class QnMediaServerResourceGuard: public QObject {
+public:
+    QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
+
+private:
+    QnMediaServerResourcePtr m_resource;
+};
+
+
+QnLocalMediaServerResource::QnLocalMediaServerResource(): 
+    QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
@@ -24,7 +33,8 @@ QString QnLocalMediaServerResource::getUniqueId() const
 
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
-    m_panicMode(PM_None)
+    m_panicMode(PM_None),
+    m_guard(NULL)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -36,7 +46,7 @@ QnMediaServerResource::QnMediaServerResource():
 
 QnMediaServerResource::~QnMediaServerResource()
 {
-    //delete m_rtspListener;
+    QMutexLocker lock(&m_mutex); // TODO: #Elric remove once m_guard hell is removed.
 }
 
 QString QnMediaServerResource::getUniqueId() const
@@ -143,16 +153,24 @@ private:
 
 void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
 {
+    QMutexLocker lock(&m_mutex);
+
+    QString urlStr = m_runningIfRequests.value(responseNum);
     QByteArray guid = getGuid().toUtf8();
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
         // server OK
-        QString urlStr = m_runningIfRequests.value(responseNum);
         if (urlStr == QLatin1String("proxy"))
             setPrimaryIF(urlStr);
         else
             setPrimaryIF(QUrl(urlStr).host());
-        m_runningIfRequests.remove(responseNum);
+    }
+
+    m_runningIfRequests.remove(responseNum);
+
+    if(m_runningIfRequests.isEmpty() && m_guard) {
+        m_guard->deleteLater();
+        m_guard = NULL;
     }
 }
 
@@ -163,6 +181,8 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
         return;
     m_primaryIFSelected = true;
     
+    QUrl origApiUrl = getApiUrl();
+
     if (primaryIF != QLatin1String("proxy"))
     {
         QUrl apiUrl(getApiUrl());
@@ -175,7 +195,7 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     }
 
     m_primaryIf = primaryIF;
-    emit serverIfFound(::toSharedPointer(this), primaryIF);
+    emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
 }
 
 QString QnMediaServerResource::getPrimaryIF() const 
@@ -227,10 +247,26 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 
     // send request via proxy (ping request always send directly, other request are sent via proxy here)
-    QnSleep::msleep(5); // send request slighty latter to preffer direct connect
+    QTimer *timer = new QTimer();
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
+    connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
+    timer->start(5); // send request slighty later to preffer direct connect // TODO: #Elric still bad, implement properly
+    timer->moveToThread(qApp->thread());
+
+    m_runningIfRequests.insert(-1, QString());
+
+    if(!m_guard) {
+        m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
+        m_guard->moveToThread(qApp->thread());
+    }
+}
+
+void QnMediaServerResource::determineOptimalNetIF_testProxy() {
+    QMutexLocker lock(&m_mutex);
+    m_runningIfRequests.remove(-1);
     int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
     m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
-
 }
 
 void QnMediaServerResource::updateInner(QnResourcePtr other) 
