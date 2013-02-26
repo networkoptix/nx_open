@@ -183,7 +183,7 @@
 					<artifactId>vmax-integration</artifactId>
 					<version>1.0-SNAPSHOT</version>
 					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
+					<classifier>${platform}-x86</classifier>
 				</dependency>				
 				<!--<dependency>
 					<groupId>org.ffmpeg</groupId>
