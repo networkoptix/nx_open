@@ -430,14 +430,13 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     bool needToAsk = false;
     QnLayoutResourceList saveableResources, rollbackResources;
     foreach(const QnLayoutResourcePtr &resource, resources) {
-        bool changed, saveable, askable;
+        bool changed, saveable;
 
         Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
-        askable = flags == (Qn::ResourceIsChanged | Qn::ResourceIsLocal); /* Changed, local, not being saved. */
         changed = flags & Qn::ResourceIsChanged;
         saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
-        if(askable && saveable)
+        if(changed && saveable)
             needToAsk = true;
 
         if(changed) {
