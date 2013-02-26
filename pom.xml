@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.2-SNAPSHOT</version>
+	<version>1.4.2</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
@@ -18,18 +18,9 @@
 			<url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>	
-
+	
 	<properties>
-		<release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-		<appserver.name>Enterprise Controller</appserver.name>
-		<client.name>${company.name} ${product.name} Client</client.name>
-		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
-		<mediaserver.name>${company.name} Media Server</mediaserver.name>
-		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
-		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
-		<testcamera.name>${company.name} Test Camera</testcamera.name>
-		<traytool.name>${product.name} Tray Assistant</traytool.name>	
-		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
+        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
@@ -59,10 +50,10 @@
 		<module>build-environment</module>
 		<module>appserver</module>
 		<module>common</module>
-		<module>mediaproxy</module>
-		<module>testcamera</module>
 		<module>mediaserver</module>
+		<module>mediaproxy</module>
 		<module>client</module>		
+		<module>testcamera</module>
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -144,20 +135,6 @@
 
 	<profiles>
 		<profile>
-			<id>vmax</id>
-			<activation>
-				<property>
-					<name>vmax</name>
-					<value>true</value>
-				</property>	 			
-			</activation>
-
-			<modules>
-				<module>vmaxproxy</module>
-			</modules>
-		</profile>	
-
-		<profile>
 			<id>windows</id>
 			<activation>
 				<os>
@@ -190,7 +167,7 @@
 									<goal>unpack-dependencies</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${libdir}</outputDirectory>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 									<skip>${unpack.skip}</skip>
 								</configuration>
 							</execution>
@@ -207,7 +184,7 @@
 				</os> 
 			</activation>
 			<modules>
-				<!--<module>xvbadecoder</module>-->
+			  <!--<module>xvbadecoder</module>-->
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
@@ -253,7 +230,7 @@
 				<module>android-client/protobuf-classes</module>
 				<module>android-client/android-main</module>
 			</modules>
-		</profile>		
+		</profile>			
 	</profiles>	
 </project>
 
