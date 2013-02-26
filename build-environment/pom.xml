@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.2</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.2</version>
+	<version>1.4.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>build-environment</artifactId>
 	<packaging>pom</packaging>
@@ -152,7 +152,7 @@
 		</plugins>		
 	</build>
 	<profiles>
-		<profile>
+		<!--<profile>
 			<id>vmax</id>
 			<activation>
 				<property>
@@ -169,7 +169,7 @@
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>	
 			</dependencies>				
-		</profile>	
+		</profile>	-->
 		<profile>
 			<id>windows</id>
 			<activation>
@@ -178,6 +178,13 @@
 				</os>
 			</activation>
 			<dependencies>
+				<dependency>
+					<groupId>com.digitalwatchdog.dvr</groupId>
+					<artifactId>vmax-integration</artifactId>
+					<version>1.0-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-x86</classifier>
+				</dependency>				
 				<!--<dependency>
 					<groupId>org.ffmpeg</groupId>
 					<artifactId>ffmpeg-misc-headers-win32</artifactId>
