@@ -13,3 +13,13 @@ win32 {
 mac {
   DEFINES += QN_EXPORT= 
 }
+
+CONFIG(debug, debug|release) {
+  LIBS -= -LC:\\develop\\buildenv/qt/bin/x64/debug
+  LIBS += -LC:\\develop\\buildenv/qt/bin/x86/debug  
+}
+
+CONFIG(release, debug|release) {
+  LIBS -= -LC:\\develop\\buildenv/qt/bin/x64/release
+  LIBS += -LC:\\develop\\buildenv/qt/bin/x86/release  
+}
