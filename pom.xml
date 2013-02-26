@@ -143,7 +143,8 @@
 			</activation>
 			<modules>
 				<module>quicksyncdecoder</module>	
-				<module>traytool</module>	
+				<module>traytool</module>
+				<module>vmaxproxy</module>	
 				<module>wixsetup</module>
 			</modules>
 			<properties>
