@@ -2,12 +2,18 @@
 #define vmax480_resource_searcher_h_1806
 
 #include "core/resource_managment/resource_searcher.h"
+#include "utils/network/nettools.h"
+
+
 
 class QnPlVmax480ResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     QnPlVmax480ResourceSearcher();
 
 public:
+
+    ~QnPlVmax480ResourceSearcher();
+
     static QnPlVmax480ResourceSearcher& instance();
 
     QnResourceList findResources(void);
@@ -18,6 +24,9 @@ public:
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
+private:
+    QMap<QString, QUdpSocket*> m_socketList;
+    QUdpSocket* sockByName(const QnInterfaceAndAddr& iface);
 
 };
 
