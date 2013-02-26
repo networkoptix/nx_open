@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>help</artifactId>
-			<version>${project.version}-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>zip</type>
 			<classifier>${customization}</classifier>
 		</dependency>
