@@ -525,7 +525,16 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
 }
 
 void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
-    m_dropResources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+
+    QnResourceList media = resources.filtered<QnMediaResource>();
+    QnResourceList layouts = resources.filtered<QnLayoutResource>();
+    QnResourceList servers = resources.filtered<QnMediaServerResource>();
+
+    m_dropResources = media;
+    m_dropResources << layouts;
+    m_dropResources << servers;
+
     if (m_dropResources.empty())
         return;
 
