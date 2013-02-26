@@ -26,11 +26,11 @@ static int isFullMessage(quint8* data, int msgLen)
     if (msgLen < 6)
         return 0;
 
-    const QByteArray message = QByteArray::fromRawData((const char*)data + 6, msgLen -6);
+    const QByteArray message = QByteArray::fromRawData((const char*)data + 4, msgLen - 4);
     int eofIdx = message.indexOf("\n\n");
     if (eofIdx == -1)
         return 0;
-    return eofIdx + 2 + 6;
+    return eofIdx + 2 + 4;
 }
 
 int main(int argc, char* argv[])

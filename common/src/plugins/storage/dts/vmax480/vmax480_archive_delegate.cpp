@@ -149,4 +149,5 @@ void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
 void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     m_reverseMode = value;
+    seek(displayTime, true);
 }

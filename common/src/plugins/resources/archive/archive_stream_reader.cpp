@@ -59,8 +59,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_pausedStart(false),
     m_sendMotion(false),
     m_prevSendMotion(false),
-    m_outOfPlaybackMask(false),
-    m_jumpMtx(QMutex::Recursive)
+    m_outOfPlaybackMask(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -209,14 +208,12 @@ bool QnArchiveStreamReader::init()
     qint64 requiredJumpTime = m_requiredJumpTime;
 	MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode)
+    bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
+    if (imSeek && (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode))
     {
         // It is optimization: open and jump at same time
         while (1)
         {
-            if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
-                m_delegate->open(m_resource);
-
 			m_delegate->setQuality(quality, true);
             qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
             bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
@@ -1010,17 +1007,25 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         skipTime = 0;
 
 
-    m_jumpMtx.lock();
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
+
     bool needJump = newTime != m_lastJumpTime || m_lastSkipTime != skipTime;
     m_lastJumpTime = newTime;
     m_lastSkipTime = skipTime;
-    m_jumpMtx.unlock();
+
+    if(useMutex)
+        m_jumpMtx.unlock();
 
     if (needJump)
     {
-        QMutexLocker mutex(&m_jumpMtx);
+        if (useMutex)
+            m_jumpMtx.lock();
         beforeJumpInternal(newTime);
         channeljumpToUnsync(newTime, 0, skipTime);
+        if (useMutex)
+            m_jumpMtx.unlock();
     }
 
     //start(QThread::HighPriority);
