@@ -152,7 +152,7 @@
 		</plugins>		
 	</build>
 	<profiles>
-		<profile>
+		<!--<profile>
 			<id>vmax</id>
 			<activation>
 				<property>
@@ -169,7 +169,7 @@
 					<classifier>${platform}-${arch}</classifier>
 				</dependency>	
 			</dependencies>				
-		</profile>	
+		</profile>	-->
 		<profile>
 			<id>windows</id>
 			<activation>
@@ -178,6 +178,13 @@
 				</os>
 			</activation>
 			<dependencies>
+				<dependency>
+					<groupId>com.digitalwatchdog.dvr</groupId>
+					<artifactId>vmax-integration</artifactId>
+					<version>1.0-SNAPSHOT</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>				
 				<!--<dependency>
 					<groupId>org.ffmpeg</groupId>
 					<artifactId>ffmpeg-misc-headers-win32</artifactId>
