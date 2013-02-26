@@ -54,7 +54,6 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->portComboBox,           SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
-    connect(ui->portComboBox,           SIGNAL(editTextChanged(QString)),   this,   SLOT(at_portComboBox_editTextChanged(QString)));
     connect(ui->advancedCheckBox,       SIGNAL(toggled(bool)),              this,   SLOT(at_advancedCheckBox_toggled(bool)));
     connect(ui->simpleEmailLineEdit,    SIGNAL(textChanged(QString)),       this,   SLOT(at_simpleEmail_textChanged(QString)));
     connect(ui->testButton,             SIGNAL(clicked()),                  this,   SLOT(at_testButton_clicked()));
