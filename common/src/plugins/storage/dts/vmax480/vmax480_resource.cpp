@@ -121,7 +121,7 @@ void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 bool QnPlVmax480Resource::initInternal()
 {
 
-    Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability | Qn::DtsBasedCapability | Qn::AnalogCapability;
+    Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
 

@@ -383,6 +383,11 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
         ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
         ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+
+        bool dtsBased = camera()->isDtsBased();
+        ui->recordingTab->setEnabled(!dtsBased);
+        ui->motionTab->setEnabled(!dtsBased);
+        ui->advancedTab->setEnabled(!dtsBased);
     }
 
     updateMotionWidgetFromResource();

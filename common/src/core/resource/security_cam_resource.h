@@ -66,6 +66,8 @@ public:
     const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
+    bool isDtsBased() const;
+
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
 
@@ -74,6 +76,7 @@ public:
 
 
     Qn::CameraCapabilities getCameraCapabilities() const;
+    bool hasCameraCapabilities(Qn::CameraCapabilities capabilities) const;
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
