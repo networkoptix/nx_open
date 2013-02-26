@@ -13,7 +13,7 @@ QnPlVmax480Resource::QnPlVmax480Resource():
     m_chunkReader(0),
     m_chunksReady(false)
 {
-    addFlags(dts_storage);
+    addFlags(dts_storage | analog_camera);
 }
 
 QnPlVmax480Resource::~QnPlVmax480Resource()
