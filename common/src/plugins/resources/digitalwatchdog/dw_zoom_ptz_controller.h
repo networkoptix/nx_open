@@ -7,7 +7,7 @@
 class QnDwZoomPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
-    QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource);
+    QnDwZoomPtzController(QnPlWatchDogResource* resource);
     virtual ~QnDwZoomPtzController();
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
@@ -18,7 +18,7 @@ public:
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
 private:
-    QnPlWatchDogResourcePtr m_resource;
+    QnPlWatchDogResource* m_resource;
 };
 
 

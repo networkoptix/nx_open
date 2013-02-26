@@ -12,7 +12,7 @@ class QnPtzSpaceMapper;
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
-    QnAbstractPtzController(const QnResourcePtr &resource);
+    QnAbstractPtzController(QnResource* resource);
     virtual ~QnAbstractPtzController();
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
@@ -22,8 +22,8 @@ public:
     virtual Qn::CameraCapabilities getCapabilities() = 0;
     virtual const QnPtzSpaceMapper *getSpaceMapper() = 0;
 
-    bool calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
-    void getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);
+    //bool calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
+    //void getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);
 
     static bool calibrate(QnVirtualCameraResourcePtr res, qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
     static void getCalibrate(QnVirtualCameraResourcePtr res, qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);
@@ -33,7 +33,7 @@ public:
     qreal getZoomVelocityCoeff() const;
 
 private:
-    QnVirtualCameraResourcePtr m_resource; // TODO: #VASILENKO why not QnSecurityCamResource?
+    QnSecurityCamResource* m_resource;
 };
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H
