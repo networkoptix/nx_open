@@ -179,7 +179,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         // Unknown error(530, 'Access denied')
         // Unknown error(535, '5.7.1 Username and Password not accepted. Learn more at\n5.7.1 http://support.google.com/mail/bin/answer.py?answer=14257 fz10sm351687lbb.12 - gsmtp')
         if (result != "OK")
-            errorString += result;
+            errorString = result;
 
         emit finishedTestEmailSettings(status, errorString, result == "OK", handle);
     } else if (m_objectName == emailObject) {

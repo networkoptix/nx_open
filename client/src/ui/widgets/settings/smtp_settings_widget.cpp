@@ -184,7 +184,7 @@ void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteA
             ? tr("Error while testing settings")
             : result
               ? tr("Success")
-              : tr("Error")
+              : tr("Error") + QString::fromLatin1(errorString)
                 );
     //TODO: #GDM error string?
 }
