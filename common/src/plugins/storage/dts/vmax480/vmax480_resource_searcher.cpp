@@ -1,20 +1,25 @@
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
+#include "utils/common/sleep.h"
 
-struct Vmax480Box
-{
-    QString ip;
-    QString login;
-    QString pass;
 
-    int videoPort;
-    int eventPort;
-};
+extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
+
+extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
+
+QHostAddress groupAddress(QLatin1String("239.255.255.250"));
+
 
 //====================================================================
 QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher()
 {
 
+}
+
+QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
+{
+    foreach(QUdpSocket* sock, m_socketList)
+        delete sock;
 }
 
 QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
@@ -23,6 +28,123 @@ QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
     return inst;
 }
 
+QUdpSocket* QnPlVmax480ResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
+{
+    QMap<QString, QUdpSocket*>::iterator it = m_socketList.find(iface.address.toString());
+    if (it == m_socketList.end())
+    {
+        QUdpSocket* sock = new QUdpSocket();
+        if (!bindToInterface(*sock, iface,1900, QUdpSocket::ReuseAddressHint))
+        {
+            delete sock;
+            return 0;
+        }
+
+        if (!multicastJoinGroup(*sock, groupAddress, iface.address))
+        {
+            delete sock;
+            return 0;
+        }
+
+        m_socketList.insert(iface.address.toString(), sock);
+
+        return sock;
+    }
+    return it.value();
+}
+
+QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
+{
+    QnResourceList result;
+
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    {
+        QUdpSocket* sock = sockByName(iface);
+
+        QString tmp = iface.address.toString();
+        
+        
+        if (!sock)
+            continue;
+
+
+
+        /*
+        QByteArray requestDatagram;
+        socket.writeDatagram(requestDatagram.data(), requestDatagram.size(), groupAddress, 1900);
+        **/
+
+        while(sock->hasPendingDatagrams())
+        {
+            QByteArray reply;
+            reply.resize(sock->pendingDatagramSize());
+
+            QHostAddress sender;
+            quint16 senderPort;
+            sock->readDatagram(reply.data(), reply.size(),    &sender, &senderPort);
+
+            int index = reply.indexOf("DW-VF");
+
+            if (index < 0 || index + 20 > reply.size())
+                continue;
+
+            index += 5;
+
+            int index2 = reply.indexOf("-", index);
+            if (index2 < 0)
+                continue;
+
+            QByteArray channelsstr = reply.mid(index, index2 - index);
+
+            int channles = channelsstr.toInt();
+
+            index = index2 + 1;
+            index2 = reply.indexOf(":", index);
+
+            if (index2 < 0)
+                continue;
+
+
+            
+
+            QByteArray macstr = reply.mid(index, index2 - index);
+
+            QString mac = QnMacAddress(QString(QLatin1String(macstr))).toString();
+            QString host = sender.toString();
+
+
+
+            QAuthenticator auth;
+            auth.setUser(QLatin1String("admin"));
+
+            for (int i = 1; i <= channles; ++i)
+            {
+                QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+                QString name;
+                QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+
+                resource->setTypeId(rt);
+                resource->setName(name);
+                (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+                resource->setMAC(mac);
+
+                resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(9010).arg(i+1));
+                resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
+                resource->setDiscoveryAddr(iface.address);
+                resource->setAuth(auth);
+
+                result << resource;
+            }
+
+
+        }
+    }
+
+
+    return result;
+}
+
+/*
 QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
     QnResourceList result;
@@ -77,6 +199,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
     return result;
 }
+/**/
 
 QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
