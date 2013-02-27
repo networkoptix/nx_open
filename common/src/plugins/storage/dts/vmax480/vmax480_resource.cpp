@@ -153,9 +153,11 @@ void QnPlVmax480Resource::setEndTime(qint64 valueUsec)
 
 void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec)
 {
-    QMutexLocker lock(&m_mutex);
-    m_startTime = startTimeUsec;
-    m_endTime = endTimeUsec;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_startTime = startTimeUsec;
+        m_endTime = endTimeUsec;
+    }
 
     if (getChannel() == 0) 
     {
