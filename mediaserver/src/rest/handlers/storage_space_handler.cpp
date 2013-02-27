@@ -13,7 +13,6 @@
 
 #include <version.h>
 
-
 QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
@@ -28,6 +27,7 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         info.storageId = storage->getId();
         info.totalSpace = storage->getTotalSpace();
         info.freeSpace = storage->getFreeSpace();
+        info.isWritable = storage->isStorageAvailableForWriting();
 
         // TODO: #Elric remove once UnknownSize is dropped.
         if(info.totalSpace == QnStorageResource::UnknownSize)
@@ -59,6 +59,10 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         info.storageId = -1;
         info.totalSpace = partition.sizeBytes;
         info.freeSpace = partition.freeBytes;
+
+        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(info.path, false));
+        info.isWritable = storage->isStorageAvailableForWriting();
+
         infos.push_back(info);
     }
 
