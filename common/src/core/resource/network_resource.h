@@ -97,7 +97,11 @@ public:
     /*
     * Return time periods from resource based archive (direct to storage)
     */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) { return QnTimePeriodList(); }
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
+        Q_UNUSED(startTimeMs)
+        Q_UNUSED(endTimeMs)
+        Q_UNUSED(detailLevel)
+        return QnTimePeriodList(); }
 private:
     QAuthenticator m_auth;
     bool m_authenticated;
