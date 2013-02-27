@@ -183,7 +183,7 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
     if (channel == getChannel())
         setChunks(chunks);
     else {
-        QString suffix = QString(QLatin1String("?channel=%1")).arg(channel+1);
+        QString suffix = QString(QLatin1String("channel=%1")).arg(channel+1);
         QString url = getUrl();
         url = url.left(url.indexOf(L'?')+1) + suffix;
         QnPlVmax480ResourcePtr otherRes = qnResPool->getResourceByUrl(url).dynamicCast<QnPlVmax480Resource>();
