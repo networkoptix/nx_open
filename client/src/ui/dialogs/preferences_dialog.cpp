@@ -253,6 +253,7 @@ void QnPreferencesDialog::openLicensesPage() {
 
 void QnPreferencesDialog::openServerSettingsPage() {
     ui->tabWidget->setCurrentIndex(m_serverSettingsTabIndex);
+    m_serverSettingsWidget->updateFocusedElement();
 }
 
 void QnPreferencesDialog::openPopupSettingsPage() {

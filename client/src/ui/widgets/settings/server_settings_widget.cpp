@@ -20,3 +20,6 @@ void QnServerSettingsWidget::update() {
     ui->smtpSettingsWidget->update();
 }
 
+void QnServerSettingsWidget::updateFocusedElement() {
+    ui->smtpSettingsWidget->updateFocusedElement();
+}

@@ -95,6 +95,19 @@ void QnSmtpSettingsWidget::submit() {
     //TODO: #GDM else?
 }
 
+void QnSmtpSettingsWidget::updateFocusedElement() {
+    switch (ui->stackedWidget->currentIndex()) {
+    case SimplePage:
+        ui->simpleEmailLineEdit->setFocus();
+        break;
+    case AdvancedPage:
+        ui->serverLineEdit->setFocus();
+        break;
+    default:
+        break;
+    }
+}
+
 QnEmail::Settings QnSmtpSettingsWidget::settings() {
 
     QnEmail::Settings result;

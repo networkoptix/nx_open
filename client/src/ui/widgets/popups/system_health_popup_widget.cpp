@@ -81,8 +81,11 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
 void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     switch (m_messageType) {
     case QnSystemHealth::EmailIsEmpty:
-        menu()->trigger(Qn::UserSettingsAction,
-                        QnActionParameters(context()->user()));
+        {
+            QnActionParameters params(context()->user());
+            params.setFocusElement(QLatin1String("email"));
+            menu()->trigger(Qn::UserSettingsAction, params);
+        }
         break;
     case QnSystemHealth::NoLicenses:
         menu()->trigger(Qn::GetMoreLicensesAction);
@@ -111,8 +114,9 @@ void QnSystemHealthPopupWidget::at_fixUserLabel_linkActivated(const QString &anc
     QnUserResourcePtr user = qnResPool->getResourceById(id).dynamicCast<QnUserResource>();
     if (!user)
         return;
-    menu()->trigger(Qn::UserSettingsAction,
-                    QnActionParameters(user));
+    QnActionParameters params(user);
+    params.setFocusElement(QLatin1String("email"));
+    menu()->trigger(Qn::UserSettingsAction, params);
 }
 
 void QnSystemHealthPopupWidget::at_postponeButton_clicked() {
