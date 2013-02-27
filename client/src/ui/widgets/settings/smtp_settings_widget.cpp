@@ -61,7 +61,6 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(ui->okTestButton,           SIGNAL(clicked()),                  this,   SLOT(at_okTestButton_clicked()));
     connect(m_timeoutTimer,             SIGNAL(timeout()),                  this,   SLOT(at_timer_timeout()));
 
-    m_timeoutTimer->setInterval(100);
     m_timeoutTimer->setSingleShot(false);
 
     QPalette palette = this->palette();
@@ -192,7 +191,6 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
     if (!m_settingsReceived)
         return;
 
-    ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
     if (toggled) {
         QString value = ui->simpleEmailLineEdit->text();
         QnEmail email(value);
@@ -209,6 +207,7 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
     }
+    ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
 }
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
@@ -221,7 +220,9 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     ui->controlsWidget->setEnabled(false);
 
     ui->testServerLabel->setText(result.server);
-    ui->testPortLabel->setText(QString::number(result.port));
+    ui->testPortLabel->setText(QString::number(result.port == 0
+                                               ? QnEmail::defaultPort(result.connectionType)
+                                               : result.port));
     ui->testUserLabel->setText(result.user);
     ui->testSecurityLabel->setText(result.connectionType == QnEmail::Tls
                                    ? tr("TLS")
@@ -232,10 +233,11 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     ui->cancelTestButton->setVisible(true);
     ui->okTestButton->setVisible(false);
 
-    ui->testProgressBar->setMaximum(result.timeout * 10); //timer interval is 100ms
     ui->testProgressBar->setValue(0);
 
     ui->testResultLabel->setText(tr("In Progress..."));
+
+    m_timeoutTimer->setInterval(result.timeout * 1000 / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
     m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
@@ -298,6 +300,9 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     ui->passwordLineEdit->setText(settings.password);
     ui->simplePasswordLineEdit->setText(settings.password);
     ui->advancedCheckBox->setChecked(!settings.simple);
+    ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
+                                       ? AdvancedPage
+                                       : SimplePage);
 
     m_settingsReceived = true;
 }

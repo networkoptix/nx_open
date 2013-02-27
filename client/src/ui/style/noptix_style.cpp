@@ -539,9 +539,12 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
     if(!widget)
         return false;
 
+    if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
+        return true; /* Draw nothing. */
+
     qreal itemOpacity = qvariant_cast<qreal>(widget->property(Qn::ItemViewItemBackgroundOpacity), 1.0);
     if(qFuzzyCompare(itemOpacity, 1.0))
-        return false;
+        return false; /* Let the default implementation handle it. */
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * itemOpacity);
