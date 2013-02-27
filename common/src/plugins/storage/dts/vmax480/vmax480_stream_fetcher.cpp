@@ -48,11 +48,14 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
     
+    QString exePath = QLatin1String(qApp->argv()[0]);
+    QString execStr = QFileInfo(exePath).absoluteDir().absolutePath();
+    execStr += QString(QLatin1String("/vmaxproxy/vmaxproxy"));
 #if 0
-    m_vMaxProxy->start(QLatin1String("./vmaxproxy/vmaxproxy"), args);
+    m_vMaxProxy->start(QLatin1String(execStr, args);
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
 #else
-    m_vMaxProxy->startDetached(QLatin1String("./vmaxproxy/vmaxproxy"), args); // debug only!
+    m_vMaxProxy->startDetached(execStr, args); // debug only!
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)     // debug only!
 #endif
     {
