@@ -752,10 +752,6 @@
 								</Component>
 							
 								<Component Id="VmaxProxySDK" Guid="{6f159b73-68e0-4709-a91f-ef341cd34be2}">
-									<File Id="VmaxProxyacscodecmr.dll" Name="acs_codec_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_codec_mr.dll"/>
-									<File Id="VmaxProxyacseventmr.dll" Name="acs_event_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_event_mr.dll"/>
-									<File Id="VmaxProxyacsexportmr.dll" Name="acs_export_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_export_mr.dll"/>
-									<File Id="VmaxProxyacspostprocessingmr.dll" Name="acs_post_processing_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_post_processing_mr.dll"/>
 									<File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_mr.dll"/>
 									<File Id="VmaxProxyPid.dat" Name="pid.dat" Source="${libdir}/bin/${build.configuration}/vmaxproxy/pid.dat"/>
 								</Component>                            
