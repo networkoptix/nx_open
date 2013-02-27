@@ -77,12 +77,13 @@ bool QnVMax480LiveProvider::isStreamOpened() const
 
 void QnVMax480LiveProvider::beforeRun()
 {
-    msleep(300);
+    //msleep(300);
 }
 
 void QnVMax480LiveProvider::afterRun()
 {
-    msleep(300);
+    //msleep(300);
+    closeStream();
 }
 
 void QnVMax480LiveProvider::updateStreamParamsBasedOnQuality()

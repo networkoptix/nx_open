@@ -1167,3 +1167,9 @@ qint64 QnArchiveStreamReader::endTime() const
     else
         return p.endTimeMs()*1000;
 }
+
+void QnArchiveStreamReader::afterRun()
+{
+    if (m_delegate)
+        m_delegate->close();
+}
