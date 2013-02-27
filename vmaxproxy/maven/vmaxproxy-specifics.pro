@@ -16,12 +16,12 @@ mac {
 
 CONFIG(debug, debug|release) {
   DESTDIR = ../../build-environment/${arch}/bin/debug/${project.artifactId}
-  LIBS -= -LC:\\develop\\buildenv/qt/bin/x64/debug
-  LIBS += -LC:\\develop\\buildenv/qt/bin/x86/debug  
+  LIBS -= -L${environment.dir}/qt/bin/x64/debug
+  LIBS += -L${environment.dir}/qt/bin/x86/debug  
 }
 
 CONFIG(release, debug|release) {
   DESTDIR = ../../build-environment/${arch}/bin/release/${project.artifactId}
-  LIBS -= -LC:\\develop\\buildenv/qt/bin/x64/release
-  LIBS += -LC:\\develop\\buildenv/qt/bin/x86/release  
+  LIBS -= -L${environment.dir}/qt/bin/x64/release
+  LIBS += -L${environment.dir}/qt/bin/x86/release  
 }
