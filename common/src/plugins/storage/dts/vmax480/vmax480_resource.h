@@ -53,6 +53,7 @@ protected:
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
+    QnPhysicalCameraResourcePtr getOtherResource(int channel);
 private slots:
     void at_gotChunks(int channel, QnTimePeriodList chunks);
 private:

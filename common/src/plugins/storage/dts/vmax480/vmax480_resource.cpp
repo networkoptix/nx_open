@@ -156,6 +156,20 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
     QMutexLocker lock(&m_mutex);
     m_startTime = startTimeUsec;
     m_endTime = endTimeUsec;
+
+    if (getChannel() == 0) 
+    {
+        for (int i = 1; i < VMAX_MAX_CH; ++i)
+        {
+            QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
+            if (otherRes) {
+                otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec);
+            }
+            else {
+                break;
+            }
+        }
+    }
 }
 
 void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
@@ -178,17 +192,22 @@ void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
     }
 }
 
+QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
+{
+    QString suffix = QString(QLatin1String("channel=%1")).arg(channel+1);
+    QString url = getUrl();
+    url = url.left(url.indexOf(L'?')+1) + suffix;
+    return qnResPool->getResourceByUrl(url).dynamicCast<QnPhysicalCameraResource>();
+}
+
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
 {
     if (channel == getChannel())
         setChunks(chunks);
     else {
-        QString suffix = QString(QLatin1String("channel=%1")).arg(channel+1);
-        QString url = getUrl();
-        url = url.left(url.indexOf(L'?')+1) + suffix;
-        QnPlVmax480ResourcePtr otherRes = qnResPool->getResourceByUrl(url).dynamicCast<QnPlVmax480Resource>();
+        QnPhysicalCameraResourcePtr otherRes = getOtherResource(channel);
         if (otherRes)
-            otherRes->setChunks(chunks);
+            otherRes.dynamicCast<QnPlVmax480Resource>()->setChunks(chunks);
     }
 }
 
