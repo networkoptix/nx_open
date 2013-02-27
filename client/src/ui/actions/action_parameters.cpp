@@ -17,6 +17,8 @@ namespace {
         return true;
     }
 
+    QLatin1String focusElementKey("focus");
+
 } // anonymous namespace
 
 QnActionParameters::QnActionParameters(const QVariantMap &arguments) {
@@ -115,5 +117,13 @@ QnResourceWidgetList QnActionParameters::widgets(const QString &key) const {
     return QnActionParameterTypes::widgets(argument(key));
 }
 
+void QnActionParameters::setFocusElement(QString element) {
+    setArgument(focusElementKey, element);
+}
 
+QString QnActionParameters::focusElement() const {
+    if (hasArgument(focusElementKey))
+        return argument(focusElementKey).toString();
+    return QString();
+}
 

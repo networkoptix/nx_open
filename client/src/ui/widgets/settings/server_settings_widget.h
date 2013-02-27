@@ -16,6 +16,9 @@ public:
     void submit();
     void update();
 
+    // now is used only for email setup so parameter is omitted
+    void updateFocusedElement();
+
 private:
     QScopedPointer<Ui::ServerSettingsWidget> ui;
 };
