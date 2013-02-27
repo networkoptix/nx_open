@@ -24,16 +24,22 @@ void QnVMax480ChunkReader::run()
 {
     while (!m_needStop)
     {
-        if (!isOpened())
-            vmaxConnect(false, -1);
         if (!isOpened()) {
-            msleep(10000);
-            continue;
+            vmaxConnect(false, -1);
+            if (isOpened()) {
+                m_waitingAnswer = true;
+                m_waitTimer.restart();
+                vmaxRequestRange();
+            }
+            else {
+                msleep(10000);
+                continue;
+            }
         }
 
         if (m_waitingAnswer) 
         {
-            if (m_waitTimer.elapsed() > 1000*30) {
+            if (m_waitTimer.elapsed() > 1000*3000) {
                 vmaxDisconnect();
                 m_state = State_Started;
                 m_waitTimer.restart();

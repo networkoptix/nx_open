@@ -162,7 +162,7 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
 
     create_acs_source(&m_ACSStream);
 
-    m_ACSStream->setRecvAudioStreamCallback(receiveAudioStramCallback , (long long)this);
+    //m_ACSStream->setRecvAudioStreamCallback(receiveAudioStramCallback , (long long)this);
     m_ACSStream->setRecvVideoStreamCallback(receiveVideoStramCallback , (long long)this);
     m_ACSStream->setRecvResultCallback(receiveResultCallback , (long long)this);
 
@@ -205,13 +205,13 @@ void QnVMax480Provider::disconnect()
     if (!m_connected)
         return;
 
+    QMutexLocker lock(&m_callbackMutex);
 
     m_ACSStream->disconnect();
 
-    QMutexLocker lock(&m_callbackMutex);
 
     if (m_connectedInternal) {
-        m_callbackCond.wait(&m_callbackMutex, 100);
+        m_callbackCond.wait(&m_callbackMutex, 200);
         m_connectedInternal = false;
     }
 
@@ -298,7 +298,7 @@ void QnVMax480Provider::playPointsInternal()
         toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(m_playPoints.dequeue()), &playDate, &playTime, 0);
         qDebug() << "go next thumbnails point";
         m_ppState = PP_WaitAnswer;
-        m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, playDate, playTime, false);
+        m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, playDate, playTime, true);
     }
     else {
         qDebug() << "stop thumbnails point";
@@ -479,7 +479,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
         {
             if( _result->mResult == true )
             {
-                m_ACSStream->requestRecordDateTime();
+                //m_ACSStream->requestRecordDateTime();
                 if (m_channelNum != -1) {
                     m_ACSStream->openChannel(1 << m_channelNum);
                     m_ACSStream->openAudioChannel(1 << m_channelNum);

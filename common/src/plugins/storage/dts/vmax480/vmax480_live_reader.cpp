@@ -13,7 +13,6 @@
 QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
     CLServerPushStreamreader(dev),
     VMaxStreamFetcher(dev),
-    m_connected(false),
     m_internalQueue(16)
 {
     m_networkRes = dev.dynamicCast<QnNetworkResource>();
@@ -38,7 +37,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     QnAbstractDataPacketPtr result;
     QTime getTimer;
     getTimer.restart();
-    while (!needToStop() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
+    while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
     {
         m_internalQueue.pop(result, 100);
     }
@@ -55,26 +54,25 @@ void QnVMax480LiveProvider::onGotData(QnAbstractMediaDataPtr mediaData)
 
 void QnVMax480LiveProvider::openStream()
 {
-    if (m_connected)
+    if (isOpened())
         return;
+
+    vmaxDisconnect();
 
     int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
         channel--;
-    m_connected = vmaxConnect(true, channel);
+    vmaxConnect(true, channel);
 }
 
 void QnVMax480LiveProvider::closeStream()
 {
-    if (!m_connected)
-        return;
     vmaxDisconnect();
-    m_connected = false;
 }
 
 bool QnVMax480LiveProvider::isStreamOpened() const
 {
-    return m_connected;
+    return isOpened();
 }
 
 void QnVMax480LiveProvider::beforeRun()

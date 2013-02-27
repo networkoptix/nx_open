@@ -28,7 +28,6 @@ protected:
 
 private:
     QnNetworkResourcePtr m_networkRes;
-    bool m_connected;
     CLDataQueue m_internalQueue;
     //QnVMax480ConnectionProcessor* m_processor;
 };

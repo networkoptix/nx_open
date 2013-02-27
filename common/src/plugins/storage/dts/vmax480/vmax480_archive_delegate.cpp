@@ -106,7 +106,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
         if (result && result->opaque == m_sequence)
             break;
-        if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*1000)
+        if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*2)
             return QnAbstractMediaDataPtr();
     }
     if (result) {
