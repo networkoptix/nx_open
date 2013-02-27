@@ -1,6 +1,7 @@
 #ifndef QN_RESOURCE_DISCOVERY_MANAGER_H
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
+#include <memory> // for auto_ptr
 #include <QtCore/QThread>
 #include <QAuthenticator>
 #include <QTimer>
