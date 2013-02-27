@@ -15,6 +15,7 @@ message Server {
         required string       name         = 2;
         required string       url          = 3;
         required int64        spaceLimit   = 4;
+        optional bool         usedForWriting = 5; // TODO: #IVAN make required
     }
 
     required string       apiUrl       = 1;

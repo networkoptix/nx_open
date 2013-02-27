@@ -12,10 +12,12 @@ struct QnStorageSpaceData {
 	int storageId;
 	qint64 totalSpace;
 	qint64 freeSpace;
+    qint64 reservedSpace;
     bool isWritable;
+    bool isUsedForWriting;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(isWritable), inline)
+QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isWritable)(isUsedForWriting), inline)
 
 typedef QList<QnStorageSpaceData> QnStorageSpaceDataList;
 

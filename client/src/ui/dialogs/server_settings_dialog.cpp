@@ -203,14 +203,6 @@ namespace {
 
 } // anonymous namespace
 
-struct QnServerSettingsDialog::StorageItem: public QnStorageSpaceData {
-    StorageItem() {}
-    StorageItem(const QnStorageSpaceData &data): QnStorageSpaceData(data) {}
-
-    qint64 reservedSpace;
-    bool inUse;
-};
-
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
@@ -266,13 +258,13 @@ void QnServerSettingsDialog::reject() {
     base_type::reject();
 }
 
-void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
+void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     int row = ui->storagesTable->rowCount() - 1;
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
     checkBoxItem->setFlags((item.isWritable ? Qt::ItemIsEnabled : Qt::NoItemFlags) | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
-    checkBoxItem->setCheckState(item.inUse ? Qt::Checked : Qt::Unchecked);
+    checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, item.storageId);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
@@ -296,7 +288,7 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
 }
 
-void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
+void QnServerSettingsDialog::setTableItems(const QnStorageSpaceDataList &items) {
     ui->storagesTable->setRowCount(0);
     ui->storagesTable->insertRow(0);
     ui->storagesTable->setSpan(0, 0, 1, 4);
@@ -304,18 +296,18 @@ void QnServerSettingsDialog::setTableItems(const QList<StorageItem> &items) {
     m_tableBottomLabel->setAlignment(Qt::AlignCenter);
     ui->storagesTable->setCellWidget(0, 0, m_tableBottomLabel);
 
-    foreach(const StorageItem &item, items)
+    foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
 }
 
-QList<QnServerSettingsDialog::StorageItem> QnServerSettingsDialog::tableItems() const {
-    QList<StorageItem> result;
+QnStorageSpaceDataList QnServerSettingsDialog::tableItems() const {
+    QnStorageSpaceDataList result;
 
     for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++) {
-        StorageItem item;
+        QnStorageSpaceData item;
 
         item.isWritable = ui->storagesTable->item(row, CheckBoxColumn)->flags() & Qt::ItemIsEnabled;
-        item.inUse = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
+        item.isUsedForWriting = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
         item.storageId = qvariant_cast<int>(ui->storagesTable->item(row, CheckBoxColumn)->data(StorageIdRole), -1);
 
         item.path = ui->storagesTable->item(row, PathColumn)->text();
@@ -356,8 +348,8 @@ void QnServerSettingsDialog::submitToResources() {
         QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
 
         QnAbstractStorageResourceList storages;
-        foreach(const StorageItem &item, tableItems()) {
-            if(!item.inUse) {
+        foreach(const QnStorageSpaceData &item, tableItems()) {
+            if(!item.isUsedForWriting && item.storageId == -1) {
                 serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
                 continue;
             }
@@ -369,6 +361,7 @@ void QnServerSettingsDialog::submitToResources() {
             storage->setParentId(m_server->getId());
             storage->setUrl(item.path);
             storage->setSpaceLimit(item.reservedSpace);
+            storage->setUsedForWriting(item.isUsedForWriting);
 
             storages.push_back(storage);
         }
@@ -505,7 +498,7 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_storageAddButton_clicked() {
-    // XXX
+    // TODO: #Elric implement me
 
     m_hasStorageChanges = true;
 }
@@ -523,36 +516,22 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
         return;
     }
 
-    QList<StorageItem> items;
-
     QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
 
-    QnAbstractStorageResourceList storages = m_server->getStorages();
-    foreach(const QnStorageSpaceData &data, dataList) {
-        StorageItem item = data;
+    QnStorageSpaceDataList items = dataList;
+    for(int i = 0; i < items.size(); i++) {
+        QnStorageSpaceData &item = items[i];
 
-        item.reservedSpace = -1;
-        if(item.storageId != -1) {
-            foreach(const QnAbstractStorageResourcePtr &storage, storages) {
-                if(storage->getId() == item.storageId) {
-                    item.reservedSpace = storage->getSpaceLimit();
-                    break;
-                }
-            }
-        }
         if(item.reservedSpace == -1)
             item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getGuid(), item.path) , -1);
+
         /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
         if(item.reservedSpace == -1)
             item.reservedSpace = qMin(defaultReservedSpace, item.freeSpace);
-
-        item.inUse = item.storageId != -1;
-
-        items.push_back(item);
     }
 
-    struct StorageItemLess {
-        bool operator()(const StorageItem &l, const StorageItem &r) {
+    struct StorageSpaceDataLess {
+        bool operator()(const QnStorageSpaceData &l, const QnStorageSpaceData &r) {
             bool lLocal = l.path.contains(lit("://"));
             bool rLocal = r.path.contains(lit("://"));
 
@@ -562,7 +541,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
             return l.path < r.path;
         }
     };
-    qSort(items.begin(), items.end(), StorageItemLess());
+    qSort(items.begin(), items.end(), StorageSpaceDataLess());
 
     setTableItems(items);
     m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
