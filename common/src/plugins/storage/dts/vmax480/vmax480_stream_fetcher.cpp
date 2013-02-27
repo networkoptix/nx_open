@@ -20,12 +20,17 @@ VMaxStreamFetcher::~VMaxStreamFetcher()
 
 bool VMaxStreamFetcher::isOpened() const
 {
-    return m_vMaxProxy && !m_tcpID.isEmpty();
+    return m_vMaxProxy && !m_tcpID.isEmpty() && m_vmaxConnection && m_vmaxConnection->isRunning();
 }
 
 void VMaxStreamFetcher::vmaxArchivePlay(qint64 timeUsec, quint8 sequence, int speed)
 {
     m_vmaxConnection->vMaxArchivePlay(timeUsec, sequence, speed);
+}
+
+void VMaxStreamFetcher::vmaxPlayRange(const QList<qint64>& pointsUsec, quint8 sequence)
+{
+    m_vmaxConnection->vmaxPlayRange(pointsUsec, sequence);
 }
 
 void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* connection)

@@ -41,6 +41,7 @@ public:
     void vMaxConnect(const QString& url, int channel, const QAuthenticator& auth, bool isLive);
     void vMaxDisconnect();
     void vMaxArchivePlay(qint64 timeUsec, quint8 newSequence, int speed);
+    void vmaxPlayRange(const QList<qint64>& pointsUsec, quint8 sequence);
     void vMaxRequestMonthInfo(const QDate& month);
     void vMaxRequestDayInfo(int dayNum);
     void vMaxRequestRange();

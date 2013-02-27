@@ -120,9 +120,13 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
     }
     else if (role == QnResource::Role_Archive) {
-        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
-        if (result)
-            return result;
+        
+        QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+        if (archiveDelegate) {
+            QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+            archiveReader->setArchiveDelegate(archiveDelegate);
+            return archiveReader;
+        }
     }
 
     if (m_dpFactory)

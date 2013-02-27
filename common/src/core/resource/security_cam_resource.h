@@ -8,6 +8,8 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 
+class QnAbstractArchiveDelegate;
+
 class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
@@ -91,6 +93,8 @@ public:
 
     bool isRecordingEventAttached() const;
 
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
@@ -120,7 +124,6 @@ protected:
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }

@@ -25,6 +25,8 @@ protected:
     bool vmaxConnect(bool isLive, int channel);
     void vmaxDisconnect();
     void vmaxArchivePlay(qint64 timeUsec, quint8 sequence, int speed);
+    void vmaxPlayRange(const QList<qint64>& pointsUsec, quint8 sequence);
+
     void vmaxRequestMonthInfo(const QDate& month);
     void vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
     void vmaxRequestRange();

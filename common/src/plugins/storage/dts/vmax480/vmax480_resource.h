@@ -5,6 +5,7 @@
 #include "recording/time_period_list.h"
 
 class QnVMax480ChunkReader;
+class QnAbstractArchiveDelegate;
 
 class QnPlVmax480Resource : public QnPhysicalCameraResource
 {
@@ -44,9 +45,10 @@ public:
     virtual void setStatus(Status newStatus, bool silenceMode = false);
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    QnTimePeriodList getChunks();
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool initInternal() override;

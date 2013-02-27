@@ -139,6 +139,12 @@ int main(int argc, char* argv[])
                     connection->archivePlay(params, sequence);
                 }
                 break;
+            case Command_PlayPoints:
+                if (connection) {
+                    qDebug() << "before exec Command_PlayPoints" <<  "seq=" << sequence;
+                    connection->pointsPlay(params, sequence);
+                }
+                break;
             case Command_CloseConnect:
                 if (connection) {
                     connection->disconnect();

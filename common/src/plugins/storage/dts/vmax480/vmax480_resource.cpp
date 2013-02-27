@@ -106,12 +106,11 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
     return new QnVMax480LiveProvider(toSharedPointer());
 }
 
-QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider() 
+QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate() 
 { 
-    QnArchiveStreamReader* reader = new QnArchiveStreamReader(toSharedPointer());
-    reader->setArchiveDelegate(new QnVMax480ArchiveDelegate(toSharedPointer()));
-    return reader; 
+    return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
+
 
 void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 {
@@ -191,6 +190,12 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
         if (otherRes)
             otherRes->setChunks(chunks);
     }
+}
+
+QnTimePeriodList  QnPlVmax480Resource::getChunks()
+{
+    QMutexLocker lock(&m_mutexChunks);
+    return m_chunks;
 }
 
 void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)

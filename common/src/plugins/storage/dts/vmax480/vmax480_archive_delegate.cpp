@@ -6,17 +6,18 @@
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
     VMaxStreamFetcher(res),
-    m_connected(false),
     m_internalQueue(100),
     m_needStop(false),
     m_sequence(0),
     m_vmaxPaused(false),
     m_lastMediaTime(AV_NOPTS_VALUE),
-    m_reverseMode(false)
+    m_reverseMode(false),
+    m_thumbnailsMode(false)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
+    m_flags |= Flag_CanProcessMediaStep;
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
@@ -27,11 +28,12 @@ QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
 
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
-    m_needStop = false;
-
-    if (m_connected)
+    if (isOpened())
         return true;
 
+    close();
+
+    m_needStop = false;
     m_sequence = 0;
 
     int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
@@ -40,8 +42,7 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 
     qDebug() << "before vmaxConnect";
 
-    m_connected = vmaxConnect(false, channel);
-    return m_connected;
+    return vmaxConnect(false, channel);
 }
 
 void QnVMax480ArchiveDelegate::beforeClose()
@@ -53,6 +54,11 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     if (!isOpened())
         return -1;
+
+    m_thumbnailsMode = false;
+    QnTimePeriodList chunks = m_res->getChunks();
+    if (!chunks.isEmpty())
+        time = chunks.roundTimeToPeriodUSec(time, true);
 
     m_sequence++;
 
@@ -67,7 +73,6 @@ void QnVMax480ArchiveDelegate::close()
 {
     m_needStop = true;
     vmaxDisconnect();
-    m_connected =false;
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime()
@@ -89,12 +94,16 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         m_vmaxPaused = false;
     }
 
+    if (m_thumbnailsMode && m_ThumbnailsSeekPoints.isEmpty())
+        return result;
+
     QTime getTimer;
     getTimer.restart();
-    while (1) {
+    while (isOpened()) {
         QnAbstractDataPacketPtr tmp;
         m_internalQueue.pop(tmp, 100);
         result = tmp.dynamicCast<QnAbstractMediaData>();
+
         if (result && result->opaque == m_sequence)
             break;
         if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*1000)
@@ -106,7 +115,20 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
             result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
             result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
         }
+
+        if (m_thumbnailsMode && !m_ThumbnailsSeekPoints.isEmpty())
+        {
+            bool isHole = m_ThumbnailsSeekPoints.begin().value();
+            if (isHole)
+                result->flags |= QnAbstractMediaData::MediaFlags_BOF;
+
+            qDebug() << "got thumbnails.frame=" << QDateTime::fromMSecsSinceEpoch(result->timestamp/1000).toString(QLatin1String("dd hh.mm.ss.zzz"))
+                << "point=" << QDateTime::fromMSecsSinceEpoch(m_ThumbnailsSeekPoints.begin().key()/1000).toString(QLatin1String("dd hh.mm.ss.zzz"));
+
+            m_ThumbnailsSeekPoints.erase(m_ThumbnailsSeekPoints.begin());
+        }
     }
+
     return result;
 }
 
@@ -150,4 +172,40 @@ void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     m_reverseMode = value;
     seek(displayTime, true);
+}
+
+void QnVMax480ArchiveDelegate::calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep)
+{
+    qint64 curTime = startTime;
+    QnTimePeriodList chunks = m_res->getChunks();
+    while (1) 
+    {
+        qint64 seekRez = chunks.roundTimeToPeriodUSec(curTime, true);
+        if (seekRez > endTime)
+            break;
+        bool holeDetected = seekRez > curTime;
+        curTime = seekRez - (seekRez-curTime)%frameStep;
+
+        m_ThumbnailsSeekPoints.insert(seekRez, holeDetected);
+
+        curTime += frameStep;
+    }
+}
+
+void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
+{
+    m_thumbnailsMode = true;
+
+    calcSeekPoints(startTime, endTime, frameStep);
+
+    if (m_ThumbnailsSeekPoints.isEmpty())
+        return;
+
+    open(m_res);
+    if (!isOpened())
+        return;
+
+
+    m_sequence++;
+    vmaxPlayRange(m_ThumbnailsSeekPoints.keys(), m_sequence);
 }

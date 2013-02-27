@@ -38,6 +38,7 @@ void QnVMax480ChunkReader::run()
                 m_state = State_Started;
                 m_waitTimer.restart();
                 m_waitingAnswer = false;
+                m_firstRange = true;
             }
             msleep(1);
             continue;
@@ -160,22 +161,26 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     qint64 dayBase = QDateTime(QDate(year, month, day)).toMSecsSinceEpoch();
 
     const char* curPtr = data.data();
+    QnTimePeriodList dayPeriods;
+
     for (int ch = 0; ch < VMAX_MAX_CH; ++ch)
     {
-        int startIdx = 0;
-        if (!m_chunks[ch].isEmpty()) {
-            qint64 lastTime = m_chunks[ch].last().endTimeMs();
-            startIdx = qMax(0ll, (lastTime - dayBase)/60/1000);
-            curPtr += startIdx;
-        }
-        for(int min = startIdx; min < VMAX_MAX_SLICE_DAY; ++min)
+        for(int min = 0; min < VMAX_MAX_SLICE_DAY; ++min)
         {
             char recordType = *curPtr & 0x0f;
             if (recordType)
-                addChunk(m_chunks[ch], QnTimePeriod(dayBase + min*60*1000ll, 60*1000));
+                addChunk(dayPeriods, QnTimePeriod(dayBase + min*60*1000ll, 60*1000));
             curPtr++;
         }
+
+        if (!dayPeriods.isEmpty()) {
+            QVector<QnTimePeriodList> allPeriods;
+            allPeriods << m_chunks[ch];
+            allPeriods << dayPeriods;
+            m_chunks[ch] = QnTimePeriod::mergeTimePeriods(allPeriods);
+        }
     }
+
     m_waitingAnswer = false;
 }
 

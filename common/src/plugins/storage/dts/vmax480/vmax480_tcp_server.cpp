@@ -62,6 +62,26 @@ void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 seque
     d->socket->send(data);
 }
 
+void QnVMax480ConnectionProcessor::vmaxPlayRange(const QList<qint64>& pointsUsec, quint8 sequence)
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    VMaxParamList params;
+    QByteArray pointsData;
+
+    for (int i = 0; i < pointsUsec.size(); ++i)
+    {
+        if (i > 0)
+            pointsData.append(';');
+        pointsData.append(QByteArray::number(quint32(pointsUsec[i]/1000000ll)));
+    }
+
+    params["points"] = pointsData;
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_PlayPoints, sequence, params);
+    qDebug () << "before send command vmaxPlayRange" << "sequence=" << sequence;
+    d->socket->send(data);
+}
+
 void QnVMax480ConnectionProcessor::vMaxRequestMonthInfo(const QDate& month)
 {
     Q_D(QnVMax480ConnectionProcessor);

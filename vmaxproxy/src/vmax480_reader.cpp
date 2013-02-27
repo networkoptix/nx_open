@@ -132,7 +132,10 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_channelNum(0),
     m_reqSequence(0),
     m_curSequence(0),
-    m_archivePlayProcessing(false)
+    m_archivePlayProcessing(false),
+    m_pointsPlayMode(false),
+    //m_pointsNeedFrame(false)
+    m_ppState(PP_None)
 {
 }
 
@@ -231,6 +234,8 @@ void QnVMax480Provider::archivePlay(const VMaxParamList& params, quint8 sequence
 
 void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 sequence)
 {
+    m_pointsPlayMode = false;
+
     qint64 posUsec = params.value("pos").toLongLong();
     int speed = params.value("speed").toInt();
     quint32 startDate;
@@ -254,6 +259,52 @@ void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 
     }
     else {
         m_newPlayCommand = params;
+    }
+}
+
+void QnVMax480Provider::pointsPlay(const VMaxParamList& params, quint8 sequence)
+{
+    if (!m_ACSStream)
+        return;
+
+    QList<QByteArray> points = params.value("points").split(';'); // points at seconds
+    m_playPoints.clear();
+
+    
+    QMutexLocker lock(&m_callbackMutex);
+
+    m_pointsPlayMode = true;
+    m_reqSequence = sequence;
+
+    for (int i = 0; i < points.size(); ++i)
+        m_playPoints << points[i].toLongLong() * 1000ll; // convert to ms
+
+    qDebug() << "got points:";
+    for (int i = 0; i < points.size(); ++i)
+    {
+        qDebug() << QDateTime::fromMSecsSinceEpoch(m_playPoints[i]).toString(QLatin1String("dd hh.mm.ss.zzz"));
+    }
+
+    if (!m_archivePlayProcessing)
+        playPointsInternal();
+}
+
+void QnVMax480Provider::playPointsInternal()
+{
+    //m_pointsNeedFrame = true;
+    if (!m_playPoints.isEmpty()) 
+    {
+        quint32 playDate, playTime;
+        toNativeTimestamp(QDateTime::fromMSecsSinceEpoch(m_playPoints.dequeue()), &playDate, &playTime, 0);
+        qDebug() << "go next thumbnails point";
+        m_ppState = PP_WaitAnswer;
+        m_ACSStream->requestPlayMode(ACS_stream_source::FORWARDPLAY, 1, playDate, playTime, false);
+    }
+    else {
+        qDebug() << "stop thumbnails point";
+        m_ACSStream->requestPlayMode(ACS_stream_source::STOP, 0, 0, 0, false);
+        //m_pointsPlayMode = false;
+        m_ppState = PP_None;
     }
 }
 
@@ -326,14 +377,21 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
     {
         QMutexLocker lock(&m_callbackMutex);
 
+        if(!m_connected)
+            return;
+
         if (m_reqSequence != m_curSequence) {
             qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
             return;
         }
 
+        if (m_pointsPlayMode)
+        {
+            if (m_ppState != PP_GotAnswer)
+                return;
 
-        if(!m_connected)
-            return;
+            qDebug() << "got thumbnails frame";
+        }
 
         QDateTime packetTimestamp = fromNativeTimestamp(_stream->mDate, _stream->mTime, _stream->mMillisec);
 
@@ -353,6 +411,9 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
         *(quint32*)(VMaxHeader+4) = dataSize;
         //*(quint64*)(VMaxHeader+8) = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
         *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
+
+        if (m_pointsPlayMode)
+            playPointsInternal();
     }
 
     m_socket->send(VMaxHeader, sizeof(VMaxHeader));
@@ -464,10 +525,17 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     case RESULT_SEARCH_PLAY:
         {
             m_archivePlayProcessing = false;
-            if (m_newPlayCommand.isEmpty())
+            //m_pointsNeedFrame = true;
+            if (m_pointsPlayMode) {
                 m_curSequence = m_reqSequence;
-            else
-                archivePlayInternal(m_newPlayCommand, m_reqSequence);
+                m_ppState = PP_GotAnswer;
+            }
+            else {
+                if (m_newPlayCommand.isEmpty())
+                    m_curSequence = m_reqSequence;
+                else
+                    archivePlayInternal(m_newPlayCommand, m_reqSequence);
+            }
             break;
         }
     case RESULT_REC_DATE_TIME :
