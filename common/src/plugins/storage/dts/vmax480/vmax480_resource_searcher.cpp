@@ -14,6 +14,7 @@ extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress
 QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 
+//!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
@@ -54,9 +55,6 @@ public:
     {
         return true;
     }
-    //virtual QString errorString() const;
-    //virtual bool error( const QXmlParseException& exception );
-    //virtual bool fatalError( const QXmlParseException& exception );
 
     QString friendlyName() const { return m_friendlyName; }
     QString manufacturer() const { return m_manufacturer; }
@@ -192,7 +190,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
                     continue;
                 QByteArray foundDeviceDescription;
                 http.readAll( foundDeviceDescription );
-                //TODO/IMPL checking Content-Type of received description (MUST be upnp xml to continue)
+                //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
 
                 //parsing description xml
                 UpnpDeviceDescriptionSaxHandler xmlHandler;
@@ -210,8 +208,20 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
                 mac = xmlHandler.serialNumber();
                 //name = xmlHandler.friendlyName();
-                channles = 8;   //TODO/IMPL read from xml
-                name = QLatin1String("DW-VF") + QString::number(channles);
+                //reading channel number from xml
+                    //<modelName>VMAX480-8 - 08CH H.264 DVR</modelName>
+                const QString& modelName = xmlHandler.modelName();
+                const int channelCountEndIndex = modelName.indexOf( QLatin1String("CH") );
+                if( channelCountEndIndex == -1 )
+                    continue;
+                int channelCountStartIndex = modelName.lastIndexOf( QLatin1String(" "), channelCountEndIndex );
+                if( channelCountStartIndex == -1 )
+                    continue;
+                ++channelCountStartIndex;
+                if( channelCountStartIndex >= channelCountEndIndex )
+                    continue;
+                channles = modelName.mid( channelCountStartIndex, channelCountEndIndex-channelCountStartIndex ).toInt();
+                name = QLatin1String("DW-VF") + QString::number(channles);  //DW-VF is a registered resource type
             }
 
             QString host = sender.toString();
