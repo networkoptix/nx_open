@@ -37,11 +37,25 @@ QList<QnResourcePtr> QnManualCameraInfo::checkHostAddr() const
         return QList<QnResourcePtr>();
 }
 
+
+
+QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager )
+:
+    m_discoveryManager( discoveryManager )
+{
+}
+
+void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
+{
+    m_discoveryManager->doResourceDiscoverIteration();
+}
+
+
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
-    m_ready(false)
-
+    m_ready(false),
+    m_state( initialSearch )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
 }
@@ -59,6 +73,12 @@ void QnResourceDiscoveryManager::setReady(bool ready)
 void QnResourceDiscoveryManager::init(QnResourceDiscoveryManager* instance)
 {
     m_instance = instance;
+}
+
+void QnResourceDiscoveryManager::start( Priority priority )
+{
+    QnLongRunnable::start( priority );
+    //moveToThread( this );
 }
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
@@ -133,9 +153,28 @@ void QnResourceDiscoveryManager::pleaseStop()
     }
 
     QnLongRunnable::pleaseStop();
+
+    quit(); //telling thread's event loop to return
 }
 
 void QnResourceDiscoveryManager::run()
+{
+    m_runNumber = 0;
+    m_timer.reset( new QTimer() );
+    m_timer->setSingleShot( true );
+    QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
+    connect( m_timer.get(), SIGNAL(timeout()), &timoutDelegate, SLOT(onTimeout()) );
+    m_timer->start( 0 );    //immediate execution
+    m_state = initialSearch;
+
+    exec();
+
+    m_timer.reset();
+}
+
+static int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
+
+void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
     ResourceSearcherList searchersList;
     {
@@ -143,36 +182,42 @@ void QnResourceDiscoveryManager::run()
         searchersList = m_searchersList;
     }
 
-
-    foreach (QnAbstractResourceSearcher *searcher, searchersList)
+    switch( m_state )
     {
-        if (searcher->shouldBeUsed() && dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
+        case initialSearch:
+            foreach (QnAbstractResourceSearcher *searcher, searchersList)
+            {
+                if (searcher->shouldBeUsed() && dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
+                {
+                    QnResourceList lst = searcher->search();
+                    m_resourceProcessor->processResources(lst);
+                }
+            }
+            m_state = periodicSearch;
+            break;
+
+        case periodicSearch:
         {
-            QnResourceList lst = searcher->search();
-            m_resourceProcessor->processResources(lst);
+            if( !m_ready )
+                break;
+
+            updateLocalNetworkInterfaces();
+
+            QnResourceList result = findNewResources();
+
+            if (!result.isEmpty())
+            {
+                m_resourceProcessor->processResources(result);
+            }
+
+            int global_delay_between_search = 1000;
+            smartSleep(global_delay_between_search);
+            ++m_runNumber;
+            break;
         }
     }
 
-    while (!needToStop() && !m_ready)
-        QnSleep::msleep(1);
-
-    m_runNumber = 0;
-
-    while (!needToStop())
-    {
-        updateLocalNetworkInterfaces();
-
-        QnResourceList result = findNewResources();
-
-        if (!result.isEmpty())
-        {
-            m_resourceProcessor->processResources(result);
-        }
-
-        int global_delay_between_search = 1000;
-        smartSleep(global_delay_between_search);
-        ++m_runNumber;
-    }
+    m_timer->start( GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS );
 }
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()

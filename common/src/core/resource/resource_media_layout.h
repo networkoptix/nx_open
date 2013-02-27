@@ -42,6 +42,7 @@ public:
     
 
     QnResourceCustomAudioLayout(): QnResourceAudioLayout() {}
+    virtual ~QnResourceCustomAudioLayout() {}
 
     void addAudioTrack(const AudioTrack& audioTrack) {m_audioTracks << audioTrack; }
     void setNumberOfChannels(int value) { m_audioTracks.resize(value); }

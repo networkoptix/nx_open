@@ -73,7 +73,7 @@ bool QnStorageManager::deserializeStorageFile()
         QStringList params = line.split(';');
         if (params.size() >= 2) {
             QString path = toCanonicalPath(params[0]);
-            for (int i = 0; i < params.size(); ++i) {
+            for (int i = 1; i < params.size(); ++i) {
                 int index = params[i].toInt();
                 m_storageIndexes[path].insert(index);
             }
