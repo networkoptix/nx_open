@@ -709,12 +709,7 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(QnResourceWidget *widget, widgets)
-            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                mediaWidget->setResolutionMode(resolutionMode);
-    }
+    // TODO: #Elric #radass
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
