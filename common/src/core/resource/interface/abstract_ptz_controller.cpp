@@ -10,8 +10,8 @@
 #include <core/resource/param.h>
 
 
-QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource) {
-    m_resource = resource.dynamicCast<QnVirtualCameraResource>();
+QnAbstractPtzController::QnAbstractPtzController(QnResource* resource) {
+    m_resource = dynamic_cast<QnSecurityCamResource*>(resource);
     if(!m_resource)
         qnWarning("Invalid non-camera resource '%1' provided to ptz controller.", resource ? resource->getName() : QLatin1String("NULL"));
 }
@@ -31,10 +31,12 @@ void QnAbstractPtzController::getCalibrate(QnVirtualCameraResourcePtr res, qreal
     zoomVelocityCoeff = val.toFloat();
 }
 
+/*
 void QnAbstractPtzController::getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff)
 {
     getCalibrate(m_resource, xVelocityCoeff, yVelocityCoeff, zoomVelocityCoeff);
 }
+*/
 
 bool QnAbstractPtzController::calibrate(QnVirtualCameraResourcePtr res, qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff)
 {
@@ -52,10 +54,12 @@ bool QnAbstractPtzController::calibrate(QnVirtualCameraResourcePtr res, qreal xV
     return true;
 }
 
+/*
 bool QnAbstractPtzController::calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff)
 {
     return calibrate(m_resource, xVelocityCoeff, yVelocityCoeff, zoomVelocityCoeff);
 }
+*/
 
 qreal QnAbstractPtzController::getXVelocityCoeff() const
 {

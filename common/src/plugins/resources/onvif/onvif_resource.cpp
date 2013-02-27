@@ -2020,7 +2020,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     if (!m_ptzController) 
     {
-        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(::toSharedPointer(this)));
+        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
         if (!controller->getPtzConfigurationToken().isEmpty())
             m_ptzController.reset(controller.take());
     }

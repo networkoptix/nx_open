@@ -135,7 +135,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
         if(hasFocus) {
             setCameraCapability(Qn::ContinuousZoomCapability, true);
-            m_ptzController.reset(new QnDwZoomPtzController(::toSharedPointer(this)));
+            m_ptzController.reset(new QnDwZoomPtzController(this));
         }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
