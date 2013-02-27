@@ -61,7 +61,6 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(ui->okTestButton,           SIGNAL(clicked()),                  this,   SLOT(at_okTestButton_clicked()));
     connect(m_timeoutTimer,             SIGNAL(timeout()),                  this,   SLOT(at_timer_timeout()));
 
-    m_timeoutTimer->setInterval(100);
     m_timeoutTimer->setSingleShot(false);
 
     QPalette palette = this->palette();
@@ -234,10 +233,11 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     ui->cancelTestButton->setVisible(true);
     ui->okTestButton->setVisible(false);
 
-    ui->testProgressBar->setMaximum(result.timeout * 10); //timer interval is 100ms
     ui->testProgressBar->setValue(0);
 
     ui->testResultLabel->setText(tr("In Progress..."));
+
+    m_timeoutTimer->setInterval(result.timeout * 1000 / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
     m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
