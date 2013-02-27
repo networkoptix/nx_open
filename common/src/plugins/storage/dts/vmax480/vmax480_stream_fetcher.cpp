@@ -48,7 +48,7 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
     
-#if 0
+#if 1
     m_vMaxProxy->start(QLatin1String("vmaxproxy"), args);
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
 #else

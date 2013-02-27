@@ -482,11 +482,13 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                 //m_ACSStream->requestRecordDateTime();
                 if (m_channelNum != -1) {
                     m_ACSStream->openChannel(1 << m_channelNum);
-                    m_ACSStream->openAudioChannel(1 << m_channelNum);
+                    //m_ACSStream->openAudioChannel(1 << m_channelNum);
+                }
+                else {
+                    m_connectedInternal = true;
+                    m_callbackCond.wakeOne();
                 }
             }
-            m_connectedInternal = true;
-            m_callbackCond.wakeOne();
             break;
         }
 
@@ -512,7 +514,10 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
             }
             break;
         }
-
+    case RESULT_OPEN_VIDEO:
+        m_connectedInternal = true;
+        m_callbackCond.wakeOne();
+        break;
     case RESULT_ALIVECHK:
         {
             if( _result->mResult == false )
