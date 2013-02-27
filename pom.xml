@@ -18,9 +18,20 @@
 			<url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>	
-	
+
 	<properties>
-        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
+		<release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+
+		<appserver.name>Enterprise Controller</appserver.name>
+		<client.name>${company.name} ${product.name} Client</client.name>
+		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
+		<mediaserver.name>${company.name} Media Server</mediaserver.name>
+		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
+		<testcamera.name>${company.name} Test Camera</testcamera.name>
+		<traytool.name>${product.name} Tray Assistant</traytool.name>
+		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+
+		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
@@ -185,7 +196,7 @@
 				</os> 
 			</activation>
 			<modules>
-			  <!--<module>xvbadecoder</module>-->
+				<!--<module>xvbadecoder</module>-->
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>

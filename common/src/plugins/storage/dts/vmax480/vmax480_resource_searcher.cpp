@@ -1,6 +1,7 @@
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
+#include "utils/network/simple_http_client.h"
 
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -56,7 +57,9 @@ QUdpSocket* QnPlVmax480ResourceSearcher::sockByName(const QnInterfaceAndAddr& if
 /*
 QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
+    
     QnResourceList result;
+    return result;
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
@@ -82,18 +85,20 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
             quint16 senderPort;
             sock->readDatagram(reply.data(), reply.size(),    &sender, &senderPort);
 
-            int index = reply.indexOf("DW-VF");
+            int index = reply.indexOf("Upnp-DW-VF");
 
-            if (index < 0 || index + 20 > reply.size())
+            if (index < 0 || index + 25 > reply.size())
                 continue;
 
-            index += 5;
+            index += 10;
 
             int index2 = reply.indexOf("-", index);
             if (index2 < 0)
                 continue;
 
             QByteArray channelsstr = reply.mid(index, index2 - index);
+
+            QString name = QString(QLatin1String("DW-VF")) + QString(QLatin1String(channelsstr));
 
             int channles = channelsstr.toInt();
 
@@ -116,11 +121,15 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
             QAuthenticator auth;
             auth.setUser(QLatin1String("admin"));
 
-            for (int i = 1; i <= channles; ++i)
+            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+            if (!rt.isValid())
+                continue;
+
+
+
+            for (int i = 0; i < channles; ++i)
             {
                 QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
-                QString name;
-                QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
                 resource->setTypeId(rt);
                 resource->setName(name);
@@ -231,6 +240,69 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, c
 QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
+
+    
+
+    CLHttpStatus status;
+    QByteArray reply = downloadFile(status, QLatin1String("dvrdevicedesc.xml"),  url.host(), 49152, 1000, auth);
+
+    if (status != CL_HTTP_SUCCESS)
+        return result;
+
+
+    int index = reply.indexOf("Upnp-DW-VF");
+
+    if (index < 0 || index + 25 > reply.size())
+        return result;
+
+    index += 10;
+
+    int index2 = reply.indexOf("-", index);
+    if (index2 < 0)
+        return result;
+
+    QByteArray channelsstr = reply.mid(index, index2 - index);
+
+    QString name = QString(QLatin1String("DW-VF")) + QString(QLatin1String(channelsstr));
+
+    int channles = channelsstr.toInt();
+
+    index = index2 + 1;
+    index2 = reply.indexOf("<", index);
+
+    if (index2 < 0)
+        return result;
+
+
+    QByteArray macstr = reply.mid(index, index2 - index);
+
+    QString mac = QnMacAddress(QString(QLatin1String(macstr))).toString();
+    QString host = url.host();
+
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!rt.isValid())
+        return result;
+
+
+
+    for (int i = 0; i < channles; ++i)
+    {
+        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+
+        resource->setTypeId(rt);
+        resource->setName(name);
+        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+        resource->setMAC(mac);
+
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(9010).arg(i+1));
+        resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
+        resource->setAuth(auth);
+
+        result << resource;
+    }
+
+
     return result;
 }
 
@@ -238,3 +310,5 @@ QString QnPlVmax480ResourceSearcher::manufacture() const
 {
     return QLatin1String(QnPlVmax480Resource::MANUFACTURE);
 }
+
+
