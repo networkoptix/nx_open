@@ -2,6 +2,9 @@
 
 since 1.4
 
+VMAX
+"Close All but This" menu item doesn't ask to save layouts. 
+If a layout had been modified via drag'n'drop is was not suggested to save it if try to close the client.
 If open camera in a new tab it removes from layout in resource tree.
 Settings are not saved under Linux if client has been run under Root
 Do not ask to select an item before export (at least one item is always selected (selection can be grey))
