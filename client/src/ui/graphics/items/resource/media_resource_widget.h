@@ -132,7 +132,6 @@ private slots:
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
-    void at_radassButton_clicked();
 
     void at_camDisplay_liveChanged();
 
@@ -140,7 +139,6 @@ private:
     int currentRecordingMode();
 
     Q_SLOT void updateIconButton();
-    Q_SLOT void updateRadassButton();
 
 private:
     /** Media resource. */
