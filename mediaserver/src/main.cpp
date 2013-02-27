@@ -82,6 +82,7 @@
 #include "business/events/reasoned_business_event.h"
 #include "rest/handlers/favico_handler.h"
 #include "rest/handlers/storage_space_handler.h"
+#include "common/customization.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -952,7 +953,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
 #ifdef Q_OS_WIN
-    if (QString(QN_CUSTOMIZATION_NAME) == "digitalwatchdog")
+    if (qnCustomization() == Qn::DwSpectrumCustomization)
         QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
 #endif
 
