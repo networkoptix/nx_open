@@ -154,6 +154,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         
         ui->checkBoxEnableAudio->setEnabled(true);
     
+        ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
+
         bool firstCamera = true;
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
         {
@@ -162,6 +164,9 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             if (!camera->isAudioSupported())
                 ui->checkBoxEnableAudio->setEnabled(false);
+
+            if (camera->isDtsBased())
+                ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
 
             Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
             if (firstCamera) {

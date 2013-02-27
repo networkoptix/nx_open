@@ -385,9 +385,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 
         bool dtsBased = camera()->isDtsBased();
-        ui->recordingTab->setEnabled(!dtsBased);
-        ui->motionTab->setEnabled(!dtsBased);
-        ui->advancedTab->setEnabled(!dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
+        ui->tabWidget->setTabEnabled(Qn::AdvancedSettingsTab, !dtsBased);
     }
 
     updateMotionWidgetFromResource();
