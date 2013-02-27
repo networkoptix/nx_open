@@ -66,7 +66,7 @@ private:
 };
 
 
-QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
+QnAxisPtzController::QnAxisPtzController(QnPlAxisResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),

@@ -937,7 +937,7 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-    m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
+    m_ptzController.reset(new QnAxisPtzController(this));
     Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
     if(capabilities == Qn::NoCapabilities)
         m_ptzController.reset();

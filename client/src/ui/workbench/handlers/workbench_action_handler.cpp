@@ -430,14 +430,13 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     bool needToAsk = false;
     QnLayoutResourceList saveableResources, rollbackResources;
     foreach(const QnLayoutResourcePtr &resource, resources) {
-        bool changed, saveable, askable;
+        bool changed, saveable;
 
         Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
-        askable = flags == (Qn::ResourceIsChanged | Qn::ResourceIsLocal); /* Changed, local, not being saved. */
         changed = flags & Qn::ResourceIsChanged;
         saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
-        if(askable && saveable)
+        if(changed && saveable)
             needToAsk = true;
 
         if(changed) {
@@ -710,12 +709,7 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(QnResourceWidget *widget, widgets)
-            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                mediaWidget->setResolutionMode(resolutionMode);
-    }
+    // TODO: #Elric #radass
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -789,9 +783,13 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         //QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
         //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     //}
-    QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
-    workbench()->update(state);
-    
+
+    // we should not restore state when using "Open in New Window"
+    if (m_delayedDrops.size() == 0) {
+        QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
+        workbench()->update(state);
+    }
+
     /* Delete empty orphaned layouts, move non-empty to the new user. */
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {

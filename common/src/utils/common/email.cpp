@@ -22,6 +22,8 @@ namespace {
     const int TIMEOUT = 10; //seconds
 
     //TODO: #GDM check authorization login: use domain or not
+    // Actual list here:
+    // https://noptix.enk.me/redmine/projects/vms/wiki/SMTP_Server_Presets
     static QHash<QString, QnEmail::SmtpServerPreset> initSmtpPresets() {
         typedef QLatin1String _;
         typedef QnEmail::SmtpServerPreset server;
@@ -35,13 +37,14 @@ namespace {
         presets.insert(_("msn.com"),            server(_("smtp.live.com")));
 
         presets.insert(_("dwcc.tv"),            server(_("mail.dwcc.tv")));
+        presets.insert(_("networkoptix.com"),   server(_("smtp.networkoptix.com")));
 
         presets.insert(_("yahoo.com"),          server(_("smtp.mail.yahoo.com"), QnEmail::Ssl));
         presets.insert(_("yahoo.co.uk"),        server(_("smtp.mail.yahoo.co.uk"), QnEmail::Ssl));
         presets.insert(_("yahoo.de"),           server(_("smtp.mail.yahoo.de"), QnEmail::Ssl));
         presets.insert(_("yahoo.com.au"),       server(_("smtp.mail.yahoo.com.au"), QnEmail::Ssl));
 
-        presets.insert(_("att.yahoo.com"),       server(_("smtp.att.yahoo.com"), QnEmail::Ssl));
+        presets.insert(_("att.yahoo.com"),      server(_("smtp.att.yahoo.com"), QnEmail::Ssl));
 
         presets.insert(_("o2.ie"),              server(_("smtp.o2.ie"), QnEmail::Unsecure));
         presets.insert(_("o2.co.uk"),           server(_("smtp.o2.co.uk"), QnEmail::Unsecure));
@@ -82,7 +85,40 @@ namespace {
         presets.insert(_("wanadoo.co.uk"),      server(_("smtp.wanadoo.co.uk"), QnEmail::Unsecure));
 
         presets.insert(_("mail.ru"),            server(_("smtp.mail.ru"), QnEmail::Ssl));
+        presets.insert(_("list.ru"),            server(_("smtp.mail.ru"), QnEmail::Ssl));
+        presets.insert(_("bk.ru"),              server(_("smtp.mail.ru"), QnEmail::Ssl));
+        presets.insert(_("inbox.ru"),           server(_("smtp.mail.ru"), QnEmail::Ssl));
+
+        presets.insert(_("narod.ru"),           server(_("smtp.yandex.ru"), QnEmail::Ssl));
         presets.insert(_("yandex.ru"),          server(_("smtp.yandex.ru"), QnEmail::Ssl));
+
+        presets.insert(_("pochta.ru"),          server(_("smtp.pochta.ru"), QnEmail::Unsecure));
+
+        presets.insert(_("rambler.ru"),         server(_("mail.rambler.ru")));
+        presets.insert(_("lenta.ru"),           server(_("mail.rambler.ru")));
+        presets.insert(_("autorambler.ru"),     server(_("mail.rambler.ru")));
+        presets.insert(_("myrambler.ru"),       server(_("mail.rambler.ru")));
+        presets.insert(_("ro.ru"),              server(_("mail.rambler.ru")));
+        presets.insert(_("r0.ru"),              server(_("mail.rambler.ru")));
+
+        presets.insert(_("li.ru"),              server(_("smtp.li.ru"), QnEmail::Ssl));
+        presets.insert(_("nic.ru"),             server(_("mail.nic.ru"), QnEmail::Unsecure));
+
+        presets.insert(_("qip.ru"),             server(_("smtp.qip.ru"), QnEmail::Unsecure));
+        presets.insert(_("newmail.ru"),         server(_("smtp.qip.ru"), QnEmail::Unsecure));
+        presets.insert(_("hotmail.ru"),         server(_("smtp.qip.ru"), QnEmail::Unsecure));
+        presets.insert(_("nm.ru"),              server(_("smtp.qip.ru"), QnEmail::Unsecure));
+        presets.insert(_("nightmail.ru"),       server(_("smtp.qip.ru"), QnEmail::Unsecure));
+
+        presets.insert(_("km.ru"),              server(_("smtp.km.ru"), QnEmail::Unsecure));
+        presets.insert(_("freemail.ru"),        server(_("smtp.km.ru"), QnEmail::Unsecure));
+        presets.insert(_("bossmail.ru"),        server(_("smtp.km.ru"), QnEmail::Unsecure));
+        presets.insert(_("girlmail.ru"),        server(_("smtp.km.ru"), QnEmail::Unsecure));
+        presets.insert(_("boymail.ru"),         server(_("smtp.km.ru"), QnEmail::Unsecure));
+        presets.insert(_("safebox.ru"),         server(_("smtp.km.ru"), QnEmail::Unsecure));
+        presets.insert(_("megabox.ru"),         server(_("smtp.km.ru"), QnEmail::Unsecure));
+
+
 
         return presets;
     }
@@ -125,7 +161,7 @@ QnEmail::SmtpServerPreset QnEmail::smtpServer() const {
     QString key = domain();
     if (SmtpServerPresetPresets.contains(key))
         return SmtpServerPresetPresets[key];
-    return SmtpServerPreset(QLatin1String("smtp.") + key, Unsecure);
+    return SmtpServerPreset();
 }
 
 QnEmail::Settings QnEmail::settings() const {
@@ -133,9 +169,10 @@ QnEmail::Settings QnEmail::settings() const {
     SmtpServerPreset preset = smtpServer();
 
     result.server = preset.server;
-    result.port = preset.port == 0
-            ? QnEmail::defaultPort(preset.connectionType)
-            : preset.port;
+    result.port = preset.port;
+//    == 0
+//            ? QnEmail::defaultPort(preset.connectionType)
+//            : preset.port;
     result.connectionType = preset.connectionType;
 
     return result;
@@ -173,6 +210,8 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
             : useSsl
               ? QnEmail::Ssl
               : QnEmail::Unsecure;
+    if (port == defaultPort(connectionType))
+        port = 0;
 }
 
 QnKvPairList QnEmail::Settings::serialized() const {
@@ -183,7 +222,7 @@ QnKvPairList QnEmail::Settings::serialized() const {
 
     result
     << QnKvPair(nameHost, server)
-    << QnKvPair(namePort, port)
+    << QnKvPair(namePort, port == 0 ? defaultPort(connectionType) : port)
     << QnKvPair(nameUser, user)
     << QnKvPair(nameFrom, user)
     << QnKvPair(namePassword, password)

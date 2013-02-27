@@ -69,7 +69,6 @@ TimerManager::~TimerManager()
         m_impl->cond.wakeAll();
     }
 
-    terminate();
     wait();
 
     delete m_impl;
