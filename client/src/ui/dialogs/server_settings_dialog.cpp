@@ -31,63 +31,23 @@
 namespace {
     const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
 
-    const qint64 bytesInMib = 1024 * 1024;
+    const qint64 bytesInMb = 1000 * 1000;
 
-    const int SpaceRole = Qt::UserRole;
-    const int TotalSpaceRole = Qt::UserRole + 1;
-    const int StorageIdRole = Qt::UserRole + 2;
+    const int ReservedSpaceRole = Qt::UserRole;
+    const int FreeSpaceRole = Qt::UserRole + 1;
+    const int TotalSpaceRole = Qt::UserRole + 2;
+    const int StorageIdRole = Qt::UserRole + 3;
 
     enum Column {
         CheckBoxColumn,
         PathColumn,
-        UsedSpaceColumn,
+        CapacityColumn,
         ArchiveSpaceColumn
     };
 
-    class SpaceItemDelegate: public QStyledItemDelegate {
-        typedef QStyledItemDelegate base_type;
-    public:
-        SpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
-
-        virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-            if(!m_gradient.isNull()) {
-                qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
-                qint64 space = index.data(SpaceRole).toLongLong();
-                if(totalSpace > 0) {
-                    double fill = qBound(0.0, static_cast<double>(space) / totalSpace, 1.0);
-                    QColor color = m_gradient(fill);
-
-                    painter->fillRect(QRect(option.rect.topLeft(), QSize(option.rect.width() * fill, option.rect.height())), color);
-                }
-            }
-
-            base_type::paint(painter, option, index);
-        }
-
-        const QnInterpolator<QColor> &gradient() {
-            return m_gradient;
-        }
-
-        void setGradient(const QnInterpolator<QColor> &gradient) {
-            m_gradient = gradient;
-        }
-
-    private:
-        QnInterpolator<QColor> m_gradient;
-    };
-
-    class UsedSpaceItemDelegate: public SpaceItemDelegate {
-        typedef SpaceItemDelegate base_type;
-    public:
-        UsedSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
-            QVector<QPair<qreal, QColor> > points;
-            points 
-                << qMakePair( 0.8, QColor(0, 255, 0, 48))
-                << qMakePair(0.85, QColor(255, 255, 0, 48))
-                << qMakePair( 0.9, QColor(255, 0, 0, 48));
-            setGradient(points);
-        }
-    };
+    QString formatStorageSize(qint64 size) {
+        return formatFileSize(size, 1, 10);
+    }
 
     class ArchiveSpaceSlider: public QSlider {
         typedef QSlider base_type;
@@ -99,6 +59,11 @@ namespace {
             setOrientation(Qt::Horizontal);
             setMouseTracking(true);
             setProperty(Qn::SliderLength, 0);
+
+            setTextFormat(QLatin1String("%1"));
+
+            connect(this, SIGNAL(sliderPressed()), this, SLOT(update()));
+            connect(this, SIGNAL(sliderReleased()), this, SLOT(update()));
         }
 
         const QColor &color() const {
@@ -109,15 +74,42 @@ namespace {
             m_color = color;
         }
 
+        QString text() const {
+            if(!m_textFormatHasPlaceholder) {
+                return m_textFormat;
+            } else {
+                if(isSliderDown()) {
+                    return formatStorageSize(sliderPosition() * bytesInMb);
+                } else {
+                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
+                }
+            }
+        }
+
+        QString textFormat() const {
+            return m_textFormat;
+        }
+
+        void setTextFormat(const QString &textFormat) {
+            if(m_textFormat == textFormat)
+                return;
+
+            m_textFormat = textFormat;
+            m_textFormatHasPlaceholder = textFormat.contains(QLatin1String("%1"));
+            update();
+        }
+
     protected:
         virtual void mouseMoveEvent(QMouseEvent *event) override {
             base_type::mouseMoveEvent(event);
 
-            int x = handlePos();
-            if(qAbs(x - event->pos().x()) < 6) {
-                setCursor(Qt::SplitHCursor);
-            } else {
-                unsetCursor();
+            if(!isEmpty()) {
+                int x = handlePos();
+                if(qAbs(x - event->pos().x()) < 6) {
+                    setCursor(Qt::SplitHCursor);
+                } else {
+                    unsetCursor();
+                }
             }
         }
 
@@ -133,7 +125,7 @@ namespace {
 
             painter.fillRect(rect, palette().color(backgroundRole()));
 
-            if(minimum() != maximum()) {
+            if(!isEmpty()) {
                 int x = handlePos();
                 painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
                 
@@ -142,32 +134,35 @@ namespace {
             }
 
             const int textMargin = style()->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
-            QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
+            QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0);
             painter.setPen(palette().color(QPalette::WindowText));
-            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, formatFileSize(sliderPosition() * bytesInMib));
+            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text());
         }
 
     private:
-        int handlePos() const {
-            if(minimum() == maximum())
-                return 0;
+        qreal relativePosition() const {
+            return isEmpty() ? 0.0 : static_cast<double>(sliderPosition() - minimum()) / (maximum() - minimum());
+        }
 
-            return rect().width() * static_cast<double>(sliderPosition() - minimum()) / (maximum() - minimum());
+        int handlePos() const {
+            return rect().width() * relativePosition();
+        }
+
+        bool isEmpty() const {
+            return maximum() == minimum();
         }
 
     private:
         QColor m_color;
+        QString m_textFormat;
+        bool m_textFormatHasPlaceholder;
     };
 
-    class ArchiveSpaceItemDelegate: public SpaceItemDelegate {
-        typedef SpaceItemDelegate base_type;
+    class ArchiveSpaceItemDelegate: public QStyledItemDelegate {
+        typedef QStyledItemDelegate base_type;
     public:
         ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
             m_color = toTransparent(withAlpha(qnGlobals->selectionColor(), 255), 0.25);
-
-            QVector<QPair<qreal, QColor> > points;
-            points << qMakePair(0.0, m_color);
-            setGradient(points);
         }
 
         virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
@@ -184,10 +179,10 @@ namespace {
             }
 
             qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
-            qint64 space = index.data(SpaceRole).toLongLong();
+            qint64 videoSpace = totalSpace - index.data(ReservedSpaceRole).toLongLong();
 
-            slider->setRange(0, totalSpace / bytesInMib);
-            slider->setValue(space / bytesInMib);
+            slider->setRange(0, totalSpace / bytesInMb);
+            slider->setValue(videoSpace / bytesInMb);
         }
 
         virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
@@ -197,9 +192,9 @@ namespace {
                 return;
             }
 
-            qint64 value = slider->value() * bytesInMib;
-            model->setData(index, value, SpaceRole);
-            model->setData(index, formatFileSize(value), Qt::DisplayRole);
+            qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
+            qint64 videoSpace = slider->value() * bytesInMb;
+            model->setData(index, totalSpace - videoSpace, ReservedSpaceRole);
         }
 
     private:
@@ -230,9 +225,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
     ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
     ui->storagesTable->horizontalHeader()->setResizeMode(PathColumn, QHeaderView::ResizeToContents);
-    ui->storagesTable->horizontalHeader()->setResizeMode(UsedSpaceColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
-    ui->storagesTable->setItemDelegateForColumn(UsedSpaceColumn, new UsedSpaceItemDelegate(this));
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
 
     setButtonBox(ui->buttonBox);
@@ -282,37 +276,22 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
     checkBoxItem->setData(StorageIdRole, item.storageId);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
-    pathItem->setData(Qt::DisplayRole, item.path);
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    pathItem->setData(Qt::DisplayRole, item.path);
 
-    QTableWidgetItem *usedSpaceItem = new QTableWidgetItem();
-    usedSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    if(item.freeSpace == -1 || item.totalSpace == -1) {
-        usedSpaceItem->setData(Qt::DisplayRole, tr("Not available"));
-        usedSpaceItem->setData(SpaceRole, 0);
-        usedSpaceItem->setData(TotalSpaceRole, 0);
-    } else {
-        /*: This text refers to storage's used space. E.g. "2Gb of 30Gb". */
-        usedSpaceItem->setData(Qt::DisplayRole, tr("%1 of %2").arg(formatFileSize(item.totalSpace - item.freeSpace)).arg(formatFileSize(item.totalSpace)));
-        usedSpaceItem->setData(SpaceRole, item.totalSpace - item.freeSpace);
-        usedSpaceItem->setData(TotalSpaceRole, item.totalSpace);
-    }
+    QTableWidgetItem *capacityItem = new QTableWidgetItem();
+    capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : formatStorageSize(item.totalSpace));
 
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
     archiveSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-    if(item.reservedSpace == -1) {
-        archiveSpaceItem->setData(Qt::DisplayRole, tr("Not applicable"));
-        archiveSpaceItem->setData(SpaceRole, 0);
-        archiveSpaceItem->setData(TotalSpaceRole, 0);
-    } else {
-        archiveSpaceItem->setData(Qt::DisplayRole, formatFileSize(item.totalSpace - item.reservedSpace));
-        archiveSpaceItem->setData(SpaceRole, item.totalSpace - item.reservedSpace);
-        archiveSpaceItem->setData(TotalSpaceRole, item.totalSpace);
-    }
+    archiveSpaceItem->setData(ReservedSpaceRole, item.reservedSpace);
+    archiveSpaceItem->setData(TotalSpaceRole, item.totalSpace);
+    archiveSpaceItem->setData(FreeSpaceRole, item.freeSpace);
 
     ui->storagesTable->setItem(row, CheckBoxColumn, checkBoxItem);
     ui->storagesTable->setItem(row, PathColumn, pathItem);
-    ui->storagesTable->setItem(row, UsedSpaceColumn, usedSpaceItem);
+    ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
     ui->storagesTable->setItem(row, ArchiveSpaceColumn, archiveSpaceItem);
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
 }
@@ -340,9 +319,9 @@ QList<QnServerSettingsDialog::StorageItem> QnServerSettingsDialog::tableItems() 
 
         item.path = ui->storagesTable->item(row, PathColumn)->text();
 
-        item.totalSpace = ui->storagesTable->item(row, UsedSpaceColumn)->data(TotalSpaceRole).toLongLong();
-        item.freeSpace = item.totalSpace - ui->storagesTable->item(row, UsedSpaceColumn)->data(SpaceRole).toLongLong();
-        item.reservedSpace = item.totalSpace - ui->storagesTable->item(row, ArchiveSpaceColumn)->data(SpaceRole).toLongLong();
+        item.totalSpace = ui->storagesTable->item(row, ArchiveSpaceColumn)->data(TotalSpaceRole).toLongLong();
+        item.freeSpace = ui->storagesTable->item(row, ArchiveSpaceColumn)->data(FreeSpaceRole).toLongLong();
+        item.reservedSpace = ui->storagesTable->item(row, ArchiveSpaceColumn)->data(ReservedSpaceRole).toLongLong();
 
         result.push_back(item);
     }

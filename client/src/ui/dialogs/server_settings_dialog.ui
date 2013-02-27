@@ -138,12 +138,12 @@
         </column>
         <column>
          <property name="text">
-          <string>Used Space</string>
+          <string>Capacity</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Archive Space</string>
+          <string>Video Storage</string>
          </property>
         </column>
        </widget>

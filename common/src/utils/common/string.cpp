@@ -25,8 +25,8 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
     return result;
 }
 
-QString formatFileSize(qint64 size, const QString pattern) {
-    static const char *sizeSuffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, const QString pattern) {
+    static const char *sizeSuffixes[] = {"B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
 
     QString number, suffix;
     if (size == 0) {
@@ -34,11 +34,11 @@ QString formatFileSize(qint64 size, const QString pattern) {
         suffix = lit("B");
     } else {
         double absSize = std::abs(static_cast<double>(size));
-        int power = static_cast<int>(std::log(absSize) / std::log(1000.0));
-        int unit = power >= arraysize(sizeSuffixes) ? arraysize(sizeSuffixes) - 1 : power;
+        int power = static_cast<int>(std::log(absSize / prefixThreshold) / std::log(1000.0));
+        int unit = qBound(static_cast<int>(minPrefix), power, qMin(static_cast<int>(maxPrefix), static_cast<int>(arraysize(sizeSuffixes) - 1)));
 
         suffix = lit(sizeSuffixes[unit]);
-        number = (size < 0 ? lit("-") : QString()) + QString::number(absSize / std::pow(1000.0, unit), 'f', 1);
+        number = (size < 0 ? lit("-") : QString()) + QString::number(absSize / std::pow(1000.0, unit), 'f', precision);
 
         /* Chop trailing zeros. */
         for(int i = number.size() - 1; ;i--) {
