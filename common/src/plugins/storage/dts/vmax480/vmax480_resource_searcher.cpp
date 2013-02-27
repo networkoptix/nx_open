@@ -54,12 +54,12 @@ QUdpSocket* QnPlVmax480ResourceSearcher::sockByName(const QnInterfaceAndAddr& if
     return it.value();
 }
 
-/*
+#if 1
+
 QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
     
     QnResourceList result;
-    return result;
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
@@ -151,8 +151,8 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
     return result;
 }
-*/
 
+#else
 QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
     QnResourceList result;
@@ -207,6 +207,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
     return result;
 }
+#endif
 
 QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
