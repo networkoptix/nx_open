@@ -263,7 +263,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
     {
         QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resList[i]);
         if (camera) {
-            if (camera->getCameraCapabilities() & Qn::DtsBasedCamera)
+            if (camera->isDtsBased())
             {
                 periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
             }

@@ -26,15 +26,20 @@ public:
     virtual void beforeClose() override;
 
     virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+private:
+    void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
+    qint64 seekInternal(qint64 time, bool findIFrame);
 private:
     QnPlVmax480ResourcePtr m_res;
-    bool m_connected;
     CLDataQueue m_internalQueue;
     bool m_needStop;
     quint8 m_sequence;
     bool m_vmaxPaused;
     qint64 m_lastMediaTime;
     bool m_reverseMode;
+    QMap<qint64, bool> m_ThumbnailsSeekPoints; // key - time, value - isRecordingHole detected
+    bool m_thumbnailsMode;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

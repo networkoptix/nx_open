@@ -106,12 +106,11 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
     return new QnVMax480LiveProvider(toSharedPointer());
 }
 
-QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider() 
+QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate() 
 { 
-    QnArchiveStreamReader* reader = new QnArchiveStreamReader(toSharedPointer());
-    reader->setArchiveDelegate(new QnVMax480ArchiveDelegate(toSharedPointer()));
-    return reader; 
+    return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
+
 
 void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 {
@@ -121,7 +120,7 @@ void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 bool QnPlVmax480Resource::initInternal()
 {
 
-    Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability | Qn::DtsBasedCamera | Qn::AnalogCamera;
+    Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
 
@@ -193,6 +192,12 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
     }
 }
 
+QnTimePeriodList  QnPlVmax480Resource::getChunks()
+{
+    QMutexLocker lock(&m_mutexChunks);
+    return m_chunks;
+}
+
 void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 {
     QMutexLocker lock(&m_mutexChunks);
@@ -203,6 +208,10 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 
 QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
 {
+
+    if (!m_chunks.isEmpty())
+        startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
+
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     
     QMutexLocker lock(&m_mutexChunks);

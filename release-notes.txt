@@ -1,8 +1,17 @@
------------------------------------------------ 1.4.3 - Beta -----------------------------------------------
+----------------------------------------------- 1.4.3 - Beta2 -----------------------------------------------
 
-Do not ask to select an item before export (at least one item is always selected (selection can be grey)) - since 1.4
-If two cameras had the same password, it was displayed in - since 1.4
-If show cursor on screen position then the position of the cursor is incorrect in the recorded video, especially if recording application Window only - since 1.4
+since 1.4
+
+If open camera in a new tab it removes from layout in resource tree.
+Settings are not saved under Linux if client has been run under Root
+Do not ask to select an item before export (at least one item is always selected (selection can be grey))
+If two cameras had the same password, it was displayed in
+If show cursor on screen position then the position of the cursor is incorrect in the recorded video, especially if recording application Window only
+Redesign Screen Recording form 
+Arecont. If choose Motion+Lo-Res and click Cancel, than warning message will be appeared severel times.
+Thumbnails are drawn on top of chunks holes in multi-video exported file
+Columns are not auto-resized in camera addition dialog
+If set an existed name, layout will saved as new.
 
 Display confirmation window when choosing a file for db restore
 add E-mail servers preset

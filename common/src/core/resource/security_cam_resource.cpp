@@ -120,9 +120,13 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
     }
     else if (role == QnResource::Role_Archive) {
-        QnAbstractStreamDataProvider* result = createArchiveDataProvider();
-        if (result)
-            return result;
+        
+        QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+        if (archiveDelegate) {
+            QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+            archiveReader->setArchiveDelegate(archiveDelegate);
+            return archiveReader;
+        }
     }
 
     if (m_dpFactory)
@@ -250,6 +254,17 @@ bool QnSecurityCamResource::hasDualStreaming() const
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
     this_casted->getParam(lit("hasDualStreaming"), val, QnDomainMemory);
+    return val.toInt();
+}
+
+bool QnSecurityCamResource::isDtsBased() const
+{
+    if (!hasParam(lit("dts")))
+        return false;
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam(lit("dts"), val, QnDomainMemory);
     return val.toInt();
 }
 
@@ -451,6 +466,11 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
     QVariant mediaVariant;
     const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: const_cast? get rid of it!
     return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
+}
+
+bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const
+{
+    return getCameraCapabilities() & capabilities;
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {

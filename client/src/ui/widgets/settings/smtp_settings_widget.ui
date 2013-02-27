@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QWidget" name="controlsWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -62,7 +62,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="simplePage">
       <layout class="QFormLayout" name="formLayout_3">
@@ -72,7 +72,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="simpleEmailLabel">
          <property name="text">
-          <string>&amp;Email:</string>
+          <string>&amp;E-Mail:</string>
          </property>
          <property name="buddy">
           <cstring>simpleEmailLineEdit</cstring>
@@ -243,39 +243,141 @@
        </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="testingProgressWidget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="testLabel">
-        <property name="text">
-         <string>Testing...</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QProgressBar" name="testProgressBar">
-        <property name="maximum">
-         <number>0</number>
-        </property>
-        <property name="value">
-         <number>-1</number>
-        </property>
-        <property name="textVisible">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="testResultButton">
-        <property name="text">
-         <string>Cancel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QWidget" name="page">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QFormLayout" name="formLayout_4">
+         <item row="0" column="0">
+          <widget class="QLabel" name="testServerCaptionLabel">
+           <property name="text">
+            <string>Server:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="testServerLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="testPortCaptionLabel">
+           <property name="text">
+            <string>Port:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="testPortLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="testUserCaptionLabel">
+           <property name="text">
+            <string>User:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="testSecurityCaptionLabel">
+           <property name="text">
+            <string>Security:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="testUserLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="testSecurityLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="testProgressCaptionLabel">
+           <property name="text">
+            <string>Progress:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QProgressBar" name="testProgressBar">
+           <property name="maximum">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+           <property name="textVisible">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="testResultCaptionLabel">
+           <property name="text">
+            <string>Result:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="testResultLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="okTestButton">
+           <property name="text">
+            <string>OK</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cancelTestButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -301,7 +403,12 @@
   <tabstop>userLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>tlsRadioButton</tabstop>
+  <tabstop>sslRadioButton</tabstop>
   <tabstop>unsecuredRadioButton</tabstop>
+  <tabstop>okTestButton</tabstop>
+  <tabstop>cancelTestButton</tabstop>
+  <tabstop>advancedCheckBox</tabstop>
+  <tabstop>testButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

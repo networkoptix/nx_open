@@ -54,6 +54,7 @@ QUdpSocket* QnPlVmax480ResourceSearcher::sockByName(const QnInterfaceAndAddr& if
     return it.value();
 }
 
+/*
 QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
     
@@ -72,10 +73,8 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
 
 
-        /*
-        QByteArray requestDatagram;
-        socket.writeDatagram(requestDatagram.data(), requestDatagram.size(), groupAddress, 1900);
-        **/
+        //QByteArray requestDatagram;
+        //socket.writeDatagram(requestDatagram.data(), requestDatagram.size(), groupAddress, 1900);
 
         while(sock->hasPendingDatagrams())
         {
@@ -152,8 +151,8 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
     return result;
 }
+*/
 
-/*
 QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
     QnResourceList result;
@@ -208,7 +207,6 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
     return result;
 }
-/**/
 
 QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {

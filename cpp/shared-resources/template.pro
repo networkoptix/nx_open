@@ -44,7 +44,7 @@ CONFIG(release, debug|release) {
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
-!contains(TARGET,common) {
+!contains(TARGET,common){
   LIBS += -lcommon	
 }
 

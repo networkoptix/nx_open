@@ -47,9 +47,7 @@ public:
         ContinuousPanTiltCapability         = 0x040,
         ContinuousZoomCapability            = 0x080,
         OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
-        DtsBasedCamera                      = 0x200, // Camera archive is placed on foreign system
-        AnalogCamera                        = 0x400, // Analog cameras use different license type
-
+        
         /* Shortcuts */
         AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
 

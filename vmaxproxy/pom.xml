@@ -9,7 +9,7 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.2</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
@@ -21,6 +21,9 @@
 	<name>HD Witness VMax Proxy</name>	
 
 	<properties>
+		<!--This module is forced to be built under x86. This is done by "replace.skip" property and ./maven/vmaxproxy-specifics.pro-->
+		<!--Skipping replace plugin. It replaces Win32->x64 in vcproj files for x64 build.-->
+		<replace.skip>true</replace.skip>
 		<product.title>${vmaxproxy.name}</product.title>	
 		<!--Global libs-->
 		<global.libs/>
@@ -34,29 +37,6 @@
 		<windows.defines/>
 		<windows.defines/>
 		<linux.defines/>
-		<mac.defines/>		
+		<mac.defines/>	
 	</properties>  
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.2</version>
-				<executions>
-					<execution>
-						<id>pack-binaries</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>${basedir}/binaries.xml</descriptor>
-							</descriptors>	
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>	
 </project>

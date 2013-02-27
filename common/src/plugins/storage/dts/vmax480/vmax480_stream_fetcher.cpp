@@ -20,12 +20,17 @@ VMaxStreamFetcher::~VMaxStreamFetcher()
 
 bool VMaxStreamFetcher::isOpened() const
 {
-    return m_vMaxProxy && !m_tcpID.isEmpty();
+    return m_vMaxProxy && !m_tcpID.isEmpty() && m_vmaxConnection && m_vmaxConnection->isRunning();
 }
 
 void VMaxStreamFetcher::vmaxArchivePlay(qint64 timeUsec, quint8 sequence, int speed)
 {
     m_vmaxConnection->vMaxArchivePlay(timeUsec, sequence, speed);
+}
+
+void VMaxStreamFetcher::vmaxPlayRange(const QList<qint64>& pointsUsec, quint8 sequence)
+{
+    m_vmaxConnection->vmaxPlayRange(pointsUsec, sequence);
 }
 
 void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* connection)
@@ -43,11 +48,11 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
     
-#if 0
-    m_vMaxProxy->start(QLatin1String("vmaxproxy"), args);
+#if 1
+    m_vMaxProxy->start(QLatin1String("./vmaxproxy/vmaxproxy"), args);
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
 #else
-    m_vMaxProxy->startDetached(QLatin1String("vmaxproxy"), args); // debug only!
+    m_vMaxProxy->startDetached(QLatin1String("./vmaxproxy/vmaxproxy"), args); // debug only!
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)     // debug only!
 #endif
     {
