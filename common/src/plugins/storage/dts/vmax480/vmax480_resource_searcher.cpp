@@ -2,6 +2,9 @@
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/network/simple_http_client.h"
+#include "utils/network/http/httptypes.h"
+
+#include <QXmlDefaultHandler>
 
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -9,6 +12,64 @@ extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress,
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
 QHostAddress groupAddress(QLatin1String("239.255.255.250"));
+
+
+class UpnpDeviceDescriptionSaxHandler
+:
+    public QXmlDefaultHandler
+{
+public:
+    virtual bool startDocument()
+    {
+        return true;
+    }
+
+    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
+    {
+        m_currentElementName = qName;
+        return true;
+    }
+
+    virtual bool characters( const QString& ch )
+    {
+        if( m_currentElementName == QLatin1String("friendlyName") )
+            m_friendlyName = ch;
+        else if( m_currentElementName == QLatin1String("manufacturer") )
+            m_manufacturer = ch;
+        else if( m_currentElementName == QLatin1String("modelName") )
+            m_modelName = ch;
+        else if( m_currentElementName == QLatin1String("serialNumber") )
+            m_serialNumber = ch;
+
+        return true;
+    }
+
+    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
+    {
+        m_currentElementName.clear();
+        return true;
+    }
+
+    virtual bool endDocument()
+    {
+        return true;
+    }
+    //virtual QString errorString() const;
+    //virtual bool error( const QXmlParseException& exception );
+    //virtual bool fatalError( const QXmlParseException& exception );
+
+    QString friendlyName() const { return m_friendlyName; }
+    QString manufacturer() const { return m_manufacturer; }
+    QString modelName() const { return m_modelName; }
+    QString serialNumber() const { return m_serialNumber; }
+
+private:
+    QString m_currentElementName;
+    QString m_friendlyName;
+    QString m_manufacturer;
+    QString m_modelName;
+    QString m_serialNumber;
+};
 
 
 //====================================================================
@@ -87,36 +148,73 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
             int index = reply.indexOf("Upnp-DW-VF");
 
-            if (index < 0 || index + 25 > reply.size())
-                continue;
+            QString mac;
+            QString name;
+            int channles = 0;
+            if( !(index < 0 || index + 25 > reply.size()) )
+            {
+                index += 10;
 
-            index += 10;
+                int index2 = reply.indexOf("-", index);
+                if (index2 < 0)
+                    continue;
 
-            int index2 = reply.indexOf("-", index);
-            if (index2 < 0)
-                continue;
+                QByteArray channelsstr = reply.mid(index, index2 - index);
 
-            QByteArray channelsstr = reply.mid(index, index2 - index);
+                name = QString(QLatin1String("DW-VF")) + QString(QLatin1String(channelsstr));
 
-            QString name = QString(QLatin1String("DW-VF")) + QString(QLatin1String(channelsstr));
+                channles = channelsstr.toInt();
 
-            int channles = channelsstr.toInt();
+                index = index2 + 1;
+                index2 = reply.indexOf(":", index);
 
-            index = index2 + 1;
-            index2 = reply.indexOf(":", index);
+                if (index2 < 0)
+                    continue;
 
-            if (index2 < 0)
-                continue;
+                QByteArray macstr = reply.mid(index, index2 - index);
 
+                mac = QnMacAddress(QString(QLatin1String(macstr))).toString();
+            }
+            else
+            {
+                nx_http::HttpRequest foundDeviceReply;
+                if( !foundDeviceReply.parse( reply ) )
+                    continue;
+                nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
+                if( locationHeader == foundDeviceReply.headers.end() )
+                    continue;
 
-            
+                const QUrl descritionUrl( QLatin1String(locationHeader->second) );
 
-            QByteArray macstr = reply.mid(index, index2 - index);
+                CLSimpleHTTPClient http( descritionUrl.host(), descritionUrl.port(nx_http::DEFAULT_HTTP_PORT), 3000, QAuthenticator() );
+                CLHttpStatus status = http.doGET( descritionUrl.path() );
+                if (status != CL_HTTP_SUCCESS)
+                    continue;
+                QByteArray foundDeviceDescription;
+                http.readAll( foundDeviceDescription );
+                //TODO/IMPL checking Content-Type of received description (MUST be upnp xml to continue)
 
-            QString mac = QnMacAddress(QString(QLatin1String(macstr))).toString();
+                //parsing description xml
+                UpnpDeviceDescriptionSaxHandler xmlHandler;
+                QXmlSimpleReader xmlReader;
+                xmlReader.setContentHandler( &xmlHandler );
+                xmlReader.setErrorHandler( &xmlHandler );
+
+                QXmlInputSource input;
+                input.setData( foundDeviceDescription );
+                if( !xmlReader.parse( &input ) )
+                    continue;
+
+                if( xmlHandler.manufacturer().indexOf(QLatin1String("VMAX480")) == -1 )
+                    continue;
+
+                mac = xmlHandler.serialNumber();
+                //name = xmlHandler.friendlyName();
+                channles = 8;   //TODO/IMPL read from xml
+                name = QLatin1String("DW-VF") + QString::number(channles);
+            }
+
             QString host = sender.toString();
-
-
 
             QAuthenticator auth;
             auth.setUser(QLatin1String("admin"));
@@ -124,8 +222,6 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
             if (!rt.isValid())
                 continue;
-
-
 
             for (int i = 0; i < channles; ++i)
             {

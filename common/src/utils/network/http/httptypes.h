@@ -174,6 +174,7 @@ namespace nx_http
         HttpHeaders headers;
         BufferType messageBody;
 
+        bool parse( const ConstBufferRefType& data );
         void serialize( BufferType* const dstBuffer ) const;
     };
 
