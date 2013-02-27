@@ -132,3 +132,9 @@ void QnThumbnailsStreamReader::run()
 
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader reader stopped."), cl_logINFO);
 }
+
+void QnThumbnailsStreamReader::afterRun()
+{
+    if (m_delegate)
+        m_delegate->close();
+}

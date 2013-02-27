@@ -77,6 +77,8 @@ public:
     
     /* Return true if archvie range is accessible immedeatly without opening an archive */
     bool offlineRangeSupported() const;
+
+    virtual void afterRun() override;
 protected:
     virtual bool init();
 

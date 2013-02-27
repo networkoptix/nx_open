@@ -93,6 +93,13 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
 
+    
+    if (!isOpened()) {
+        open(m_res);
+        if (!isOpened())
+            return result;
+    }
+
     if (m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
         vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
         m_vmaxPaused = false;
@@ -213,10 +220,6 @@ void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64
     calcSeekPoints(startTime, endTime, frameStep);
 
     if (m_ThumbnailsSeekPoints.isEmpty())
-        return;
-
-    open(m_res);
-    if (!isOpened())
         return;
 
     //m_sequence++;

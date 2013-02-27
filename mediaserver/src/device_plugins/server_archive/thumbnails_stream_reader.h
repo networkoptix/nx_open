@@ -29,6 +29,7 @@ public:
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run();
+    virtual void afterRun() override;
 private:
     QnAbstractMediaDataPtr createEmptyPacket();
 private:
