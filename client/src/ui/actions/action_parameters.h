@@ -68,6 +68,10 @@ public:
 
     QnResourceWidgetList widgets(const QString &key = QString()) const;
 
+    void setFocusElement(QString element);
+
+    QString focusElement() const;
+
     const QVariantMap &arguments() const {
         return m_arguments;
     }

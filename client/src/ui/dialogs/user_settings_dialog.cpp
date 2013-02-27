@@ -150,6 +150,11 @@ void QnUserSettingsDialog::setEditorPermissions(quint64 rights) {
     }
 }
 
+void QnUserSettingsDialog::setFocusedElement(QString element) {
+    if (element == QLatin1String("email"))
+        ui->emailEdit->setFocus();
+}
+
 QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element element) const {
     if(element < 0 || element >= ElementCount) {
         qnWarning("Invalid element '%1'.", static_cast<int>(element));

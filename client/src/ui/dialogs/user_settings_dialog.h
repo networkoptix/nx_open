@@ -45,6 +45,8 @@ public:
     void setElementFlags(Element element, ElementFlags flags);
     ElementFlags elementFlags(Element element) const;
 
+    void setFocusedElement(QString element);
+
     void setEditorPermissions(quint64 rights);
 
     bool hasChanges() const {

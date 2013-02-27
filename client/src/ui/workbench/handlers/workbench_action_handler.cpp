@@ -709,12 +709,7 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(QnResourceWidget *widget, widgets)
-            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                mediaWidget->setResolutionMode(resolutionMode);
-    }
+    // TODO: #Elric #radass
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -2183,7 +2178,8 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
-    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
+    QnActionParameters params = menu()->currentParameters(sender());
+    QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
     if(!user)
         return;
 
@@ -2195,6 +2191,8 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);
+
+    dialog->setFocusedElement(params.focusElement());
 
     QnUserSettingsDialog::ElementFlags zero(0);
 

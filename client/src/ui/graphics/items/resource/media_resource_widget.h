@@ -21,10 +21,8 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button RadassButton = static_cast<Button>(0x08);
-    static const Button MotionSearchButton = static_cast<Button>(0x10);
-    static const Button PtzButton = static_cast<Button>(0x20);
-#define RadassButton RadassButton
+    static const Button MotionSearchButton = static_cast<Button>(0x08);
+    static const Button PtzButton = static_cast<Button>(0x10);
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
 
@@ -90,12 +88,8 @@ public:
 
     bool isMotionSensitivityEmpty() const;
 
-    Qn::ResolutionMode resolutionMode() const;
-    void setResolutionMode(Qn::ResolutionMode resolutionMode);
-
 signals:
     void motionSelectionChanged();
-    void resolutionModeChanged();
 
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
@@ -138,7 +132,6 @@ private slots:
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
-    void at_radassButton_clicked();
 
     void at_camDisplay_liveChanged();
 
@@ -146,7 +139,6 @@ private:
     int currentRecordingMode();
 
     Q_SLOT void updateIconButton();
-    Q_SLOT void updateRadassButton();
 
 private:
     /** Media resource. */
@@ -154,9 +146,6 @@ private:
 
     /** Camera resource. */
     QnVirtualCameraResourcePtr m_camera;
-
-    /** Current resolution mode of this widget. */
-    Qn::ResolutionMode m_resolutionMode;
 
     /** Display. */
     QnResourceDisplay *m_display;
