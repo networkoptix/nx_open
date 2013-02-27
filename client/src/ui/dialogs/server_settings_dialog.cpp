@@ -271,7 +271,7 @@ void QnServerSettingsDialog::addTableItem(const StorageItem &item) {
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
-    checkBoxItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
+    checkBoxItem->setFlags((item.isWritable ? Qt::ItemIsEnabled : Qt::NoItemFlags) | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
     checkBoxItem->setCheckState(item.inUse ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, item.storageId);
 
@@ -314,6 +314,7 @@ QList<QnServerSettingsDialog::StorageItem> QnServerSettingsDialog::tableItems() 
     for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++) {
         StorageItem item;
 
+        item.isWritable = ui->storagesTable->item(row, CheckBoxColumn)->flags() & Qt::ItemIsEnabled;
         item.inUse = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
         item.storageId = qvariant_cast<int>(ui->storagesTable->item(row, CheckBoxColumn)->data(StorageIdRole), -1);
 
