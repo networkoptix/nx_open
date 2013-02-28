@@ -79,5 +79,5 @@ int QnStorageSpaceHandler::executePost(const QString &path, const QnRequestParam
 }
 
 QString QnStorageSpaceHandler::description(TCPSocket *tcpSocket) const {
-    return QString();
+    return QString(); // TODO: #Elric
 }
