@@ -2,6 +2,8 @@
 
 #include "vmax480_chunk_reader.h"
 #include "utils/common/synctime.h"
+#include "vmax480_stream_fetcher.h"
+#include "core/resource/network_resource.h"
 
 static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
@@ -17,13 +19,20 @@ QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
 
 QnVMax480ChunkReader::~QnVMax480ChunkReader()
 {
-
+    stop();
 }
 
 void QnVMax480ChunkReader::run()
 {
     while (!m_needStop)
     {
+        QnResource::Status status = m_res->getStatus();
+        if (status == QnResource::Offline || status == QnResource::Unauthorized)
+        {
+            msleep(100);
+            continue;
+        }
+
         if (!isOpened()) {
             vmaxConnect(false, -1);
             if (isOpened()) {

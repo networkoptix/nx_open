@@ -124,6 +124,15 @@ bool QnPlVmax480Resource::initInternal()
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
 
+    if (getChannel() == 0)
+    {
+        if (!m_chunkReader) {
+            m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
+            connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
+        }
+        m_chunkReader->start();
+    }
+
     return true;
 }
 
@@ -176,22 +185,7 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
 
 void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
 {
-    Status oldStatus = getStatus();
-    bool isOldOnline = oldStatus == QnResource::Online || oldStatus == QnResource::Recording;
-
     QnPhysicalCameraResource::setStatus(newStatus, silenceMode);
-    if (getChannel() == 0)
-    {
-        if (!m_chunkReader) {
-            m_chunkReader = new QnVMax480ChunkReader(toSharedPointer());
-            connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
-        }
-        bool isNewOnline = getStatus() == QnResource::Online || getStatus() == QnResource::Recording;
-        if (isNewOnline && !isOldOnline)
-            m_chunkReader->start();
-        else
-            m_chunkReader->stop();
-    }
 }
 
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)

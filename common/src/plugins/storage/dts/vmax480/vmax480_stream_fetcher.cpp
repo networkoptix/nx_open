@@ -50,15 +50,17 @@ bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
 
     const QString execStr = QCoreApplication::applicationDirPath() + QLatin1String("/vmaxproxy/vmaxproxy");
 #if 0
-    m_vMaxProxy->start(QLatin1String(execStr, args);
+    m_vMaxProxy->start(execStr, args);
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT))
 #else
-    m_vMaxProxy->startDetached(execStr, args); // debug only!
-    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)     // debug only!
+    m_vMaxProxy->startDetached(execStr, args); 
+    if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)
 #endif
     {
+        QTime t;
+        t.restart();
         QMutexLocker lock(&m_connectMtx);
-        while (!m_vmaxConnection)
+        while (!m_vmaxConnection && t.elapsed() < PROCESS_TIMEOUT)
             m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
 
         if (m_vmaxConnection) {
