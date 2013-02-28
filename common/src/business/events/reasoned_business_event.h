@@ -8,6 +8,7 @@ namespace QnBusiness {
     enum EventReason {
         NoReason,
         NetworkIssueNoFrame,
+        NetworkIssueConnectionClosed,
         NetworkIssueRtpPacketLoss,
         MServerIssueTerminated,
         MServerIssueStarted,

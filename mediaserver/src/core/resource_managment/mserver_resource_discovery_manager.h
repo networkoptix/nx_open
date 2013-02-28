@@ -23,8 +23,6 @@ private:
 
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(QnResourcePtr res);
-
-    bool hasRunningLiveProvider(QnNetworkResourcePtr netRes) const;
 private:
     bool m_foundSmth; // minor just to minimize lof output
     QMap<QString, int> m_resourceDiscoveryCounter;
