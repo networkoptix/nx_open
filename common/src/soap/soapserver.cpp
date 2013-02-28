@@ -16,6 +16,7 @@ QnSoapServer::QnSoapServer()
     m_terminated( false ),
     m_initialized( false )
 {
+    setObjectName( QLatin1String("QnSoapServer") );
 }
 
 QnSoapServer::QnSoapServer( unsigned int port, const char* path )
@@ -25,17 +26,18 @@ QnSoapServer::QnSoapServer( unsigned int port, const char* path )
     m_initialized( false )
 {
     initialize( port, path );
+    setObjectName( QLatin1String("QnSoapServer") );
 }
 
 QnSoapServer::~QnSoapServer()
 {
     stop();
+    m_service.soap_force_close_socket();
 }
 
 void QnSoapServer::pleaseStop()
 {
     m_terminated = true;
-    m_service.soap_force_close_socket();
 }
 
 void QnSoapServer::initialize( unsigned int port, const char* path )
@@ -79,10 +81,14 @@ QnSoapServer* QnSoapServer::instance()
 
 static const unsigned int ERROR_SKIP_TIMEOUT_MS = 500;
 
+static const int SOAP_CONNECTION_ACCEPT_TIMEOUT = 1;    //one second
+
 void QnSoapServer::run()
 {
     strcpy( m_service.soap->endpoint, m_path.c_str() );
     strcpy( m_service.soap->path, m_path.c_str() );
+
+    m_service.soap->accept_timeout = SOAP_CONNECTION_ACCEPT_TIMEOUT;
 
     int m = soap_bind( m_service.soap, NULL, m_port, 100 ); 
     if( m < 0 )
@@ -95,14 +101,15 @@ void QnSoapServer::run()
 
     while( !m_terminated )
     {
-        int s = soap_accept( m_service.soap ); 
-        if( s < 0 )
+        SOAP_SOCKET s = m_service.accept(); 
+        if( s == SOAP_INVALID_SOCKET )
         {
+            //error or timeout
             if( m_terminated )
                 break;
-            std::ostringstream ss;
-            soap_stream_fault( m_service.soap, ss );
-            cl_log.log( QString::fromAscii("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            //std::ostringstream ss;
+            //soap_stream_fault( m_service.soap, ss );
+            //cl_log.log( QString::fromAscii("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
             msleep( ERROR_SKIP_TIMEOUT_MS );
             continue;
         }
@@ -122,7 +129,7 @@ void QnSoapServer::run()
             //    soap_copy_stream(&xyz, &uvw); 
             //    if( xyz.dispatch() )
             //    { 
-            //        soap_send_fault(&xyz); // send fault to client 
+            //        soap_send_fault(&xyz); // send fault to client
             //        xyz.soap_stream_fault(std::cerr); 
             //    } 
             //    soap_free_stream(&xyz); // free the copy 
