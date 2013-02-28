@@ -16,12 +16,16 @@ namespace Ui {
 class QnSystemHealthPopupWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef QWidget base_type;
     
 public:
     explicit QnSystemHealthPopupWidget(QWidget *parent = 0);
     ~QnSystemHealthPopupWidget();
     
     bool showSystemHealthMessage(QnSystemHealth::MessageType message, const QnUserResourceList &users);
+protected:
+    virtual void paintEvent(QPaintEvent *event) override;
 signals:
     void closed(QnSystemHealth::MessageType message, bool ignore);
 

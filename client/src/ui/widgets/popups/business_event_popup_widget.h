@@ -17,6 +17,8 @@ class QnBusinessEventPopupWidget : public QWidget
 {
     Q_OBJECT
     
+    typedef QWidget base_type;
+
 public:
     explicit QnBusinessEventPopupWidget(QWidget *parent = 0);
     virtual ~QnBusinessEventPopupWidget();
@@ -27,6 +29,8 @@ public:
      * @return                      True if addition was successful, false otherwise.
      */
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+protected:
+    virtual void paintEvent(QPaintEvent *event) override;
 signals:
     void closed(BusinessEventType::Value eventType, bool ignore);
 

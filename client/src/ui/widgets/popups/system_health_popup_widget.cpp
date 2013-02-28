@@ -1,6 +1,11 @@
 #include "system_health_popup_widget.h"
 #include "ui_system_health_popup_widget.h"
 
+#include <QPaintEvent>
+#include <QPen>
+#include <QPainter>
+#include <QPainterPath>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -8,6 +13,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -76,6 +82,20 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
     }
 
     return true;
+}
+
+void QnSystemHealthPopupWidget::paintEvent(QPaintEvent *event) {
+    base_type::paintEvent(event);
+
+    QPainter p(this);
+
+    QPainterPath path;
+    path.addRect(this->rect());
+
+    QPen pen;
+    pen.setColor(qnGlobals->selectedFrameColor());
+    pen.setWidthF(10);
+    p.strokePath(path, pen);
 }
 
 void QnSystemHealthPopupWidget::at_fixButton_clicked() {
