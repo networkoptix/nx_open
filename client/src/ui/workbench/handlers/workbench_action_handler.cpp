@@ -1623,14 +1623,28 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
+        1000ll * 15,                    /* 15 seconds. */
+        1000ll * 20,                    /* 20 seconds. */
+        1000ll * 30,                    /* 30 seconds. */
         1000ll * 60,                    /* 1 minute. */
+        1000ll * 60 * 2,                /* 2 minutes. */
+        1000ll * 60 * 3,                /* 3 minutes. */
         1000ll * 60 * 5,                /* 5 minutes. */
         1000ll * 60 * 10,               /* 10 minutes. */
+        1000ll * 60 * 15,               /* 15 minutes. */
+        1000ll * 60 * 20,               /* 20 minutes. */
+        1000ll * 60 * 30,               /* 30 minutes. */
         1000ll * 60 * 60,               /* 1 hour. */
+        1000ll * 60 * 60 * 2,           /* 2 hours. */
         1000ll * 60 * 60 * 3,           /* 3 hours. */
         1000ll * 60 * 60 * 6,           /* 6 hours. */
+        1000ll * 60 * 60 * 12,          /* 12 hours. */
         1000ll * 60 * 60 * 24,          /* 1 day. */
+        1000ll * 60 * 60 * 24 * 2,      /* 2 days. */
+        1000ll * 60 * 60 * 24 * 3,      /* 3 days. */
         1000ll * 60 * 60 * 24 * 5,      /* 5 days. */
+        1000ll * 60 * 60 * 24 * 10,     /* 10 days. */
+        1000ll * 60 * 60 * 24 * 20,     /* 20 days. */
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
