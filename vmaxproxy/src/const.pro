@@ -1,4 +1,4 @@
-QT = core network xml
+QT = core
 CONFIG += precompile_header
 CONFIG -= flat app_bundle
 
@@ -13,14 +13,8 @@ ICON = mediaproxy.icns
 
 TARGET = vmaxproxy
 
-include(../contrib/qtservice/src/qtservice.pri)
-include(../../common/contrib/qtsingleapplication/src/qtsinglecoreapplication.pri)
-
 
 BUILDLIB = %BUILDLIB
-EVETOOLS_DIR = %EVETOOLS_DIR
-
-INCLUDEPATH += ../../common/src
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
@@ -33,15 +27,6 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../build/debug/generated
   UI_DIR = ../build/debug/generated
   RCC_DIR = ../build/debug/generated
-  win32 {
-  PRE_TARGETDEPS += ../../common/bin/debug/common.lib
-  }
-  unix:!mac {
-  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.a
-  }
-  mac {
-  PRE_TARGETDEPS += ../../common/bin/debug/libcommon.dylib
-  }
 }
 
 CONFIG(release, debug|release) {
@@ -50,37 +35,12 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../build/release/generated
   UI_DIR = ../build/release/generated
   RCC_DIR = ../build/release/generated
-  win32 {
-  PRE_TARGETDEPS += ../../common/bin/release/common.lib
-  }
-  unix:!mac {
-  PRE_TARGETDEPS += ../../common/bin/release/libcommon.a
-  }
-  mac {
-  PRE_TARGETDEPS += ../../common/bin/release/libcommon.dylib
-  }
 }
 
 win32: RC_FILE = vmaxproxy.rc
 
-win32 {
-    # Define QN_EXPORT only if common build is not static
-    isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
-    !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
-}
-
-unix {
-  LIBS += -lcrypto -lz -L$$EVETOOLS_DIR/lib
-  QMAKE_CXXFLAGS += -msse4.1
-  DEFINES += QN_EXPORT=
-}
 
 DEFINES += __STDC_CONSTANT_MACROS
-
-mac {
-  LIBS += -framework IOKit -framework CoreServices
-  LIBS += -lbz2
-}
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
@@ -90,11 +50,4 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
-
-CONFIG(debug, debug|release) {
-  LIBS += -L$$PWD/../../common/bin/debug -lcommon
-}
-CONFIG(release, debug|release) {
-  LIBS += -L$$PWD/../../common/bin/release -lcommon
-}
 
