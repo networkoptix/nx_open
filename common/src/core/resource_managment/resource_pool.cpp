@@ -471,6 +471,15 @@ int QnResourcePool::activeCameras() const
     return count;
 }
 
+void QnResourcePool::clear()
+{
+    QMutexLocker lk( &m_resourcesMtx );
+
+    localServer.clear();
+    m_resources.clear();
+    m_foreignResources.clear();
+}
+
 bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )
 {
     const QString& uniqueId = resource->getUniqueId();

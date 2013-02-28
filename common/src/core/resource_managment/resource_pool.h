@@ -92,6 +92,9 @@ public:
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
 
+    //!Empties all internal dictionaries. Needed for correct destruction order at application stop
+    void clear();
+
 signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);

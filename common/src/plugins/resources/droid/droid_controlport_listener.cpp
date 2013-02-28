@@ -8,6 +8,11 @@ QnDroidControlPortListener::QnDroidControlPortListener(const QHostAddress& addre
 
 }
 
+QnDroidControlPortListener::~QnDroidControlPortListener()
+{
+    stop();
+}
+
 QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnDroidControlPortProcessor(clientSocket, owner);

@@ -1085,6 +1085,7 @@ void stopServer(int signal)
     av_lockmgr_register(NULL);
     qApp->quit();
     qSettings.setValue("lastRunningTime", 0);
+    QnResourcePool::instance()->clear();
 }
 
 int main(int argc, char* argv[])
