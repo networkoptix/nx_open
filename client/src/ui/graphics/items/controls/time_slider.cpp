@@ -1158,6 +1158,9 @@ void QnTimeSlider::updateThumbnailsPeriod() {
     if(m_thumbnailsUpdateTimer->isActive() || !m_oldThumbnailData.isEmpty())
         return;
 
+    if(qFuzzyIsNull(thumbnailsHeight()))
+        return; // TODO: #Elric may be a wrong place for the check
+
     thumbnailsLoader()->setTimePeriod(m_windowStart, m_windowEnd);
 }
 
