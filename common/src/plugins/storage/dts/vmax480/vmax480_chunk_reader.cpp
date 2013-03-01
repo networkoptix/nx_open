@@ -8,8 +8,8 @@
 static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
 QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
-    VMaxStreamFetcher(res),
     QnLongRunnable(),
+    VMaxStreamFetcher(res),
     m_waitingAnswer(false),
     m_state(State_Started),
     m_firstRange(true)
@@ -155,8 +155,8 @@ void QnVMax480ChunkReader::onGotMonthInfo(const QDate& month, int _monthInfo)
 {
     QMutexLocker lock(&m_mutex);
 
-    QDateTime timestamp(month);
-    qint64 base = timestamp.toMSecsSinceEpoch();
+//    QDateTime timestamp(month);
+//    qint64 base = timestamp.toMSecsSinceEpoch();
     quint32 monthInfo = (quint32) _monthInfo;
     for (int i = 0; i < 31; ++i)
     {

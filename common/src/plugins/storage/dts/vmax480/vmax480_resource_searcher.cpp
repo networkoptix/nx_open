@@ -346,6 +346,7 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, c
 
 QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
     QList<QnResourcePtr> result;
 
     
