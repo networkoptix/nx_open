@@ -176,10 +176,11 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     qint64 dayBase = QDateTime(QDate(year, month, day)).toMSecsSinceEpoch();
 
     const char* curPtr = data.data();
-    QnTimePeriodList dayPeriods;
 
     for (int ch = 0; ch < VMAX_MAX_CH; ++ch)
     {
+        QnTimePeriodList dayPeriods;
+
         for(int min = 0; min < VMAX_MAX_SLICE_DAY; ++min)
         {
             char recordType = *curPtr & 0x0f;
