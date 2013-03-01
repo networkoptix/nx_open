@@ -7,15 +7,18 @@
 
 #include <health/system_health.h>
 
+#include <ui/widgets/popups/bordered_popup_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class QnSystemHealthPopupWidget;
 }
 
-class QnSystemHealthPopupWidget : public QWidget, public QnWorkbenchContextAware
+class QnSystemHealthPopupWidget : public QnBorderedPopupWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef QnBorderedPopupWidget base_type;
     
 public:
     explicit QnSystemHealthPopupWidget(QWidget *parent = 0);

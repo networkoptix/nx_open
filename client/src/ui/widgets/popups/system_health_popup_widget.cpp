@@ -19,17 +19,18 @@ namespace {
 }
 
 QnSystemHealthPopupWidget::QnSystemHealthPopupWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnSystemHealthPopupWidget),
     m_messageType(QnSystemHealth::NotDefined)
 {
     ui->setupUi(this);
-
+/*
     QPalette palette = this->palette();
     palette.setColor(QPalette::Window, QColor(85, 0, 0)); //TODO: #elric skin color
-    this->setPalette(palette);
-
+    ui->groupBox->setPalette(palette);
+*/
+    setBorderColor(QColor(255, 0, 0, 128)); //TODO: #GDM skin color
     connect(ui->fixButton,      SIGNAL(clicked()), this, SLOT(at_fixButton_clicked()));
     connect(ui->postponeButton, SIGNAL(clicked()), this, SLOT(at_postponeButton_clicked()));
 }
