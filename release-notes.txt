@@ -55,6 +55,7 @@ IMPROVEMENTS:
  - Screen Recording form was redesigned
  
 BUGS FIXED:
+ - If several cameras had different recording parameters it was not possible to set "Do not record" to them simultaneously
  - Identically named items were sorted randomly in Tree each time Client was started. Fixed
  - If the password for admin was changed, no changes were applied toEC until system restart. Fixed
  - If a distance between recorded fragments were small (2-3sec), then "Next chunk" button resulted in jump over these chunks. Fixed
