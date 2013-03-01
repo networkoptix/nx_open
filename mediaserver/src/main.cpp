@@ -579,6 +579,7 @@ void QnMain::stopObjects()
     }
 
     QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
+    QnBusinessRuleProcessor::fini();
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;

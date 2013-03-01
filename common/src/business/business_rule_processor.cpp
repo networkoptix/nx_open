@@ -28,6 +28,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
+    quit();
+    wait();
 }
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
@@ -102,8 +104,7 @@ class QnBusinessRuleProcessorInstanceDeleter
 public:
     ~QnBusinessRuleProcessorInstanceDeleter()
     {
-        if( QnBusinessRuleProcessor::instance() )
-            delete QnBusinessRuleProcessor::instance();
+        QnBusinessRuleProcessor::fini();
     }
 };
 
@@ -121,6 +122,12 @@ void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
     // this call is not thread safe! You should init from main thread e.t.c
     Q_ASSERT_X(!m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called once!");
     m_instance = instance;
+}
+
+void QnBusinessRuleProcessor::fini()
+{
+    delete m_instance;
+    m_instance = NULL;
 }
 
 void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)

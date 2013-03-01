@@ -50,6 +50,7 @@ public slots:
 
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
+    static void fini();
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
     void at_businessRuleDeleted(int id);

@@ -29,6 +29,10 @@ public:
 
     /** Remove ownership from connection.*/
     void removeOwnership(QnLongRunnable* processor);
+
+public slots:
+    virtual void pleaseStop() override;
+
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;

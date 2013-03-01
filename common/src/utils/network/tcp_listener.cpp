@@ -108,6 +108,14 @@ void QnTcpListener::removeOwnership(QnLongRunnable* processor)
     }
 }
 
+void QnTcpListener::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+
+    Q_D(QnTcpListener);
+    d->serverSocket->close();
+}
+
 void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
