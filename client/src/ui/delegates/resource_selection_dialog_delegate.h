@@ -5,6 +5,7 @@
 #include <QLabel>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 class QnResourceSelectionDialogDelegate: public QObject
 {
