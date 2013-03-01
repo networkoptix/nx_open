@@ -2183,10 +2183,16 @@ bool QnPlOnvifResource::startInputPortMonitoring()
 void QnPlOnvifResource::stopInputPortMonitoring()
 {
     //removing timer
-    TimerManager::instance()->deleteTimer( m_timerID );
-    m_timerID = 0;
-    TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
-    m_renewSubscriptionTaskID = 0;
+    if( m_timerID > 0 )
+    {
+        TimerManager::instance()->deleteTimer( m_timerID );
+        m_timerID = 0;
+    }
+    if( m_renewSubscriptionTaskID > 0 )
+    {
+        TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
+        m_renewSubscriptionTaskID = 0;
+    }
     //TODO/IMPL removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
