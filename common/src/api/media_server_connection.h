@@ -191,7 +191,7 @@ class QN_EXPORT QnMediaServerConnection: public QObject
 {
     Q_OBJECT
 public:
-    QnMediaServerConnection(QnResourcePtr mServer, QObject *parent = 0);
+    QnMediaServerConnection( const QUrl& mediaServerApiUrl, QObject *parent = 0 );
     virtual ~QnMediaServerConnection();
 
     void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
@@ -272,7 +272,6 @@ private:
 
 private:
     QUrl m_url;
-    QnResourcePtr m_mServer;
     QString m_proxyAddr;
     int m_proxyPort;
 };

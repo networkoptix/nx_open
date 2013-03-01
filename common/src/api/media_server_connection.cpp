@@ -240,12 +240,12 @@ namespace detail
 
 // ---------------------------------- QnMediaServerConnection ---------------------
 
-QnMediaServerConnection::QnMediaServerConnection(QnResourcePtr mServer, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection( const QUrl& mediaServerApiUrl, QObject *parent )
+:
     QObject(parent),
-    m_mServer(mServer),
+    m_url(mediaServerApiUrl),
     m_proxyPort(0)
 {
-    m_url = m_mServer.dynamicCast<QnMediaServerResource>()->getApiUrl();
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {}

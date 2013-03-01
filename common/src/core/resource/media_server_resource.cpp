@@ -67,7 +67,7 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
 
         /* We want the video server connection to be deleted in its associated thread, 
          * no matter where the reference count reached zero. Hence the custom deleter. */
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(toSharedPointer()), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
     }
 }
 
