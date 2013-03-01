@@ -55,7 +55,7 @@ QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
     return addListStrings.join(QLatin1String(";"));
 }
 
-QHostAddress stringToAddr(const QString& hostStr)
+static QHostAddress stringToAddr(const QString& hostStr)
 {
     return QHostAddress(hostStr);
 }
