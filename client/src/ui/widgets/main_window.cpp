@@ -183,6 +183,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::ExitAction));
+    addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
@@ -556,6 +557,17 @@ void QnMainWindow::dropEvent(QDropEvent *event) {
     menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_dropResources);
 
     event->acceptProposedAction();
+}
+
+void QnMainWindow::keyPressEvent(QKeyEvent *event) {
+    base_type::keyPressEvent(event);
+
+    if (!action(Qn::ToggleTourModeAction)->isChecked())
+        return;
+
+    if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
+        return;
+    menu()->trigger(Qn::ToggleTourModeAction);
 }
 
 #ifdef Q_OS_WIN

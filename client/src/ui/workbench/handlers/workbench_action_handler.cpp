@@ -274,10 +274,11 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
+    connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
-    connect(action(Qn::ToggleTourModeHotkeyAction),             SIGNAL(triggered()),    action(Qn::ToggleTourModeAction),   SLOT(toggle()));
+    connect(action(Qn::ToggleTourModeHotkeyAction),             SIGNAL(triggered()),    this,   SLOT(at_toggleTourModeHotkeyAction_triggered()));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
@@ -3215,6 +3216,10 @@ void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
     }
 }
 
+void QnWorkbenchActionHandler::at_toggleTourModeHotkeyAction_triggered() {
+    menu()->trigger(Qn::ToggleTourModeAction);
+}
+
 struct ItemPositionCmp {
     bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
         QRect lg = l->geometry();
@@ -3249,6 +3254,13 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
     QWhatsThis::enterWhatsThisMode();
+}
+
+void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
+    if (action(Qn::ToggleTourModeAction)->isChecked())
+        menu()->trigger(Qn::ToggleTourModeAction);
+    else
+        menu()->trigger(Qn::FullscreenAction);
 }
 
 void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
