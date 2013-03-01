@@ -150,10 +150,12 @@ quint32 RTPSession::SDPTrackInfo::getSSRC() const
 // ================================================== QnRtspTimeHelper ==========================================
 
 QMutex QnRtspTimeHelper::m_camClockMutex;
-QMap<QString, QnRtspTimeHelper::CamSyncInfo*> QnRtspTimeHelper::m_camClock;
+//!map<resID, <CamSyncInfo, refcount> >
+QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > QnRtspTimeHelper::m_camClock;
 
 
-QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
+QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId)
+:
     m_lastTime(AV_NOPTS_VALUE),
     m_localStartTime(0),
     m_rtcpReportTimeDiff(INT_MAX),
@@ -161,15 +163,29 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
 {
     {
         QMutexLocker lock(&m_camClockMutex);
-        QMap<QString, CamSyncInfo*>::iterator itr = m_camClock.find(resId);
-        if (itr == m_camClock.end())
-            itr = m_camClock.insert(resId, new CamSyncInfo());
-        m_cameraClockToLocalDiff = itr.value();
+
+        QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>& val = m_camClock[resId];
+        if( !val.first )
+            val.first = QSharedPointer<CamSyncInfo>(new CamSyncInfo());
+        m_cameraClockToLocalDiff = val.first;
+        ++val.second;   //need ref count, since QSharedPointer does not provide access to its refcount
     }
-    
+
     m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
     m_timer.restart();
     m_lastWarnTime = 0;
+}
+
+QnRtspTimeHelper::~QnRtspTimeHelper()
+{
+    {
+        QMutexLocker lock(&m_camClockMutex);
+
+        QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> >::iterator it = m_camClock.find( m_resId );
+        if( it != m_camClock.end() )
+            if( (--it.value().second) == 0 )
+                m_camClock.erase( it );
+    }
 }
 
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
