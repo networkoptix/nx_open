@@ -39,7 +39,7 @@ namespace {
         QnSmtpPresets presets;
         presets.insert(_("gmail.com"),          server(_("smtp.gmail.com")));
 
-        presets.insert(_("dwcc.tv"),            server(_("mail.dwcc.tv")));
+        presets.insert(_("dwcc.tv"),            server(_("mail.dwcc.tv"), QnEmail::Unsecure));
 //        presets.insert(_("networkoptix.com"),   server(_("mail.ex2.secureserver.net")));
 
         presets.insert(_("yahoo.com"),          server(_("smtp.mail.yahoo.com"), QnEmail::Ssl));
