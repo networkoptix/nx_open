@@ -7,7 +7,6 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
@@ -50,7 +49,7 @@ namespace {
 }
 
 QnBusinessEventPopupWidget::QnBusinessEventPopupWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnBusinessEventPopupWidget),
     m_eventType(BusinessEventType::BE_NotDefined),
     m_showAllItem(NULL),
@@ -168,20 +167,6 @@ bool QnBusinessEventPopupWidget::addBusinessAction(const QnAbstractBusinessActio
 
     updateTreeSize();
     return true;
-}
-
-void QnBusinessEventPopupWidget::paintEvent(QPaintEvent *event) {
-    base_type::paintEvent(event);
-
-    QPainter p(this);
-
-    QPainterPath path;
-    path.addRoundedRect(this->rect().adjusted(3, 3, -6, -6), 3, 3);
-
-    QPen pen;
-    pen.setColor(qnGlobals->selectedFrameColor());
-    pen.setWidthF(3);
-    p.strokePath(path, pen);
 }
 
 void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) {

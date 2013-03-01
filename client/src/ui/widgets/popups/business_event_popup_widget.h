@@ -7,17 +7,19 @@
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 
+#include <ui/widgets/popups/bordered_popup_widget.h>
+
 #include <health/system_health.h>
 
 namespace Ui {
     class QnBusinessEventPopupWidget;
 }
 
-class QnBusinessEventPopupWidget : public QWidget
+class QnBusinessEventPopupWidget : public QnBorderedPopupWidget
 {
     Q_OBJECT
     
-    typedef QWidget base_type;
+    typedef QnBorderedPopupWidget base_type;
 
 public:
     explicit QnBusinessEventPopupWidget(QWidget *parent = 0);
@@ -29,8 +31,6 @@ public:
      * @return                      True if addition was successful, false otherwise.
      */
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
-protected:
-    virtual void paintEvent(QPaintEvent *event) override;
 signals:
     void closed(BusinessEventType::Value eventType, bool ignore);
 
