@@ -408,6 +408,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     if (QnScreenRecorder::isSupported())
         connect(action(Qn::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                   this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(action(Qn::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
+    connect(action(Qn::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
 
     /* Init screen recorder. */
     if (QnScreenRecorder::isSupported()){
@@ -434,6 +435,21 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
+    if (watched == m_recordingLabel) {
+        if (event->type() != QEvent::KeyPress)
+            return base_type::eventFilter(watched, event);
+        //TODO: #GDM duplicating code with main_window.cpp
+        if (!action(Qn::ToggleTourModeAction)->isChecked())
+            return base_type::eventFilter(watched, event);
+
+        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
+        if (pKeyEvent->key() == Qt::Key_Alt || pKeyEvent->key() == Qt::Key_Control)
+            return base_type::eventFilter(watched, event);
+
+        menu()->trigger(Qn::ToggleTourModeAction);
+        return base_type::eventFilter(watched, event);
+    }
+
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should clear selection. */
@@ -1346,6 +1362,53 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
     } else {
         stopRecording();
     }
+}
+
+void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
+    if (!checked) {
+        if (!m_recordingLabel)
+            return;
+        m_recordingLabel->hide();
+        if (!m_recordingAnimation)
+            return;
+        m_recordingAnimation->stop();
+        return;
+    }
+
+
+    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
+    if (widget == NULL) {
+        qnWarning("Viewport was expected to be a QGLWidget.");
+        return;
+    }
+
+    QWidget *view = display()->view();
+
+    if (m_recordingLabel == 0)
+        m_recordingLabel = new QLabel(view);
+    m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+    m_recordingLabel->resize(280, 165);
+    m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
+
+    m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
+    m_recordingLabel->setText(tr("Press any key to stop tour"));
+    m_recordingLabel->setAlignment(Qt::AlignCenter);
+    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
+    m_recordingLabel->setFocusPolicy(Qt::NoFocus);
+    m_recordingLabel->show();
+
+    m_recordingLabel->installEventFilter(this);
+
+    if (m_recordingAnimation == 0)
+        m_recordingAnimation = new QPropertyAnimation(m_recordingLabel, "windowOpacity", m_recordingLabel);
+    m_recordingAnimation->setEasingCurve(QEasingCurve::OutCubic);
+    m_recordingAnimation->setDuration(3000);
+    m_recordingAnimation->setStartValue(1.0);
+    m_recordingAnimation->setEndValue(0.6);
+
+    m_recordingAnimation->disconnect();
+    connect(m_recordingAnimation, SIGNAL(finished()), m_recordingLabel, SLOT(hide()));
+    m_recordingAnimation->start();
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {

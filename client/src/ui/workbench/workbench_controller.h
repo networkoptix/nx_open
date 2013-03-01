@@ -53,7 +53,9 @@ class QnScreenRecorder;
  * This class implements default scene manipulation logic.
  */
 class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected QnGeometry {
-    Q_OBJECT;
+    Q_OBJECT
+
+    typedef QObject base_type;
 
 public:
     /**
@@ -162,6 +164,7 @@ protected slots:
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
     void at_recordingAction_triggered(bool checked);
+    void at_toggleTourModeAction_triggered(bool checked);
     void at_fitInViewAction_triggered();
     void at_checkFileSignatureAction_triggered();
 

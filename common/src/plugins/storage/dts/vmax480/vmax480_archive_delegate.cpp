@@ -28,6 +28,7 @@ QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
 
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
+    Q_UNUSED(resource)
     if (isOpened())
         return true;
 
@@ -65,6 +66,7 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 
 qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 {
+    Q_UNUSED(findIFrame)
     m_sequence++;
     qDebug() << "QnVMax480ArchiveDelegate::seek" << "m_sequence" << m_sequence;
 

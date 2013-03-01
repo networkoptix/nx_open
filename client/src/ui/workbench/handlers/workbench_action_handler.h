@@ -323,6 +323,7 @@ protected slots:
     void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
+    void at_toggleTourModeHotkeyAction_triggered();
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
@@ -335,6 +336,8 @@ protected slots:
     void at_cancelExport();
 
     void at_whatsThisAction_triggered();
+
+    void at_escapeHotkeyAction_triggered();
 
     void at_checkSystemHealthAction_triggered();
 

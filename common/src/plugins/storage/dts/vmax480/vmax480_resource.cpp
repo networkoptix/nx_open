@@ -42,7 +42,8 @@ QString QnPlVmax480Resource::manufacture() const
 
 void QnPlVmax480Resource::setIframeDistance(int frames, int timems) 
 {
-
+    Q_UNUSED(frames)
+    Q_UNUSED(timems)
 }
 
 QString QnPlVmax480Resource::getHostAddress() const 
@@ -52,6 +53,7 @@ QString QnPlVmax480Resource::getHostAddress() const
 
 bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain) 
 {
+    Q_UNUSED(domain)
     QUrl url(getUrl());
     url.setHost(ip);
     setUrl(url.toString());
@@ -114,7 +116,7 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
 
 void QnPlVmax480Resource::setCropingPhysical(QRect croping)
 {
-
+    Q_UNUSED(croping)
 }
 
 bool QnPlVmax480Resource::initInternal()
@@ -223,7 +225,7 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
 
 QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
 {
-
+    Q_UNUSED(detailLevel)
     if (!m_chunks.isEmpty())
         startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
 

@@ -62,6 +62,7 @@ protected:
     virtual void dropEvent(QDropEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
