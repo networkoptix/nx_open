@@ -176,11 +176,11 @@ void QnBusinessEventPopupWidget::paintEvent(QPaintEvent *event) {
     QPainter p(this);
 
     QPainterPath path;
-    path.addRect(this->rect());
+    path.addRoundedRect(this->rect().adjusted(3, 3, -6, -6), 3, 3);
 
     QPen pen;
     pen.setColor(qnGlobals->selectedFrameColor());
-    pen.setWidthF(10);
+    pen.setWidthF(3);
     p.strokePath(path, pen);
 }
 

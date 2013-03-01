@@ -34,7 +34,7 @@ QnSystemHealthPopupWidget::QnSystemHealthPopupWidget(QWidget *parent) :
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::Window, QColor(85, 0, 0)); //TODO: #elric skin color
-    this->setPalette(palette);
+    ui->groupBox->setPalette(palette);
 
     connect(ui->fixButton,      SIGNAL(clicked()), this, SLOT(at_fixButton_clicked()));
     connect(ui->postponeButton, SIGNAL(clicked()), this, SLOT(at_postponeButton_clicked()));
@@ -90,11 +90,11 @@ void QnSystemHealthPopupWidget::paintEvent(QPaintEvent *event) {
     QPainter p(this);
 
     QPainterPath path;
-    path.addRect(this->rect());
+    path.addRoundedRect(this->rect().adjusted(3, 3, -6, -6), 3, 3);
 
     QPen pen;
     pen.setColor(qnGlobals->selectedFrameColor());
-    pen.setWidthF(10);
+    pen.setWidthF(3);
     p.strokePath(path, pen);
 }
 
