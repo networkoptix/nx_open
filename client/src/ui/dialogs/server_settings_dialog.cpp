@@ -30,6 +30,7 @@
 
 namespace {
     const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
+    const qint64 minimalReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
 
     const qint64 bytesInMb = 1000 * 1000;
 
@@ -368,7 +369,7 @@ void QnServerSettingsDialog::submitToResources() {
             storage->setName(QUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
             storage->setUrl(item.path);
-            storage->setSpaceLimit(item.reservedSpace);
+            storage->setSpaceLimit(qMax(minimalReservedSpace, item.reservedSpace)); // TODO: #Elric is this a proper place for this qMax?
 
             storages.push_back(storage);
         }

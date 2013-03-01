@@ -1,43 +1,18 @@
 ----------------------------------------------- 1.4.3 - Beta2 -----------------------------------------------
 
-since 1.4
-
-VMAX
-"Close All but This" menu item doesn't ask to save layouts. 
-If a layout had been modified via drag'n'drop is was not suggested to save it if try to close the client.
-If open camera in a new tab it removes from layout in resource tree.
-Settings are not saved under Linux if client has been run under Root
-Do not ask to select an item before export (at least one item is always selected (selection can be grey))
-If two cameras had the same password, it was displayed in
-If show cursor on screen position then the position of the cursor is incorrect in the recorded video, especially if recording application Window only
-Redesign Screen Recording form 
-Arecont. If choose Motion+Lo-Res and click Cancel, than warning message will be appeared severel times.
-Thumbnails are drawn on top of chunks holes in multi-video exported file
-Columns are not auto-resized in camera addition dialog
-If set an existed name, layout will saved as new.
-
-Display confirmation window when choosing a file for db restore
-add E-mail servers preset
-Notifications if Mail Addresses/Servers/Licenses/Storages are not configured
-If FF/RW a camera in archive and the resolution was switching to low (RADASS) the speed was increased dramatically. Fixed
-Space didn't not work for selecting/deselecting cameras in event rules editing dialog.
-Add notifications about the following:
-1) Mail Server Parameters are not specified (for Administrator)
-2) E-Mail is not specified:
-   - own e-mail - for Viewer
-   - own and all Users - for Administrator
-3) Licenses are not registered (for Administrator)
-4) Storages are not properly configured (for Administrator)
 
 ----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
- - Axis Encoders
- - Flex Watch Encoders
+ - Digital Waychdog VMAX 480 Encoders
+ - Axis Encoders (incl. PTZ)
+ - Flex Watch Encoders (incl. PTZ)
  - Vivotek Encoders 
 
 NEW FEATURES:  
  - Windows 8 is supported
+ - E-Mails are introduced for Users. Each user is advised to have an e-mail. These e-mails will be used for notifications (see below)
+ - Intuitive Mail Server settings. It is necessary to specify e-mail address and password of the account that is intended to be used for mail notifications. The system will do the rest. Additional parameters are available as well.
  - Events and Actions:
    - Events: 
      - Motion (camera(s) must be specified). Camera(s) must have Recording enabled
@@ -48,10 +23,14 @@ NEW FEATURES:
      - Input Signal on Camera (if supported - ONVIF and Axis only)
      - Media Server Failure (in case Media Server goes down or reboots itself)
      - Media Servers Conflict (if another Media Server that connected to another EC is pulling video from the same camera(s))
+	 - EC Connection Lost (results in notifications only)
+	 - Licenses are not configured (results in notifications only for Admin)
+	 - E-mail is not set (results in notifications only). Admin gets notifications about all users that have not emails specified
+	 - Storages are not configure properly (results in notifications only for Admin)
    - Actions: 
      - Camera Recording (camera(s) must be specified). Camera(s) must have Recording enabled
      - Panic Recording
-     - Send Mail (recipient(s) must be specified). Mail Server settings should be configured in Global Settings
+     - Send Mail (user(s) and additional recipient(s) must be specified). Mail Server settings should be configured in Global Settings
      - Show Notification (User roles may be specified). Notification parameters should be configured in Global Settings
      - Camera Output(if supported - ONVIF and Axis only)     
    - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has standard and advanced parameters
@@ -63,6 +42,7 @@ NEW FEATURES:
    - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
  
 IMPROVEMENTS:
+ - Storage Dialog is significantly redesigned. Now it is not necessary to specify the folder for the recording data, it is necessary to select the disks the recording will be performed to and the amount of free space to preserve. The software will do the last.
  - CTRL can be used in Calendar Search to select multiple dates
  - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
  - Domain names are allowed for the "Manual camera addition" form
@@ -71,6 +51,8 @@ IMPROVEMENTS:
  - Auto storage selection is improved. While installing a media server, every available partition in the system must be added (if the partition has >100 GB free)
  - Manual RADASS Switch is added to the interface but not implemented in the code. We will think about it and maybe remove it
  - If max fps has been reduced for motion+low, it will be reduced for all record modes in schedule (Arecont cameras only)
+ - Now it is not necessary to select an item before export. Last selected item will be exported
+ - Screen Recording form was redesigned
  
 BUGS FIXED:
  - Identically named items were sorted randomly in Tree each time Client was started. Fixed
@@ -80,6 +62,14 @@ BUGS FIXED:
  - The selection of items was not saved correctly after closing and re-opening the layout. Fixed
  - If two cameras were playing video near the live position (last minute) and one of them was closed, than another didn't jump up to live and could stuck. Fixed
  - If open several Multi-Videos then change and save one of them, then another was corrupted. Fixed
+ - "Close All but This" menu item didn't ask to save layouts. Fixed
+ - If a layout had been modified via drag'n'drop is was not suggested to save it if try to close the client. Fixed
+ - If open camera from another user's Layout in a new tab (using Resource Tree) it was removed from layout in resource tree. Fixed
+ - If two cameras had the same password, it was displayed if select them both and open their properties. Now asterisks are displayed
+ - If Screen Recording was performed with the mouse cursor, the cursor position displayed incorrectly. Fixed
+ - Arecont. If choose Motion + Lo-Res Recording and choose Max FPS, then click Cancel then warning message was appeared severel times. Fixed
+ - If save a layout as... and specify the existing name, this layout was saved as new. Fixed
+ - Thumbnails are drawn on top of chunks holes in multi-video exported file. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
 
