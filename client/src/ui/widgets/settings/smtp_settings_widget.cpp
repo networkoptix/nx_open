@@ -90,7 +90,7 @@ void QnSmtpSettingsWidget::update() {
 
 void QnSmtpSettingsWidget::submit() {
     QnEmail::Settings result = settings();
-    if (!result.isNull())
+    //if (!result.isNull())
         QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
     //TODO: #GDM else?
 }
@@ -178,11 +178,9 @@ void QnSmtpSettingsWidget::loadSettings(QString server, QnEmail::ConnectionType 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
     int port = ui->portComboBox->itemData(index).toInt();
     if (port == QnEmail::defaultPort(QnEmail::Ssl)) {
-        ui->sslRadioButton->setChecked(true);
         ui->tlsRecommendedLabel->hide();
         ui->sslRecommendedLabel->show();
     } else {
-        ui->tlsRadioButton->setChecked(true);
         ui->tlsRecommendedLabel->show();
         ui->sslRecommendedLabel->hide();
     }
@@ -190,6 +188,9 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 
 void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
     ui->detectErrorLabel->setText(QString());
+
+    if (value.isEmpty())
+        return;
 
     QnEmail email(value);
     if (!email.isValid()) {
@@ -210,7 +211,10 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
 
         QnEmail::SmtpServerPreset preset = email.smtpServer();
         if (preset.isNull()) {
-            loadSettings(QLatin1String("smtp.") + email.domain(), QnEmail::Unsecure);
+            QString domain = email.domain();
+            if (!domain.isEmpty())
+                domain = QLatin1String("smtp.") + domain;
+            loadSettings(domain, QnEmail::Unsecure);
         } else {
             loadSettings(preset.server, preset.connectionType, preset.port);
         }
