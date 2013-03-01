@@ -7,6 +7,7 @@
 #include "recording_manager.h"
 #include "serverutil.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
+#include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 
@@ -257,18 +258,24 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
-    QVector<QnTimePeriodList> cameras;
+    QVector<QnTimePeriodList> periods;
     for (int i = 0; i < resList.size(); ++i)
     {
-        QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
+        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resList[i]);
         if (camera) {
-            QString physicalId = camera->getPhysicalId();
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
+            if (camera->isDtsBased())
+            {
+                periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
+            }
+            else {
+                QString physicalId = camera->getPhysicalId();
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
+            }
         }
     }
 
-    return QnTimePeriod::mergeTimePeriods(cameras);
+    return QnTimePeriod::mergeTimePeriods(periods);
 }
 
 void QnStorageManager::clearSpace()

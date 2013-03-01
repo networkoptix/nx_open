@@ -302,6 +302,10 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessPara
                 item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
                                                   .arg(reasonText)));
             break;
+        case QnBusiness::NetworkIssueConnectionClosed:
+            if (m_eventType == BusinessEventType::BE_Network_Issue)
+                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
+            break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
             if (m_eventType == BusinessEventType::BE_Network_Issue) {
                 QStringList seqs = reasonText.split(QLatin1Char(';'));

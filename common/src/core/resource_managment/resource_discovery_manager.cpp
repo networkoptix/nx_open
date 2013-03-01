@@ -129,11 +129,14 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
             QMutexLocker locker(&m_searchersListMutex);
             searchersList = m_searchersList;
         }
+
+        int i = 0;
         foreach (QnAbstractResourceSearcher *searcher, searchersList)
         {
             result = searcher->createResource(resourceTypeId, parameters);
             if (!result.isNull())
                 break;
+            i++;
         }
     }
 

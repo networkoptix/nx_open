@@ -12,7 +12,7 @@
 #include <unistd.h>
 #endif
 
-bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port)
+bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
 {
     int res;
 
@@ -20,7 +20,7 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
     sock.bind(port);
     res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
 #else
-    res = !sock.bind(iface.address, port);
+    res = !sock.bind(iface.address, port, mode);
 #endif
 
     if (res)

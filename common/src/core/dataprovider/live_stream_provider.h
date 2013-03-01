@@ -44,6 +44,8 @@ public:
     bool canChangeStatus() const { return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource; }
 
     virtual bool secondaryResolutionIsLarge() const { return false; }
+
+    static bool hasRunningLiveProvider(QnNetworkResourcePtr netRes);
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;

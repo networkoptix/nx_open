@@ -25,6 +25,10 @@ public:
     void* getOpenSSLContext();
     bool enableSSLMode();
 
+    int getPort() const;
+
+    /** Remove ownership from connection.*/
+    void removeOwnership(QnLongRunnable* processor);
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;

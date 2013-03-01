@@ -62,6 +62,7 @@ private:
     QVector<int> m_gotKeyData;
     bool m_pleaseStop;
     QTime m_rtcpReportTimer;
+    bool m_gotSomeFrame;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

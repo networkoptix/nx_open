@@ -29,13 +29,14 @@ public:
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run();
+    virtual void afterRun() override;
 private:
     QnAbstractMediaDataPtr createEmptyPacket();
 private:
     QnAbstractArchiveDelegate* m_delegate;
     qint64 m_currentPos;
     int m_cseq;
-    QnServerArchiveDelegatePtr m_archiveDelegate;
+    QnAbstractArchiveDelegate* m_archiveDelegate;
 };
 
 #endif //THUMBNAILS_STREAM_READER_H__

@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.2</version>
+		<version>1.4.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.2</version>
+	<version>1.4.2-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -361,8 +361,8 @@
 					</plugin>	
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
-						<version>1.4.1</version>
+						<artifactId>replacer</artifactId>
+						<version>1.5.2</version>
 						<executions>
 							<execution>
 								<phase>process-resources</phase>
@@ -373,12 +373,16 @@
 									<includes>
 										<include>**/${project.artifactId}-x64.vcproj</include>
 									</includes>
+									<!-- <excludes>
+										<exclude>**/vmaxproxy-x64.vcproj</exclude>
+									</excludes> -->									
 									<replacements>
 										<replacement>
 											<token>Win32</token>
 											<value>${arch}</value>
 										</replacement>         
 									</replacements>
+									<skip>${replace.skip}</skip>
 								</configuration>								
 							</execution>
 						</executions>

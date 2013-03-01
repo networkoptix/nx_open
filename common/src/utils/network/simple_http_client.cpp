@@ -238,7 +238,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
 
         QByteArray request;
 
-        request.append("GET /");
+        request.append("GET ");
+        if( !requestStr.startsWith('/') )
+            request.append('/');
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");

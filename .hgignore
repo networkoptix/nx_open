@@ -115,6 +115,15 @@ mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
 
+vmaxproxy/bin
+vmaxproxy/build
+vmaxproxy/src/version.h
+vmaxproxy/src/mediaproxy.vcproj
+vmaxproxy/src/mediaproxy.pro
+vmaxproxy/mediaproxy.mak*
+vmaxproxy/x86
+vmaxproxy/x64
+
 quicksyncdecoder/x86
 quicksyncdecoder/x64
 

@@ -387,8 +387,10 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
         m_onlineCameras.insert(camera);
     }
 
-    if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) {
-        emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
+    if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) 
+    {
+        if (QnLiveStreamProvider::hasRunningLiveProvider(resource.dynamicCast<QnNetworkResource>()))
+            emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
         m_onlineCameras.remove(camera);
     }
 }

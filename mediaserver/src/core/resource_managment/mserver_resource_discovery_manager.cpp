@@ -94,7 +94,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
                 // sometimes camera could be found with 2 different nics; sometimes just on one nic. so, diffNet will be detected - but camera is still ok,
                 // so status needs to be checked. hasRunningLiveProvider here to avoid situation where there is no recording and live view, but user is about to view the cam. fuck
-                bool shouldInvesigate = (diffAddr || (diffNet && newNetRes->shoudResolveConflicts() )) && ( rpNetRes->getStatus() == QnResource::Offline || !hasRunningLiveProvider(rpNetRes));
+                bool shouldInvesigate = (diffAddr || (diffNet && newNetRes->shoudResolveConflicts() )) && 
+                                        ( rpNetRes->getStatus() == QnResource::Offline || !QnLiveStreamProvider::hasRunningLiveProvider(rpNetRes));
                 if (shouldInvesigate)
                 {
                     // should keep it into resources to investigate it further 
@@ -428,7 +429,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !hasRunningLiveProvider(netRes))
+            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !QnLiveStreamProvider::hasRunningLiveProvider(netRes))
             {
                 res->setStatus(QnResource::Offline);
                 m_resourceDiscoveryCounter[uniqId] = 0;
@@ -523,7 +524,7 @@ void QnMServerResourceDiscoveryManager::pingResources(QnResourcePtr res)
 
     if (rpNetRes)
     {
-        if (!hasRunningLiveProvider(rpNetRes))
+        if (!QnLiveStreamProvider::hasRunningLiveProvider(rpNetRes))
         {
             CLPing ping;
             ping.ping(rpNetRes->getHostAddress(), 1, 300);
@@ -563,25 +564,4 @@ void QnMServerResourceDiscoveryManager::check_if_accessible(QnResourceList& just
     QtConcurrent::blockingMap(checkLst, &check_if_accessible_STRUCT::f);
     for (int i = 0; i < threads; ++i )global->reserveThread();
 #endif //_DEBUG
-}
-
-bool QnMServerResourceDiscoveryManager::hasRunningLiveProvider(QnNetworkResourcePtr netRes) const
-{
-    bool rez = false;
-    netRes->lockConsumers();
-    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (lp)
-        {
-            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
-            if (lr && lr->isRunning()) {
-                rez = true;
-                break;
-            }
-        }
-    }
-
-    netRes->unlockConsumers();
-    return rez;
 }

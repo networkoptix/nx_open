@@ -47,7 +47,7 @@ public:
         ContinuousPanTiltCapability         = 0x040,
         ContinuousZoomCapability            = 0x080,
         OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
-
+        
         /* Shortcuts */
         AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
 

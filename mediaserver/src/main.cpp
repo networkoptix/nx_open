@@ -78,9 +78,11 @@
 #include "core/resource_managment/mserver_resource_discovery_manager.h"
 #include "plugins/resources/mserver_resource_searcher.h"
 #include "rest/handlers/log_handler.h"
-#include "rest/handlers/favico_handler.h"
+#include "plugins/storage/dts/vmax480/vmax480_resource_searcher.h"
 #include "business/events/reasoned_business_event.h"
+#include "rest/handlers/favico_handler.h"
 #include "rest/handlers/storage_space_handler.h"
+#include "common/customization.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -949,10 +951,17 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
+
+#ifdef Q_OS_WIN
+    if (qnCustomization() == Qn::DwSpectrumCustomization)
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+#endif
+
     //Onvif searcher should be the last:
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
 
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
+    
 
     QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 

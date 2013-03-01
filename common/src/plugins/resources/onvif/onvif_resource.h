@@ -185,8 +185,6 @@ public:
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
-    virtual void setUrl(const QString &url) override;
-    virtual int getChannel() const override;
     int getMaxChannels() const;
 
     void updateToChannel(int value);
@@ -246,8 +244,6 @@ private:
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
-
-    void save();
 
     int round(float value);
     QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
@@ -396,7 +392,6 @@ private:
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;
-    int m_channelNumer; // video/audio source number
     int m_maxChannels;
 	
     bool createPullPointSubscription();
