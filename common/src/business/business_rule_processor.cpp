@@ -97,6 +97,18 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
     return false;
 }
 
+class QnBusinessRuleProcessorInstanceDeleter
+{
+public:
+    ~QnBusinessRuleProcessorInstanceDeleter()
+    {
+        if( QnBusinessRuleProcessor::instance() )
+            delete QnBusinessRuleProcessor::instance();
+    }
+};
+
+static QnBusinessRuleProcessorInstanceDeleter qnBusinessRuleProcessorInstanceDeleter;
+
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
 {
     // this call is not thread safe! You should init from main thread e.t.c
