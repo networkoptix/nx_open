@@ -390,6 +390,8 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
             model->addCriterion(QnResourceCriterion(QnResource::server));
+            model->addCriterion(QnResourceCriterion(QnResource::user));
+            model->addCriterion(QnResourceCriterion(QnResource::layout));
         }
     }
 
