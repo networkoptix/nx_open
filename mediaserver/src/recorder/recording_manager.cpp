@@ -90,6 +90,11 @@ void QnRecordingManager::stop()
         deleteRecorder(recorders);
     }
     m_recordMap.clear();
+    m_onlineCameras.clear();
+    m_scheduleWatchingTimer.stop();
+
+    onTimer();
+    m_delayedStop.clear();
 }
 
 Recorders QnRecordingManager::findRecorders(QnResourcePtr res) const

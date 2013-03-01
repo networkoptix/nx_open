@@ -577,6 +577,8 @@ void QnMain::stopObjects()
         delete m_processor;
         m_processor = 0;
     }
+
+    QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -1013,10 +1015,9 @@ void QnMain::run()
                                                    lastRunningTime*1000,
                                                    QnBusiness::MServerIssueStarted);
 
-    m_timer = new QTimer(this);
     at_timer();
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    m_timer->start(60 * 1000);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    m_timer.start(60 * 1000);
 
 
     exec();
