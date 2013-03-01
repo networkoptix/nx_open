@@ -155,5 +155,7 @@ void QnSoapServer::run()
         soap_end( m_service.soap );
     }
 
+    soap_destroy( m_service.soap );
+    soap_end( m_service.soap );
     soap_done( m_service.soap );
 }
