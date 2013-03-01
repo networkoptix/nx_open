@@ -55,7 +55,8 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     if (eventType >= BusinessEventType::BE_UserDefined)
         return false;
 
-    if (int healthMessage = eventType - BusinessEventType::BE_SystemHealthMessage >= 0)
+    int healthMessage = eventType - BusinessEventType::BE_SystemHealthMessage;
+    if (healthMessage >= 0)
         return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage)); //TODO: #GDM resources?
 
     if (!(qnSettings->popupBusinessEvents() & (1 << eventType))) {

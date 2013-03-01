@@ -451,10 +451,12 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
 }
 
 int serializeBusinessEventType(BusinessEventType::Value value) {
-    if (int userEvent = value - BusinessEventType::BE_UserDefined >= 0)
+    int userEvent = value - BusinessEventType::BE_UserDefined;
+    if (userEvent >= 0)
         return (pb::UserDefinedEvent + userEvent);
 
-    if (int healthMessage = value - BusinessEventType::BE_SystemHealthMessage >= 0)
+    int healthMessage = value - BusinessEventType::BE_SystemHealthMessage;
+    if (healthMessage >= 0)
         return (pb::SystemHealthMessage + healthMessage);
 
     switch(value) {
@@ -550,10 +552,12 @@ void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
 }
 
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
-    if (int userEvent = pbValue - pb::UserDefinedEvent >= 0)
+    int userEvent = pbValue - pb::UserDefinedEvent;
+    if (userEvent >= 0)
         return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
 
-    if (int healthMessage = pbValue - pb::SystemHealthMessage >= 0)
+    int healthMessage = pbValue - pb::SystemHealthMessage;
+    if (healthMessage >= 0)
         return BusinessEventType::Value((BusinessEventType::BE_SystemHealthMessage + healthMessage));
 
     switch(pbValue) {
