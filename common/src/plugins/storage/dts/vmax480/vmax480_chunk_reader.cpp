@@ -188,6 +188,8 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
             curPtr++;
         }
 
+        curPtr += 60; // skip reserved hour
+
         if (!dayPeriods.isEmpty()) {
             QVector<QnTimePeriodList> allPeriods;
             allPeriods << m_chunks[ch];
