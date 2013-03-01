@@ -150,38 +150,38 @@ const QString& CommonStringValues::SEPARATOR = *(new QString(QLatin1String(","))
 
 const OnvifCameraSettingOperationAbstract& OnvifCameraSettingOperationAbstract::EMPTY_OPERATION = *(new OnvifCameraSettingOperationEmpty());
 
-QHash<QString, OnvifCameraSettingOperationAbstract*>& createOnvifCameraSettingOperationAbstract()
+static QHash<QString, OnvifCameraSettingOperationAbstract*> createOnvifCameraSettingOperationAbstract()
 {
-    QHash<QString, OnvifCameraSettingOperationAbstract*>* tmp = new QHash<QString, OnvifCameraSettingOperationAbstract*>();
+    QHash<QString, OnvifCameraSettingOperationAbstract*> tmp;
 
-    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yb Gain"),          new ImagingWhiteBalanceYbGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Iris"),                  new ImagingExposureIrisOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Exposure Time"),         new ImagingExposureExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Mode"),        new ImagingWideDynamicRangeModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Mode"),             new ImagingWhiteBalanceModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Gain"),              new ImagingExposureMaxGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Exposure Time"),     new ImagingExposureMinExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Level"),   new ImagingBacklightCompensationLevelOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Contrast"),                        new ImagingContrastOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Priority"),              new ImagingExposurePriorityOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Sharpness"),                       new ImagingSharpnessOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Mode"),              new ImagingIrCutFilterModesOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yr Gain"),          new ImagingWhiteBalanceYrGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Gain"),              new ImagingExposureMinGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Gain"),                  new ImagingExposureGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Mode"),                  new ImagingExposureModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Level"),       new ImagingWideDynamicRangeLevelOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Iris"),              new ImagingExposureMaxIrisOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Brightness"),                      new ImagingBrightnessOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Iris"),              new ImagingExposureMinIrisOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Mode"),    new ImagingBacklightCompensationModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Color Saturation"),                new ImagingColorSaturationOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Exposure Time"),     new ImagingExposureMaxExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               new MaintenanceSystemRebootOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), new MaintenanceSoftSystemFactoryDefaultOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), new MaintenanceHardSystemFactoryDefaultOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%White Balance%%Yb Gain"),          new ImagingWhiteBalanceYbGainOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Iris"),                  new ImagingExposureIrisOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Exposure Time"),         new ImagingExposureExposureTimeOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Mode"),        new ImagingWideDynamicRangeModeOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%White Balance%%Mode"),             new ImagingWhiteBalanceModeOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Gain"),              new ImagingExposureMaxGainOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Exposure Time"),     new ImagingExposureMinExposureTimeOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Level"),   new ImagingBacklightCompensationLevelOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Contrast"),                        new ImagingContrastOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Priority"),              new ImagingExposurePriorityOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Sharpness"),                       new ImagingSharpnessOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Mode"),              new ImagingIrCutFilterModesOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%White Balance%%Yr Gain"),          new ImagingWhiteBalanceYrGainOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Gain"),              new ImagingExposureMinGainOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Gain"),                  new ImagingExposureGainOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Mode"),                  new ImagingExposureModeOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Level"),       new ImagingWideDynamicRangeLevelOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Iris"),              new ImagingExposureMaxIrisOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Brightness"),                      new ImagingBrightnessOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Iris"),              new ImagingExposureMinIrisOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Mode"),    new ImagingBacklightCompensationModeOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Color Saturation"),                new ImagingColorSaturationOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Exposure Time"),     new ImagingExposureMaxExposureTimeOperation());
+    tmp.insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               new MaintenanceSystemRebootOperation());
+    tmp.insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), new MaintenanceSoftSystemFactoryDefaultOperation());
+    tmp.insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), new MaintenanceHardSystemFactoryDefaultOperation());
 
-    return *tmp;
+    return tmp;
 }
 
 const QHash<QString, OnvifCameraSettingOperationAbstract*> OnvifCameraSettingOperationAbstract::operations = createOnvifCameraSettingOperationAbstract();
