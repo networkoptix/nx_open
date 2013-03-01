@@ -238,7 +238,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
                 QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
 
                 resource->setTypeId(rt);
-                resource->setName(name);
+                resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1));
                 (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
                 resource->setMAC(mac);
 
@@ -398,7 +398,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
 
         resource->setTypeId(rt);
-        resource->setName(name);
+        resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1));
         (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
         resource->setMAC(mac);
 
