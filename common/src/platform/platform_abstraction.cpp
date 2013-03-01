@@ -26,5 +26,11 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
 QnPlatformAbstraction::~QnPlatformAbstraction() {
     if(s_instance == this)
         s_instance = NULL;
-}
 
+    delete m_monitor;
+    m_monitor = NULL;
+    delete m_notifier;
+    m_notifier = NULL;
+    delete m_images;
+    m_images = NULL;
+}
