@@ -49,7 +49,7 @@ namespace {
 }
 
 QnBusinessEventPopupWidget::QnBusinessEventPopupWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnBusinessEventPopupWidget),
     m_eventType(BusinessEventType::BE_NotDefined),
     m_showAllItem(NULL),

@@ -7,16 +7,20 @@
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 
+#include <ui/widgets/popups/bordered_popup_widget.h>
+
 #include <health/system_health.h>
 
 namespace Ui {
     class QnBusinessEventPopupWidget;
 }
 
-class QnBusinessEventPopupWidget : public QWidget
+class QnBusinessEventPopupWidget : public QnBorderedPopupWidget
 {
     Q_OBJECT
     
+    typedef QnBorderedPopupWidget base_type;
+
 public:
     explicit QnBusinessEventPopupWidget(QWidget *parent = 0);
     virtual ~QnBusinessEventPopupWidget();
