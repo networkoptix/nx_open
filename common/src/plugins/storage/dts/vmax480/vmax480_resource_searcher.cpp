@@ -3,8 +3,10 @@
 #include "utils/common/sleep.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/http/httptypes.h"
+#include "utils/network/simple_http_client.h"
 
 #include <QXmlDefaultHandler>
+#include "core/resource_managment/resource_pool.h"
 
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -13,6 +15,8 @@ extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress
 
 QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
+
+static const int API_PORT = 9010;
 
 //!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
@@ -242,7 +246,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
                 (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
                 resource->setMAC(mac);
 
-                resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(9010).arg(i+1));
+                resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(API_PORT).arg(i+1));
                 resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setAuth(auth);
@@ -344,9 +348,103 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, c
 
 }
 
+int extractNum(const QByteArray data, int pos)
+{
+    int result = 0;
+    for (;pos < data.size() && data.at(pos) >= '0' && data.at(pos) <= '9'; ++pos)
+    {
+        result *= 10;
+        result += data.at(pos) - '0';
+    }
+    return result;
+}
+
 QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
-    Q_UNUSED(doMultichannelCheck)
+    QList<QnResourcePtr> result;
+
+    int channels = -1;
+
+    if (!doMultichannelCheck)
+    {
+        // it is a fast discovery mode used by resource searcher
+        QString uniqId = QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(1);
+        QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
+        if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording))
+            channels = existsRes->channelNum(); // avoid real requests
+    }
+    else {
+        // user search request
+        QString existUrl;
+        existUrl = QString(QLatin1String("http://%1:%2?channel=1")).arg(url.host()).arg(API_PORT);
+        QnResourcePtr existsRes = qnResPool->getResourceByUrl(existUrl);
+        if (existsRes)
+            return result; // resource already in a pool
+    }
+
+    if (channels == -1)
+    {
+        CLSimpleHTTPClient client(url.host(), 80, 3000, QAuthenticator());
+
+        QString body(QLatin1String("login_txt_id=%1&login_txt_pw=%2"));
+        body = body.arg(auth.user()).arg(auth.password());
+        CLHttpStatus status = client.doPOST("cgi-bin/design/html_template/Login.cgi", body);
+
+        if (status != CL_HTTP_SUCCESS)
+            return result;
+
+        QByteArray answer;
+        client.readAll(answer);
+
+        QByteArray sessionId = client.getHeaderValue("Set-Cookie");
+
+        client.close();
+
+        client.addHeader("Cookie", sessionId);
+        status = client.doGET("cgi-bin/design/html_template/webviewer.cgi");
+        if (status != CL_HTTP_SUCCESS)
+            return result;
+
+        answer.clear();
+        client.readAll(answer);
+        client.close();
+
+        int btnPos = answer.indexOf("\"btn_ch");
+        while (btnPos >= 0) {
+            channels = qMax(channels, extractNum(answer, btnPos+7));
+            btnPos = answer.indexOf("\"btn_ch", btnPos+1);
+        }
+    }
+
+    QString name = QString(QLatin1String("DW-VF")) + QString::number(channels);
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!rt.isValid())
+        return result;
+
+    for (int i = 0; i < channels; ++i)
+    {
+        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+
+        resource->setTypeId(rt);
+        resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
+        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+        //resource->setMAC(mac);
+
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(url.host()).arg(API_PORT).arg(i+1));
+        resource->setPhysicalId(QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1));
+        resource->setAuth(auth);
+
+        result << resource;
+
+    }
+
+    return result;
+}
+
+/*
+QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+{
     QList<QnResourcePtr> result;
 
     
@@ -403,7 +501,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
         resource->setMAC(mac);
 
-        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(9010).arg(i+1));
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(API_PORT).arg(i+1));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
         resource->setAuth(auth);
 
@@ -413,6 +511,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
     return result;
 }
+*/
 
 QString QnPlVmax480ResourceSearcher::manufacture() const
 {
