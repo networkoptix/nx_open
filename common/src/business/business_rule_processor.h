@@ -35,6 +35,8 @@ public:
     */
 
     virtual QString getGuid() const { return QString(); }
+
+    bool showPopup(QnPopupBusinessActionPtr action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
@@ -78,15 +80,13 @@ protected:
     QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 
     void terminateRunningRule(QnBusinessEventRulePtr rule);
+
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
     bool sendMail( const QnSendMailBusinessActionPtr& action );
-
-    bool showPopup(QnPopupBusinessActionPtr action);
-
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);

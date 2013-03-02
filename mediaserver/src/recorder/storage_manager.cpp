@@ -21,7 +21,8 @@ QnStorageManager::QnStorageManager():
     m_mutexCatalog(QMutex::Recursive),
     m_storageFileReaded(false),
     m_storagesStatisticsReady(false),
-    m_catalogLoaded(false)
+    m_catalogLoaded(false),
+    m_warnSended(false)
 {
 }
 
@@ -445,10 +446,16 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         }
     }
 
-	if (result)
+    if (result) {
 		qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
-	else
+    }
+    else {
 		qDebug() << "No storage available for recording";
+        if (!m_warnSended) {
+            emit noStoragesAvailable();
+            m_warnSended = true;
+        }
+    }
 
     return result;
 }

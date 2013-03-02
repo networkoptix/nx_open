@@ -12,6 +12,8 @@
 
 #include "core/resource/resource.h"
 #include <core/resource_managment/resource_pool.h>
+#include "health/system_health.h"
+#include "actions/system_health_business_action.h"
 
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
@@ -100,4 +102,10 @@ void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resou
         timeStamp,
         otherServers));
     qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
+}
+
+void QnBusinessEventConnector::at_NoStorages(qint64 timeStamp)
+{
+    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured));
+    qnBusinessRuleProcessor->showPopup(action);
 }

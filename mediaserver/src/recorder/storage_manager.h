@@ -61,7 +61,8 @@ public:
     StorageMap getAllStorages() const;
     QnStorageResourceList getStorages() const;
     void clearSpace();
-
+signals:
+    void noStoragesAvailable();
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -96,6 +97,7 @@ private:
     FileNumCache m_fileNumCache;
     QMutex m_cacheMutex;
     bool m_catalogLoaded;
+    bool m_warnSended;
 };
 
 #define qnStorageMan QnStorageManager::instance()
