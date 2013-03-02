@@ -7,6 +7,7 @@
 
 #include <QXmlDefaultHandler>
 #include "core/resource_managment/resource_pool.h"
+#include "../../vmaxproxy/src/vmax480_helper.h"
 
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -17,6 +18,8 @@ QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 
 static const int API_PORT = 9010;
+static const int TCP_TIMEOUT = 3000;
+static const QString NAME_PREFIX(QLatin1String("VMAX-"));
 
 //!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
@@ -123,6 +126,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 {
     
     QnResourceList result;
+    QSet<QString> processedMac;
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
@@ -188,7 +192,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
 
                 const QUrl descritionUrl( QLatin1String(locationHeader->second) );
 
-                CLSimpleHTTPClient http( descritionUrl.host(), descritionUrl.port(nx_http::DEFAULT_HTTP_PORT), 3000, QAuthenticator() );
+                CLSimpleHTTPClient http( descritionUrl.host(), descritionUrl.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator() );
                 CLHttpStatus status = http.doGET( descritionUrl.path() );
                 if (status != CL_HTTP_SUCCESS)
                     continue;
@@ -228,6 +232,10 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
                 name = QLatin1String("DW-VF") + QString::number(channles);  //DW-VF is a registered resource type
             }
 
+            if (processedMac.contains(mac))
+                continue;
+            processedMac << mac;
+
             QString host = sender.toString();
 
             QAuthenticator auth;
@@ -237,12 +245,33 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
             if (!rt.isValid())
                 continue;
 
+
+            QMap<int, QByteArray> camNames;
+            bool camNamesReaded = false;
+
             for (int i = 0; i < channles; ++i)
             {
                 QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
 
                 resource->setTypeId(rt);
-                resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
+
+                QString uniqId = QString(QLatin1String("%1_%2")).arg(mac).arg(i+1);
+                QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
+                if (existsRes)
+                    resource->setName(existsRes->getName());
+                else {
+                    if (!camNamesReaded) {
+                        CLSimpleHTTPClient client(host, 80, TCP_TIMEOUT, QAuthenticator());
+                        if (vmaxAuthenticate(client, auth))
+                            camNames = getCamNames(client);
+                        camNamesReaded = true;
+                    }
+                    if (camNames.value(i+1).isEmpty())
+                        resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
+                    else
+                        resource->setName(NAME_PREFIX + QString::fromUtf8(camNames.value(i+1)));
+                }
+
                 (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
                 resource->setMAC(mac);
 
@@ -359,6 +388,83 @@ int extractNum(const QByteArray data, int pos)
     return result;
 }
 
+QByteArray extractCamName(const QByteArray& request, int pos)
+{
+    QByteArray rez;
+    if (pos >= request.size() || request.at(pos) != '+')
+        return rez;
+    ++pos;
+    for (;pos < request.size() && request.at(pos) != '+' && request.at(pos) != '"'; ++pos)
+    {
+        rez += request.at(pos);
+    }
+    return rez;
+}
+
+QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(CLSimpleHTTPClient& client)
+{
+    QMap<int, QByteArray> camNames;
+
+    CLHttpStatus status = client.doGET("cgi-bin/design/html_template/Camera.cgi");
+    if (status == CL_HTTP_SUCCESS)
+    {
+        QByteArray answer;
+        client.readAll(answer);
+        QByteArray pattern1("\"hid_camera_info_");
+        QByteArray pattern2("value=\"");
+        int pos = answer.indexOf(pattern1);
+        while (pos >= 0) {
+            int chNum = extractNum(answer, pos + pattern1.length());
+            if (chNum > 0) 
+            {
+                int valuePos = answer.indexOf(pattern2, pos);
+                if (valuePos > 0) {
+                    QByteArray value = extractCamName(answer, valuePos + pattern2.length());
+                    if (!value.isEmpty())
+                        camNames[chNum] = value;
+                }
+            }
+            pos = answer.indexOf(pattern1, pos+1);
+        }
+    }
+
+    return camNames;
+}
+
+bool QnPlVmax480ResourceSearcher::vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth)
+{
+    QString body(QLatin1String("login_txt_id=%1&login_txt_pw=%2"));
+    body = body.arg(auth.user()).arg(auth.password());
+    CLHttpStatus status = client.doPOST("cgi-bin/design/html_template/Login.cgi", body);
+
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+    QByteArray answer;
+    client.readAll(answer);
+
+    QByteArray sessionId = client.getHeaderValue("Set-Cookie");
+
+    client.close();
+
+    if (sessionId.isEmpty())
+        return false;
+
+    client.addHeader("Cookie", sessionId);
+    return true;
+}
+
+int extractChannelCount(const QByteArray& model)
+{
+    QByteArray num;
+    for (int i = model.size()-1; i >= 0; --i)
+    {
+        if (model.at(i) >= '0' && model.at(i) <= '9')
+            num = model.at(i) + num;
+    }
+    return num.toInt();
+}
+
 QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     QList<QnResourcePtr> result;
@@ -368,57 +474,48 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     if (!doMultichannelCheck)
     {
         // it is a fast discovery mode used by resource searcher
-        QString uniqId = QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(1);
-        QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
+        QnPlVmax480ResourcePtr existsRes;
+        for (int i = 0; i < VMAX_MAX_CH; ++i) {
+            QString uniqId = QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1);
+            existsRes = qnResPool->getResourceByUniqId(uniqId).dynamicCast<QnPlVmax480Resource>();
+            if (existsRes)
+                break;
+        }
         if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording))
-            channels = existsRes->channelNum(); // avoid real requests
+            channels = extractChannelCount(existsRes->getModel().toUtf8()); // avoid real requests
     }
-    else {
-        // user search request
-        QString existUrl;
-        existUrl = QString(QLatin1String("http://%1:%2?channel=1")).arg(url.host()).arg(API_PORT);
-        QnResourcePtr existsRes = qnResPool->getResourceByUrl(existUrl);
-        if (existsRes)
-            return result; // resource already in a pool
-    }
+
+    QMap<int, QByteArray> camNames;
 
     if (channels == -1)
     {
-        CLSimpleHTTPClient client(url.host(), 80, 3000, QAuthenticator());
+        CLSimpleHTTPClient client(url.host(), 80, TCP_TIMEOUT, QAuthenticator());
 
-        QString body(QLatin1String("login_txt_id=%1&login_txt_pw=%2"));
-        body = body.arg(auth.user()).arg(auth.password());
-        CLHttpStatus status = client.doPOST("cgi-bin/design/html_template/Login.cgi", body);
+        if (!vmaxAuthenticate(client, auth))
+            return result;
 
+        CLHttpStatus status = client.doGET("cgi-bin/design/html_template/webviewer.cgi");
         if (status != CL_HTTP_SUCCESS)
             return result;
 
         QByteArray answer;
         client.readAll(answer);
-
-        QByteArray sessionId = client.getHeaderValue("Set-Cookie");
-
         client.close();
 
-        client.addHeader("Cookie", sessionId);
-        status = client.doGET("cgi-bin/design/html_template/webviewer.cgi");
-        if (status != CL_HTTP_SUCCESS)
-            return result;
-
-        answer.clear();
-        client.readAll(answer);
-        client.close();
-
-        int btnPos = answer.indexOf("\"btn_ch");
-        while (btnPos >= 0) {
-            channels = qMax(channels, extractNum(answer, btnPos+7));
-            btnPos = answer.indexOf("\"btn_ch", btnPos+1);
+        int pos = answer.indexOf("\"btn_ch");
+        while (pos >= 0) {
+            channels = qMax(channels, extractNum(answer, pos+7));
+            pos = answer.indexOf("\"btn_ch", pos+1);
         }
+
+        client.close();
+
+        camNames = getCamNames(client);
     }
 
-    QString name = QString(QLatin1String("DW-VF")) + QString::number(channels);
+    QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
     if (!rt.isValid())
         return result;
 
@@ -427,8 +524,11 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
 
         resource->setTypeId(rt);
-        resource->setName(name + QString(QLatin1String("-ch%1")).arg(i+1,2));
-        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
+        if (camNames.value(i+1).isEmpty())
+            resource->setName(baseName + QString(QLatin1String("-ch%1")).arg(i+1,2));
+        else
+            resource->setName(NAME_PREFIX + QString::fromUtf8(camNames.value(i+1)));
+        (resource.dynamicCast<QnPlVmax480Resource>())->setModel(baseName);
         //resource->setMAC(mac);
 
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(url.host()).arg(API_PORT).arg(i+1));

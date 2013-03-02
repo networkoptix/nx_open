@@ -4,7 +4,7 @@
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/network/nettools.h"
 
-
+class CLSimpleHTTPClient;
 
 class QnPlVmax480ResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
@@ -27,7 +27,8 @@ protected:
 private:
     QMap<QString, QUdpSocket*> m_socketList;
     QUdpSocket* sockByName(const QnInterfaceAndAddr& iface);
-
+    QMap<int, QByteArray> getCamNames(CLSimpleHTTPClient& client);
+    bool vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth);
 };
 
 
