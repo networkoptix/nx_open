@@ -120,6 +120,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary)
     //}
     QString result = fetchStreamUrl(soapWrapper, info.profileToken, isPrimary);
     qDebug() << "got stream URL for camera" << m_resource->getUrl() << "for profile" << info.profileToken;
+    qDebug() << "rtsp=" << result;
     return result;
 }
 

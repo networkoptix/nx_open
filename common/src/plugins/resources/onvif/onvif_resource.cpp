@@ -1748,6 +1748,8 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
+        if (soapWrapper.isNotAuthenticated())
+            setStatus(QnResource::Unauthorized);
         return false;
 
     }
