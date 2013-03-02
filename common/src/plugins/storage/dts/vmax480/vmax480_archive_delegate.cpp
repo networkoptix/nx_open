@@ -53,8 +53,11 @@ void QnVMax480ArchiveDelegate::beforeClose()
 
 qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-    if (!isOpened())
-        return -1;
+    if (!isOpened()) {
+        open(m_res);
+        if (!isOpened())
+            return -1;
+    }
 
     m_thumbnailsMode = false;
     QnTimePeriodList chunks = m_res->getChunks();
