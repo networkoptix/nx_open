@@ -87,7 +87,8 @@ public slots:
         );
 
         pleaseStop();
-        wait();
+        if( isRunning() )
+            wait();
     }
 
 protected:
