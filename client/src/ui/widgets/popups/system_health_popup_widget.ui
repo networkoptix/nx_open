@@ -55,8 +55,8 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="userListWidget" native="true">
-        <layout class="QVBoxLayout" name="userListLayout"/>
+       <widget class="QWidget" name="resourcesListWidget" native="true">
+        <layout class="QVBoxLayout" name="resourcesListLayout"/>
        </widget>
       </item>
       <item>

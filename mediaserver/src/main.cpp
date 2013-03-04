@@ -696,7 +696,7 @@ void QnMain::at_timer()
 
 void QnMain::at_noStorages()
 {
-    qnBusinessRuleConnector->at_NoStorages(qnSyncTime->currentUSecsSinceEpoch());
+    qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
 void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)

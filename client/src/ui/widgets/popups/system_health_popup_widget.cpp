@@ -3,6 +3,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/actions.h>
@@ -13,7 +14,7 @@
 #include <ui/workbench/workbench_context.h>
 
 namespace {
-    static bool userResource_less_than(const QnUserResourcePtr &u1, const QnUserResourcePtr &u2)
+    static bool localResource_less_than(const QnResourcePtr &u1, const QnResourcePtr &u2)
     {
         return QString::compare(u1->getName(), u2->getName()) < 0;
     }
@@ -36,7 +37,7 @@ QnSystemHealthPopupWidget::~QnSystemHealthPopupWidget()
 {
 }
 
-bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnUserResourceList &users) {
+bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourceList &resources) {
 
     QLatin1String htmlTemplate("<html><head/><body><p>%1 <a href=\"%2\">"\
                                "<span style=\"text-decoration: underline; \">"\
@@ -46,29 +47,38 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
     if (message == QnSystemHealth::NotDefined)
         return false;
     ui->messageLabel->setText(QnSystemHealth::toString(m_messageType));
-    ui->userListWidget->setVisible(!users.isEmpty());
-    ui->fixButton->setVisible(users.isEmpty());
+    ui->resourcesListWidget->setVisible(!resources.isEmpty());
+    ui->fixButton->setVisible(resources.isEmpty());
 
-    QnUserResourceList localUsers = users;
-    qSort(localUsers.begin(), localUsers.end(), userResource_less_than);
-    foreach (const QnUserResourcePtr &user, localUsers) {
+    QnResourceList localResources = resources;
+    qSort(localResources.begin(), localResources.end(), localResource_less_than);
+    foreach (const QnResourcePtr &resource, localResources) {
         QHBoxLayout* layout = new QHBoxLayout();
-        ui->userListLayout->addLayout(layout);
+        ui->resourcesListLayout->addLayout(layout);
 
-        QLabel* labelIcon = new QLabel(ui->userListWidget);
-        labelIcon->setPixmap(qnResIconCache->icon(user->flags(), user->getStatus()).pixmap(18, 18));
+        QLabel* labelIcon = new QLabel(ui->resourcesListWidget);
+        labelIcon->setPixmap(qnResIconCache->icon(resource->flags(), resource->getStatus()).pixmap(18, 18));
         layout->addWidget(labelIcon);
 
-        QLabel* labelName = new QLabel(ui->userListWidget);
+        QLabel* labelName = new QLabel(ui->resourcesListWidget);
         labelName->setText( QString(htmlTemplate)
-                            .arg(user->getName())
-                            .arg(QString::number(user->getId().toInt()))
+                            .arg(resource->getName())
+                            .arg(QString::number(resource->getId().toInt()))
                             .arg(tr("( Fix... )"))
                            );
         layout->addWidget(labelName);
 
-        connect(labelName, SIGNAL(linkActivated(QString)), this, SLOT(at_fixUserLabel_linkActivated(QString)));
-
+        switch (message) {
+        case QnSystemHealth::UsersEmailIsEmpty:
+            connect(labelName, SIGNAL(linkActivated(QString)), this, SLOT(at_fixUserLabel_linkActivated(QString)));
+            break;
+        case QnSystemHealth::StoragesAreFull:
+        case QnSystemHealth::StoragesNotConfigured:
+            connect(labelName, SIGNAL(linkActivated(QString)), this, SLOT(at_fixStoragesLabel_linkActivated(QString)));
+            break;
+        default:
+            break;
+        }
         QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
         layout->addItem(horizontalSpacer);
     }
@@ -95,14 +105,6 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     case QnSystemHealth::ConnectionLost:
         menu()->trigger(Qn::ConnectToServerAction);
         break;
-    case QnSystemHealth::StoragesAreFull:
-    case QnSystemHealth::StoragesNotConfigured:
-        /*
-         menu()->trigger(Qn::ServerSettingsAction,
-            QnActionParameters(server));
-        */
-        //TODO: #GDM read resource list and open dialog clicking on "Fix" url.
-        break;
     default:
         break;
     }
@@ -119,6 +121,15 @@ void QnSystemHealthPopupWidget::at_fixUserLabel_linkActivated(const QString &anc
     QnActionParameters params(user);
     params.setFocusElement(QLatin1String("email"));
     menu()->trigger(Qn::UserSettingsAction, params);
+}
+
+void QnSystemHealthPopupWidget::at_fixStoragesLabel_linkActivated(const QString &anchor) {
+    int id = anchor.toInt();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+    QnActionParameters params(server);
+    menu()->trigger(Qn::ServerSettingsAction, params);
 }
 
 void QnSystemHealthPopupWidget::at_postponeButton_clicked() {

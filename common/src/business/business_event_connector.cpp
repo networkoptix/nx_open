@@ -104,8 +104,8 @@ void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resou
     qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
 }
 
-void QnBusinessEventConnector::at_NoStorages(qint64 timeStamp)
+void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
 {
-    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured));
+    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured, resource->getId()));
     qnBusinessRuleProcessor->showPopup(action);
 }

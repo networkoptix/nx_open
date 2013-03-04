@@ -56,8 +56,16 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return false;
 
     int healthMessage = eventType - BusinessEventType::BE_SystemHealthMessage;
-    if (healthMessage >= 0)
-        return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage)); //TODO: #GDM resources?
+    if (healthMessage >= 0) {
+        QnResourceList resources;
+
+        int resourceId = QnBusinessEventRuntime::getEventResourceId(params);
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
+        if (!resource)
+            resources << resource;
+
+        return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resources);
+    }
 
     if (!(qnSettings->popupBusinessEvents() & (1 << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
@@ -89,7 +97,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
     return addSystemHealthEvent(message, QnUserResourceList());
 }
 
-bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnUserResourceList &users) {
+bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
     if (!(qnSettings->popupSystemHealth() & (1 << message)))
         return false;
 
@@ -98,7 +106,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         pw->show();
     } else {
         QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(this);
-        if (!pw->showSystemHealthMessage(message, users))
+        if (!pw->showSystemHealthMessage(message, resources))
             return false;
         ui->verticalLayout->addWidget(pw);
         m_systemHealthWidgets[message] = pw;
