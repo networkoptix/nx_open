@@ -528,8 +528,7 @@ QnMain::QnMain(int argc, char* argv[])
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
-    m_universalTcpListener(0),
-    m_timer(0)
+    m_universalTcpListener(0)
 {
     serviceMainInstance = this;
 }
@@ -577,9 +576,6 @@ void QnMain::stopObjects()
         delete m_processor;
         m_processor = 0;
     }
-
-    QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
-    QnBusinessRuleProcessor::fini();
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -1047,7 +1043,14 @@ protected:
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
-        return application()->exec();
+        const int result = application()->exec();
+
+        //providing garanteed single tone destruction order, when needed. 
+            //TODO Explicit instanciation/destruction (avoid using Q_GLOBAL_STATIC) of all single-tone objects would be a good fix
+            //to avoid destruction order - related problems in future
+        destroySingleToneObjects();
+
+        return result;
     }
 
     virtual void start() override
@@ -1084,6 +1087,12 @@ private:
     QnMain m_main;
     int m_argc;
     char **m_argv;
+
+    void destroySingleToneObjects()
+    {
+        QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
+        QnBusinessRuleProcessor::fini();
+    }
 };
 
 void stopServer(int signal)
