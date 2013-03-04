@@ -6,6 +6,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
+#include <utils/common/delete_later.h>
 
 // -------------------------------------------------------------------------- //
 // QnStubMonitor
@@ -88,6 +89,7 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 
     if(base->thread() != thread()) {
         qnWarning("Cannot use a base monitor that lives in another thread.");
+        qnDeleteLater(base); /* Claim ownership. */
         base = new QnStubMonitor();
     }
 
