@@ -132,8 +132,8 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
 // QnSessionManager :: sync API
 // -------------------------------------------------------------------------- //
 int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response) {
-    QnSessionManagerSyncReplyProcessor syncProcessor;
-    syncProcessor.moveToThread(this->thread());
+    QScopedPointer<QnSessionManagerSyncReplyProcessor, QScopedPointerLaterDeleter> syncProcessor(new QnSessionManagerSyncReplyProcessor());
+    syncProcessor->moveToThread(this->thread());
 
     {
         QMutexLocker locker(&m_accessManagerMutex);
@@ -143,11 +143,11 @@ int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QStr
             return -1;
         }
 
-        connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
+        connect(m_accessManager, SIGNAL(destroyed()), syncProcessor.data(), SLOT(at_destroy()));
     }
 
-    sendAsyncRequest(operation, url, objectName, headers, params, data, &syncProcessor, SLOT(at_finished(QnHTTPRawResponse,int)), Qt::AutoConnection);
-    return syncProcessor.wait(response);
+    sendAsyncRequest(operation, url, objectName, headers, params, data, syncProcessor.data(), SLOT(at_finished(QnHTTPRawResponse,int)), Qt::AutoConnection);
+    return syncProcessor->wait(response);
 }
 
 int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response) {
