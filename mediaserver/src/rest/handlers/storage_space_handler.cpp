@@ -61,9 +61,11 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         info.freeSpace = partition.freeBytes;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(info.path, false));
-        info.isWritable = storage->isStorageAvailableForWriting();
-
-        infos.push_back(info);
+        if (storage) {
+            storage->setUrl(info.path); // createStorage is just factory and does not fill url
+            info.isWritable = storage->isStorageAvailableForWriting();
+            infos.push_back(info);
+        }
     }
 
     QVariantMap root;
