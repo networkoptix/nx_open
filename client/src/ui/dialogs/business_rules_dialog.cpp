@@ -28,7 +28,10 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent),
+    base_type(parent,
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowCloseButtonHint |
+              Qt::WindowSystemMenuHint ),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
