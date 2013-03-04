@@ -170,6 +170,13 @@ QString QnVirtualCameraResource::getUniqueId() const
 
 }
 
+void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters) {
+    QnNetworkResource::deserialize(parameters);
+
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        addFlags(motion);
+}
+
 void QnVirtualCameraResource::save()
 {
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();

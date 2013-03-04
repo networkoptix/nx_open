@@ -486,14 +486,8 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
     foreach(QnResourceWidget *widget, widgets) {
-        if(!(widget->resource()->flags() & QnResource::motion))
+        if(!widget->resource()->hasFlags(QnResource::motion))
             continue;
-
-        //TODO: #GDM motion flag should be enough if it will be set correctly
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->isDtsBased() || camera->supportedMotionType() == Qn::MT_NoMotion)
-            continue;
-
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
 }
@@ -1298,19 +1292,16 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
 void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
-    bool hidden = false;
     foreach(QnResourceWidget *widget, widgets) {
-        if((widget->resource()->flags() & QnResource::network) && !(widget->options() & QnResourceWidget::DisplayMotion)) {
-            hidden = true;
-            break;
+        if (!widget->resource()->hasFlags(QnResource::motion))
+            continue;
+
+        if(!(widget->options() & QnResourceWidget::DisplayMotion)) {
+            at_startSmartSearchAction_triggered();
+            return;
         }
     }
-
-    if(hidden) {
-        at_startSmartSearchAction_triggered();
-    } else {
-        at_stopSmartSearchAction_triggered();
-    }
+    at_stopSmartSearchAction_triggered();
 }
 
 void QnWorkbenchController::at_clearMotionSelectionAction_triggered() {
