@@ -98,10 +98,10 @@ namespace Qn { namespace detail {
 
 #define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS)                    \
     template<class Enum>                                                        \
-    static QnEnumNameMapper createEnumNameMapper();                             \
+    inline QnEnumNameMapper createEnumNameMapper();                             \
                                                                                 \
     template<>                                                                  \
-    static QnEnumNameMapper createEnumNameMapper<ENUM>() {                      \
+    inline QnEnumNameMapper createEnumNameMapper<ENUM>() {                      \
         QnEnumNameMapper result;                                                \
         BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
         return result;                                                          \

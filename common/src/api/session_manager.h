@@ -49,14 +49,6 @@ private:
     int m_handle;
 };
 
-class QnSessionManagerHandler: public QObject {
-    Q_OBJECT
-public:
-    QnSessionManagerHandler(QObject *parent = NULL);
-
-
-
-};
 
 // TODO: #Elric separate into two objects, one object per thread.
 class QnSessionManager: public QObject {
