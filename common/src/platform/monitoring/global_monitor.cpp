@@ -75,6 +75,7 @@ private:
 // QnGlobalMonitor
 // -------------------------------------------------------------------------- //
 QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
+    QnPlatformMonitor( parent ),
     d_ptr(new QnGlobalMonitorPrivate())
 {
     Q_UNUSED(parent)
