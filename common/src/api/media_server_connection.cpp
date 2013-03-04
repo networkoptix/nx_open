@@ -373,17 +373,6 @@ int QnMediaServerConnection::asyncGetStatistics(QObject *target, const char *slo
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("statistics"), QnRequestHeaderList(), QnRequestParamList(), processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
-int QnMediaServerConnection::syncGetStatistics(QObject *target, const char *slot) {
-    QnHTTPRawResponse response;
-    int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("statistics"), response);
-    
-    detail::QnMediaServerStatisticsReplyProcessor *processor = new detail::QnMediaServerStatisticsReplyProcessor();
-    connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
-    processor->at_replyReceived(response, 0);
-    
-    return status;
-}
-
 int QnMediaServerConnection::asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
                                                         QObject *target, const char *slotSuccess, const char *slotError){
 

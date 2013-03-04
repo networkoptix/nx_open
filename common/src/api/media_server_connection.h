@@ -239,11 +239,6 @@ public:
      */
     int asyncGetStatistics(QObject *target, const char *slot);
 
-    /** 
-     * \returns                         Status. 
-     */
-    int syncGetStatistics(QObject *target, const char *slot);
-
     // TODO: #GDM consistency! All other methods accept a single SLOT with signature (status, DATA, handle). Use a single slot here too!
     int asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
                                    QObject *target, const char *slotSuccess, const char *slotError); 
