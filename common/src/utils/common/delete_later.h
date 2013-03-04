@@ -27,4 +27,12 @@ inline void qnDeleteLater(QObject *object) {
     }
 }
 
+
+struct QScopedPointerLaterDeleter {
+    static inline void cleanup(QObject *pointer) {
+        qnDeleteLater(pointer);
+    }
+};
+
+
 #endif // QN_DELETE_LATER_H
