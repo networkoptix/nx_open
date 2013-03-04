@@ -37,6 +37,17 @@ namespace {
     );
 } // anonymous namespace
 
+QnAppServerReplyProcessor::QnAppServerReplyProcessor(QnResourceFactory &resourceFactory, QnApiSerializer &serializer, int object): 
+    m_resourceFactory(resourceFactory),
+    m_serializer(serializer),
+    m_object(object)
+{
+}
+
+QnAppServerReplyProcessor::~QnAppServerReplyProcessor()
+{
+}
+
 void QnAppServerReplyProcessor::finished(const QnHTTPRawResponse &response, int handle)
 {
     const QByteArray &result = response.data;
@@ -204,6 +215,8 @@ void QnAppServerReplyProcessor::finished(const QnHTTPRawResponse &response, int 
     default:
         ;// TODO: #Elric warning?
     }
+
+    deleteLater();
 }
 
 QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString &guid, const QString& authKey): 
