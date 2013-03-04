@@ -405,7 +405,7 @@ QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(CLSimpleHTTPClien
 {
     QMap<int, QByteArray> camNames;
 
-    CLHttpStatus status = client.doGET("cgi-bin/design/html_template/Camera.cgi");
+    CLHttpStatus status = client.doGET(QLatin1String("cgi-bin/design/html_template/Camera.cgi"));
     if (status == CL_HTTP_SUCCESS)
     {
         QByteArray answer;
@@ -435,7 +435,7 @@ bool QnPlVmax480ResourceSearcher::vmaxAuthenticate(CLSimpleHTTPClient& client, c
 {
     QString body(QLatin1String("login_txt_id=%1&login_txt_pw=%2"));
     body = body.arg(auth.user()).arg(auth.password());
-    CLHttpStatus status = client.doPOST("cgi-bin/design/html_template/Login.cgi", body);
+    CLHttpStatus status = client.doPOST(QLatin1String("cgi-bin/design/html_template/Login.cgi"), body);
 
     if (status != CL_HTTP_SUCCESS)
         return false;
@@ -494,7 +494,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         if (!vmaxAuthenticate(client, auth))
             return result;
 
-        CLHttpStatus status = client.doGET("cgi-bin/design/html_template/webviewer.cgi");
+        CLHttpStatus status = client.doGET(QLatin1String("cgi-bin/design/html_template/webviewer.cgi"));
         if (status != CL_HTTP_SUCCESS)
             return result;
 
