@@ -212,6 +212,12 @@ QnPlOnvifResource::~QnPlOnvifResource()
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
+
+    if( m_eventCapabilities )
+    {
+        delete m_eventCapabilities;
+        m_eventCapabilities = NULL;
+    }
 }
 
 
@@ -1958,7 +1964,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
         }
 
         //For Button - only operation object is required
-        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator opIt =
+        QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator opIt =
             OnvifCameraSettingOperationAbstract::operations.find(param.name());
 
         if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {

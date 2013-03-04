@@ -66,7 +66,7 @@ public:
 
     static const OnvifCameraSettingOperationAbstract& EMPTY_OPERATION;
 
-    static const QHash<QString, OnvifCameraSettingOperationAbstract*> operations;
+    static const QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > operations;
 
     virtual bool get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinitSrc = false) const = 0;
     virtual bool set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinitSrc = false) const = 0;
