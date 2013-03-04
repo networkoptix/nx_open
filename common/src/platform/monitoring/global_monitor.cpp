@@ -101,10 +101,7 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 }
 
 QnGlobalMonitor::~QnGlobalMonitor() {
-    Q_D(QnGlobalMonitor);
-
-    delete d->base;
-    d->base = NULL;
+    return;
 }
 
 qint64 QnGlobalMonitor::updatePeriod() const {
