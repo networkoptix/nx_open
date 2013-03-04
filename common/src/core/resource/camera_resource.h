@@ -48,6 +48,8 @@ public:
     void setFirmware(QString firmware);
 
 	virtual QString getUniqueId() const override;
+
+    void deserialize(const QnResourceParameters& parameters);
 protected:
     void save();
 // -------------------------------------------------------------------------- //

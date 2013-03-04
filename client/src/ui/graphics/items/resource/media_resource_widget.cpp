@@ -92,6 +92,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
+
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
     searchButton->setCheckable(true);
@@ -235,7 +236,7 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
-    } else if(m_resource->flags() & QnResource::motion) {
+    } else if(m_resource->hasFlags(QnResource::motion)) {
         for(int i = 0, count = channelCount(); i < count; i++)
             m_motionSensitivity.push_back(QnMotionRegion());
     } else {
@@ -657,7 +658,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if (resource()->flags() & QnResource::motion)
+    if (resource()->hasFlags(QnResource::motion))
         result |= MotionSearchButton | InfoButton;
 
     if(m_camera) {

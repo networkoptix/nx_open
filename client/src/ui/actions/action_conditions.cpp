@@ -67,8 +67,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->isDtsBased() || camera->supportedMotionType() == Qn::MT_NoMotion)
+        if (!widget->resource()->hasFlags(QnResource::motion))
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
