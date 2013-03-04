@@ -4,6 +4,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
+#include <QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
@@ -83,6 +84,7 @@
 #include "rest/handlers/favico_handler.h"
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
+
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -1024,6 +1026,9 @@ void QnMain::run()
 
 
     exec();
+
+    delete QnResourceDiscoveryManager::instance();
+    QnResourceDiscoveryManager::init( NULL );
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
@@ -1090,6 +1095,8 @@ private:
 
     void destroySingleToneObjects()
     {
+        QThreadPool::globalInstance()->waitForDone();
+
         QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
         QnBusinessRuleProcessor::fini();
     }
