@@ -17,9 +17,9 @@
  * tokens are:
  * <ul>
  * <li> <tt>qhash</tt>          --- <tt>qHash</tt> function. </li>
- * <li> <tt>qdatastream</tt>    --- <tt>QDataStream</tt> (de)serialization function. </li>
+ * <li> <tt>qdatastream</tt>    --- <tt>QDataStream</tt> (de)serialization functions. </li>
  * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
- * <li> <tt>qjson</tt>          --- json (de)serialization function. </li>
+ * <li> <tt>qjson</tt>          --- json (de)serialization functions. </li>
  * </ul>
  * 
  * \param TYPE                          Struct type to define functions for.

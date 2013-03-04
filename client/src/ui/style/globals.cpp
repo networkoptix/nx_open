@@ -96,30 +96,30 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
 }
 
 QnColorVector QnGlobals::initSystemHealthColors() {
-    // IMPORTANT: if vector sizxe will be changed, server_resource_widget MUST be fixed
     QnColorVector result;
     //0
-    result.append(QColor(103, 237, 66));    // E: sdc
-    //1
-    result.append(QColor(255, 131, 48));    // F: sdd
-    //2
-    result.append(QColor(178, 0, 255));     // etc
-    //3
-    result.append(QColor(0, 255, 255));
-    //4
-    result.append(QColor(38, 127, 0));
-    //5
-    result.append(QColor(255, 127, 127));
-    //6
-    result.append(QColor(201, 0, 0));
-    //7
     result.append(QColor(66, 140, 237));    // CPU
-    //8
+    //1
     result.append(QColor(219, 59, 169));    // RAM
-    //9
+    //2
     result.append(QColor(237, 237, 237));   // C: sda
-    //10
+    //3
     result.append(QColor(237, 200, 66));    // D: sdb
+    //4
+    result.append(QColor(103, 237, 66));    // E: sdc
+    //5
+    result.append(QColor(255, 131, 48));    // F: sdd
+    //6
+    result.append(QColor(178, 0, 255));     // etc
+    //7
+    result.append(QColor(0, 255, 255));
+    //8
+    result.append(QColor(38, 127, 0));
+    //9
+    result.append(QColor(255, 127, 127));
+    //10
+    result.append(QColor(201, 0, 0));
+
     return result;
 }
 
