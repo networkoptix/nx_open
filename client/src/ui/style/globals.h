@@ -60,6 +60,11 @@ public:
         SYSTEM_HEALTH_COLOR_GRID,
         SYSTEM_HEALTH_COLORS,
 
+        POPUP_FRAME_SYSTEM,
+        POPUP_FRAME_NOTIFICATION,
+        POPUP_FRAME_IMPORTANT,
+        POPUP_FRAME_WARNING,
+
         VARIABLE_COUNT
     };
 
@@ -104,6 +109,11 @@ private:
 
         QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorGrid,          SYSTEM_HEALTH_COLOR_GRID,               QColor(66, 140, 237, 100))
         QN_DECLARE_R_PROPERTY(QnColorVector,   systemHealthColors,      SYSTEM_HEALTH_COLORS,                   initSystemHealthColors())
+
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameSystem,               POPUP_FRAME_SYSTEM,                     QColor(255, 0, 0, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameImportant,            POPUP_FRAME_IMPORTANT,                  QColor(255, 128, 0, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameWarning,              POPUP_FRAME_WARNING,                    QColor(255, 0, 0, 128))
     QN_END_PROPERTY_STORAGE()
 };
 
