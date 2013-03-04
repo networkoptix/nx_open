@@ -40,7 +40,7 @@ public:
         socket(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
-        socketTimeout = 5000 * 1000;
+        socketTimeout = 5 * 1000;
     }
 
     virtual ~QnTCPConnectionProcessorPrivate()
