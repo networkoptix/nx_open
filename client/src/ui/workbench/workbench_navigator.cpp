@@ -628,7 +628,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
     if(m_currentWidget) {
-        updateItemDataFromSlider(m_currentWidget);
+        if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
+            foreach(QnResourceWidget *widget, m_syncedWidgets)
+                updateItemDataFromSlider(widget); //TODO: #GDM may be it should be done at every selection change? ask #elrik
+        else
+            updateItemDataFromSlider(m_currentWidget);
     } else {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = true;
