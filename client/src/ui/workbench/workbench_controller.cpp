@@ -489,6 +489,11 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::motion))
             continue;
 
+        //TODO: #GDM motion flag should be enough if it will be set correctly
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if (!camera || camera->isDtsBased() || camera->supportedMotionType() == Qn::MT_NoMotion)
+            continue;
+
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
 }
