@@ -61,7 +61,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
 
         int resourceId = QnBusinessEventRuntime::getEventResourceId(params);
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::rfAllResources);
-        if (!resource)
+        if (resource)
             resources << resource;
 
         return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resources);
@@ -94,7 +94,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
 }
 
 bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message) {
-    return addSystemHealthEvent(message, QnUserResourceList());
+    return addSystemHealthEvent(message, QnResourceList());
 }
 
 bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
