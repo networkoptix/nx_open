@@ -297,13 +297,6 @@ __VA_ARGS__ void serialize(const TYPE &value, QVariant *target);                
 __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target);
 
 
-#define QN_DEFINE_STRUCT_SERIALIZATION_STEP_I(R, DATA, FIELD)                   \
-    QJson::serialize(value.FIELD, BOOST_PP_STRINGIZE(FIELD), &result);
-
-#define QN_DEFINE_STRUCT_DESERIALIZATION_STEP_I(R, DATA, FIELD)                 \
-    if(!QJson::deserialize(map, BOOST_PP_STRINGIZE(FIELD), &result.FIELD))      \
-        return false;
-
 /**
  * This macro generates the necessary boilerplate to (de)serialize struct types.
  * It uses field names for JSON keys.
@@ -330,5 +323,13 @@ __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             
     *target = result;                                                           \
     return true;                                                                \
 }
+
+#define QN_DEFINE_STRUCT_SERIALIZATION_STEP_I(R, DATA, FIELD)                   \
+    QJson::serialize(value.FIELD, BOOST_PP_STRINGIZE(FIELD), &result);
+
+#define QN_DEFINE_STRUCT_DESERIALIZATION_STEP_I(R, DATA, FIELD)                 \
+    if(!QJson::deserialize(map, BOOST_PP_STRINGIZE(FIELD), &result.FIELD))      \
+    return false;
+
 
 #endif // QN_JSON_H

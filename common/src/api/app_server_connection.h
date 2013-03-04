@@ -33,11 +33,8 @@ class QnAppServerReplyProcessor: public QObject
     Q_OBJECT
 
 public:
-    QnAppServerReplyProcessor(QnResourceFactory &resourceFactory, QnApiSerializer &serializer, int object): 
-        m_resourceFactory(resourceFactory),
-        m_serializer(serializer),
-        m_object(object)
-    {}
+    QnAppServerReplyProcessor(QnResourceFactory &resourceFactory, QnApiSerializer &serializer, int object);
+    virtual ~QnAppServerReplyProcessor();
 
 public slots:
     void finished(const QnHTTPRawResponse &response, int handle);
