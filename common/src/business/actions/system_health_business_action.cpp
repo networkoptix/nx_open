@@ -5,12 +5,13 @@
 #include <utils/common/synctime.h>
 
 
-QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message):
+QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, int eventResourceId):
     base_type(QnBusinessParams())
 {
     QnBusinessParams runtimeParams;
     QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::Value(BusinessEventType::BE_SystemHealthMessage + message));
     QnBusinessEventRuntime::setEventTimestamp(&runtimeParams, qnSyncTime->currentUSecsSinceEpoch());
+    QnBusinessEventRuntime::setEventResourceId(&runtimeParams, eventResourceId);
     setRuntimeParams(runtimeParams);
 
     QnBusinessParams actionParams;

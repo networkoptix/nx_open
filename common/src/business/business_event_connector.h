@@ -45,7 +45,7 @@ public slots:
 
     void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers);
 
-    void at_NoStorages(qint64 timeStamp);
+    void at_NoStorages(const QnResourcePtr& resource);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

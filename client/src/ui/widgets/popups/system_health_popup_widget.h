@@ -24,13 +24,14 @@ public:
     explicit QnSystemHealthPopupWidget(QWidget *parent = 0);
     ~QnSystemHealthPopupWidget();
     
-    bool showSystemHealthMessage(QnSystemHealth::MessageType message, const QnUserResourceList &users);
+    bool showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourceList &resources);
 signals:
     void closed(QnSystemHealth::MessageType message, bool ignore);
 
 private slots:
     void at_fixButton_clicked();
     void at_fixUserLabel_linkActivated(const QString &anchor);
+    void at_fixStoragesLabel_linkActivated(const QString &anchor);
     void at_postponeButton_clicked();
 
 private:

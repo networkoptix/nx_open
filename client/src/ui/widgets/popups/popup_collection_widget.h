@@ -28,7 +28,7 @@ public:
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
-    bool addSystemHealthEvent(QnSystemHealth::MessageType message, const QnUserResourceList &users);
+    bool addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources);
 
     void clear();
 
