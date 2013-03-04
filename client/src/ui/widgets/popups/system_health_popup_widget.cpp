@@ -8,6 +8,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -25,12 +26,8 @@ QnSystemHealthPopupWidget::QnSystemHealthPopupWidget(QWidget *parent) :
     m_messageType(QnSystemHealth::NotDefined)
 {
     ui->setupUi(this);
-/*
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::Window, QColor(85, 0, 0)); //TODO: #elric skin color
-    ui->groupBox->setPalette(palette);
-*/
-    setBorderColor(QColor(255, 0, 0, 128)); //TODO: #GDM skin color
+
+    setBorderColor(qnGlobals->popupFrameSystem()); //TODO: #GDM skin color
     connect(ui->fixButton,      SIGNAL(clicked()), this, SLOT(at_fixButton_clicked()));
     connect(ui->postponeButton, SIGNAL(clicked()), this, SLOT(at_postponeButton_clicked()));
 }
@@ -100,6 +97,10 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
         break;
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::StoragesNotConfigured:
+        /*
+         menu()->trigger(Qn::ServerSettingsAction,
+            QnActionParameters(server));
+        */
         //TODO: #GDM read resource list and open dialog clicking on "Fix" url.
         break;
     default:

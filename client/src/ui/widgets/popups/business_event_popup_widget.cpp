@@ -7,6 +7,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
@@ -183,6 +184,7 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
 
     case BusinessEventType::BE_Camera_Input:
     case BusinessEventType::BE_Camera_Disconnect:
+        setBorderColor(qnGlobals->popupFrameImportant());
         ui->importantLabel->setVisible(true);
         break;
 
@@ -191,12 +193,14 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
     case BusinessEventType::BE_Camera_Ip_Conflict:
     case BusinessEventType::BE_MediaServer_Failure:
     case BusinessEventType::BE_MediaServer_Conflict:
+        setBorderColor(qnGlobals->popupFrameWarning());
         ui->warningLabel->setVisible(true);
         break;
 
         //case BusinessEventType::BE_Camera_Motion:
         //case BusinessEventType::BE_UserDefined:
     default:
+        setBorderColor(qnGlobals->popupFrameNotification());
         ui->notificationLabel->setVisible(true);
         break;
     }
