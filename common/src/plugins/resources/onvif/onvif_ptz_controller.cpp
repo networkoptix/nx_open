@@ -82,12 +82,15 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
-    m_capabilities = Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability; // TODO
+    m_capabilities |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability;
     m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable
     if(m_resource->getModel() == lit("FW3471-PS-E")) {
         m_capabilities |= Qn::OctagonalPtzCapability;
+    }
+    if(m_resource->getModel() == lit("FD8162")) {
+        m_capabilities ~= Qn::AbsolutePtzCapability;
     }
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
