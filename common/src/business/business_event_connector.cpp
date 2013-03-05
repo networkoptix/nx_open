@@ -16,11 +16,25 @@
 #include "actions/system_health_business_action.h"
 
 
-Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
+static QnBusinessEventConnector* _instance = NULL;
+
+QnBusinessEventConnector::QnBusinessEventConnector()
+{
+}
+
+QnBusinessEventConnector::~QnBusinessEventConnector()
+{
+}
+
+void QnBusinessEventConnector::initStaticInstance( QnBusinessEventConnector* inst )
+{
+    _instance = inst;
+}
 
 QnBusinessEventConnector* QnBusinessEventConnector::instance()
 {
-    return static_instance();
+    //return static_instance();
+    return _instance;
 }
 
 void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata)

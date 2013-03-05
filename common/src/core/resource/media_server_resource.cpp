@@ -288,13 +288,13 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        // keep index uhcnaged (app server does not provide such info
-        foreach(QnAbstractStorageResourcePtr storage, m_storages)
+        /* Keep indices unchanged (EC does not provide this info). */
+        foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
-            for (int i = 0; i < otherStorages.size(); ++i)
+            foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
             {
-                if (otherStorages[i]->getId() == storage->getId()) {
-                    otherStorages[i]->setIndex(storage->getIndex());
+                if (otherStorage->getId() == storage->getId()) {
+                    otherStorage->setIndex(storage->getIndex());
                     break;
                 }
             }

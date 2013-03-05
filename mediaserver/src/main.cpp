@@ -805,9 +805,10 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
-    QThread *connectorThread = new QThread(); // TODO: #Elric leaking thread
-    qnBusinessRuleConnector->moveToThread(connectorThread);
+    QnBusinessEventConnector::initStaticInstance( new QnBusinessEventConnector() );
+    std::auto_ptr<QThread> connectorThread( new QThread() );
     connectorThread->start();
+    qnBusinessRuleConnector->moveToThread(connectorThread.get());
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
     initAppServerConnection(qSettings);
@@ -1029,6 +1030,13 @@ void QnMain::run()
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+
+    connectorThread->quit();
+    connectorThread->wait();
+
+    //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
+    delete QnBusinessEventConnector::instance();
+    QnBusinessEventConnector::initStaticInstance( NULL );
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>

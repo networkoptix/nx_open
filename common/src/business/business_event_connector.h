@@ -11,7 +11,12 @@
 class QnBusinessEventConnector: public QObject
 {
     Q_OBJECT
+
 public:
+    QnBusinessEventConnector();
+    ~QnBusinessEventConnector();
+
+    static void initStaticInstance( QnBusinessEventConnector* );
     static QnBusinessEventConnector* instance();
 
 public slots:
