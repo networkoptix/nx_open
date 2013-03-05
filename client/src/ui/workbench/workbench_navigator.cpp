@@ -795,11 +795,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         if((quint64)timeUSec != AV_NOPTS_VALUE)
             updateLive();
 
-        if(isSearch) {
+        bool sync = (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods));
+        if(isSearch || !sync) {
             QVector<qint64> indicators;
             foreach(QnResourceWidget *widget, display()->widgets())
                 if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                    indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
+                    if (mediaWidget != m_currentMediaWidget)
+                        indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
             m_timeSlider->setIndicators(indicators);
         } else {
             m_timeSlider->setIndicators(QVector<qint64>());
