@@ -318,33 +318,33 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
     QMutexLocker lock(&m_mutex);
     if (display->getArchiveReader()) 
     {
-        switch (m_mode) 
+        if (isSupportedDisplay(display))
         {
-            case Mode_Auto:
-                if (m_redAssInfo.size() >= 16) {
-                    gotoLowQuality(display, Reason_Network);
-                }
-                else {
-                    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
-                    {
-                        if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
-                            gotoLowQuality(display, itr.value().lqReason);
+            switch (m_mode) 
+            {
+                case Mode_Auto:
+                    if (m_redAssInfo.size() >= 16) {
+                        gotoLowQuality(display, Reason_Network);
                     }
-                }
-                break;
+                    else {
+                        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+                        {
+                            if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+                                gotoLowQuality(display, itr.value().lqReason);
+                        }
+                    }
+                    break;
 
-            case Mode_ForceHQ:
-                if (isSupportedDisplay(display))
+                case Mode_ForceHQ:
                     display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
-                break;
-            case Mode_ForceLQ:
-                if (isSupportedDisplay(display))
+                    break;
+                case Mode_ForceLQ:
                     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
-
         m_redAssInfo.insert(display, RedAssInfo());
     }
 }
