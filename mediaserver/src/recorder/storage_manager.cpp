@@ -283,7 +283,7 @@ void QnStorageManager::clearSpace()
 {
     if (!m_catalogLoaded)
         return;
-    const StorageMap storages = getAllStorages();
+    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
     foreach(QnStorageResourcePtr storage, storages)
         clearSpace(storage);
 }
@@ -296,8 +296,8 @@ QnStorageManager::StorageMap QnStorageManager::getAllStorages() const
 
 QnStorageResourceList QnStorageManager::getStorages() const 
 {
-    QMutexLocker lock(&m_mutexStorages); 
-    return m_storageRoots.values().toSet().toList(); // TODO: #Elric totally evil. Store storage list as a member.
+    QMutexLocker lock(&m_mutexStorages);
+    return m_storageRoots.values().toSet().toList(); // remove storage duplicates. Duplicates are allowed in sake for v1.4 compatibility
 }
 
 void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
@@ -373,28 +373,40 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
+QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
+{
+    QSet<QnStorageResourcePtr> result;
+
+    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        if (fileStorage && fileStorage->getStatus() != QnResource::Offline) 
+        {
+            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+            if (available > 1000000000ll)
+                result << fileStorage;
+        }
+    }
+
+    return result;
+}
+
 void QnStorageManager::updateStorageStatistics()
 {
     double totalSpace = 0;
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
-        if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
-            continue; // do not use offline storages for writting
-
-        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
-        qint64 storageSpace = fileStorage->getSpaceLimit();
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
     }
 
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
-        if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
-            continue; // do not use offline storages for writting
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
 
-        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
-        qint64 storageSpace = fileStorage->getSpaceLimit();
+        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
@@ -417,16 +429,14 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QVector<QnStorageResourcePtr> candidates;
 
     // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
-    const StorageMap storages = getAllStorages();
-    for (StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-		QnStorageResourcePtr storage = itr.value();
-        if (storage->getStatus() != QnResource::Offline) {
-            qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
-            float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
-            minBitrate = qMin(minBitrate, bitrate);
-            bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
-        }
+		QnStorageResourcePtr storage = *itr;
+        qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
+        float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
+        minBitrate = qMin(minBitrate, bitrate);
+        bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
     }
     for (int i = 0; i < bitrateInfo.size(); ++i)
     {
@@ -535,6 +545,12 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
 
 QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
+    // 1.4 to 1.5 compatibility notes:
+    // 1.5 prevent duplicates path to same physical storage (aka c:/test and c:/test/)
+    // for compatibility with 1.4 I keep all such patches as difference keys to same storage
+	// In other case we are going to lose archive from 1.4 because of storage_index is different for same physical folder
+    // If several storage keys are exists, function return minimal storage index
+
     storageIndex = -1;
     const StorageMap storages = getAllStorages();
     for(StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
