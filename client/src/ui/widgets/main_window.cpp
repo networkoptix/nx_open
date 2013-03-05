@@ -337,9 +337,11 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         return;
 
     if(fullScreen) {
+        m_storedGeometry = geometry();
         showFullScreen();
     } else if(isFullScreen()) {
         showNormal();
+        setGeometry(m_storedGeometry);
     }
 }
 
