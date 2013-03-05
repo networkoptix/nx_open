@@ -14,6 +14,8 @@ LiveMediaCacheReader::LiveMediaCacheReader( MediaStreamCache* mediaCache, quint6
 
 bool LiveMediaCacheReader::tryRead( QnAbstractDataPacketPtr* const data )
 {
+    //TODO/IMPL throw dataAvailable signal if data is available after returning false
+
     QnAbstractDataPacketPtr packet = m_readCtx.getNextFrame();
     if( !packet )
         return false;

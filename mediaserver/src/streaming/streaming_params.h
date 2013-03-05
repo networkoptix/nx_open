@@ -22,6 +22,7 @@ namespace StreamingParams
     static const QLatin1String VIDEO_CODEC_PARAM_NAME( "videoCodec" );
     static const QLatin1String AUDIO_CODEC_PARAM_NAME( "audioCodec" );
     static const QLatin1String DURATION_MS_PARAM_NAME( "duration" );
+    static const QLatin1String LIVE_PARAM_NAME( "live" );
 }
 
 #endif  //STREAMING_PARAMS_H

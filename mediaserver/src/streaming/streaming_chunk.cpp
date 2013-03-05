@@ -32,8 +32,18 @@ const StreamingChunkCacheKey& StreamingChunk::params() const
 
 QString StreamingChunk::mimeType() const
 {
-    //TODO/IMPL/HLS
-    return QLatin1String("video/mp2t");
+    if( m_params.containerFormat() == "mpegts" )
+        return QLatin1String("video/mp2t");
+    else if( m_params.containerFormat() == "mp4" )
+        return QLatin1String("video/mp4");
+    else if( m_params.containerFormat() == "webm" )
+        return QLatin1String("video/webm");
+    else if( m_params.containerFormat() == "flv" )
+        return QLatin1String("video/x-flv");
+    else
+        return QLatin1String("application/octet-stream");
+
+    //TODO/IMPL should find some common place for containerFormat -> MIME_type match
 }
 
 //!Returns whole chunk data

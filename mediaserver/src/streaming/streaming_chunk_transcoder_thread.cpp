@@ -133,14 +133,15 @@ void StreamingChunkTranscoderThread::run()
             if( transcodeIter == m_transcodeContext.end() )
                 transcodeIter = m_transcodeContext.begin();
             if( transcodeIter->second->dataAvailable )
-                break;
+                break;      //TODO/IMPL using dataAvailable looks unreliable, since logic based on AbstractOnDemandDataProvider::dataAvailable is event-triggered
+                                //but AbstractOnDemandDataProvider::tryRead is level-triggered, which is better
             ++transcodeIter;
         }
 
         if( transcodeIter == m_transcodeContext.end() || !transcodeIter->second->dataAvailable )
         {
             //nothing to do
-            m_cond.wait( lk.mutex() );
+            m_cond.wait( lk.mutex(), 1000 );
             continue;
         }
 

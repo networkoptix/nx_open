@@ -99,8 +99,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     //checking requested time region:
         //whether data is present (in archive or cache)
-    if( camera->liveCache() )
+    if( transcodeParams.live() )
     {
+        if( !camera->liveCache() )
+            return false;
+
         const quint64 cacheStartTimestamp = camera->liveCache()->startTimestamp();
         const quint64 cacheEndTimestamp = camera->liveCache()->currentTimestamp();
         const quint64 actualStartTimestamp = std::max<>( cacheStartTimestamp, transcodeParams.startTimestamp() );
@@ -137,10 +140,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
             m_transcodings.erase( p.first );
             return false;
         }
+
+        return true;
     }
 
-#if 0   //TODO/IMPL creating archive reader
-    //checking archive
+    //creating archive reader
     QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->createDataProvider( QnResource::Role_Archive ) );
     if( !dp )
     {
@@ -160,8 +164,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     QSharedPointer<OnDemandMediaDataProvider> onDemandArchiveReader( new OnDemandMediaDataProvider( dp ) );
-    if( transcodeParams.startTimestamp().toMSecsSinceEpoch() < (archiveReader->endTime() / 1000) &&
-        transcodeParams.endTimestamp().toMSecsSinceEpoch() > (archiveReader->startTime() / 1000) )
+    if( onDemandArchiveReader->seek( transcodeParams.startTimestamp() ) )
     {
         if( startTranscoding(
                 p.first->first,
@@ -171,13 +174,13 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 chunk ) )
         {
             chunk->openForModification();
+            archiveReader->start();
             return true;
         }
 
         m_transcodings.erase( p.first );
         return false;
     }
-#endif
 
     NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
         "Resource %1, statTime %2, duration %3").arg(mediaResource->getUniqueId()).

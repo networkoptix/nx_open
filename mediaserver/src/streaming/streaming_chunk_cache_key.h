@@ -60,6 +60,9 @@ public:
     const QString& videoCodec() const;
     const QString& audioCodec() const;
 
+    //!true, if live stream requested. false if archive requested
+    bool live() const;
+
     bool operator<( const StreamingChunkCacheKey& right ) const;
     bool operator>( const StreamingChunkCacheKey& right ) const;
     bool operator==( const StreamingChunkCacheKey& right ) const;
@@ -71,6 +74,7 @@ private:
     QString m_containerFormat;
     quint64 m_startTimestamp;
     quint64 m_duration;
+    bool m_isLive;
     QSize m_pictureSizePixels;
     QString m_videoCodec;
     QString m_audioCodec;

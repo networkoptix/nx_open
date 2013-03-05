@@ -176,7 +176,9 @@ void QnHttpLiveStreamingProcessor::processRequest( const nx_http::Request& reque
 {
     nx_http::Response response;
     response.statusLine.version = request.requestLine.version;
-    response.headers.insert( std::make_pair( "Date", QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL/HLS get timezone
+    response.headers.insert( std::make_pair(
+        "Date",
+        QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL/HLS get timezone
     response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME" "QN_APPLICATION_VERSION ) );
     response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //findRequestedFile can override this
 
@@ -404,8 +406,10 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
     }
 
     std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
+    const bool liveStreamRequested = startDatetimeIter == requestParams.end();
+
     std::vector<HLSLivePlaylistManager::ChunkData> chunkList;
-    const nx_http::StatusCode::Value playlistResult = startDatetimeIter == requestParams.end()
+    const nx_http::StatusCode::Value playlistResult = liveStreamRequested
         ? getLiveChunkPlaylist(
             mediaResource,
             requestParams,
@@ -425,7 +429,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
     nx_hls::Playlist playlist;
     if( !chunkList.empty() )
         playlist.mediaSequence = chunkList[0].mediaSequence;
-    playlist.closed = !(startDatetimeIter == requestParams.end());  //closed == false for live
+    playlist.closed = !liveStreamRequested;  //closed == false for live
 
     //TODO/IMPL/HLS special processing for empty playlist
     //if( playlist.chunks.empty() )
@@ -472,6 +476,8 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
             hlsChunk.url.addQueryItem( param.first, param.second );
         hlsChunk.url.addQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME, QString::number(chunkList[i].startTimestamp) );
         hlsChunk.url.addQueryItem( StreamingParams::DURATION_MS_PARAM_NAME, QString::number(chunkList[i].duration) );
+        if( liveStreamRequested )
+            hlsChunk.url.addQueryItem( StreamingParams::LIVE_PARAM_NAME, QString() );
         playlist.chunks.push_back( hlsChunk );
     }
 
@@ -511,27 +517,25 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getLiveChunkPlaylist(
         return nx_http::StatusCode::noContent;
     }
 
-    //const MediaIndex& mediaIndex = *camera->mediaIndex();
-    //if( !mediaIndex.generateChunkListForLivePlayback(
-    //        DEFAULT_TARGET_DURATION * MS_IN_SEC,
-    //        MIN_CHUNK_COUNT_IN_PLAYLIST,
-    //        chunkList )
-    //    || chunkList->empty() )
-    //{
-    //    NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(mediaResource->getUniqueId()), cl_logWARNING );
-    //    return nx_http::StatusCode::noContent;
-    //}
-
     return nx_http::StatusCode::ok;
 }
 
 nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getArchiveChunkPlaylist(
-    const QnMediaResourcePtr& /*mediaResource*/,
+    const QnMediaResourcePtr& mediaResource,
     const QDateTime& /*startDatetime*/,
     const std::multimap<QString, QString>& /*requestParams*/,
     std::vector<HLSLivePlaylistManager::ChunkData>* const /*chunkList*/ )
 {
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
+    if( !camera )
+    {
+        NX_LOG( QString::fromLatin1("Error. Requested hls playlist of resource %1 which is not camera").arg(mediaResource->getUniqueId()), cl_logWARNING );
+        return nx_http::StatusCode::forbidden;
+    }
+
     //TODO/IMPL/HLS
+        //converting startDatetime to timestamp
+
     return nx_http::StatusCode::notImplemented;
 }
 
@@ -567,7 +571,8 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         if( startDatetimeIter != requestParams.end() )
         {
             QDateTime startDatetime = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate);
-            //TODO/IMPL/HLS converting startDatetime to startTimestamp
+            //TODO/IMPL converting startDatetime to startTimestamp
+                //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by absolute positions)
         }
     }
 
@@ -581,7 +586,7 @@ nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         durationIter != requestParams.end()
             ? durationIter->second.toLongLong()
             : DEFAULT_TARGET_DURATION * MS_IN_SEC * MICROS_IN_MS,
-            //: std::numeric_limits<quint64>::max(),  //TODO/IMPL support downloading to the end, but that chunk MUST not bwe cached!
+            //: std::numeric_limits<quint64>::max(),  //TODO/IMPL support downloading to the end, but that chunk MUST not be cached!
         //endTimestampIter != requestParams.end()
         //    ? QDateTime::fromString(endTimestampIter->second, Qt::ISODate)
         //    : QDateTime::fromTime_t(0xffffffff),

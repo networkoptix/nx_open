@@ -37,9 +37,12 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_channel( channel ),
     m_containerFormat( containerFormat ),
     m_startTimestamp( startTimestamp ),
-    m_duration( duration )
+    m_duration( duration ),
+    m_isLive( false )
     //,m_auxiliaryParams( auxiliaryParams )
 {
+    Q_ASSERT( !containerFormat.isEmpty() );
+
     std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find( StreamingParams::VIDEO_CODEC_PARAM_NAME );
     if( it != auxiliaryParams.end() )
         m_videoCodec = it->second;
@@ -57,6 +60,9 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
             sizesStr.size() > 0 ? sizesStr[0].toInt() : 0,
             sizesStr.size() > 1 ? sizesStr[1].toInt() : 0 );
     }
+
+    it = auxiliaryParams.find( StreamingParams::LIVE_PARAM_NAME );
+    m_isLive = it != auxiliaryParams.end();
 }
 
 //!data source (camera id, stream id)
@@ -107,6 +113,11 @@ const QString& StreamingChunkCacheKey::videoCodec() const
 const QString& StreamingChunkCacheKey::audioCodec() const
 {
     return m_audioCodec;
+}
+
+bool StreamingChunkCacheKey::live() const
+{
+    return m_isLive;
 }
 
 bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) const
