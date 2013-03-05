@@ -264,8 +264,11 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
-    checkBoxItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
-    checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
+    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    if (item.isWritable)
+        flags |= Qt::ItemIsEnabled;
+    checkBoxItem->setFlags(flags);
+    checkBoxItem->setCheckState(item.isUsedForWriting && item.isWritable ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, item.storageId);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
