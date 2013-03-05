@@ -126,6 +126,15 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     else
         m_isRealTimeSource = false;
 
+    if (resource && resource->hasFlags(QnResource::still_image)) {
+        m_isStillImage = true;
+
+        if (access(resource->getUrl().toLatin1(), 0) == 0)
+            resource->setStatus(QnResource::Online);
+        else
+            resource->setStatus(QnResource::Offline);
+    }
+
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_display[i] = 0;
