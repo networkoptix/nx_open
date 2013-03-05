@@ -75,6 +75,11 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         reply.storages.push_back(data);
     }
 
+#ifdef Q_OS_WIN
+    reply.storagePlugins.push_back(lit("smb"));
+#endif
+    // TODO: #Elric check for other plugins, e.g. coldstore
+
     QVariantMap root;
     QJson::serialize(reply, "reply", &root);
     QJson::serialize(root, &result);
