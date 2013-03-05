@@ -8,7 +8,7 @@
 #include <utils/network/networkoptixmodulerevealcommon.h>
 #include <utils/math/space_mapper.h>
 
-#include <api/model/storage_space_data.h>
+#include <api/model/storage_space_reply.h>
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
 #include <api/media_server_statistics_data.h>
@@ -100,8 +100,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
 
-    qRegisterMetaType<QnStorageSpaceData>();
-    qRegisterMetaType<QnStorageSpaceDataList>();
+    qRegisterMetaType<QnStorageSpaceReply>();
     
     qn_commonMetaTypes_initialized = true;
 }

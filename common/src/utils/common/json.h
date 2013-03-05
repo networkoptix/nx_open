@@ -318,7 +318,7 @@ __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             
         return false;                                                           \
     QVariantMap map = value.toMap();                                            \
                                                                                 \
-    QnStorageSpaceData result;                                                  \
+    TYPE result;                                                                \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
     *target = result;                                                           \
     return true;                                                                \
