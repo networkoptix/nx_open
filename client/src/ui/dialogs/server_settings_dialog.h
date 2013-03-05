@@ -70,14 +70,12 @@ public slots:
     virtual void reject() override;
 
 private:
-    struct StorageItem;
-
     void updateFromResources();
     void submitToResources();
 
-    void addTableItem(const StorageItem &item);
-    void setTableItems(const QList<StorageItem> &items);
-    QList<StorageItem> tableItems() const;
+    void addTableItem(const QnStorageSpaceData &item);
+    void setTableItems(const QnStorageSpaceDataList &items);
+    QnStorageSpaceDataList tableItems() const;
 
     //int addTableRow(int id, const QString &url, int spaceLimitGb);
 

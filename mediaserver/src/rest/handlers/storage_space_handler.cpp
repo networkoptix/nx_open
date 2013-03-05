@@ -27,7 +27,9 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         info.storageId = storage->getId();
         info.totalSpace = storage->getTotalSpace();
         info.freeSpace = storage->getFreeSpace();
+        info.reservedSpace = storage->getSpaceLimit();
         info.isWritable = storage->isStorageAvailableForWriting();
+        info.isUsedForWriting = storage->isUsedForWriting();
 
         // TODO: #Elric remove once UnknownSize is dropped.
         if(info.totalSpace == QnStorageResource::UnknownSize)
@@ -59,11 +61,13 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         info.storageId = -1;
         info.totalSpace = partition.sizeBytes;
         info.freeSpace = partition.freeBytes;
+        info.reservedSpace = -1;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(info.path, false));
         if (storage) {
             storage->setUrl(info.path); // createStorage is just factory and does not fill url
             info.isWritable = storage->isStorageAvailableForWriting();
+        	info.isUsedForWriting = false;
             infos.push_back(info);
         }
     }

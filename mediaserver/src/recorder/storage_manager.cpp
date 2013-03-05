@@ -380,7 +380,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
-        if (fileStorage && fileStorage->getStatus() != QnResource::Offline) 
+        if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
             if (available > 1000000000ll)
@@ -433,6 +433,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
 		QnStorageResourcePtr storage = *itr;
+        if (storage->getStatus() != QnResource::Offline) {
         qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
         float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
