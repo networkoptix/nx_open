@@ -10,6 +10,7 @@
 #include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+static const qint64 MIN_SPACE_FOR_WRITTING = 1000000ll * 100; // 100Mb
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -383,7 +384,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > 1000000000ll)
+            if (available > MIN_SPACE_FOR_WRITTING)
                 result << fileStorage;
         }
     }
