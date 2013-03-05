@@ -284,8 +284,7 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     //// class Request
     ////////////////////////////////////////////////////////////
-    void Request::serialize( BufferType* const dstBuffer ) const
-    bool HttpRequest::parse( const ConstBufferRefType& data )
+    bool Request::parse( const ConstBufferRefType& data )
     {
         enum ParseState
         {
@@ -347,6 +346,7 @@ namespace nx_http
         return true;
     }
 
+    void Request::serialize( BufferType* const dstBuffer ) const
     {
         //estimating required buffer size
         dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
