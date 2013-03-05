@@ -674,13 +674,20 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 }
 
 QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
-    if (m_display->camDisplay()->isStillImage()) {
-        return EmptyOverlay;
+    QnResourcePtr resource = m_display->resource();
+
+    if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
+        if (resource->getStatus() == QnResource::Offline)
+            return NoDataOverlay;
+        else
+            return EmptyOverlay;
+    } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
+        return NoDataOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
         return PausedOverlay;
-    } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
+    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return OfflineOverlay;
-    } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
+    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
         return UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())

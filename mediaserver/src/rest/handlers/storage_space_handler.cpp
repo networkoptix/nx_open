@@ -5,7 +5,7 @@
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/common/json.h>
 
-#include <api/model/storage_space_data.h>
+#include <api/model/storage_space_reply.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -18,27 +18,27 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
 {}
 
 int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamList &, QByteArray &result, QByteArray &contentType) {
-    QnStorageSpaceDataList infos;
+    QnStorageSpaceReply reply;
 
     QList<QString> storagePaths;
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
-        QnStorageSpaceData info;
-        info.path = QDir::toNativeSeparators(storage->getUrl());
-        info.storageId = storage->getId();
-        info.totalSpace = storage->getTotalSpace();
-        info.freeSpace = storage->getFreeSpace();
-        info.reservedSpace = storage->getSpaceLimit();
-        info.isWritable = storage->isStorageAvailableForWriting();
-        info.isUsedForWriting = storage->isUsedForWriting();
+        QnStorageSpaceData data;
+        data.path = QDir::toNativeSeparators(storage->getUrl());
+        data.storageId = storage->getId();
+        data.totalSpace = storage->getTotalSpace();
+        data.freeSpace = storage->getFreeSpace();
+        data.reservedSpace = storage->getSpaceLimit();
+        data.isWritable = storage->isStorageAvailableForWriting();
+        data.isUsedForWriting = storage->isUsedForWriting();
 
         // TODO: #Elric remove once UnknownSize is dropped.
-        if(info.totalSpace == QnStorageResource::UnknownSize)
-            info.totalSpace = -1;
-        if(info.freeSpace == QnStorageResource::UnknownSize)
-            info.freeSpace = -1;
+        if(data.totalSpace == QnStorageResource::UnknownSize)
+            data.totalSpace = -1;
+        if(data.freeSpace == QnStorageResource::UnknownSize)
+            data.freeSpace = -1;
 
-        infos.push_back(info);
-        storagePaths.push_back(info.path);
+        reply.storages.push_back(data);
+        storagePaths.push_back(data.path);
     }
 
     foreach(const QnPlatformMonitor::PartitionSpace &partition, m_monitor->totalPartitionSpaceInfo()) {
@@ -56,24 +56,32 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
         if(hasStorage)
             continue;
 
-        QnStorageSpaceData info;
-        info.path = path + lit(QN_MEDIA_FOLDER_NAME);
-        info.storageId = -1;
-        info.totalSpace = partition.sizeBytes;
-        info.freeSpace = partition.freeBytes;
-        info.reservedSpace = -1;
+        QnStorageSpaceData data;
+        data.path = path + lit(QN_MEDIA_FOLDER_NAME);
+        data.storageId = -1;
+        data.totalSpace = partition.sizeBytes;
+        data.freeSpace = partition.freeBytes;
+        data.reservedSpace = -1;
+        data.isUsedForWriting = false;
 
-        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(info.path, false));
+        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
         if (storage) {
-            storage->setUrl(info.path); // createStorage is just factory and does not fill url
-            info.isWritable = storage->isStorageAvailableForWriting();
-        	info.isUsedForWriting = false;
-            infos.push_back(info);
+            storage->setUrl(data.path); /* createStorage does not fill url. */
+            data.isWritable = storage->isStorageAvailableForWriting();
+        } else {
+            data.isWritable = false;
         }
+
+        reply.storages.push_back(data);
     }
 
+#ifdef Q_OS_WIN
+    reply.storagePlugins.push_back(lit("smb"));
+#endif
+    // TODO: #Elric check for other plugins, e.g. coldstore
+
     QVariantMap root;
-    QJson::serialize(infos, "data", &root);
+    QJson::serialize(reply, "reply", &root);
     QJson::serialize(root, &result);
     contentType = "application/json";
 

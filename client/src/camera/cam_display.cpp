@@ -7,6 +7,7 @@
 #include "utils/common/synctime.h"
 
 #include <QDateTime>
+#include <QFileInfo>
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
@@ -125,6 +126,16 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
+
+    if (resource && resource->hasFlags(QnResource::still_image)) {
+        m_isStillImage = true;
+
+        QFileInfo fileInfo(resource->getUrl());
+        if (fileInfo.isReadable())
+            resource->setStatus(QnResource::Online);
+        else
+            resource->setStatus(QnResource::Offline);
+    }
 
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {

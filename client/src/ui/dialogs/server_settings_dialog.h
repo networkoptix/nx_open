@@ -4,11 +4,13 @@
 #include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
-#include <api/model/storage_space_data.h>
 
 #include "button_box_dialog.h"
 
 class QLabel;
+
+struct QnStorageSpaceReply;
+struct QnStorageSpaceData;
 
 namespace Ui {
     class ServerSettingsDialog;
@@ -74,8 +76,8 @@ private:
     void submitToResources();
 
     void addTableItem(const QnStorageSpaceData &item);
-    void setTableItems(const QnStorageSpaceDataList &items);
-    QnStorageSpaceDataList tableItems() const;
+    void setTableItems(const QList<QnStorageSpaceData> &items);
+    QList<QnStorageSpaceData> tableItems() const;
 
     //int addTableRow(int id, const QString &url, int spaceLimitGb);
 
@@ -90,7 +92,7 @@ private slots:
     void at_storageAddButton_clicked();
     void at_storagesTable_cellChanged(int row, int column);
 
-    void at_replyReceived(int status, const QnStorageSpaceDataList &dataList, int handle);
+    void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;

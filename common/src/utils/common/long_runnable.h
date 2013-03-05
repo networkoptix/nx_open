@@ -87,7 +87,7 @@ public slots:
         );
 
         pleaseStop();
-        if( isRunning() )
+//        if( isRunning() )
             wait();
     }
 

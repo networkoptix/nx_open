@@ -1,5 +1,5 @@
-#ifndef __VIDEO_SERVER_CONNECTION_H_
-#define __VIDEO_SERVER_CONNECTION_H_
+#ifndef QN_MEDIA_SERVER_CONNECTION_H
+#define QN_MEDIA_SERVER_CONNECTION_H
 
 #include <QUrl>
 #include <QRegion>
@@ -16,7 +16,7 @@
 #include <api/media_server_cameras_data.h>
     
 #include "api_fwd.h"
-#include "model/storage_space_data.h"
+#include "model/storage_space_reply.h"
 
 class QnPtzSpaceMapper;
 
@@ -174,7 +174,7 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse &response, int handle);
 
     signals:
-        void finished(int status, const QnStorageSpaceDataList &data, int handle);
+        void finished(int status, const QnStorageSpaceReply &reply, int handle);
     };
 
 

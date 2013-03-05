@@ -676,24 +676,23 @@ void detail::QnMediaServerPtzGetSpaceMapperReplyProcessor::at_replyReceived(cons
 
 int QnMediaServerConnection::asyncGetStorageSpace(QObject *target, const char *slot) {
     detail::QnMediaServerStorageSpaceReplyProcessor *processor = new detail::QnMediaServerStorageSpaceReplyProcessor();
-    connect(processor, SIGNAL(finished(int, const QnStorageSpaceDataList &, int)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(int, const QnStorageSpaceReply &, int)), target, slot, Qt::QueuedConnection);
 
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("storageSpace"), QnRequestHeaderList(), QnRequestParamList(), processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
 
 void detail::QnMediaServerStorageSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse &response, int handle) {
-    const QByteArray& reply = response.data;
     int status = response.status;
 
-    QnStorageSpaceDataList data;
+    QnStorageSpaceReply reply;
     if(response.status == 0) {
         QVariantMap map;
-        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "data", &data))
+        if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
             status = 1;
     } else {
         qnWarning("Could not get storage spaces.", response.errorString);
     }
 
-    emit finished(status, data, handle);
+    emit finished(status, reply, handle);
 }

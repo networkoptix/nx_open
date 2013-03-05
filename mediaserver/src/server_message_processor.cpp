@@ -95,7 +95,6 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isServer)
             resource->setStatus(QnResource::Online);
 
-        QByteArray errorString;
         QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::rfAllResources);
         if (ownResource)
         {

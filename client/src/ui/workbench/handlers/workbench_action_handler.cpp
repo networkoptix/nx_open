@@ -40,6 +40,7 @@
 
 #include <recording/time_period_list.h>
 
+#include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
 #include <ui/actions/action_manager.h>
@@ -710,7 +711,13 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
 }
 
 void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
-    // TODO: #Elric #radass
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    foreach (QnResourceWidget* widget, widgets) {
+        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+        if (!mediaWidget)
+            continue;
+        //TODO: #vasilenko #gdm call redAssController method
+    }
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -1728,7 +1735,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Calculate size of the resulting matrix. */
-    const qreal desiredAspectRatio = 4.0 / 3.0;
+    qreal desiredAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+    QnResourceWidget* w = parameters.widget();
+    if (w && w->hasAspectRatio())
+        desiredAspectRatio = w->aspectRatio();
+
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
 
     /* Construct and add a new layout. */
@@ -1761,6 +1772,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
+    layout->setData(Qn::LayoutCellAspectRatioRole, desiredAspectRatio);
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
@@ -3293,6 +3305,11 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
                 continue; // we are displaying separate notification for us
             if (QnEmail::isValid(user->getEmail()))
                 continue;
+
+            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
+                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
+                    continue; // usual admins can not edit other admins, owner can
+
             usersWithNoEmail << user;
         }
         if (!usersWithNoEmail.isEmpty())
