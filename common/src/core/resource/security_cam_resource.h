@@ -68,8 +68,12 @@ public:
     const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
+
+    /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
 
+    /** Returns true if it is a analog camera */
+    bool isAnalog() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
 

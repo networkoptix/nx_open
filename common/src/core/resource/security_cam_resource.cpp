@@ -268,6 +268,17 @@ bool QnSecurityCamResource::isDtsBased() const
     return val.toInt();
 }
 
+bool QnSecurityCamResource::isAnalog() const
+{
+    if (!hasParam(lit("analog")))
+        return false;
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam(lit("analog"), val, QnDomainMemory);
+    return val.toInt();
+}
+
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 {
     if (!hasParam(lit("streamFpsSharing")))
