@@ -292,7 +292,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
 }
 
-void QnServerSettingsDialog::setTableItems(const QnStorageSpaceDataList &items) {
+void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &items) {
     ui->storagesTable->setRowCount(0);
     ui->storagesTable->insertRow(0);
     ui->storagesTable->setSpan(0, 0, 1, 4);
@@ -304,8 +304,8 @@ void QnServerSettingsDialog::setTableItems(const QnStorageSpaceDataList &items) 
         addTableItem(item);
 }
 
-QnStorageSpaceDataList QnServerSettingsDialog::tableItems() const {
-    QnStorageSpaceDataList result;
+QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
+    QList<QnStorageSpaceData> result;
 
     for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++) {
         QnStorageSpaceData item;
@@ -328,7 +328,7 @@ QnStorageSpaceDataList QnServerSettingsDialog::tableItems() const {
 
 void QnServerSettingsDialog::updateFromResources() {
     m_server->apiConnection()->asyncGetStorageSpace(this, SLOT(at_replyReceived(int, const QnStorageSpaceDataList &, int)));
-    setTableItems(QnStorageSpaceDataList());
+    setTableItems(QList<QnStorageSpaceData>());
     m_tableBottomLabel->setText(tr("Loading..."));
 
     ui->nameLineEdit->setText(m_server->getName());
@@ -514,7 +514,7 @@ void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
     m_hasStorageChanges = true;
 }
 
-void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDataList &dataList, int handle) {
+void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle) {
     if(status != 0) {
         m_tableBottomLabel->setText(tr("Could not load storages from server."));
         return;
@@ -522,7 +522,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceDa
 
     QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
 
-    QnStorageSpaceDataList items = dataList;
+    QList<QnStorageSpaceData> items = reply.storages;
     for(int i = 0; i < items.size(); i++) {
         QnStorageSpaceData &item = items[i];
 

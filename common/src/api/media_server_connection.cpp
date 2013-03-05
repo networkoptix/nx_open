@@ -683,17 +683,16 @@ int QnMediaServerConnection::asyncGetStorageSpace(QObject *target, const char *s
 
 
 void detail::QnMediaServerStorageSpaceReplyProcessor::at_replyReceived(const QnHTTPRawResponse &response, int handle) {
-    const QByteArray& reply = response.data;
     int status = response.status;
 
-    QnStorageSpaceDataList data;
+    QnStorageSpaceReply reply;
     if(response.status == 0) {
         QVariantMap map;
-        if(!QJson::deserialize(reply, &map) || !QJson::deserialize(map, "data", &data))
+        if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
             status = 1;
     } else {
         qnWarning("Could not get storage spaces.", response.errorString);
     }
 
-    emit finished(status, data, handle);
+    emit finished(status, reply, handle);
 }
