@@ -3299,6 +3299,11 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
                 continue; // we are displaying separate notification for us
             if (QnEmail::isValid(user->getEmail()))
                 continue;
+
+            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
+                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
+                    continue; // usual admins can not edit other admins, owner can
+
             usersWithNoEmail << user;
         }
         if (!usersWithNoEmail.isEmpty())
