@@ -7,6 +7,7 @@
 #include "utils/common/synctime.h"
 
 #include <QDateTime>
+#include <QFileInfo>
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
@@ -129,7 +130,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     if (resource && resource->hasFlags(QnResource::still_image)) {
         m_isStillImage = true;
 
-        if (access(resource->getUrl().toLatin1(), 0) == 0)
+        QFileInfo fileInfo(resource->getUrl());
+        if (fileInfo.isReadable())
             resource->setStatus(QnResource::Online);
         else
             resource->setStatus(QnResource::Offline);
