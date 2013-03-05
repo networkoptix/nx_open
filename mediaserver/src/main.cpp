@@ -1011,10 +1011,6 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    //starting soap server to accept event notifications from onvif servers
-    QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
-    QnSoapServer::instance()->start();
-
     qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
     if (lastRunningTime)
         qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
@@ -1053,6 +1049,9 @@ public:
 
 protected:
     virtual int executeApplication() override { 
+
+        initializeSingleToneObjects();
+
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
@@ -1101,12 +1100,23 @@ private:
     int m_argc;
     char **m_argv;
 
+    void initializeSingleToneObjects()
+    {
+        //starting soap server to accept event notifications from onvif servers
+        QnSoapServer::initGlobalInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
+        QnSoapServer::instance()->start();
+    }
+
     void destroySingleToneObjects()
     {
         QThreadPool::globalInstance()->waitForDone();
 
         QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
+
         QnBusinessRuleProcessor::fini();
+
+        delete QnSoapServer::instance();
+        QnSoapServer::initGlobalInstance( NULL );
     }
 };
 

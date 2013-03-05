@@ -72,11 +72,16 @@ const OnvifNotificationConsumer* QnSoapServer::getService() const
     return &m_service;
 }
 
-Q_GLOBAL_STATIC( QnSoapServer, static_instance )
+static QnSoapServer* globalInstance = NULL;
+
+void QnSoapServer::initGlobalInstance( QnSoapServer* inst )
+{
+    globalInstance = inst;
+}
 
 QnSoapServer* QnSoapServer::instance()
 {
-    return static_instance();
+    return globalInstance;
 }
 
 static const unsigned int ERROR_SKIP_TIMEOUT_MS = 500;
