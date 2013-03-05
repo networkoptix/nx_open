@@ -59,6 +59,8 @@ public:
 
     QnStorageResourceList getStorages() const;
     void clearSpace();
+
+    bool isWritableStoragesAvailable();
 signals:
     void noStoragesAvailable();
 public slots:
@@ -98,6 +100,7 @@ private:
     QMutex m_cacheMutex;
     bool m_catalogLoaded;
     bool m_warnSended;
+    bool m_isWritableStorageAvail;
 };
 
 #define qnStorageMan QnStorageManager::instance()
