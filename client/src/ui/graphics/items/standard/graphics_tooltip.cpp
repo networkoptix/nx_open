@@ -12,8 +12,15 @@
 #include <QtGui/QTextDocument>
 #include <QtGui/QGraphicsDropShadowEffect>
 
+#include <camera/thumbnails_loader.h>
+#include <camera/thumbnail.h>
+
+#include <core/resource_managment/resource_pool.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>
+
+#include <utils/common/synctime.h>
 
 namespace {
     const qreal toolTipMargin = 5.0;
@@ -44,6 +51,9 @@ protected:
     virtual void timerEvent(QTimerEvent *e) override;
     virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
+private slots:
+    void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
+
 private:
     QGraphicsItem *item() const {
         return m_item.data();
@@ -51,13 +61,17 @@ private:
 
 private:
     WeakGraphicsItemPointer m_item;
+    QnThumbnail m_thumbnail;
+    qint64 m_time;
+    QnThumbnailsLoader* m_loader;
 };
 
 GraphicsTooltipLabel *GraphicsTooltipLabel::instance = 0;
 
 GraphicsTooltipLabel::GraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem):
     base_type(text),
-    m_item(0)
+    m_item(0),
+    m_loader(0)
 {
     delete instance;
     instance = this;
@@ -100,10 +114,31 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
 
     setZValue(std::numeric_limits<qreal>::max());
     setText(newText);
-    resize(sizeHint(Qt::PreferredSize) + QSize(2 * toolTipMargin, 2 * toolTipMargin));
+    resize(sizeHint(Qt::PreferredSize) + QSize(2 * toolTipMargin, 10 * toolTipMargin));
     newItem->installSceneEventFilter(this);
     newItem->setAcceptHoverEvents(true); // this won't be undone, can be stored in inner field
     restartExpireTimer();
+
+    if(m_loader) {
+        disconnect(m_loader, NULL, this, NULL);
+        m_loader->pleaseStop();
+    }
+
+    QnResourceList cameras = qnResPool->getAllEnabledCameras();
+    if (cameras.isEmpty())
+        return;
+
+
+    m_loader = new QnThumbnailsLoader(cameras.at(0), false);
+
+    connect(m_loader, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(at_loader_thumbnailLoaded(const QnThumbnail &)));
+    connect(m_loader, SIGNAL(finished()), m_loader, SLOT(deleteLater()));
+
+    m_time = qnSyncTime->currentMSecsSinceEpoch();
+    m_loader->setStartTime(m_time);
+    m_loader->setEndTime(m_time);
+    m_loader->setTimeStep(1);
+    m_loader->start();
 }
 
 void GraphicsTooltipLabel::hideTip()
@@ -184,6 +219,9 @@ void GraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);
     base_type::paint(painter, option, widget);
+
+    if (!m_thumbnail.isEmpty())
+        painter->drawImage(0, 0, m_thumbnail.image());
 }
 
 void GraphicsTooltipLabel::timerEvent(QTimerEvent *e)
@@ -199,6 +237,12 @@ bool GraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *even
     if (event->type() == QEvent::GraphicsSceneHoverLeave && watched == item())
         hideTip();
     return base_type::sceneEventFilter(watched, event);
+}
+
+
+void GraphicsTooltipLabel::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
+    m_thumbnail = thumbnail;
+    update(rect());
 }
 
 void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport) {
