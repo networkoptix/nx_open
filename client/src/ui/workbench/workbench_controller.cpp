@@ -614,21 +614,25 @@ void  QnWorkbenchController::initOverlayLabelAnimation() {
 void QnWorkbenchController::startRecording()
 {
     if (!m_screenRecorder) {
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
 
-    if(m_screenRecorder->isRecording() || (m_overlayLabelAnimation && m_overlayLabelAnimation->state() == QAbstractAnimation::Running))
+    if(m_screenRecorder->isRecording() || (m_overlayLabelAnimation && m_overlayLabelAnimation->state() == QAbstractAnimation::Running)) {
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
-
-    action(Qn::ToggleScreenRecordingAction)->setChecked(true);
-
-    m_countdownCanceled = false;
+    }
 
     QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
     if (widget == NULL) {
         qnWarning("Viewport was expected to be a QGLWidget.");
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
+
+    action(Qn::ToggleScreenRecordingAction)->setChecked(true);
+
+    m_countdownCanceled = false;
 
     showOverlayLabel(tr("Recording in..."), 220);
     initOverlayLabelAnimation();
