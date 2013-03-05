@@ -9,7 +9,7 @@
 #ifdef Q_OS_WIN
 #include "windows.h"
 #endif
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs

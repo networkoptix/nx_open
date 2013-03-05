@@ -228,10 +228,9 @@ int QnImageHandler::executePost(const QString& path, const QnRequestParamList& p
     return executeGet(path, params, result, contentType);
 }
 
-QString QnImageHandler::description(TCPSocket* tcpSocket) const
+QString QnImageHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
-        QString rez;
+    QString rez;
     rez += "Return image from camera <BR>";
     rez += "<BR>Param <b>physicalId</b> - camera physicalId.";
     rez += "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected. Also, special values allowed: 'NOW' - live position (no frame is returned if camera is offline). 'LATEST' - last frame from camera (return live position or last frame from archive if camera is offline)";

@@ -25,9 +25,8 @@ int QnRestPingHandler::executePost(const QString& path, const QnRequestParamList
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestPingHandler::description(TCPSocket* tcpSocket) const
+QString QnRestPingHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Returns server ping message";
     return rez;

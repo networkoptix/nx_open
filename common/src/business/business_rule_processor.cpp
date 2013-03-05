@@ -4,10 +4,13 @@
 #include "core/resource/resource.h"
 #include "core/resource/media_server_resource.h"
 #include <business/business_event_rule.h>
+#include <business/actions/system_health_business_action.h>
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
 #include "core/resource_managment/resource_pool.h"
+
+const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -25,6 +28,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
+    quit();
+    wait();
 }
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
@@ -94,6 +99,17 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
     return false;
 }
 
+class QnBusinessRuleProcessorInstanceDeleter
+{
+public:
+    ~QnBusinessRuleProcessorInstanceDeleter()
+    {
+        QnBusinessRuleProcessor::fini();
+    }
+};
+
+static QnBusinessRuleProcessorInstanceDeleter qnBusinessRuleProcessorInstanceDeleter;
+
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
 {
     // this call is not thread safe! You should init from main thread e.t.c
@@ -108,6 +124,12 @@ void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
     m_instance = instance;
 }
 
+void QnBusinessRuleProcessor::fini()
+{
+    delete m_instance;
+    m_instance = NULL;
+}
+
 void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
 {
     QMutexLocker lock(&m_mutex);
@@ -118,6 +140,8 @@ void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
 
 void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bEvent)
 {
+    QMutexLocker lock(&m_mutex);
+
     QList<QnAbstractBusinessActionPtr> actions = matchActions(bEvent);
     foreach(QnAbstractBusinessActionPtr action, actions)
     {
@@ -273,11 +297,10 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
 
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
-    QMutexLocker lock(&m_mutex);
     QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
-        if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
+        if (rule->disabled() || rule->eventType() != bEvent->getEventType())
             continue;
         bool condOK = checkEventCondition(bEvent, rule);
         if (condOK)
@@ -319,13 +342,16 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     QStringList recipients;
     foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
         QString email = user->getEmail();
-        if (!email.isEmpty() && isEmailValid(email))
+        if (!email.isEmpty() && QnEmail::isValid(email))
             recipients << email;
     }
 
     QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
-        if (isEmailValid(email))
+        QString trimmed = email.trimmed();
+        if (trimmed.isEmpty())
+            continue;
+        if (QnEmail::isValid(trimmed))
             recipients << email;
     }
 
@@ -339,17 +365,32 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if( appServerConnection->sendEmail(
-            recipients,
-            action->getSubject(),
-            action->getMessageBody()))
-    {
-        cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
-                    arg(recipients.join(QLatin1String("; "))).arg(QLatin1String(appServerConnection->getLastError())), cl_logWARNING );
-        return false;
-    }
+    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
+    appServerConnection->sendEmailAsync(
+                recipients,
+                action->getSubject(),
+                action->getMessageBody(),
+                EMAIL_SEND_TIMEOUT,
+                this,
+                SLOT(at_sendEmailFinished(int,QByteArray,bool,int)));
+
     return true;
+}
+
+void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray &errorString, bool result, int handle)
+{
+    Q_UNUSED(status)
+    Q_UNUSED(handle)
+    if (result)
+        return;
+
+    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+
+    showPopup(action);
+
+    cl_log.log( QString::fromLatin1("Error processing action SendMail: %2").
+                arg(QString::fromUtf8(errorString)), cl_logWARNING );
+
 }
 
 bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
@@ -368,7 +409,7 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
-        if (m_rules[i]->getId() == bRule->getId())
+        if (m_rules[i]->id() == bRule->id())
         {
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             notifyResourcesAboutEventIfNeccessary( bRule, true );
@@ -415,12 +456,12 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     }
 }
 
-void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
+void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
 {
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_rules.size(); ++i)
     {
-        if (m_rules[i]->getId() == id)
+        if (m_rules[i]->id() == id)
         {
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             terminateRunningRule(m_rules[i]);

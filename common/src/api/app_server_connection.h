@@ -24,40 +24,37 @@
 
 #include "api_fwd.h"
 
+class QnEnumNameMapper;
 class QnAppServerConnectionFactory;
-
 class QnApiSerializer;
 
-namespace conn_detail
+class QnAppServerReplyProcessor: public QObject 
 {
-    class ReplyProcessor : public QObject
-    {
-        Q_OBJECT
+    Q_OBJECT
 
-    public:
-        ReplyProcessor(QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& objectName)
-              : m_resourceFactory(resourceFactory),
-                m_serializer(serializer),
-                m_objectName(objectName)
-        {
-        }
+public:
+    QnAppServerReplyProcessor(QnResourceFactory &resourceFactory, QnApiSerializer &serializer, int object);
+    virtual ~QnAppServerReplyProcessor();
 
-    public slots:
-        void finished(const QnHTTPRawResponse& response, int handle);
+public slots:
+    void finished(const QnHTTPRawResponse &response, int handle);
 
-    signals:
-        void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-        void finishedLicense(int status, const QByteArray &errorString, QnLicenseList licenses, int handle);
-        void finishedKvPair(int status, const QByteArray& errorString, QnKvPairList kvPairs, int handle);
-        void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
-        void finishedBusinessRule(int status, const QByteArray &errorString, QnBusinessEventRules businessRules, int handle);
-        void finishedSetting(int status, const QByteArray& errorString, QnKvPairList settings, int handle);
-    private:
-        QnResourceFactory& m_resourceFactory;
-        QnApiSerializer& m_serializer;
-        QString m_objectName;
-    };
-}
+signals:
+    void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
+    void finishedLicense(int status, const QByteArray &errorString, const QnLicenseList &licenses, int handle);
+    void finishedKvPair(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle);
+    void finishedConnect(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
+    void finishedBusinessRule(int status, const QByteArray &errorString, const QnBusinessEventRules &businessRules, int handle);
+    void finishedSetting(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle);
+	void finishedTestEmailSettings(int status, const QByteArray &errorString, bool result, int handle);
+    void finishedSendEmail(int status, const QByteArray &errorString, bool result, int handle);
+
+private:
+    QnResourceFactory &m_resourceFactory;
+    QnApiSerializer &m_serializer;
+    int m_object;
+};
+
 
 class QN_EXPORT QnAppServerConnection
 {
@@ -94,14 +91,23 @@ public:
     int saveSync(const QnMediaServerResourcePtr&);
     int saveSync(const QnVirtualCameraResourcePtr&);
 
-    int sendEmail(const QString& to, const QString& subject, const QString& message);
-    int sendEmail(const QStringList& to, const QString& subject, const QString& message);
+	/**
+	  * Test if email settings are valid
+	  * 
+	  * Slot is (int status, const QByteArray& errorString, bool result, int handle),
+	  * where result is true if settings are valid
+	  * 
+	  * @return connection handle
+	  */
+	int testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot);
+
+    int sendEmailAsync(const QString& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
+    int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     qint64 getCurrentTime();
 
     // Asynchronous API
     int testConnectionAsync(QObject* target, const char* slot);
     int connectAsync(QObject* target, const char *slot);
-    int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int getBusinessRulesAsync(QObject *target, const char *slot);
     int getKvPairsAsync(QObject* target, const char* slot);
@@ -121,13 +127,13 @@ public:
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
     int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
+    int saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot);
 
     int saveAsync(const QnLayoutResourceList&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
 
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
-    int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
+    int addLicensesAsync(const QList<QnLicensePtr>& licenses, QObject* target, const char* slot);
 
     int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
     int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);
@@ -136,23 +142,27 @@ public:
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int deleteAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
+
+    int deleteRuleAsync(int ruleId, QObject* target, const char* slot);
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
     bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
 
     int connectAsync_i(const QnRequestHeaderList& headers, const QnRequestParamList& params, QObject* target, const char *slot);
 
-    int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
-    int getObjects(const QString& objectName, const QString& args, QnHTTPRawResponse& response);
+    int getResourcesAsync(const QString& args, int object, QObject *target, const char *slot);
 
-    int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
-    int addObject(const QString& objectName, const QByteArray& body, QnHTTPRawResponse &response);
+    int getObjectsAsync(int object, const QString& args, QObject* target, const char* slot);
+    int getObjects(int object, const QString& args, QnHTTPRawResponse& response);
 
-    int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
+    int addObjectAsync(int object, const QByteArray& data, QObject* target, const char* slot);
+    int addObject(int object, const QByteArray& body, QnHTTPRawResponse &response);
+
+    int deleteObjectAsync(int object, int id, QObject* target, const char* slot);
 
 private:
     // By now this is used only by synchronous api.
@@ -168,6 +178,8 @@ private:
     QnMediaServerResourceFactory m_serverFactory;
 
     QnApiSerializer& m_serializer;
+
+    QScopedPointer<QnEnumNameMapper> m_objectNameMapper;
 
     friend class QnAppServerConnectionFactory;
 };

@@ -14,7 +14,7 @@
 #   include <QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 #include "utils/network/socket.h"
 #include "utils/common/util.h"
 

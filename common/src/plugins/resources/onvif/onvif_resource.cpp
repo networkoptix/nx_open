@@ -17,7 +17,7 @@
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
 #include "utils/common/synctime.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 #include "utils/common/timermanager.h"
 #include "api/app_server_connection.h"
 #include <business/business_event_connector.h>
@@ -53,7 +53,7 @@ static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 
 /* Some cameras declare invalid max resolution */
 struct StrictResolution {
-    char* model;
+    const char* model;
     QSize maxRes;
 };
 
@@ -200,7 +200,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_eventMonitorType( emtNone ),
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
-    m_channelNumer(0),
     m_maxChannels(1)
 {
     connect(
@@ -213,6 +212,12 @@ QnPlOnvifResource::~QnPlOnvifResource()
     stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
+
+    if( m_eventCapabilities )
+    {
+        delete m_eventCapabilities;
+        m_eventCapabilities = NULL;
+    }
 }
 
 
@@ -222,7 +227,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     QString someMacAddress;
     std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
 
-    for (int i = 0; i < ifaces.size(); ++i)
+    for (uint i = 0; i < ifaces.size(); ++i)
     {
         onvifXsd__NetworkInterface* ifacePtr = ifaces[i];
 
@@ -494,7 +499,7 @@ QSize QnPlOnvifResource::getNearestResolution(const QSize& resolution, float asp
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
 {
-    for (int i = 0; i < sizeof(strictResolutionList) / sizeof(StrictResolution); ++i)
+    for (uint i = 0; i < sizeof(strictResolutionList) / sizeof(StrictResolution); ++i)
     {
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
@@ -1112,15 +1117,6 @@ QString QnPlOnvifResource::getPtzfUrl() const
     return m_ptzUrl;
 }
 
-void QnPlOnvifResource::save()
-{
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
-        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-                    << getPhysicalId() << ". Description: " << conn->getLastError();
-    }
-}
-
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
 {
     int netoptixDelta = QnQualityHighest - QnQualityLowest;
@@ -1352,7 +1348,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     if (m_maxChannels > 1)
     {
         // determine amount encoder configurations per each video source
-        confRangeStart = confRangeEnd/m_maxChannels * m_channelNumer;
+        confRangeStart = confRangeEnd/m_maxChannels * getChannel();
         confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
     }
 
@@ -1664,9 +1660,9 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        if ((int)response.Configurations.size() > m_channelNumer)
+        if ((int)response.Configurations.size() > getChannel())
         {
-            onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(m_channelNumer);
+            onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
             //TODO:UTF unuse std::string
@@ -1758,13 +1754,15 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
+        if (soapWrapper.isNotAuthenticated())
+            setStatus(QnResource::Unauthorized);
         return false;
 
     }
 
     m_maxChannels = (int) response.VideoSources.size();
 
-    if (m_maxChannels <= m_channelNumer) {
+    if (m_maxChannels <= getChannel()) {
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
@@ -1772,7 +1770,7 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
         return false;
     } 
 
-    onvifXsd__VideoSource* conf = response.VideoSources.at(m_channelNumer);
+    onvifXsd__VideoSource* conf = response.VideoSources.at(getChannel());
 
         if (conf) {
             QMutexLocker lock(&m_mutex);
@@ -1877,14 +1875,14 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
 
     }
 
-    if ((int)response.Configurations.size() <= m_channelNumer) {
+    if ((int)response.Configurations.size() <= getChannel()) {
         qWarning() << "QnPlOnvifResource::fetchAndSetAudioSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(m_channelNumer);
+        onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
             //TODO:UTF unuse std::string
@@ -1968,7 +1966,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
         }
 
         //For Button - only operation object is required
-        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator opIt =
+        QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator opIt =
             OnvifCameraSettingOperationAbstract::operations.find(param.name());
 
         if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
@@ -2020,7 +2018,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     if (!m_ptzController) 
     {
-        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(::toSharedPointer(this)));
+        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
         if (!controller->getPtzConfigurationToken().isEmpty())
             m_ptzController.reset(controller.take());
     }
@@ -2171,11 +2169,6 @@ QnAbstractPtzController* QnPlOnvifResource::getPtzController()
     return m_ptzController.data();
 }
 
-int QnPlOnvifResource::getChannel() const
-{
-    return m_channelNumer;
-}
-
 bool QnPlOnvifResource::startInputPortMonitoring()
 {
     if( isDisabled()
@@ -2198,10 +2191,16 @@ bool QnPlOnvifResource::startInputPortMonitoring()
 void QnPlOnvifResource::stopInputPortMonitoring()
 {
     //removing timer
-    TimerManager::instance()->deleteTimer( m_timerID );
-    m_timerID = 0;
-    TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
-    m_renewSubscriptionTaskID = 0;
+    if( m_timerID > 0 )
+    {
+        TimerManager::instance()->deleteTimer( m_timerID );
+        m_timerID = 0;
+    }
+    if( m_renewSubscriptionTaskID > 0 )
+    {
+        TimerManager::instance()->deleteTimer( m_renewSubscriptionTaskID );
+        m_renewSubscriptionTaskID = 0;
+    }
     //TODO/IMPL removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -2386,7 +2385,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
     std::string initialTerminationTime( buf );
     request.InitialTerminationTime = &initialTerminationTime;
-    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
 
     //creating filter
     //oasisWsnB2__FilterType topicFilter;
@@ -2402,6 +2400,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         return false;
     }
 
+    //TODO: #ak if this variable is unused following code may be deleted as well
+    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     if( response.oasisWsnB2__TerminationTime )
     {
         if( response.oasisWsnB2__CurrentTime )
@@ -2410,6 +2410,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             utcTerminationTime = *response.oasisWsnB2__TerminationTime; //hoping local and cam clocks are synchronized
     }
     //else: considering, that onvif device processed initialTerminationTime
+    Q_UNUSED(utcTerminationTime)
 
     std::string subscriptionID;
     if( response.SubscriptionReference &&
@@ -2640,17 +2641,6 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
     }
 
     return true;
-}
-
-void QnPlOnvifResource::setUrl(const QString &url)
-{
-    QUrl u(url);
-
-    QMutexLocker lock(&m_mutex);
-    QnPhysicalCameraResource::setUrl(url);
-    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
-    if (m_channelNumer > 0)
-        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
 }
 
 int QnPlOnvifResource::getMaxChannels() const

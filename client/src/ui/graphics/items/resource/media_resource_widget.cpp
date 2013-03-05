@@ -22,7 +22,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/help/help_topics.h>
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/help/help_topic_accessor.h>
@@ -57,7 +57,6 @@ namespace {
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
-    m_resolutionMode(Qn::AutoResolution),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false)
 {
@@ -93,10 +92,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
-    QnImageButtonWidget *radassButton = new QnImageButtonWidget();
-    radassButton->setProperty(Qn::NoBlockMotionSelection, true);
-    radassButton->setToolTip(tr("Radass mode"));
-    connect(radassButton, SIGNAL(clicked()), this, SLOT(at_radassButton_clicked()));
 
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
@@ -115,7 +110,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
 
-    buttonBar()->addButton(RadassButton, radassButton);
     buttonBar()->addButton(MotionSearchButton, searchButton);
     buttonBar()->addButton(PtzButton, ptzButton);
     
@@ -134,7 +128,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     at_camDisplay_liveChanged();
     updateIconButton();
-    updateRadassButton();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -243,7 +236,7 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
-    } else if(m_resource->flags() & QnResource::motion) {
+    } else if(m_resource->hasFlags(QnResource::motion)) {
         for(int i = 0, count = channelCount(); i < count; i++)
             m_motionSensitivity.push_back(QnMotionRegion());
     } else {
@@ -338,28 +331,6 @@ void QnMediaResourceWidget::ensureMotionSelectionCache() {
 
 void QnMediaResourceWidget::invalidateMotionSelectionCache() {
     m_motionSelectionCacheValid = false;
-}
-
-Qn::ResolutionMode QnMediaResourceWidget::resolutionMode() const {
-    return m_resolutionMode;
-}
-
-void QnMediaResourceWidget::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    if(resolutionMode < 0 || resolutionMode >= Qn::ResolutionModeCount) {
-        qnWarning("Invalid resolution mode '%1'.", static_cast<int>(resolutionMode));
-        return;
-    }
-
-    if(m_resolutionMode == resolutionMode)
-        return;
-
-    m_resolutionMode = resolutionMode;
-
-    // TODO: #VASILENKO insert code here
-
-    updateRadassButton();
-
-    emit resolutionModeChanged();
 }
 
 
@@ -559,25 +530,6 @@ void QnMediaResourceWidget::updateIconButton() {
     }
 }
 
-void QnMediaResourceWidget::updateRadassButton() {
-    QString iconPath;
-    switch(m_resolutionMode) {
-    case Qn::AutoResolution:
-        iconPath = QLatin1String("item/radass_auto.png");
-        break;
-    case Qn::LowResolution:
-        iconPath = QLatin1String("item/radass_low.png");
-        break;
-    case Qn::HighResolution:
-        iconPath = QLatin1String("item/radass_high.png");
-        break;
-    default:
-        assert(false);
-    }
-
-    buttonBar()->button(RadassButton)->setIcon(qnSkin->icon(iconPath));
-}
-
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
         return Qn::RecordingType_Never;
@@ -682,7 +634,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     QString timeString;
     if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
-        qint64 utcTime = m_renderer->lastDisplayedTime(0) / 1000;
+        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(0) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: do offset adjustments in one place
 
@@ -706,7 +658,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if (resource()->flags() & QnResource::motion)
+    if (resource()->hasFlags(QnResource::motion))
         result |= MotionSearchButton | InfoButton;
 
     if(m_camera) {
@@ -716,21 +668,26 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         ) {
             result |= PtzButton;
         }
-
-        result |= RadassButton;
     }
 
     return result;
 }
 
 QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
-    if (m_display->camDisplay()->isStillImage()) {
-        return EmptyOverlay;
+    QnResourcePtr resource = m_display->resource();
+
+    if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
+        if (resource->getStatus() == QnResource::Offline)
+            return NoDataOverlay;
+        else
+            return EmptyOverlay;
+    } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
+        return NoDataOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
         return PausedOverlay;
-    } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
+    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return OfflineOverlay;
-    } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
+    } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
         return UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
@@ -770,7 +727,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability);
+    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
@@ -779,9 +736,5 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton, false);
         action(Qn::JumpToLiveAction)->trigger(); // TODO: evil hack! Won't work if SYNC is off and this item is not selected?
     }
-}
-
-void QnMediaResourceWidget::at_radassButton_clicked() {
-    setResolutionMode(static_cast<Qn::ResolutionMode>((resolutionMode() + 1) % Qn::ResolutionModeCount));
 }
 

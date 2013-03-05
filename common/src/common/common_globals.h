@@ -39,20 +39,22 @@ public:
     };
 
     enum CameraCapability { 
-        NoCapabilities                      = 0x0, 
-        PrimaryStreamSoftMotionCapability   = 0x04,
-        relayInput                          = 0x08,
-        relayOutput                         = 0x10,
-        AbsolutePtzCapability               = 0x20,
-        ContinuousPanTiltCapability         = 0x40,
-        ContinuousZoomCapability            = 0x80,
-
+        NoCapabilities                      = 0x000, 
+        PrimaryStreamSoftMotionCapability   = 0x004,
+        relayInput                          = 0x008, // TODO: #AK please name enums properly (see how other enums are named)
+        relayOutput                         = 0x010, // TODO: #AK same here
+        AbsolutePtzCapability               = 0x020,
+        ContinuousPanTiltCapability         = 0x040,
+        ContinuousZoomCapability            = 0x080,
+        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
+        
         /* Shortcuts */
-        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability,
+        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
 
         /* Deprecated capabilities. */
-        DeprecatedContinuousPtzCapability   = 0x01,
-        DeprecatedZoomCapability            = 0x02
+        DeprecatedContinuousPtzCapability   = 0x001,
+        DeprecatedZoomCapability            = 0x002,
+
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);

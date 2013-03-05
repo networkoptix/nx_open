@@ -11,7 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/magnitude.h>
+#include <utils/math/magnitude.h>
 
 #include <client/client_globals.h>
 

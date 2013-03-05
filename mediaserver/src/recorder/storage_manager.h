@@ -57,8 +57,10 @@ public:
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
-    const StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
+    QnStorageResourceList getStorages() const;
     void clearSpace();
+signals:
+    void noStoragesAvailable();
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -76,6 +78,8 @@ private:
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
     QString toCanonicalPath(const QString& path);
+    StorageMap getAllStorages() const;
+    QSet<QnStorageResourcePtr> getWritableStorages() const;
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -93,6 +97,7 @@ private:
     FileNumCache m_fileNumCache;
     QMutex m_cacheMutex;
     bool m_catalogLoaded;
+    bool m_warnSended;
 };
 
 #define qnStorageMan QnStorageManager::instance()

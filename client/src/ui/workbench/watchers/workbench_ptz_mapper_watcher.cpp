@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 

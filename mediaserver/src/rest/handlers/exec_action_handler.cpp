@@ -48,8 +48,7 @@ int QnExecActionHandler::executePost(const QString& path, const QnRequestParamLi
     return action ? CODE_OK : CODE_INVALID_PARAMETER;
 }
 
-QString QnExecActionHandler::description(TCPSocket* tcpSocket) const
+QString QnExecActionHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     return "Execute business action. Action specified in POST request body at binary protobuf format. \n";
 }

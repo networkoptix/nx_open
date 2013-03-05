@@ -145,6 +145,10 @@ namespace Qn {
          */
         CheckSystemHealthAction,
 
+        /**
+         * Cancels Tour Mode if it is started, otherwise works as FullScreenAction
+         */
+        EscapeHotkeyAction,
 
 
         /* Main menu actions. */

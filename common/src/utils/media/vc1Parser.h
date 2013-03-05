@@ -66,7 +66,7 @@ const AVRational ff_vc1_pixel_aspect[16]={
 };
 
 enum VC1PictType {VC_I_TYPE, VC_P_TYPE, VC_B_TYPE, VC_BI_TYPE};
-extern char* pict_type_str[4];
+extern const char* pict_type_str[4];
 
 class VC1Unit {
 public:

@@ -5,6 +5,7 @@
 
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
+#include "recording/time_period_list.h"
 
 /*
 * QnLayoutFileStorageResource uses for layout export
@@ -20,14 +21,13 @@ public:
 
     static QnStorageResource* instance();
 
-    //void registerFfmpegProtocol() const override;
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getChunkLen() const override;
     virtual bool isStorageAvailable() override;
     virtual bool isStorageAvailableForWriting() override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
-    virtual qint64 getFileSize(const QString& fillName) const override;
+    virtual qint64 getFileSize(const QString& url) const override;
     virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
@@ -40,6 +40,8 @@ public:
     virtual void setUrl(const QString& value) override;
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
+
+    QnTimePeriodList getTimePeriods(QnResourcePtr res);
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 

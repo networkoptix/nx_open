@@ -10,6 +10,8 @@ public:
     * Return metadaTata in motion archive for specified time. If next call got same metadata or no metada is found return null.
     */
     virtual QnMetaDataV1Ptr getMotionData(qint64 timeUsec) = 0;
+
+    virtual ~QnAbstractMotionArchiveConnection() {}
 };
 typedef QSharedPointer<QnAbstractMotionArchiveConnection> QnAbstractMotionArchiveConnectionPtr;
 

@@ -7,6 +7,7 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
@@ -49,7 +50,7 @@ namespace {
 }
 
 QnBusinessEventPopupWidget::QnBusinessEventPopupWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnBusinessEventPopupWidget),
     m_eventType(BusinessEventType::BE_NotDefined),
     m_showAllItem(NULL),
@@ -76,6 +77,7 @@ QnBusinessEventPopupWidget::~QnBusinessEventPopupWidget()
 
 void QnBusinessEventPopupWidget::at_okButton_clicked() {
     emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
+    hide();
 }
 
 void QnBusinessEventPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
@@ -177,27 +179,30 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
 
     m_eventType = eventType;
     switch (m_eventType) {
-        case BusinessEventType::BE_NotDefined:
-            return;
+    case BusinessEventType::BE_NotDefined:
+        return;
 
-        case BusinessEventType::BE_Camera_Input:
-        case BusinessEventType::BE_Camera_Disconnect:
-            ui->importantLabel->setVisible(true);
-            break;
+    case BusinessEventType::BE_Camera_Input:
+    case BusinessEventType::BE_Camera_Disconnect:
+        setBorderColor(qnGlobals->popupFrameImportant());
+        ui->importantLabel->setVisible(true);
+        break;
 
-        case BusinessEventType::BE_Storage_Failure:
-        case BusinessEventType::BE_Network_Issue:
-        case BusinessEventType::BE_Camera_Ip_Conflict:
-        case BusinessEventType::BE_MediaServer_Failure:
-        case BusinessEventType::BE_MediaServer_Conflict:
-            ui->warningLabel->setVisible(true);
-            break;
+    case BusinessEventType::BE_Storage_Failure:
+    case BusinessEventType::BE_Network_Issue:
+    case BusinessEventType::BE_Camera_Ip_Conflict:
+    case BusinessEventType::BE_MediaServer_Failure:
+    case BusinessEventType::BE_MediaServer_Conflict:
+        setBorderColor(qnGlobals->popupFrameWarning());
+        ui->warningLabel->setVisible(true);
+        break;
 
         //case BusinessEventType::BE_Camera_Motion:
         //case BusinessEventType::BE_UserDefined:
-        default:
-            ui->notificationLabel->setVisible(true);
-            break;
+    default:
+        setBorderColor(qnGlobals->popupFrameNotification());
+        ui->notificationLabel->setVisible(true);
+        break;
     }
     ui->eventLabel->setText(BusinessEventType::toString(eventType));
 }
@@ -300,6 +305,10 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessPara
             if (m_eventType == BusinessEventType::BE_Network_Issue)
                 item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
                                                   .arg(reasonText)));
+            break;
+        case QnBusiness::NetworkIssueConnectionClosed:
+            if (m_eventType == BusinessEventType::BE_Network_Issue)
+                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
             break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
             if (m_eventType == BusinessEventType::BE_Network_Issue) {

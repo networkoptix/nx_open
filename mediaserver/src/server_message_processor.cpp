@@ -27,7 +27,7 @@ void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, 
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 
     connect(this, SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)), qnBusinessRuleProcessor, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
-    connect(this, SIGNAL(businessRuleDeleted(QnId)), qnBusinessRuleProcessor, SLOT(at_businessRuleDeleted(QnId)));
+    connect(this, SIGNAL(businessRuleDeleted(int)), qnBusinessRuleProcessor, SLOT(at_businessRuleDeleted(int)));
 }
 
 QnServerMessageProcessor::QnServerMessageProcessor()
@@ -95,7 +95,6 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isServer)
             resource->setStatus(QnResource::Online);
 
-        QByteArray errorString;
         QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::rfAllResources);
         if (ownResource)
         {
@@ -135,7 +134,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
     } else if (event.eventType == Qn::Message_Type_BusinessRuleDelete)
     {
-        emit businessRuleDeleted(event.resourceId);
+        emit businessRuleDeleted(event.resourceId.toInt());
     } else if (event.eventType == Qn::Message_Type_BroadcastBusinessAction)
     {
         emit businessActionReceived(event.businessAction);

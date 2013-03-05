@@ -421,6 +421,17 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnId id) const
     return result;
 }
 
+QnUserResourcePtr QnResourcePool::getAdministrator() const {
+    QMutexLocker locker(&m_resourcesMtx);
+
+    foreach(const QnResourcePtr &resource, m_resources) {
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        if (user && user->isAdmin())
+            return user;
+    }
+    return QnUserResourcePtr();
+}
+
 QStringList QnResourcePool::allTags() const
 {
     QStringList result;
@@ -458,6 +469,15 @@ int QnResourcePool::activeCameras() const
     }
 
     return count;
+}
+
+void QnResourcePool::clear()
+{
+    QMutexLocker lk( &m_resourcesMtx );
+
+    localServer.clear();
+    m_resources.clear();
+    m_foreignResources.clear();
 }
 
 bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )

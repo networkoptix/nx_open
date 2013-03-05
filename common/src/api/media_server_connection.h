@@ -1,5 +1,5 @@
-#ifndef __VIDEO_SERVER_CONNECTION_H_
-#define __VIDEO_SERVER_CONNECTION_H_
+#ifndef QN_MEDIA_SERVER_CONNECTION_H
+#define QN_MEDIA_SERVER_CONNECTION_H
 
 #include <QUrl>
 #include <QRegion>
@@ -16,10 +16,13 @@
 #include <api/media_server_cameras_data.h>
     
 #include "api_fwd.h"
+#include "model/storage_space_reply.h"
 
 class QnPtzSpaceMapper;
 
 namespace detail {
+
+    // TODO: #Elric merge into single processor
     class QnMediaServerSimpleReplyProcessor: public QObject
     {
         Q_OBJECT;
@@ -44,19 +47,6 @@ namespace detail {
 
     signals:
         void finished(int status, const QnTimePeriodList& timePeriods, int handle);
-    };
-
-    class QnMediaServerFreeSpaceReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, qint64 freeSpace, qint64 totalSpace, int handle);
     };
 
     class QnMediaServerStatisticsReplyProcessor: public QObject
@@ -175,6 +165,19 @@ namespace detail {
         void finished(int status, const QnPtzSpaceMapper &mapper, int handle);
     };
 
+    class QnMediaServerStorageSpaceReplyProcessor: public QObject {
+        Q_OBJECT;
+    public:
+        QnMediaServerStorageSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
+
+    signals:
+        void finished(int status, const QnStorageSpaceReply &reply, int handle);
+    };
+
+
 } // namespace detail
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
@@ -188,8 +191,12 @@ class QN_EXPORT QnMediaServerConnection: public QObject
 {
     Q_OBJECT
 public:
-    QnMediaServerConnection(QnResourcePtr mServer, QObject *parent = 0);
+    QnMediaServerConnection( const QUrl& mediaServerApiUrl, QObject *parent = 0 );
     virtual ~QnMediaServerConnection();
+
+    void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
+    int getProxyPort() { return m_proxyPort; }
+    QString getProxyHost() { return m_proxyAddr; }
 
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
 
@@ -227,24 +234,14 @@ public:
      */
     int setParamList(const QnNetworkResourcePtr &camera, const QList<QPair<QString, QVariant> > &params, QList<QPair<QString, bool> > *operationResult);
 
-    int asyncGetFreeSpace(const QString &path, QObject *target, const char *slot);
-
-    void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
-    int getProxyPort() { return m_proxyPort; }
-    QString getProxyHost() { return m_proxyAddr; }
-
     /** 
      * \returns                         Request handle. 
      */
     int asyncGetStatistics(QObject *target, const char *slot);
 
-    /** 
-     * \returns                         Status. 
-     */
-    int syncGetStatistics(QObject *target, const char *slot);
-
+    // TODO: #GDM consistency! All other methods accept a single SLOT with signature (status, DATA, handle). Use a single slot here too!
     int asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
-                                   QObject *target, const char *slotSuccess, const char *slotError);
+                                   QObject *target, const char *slotSuccess, const char *slotError); 
 
     int asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
                                 QObject *target, const char *slot);
@@ -254,6 +251,8 @@ public:
     int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, qreal xPos, qreal yPos, qreal zoomPos, QObject *target, const char *slot);
     int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
     int asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int asyncGetStorageSpace(QObject *target, const char *slot);
 
     int asyncGetTime(QObject *target, const char *slot);
 
@@ -268,7 +267,6 @@ private:
 
 private:
     QUrl m_url;
-    QnResourcePtr m_mServer;
     QString m_proxyAddr;
     int m_proxyPort;
 };

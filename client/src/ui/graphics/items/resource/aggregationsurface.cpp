@@ -10,7 +10,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/glext.h>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/log.h>
 #include <utils/media/sse_helper.h>
 #include <utils/color_space/yuvconvert.h>
@@ -184,7 +184,7 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
     m_lockedRectCount( 0 ),
     m_planeCount( 0 )
 {
-    for( int i = 0; i < MAX_PLANE_COUNT; ++i )
+    for( uint i = 0; i < MAX_PLANE_COUNT; ++i )
     {
         m_textures[i].reset(new QnGlRendererTexture1());
         //m_textures[i]->ensureAllocated();

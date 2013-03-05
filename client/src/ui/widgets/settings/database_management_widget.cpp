@@ -1,13 +1,20 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
-#include <ui/dialogs/progress_dialog.h>
+#include <QMessageBox>
 
 #include "utils/settings.h"
 #include "api/app_server_connection.h"
 
+#include <ui/actions/actions.h>
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_parameters.h>
+#include <ui/dialogs/progress_dialog.h>
+#include <ui/workbench/workbench_context.h>
+
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
@@ -65,6 +72,13 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for reading.").arg(fileName));
         return;
     }
+
+    if (QMessageBox::warning(this, tr("Warning"), tr("Are you sure you want to start restoring database? All current data will be lost."),
+                             QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+        file.close();
+        return;
+    }
+
     QByteArray data = file.readAll();
     file.close();
 
@@ -84,9 +98,13 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         return; // TODO: #Elric make non-cancellable.
 
     if(processor->response.status == 0) {
-        QMessageBox::information(this, tr("Information"), tr("Database was successfully restored from file '%1'.").arg(fileName));
+        QMessageBox::information(this,
+                                 tr("Information"),
+                                 tr("Database was successfully restored from file '%1'.").arg(fileName));
+        menu()->trigger(Qn::ReconnectAction);
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'. Error description: '%2'.").arg(fileName).arg(QString::fromLatin1(processor->response.errorString)));
+        QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'.")
+                              .arg(fileName));
     }
 }
 

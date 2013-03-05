@@ -4,7 +4,7 @@
 #include "rest/server/rest_server.h"
 #include "utils/common/util.h"
 #include "utils/common/json.h"
-#include "utils/common/space_mapper.h"
+#include "utils/math/space_mapper.h"
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
@@ -158,7 +158,7 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         const QnPtzSpaceMapper *spaceMapper = ptzController ? ptzController->getSpaceMapper() : NULL;
         if(spaceMapper) {
             QVariantMap map;
-            QJson::serialize(*spaceMapper, "mapper", &map);
+            QJson::serialize(*spaceMapper, "data", &map);
             QJson::serialize(map, &result);
         } else {
             result = "{ \"mapper\": null }";
@@ -189,9 +189,8 @@ int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& par
     return executeGet(path, params, result, contentType);
 }
 
-QString QnPtzHandler::description(TCPSocket* tcpSocket) const
+QString QnPtzHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
     return "\
         There are several ptz commands: <BR>\
         <b>api/ptz/move</b> - start camera moving.<BR>\

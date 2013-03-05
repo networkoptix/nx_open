@@ -3,7 +3,7 @@
 #include <QtGui/QGraphicsSceneMouseEvent>
 
 #include <utils/common/warnings.h>
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 
 #include <ui/animation/variant_animator.h>
 

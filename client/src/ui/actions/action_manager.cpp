@@ -550,6 +550,11 @@ QnActionManager::QnActionManager(QObject *parent):
             rotationSpeed(180.0);
     }
 
+    factory(Qn::EscapeHotkeyAction).
+        flags(Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Esc")).
+        text(tr("Stop current action"));
+
     factory(Qn::FullscreenAction).
         flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
@@ -560,7 +565,6 @@ QnActionManager::QnActionManager(QObject *parent):
 #else
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
-        shortcut(tr("Esc")).
 #endif
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
@@ -763,20 +767,26 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Change Resolution..."));
 
     factory.beginSubMenu(); {
+        factory.beginGroup();
         factory(Qn::RadassAutoAction).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("Auto")).
+            checkable().
+            checked().
             condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
 
         factory(Qn::RadassLowAction).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("Low")).
+            checkable().
             condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
 
         factory(Qn::RadassHighAction).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("High")).
+            checkable().
             condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+        factory.endGroup();
     } factory.endSubMenu();
 
     factory().

@@ -149,32 +149,6 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// QnResourceTreeStyle
-// -------------------------------------------------------------------------- //
-class QnResourceTreeStyle: public QnProxyStyle {
-public:
-    explicit QnResourceTreeStyle(QStyle *baseStyle, QObject *parent = NULL): QnProxyStyle(baseStyle, parent) {}
-
-    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const override {
-        switch(element) {
-        case PE_PanelItemViewItem:
-        case PE_PanelItemViewRow:
-            /* Don't draw elements that are only partially visible.
-             * Note that this won't work with partial updates of tree widget's viewport. */
-            if(widget && widget->rect().bottom() < option->rect.bottom()
-                    && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
-                return;
-            break;
-        default:
-            break;
-        }
-
-        QnProxyStyle::drawPrimitive(element, option, painter, widget);
-    }
-};
-
-
-// -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
 class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel {
@@ -274,9 +248,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     m_itemDelegate = new QnResourceTreeItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
-
-    QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
-    ui->resourcesTreeView->setStyle(treeStyle);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(spacePressed(QModelIndex)),  this,               SLOT(at_treeView_spacePressed(QModelIndex)));

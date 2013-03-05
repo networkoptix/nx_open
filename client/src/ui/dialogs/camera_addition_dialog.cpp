@@ -13,6 +13,16 @@
 
 #define PORT_AUTO 0
 
+namespace {
+    enum Column {
+        CheckBoxColumn,
+        ManufColumn,
+        NameColumn,
+        UrlColumn
+    };
+}
+
+
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -25,8 +35,10 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
     ui->camerasTable->horizontalHeader()->setVisible(true);
-    ui->camerasTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-    ui->camerasTable->resizeColumnsToContents();
+    ui->camerasTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
+    ui->camerasTable->horizontalHeader()->setResizeMode(ManufColumn, QHeaderView::ResizeToContents);
+    ui->camerasTable->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::ResizeToContents);
+    ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::ResizeToContents);
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),    this, SLOT(at_startIPLineEdit_editingFinished()));
@@ -84,17 +96,17 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         urlItem->setFlags(urlItem->flags() &~ Qt::ItemIsEditable);
         urlItem->setData(Qt::FontRole, font);
 
-        ui->camerasTable->setItem(row, 0, checkItem);
-        ui->camerasTable->setItem(row, 1, manufItem);
-        ui->camerasTable->setItem(row, 2, nameItem);
-        ui->camerasTable->setItem(row, 3, urlItem);
+        ui->camerasTable->setItem(row, CheckBoxColumn, checkItem);
+        ui->camerasTable->setItem(row, ManufColumn, manufItem);
+        ui->camerasTable->setItem(row, NameColumn, nameItem);
+        ui->camerasTable->setItem(row, UrlColumn, urlItem);
     }
 }
 
 void QnCameraAdditionDialog::removeAddedCameras(){
     int row = ui->camerasTable->rowCount() - 1;
     while (row >= 0){
-        if (ui->camerasTable->item(row, 0)->checkState() == Qt::Checked)
+        if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked)
 	        ui->camerasTable->removeRow(row);
 		row--;
     }
@@ -179,13 +191,13 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
 void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column){
     Q_UNUSED(row)
 
-    if (column > 0)
+    if (column > CheckBoxColumn)
         return;
 
     int rowCount = ui->camerasTable->rowCount();
     bool enabled = false;
     for (int row = 0; row < rowCount; ++row) {
-        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
+        if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
 		enabled = true;
 		break;
@@ -194,7 +206,7 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column){
 }
 
 void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column){
-    if (column != 3)
+    if (column != UrlColumn)
         return;
 
     QUrl url(ui->camerasTable->item(row, column)->text());
@@ -202,7 +214,6 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column){
         return;
 
     url.setPath(QString());
-    qDebug() << "opening url" << url.toString();
     QDesktopServices::openUrl(url);
 }
 
@@ -306,7 +317,6 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
             fillTable(processor->camerasFound());
             ui->camerasTable->setEnabled(true);
             ui->addButton->setFocus();
-            ui->camerasTable->resizeColumnsToContents();
         } else {
             QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
             if (m_subnetMode)
@@ -330,10 +340,10 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     QStringList manufacturers;
     int rowCount = ui->camerasTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
-        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
+        if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
-        urls.append(ui->camerasTable->item(row, 3)->text());
-        manufacturers.append(ui->camerasTable->item(row, 1)->text());
+        urls.append(ui->camerasTable->item(row, UrlColumn)->text());
+        manufacturers.append(ui->camerasTable->item(row, ManufColumn)->text());
     }
     if (urls.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"), QMessageBox::Ok);

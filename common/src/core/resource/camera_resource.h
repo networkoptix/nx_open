@@ -49,6 +49,9 @@ public:
 
 	virtual QString getUniqueId() const override;
 
+    void deserialize(const QnResourceParameters& parameters);
+protected:
+    void save();
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource metaobject support
 // -------------------------------------------------------------------------- //
@@ -98,6 +101,10 @@ public:
 
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
+    virtual void setUrl(const QString &url) override;
+    virtual int getChannel() const override;
+private:
+    int m_channelNumer; // video/audio source number
 };
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);

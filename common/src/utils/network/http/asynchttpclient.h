@@ -8,6 +8,7 @@
 
 #include <map>
 
+#include <QMutex>
 #include <QObject>
 #include <QUrl>
 #include <QSharedPointer>
@@ -55,6 +56,9 @@ namespace nx_http
         static const int UNLIMITED_RECONNECT_TRIES = -1;
 
         AsyncHttpClient();
+
+        //!Stops socket event processing. If some event handler is running, method blocks until event handler has been stopped
+        virtual void terminate();
 
         State state() const;
         //!Start request to \a url
@@ -122,6 +126,9 @@ namespace nx_http
         QString m_userPassword;
         bool m_authorizationTried;
         std::map<BufferType, BufferType> m_customHeaders;
+        bool m_terminated;
+        mutable QMutex m_mutex;
+        bool m_inEventHandler;
 
         bool doGetPrivate( const QUrl& url );
         /*!

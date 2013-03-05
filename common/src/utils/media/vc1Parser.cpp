@@ -3,7 +3,7 @@
 #include "vc1Parser.h"
 #include "nalUnits.h"
 
-char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
+const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
 static inline int get_unary(BitStreamReader& bitReader, int stop, int len)
 {

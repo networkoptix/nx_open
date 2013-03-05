@@ -11,7 +11,12 @@
 class QnBusinessEventConnector: public QObject
 {
     Q_OBJECT
+
 public:
+    QnBusinessEventConnector();
+    ~QnBusinessEventConnector();
+
+    static void initStaticInstance( QnBusinessEventConnector* );
     static QnBusinessEventConnector* instance();
 
 public slots:
@@ -44,6 +49,8 @@ public slots:
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList, qint64 timeStamp);
 
     void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers);
+
+    void at_NoStorages(const QnResourcePtr& resource);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

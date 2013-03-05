@@ -37,7 +37,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
         qnNullWarning(context);
 
     foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
-        m_userByLogin[user->getName()] = user;
+        m_userByLogin[user->getName().toLower()] = user;
 
     for(int i = 0; i < ElementCount; i++) {
         m_valid[i] = true;
@@ -148,6 +148,11 @@ void QnUserSettingsDialog::setEditorPermissions(quint64 rights) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
+}
+
+void QnUserSettingsDialog::setFocusedElement(QString element) {
+    if (element == QLatin1String("email"))
+        ui->emailEdit->setFocus();
 }
 
 QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element element) const {
@@ -295,7 +300,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Login cannot be empty.");
             valid = false;
         }
-        if(m_userByLogin.contains(ui->loginEdit->text()) && m_userByLogin.value(ui->loginEdit->text()) != m_user) {
+        if(m_userByLogin.contains(ui->loginEdit->text().toLower()) && m_userByLogin.value(ui->loginEdit->text().toLower()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
         }
@@ -338,7 +343,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         }
         break;
     case Email:
-        if(!ui->emailEdit->text().isEmpty() && !isEmailValid(ui->emailEdit->text())) {
+        if(!ui->emailEdit->text().trimmed().isEmpty() && !QnEmail::isValid(ui->emailEdit->text())) {
             hint = tr("Invalid email address.");
             valid = false;
         }

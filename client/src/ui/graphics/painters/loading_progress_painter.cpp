@@ -5,7 +5,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/shaders/color_shader_program.h>
-#include <ui/common/linear_combination.h>
+#include <utils/math/linear_combination.h>
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
     QnGlFunctions(context),

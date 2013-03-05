@@ -18,7 +18,7 @@
 
 #include <camera/thumbnails_loader.h>
 
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
@@ -1157,6 +1157,9 @@ void QnTimeSlider::updateThumbnailsPeriod() {
 
     if(m_thumbnailsUpdateTimer->isActive() || !m_oldThumbnailData.isEmpty())
         return;
+
+    if(qFuzzyIsNull(thumbnailsHeight()))
+        return; // TODO: #Elric may be a wrong place for the check
 
     thumbnailsLoader()->setTimePeriod(m_windowStart, m_windowEnd);
 }

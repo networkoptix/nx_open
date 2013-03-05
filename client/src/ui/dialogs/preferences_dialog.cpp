@@ -22,6 +22,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/globals.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
@@ -115,6 +116,24 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     initLanguages();
     updateFromSettings();
     at_context_userChanged();
+
+    if (m_settings->isWritable()) {
+        ui->readOnlyWarningLabel->hide();
+    }
+    else {
+        QPalette palette = this->palette();
+        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        ui->readOnlyWarningLabel->setPalette(palette);
+        ui->readOnlyWarningLabel->setText(
+                     #ifdef Q_OS_LINUX
+                             tr("Settings file is read-only. Please contact your system administrator.\n" \
+                                "All changes will be lost after program exit.")
+                     #else
+                             tr("Settings cannot be saved. Please contact your system administrator.\n" \
+                                "All changes will be lost after program exit.")
+                     #endif
+                             );
+    }
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {
@@ -155,8 +174,13 @@ void QnPreferencesDialog::initLanguages() {
 void QnPreferencesDialog::accept() {
     QString oldLanguage = m_settings->translationPath();
     submitToSettings();
-    if (oldLanguage != m_settings->translationPath())
-        QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
+    if (oldLanguage != m_settings->translationPath()) {
+        QMessageBox::StandardButton button =
+            QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart. Press OK to close application now."),
+                                     QMessageBox::Ok, QMessageBox::Cancel);
+        if (button == QMessageBox::Ok)
+            qApp->exit();
+    }
     //m_youTubeSettingsWidget->accept();
     base_type::accept();
 }
@@ -229,6 +253,7 @@ void QnPreferencesDialog::openLicensesPage() {
 
 void QnPreferencesDialog::openServerSettingsPage() {
     ui->tabWidget->setCurrentIndex(m_serverSettingsTabIndex);
+    m_serverSettingsWidget->updateFocusedElement();
 }
 
 void QnPreferencesDialog::openPopupSettingsPage() {
@@ -296,9 +321,11 @@ void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &co
 }
 
 void QnPreferencesDialog::at_context_userChanged() {
-    ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
-    ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
-    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
+    bool isAdmin = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+
+    ui->tabWidget->setTabEnabled(m_licenseTabIndex, isAdmin);
+    ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, isAdmin);
+    if (isAdmin) {
         m_serverSettingsWidget->update();
     }
 }

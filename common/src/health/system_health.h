@@ -6,8 +6,18 @@
 namespace QnSystemHealth {
 
     enum MessageType {
+        // These messages are generated on the client
         EmailIsEmpty,
         NoLicenses,
+        SmtpIsNotSet,
+        UsersEmailIsEmpty,
+        ConnectionLost,
+
+        // These messages are sent from mediaserver
+        EmailSendError,
+        StoragesNotConfigured,
+        StoragesAreFull,
+
         NotDefined,
 
         MessageTypeCount = NotDefined

@@ -252,3 +252,24 @@ QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
     result->m_duration = 1000*1000*1000; // 1000 sec 
     return result;
 }
+
+bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResourcePtr netRes)
+{
+    bool rez = false;
+    netRes->lockConsumers();
+    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+    {
+        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
+        if (lp)
+        {
+            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
+            if (lr && lr->isRunning()) {
+                rez = true;
+                break;
+            }
+        }
+    }
+
+    netRes->unlockConsumers();
+    return rez;
+}

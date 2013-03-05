@@ -285,6 +285,68 @@ namespace nx_http
     //// class Request
     ////////////////////////////////////////////////////////////
     void Request::serialize( BufferType* const dstBuffer ) const
+    bool HttpRequest::parse( const ConstBufferRefType& data )
+    {
+        enum ParseState
+        {
+            readingRequestLine,
+            readingHeaders,
+            readingMessageBody
+        }
+        state = readingRequestLine;
+
+        int lineNumber = 0;
+        for( size_t curPos = 0; curPos < data.size(); ++lineNumber )
+        {
+            if( state == readingMessageBody )
+            {
+                messageBody = data.mid( curPos );
+                break;
+            }
+
+            //breaking into lines
+            const size_t lineSepPos = find_first_of( data, "\r\n", curPos, data.size()-curPos );
+            const ConstBufferRefType currentLine = data.mid( curPos, lineSepPos == BufferNpos ? lineSepPos : lineSepPos-curPos );
+            switch( state )
+            {
+                case readingRequestLine:
+                    if( !requestLine.parse( currentLine ) )
+                        return false;
+                    state = readingHeaders;
+                    break;
+
+                case readingHeaders:
+                {
+                    if( !currentLine.isEmpty() )
+                    {
+                        StringType headerName;
+                        StringType headerValue;
+                        if( !parseHeader( &headerName, &headerValue, currentLine ) )
+                            return false;
+                        headers.insert( std::make_pair( headerName, headerValue ) );
+                        break;
+                    }
+                    else
+                    {
+                        state = readingMessageBody;
+                    }
+                }
+
+                case readingMessageBody:
+                    break;
+            }
+
+            if( lineSepPos == BufferNpos )
+                break;  //no more data to parse
+            curPos = lineSepPos;
+            ++curPos;   //skipping separator
+            if( curPos < data.size() && (data[curPos] == '\r' || data[curPos] == '\n') )
+                ++curPos;   //skipping complex separator (\r\n)
+        }
+
+        return true;
+    }
+
     {
         //estimating required buffer size
         dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );

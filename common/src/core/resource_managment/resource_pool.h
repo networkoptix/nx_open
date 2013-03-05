@@ -82,6 +82,8 @@ public:
     QnResourceList getResourcesWithParentId(QnId id) const;
     QnResourceList getResourcesWithTypeId(QnId id) const;
 
+    QnUserResourcePtr getAdministrator() const;
+
     QStringList allTags() const;
 
     int activeCameras() const;
@@ -89,6 +91,9 @@ public:
     // TODO #gdm: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
+
+    //!Empties all internal dictionaries. Needed for correct destruction order at application stop
+    void clear();
 
 signals:
     void resourceAdded(const QnResourcePtr &resource);

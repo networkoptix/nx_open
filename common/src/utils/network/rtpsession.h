@@ -37,6 +37,7 @@ class QnRtspTimeHelper
 {
 public:
     QnRtspTimeHelper(const QString& resId);
+    ~QnRtspTimeHelper();
 
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
@@ -61,11 +62,11 @@ private:
         qint64 driftSum;
     };
 
-    CamSyncInfo* m_cameraClockToLocalDiff;
+    QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
     QString m_resId;
 
     static QMutex m_camClockMutex;
-    static QMap<QString, CamSyncInfo*> m_camClock;
+    static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
 
 #ifdef DEBUG_TIMINGS

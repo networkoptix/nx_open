@@ -7,6 +7,11 @@
 
 #include "button_box_dialog.h"
 
+class QLabel;
+
+struct QnStorageSpaceReply;
+struct QnStorageSpaceData;
+
 namespace Ui {
     class ServerSettingsDialog;
 }
@@ -26,7 +31,7 @@ namespace detail {
 
     class CheckFreeSpaceReplyProcessor: public QObject 
     {
-        Q_OBJECT;
+        Q_OBJECT
     public:
 
         CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
@@ -70,25 +75,29 @@ private:
     void updateFromResources();
     void submitToResources();
 
-    int addTableRow(int id, const QString &url, int spaceLimitGb);
+    void addTableItem(const QnStorageSpaceData &item);
+    void setTableItems(const QList<QnStorageSpaceData> &items);
+    QList<QnStorageSpaceData> tableItems() const;
 
-    void setTableStorages(const QnAbstractStorageResourceList &storages);
-    QnAbstractStorageResourceList tableStorages() const;
+    //int addTableRow(int id, const QString &url, int spaceLimitGb);
 
-    bool validateStorages(const QnAbstractStorageResourceList &storages);
+    //void setTableStorages(const QnAbstractStorageResourceList &storages);
+    //QnAbstractStorageResourceList tableStorages() const;
 
-    void updateSpaceLimitCell(int row, bool force = false);
+    //bool validateStorages(const QnAbstractStorageResourceList &storages);
+
+    //void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
     void at_storageAddButton_clicked();
-    void at_storageRemoveButton_clicked();
     void at_storagesTable_cellChanged(int row, int column);
 
-private:
-    Q_DISABLE_COPY(QnServerSettingsDialog);
+    void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 
+private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
+    QLabel *m_tableBottomLabel;
 
     bool m_hasStorageChanges;
 };

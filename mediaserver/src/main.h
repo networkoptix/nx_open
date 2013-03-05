@@ -29,6 +29,7 @@ private slots:
     void at_localInterfacesChanged();
     void at_serverSaved(int, const QByteArray&, const QnResourceList&, int);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
+    void at_noStorages();
     void at_timer();
 private:
     void initTcpListener();
@@ -44,7 +45,7 @@ private:
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QTimer* m_timer;
+    QTimer m_timer;
 };
 
 #endif // MAIN_H

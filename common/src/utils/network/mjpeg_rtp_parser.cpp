@@ -204,9 +204,9 @@ int QnMjpegRtpParser::makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt
         *p++ = 0xff;
         *p++ = 0xd8;            /* SOI */
 
-        m_lummaTablePos = p;
+        m_lummaTablePos = p+5;
         p = MakeQuantHeader(p, lqt, 0);
-        m_chromaTablePos = p;
+        m_chromaTablePos = p+5;
         p = MakeQuantHeader(p, cqt, 1);
 
         if (dri != 0)
@@ -441,7 +441,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     {
         m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? PIX_FMT_YUV420P : PIX_FMT_YUV422P;
-        m_jpegHeader.Initialize(qApp->organizationName().toAscii().constData(), qApp->applicationName().toAscii().constData(), "");
+        //m_jpegHeader.Initialize(qApp->organizationName().toAscii().constData(), qApp->applicationName().toAscii().constData(), "");
     }
 
 

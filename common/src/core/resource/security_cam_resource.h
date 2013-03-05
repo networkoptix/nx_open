@@ -8,6 +8,8 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 
+class QnAbstractArchiveDelegate;
+
 class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
@@ -67,6 +69,12 @@ public:
 
     virtual bool hasDualStreaming() const;
 
+    /** Returns true if camera stores archive on a external system */
+    bool isDtsBased() const;
+
+    /** Returns true if it is a analog camera */
+    bool isAnalog() const;
+
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
 
     virtual QStringList getRelayOutputList() const;
@@ -74,6 +82,7 @@ public:
 
 
     Qn::CameraCapabilities getCameraCapabilities() const;
+    bool hasCameraCapabilities(Qn::CameraCapabilities capabilities) const;
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
@@ -87,6 +96,8 @@ public:
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
     bool isRecordingEventAttached() const;
+
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
 
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
@@ -117,6 +128,7 @@ protected:
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
+
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting

@@ -24,6 +24,9 @@ public:
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;
 
+    void setUsedForWriting(bool isUsedForWriting);
+    bool isUsedForWriting() const;
+
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }
 
@@ -53,7 +56,8 @@ signals:
 
 private:
     qint64 m_spaceLimit;
-    int m_maxStoreTime; // at seconds
+    int m_maxStoreTime; // in seconds
+    bool m_usedForWriting;
     quint16 m_index;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;

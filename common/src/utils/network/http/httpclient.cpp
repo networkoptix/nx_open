@@ -22,6 +22,7 @@ namespace nx_http
 
     HttpClient::~HttpClient()
     {
+        m_asyncHttpClient->terminate();
         m_asyncHttpClient->scheduleForRemoval();
     }
 

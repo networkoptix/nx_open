@@ -5,8 +5,17 @@
 #include "api/session_manager.h"
 #include "utils/common/sleep.h"
 
-QnLocalMediaServerResource::QnLocalMediaServerResource()
-    : QnResource()
+class QnMediaServerResourceGuard: public QObject {
+public:
+    QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
+
+private:
+    QnMediaServerResourcePtr m_resource;
+};
+
+
+QnLocalMediaServerResource::QnLocalMediaServerResource(): 
+    QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
@@ -24,7 +33,8 @@ QString QnLocalMediaServerResource::getUniqueId() const
 
 QnMediaServerResource::QnMediaServerResource():
     QnResource(),
-    m_panicMode(PM_None)
+    m_panicMode(PM_None),
+    m_guard(NULL)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -36,7 +46,7 @@ QnMediaServerResource::QnMediaServerResource():
 
 QnMediaServerResource::~QnMediaServerResource()
 {
-    //delete m_rtspListener;
+    QMutexLocker lock(&m_mutex); // TODO: #Elric remove once m_guard hell is removed.
 }
 
 QString QnMediaServerResource::getUniqueId() const
@@ -57,7 +67,7 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
 
         /* We want the video server connection to be deleted in its associated thread, 
          * no matter where the reference count reached zero. Hence the custom deleter. */
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(toSharedPointer()), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
     }
 }
 
@@ -143,18 +153,24 @@ private:
 
 void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
 {
+    QMutexLocker lock(&m_mutex);
+
+    QString urlStr = m_runningIfRequests.value(responseNum);
     QByteArray guid = getGuid().toUtf8();
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
-        QMutexLocker lock(&m_mutex);
-
         // server OK
-        QString urlStr = m_runningIfRequests.value(responseNum);
         if (urlStr == QLatin1String("proxy"))
             setPrimaryIF(urlStr);
         else
             setPrimaryIF(QUrl(urlStr).host());
-        m_runningIfRequests.remove(responseNum);
+    }
+
+    m_runningIfRequests.remove(responseNum);
+
+    if(m_runningIfRequests.isEmpty() && m_guard) {
+        m_guard->deleteLater();
+        m_guard = NULL;
     }
 }
 
@@ -231,10 +247,26 @@ void QnMediaServerResource::determineOptimalNetIF()
     }
 
     // send request via proxy (ping request always send directly, other request are sent via proxy here)
-    QnSleep::msleep(5); // send request slighty latter to preffer direct connect
+    QTimer *timer = new QTimer();
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(determineOptimalNetIF_testProxy()), Qt::DirectConnection);
+    connect(timer, SIGNAL(timeout()), timer, SLOT(deleteLater()));
+    timer->start(5); // send request slighty later to preffer direct connect // TODO: #Elric still bad, implement properly
+    timer->moveToThread(qApp->thread());
+
+    m_runningIfRequests.insert(-1, QString());
+
+    if(!m_guard) {
+        m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
+        m_guard->moveToThread(qApp->thread());
+    }
+}
+
+void QnMediaServerResource::determineOptimalNetIF_testProxy() {
+    QMutexLocker lock(&m_mutex);
+    m_runningIfRequests.remove(-1);
     int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
     m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
-
 }
 
 void QnMediaServerResource::updateInner(QnResourcePtr other) 
@@ -256,13 +288,13 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        // keep index uhcnaged (app server does not provide such info
-        foreach(QnAbstractStorageResourcePtr storage, m_storages)
+        /* Keep indices unchanged (EC does not provide this info). */
+        foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
-            for (int i = 0; i < otherStorages.size(); ++i)
+            foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
             {
-                if (otherStorages[i]->getId() == storage->getId()) {
-                    otherStorages[i]->setIndex(storage->getIndex());
+                if (otherStorage->getId() == storage->getId()) {
+                    otherStorage->setIndex(storage->getIndex());
                     break;
                 }
             }

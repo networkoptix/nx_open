@@ -30,10 +30,11 @@ public:
     void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) override;
     void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) override;
     void serializeLicense(const QnLicensePtr& license, QByteArray& data) override;
+	void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) override;
     void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) override;
     void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) override;
     void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
-    void serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data) override;
+    void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) override;
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
     void serializeKvPair(const QnKvPair& kvPair, QByteArray& data);
     void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data);

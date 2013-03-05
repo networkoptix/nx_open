@@ -59,7 +59,7 @@ public:
     bool isPaused() const { return m_onPause; }
 
 public slots:
-    void start(Priority priority = InheritPriority) {
+    virtual void start(Priority priority = InheritPriority) {
         if (isRunning()) // already runing;
             return;
 
@@ -87,7 +87,8 @@ public slots:
         );
 
         pleaseStop();
-        wait();
+//        if( isRunning() )
+            wait();
     }
 
 protected:

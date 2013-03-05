@@ -1,5 +1,6 @@
 #include "camera_resource.h"
 #include "resource_consumer.h"
+#include "api/app_server_connection.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_scheduleDisabled(true),
@@ -9,7 +10,9 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0)
 {}
 
-QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
+QnPhysicalCameraResource::QnPhysicalCameraResource(): 
+    QnVirtualCameraResource(),
+    m_channelNumer(0)
 {
     setFlags(local_live_cam);
 }
@@ -33,6 +36,24 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
 
     return qMax(128,result);
 }
+
+int QnPhysicalCameraResource::getChannel() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_channelNumer;
+}
+
+void QnPhysicalCameraResource::setUrl(const QString &url)
+{
+    QUrl u(url);
+
+    QMutexLocker lock(&m_mutex);
+    QnVirtualCameraResource::setUrl(url);
+    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
+    if (m_channelNumer > 0)
+        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+}
+
 
 void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {
@@ -148,3 +169,20 @@ QString QnVirtualCameraResource::getUniqueId() const
 		return getPhysicalId();
 
 }
+
+void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters) {
+    QnNetworkResource::deserialize(parameters);
+
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        addFlags(motion);
+}
+
+void QnVirtualCameraResource::save()
+{
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
+        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
+            << getPhysicalId() << ". Description: " << conn->getLastError();
+    }
+}
+

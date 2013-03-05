@@ -10,7 +10,7 @@
 #define QN_ORGANIZATION_NAME        "${company.name}"
 #define QN_APPLICATION_NAME         "${product.title}"
 #define QN_APPLICATION_VERSION      "${release.version}.${buildNumber}"
-#define QN_ENGINE_VERSION           "${project.version}.${buildNumber}"
+#define QN_ENGINE_VERSION           "${release.version}.${buildNumber}"
 #define QN_APPLICATION_REVISION     "${changeSet}"
 #define QN_APPLICATION_PLATFORM     "${platform}"
 #define QN_APPLICATION_ARCH         "${arch}"
@@ -34,9 +34,9 @@
  */
 #define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}" // TODO: move up
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
-#define VER_FILEVERSION_STR         "${project.version}.${buildNumber}"
+#define VER_FILEVERSION_STR         "${release.version}.${buildNumber}"
 #define VER_PRODUCTVERSION          ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
-#define VER_PRODUCTVERSION_STR      "${project.version}.${buildNumber}"
+#define VER_PRODUCTVERSION_STR      "${release.version}.${buildNumber}"
 #define VER_COMPANYNAME_STR         "${company.name}"
 #define VER_FILEDESCRIPTION_STR     "${product.title}"
 #define VER_INTERNALNAME_STR        "${product.title}"

@@ -24,7 +24,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_videoParser(0),
     m_audioParser(0),
     m_timeHelper(res->getUniqueId()),
-    m_pleaseStop(false)
+    m_pleaseStop(false),
+    m_gotSomeFrame(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -194,6 +195,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         result = m_lastVideoData;
 		m_lastVideoData.clear();
         m_demuxedData[channelNum]->clear();
+        m_gotSomeFrame = true;
         return result;
     }
     if (!m_lastAudioData.isEmpty())
@@ -203,14 +205,19 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         m_demuxedData[channelNum]->clear();
         result->channelNumber += m_numberOfVideoChannels;
 
+        m_gotSomeFrame = true;
         return result;
     }
-    if (m_RtpSession.isOpened() && !m_pleaseStop) {
+    if (m_RtpSession.isOpened() && !m_pleaseStop && m_gotSomeFrame) 
+    {
         qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
+
+        int elapsed = dataTimer.elapsed();
+        QnBusiness::EventReason reason = elapsed > MAX_FRAME_DURATION*2 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueConnectionClosed;
         emit networkIssue(getResource(),
                           qnSyncTime->currentUSecsSinceEpoch(),
-                          QnBusiness::NetworkIssueNoFrame,
-                          QString::number((qlonglong) MAX_FRAME_DURATION*2/1000));
+                          reason,
+                          QString::number((qlonglong) elapsed/1000));
     }
     return result;
 }
@@ -384,7 +391,7 @@ void QnMulticodecRtpReader::openStream()
     if (isStreamOpened())
         return;
     //m_timeHelper.reset();
-
+    m_gotSomeFrame = false;
     QString transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
     if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
         transport = QLatin1String("AUTO");

@@ -6,6 +6,7 @@
 #include "asynchttpclient.h"
 
 #include <QCryptographicHash>
+#include <QMutexLocker>
 
 #include "../aio/aioservice.h"
 #include "../../common/log.h"
@@ -24,7 +25,9 @@ namespace nx_http
     :
         m_state( sInit ),
         m_requestBytesSent( 0 ),
-        m_authorizationTried( false )
+        m_authorizationTried( false ),
+        m_terminated( false ),
+        m_inEventHandler( false )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
     }
@@ -38,13 +41,42 @@ namespace nx_http
         }
     }
 
+    void AsyncHttpClient::terminate()
+    {
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = true;
+        }
+        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
+        if( m_socket )
+        {
+            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+        }
+
+        {
+            //TODO/IMPL remove this block when aio::AIOService::removeFromWatch garantees that eventTriggered had returned
+            //waiting for AsyncHttpClient::eventTriggered to return
+            QMutexLocker lk( &m_mutex );
+            while( m_inEventHandler )
+            {
+                //spin loop here is not so bad, since all http event processing is nonblocking
+                lk.unlock();
+                lk.relock();
+            }
+        }
+    }
+
     //!Implementation of aio::AIOEventHandler::eventTriggered
     void AsyncHttpClient::eventTriggered( Socket* sock, PollSet::EventType eventType )
     {
+        QMutexLocker lk( &m_mutex );
+        m_inEventHandler = true;
+
         ScopedDestructionProhibition undestructable( this );
 
         Q_ASSERT( sock == m_socket.data() );
-        for( ;; )
+        while( !m_terminated )
         {
             switch( m_state )
             {
@@ -60,7 +92,9 @@ namespace nx_http
                             formRequest();
                             serializeRequest();
                             m_state = sSendingRequest;
+                            lk.unlock();
                             emit tcpConnectionEstablished( this );
+                            lk.relock();
                             continue;
 
                         case PollSet::etError:
@@ -70,7 +104,9 @@ namespace nx_http
                                 break;
                             m_state = sFailed;
                             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                            lk.unlock();
                             emit done( this );
+                            lk.relock();
                             break;
 
                        default:
@@ -86,7 +122,9 @@ namespace nx_http
                         cl_log.log( QString::fromLatin1("Error sending http request to %1. %2").
                             arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
                         break;
                     }
 
@@ -95,7 +133,9 @@ namespace nx_http
                         cl_log.log( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
                         m_state = sFailed;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
                         break;
                     }
                     if( (int)m_requestBytesSent == m_requestBuffer.size() )
@@ -117,14 +157,22 @@ namespace nx_http
                         cl_log.log( QString::fromLatin1("Error reading http response from %1. %2").
                             arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
                         break;
                     }
 
                     readAndParseHttp();
                     //TODO/IMPL reconnect in case of error
                     if( m_state >= sFailed )
+                    {
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
+                        if( m_terminated )
+                            break;
+                    }
 
                     if( m_httpStreamReader.state() == HttpStreamReader::readingMessageHeaders )
                         break;
@@ -135,7 +183,9 @@ namespace nx_http
                         cl_log.log( QString::fromLatin1("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
                             arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
                         m_state = sFailed;
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
                         break;
                     }
                     //response read
@@ -151,22 +201,36 @@ namespace nx_http
                     {
                         //trying authorization
                         if( resendRequstWithAuthorization( *response ) )
+                        {
+                            m_inEventHandler = false;
                             return;
+                        }
                     }
 
                     m_state = sResponseReceived;
+                    lk.unlock();
                     emit responseReceived( this );
+                    lk.relock();
+                    if( m_terminated )
+                        break;
+
                     if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
                     {
                         m_state = sDone;
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
+                        if( m_terminated )
+                            break;
                     }
                     //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later, we will not send someMessageBodyAvailable signal
                     if( m_state == sReadingMessageBody &&
                         m_httpStreamReader.state() == HttpStreamReader::readingMessageBody && 
                         m_httpStreamReader.messageBodyBufferSize() > 0 )
                     {
+                        lk.unlock();
                         emit someMessageBodyAvailable( this );
+                        lk.relock();
                     }
                     break;
                 }
@@ -181,7 +245,9 @@ namespace nx_http
                         cl_log.log( QString::fromLatin1("Error reading http response message body from %1. %2").
                             arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
                         break;
                     }
 
@@ -190,9 +256,19 @@ namespace nx_http
                     if( m_state != sReadingMessageBody )
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
                     if( bytesRead > 0 )
+                    {
+                        lk.unlock();
                         emit someMessageBodyAvailable( this );
+                        lk.relock();
+                        if( m_terminated )
+                            break;
+                    }
                     if( m_state >= sFailed )
+                    {
+                        lk.unlock();
                         emit done( this );
+                        lk.relock();
+                    }
                     break;
                 }
 
@@ -211,6 +287,8 @@ namespace nx_http
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
         }
+
+        m_inEventHandler = false;
     }
 
     AsyncHttpClient::State AsyncHttpClient::state() const
@@ -225,6 +303,13 @@ namespace nx_http
     */
     bool AsyncHttpClient::doGet( const QUrl& url )
     {
+        //stopping client, if it is running
+        terminate();
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = false;
+        }
+
         m_authorizationTried = false;
         m_customHeaders.clear();
         return doGetPrivate( url );

@@ -41,6 +41,7 @@ public:
     OnvifNotificationConsumer* getService();
     const OnvifNotificationConsumer* getService() const;
 
+    static void initGlobalInstance( QnSoapServer* inst );
     static QnSoapServer* instance();
 
 protected:

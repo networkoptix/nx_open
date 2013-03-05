@@ -209,6 +209,7 @@ namespace nx_http
         BufferType messageBody;
 
         //!Appends serialized data to \a dstBuffer
+        bool parse( const ConstBufferRefType& data );
         void serialize( BufferType* const dstBuffer ) const;
     };
 

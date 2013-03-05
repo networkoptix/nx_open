@@ -8,6 +8,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/math/color_transformations.h>
 
 #include <ui/common/geometry.h>
 #include <ui/common/color_to_vector_converter.h>

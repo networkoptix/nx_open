@@ -22,6 +22,9 @@ QString QnNetworkIssueBusinessEvent::toString() const
         case QnBusiness::NetworkIssueNoFrame:
             reasonText = QObject::tr("No video frame during %1 seconds").arg(m_reasonText);
             break;
+        case QnBusiness::NetworkIssueConnectionClosed:
+            reasonText = QObject::tr("Connection to camera was unexpectedly closed");
+            break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
             {
                 QStringList seqs = m_reasonText.split(QLatin1Char(';'));

@@ -175,6 +175,7 @@ void QnAxisStreamReader::openStream()
 
     QString request;
     QTextStream stream(&request);
+    //stream << "rtsp://" << QUrl(m_resource->getUrl()).host() << ":" << (QUrl(m_resource->getUrl()).port()+1) << "/"; // for port forwarding purpose
     stream << "axis-media/media.amp?streamprofile=" << profileName;
 
 
