@@ -763,29 +763,26 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnDisplayInfoActionCondition(this));
 
     factory().
-        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Resolution..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
         factory(Qn::RadassAutoAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            flags(Qn::Scene | Qn::NoTarget ).
             text(tr("Auto")).
             checkable().
-            checked().
-            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+            checked();
 
         factory(Qn::RadassLowAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            flags(Qn::Scene | Qn::NoTarget ).
             text(tr("Low")).
-            checkable().
-            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+            checkable();
 
         factory(Qn::RadassHighAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            flags(Qn::Scene | Qn::NoTarget ).
             text(tr("High")).
-            checkable().
-            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+            checkable();
         factory.endGroup();
     } factory.endSubMenu();
 

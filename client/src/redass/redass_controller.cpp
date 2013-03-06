@@ -19,7 +19,7 @@ QnRedAssController* QnRedAssController::instance()
     return inst();
 }
 
-QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Mode_Auto)
+QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Qn::AutoResolution)
 {
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_timer.start(TIMER_TICK_INTERVAL);
@@ -93,7 +93,7 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_mode != Mode_Auto)
+    if (m_mode != Qn::AutoResolution)
         return;
 
     QnCamDisplay* display = getDisplayByReader(reader);
@@ -145,7 +145,7 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_mode != Mode_Auto)
+    if (m_mode != Qn::AutoResolution)
         return;
 
     if (reader->getQuality() == MEDIA_Quality_High || reader->getQuality() == MEDIA_Quality_ForceHigh)
@@ -220,7 +220,7 @@ void QnRedAssController::onTimer()
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_mode != Mode_Auto)
+    if (m_mode != Qn::AutoResolution)
         return;
 
     if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
@@ -322,7 +322,7 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
         {
             switch (m_mode) 
             {
-                case Mode_Auto:
+                case Qn::AutoResolution:
                     if (m_redAssInfo.size() >= 16) {
                         gotoLowQuality(display, Reason_Network);
                     }
@@ -335,10 +335,10 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
                     }
                     break;
 
-                case Mode_ForceHQ:
+                case Qn::HighResolution:
                     display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
                     break;
-                case Mode_ForceLQ:
+                case Qn::LowResolution:
                     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
                     break;
                 default:
@@ -374,7 +374,7 @@ void QnRedAssController::addHQTry()
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
 
-void QnRedAssController::setMode(Mode mode)
+void QnRedAssController::setMode(Qn::ResolutionMode mode)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -383,7 +383,7 @@ void QnRedAssController::setMode(Mode mode)
 
     m_mode = mode;
 
-    if (m_mode == Mode_Auto) {
+    if (m_mode == Qn::AutoResolution) {
         m_hiQualityRetryCounter = 0; // allow LQ->HQ switching
     }
     else {
@@ -395,12 +395,12 @@ void QnRedAssController::setMode(Mode mode)
                 continue; // ommit cameras without dual streaming, offline and non-authorized cameras
 
             QnArchiveStreamReader* reader = display->getArchiveReader();
-            reader->setQuality(m_mode == Mode_ForceHQ ? MEDIA_Quality_High : MEDIA_Quality_Low, true);
+            reader->setQuality(m_mode == Qn::HighResolution ? MEDIA_Quality_High : MEDIA_Quality_Low, true);
         }
     }
 }
 
-QnRedAssController::Mode QnRedAssController::getMode() const
+Qn::ResolutionMode QnRedAssController::getMode() const
 {
     return m_mode;
 }

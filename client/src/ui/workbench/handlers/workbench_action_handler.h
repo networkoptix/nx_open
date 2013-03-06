@@ -187,7 +187,7 @@ protected:
 
     void rotateItems(int degrees);
 
-    void setItemsResolutionMode(Qn::ResolutionMode resolutionMode);
+    void setResolutionMode(Qn::ResolutionMode resolutionMode);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
@@ -216,6 +216,7 @@ protected slots:
     void at_workbench_layoutsChanged();
     void at_workbench_cellAspectRatioChanged();
     void at_workbench_cellSpacingChanged();
+    void at_workbench_currentLayoutChanged();
 
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();

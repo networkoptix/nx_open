@@ -39,6 +39,7 @@
 #include <client/client_connection_data.h>
 
 #include <recording/time_period_list.h>
+#include <redass/redass_controller.h>
 
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -181,7 +182,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
-    connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -191,8 +191,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
+    connect(workbench(),                                        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
@@ -713,14 +715,8 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
     }
 }
 
-void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    foreach (QnResourceWidget* widget, widgets) {
-        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-        if (!mediaWidget)
-            continue;
-        //TODO: #vasilenko #gdm call redAssController method
-    }
+void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
+    qnRedAssController->setMode(resolutionMode);
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -849,6 +845,10 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
         action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     else
         action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
+}
+
+void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
+    qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
@@ -3030,15 +3030,15 @@ void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_radassAutoAction_triggered() {
-    setItemsResolutionMode(Qn::AutoResolution);
+    setResolutionMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
-    setItemsResolutionMode(Qn::LowResolution);
+    setResolutionMode(Qn::LowResolution);
 }
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
-    setItemsResolutionMode(Qn::HighResolution);
+    setResolutionMode(Qn::HighResolution);
 }
 
 void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
