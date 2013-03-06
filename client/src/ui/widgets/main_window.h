@@ -113,6 +113,9 @@ private:
     QMargins m_frameMargins;
 
     bool m_changeOpacity;
+
+    /** This field is used to restore geometry after switching to fullscreen and back */
+    QRect m_storedGeometry;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

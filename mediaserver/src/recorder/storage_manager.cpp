@@ -23,7 +23,8 @@ QnStorageManager::QnStorageManager():
     m_storageFileReaded(false),
     m_storagesStatisticsReady(false),
     m_catalogLoaded(false),
-    m_warnSended(false)
+    m_warnSended(false),
+    m_isWritableStorageAvail(false)
 {
 }
 
@@ -392,10 +393,21 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+bool QnStorageManager::isWritableStoragesAvailable()
+{
+    updateStorageStatistics();
+    return m_isWritableStorageAvail;
+}
+
 void QnStorageManager::updateStorageStatistics()
 {
+    QMutexLocker lock(&m_mutexStorages);
+    if (m_storagesStatisticsReady) 
+        return;
+
     double totalSpace = 0;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    m_isWritableStorageAvail = !storages.isEmpty();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
@@ -411,6 +423,7 @@ void QnStorageManager::updateStorageStatistics()
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
+    m_storagesStatisticsReady = true;
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
@@ -418,13 +431,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
 
-    {
-        QMutexLocker lock(&m_mutexStorages);
-        if (!m_storagesStatisticsReady) {
-            updateStorageStatistics();
-            m_storagesStatisticsReady = true;
-        }
-    }
+    updateStorageStatistics();
 
     QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
     QVector<QnStorageResourcePtr> candidates;

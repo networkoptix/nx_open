@@ -125,6 +125,7 @@ void QnPlAxisResource::stopInputPortMonitoring()
         httpClient = m_inputPortHttpMonitor.begin()->second;
         m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
         lk.unlock();
+        httpClient->terminate();
         httpClient->scheduleForRemoval();
         lk.relock();
     }
@@ -711,7 +712,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
         cl_log.log( QString::fromLatin1("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
             arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
 
@@ -728,7 +728,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
             arg(getUrl()).arg(QLatin1String(contentType)).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
 
@@ -743,7 +742,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
             arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
     if( !nx_http::ConstBufferRefType(contentType, boundaryStart-contentType.constData()).startsWith("boundary=") )
@@ -753,7 +751,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
             arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
     boundaryStart += sizeof("boundary=")-1;
@@ -920,6 +917,7 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
     {
         if( it->second == httpClient )
         {
+            it->second->scheduleForRemoval();
             m_inputPortHttpMonitor.erase( it );
             return;
         }

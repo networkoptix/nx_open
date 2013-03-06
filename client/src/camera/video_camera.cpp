@@ -113,24 +113,6 @@ void QnVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnVideoCamera::setQuality(QnStreamQuality q, bool increase)
-{
-    Q_UNUSED(q)
-    Q_UNUSED(increase)
-    /*
-    if (increase && m_reader->getQuality() >= q)
-        return;
-
-    if (!increase && m_reader->getQuality() <= q)
-        return;
-
-    if (isRecording())
-        m_reader->setQuality(QnQualityHighest);
-    else
-        m_reader->setQuality(q);
-        */
-}
-
 void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, 
                                             QnStreamRecorder::Role role, int timeOffsetMs, int serverTimeZoneMs)
 {

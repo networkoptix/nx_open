@@ -418,8 +418,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
     m_countdownCanceled = false;
-    m_recordingLabel = 0;
-    m_recordingAnimation = 0;
+    m_overlayLabel = 0;
+    m_overlayLabelAnimation = 0;
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -435,7 +435,7 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == m_recordingLabel) {
+    if (watched == m_overlayLabel) {
         if (event->type() != QEvent::KeyPress)
             return base_type::eventFilter(watched, event);
         //TODO: #GDM duplicating code with main_window.cpp
@@ -576,6 +576,37 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     menu->exec(pos);
 }
 
+void  QnWorkbenchController::showOverlayLabel(const QString &text, int width) {
+    QWidget *view = display()->view();
+
+    if (m_overlayLabel == 0) {
+        m_overlayLabel = new QLabel(view);
+        m_overlayLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+        m_overlayLabel->setAlignment(Qt::AlignCenter);
+        m_overlayLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
+        m_overlayLabel->setFocusPolicy(Qt::NoFocus);
+        m_overlayLabel->installEventFilter(this);
+    }
+
+    m_overlayLabel->resize(width, 165);
+    m_overlayLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_overlayLabel->size()) / 2);
+    m_overlayLabel->setMask(createRoundRegion(18, 18, m_overlayLabel->rect()));
+    m_overlayLabel->setText(text);
+    m_overlayLabel->show();
+}
+
+void  QnWorkbenchController::initOverlayLabelAnimation() {
+    if (m_overlayLabelAnimation == 0) {
+        m_overlayLabelAnimation = new QPropertyAnimation(m_overlayLabel, "windowOpacity", m_overlayLabel);
+        m_overlayLabelAnimation->setEasingCurve(QEasingCurve::OutCubic);
+        m_overlayLabelAnimation->setDuration(3000);
+        m_overlayLabelAnimation->setStartValue(1.0);
+        m_overlayLabelAnimation->setEndValue(0.6);
+
+    }
+    m_overlayLabelAnimation->disconnect();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Screen recording
@@ -583,48 +614,32 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
 void QnWorkbenchController::startRecording()
 {
     if (!m_screenRecorder) {
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
+        return;
+    }
+
+    if(m_screenRecorder->isRecording() || (m_overlayLabelAnimation && m_overlayLabelAnimation->state() == QAbstractAnimation::Running)) {
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
+        return;
+    }
+
+    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
+    if (widget == NULL) {
+        qnWarning("Viewport was expected to be a QGLWidget.");
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
 
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
-    if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running))
-        return;
-
     m_countdownCanceled = false;
 
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
-        return;
-    }
+    showOverlayLabel(tr("Recording in..."), 220);
+    initOverlayLabelAnimation();
 
-    QWidget *view = display()->view();
-
-    if (m_recordingLabel == 0)
-        m_recordingLabel = new QLabel(view);
-    m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    m_recordingLabel->resize(220, 165);
-    m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
-
-    m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
-    m_recordingLabel->setText(tr("Recording in..."));
-    m_recordingLabel->setAlignment(Qt::AlignCenter);
-    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
-    m_recordingLabel->setFocusPolicy(Qt::NoFocus);
-    m_recordingLabel->show();
-
-    if (m_recordingAnimation == 0)
-        m_recordingAnimation = new QPropertyAnimation(m_recordingLabel, "windowOpacity", m_recordingLabel);
-    m_recordingAnimation->setEasingCurve(QEasingCurve::OutCubic);
-    m_recordingAnimation->setDuration(3000);
-    m_recordingAnimation->setStartValue(1.0);
-    m_recordingAnimation->setEndValue(0.6);
-
-    m_recordingAnimation->disconnect();
-    connect(m_recordingAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
-    connect(m_recordingAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
-    m_recordingAnimation->start();
+    connect(m_overlayLabelAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
+    connect(m_overlayLabelAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
+    m_overlayLabelAnimation->start();
 }
 
 void QnWorkbenchController::stopRecording()
@@ -644,7 +659,7 @@ void QnWorkbenchController::stopRecording()
 
 void QnWorkbenchController::at_recordingAnimation_finished()
 {
-    m_recordingLabel->hide();
+    m_overlayLabel->hide();
     if (!m_countdownCanceled) {
         if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
             if (m_screenRecorder) // just in case =)
@@ -1362,12 +1377,12 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
 
 void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
-        if (!m_recordingLabel)
+        if (!m_overlayLabel)
             return;
-        m_recordingLabel->hide();
-        if (!m_recordingAnimation)
+        m_overlayLabel->hide();
+        if (!m_overlayLabelAnimation)
             return;
-        m_recordingAnimation->stop();
+        m_overlayLabelAnimation->stop();
         return;
     }
 
@@ -1378,33 +1393,11 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
         return;
     }
 
-    QWidget *view = display()->view();
+    showOverlayLabel(tr("Press any key to stop tour"), 280);
+    initOverlayLabelAnimation();
 
-    if (m_recordingLabel == 0)
-        m_recordingLabel = new QLabel(view);
-    m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    m_recordingLabel->resize(280, 165);
-    m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
-
-    m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
-    m_recordingLabel->setText(tr("Press any key to stop tour"));
-    m_recordingLabel->setAlignment(Qt::AlignCenter);
-    m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
-    m_recordingLabel->setFocusPolicy(Qt::NoFocus);
-    m_recordingLabel->show();
-
-    m_recordingLabel->installEventFilter(this);
-
-    if (m_recordingAnimation == 0)
-        m_recordingAnimation = new QPropertyAnimation(m_recordingLabel, "windowOpacity", m_recordingLabel);
-    m_recordingAnimation->setEasingCurve(QEasingCurve::OutCubic);
-    m_recordingAnimation->setDuration(3000);
-    m_recordingAnimation->setStartValue(1.0);
-    m_recordingAnimation->setEndValue(0.6);
-
-    m_recordingAnimation->disconnect();
-    connect(m_recordingAnimation, SIGNAL(finished()), m_recordingLabel, SLOT(hide()));
-    m_recordingAnimation->start();
+    connect(m_overlayLabelAnimation, SIGNAL(finished()), m_overlayLabel, SLOT(hide()));
+    m_overlayLabelAnimation->start();
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {

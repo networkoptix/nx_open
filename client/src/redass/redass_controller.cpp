@@ -19,7 +19,7 @@ QnRedAssController* QnRedAssController::instance()
     return inst();
 }
 
-QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive)
+QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Mode_Auto)
 {
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_timer.start(TIMER_TICK_INTERVAL);
@@ -93,6 +93,9 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
 
+    if (m_mode != Mode_Auto)
+        return;
+
     QnCamDisplay* display = getDisplayByReader(reader);
     if (!isSupportedDisplay(display))
         return;
@@ -141,6 +144,9 @@ bool QnRedAssController::existstBufferingDisplay() const
 void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
     QMutexLocker lock(&m_mutex);
+
+    if (m_mode != Mode_Auto)
+        return;
 
     if (reader->getQuality() == MEDIA_Quality_High || reader->getQuality() == MEDIA_Quality_ForceHigh)
         return; // reader already at HQ
@@ -213,6 +219,9 @@ bool QnRedAssController::isFFSpeed(double speed) const
 void QnRedAssController::onTimer()
 {
     QMutexLocker lock(&m_mutex);
+
+    if (m_mode != Mode_Auto)
+        return;
 
     if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
     {
@@ -309,14 +318,31 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
     QMutexLocker lock(&m_mutex);
     if (display->getArchiveReader()) 
     {
-        if (m_redAssInfo.size() >= 16) {
-            gotoLowQuality(display, Reason_Network);
-        }
-        else {
-            for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        if (isSupportedDisplay(display))
+        {
+            switch (m_mode) 
             {
-                if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
-                    gotoLowQuality(display, itr.value().lqReason);
+                case Mode_Auto:
+                    if (m_redAssInfo.size() >= 16) {
+                        gotoLowQuality(display, Reason_Network);
+                    }
+                    else {
+                        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+                        {
+                            if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+                                gotoLowQuality(display, itr.value().lqReason);
+                        }
+                    }
+                    break;
+
+                case Mode_ForceHQ:
+                    display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
+                    break;
+                case Mode_ForceLQ:
+                    display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
+                    break;
+                default:
+                    break;
             }
         }
         m_redAssInfo.insert(display, RedAssInfo());
@@ -346,4 +372,35 @@ void QnRedAssController::addHQTry()
 {
     m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, HIGH_QUALITY_RETRY_COUNTER);
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
+}
+
+void QnRedAssController::setMode(Mode mode)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (m_mode == mode)
+        return;
+
+    m_mode = mode;
+
+    if (m_mode == Mode_Auto) {
+        m_hiQualityRetryCounter = 0; // allow LQ->HQ switching
+    }
+    else {
+        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        {
+            QnCamDisplay* display = itr.key();
+
+            if (!isSupportedDisplay(display))
+                continue; // ommit cameras without dual streaming, offline and non-authorized cameras
+
+            QnArchiveStreamReader* reader = display->getArchiveReader();
+            reader->setQuality(m_mode == Mode_ForceHQ ? MEDIA_Quality_High : MEDIA_Quality_Low, true);
+        }
+    }
+}
+
+QnRedAssController::Mode QnRedAssController::getMode() const
+{
+    return m_mode;
 }

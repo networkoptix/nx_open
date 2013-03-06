@@ -149,8 +149,17 @@ void QnVMax480ConnectionProcessor::run()
     {
         quint8 vMaxHeader[16];
 
+        QTime t;
+        t.restart();
+
         if (!readBuffer(vMaxHeader, sizeof(vMaxHeader)))
-            break;
+        {
+            int elapsed = t.elapsed();
+            if (elapsed < 100)
+                break;    // connection closed
+            else
+                continue; // read timeout
+        }
 
         quint8 sequence = vMaxHeader[0];
         VMaxDataType dataType = (VMaxDataType) vMaxHeader[1];

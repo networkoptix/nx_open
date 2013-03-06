@@ -42,6 +42,8 @@ void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* co
 
 bool VMaxStreamFetcher::vmaxConnect(bool isLive, int channel)
 {
+    vmaxDisconnect();
+
     QStringList args;
     args << QString::number(QnVMax480Server::instance()->getPort());
     m_tcpID = QnVMax480Server::instance()->registerProvider(this);

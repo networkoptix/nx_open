@@ -114,6 +114,9 @@ protected:
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
 
+    void showOverlayLabel(const QString &text, int width);
+    void initOverlayLabelAnimation();
+
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -275,10 +278,10 @@ private:
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
-    QLabel *m_recordingLabel;
+    QLabel *m_overlayLabel;
 
     /** Animation for screen recording countdown. */
-    QPropertyAnimation *m_recordingAnimation;
+    QPropertyAnimation *m_overlayLabelAnimation;
 
 };
 

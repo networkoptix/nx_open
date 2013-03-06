@@ -479,11 +479,11 @@ void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
     qreal opacity = visible ? 1.0 : 0.0;
 
     if(animate) {
-        opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(opacity);
-        opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(opacity);
+        foreach(const OverlayWidget &overlay, m_overlayWidgets)
+            opacityAnimator(overlay.widget, 1.0)->animateTo(opacity);
     } else {
-        m_footerOverlayWidget->setOpacity(opacity);
-        m_headerOverlayWidget->setOpacity(opacity);
+        foreach(const OverlayWidget &overlay, m_overlayWidgets)
+            overlay.widget->setOpacity(opacity);
     }
 }
 

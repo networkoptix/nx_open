@@ -150,6 +150,7 @@ bool QnPlSonyResource::startInputPortMonitoring()
 
     if( m_inputMonitorHttpClient )
     {
+        m_inputMonitorHttpClient->terminate();
         m_inputMonitorHttpClient->scheduleForRemoval();
         m_inputMonitorHttpClient = NULL;
     }
@@ -175,11 +176,16 @@ bool QnPlSonyResource::startInputPortMonitoring()
 
 void QnPlSonyResource::stopInputPortMonitoring()
 {
-    QMutexLocker lk( &m_inputPortMutex );
-    if( !m_inputMonitorHttpClient )
-        return;
-    m_inputMonitorHttpClient->scheduleForRemoval();
-    m_inputMonitorHttpClient = NULL;
+    nx_http::AsyncHttpClient* inputMonitorHttpClient = m_inputMonitorHttpClient;
+    {
+        QMutexLocker lk( &m_inputPortMutex );
+        if( !m_inputMonitorHttpClient )
+            return;
+        m_inputMonitorHttpClient = NULL;
+    }
+    //calling terminate with m_inputPortMutex locked can lead to dead-lock with onMonitorResponseReceived method, called from http event thread
+    inputMonitorHttpClient->terminate();
+    inputMonitorHttpClient->scheduleForRemoval();
 }
 
 bool QnPlSonyResource::isInputPortMonitored() const
