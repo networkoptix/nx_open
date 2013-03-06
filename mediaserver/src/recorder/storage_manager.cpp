@@ -189,6 +189,9 @@ void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
             ++itr;
         }
     }
+
+    if (getWritableStorages().isEmpty())
+        emit noStoragesAvailable();
 }
 
 bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
@@ -211,6 +214,9 @@ void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newSto
         else
             ++itr;
     }
+
+    if (getWritableStorages().isEmpty())
+        emit noStoragesAvailable();
 }
 
 QnStorageManager::~QnStorageManager()
