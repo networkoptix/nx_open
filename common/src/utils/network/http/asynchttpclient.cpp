@@ -21,30 +21,33 @@ namespace nx_http
 {
     static const size_t RESPONSE_BUFFER_SIZE = 16*1024;
 
+    static QAtomicInt AsyncHttpClient_instanceCount = 0;
+
     AsyncHttpClient::AsyncHttpClient()
     :
         m_state( sInit ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
-        m_terminated( false ),
-        m_inEventHandler( false )
+        m_terminated( false )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
+
+        AsyncHttpClient_instanceCount.ref();
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
-        if( m_socket )
-        {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-        }
+        terminate();
+
+        AsyncHttpClient_instanceCount.deref();
     }
 
     void AsyncHttpClient::terminate()
     {
         {
             QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return;
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -52,28 +55,17 @@ namespace nx_http
         {
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-        }
 
-        {
-            //TODO/IMPL remove this block when aio::AIOService::removeFromWatch garantees that eventTriggered had returned
-            //waiting for AsyncHttpClient::eventTriggered to return
-            QMutexLocker lk( &m_mutex );
-            while( m_inEventHandler )
-            {
-                //spin loop here is not so bad, since all http event processing is nonblocking
-                lk.unlock();
-                lk.relock();
-            }
+            //AIOService guarantees that eventTriggered had return and will never be called with m_socket
         }
     }
 
     //!Implementation of aio::AIOEventHandler::eventTriggered
     void AsyncHttpClient::eventTriggered( Socket* sock, PollSet::EventType eventType )
     {
-        QMutexLocker lk( &m_mutex );
-        m_inEventHandler = true;
+        ScopedDestructionProhibition undestructable( this );    //~ScopedDestructionProhibition can call delete *this, which will lock m_mutex
 
-        ScopedDestructionProhibition undestructable( this );
+        QMutexLocker lk( &m_mutex );
 
         Q_ASSERT( sock == m_socket.data() );
         while( !m_terminated )
@@ -201,10 +193,7 @@ namespace nx_http
                     {
                         //trying authorization
                         if( resendRequstWithAuthorization( *response ) )
-                        {
-                            m_inEventHandler = false;
                             return;
-                        }
                     }
 
                     m_state = sResponseReceived;
@@ -287,8 +276,6 @@ namespace nx_http
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
         }
-
-        m_inEventHandler = false;
     }
 
     AsyncHttpClient::State AsyncHttpClient::state() const
