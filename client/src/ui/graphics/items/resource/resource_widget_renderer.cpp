@@ -92,26 +92,36 @@ void QnResourceWidgetRenderer::update() {
 qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) const { 
     const RenderingTools& ctx = m_channelRenderers[channel];
     //return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
+
+    if( ctx.timestampBlocked || (ctx.framesSinceJump == 0 && ctx.forcedTimestampValue != AV_NOPTS_VALUE) )
+        return ctx.forcedTimestampValue;
+
     if( !ctx.uploader || !ctx.renderer )
         return AV_NOPTS_VALUE;
     qint64 ts = ctx.uploader->nextFrameToDisplayTimestamp();
     if( ts == (qint64)AV_NOPTS_VALUE )
         ts = ctx.renderer->lastDisplayedTime();
+
     return ts;
 }
 
 void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const 
 {
-    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    RenderingTools& ctx = m_channelRenderers[channelNumber];
     if (ctx.renderer) 
         ctx.renderer->blockTimeValue(timestamp);
+
+    ctx.timestampBlocked = true;
+    ctx.forcedTimestampValue = timestamp;
 }
 
 void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const 
 {  
-    const RenderingTools& ctx = m_channelRenderers[channelNumber];
+    RenderingTools& ctx = m_channelRenderers[channelNumber];
     if (ctx.renderer) 
         ctx.renderer->unblockTimeValue();
+    ctx.timestampBlocked = false;
+    ctx.framesSinceJump = 0;
 }
 
 bool QnResourceWidgetRenderer::isTimeBlocked(int channelNumber) const
@@ -153,6 +163,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
     if( !ctx.uploader )
         return;
     ctx.uploader->uploadDecodedPicture( image );
+    ++ctx.framesSinceJump;
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
     
