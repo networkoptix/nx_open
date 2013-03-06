@@ -116,8 +116,8 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
-    camera->setGroupId(pb_camera.groupid().c_str());
-    camera->setGroupName(pb_camera.groupname().c_str());
+    camera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
+    camera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
 
     if (pb_camera.has_region())
     {

@@ -732,7 +732,11 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         Node* parent = this->node(parentResource);
 
         //TODO: #GDM remove debug
-        QString groupName = node->resource()->getName().contains(QLatin1String("31")) ? QLatin1String("Debug Recorder") : QString();
+        //QString groupName = node->resource()->getName().contains(QLatin1String("31")) ? QLatin1String("Debug Recorder") : QString();
+        QnSecurityCamResourcePtr camRes = node->resource().dynamicCast<QnSecurityCamResource>();
+        QString groupName;
+        if (camRes)
+            groupName = camRes->getGroupName();
         if (groupName.isEmpty())
             return parent;
         return parent->recorder(groupName);

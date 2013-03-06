@@ -24,6 +24,8 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 
 void QnVMax480ChunkReader::run()
 {
+    msleep(1000*1000*10);
+
     while (!m_needStop)
     {
         QnResource::Status status = m_res->getStatus();
