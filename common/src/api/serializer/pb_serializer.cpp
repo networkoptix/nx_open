@@ -374,6 +374,7 @@ void parseBusinessRules(QnBusinessEventRules& businessRules, const PbBusinessRul
         businessRules.append(businessRule);
     }
 }
+} // namespace {}
 
 void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraResourcePtr& cameraPtr)
 {
@@ -545,12 +546,16 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
 void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
 {
-    pb_license.set_name(license->name().toUtf8().constData());
-    pb_license.set_key(license->key().constData());
-    pb_license.set_cameracount(license->cameraCount());
-    pb_license.set_hwid(""); // We can't remove it, as it's required in .proto
-    pb_license.set_signature(license->signature().constData());
-}
+	// We can't remove it by now, as it's required in .proto
+    // Will remove it ocasionally.
+    pb_license.set_name("");
+    pb_license.set_hwid(""); 
+    pb_license.set_signature("");
+	/////////
+
+	pb_license.set_key(license->key().constData());
+	pb_license.set_cameracount(license->cameraCount());
+	pb_license.set_rawlicense(license->rawLicense().constData());
 }
 
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
@@ -1050,17 +1055,38 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
     }
 }
 
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
+// TODO: #Ivan. Temporary code
+QByteArray combineV1LicenseBlock(const QString& name, const QString& serial, const QString& hwid, int count, const QString& signature)
 {
-    QnLicensePtr rawLicense = QnLicensePtr(new QnLicense(
-                            QString::fromUtf8(pb_license.name().c_str()),
-                            pb_license.key().c_str(),
-                            pb_license.cameracount(),
-                            pb_license.signature().c_str()
-                            ));
+	return (QString() +
+		QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
+		QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
+		QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
+		QLatin1String("COUNT=") + count + QLatin1String("\n") +
+		QLatin1String("SIGNATURE=") + signature).toUtf8();
+}
 
-    // TODO: #Ivan, verify that's ok to return invalid license
-    license = rawLicense; // ->isValid() ? rawLicense : QnLicensePtr();
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& hardwareId, const QByteArray& oldHardwareId)
+{
+	if (!pb_license.rawlicense().empty()) {
+		license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
+		return;
+	}
+
+	// TODO: #Ivan. Temporary code
+	QByteArray block;
+	
+	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+	if (QnLicense(block).isValid(hardwareId)) {
+		license = QnLicensePtr(new QnLicense(block));
+		return;
+	}
+
+	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+	if (QnLicense(block).isValid(hardwareId)) {
+		license = QnLicensePtr(new QnLicense(block));
+		return;
+	}
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
@@ -1139,7 +1165,9 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 
         QnLicensePtr license;
         // Parse license and validate its signature
-        parseLicense(license, pb_license);
+		if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
+			parseLicense(license, pb_license, licenses.hardwareId(), licenses.oldHardwareId());
+
         // Verify that license is valid and for our hardwareid
         if (license)
             licenses.append(license);

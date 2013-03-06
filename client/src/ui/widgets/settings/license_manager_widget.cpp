@@ -101,8 +101,8 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
-//    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/vms.dev/activate.php"));
+//    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
+    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/new/vms.dev/activate.php"));
 
     QNetworkRequest request;
     request.setUrl(url);
@@ -266,7 +266,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         updateFromServer(ui->licenseWidget->serialKey().toLatin1(), QLatin1String(m_licenses.hardwareId()), QLatin1String(m_licenses.oldHardwareId()));
     } else {
         QList<QnLicensePtr> licenseList;
-        QnLicensePtr license = readLicenseFromString(ui->licenseWidget->activationKey());
+        QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
         licenseList.append(license);
         validateLicenses(license ? license->key() : "", licenseList);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
