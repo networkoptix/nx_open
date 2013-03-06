@@ -3062,6 +3062,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
             tr("Could not get position from camera"), 
             tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
         );
+        return;
     }
 
     bool ok = false;
