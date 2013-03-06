@@ -135,7 +135,8 @@ void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
     QMutexLocker lock(&m_mutex);
     m_rules << value;
 
-    notifyResourcesAboutEventIfNeccessary( value, true );
+    if( !value->disabled() )
+        notifyResourcesAboutEventIfNeccessary( value, true );
 }
 
 void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bEvent)
@@ -411,15 +412,20 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     {
         if (m_rules[i]->id() == bRule->id())
         {
-            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
-            notifyResourcesAboutEventIfNeccessary( bRule, true );
+            if( !m_rules[i]->disabled() )
+                notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+            if( !bRule->disabled() )
+                notifyResourcesAboutEventIfNeccessary( bRule, true );
             terminateRunningRule(m_rules[i]);
             m_rules[i] = bRule;
             return;
         }
     }
+
+    //adding new rule
     m_rules << bRule;
-    notifyResourcesAboutEventIfNeccessary( bRule, true );
+    if( !bRule->disabled() )
+        notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
 void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
@@ -463,7 +469,8 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
     {
         if (m_rules[i]->id() == id)
         {
-            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+            if( !m_rules[i]->disabled() )
+                notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);
             break;

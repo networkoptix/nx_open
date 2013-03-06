@@ -77,6 +77,32 @@ public:
             FD_SET( src[i].socket->handle(), dest );
         }
     }
+
+    std::vector<SocketContext>::iterator findSocketContextIter(
+        Socket* const sock,
+        PollSet::EventType eventType,
+        std::vector<SocketContext>** setToUse )
+    {
+        *setToUse = &readSockets;   //have to return something in any case
+        if( eventType == PollSet::etRead )
+        {
+            *setToUse = &readSockets;
+        }
+        else if( eventType == PollSet::etWrite )
+        {
+            *setToUse = &writeSockets;
+        }
+        else
+        {
+            Q_ASSERT( false );
+            return (*setToUse)->end();
+        }
+
+        std::vector<SocketContext>::iterator it = std::lower_bound( (*setToUse)->begin(), (*setToUse)->end(), SocketContext(sock), std::less<SocketContext>() );
+        if( (it != (*setToUse)->end()) && (it->socket == sock) )
+            return it;
+        return (*setToUse)->end();
+    }
 };
 
 class ConstIteratorImpl
@@ -306,29 +332,18 @@ bool PollSet::add(
 }
 
 //!Remove socket from set
-void PollSet::remove( Socket* const sock, PollSet::EventType eventType )
+void* PollSet::remove( Socket* const sock, PollSet::EventType eventType )
 {
     std::vector<SocketContext>* setToUse = NULL;
-    if( eventType == etRead )
+    std::vector<SocketContext>::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
+    if( it != setToUse->end() )
     {
-        setToUse = &m_impl->readSockets;
-    }
-    else if( eventType == etWrite )
-    {
-        setToUse = &m_impl->writeSockets;
-    }
-    else
-    {
-        Q_ASSERT( false );
-        return;
+        void* userData = it->userData;
+        setToUse->erase( it );
+        return userData;
     }
 
-    std::vector<SocketContext>::iterator it = std::lower_bound( setToUse->begin(), setToUse->end(), SocketContext(sock), std::less<SocketContext>() );
-    if( (it != setToUse->end()) && (it->socket == sock) )
-    {
-        setToUse->erase( it );
-        return;
-    }
+    return NULL;
 }
 
 size_t PollSet::size( EventType eventType ) const
@@ -342,6 +357,13 @@ size_t PollSet::size( EventType eventType ) const
         Q_ASSERT( false );
         return maxPollSetSize();
     }
+}
+
+void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
+{
+    std::vector<SocketContext>* setToUse = NULL;
+    std::vector<SocketContext>::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
+    return it != setToUse->end() ? it->userData : NULL;
 }
 
 /*!
