@@ -741,7 +741,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         }
         if (groupId.isEmpty())
             return parent;
-        return parent->recorder(groupId, groupName);
+        return parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
     }
 }
 
