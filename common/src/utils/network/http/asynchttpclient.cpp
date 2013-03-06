@@ -61,7 +61,7 @@ namespace nx_http
     }
 
     //!Implementation of aio::AIOEventHandler::eventTriggered
-    void AsyncHttpClient::eventTriggered( Socket* sock, PollSet::EventType eventType )
+    void AsyncHttpClient::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
     {
         ScopedDestructionProhibition undestructable( this );    //~ScopedDestructionProhibition can call delete *this, which will lock m_mutex
 

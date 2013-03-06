@@ -6,6 +6,7 @@
 #include "aiothread.h"
 
 #include <deque>
+#include <memory>
 
 #include <QAtomicInt>
 
