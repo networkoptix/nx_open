@@ -13,9 +13,19 @@ namespace Qn {
         LocalNode,
         ServersNode,
         UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-        BastardNode,    /**< Node that contains hidden resources. */
+
+        /** Node that represents a resource. */
+        ResourceNode,
+
+        /** Node that represents a layout item. */
+        ItemNode,
+
+        /** Node that contains hidden resources. */
+        BastardNode,
+
+        /** Node that represents a recorder (VMAX, etc) */
+        RecorderNode,
+
         NodeTypeCount
     };
 

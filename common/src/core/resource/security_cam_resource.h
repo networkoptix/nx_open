@@ -99,6 +99,11 @@ public:
 
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
 
+    virtual QString getGroupName() const;
+    virtual void setGroupName(const QString& value);
+    virtual QString getGroupId() const;
+    virtual void setGroupId(const QString& value);
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //
@@ -154,6 +159,8 @@ private:
     Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
+    QString m_groupName;
+    QString m_groupId;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

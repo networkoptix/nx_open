@@ -64,7 +64,7 @@ public:
     /**
      * Constructor for toplevel nodes. 
      */
-    Node(QnResourcePoolModel *model, Qn::NodeType type):
+    Node(QnResourcePoolModel *model, Qn::NodeType type, const QString &name = QString()):
         m_model(model),
         m_type(type),
         m_state(Normal),
@@ -74,7 +74,12 @@ public:
         m_modified(false),
         m_checked(Qt::Unchecked)
     {
-        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode || type == Qn::BastardNode);
+        assert(type == Qn::LocalNode ||
+               type == Qn::ServersNode ||
+               type == Qn::UsersNode ||
+               type == Qn::RootNode ||
+               type == Qn::BastardNode ||
+               type == Qn::RecorderNode);
 
         switch(type) {
         case Qn::RootNode:
@@ -95,6 +100,11 @@ public:
         case Qn::BastardNode:
             m_displayName = m_name = QLatin1String("_HIDDEN_"); // this node is always hidden
             m_bastard = true;
+            break;
+        case Qn::RecorderNode:
+            m_displayName = m_name = name;
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+            m_bastard = true; // invisible by default until have children
             break;
         default:
             break;
@@ -217,6 +227,9 @@ public:
             break;
         case Qn::BastardNode:
             bastard = true;
+            break;
+        case Qn::RecorderNode:
+            bastard = m_children.size() == 0;
             break;
         default:
             break;
@@ -361,7 +374,6 @@ public:
         default:
             break;
         }
-
         return result;
     }
 
@@ -460,6 +472,16 @@ public:
         changeInternal();
     }
 
+    Node *recorder(const QString &groupId, const QString &groupName) {
+        if (m_recorders.contains(groupId))
+            return m_recorders[groupId];
+
+        Node* recorder = new Node(m_model, Qn::RecorderNode, groupName);
+        recorder->setParent(this);
+        m_recorders[groupId] = recorder;
+        return recorder;
+    }
+
 protected:
     void removeChildInternal(Node *child) {
         assert(child->parent() == this);
@@ -474,6 +496,8 @@ protected:
         } else {
             m_children.removeOne(child);
         }
+        if (this->type() == Qn::RecorderNode && m_children.size() == 0)
+            setBastard(true);
     }
 
     void addChildInternal(Node *child) {
@@ -489,6 +513,8 @@ protected:
         } else {
             m_children.push_back(child);
         }
+        if (this->type() == Qn::RecorderNode && m_children.size() > 0)
+            setBastard(false);
     }
 
     void changeInternal() {
@@ -527,6 +553,8 @@ private:
     /** Children of this node. */
     QList<Node *> m_children;
 
+    /** Recorder children of this node by group id. */
+    QHash<QString, Node *> m_recorders;
 
     /* Resource-related state. */
 
@@ -649,7 +677,9 @@ QnResourcePoolModel::Node *QnResourcePoolModel::node(const QModelIndex &index) c
 }
 
 void QnResourcePoolModel::deleteNode(Node *node) {
-    assert(node->type() == Qn::ResourceNode || node->type() == Qn::ItemNode);
+    assert(node->type() == Qn::ResourceNode ||
+           node->type() == Qn::ItemNode ||
+           node->type() == Qn::RecorderNode);
 
     // TODO: implement this in Node's destructor.
 
@@ -696,9 +726,22 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
             return NULL;
         }
     } else {
-        if (!m_flat)
-            return this->node(parentResource);
-        return m_rootNodes[Qn::BastardNode];
+        if (m_flat)
+            return m_rootNodes[Qn::BastardNode];
+
+        Node* parent = this->node(parentResource);
+
+        QnSecurityCamResourcePtr camRes = node->resource().dynamicCast<QnSecurityCamResource>();
+        QString groupId;
+        QString groupName;
+        if (camRes) {
+            groupName = camRes->getGroupName();
+            groupId = camRes->getGroupId();
+            qDebug() << camRes->getName() << camRes->getGroupId() << camRes->getGroupName();
+        }
+        if (groupId.isEmpty())
+            return parent;
+        return parent->recorder(groupId, groupName);
     }
 }
 
