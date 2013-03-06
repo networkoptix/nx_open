@@ -22,7 +22,7 @@ public:
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
-    void removeStorage(QnStorageResourcePtr storage);
+    void removeStorage(QnStorageResourcePtr storage, bool silent = false);
 
     /*
     * Remove storage if storage is absent in specified list
