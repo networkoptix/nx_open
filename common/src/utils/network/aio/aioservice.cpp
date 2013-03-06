@@ -137,8 +137,8 @@ namespace aio
         map<pair<Socket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
         if( it != m_sockets.end() )
         {
-            it->second->removeFromWatch( sock, eventType );
-            m_sockets.erase( it );
+            if( it->second->removeFromWatch( sock, eventType ) )
+                m_sockets.erase( it );
         }
     }
 
