@@ -157,7 +157,7 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     
     cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
-    removeStorage(storage, true); // remove existing storage record if exists
+    removeStorage(storage); // remove existing storage record if exists
     //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
     //if (oldStorage)
     //    storage->addWritedSpace(oldStorage->getWritedSpace());
@@ -171,12 +171,9 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
         m_storageRoots.insert(value, storage);
 
     connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
-
-    if (getWritableStorages().isEmpty())
-        emit noStoragesAvailable();
 }
 
-void QnStorageManager::removeStorage(QnStorageResourcePtr storage, bool silent)
+void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
 {
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
@@ -192,8 +189,10 @@ void QnStorageManager::removeStorage(QnStorageResourcePtr storage, bool silent)
             ++itr;
         }
     }
+}
 
-    if (!silent && getWritableStorages().isEmpty())
+void QnStorageManager::checkStorages() {
+    if (getWritableStorages().isEmpty())
         emit noStoragesAvailable();
 }
 
@@ -217,9 +216,6 @@ void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newSto
         else
             ++itr;
     }
-
-    if (getWritableStorages().isEmpty())
-        emit noStoragesAvailable();
 }
 
 QnStorageManager::~QnStorageManager()
