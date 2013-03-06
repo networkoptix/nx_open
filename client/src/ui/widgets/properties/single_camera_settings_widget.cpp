@@ -79,6 +79,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
+    connect(ui->dtsViewCheckBox,        SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
 
     setWarningStyle(ui->dtsViewWarningLabel);
 
@@ -283,21 +284,28 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
         m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
-        m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
 
-        if (m_hasScheduleChanges) {
-            QnScheduleTaskList scheduleTasks;
-            foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
-                scheduleTasks.append(QnScheduleTask(scheduleTaskData));
-            m_camera->setScheduleTasks(scheduleTasks);
+        if (m_camera->isDtsBased()) {
+            m_camera->setScheduleDisabled(!ui->dtsViewCheckBox->isChecked());
         }
-
-        if (ui->cameraMotionButton->isChecked())
-            m_camera->setMotionType(m_camera->getCameraBasedMotionType());
         else
-            m_camera->setMotionType(Qn::MT_SoftwareGrid);
+        {
+            m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
 
-        submitMotionWidgetToResource();
+            if (m_hasScheduleChanges) {
+                QnScheduleTaskList scheduleTasks;
+                foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
+                    scheduleTasks.append(QnScheduleTask(scheduleTaskData));
+                m_camera->setScheduleTasks(scheduleTasks);
+            }
+
+            if (ui->cameraMotionButton->isChecked())
+                m_camera->setMotionType(m_camera->getCameraBasedMotionType());
+            else
+                m_camera->setMotionType(Qn::MT_SoftwareGrid);
+
+            submitMotionWidgetToResource();
+        }
 
         setHasDbChanges(false);
     }
@@ -339,8 +347,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-        ui->dtsViewCheckBox->setVisible(false);
-        ui->dtsViewWarningLabel->setVisible(false);
+        ui->dtsWidget->setVisible(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
 
@@ -354,51 +361,54 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
-        ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
-        if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
-            ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
-        else
-            ui->cameraMotionButton->setText(tr("Do not record motion"));
-
-        QnVirtualCameraResourceList cameras;
-        cameras.push_back(m_camera);
-
-        ui->cameraScheduleWidget->beginUpdate();
-        ui->cameraScheduleWidget->setCameras(cameras);
-
-        QList<QnScheduleTask::Data> scheduleTasks;
-        foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
-            scheduleTasks.append(scheduleTaskData.getData());
-        ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
-        
-        ui->cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
-
-        int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
-        if (currentCameraFps > 0)
-            ui->cameraScheduleWidget->setFps(currentCameraFps);
-        else
-            ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
-        ui->cameraScheduleWidget->endUpdate();
-
-        // TODO: wrong, need to get camera-specific web page
-        ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
-        ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
-        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
-
-        m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
-        ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
-        ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
-
         bool dtsBased = camera()->isDtsBased();
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedSettingsTab, !dtsBased);
-        ui->dtsViewCheckBox->setVisible(dtsBased);
-        ui->dtsViewWarningLabel->setVisible(dtsBased);
+        ui->dtsWidget->setVisible(dtsBased);
+        if (dtsBased) {
+            ui->dtsViewCheckBox->setChecked(dtsBased && !m_camera->isScheduleDisabled());
+        } else {
+            ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
+            if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
+                ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
+            else
+                ui->cameraMotionButton->setText(tr("Do not record motion"));
+
+            QnVirtualCameraResourceList cameras;
+            cameras.push_back(m_camera);
+
+            ui->cameraScheduleWidget->beginUpdate();
+            ui->cameraScheduleWidget->setCameras(cameras);
+
+            QList<QnScheduleTask::Data> scheduleTasks;
+            foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
+                scheduleTasks.append(scheduleTaskData.getData());
+            ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
+
+            ui->cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
+
+            int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
+            if (currentCameraFps > 0)
+                ui->cameraScheduleWidget->setFps(currentCameraFps);
+            else
+                ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
+            ui->cameraScheduleWidget->endUpdate();
+
+            // TODO: wrong, need to get camera-specific web page
+            ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+            ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
+            ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
+
+            m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
+            ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
+            ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+        }
     }
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
+    updateDtsLicenses();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
@@ -410,6 +420,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
     if(!m_motionWidget)
+        return;
+    if (m_camera && m_camera->isDtsBased())
         return;
 
     disconnectFromMotionWidget();
@@ -509,11 +521,22 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
+    if (m_camera && m_camera->isDtsBased())
+        return;
+
     bool motionAvailable = true;
     if(ui->cameraMotionButton->isChecked())
         motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != Qn::MT_NoMotion);
 
     ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
+}
+
+void QnSingleCameraSettingsWidget::updateDtsLicenses() {
+    ui->dtsViewWarningLabel->setVisible(false);
+    if (!m_camera || !m_camera->isDtsBased())
+        return;
+
+
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {

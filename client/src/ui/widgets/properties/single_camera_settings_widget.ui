@@ -25,6 +25,26 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
+        <widget class="QWidget" name="dtsWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="dtsViewCheckBox">
+            <property name="text">
+             <string>Use analog license to view this camera</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="dtsViewWarningLabel">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <layout class="QFormLayout" name="formLayout_3">
          <item row="0" column="0">
           <widget class="QLabel" name="nameLabel">
@@ -193,20 +213,6 @@
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
           <string>Enable audio</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="dtsViewCheckBox">
-         <property name="text">
-          <string>Enable viewing</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="dtsViewWarningLabel">
-         <property name="text">
-          <string/>
          </property>
         </widget>
        </item>

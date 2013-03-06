@@ -25,6 +25,26 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
+        <widget class="QWidget" name="dtsWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="dtsViewCheckBox">
+            <property name="text">
+             <string>Use analog licenses to view these cameras</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="dtsViewWarningLabel">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Authentication</string>
@@ -71,20 +91,6 @@
          </property>
          <property name="tristate">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="dtsViewCheckBox">
-         <property name="text">
-          <string>Enable viewing of analog cameras</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="dtsViewWarningLabel">
-         <property name="text">
-          <string/>
          </property>
         </widget>
        </item>

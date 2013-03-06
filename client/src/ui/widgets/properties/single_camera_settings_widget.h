@@ -110,6 +110,7 @@ private:
 
     void updateMotionWidgetNeedControlMaxRect();
     void updateMotionAvailability();
+    void updateDtsLicenses();
 
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
