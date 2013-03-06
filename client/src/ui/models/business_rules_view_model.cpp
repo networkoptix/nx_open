@@ -14,6 +14,7 @@
 #include <business/actions/popup_business_action.h>
 #include <business/actions/recording_business_action.h>
 
+#include <ui/common/resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -56,31 +57,6 @@ namespace {
         else
             return QString(instantEvent).arg(typeStr)
                     .arg(toggleStateToString(eventState));
-    }
-
-    QString extractHost(const QString &url) {
-        /* Try it as a host address first. */
-        QHostAddress hostAddress(url);
-        if(!hostAddress.isNull())
-            return hostAddress.toString();
-
-        /* Then go default QUrl route. */
-        return QUrl(url).host();
-    }
-
-    QString getResourceName(const QnResourcePtr& resource) {
-        if (!resource)
-            return QObject::tr("<select target>");
-
-        QnResource::Flags flags = resource->flags();
-        if (qnSettings->isIpShownInTree()) {
-            if((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote)) {
-                QString host = extractHost(resource->getUrl());
-                if(!host.isEmpty())
-                    return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
-            }
-        }
-        return resource->getName();
     }
 
     const int ProlongedActionRole = Qt::UserRole + 2;

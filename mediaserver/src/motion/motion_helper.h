@@ -14,7 +14,7 @@
 class QnMotionHelper
 {
 public:
-
+    static void initStaticInstance( QnMotionHelper* inst );
     static QnMotionHelper* instance();
     virtual ~QnMotionHelper();
 

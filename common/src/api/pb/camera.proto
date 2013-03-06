@@ -53,4 +53,6 @@ message Camera {
     optional bool         manuallyAdded    = 10;
     optional string       model            = 11;
     optional string       firmware         = 12;
+    optional string       groupId          = 13;
+    optional string       groupName        = 14;
 }

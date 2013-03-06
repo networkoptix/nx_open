@@ -436,6 +436,7 @@ void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource
         if (physicalStorage)
             qnStorageMan->addStorage(physicalStorage);
     }
+    qnStorageMan->checkStorages();
 }
 
 void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
@@ -443,6 +444,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (physicalStorage) {
         qnStorageMan->removeStorage(physicalStorage);
+        qnStorageMan->checkStorages();
         return;
     }
 
@@ -501,10 +503,18 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
+//Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
+static QnRecordingManager* staticInstance = NULL;
+
+void QnRecordingManager::initStaticInstance( QnRecordingManager* recordingManager )
+{
+    staticInstance = recordingManager;
+}
+
 QnRecordingManager* QnRecordingManager::instance()
 {
-    return qn_recordingManager_instance();
+    //return qn_recordingManager_instance();
+    return staticInstance;
 }
 
 // --------------------- QnServerDataProviderFactory -------------------

@@ -191,6 +191,11 @@ void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
     }
 }
 
+void QnStorageManager::checkStorages() {
+    if (getWritableStorages().isEmpty())
+        emit noStoragesAvailable();
+}
+
 bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
 {
     foreach(const QnAbstractStorageResourcePtr& storage, storages)

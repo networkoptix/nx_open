@@ -26,6 +26,10 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager():
     netStateTime.restart();
 }
 
+QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
+{
+    stop();
+}
 
 void printInLogNetResources(const QnResourceList& resources)
 {

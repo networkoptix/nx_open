@@ -28,7 +28,9 @@ public:
     static const int MIN_SECONDARY_FPS = 2;
 
 
+    static void initStaticInstance( QnRecordingManager* );
     static QnRecordingManager* instance();
+
     QnRecordingManager();
     virtual ~QnRecordingManager();
 

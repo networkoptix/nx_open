@@ -7,8 +7,11 @@ class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 {
 public:
     QnMServerResourceDiscoveryManager();
+    virtual ~QnMServerResourceDiscoveryManager();
+
 protected:
     virtual bool processDiscoveredResources(QnResourceList& resources) override;
+
 private:
 
     void check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState);

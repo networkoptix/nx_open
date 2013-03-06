@@ -116,6 +116,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
+    camera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
+    camera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
+
     if (pb_camera.has_region())
     {
         QList<QnMotionRegion> regions;
@@ -398,6 +401,8 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
     pb_camera.set_manuallyadded(cameraPtr->isManuallyAdded());
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
+    pb_camera.set_groupid(cameraPtr->getGroupId().toUtf8().constData());
+    pb_camera.set_groupname(cameraPtr->getGroupName().toUtf8().constData());
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys())
@@ -1083,7 +1088,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     QnResourceList eventResources;
     for (int i = 0; i < pb_businessRule.eventresource_size(); i++) {
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i));
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::rfAllResources);
         if (resource)
             eventResources << resource;
         else

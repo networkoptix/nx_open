@@ -34,6 +34,7 @@
 #include "qtservice.h"
 #include "server_message_processor.h"
 #include "settings.h"
+#include "motion/motion_helper.h"
 
 #include <fstream>
 #include "soap/soapserver.h"
@@ -804,6 +805,16 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
+    //starting soap server to accept event notifications from onvif servers
+    QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::instance()->start();
+
+    QnResourcePool::initStaticInstance( new QnResourcePool() );
+
+    QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
+
+    QnMotionHelper::initStaticInstance( new QnMotionHelper() );
+
     QnBusinessEventConnector::initStaticInstance( new QnBusinessEventConnector() );
     std::auto_ptr<QThread> connectorThread( new QThread() );
     connectorThread->start();
@@ -826,6 +837,8 @@ void QnMain::run()
 
         QnSleep::msleep(1000);
     }
+
+    QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
@@ -936,6 +949,7 @@ void QnMain::run()
     }
     qnStorageMan->loadFullFileCatalog();
 
+    QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
@@ -1023,6 +1037,12 @@ void QnMain::run()
 
     exec();
 
+    delete QnRecordingManager::instance();
+    QnRecordingManager::initStaticInstance( NULL );
+
+    delete QnMServerResourceSearcher::instance();
+    QnMServerResourceSearcher::initStaticInstance( NULL );
+
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
 
@@ -1032,6 +1052,17 @@ void QnMain::run()
     //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
     delete QnBusinessEventConnector::instance();
     QnBusinessEventConnector::initStaticInstance( NULL );
+
+    delete QnMotionHelper::instance();
+    QnMotionHelper::initStaticInstance( NULL );
+
+    delete QnVideoCameraPool::instance();
+    QnVideoCameraPool::initStaticInstance( NULL );
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
+delete QnSoapServer::instance();
+    QnSoapServer::initStaticInstance( NULL );
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
@@ -1048,8 +1079,6 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-
-        initializeSingleToneObjects();
 
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
@@ -1099,23 +1128,11 @@ private:
     int m_argc;
     char **m_argv;
 
-    void initializeSingleToneObjects()
-    {
-        //starting soap server to accept event notifications from onvif servers
-        QnSoapServer::initGlobalInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
-        QnSoapServer::instance()->start();
-    }
-
     void destroySingleToneObjects()
     {
         QThreadPool::globalInstance()->waitForDone();
 
-        QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
-
         QnBusinessRuleProcessor::fini();
-
-        delete QnSoapServer::instance();
-        QnSoapServer::initGlobalInstance( NULL );
     }
 };
 
@@ -1124,18 +1141,17 @@ void stopServer(int signal)
     Q_UNUSED(signal)
 
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance()->stop();
-    QnRecordingManager::instance()->stop();
+    //QnResourceDiscoveryManager::instance()->stop();
+    //QnRecordingManager::instance()->stop();
     if (serviceMainInstance)
     {
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
-    QnVideoCameraPool::instance()->stop();
+    //QnVideoCameraPool::instance()->stop();
     av_lockmgr_register(NULL);
     qApp->quit();
     qSettings.setValue("lastRunningTime", 0);
-    QnResourcePool::instance()->clear();
 }
 
 int main(int argc, char* argv[])
