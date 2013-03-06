@@ -503,10 +503,18 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
+//Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
+static QnRecordingManager* staticInstance = NULL;
+
+void QnRecordingManager::initStaticInstance( QnRecordingManager* recordingManager )
+{
+    staticInstance = recordingManager;
+}
+
 QnRecordingManager* QnRecordingManager::instance()
 {
-    return qn_recordingManager_instance();
+    //return qn_recordingManager_instance();
+    return staticInstance;
 }
 
 // --------------------- QnServerDataProviderFactory -------------------

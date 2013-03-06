@@ -74,7 +74,7 @@ const OnvifNotificationConsumer* QnSoapServer::getService() const
 
 static QnSoapServer* globalInstance = NULL;
 
-void QnSoapServer::initGlobalInstance( QnSoapServer* inst )
+void QnSoapServer::initStaticInstance( QnSoapServer* inst )
 {
     globalInstance = inst;
 }

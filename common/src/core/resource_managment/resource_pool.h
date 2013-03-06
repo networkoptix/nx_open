@@ -41,7 +41,8 @@ public:
     QnResourcePool();
     ~QnResourcePool();
 
-    static QnResourcePool *instance();
+    static void initStaticInstance( QnResourcePool* inst );
+    static QnResourcePool* instance();
 
     // this function will add or update existing resources
     // keeps database ID ( if possible )

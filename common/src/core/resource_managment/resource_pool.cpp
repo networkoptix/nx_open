@@ -15,8 +15,6 @@
 #   define TRACE(...)
 #endif
 
-Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
-
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
@@ -28,16 +26,26 @@ QnResourcePool::QnResourcePool() : QObject(),
 QnResourcePool::~QnResourcePool()
 {
     bool signalsBlocked = blockSignals(false);
-    emit aboutToBeDestroyed();
+    //emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
     QMutexLocker locker(&m_resourcesMtx);
     m_resources.clear();
 }
 
-QnResourcePool *QnResourcePool::instance()
+//Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
+
+static QnResourcePool* resourcePool = NULL;
+
+void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    return globalResourcePool();
+    resourcePool = inst;
+}
+
+QnResourcePool* QnResourcePool::instance()
+{
+    //return globalResourcePool();
+    return resourcePool;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {
