@@ -89,7 +89,7 @@ private:
     //void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
-    void at_storageAddButton_clicked();
+    void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
@@ -97,6 +97,7 @@ private slots:
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
+    QList<QString> m_storageProtocols;
     QLabel *m_tableBottomLabel;
 
     bool m_hasStorageChanges;

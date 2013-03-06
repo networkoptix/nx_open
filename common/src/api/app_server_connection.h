@@ -37,7 +37,7 @@ public:
     virtual ~QnAppServerReplyProcessor();
 
 public slots:
-    void finished(const QnHTTPRawResponse &response, int handle);
+    void processReply(const QnHTTPRawResponse &response, int handle);
 
 signals:
     void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);

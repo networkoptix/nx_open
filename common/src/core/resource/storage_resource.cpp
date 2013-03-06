@@ -38,7 +38,7 @@ void QnStorageResource::addWritedSpace(qint64 value)
 
 Q_GLOBAL_STATIC(QnStoragePluginFactory, inst)
 
-QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultStoragePlugin(0)
+QnStoragePluginFactory::QnStoragePluginFactory(): m_defaultFactory(0)
 {
 }
 
@@ -47,31 +47,31 @@ QnStoragePluginFactory::~QnStoragePluginFactory()
 
 }
 
-QnStoragePluginFactory* QnStoragePluginFactory::instance()
+QnStoragePluginFactory *QnStoragePluginFactory::instance()
 {
     return inst();
 }
 
-void QnStoragePluginFactory::registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol)
+void QnStoragePluginFactory::registerStoragePlugin(const QString &protocol, const StorageResourceFactory &factory, bool isDefaultProtocol)
 {
-    m_storageTypes.insert(name, pluginInst);
+    m_factoryByProtocol.insert(protocol, factory);
     if (isDefaultProtocol)
-        m_defaultStoragePlugin = pluginInst;
+        m_defaultFactory = factory;
 }
 
-QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageType, bool useDefaultForUnknownPrefix)
+QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
 {
-    int prefix = storageType.indexOf(QLatin1String("://"));
-    if (prefix == -1) 
-        return m_defaultStoragePlugin ? m_defaultStoragePlugin() : 0;
+    int index = url.indexOf(QLatin1String("://"));
+    if (index == -1) 
+        return m_defaultFactory ? m_defaultFactory() : NULL;
     
-    QString protocol = storageType.left(prefix);
-    if (m_storageTypes.contains(protocol))
-        return m_storageTypes.value(protocol)();
-    else {
+    QString protocol = url.left(index);
+    if (m_factoryByProtocol.contains(protocol)) {
+        return m_factoryByProtocol.value(protocol)();
+    } else {
         if (useDefaultForUnknownPrefix)
-            return m_defaultStoragePlugin ? m_defaultStoragePlugin() : 0;
+            return m_defaultFactory ? m_defaultFactory() : NULL;
         else
-            return 0;
+            return NULL;
     }
 }

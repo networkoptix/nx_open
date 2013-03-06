@@ -35,10 +35,7 @@ int QnRestFavicoHandler::executePost(const QString& path, const QnRequestParamLi
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestFavicoHandler::description(TCPSocket* tcpSocket) const
+QString QnRestFavicoHandler::description(TCPSocket *) const
 {
-    Q_UNUSED(tcpSocket)
-    QString rez;
-    rez += "Returns favico";
-    return rez;
+    return "Returns favico";
 }

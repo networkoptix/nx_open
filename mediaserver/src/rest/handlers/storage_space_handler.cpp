@@ -17,7 +17,7 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamList &, QByteArray &result, QByteArray &contentType) {
+int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList &, JsonResult &result) {
     QnStorageSpaceReply reply;
 
     QList<QString> storagePaths;
@@ -76,22 +76,14 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
     }
 
 #ifdef Q_OS_WIN
-    reply.storagePlugins.push_back(lit("smb"));
+    reply.storageProtocols.push_back(lit("smb"));
 #endif
     // TODO: #Elric check for other plugins, e.g. coldstore
 
-    QVariantMap root;
-    QJson::serialize(reply, "reply", &root);
-    QJson::serialize(root, &result);
-    contentType = "application/json";
-
+    result.setReply(reply);
     return CODE_OK;
 }
 
-int QnStorageSpaceHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &, QByteArray &result, QByteArray &contentType) {
-    return executeGet(path, params, result, contentType);
-}
-
-QString QnStorageSpaceHandler::description(TCPSocket *tcpSocket) const {
+QString QnStorageSpaceHandler::description(TCPSocket *) const {
     return QString(); // TODO: #Elric
 }

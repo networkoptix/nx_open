@@ -48,7 +48,7 @@ QnAppServerReplyProcessor::~QnAppServerReplyProcessor()
 {
 }
 
-void QnAppServerReplyProcessor::finished(const QnHTTPRawResponse &response, int handle)
+void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle)
 {
     const QByteArray &result = response.data;
     int status = response.status;
@@ -295,7 +295,7 @@ int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList& headers, co
     QObject::connect(processor, SIGNAL(finishedConnect(int, const QByteArray&, QnConnectInfoPtr, int)), target, slot);
 
     QByteArray data;
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, m_objectNameMapper->name(ConnectObject), headers, params, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, m_objectNameMapper->name(ConnectObject), headers, params, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
@@ -490,7 +490,7 @@ int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses,
     QByteArray data;
     m_serializer.serializeLicenses(licenses, data);
 
-    return addObjectAsync(LicenseObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(LicenseObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
@@ -501,7 +501,7 @@ int QnAppServerConnection::saveAsync(const QnKvPairList &kvPairs, QObject *targe
     QByteArray data;
     m_serializer.serializeKvPairs(kvPairs, data);
 
-    return addObjectAsync(KvPairObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(KvPairObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs/*, QObject *target, const char *slot*/)
@@ -512,7 +512,7 @@ int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs/*, QObj
     QByteArray data;
     m_serializer.serializeSettings(kvPairs, data);
 
-    return addObjectAsync(SettingObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(SettingObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 
@@ -521,7 +521,7 @@ int QnAppServerConnection::getResourcesAsync(const QString& args, int object, QO
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, object);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
-    return getObjectsAsync(object, args, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return getObjectsAsync(object, args, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
@@ -529,7 +529,7 @@ int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, LicenseObject);
     QObject::connect(processor, SIGNAL(finishedLicense(int,QByteArray,QnLicenseList,int)), target, slot);
 
-    return getObjectsAsync(LicenseObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return getObjectsAsync(LicenseObject, QString(), processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *slot)
@@ -537,7 +537,7 @@ int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *sl
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, BusinessRuleObject);
     QObject::connect(processor, SIGNAL(finishedBusinessRule(int,QByteArray,QnBusinessEventRules,int)), target, slot);
 
-    return getObjectsAsync(BusinessRuleObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return getObjectsAsync(BusinessRuleObject, QString(), processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::getKvPairsAsync(QObject* target, const char* slot) 
@@ -545,7 +545,7 @@ int QnAppServerConnection::getKvPairsAsync(QObject* target, const char* slot)
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, KvPairObject);
     QObject::connect(processor, SIGNAL(finishedKvPair(int, QByteArray, QnKvPairList, int)), target, slot);
 
-    return getObjectsAsync(KvPairObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return getObjectsAsync(KvPairObject, QString(), processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
@@ -553,7 +553,7 @@ int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, SettingObject);
     QObject::connect(processor, SIGNAL(finishedSetting(int, QByteArray, QnKvPairList, int)), target, slot);
 
-    return getObjectsAsync(SettingObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return getObjectsAsync(SettingObject, QString(), processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
@@ -564,7 +564,7 @@ int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* 
     QByteArray data;
     m_serializer.serialize(userPtr, data);
 
-    return addObjectAsync(UserObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(UserObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnMediaServerResourcePtr& serverPtr, QObject* target, const char* slot)
@@ -575,7 +575,7 @@ int QnAppServerConnection::saveAsync(const QnMediaServerResourcePtr& serverPtr, 
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
-    return addObjectAsync(ServerObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(ServerObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr, QObject* target, const char* slot)
@@ -586,7 +586,7 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr
     QByteArray data;
     m_serializer.serialize(cameraPtr, data);
 
-    return addObjectAsync(CameraObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(CameraObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
@@ -597,7 +597,7 @@ int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject*
     QByteArray data;
     m_serializer.serialize(layout, data);
 
-    return addObjectAsync(LayoutObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(LayoutObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
@@ -608,7 +608,7 @@ int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject
     QByteArray data;
     m_serializer.serializeBusinessRule(rule, data);
 
-    return addObjectAsync(BusinessRuleObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(BusinessRuleObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnLayoutResourceList& layouts, QObject* target, const char* slot)
@@ -619,7 +619,7 @@ int QnAppServerConnection::saveAsync(const QnLayoutResourceList& layouts, QObjec
     QByteArray data;
     m_serializer.serializeLayouts(layouts, data);
 
-    return addObjectAsync(LayoutObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(LayoutObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot)
@@ -630,7 +630,7 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras,
     QByteArray data;
     m_serializer.serializeCameras(cameras, data);
 
-    return addObjectAsync(CameraObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(CameraObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &cameraHistoryItem)
@@ -995,7 +995,7 @@ int QnAppServerConnection::testEmailSettingsAsync(const QnKvPairList &settings, 
     QByteArray data;
     m_serializer.serializeSettings(settings, data);
 
-    return addObjectAsync(TestEmailSettingsObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(TestEmailSettingsObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::sendEmailAsync(const QString& addr, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot)
@@ -1011,7 +1011,7 @@ int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& 
     QByteArray data;
     m_serializer.serializeEmail(to, subject, message, timeout, data);
 
-    return addObjectAsync(EmailObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(EmailObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

@@ -28,6 +28,8 @@
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
 
+#include "storage_url_dialog.h"
+
 namespace {
     const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
     const qint64 minimalReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
@@ -298,6 +300,7 @@ void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &item
     ui->storagesTable->setSpan(0, 0, 1, 4);
     m_tableBottomLabel = new QLabel();
     m_tableBottomLabel->setAlignment(Qt::AlignCenter);
+    connect(m_tableBottomLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_tableBottomLabel_linkActivated()));
     ui->storagesTable->setCellWidget(0, 0, m_tableBottomLabel);
 
     foreach(const QnStorageSpaceData &item, items)
@@ -501,9 +504,19 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnServerSettingsDialog::at_storageAddButton_clicked() {
-    // TODO: #Elric implement me
+void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
+    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
+    dialog->setProtocols(m_storageProtocols);
+    if(dialog->exec() != QDialog::Accepted)
+        return;
 
+    QnStorageSpaceData item = dialog->storage();
+    if(item.storageId != -1)
+        return;
+    item.isUsedForWriting = true;
+    
+    addTableItem(item);
+    
     m_hasStorageChanges = true;
 }
 
@@ -548,6 +561,8 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
     qSort(items.begin(), items.end(), StorageSpaceDataLess());
 
     setTableItems(items);
+
+    m_storageProtocols = reply.storageProtocols;
     m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
 }
 

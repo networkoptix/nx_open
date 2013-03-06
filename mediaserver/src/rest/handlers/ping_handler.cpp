@@ -27,7 +27,5 @@ int QnRestPingHandler::executePost(const QString& path, const QnRequestParamList
 
 QString QnRestPingHandler::description() const
 {
-    QString rez;
-    rez += "Returns server ping message";
-    return rez;
+    return "Returns server ping message";
 }

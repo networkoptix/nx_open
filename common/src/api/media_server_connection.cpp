@@ -1,3 +1,7 @@
+#include "media_server_connection.h"
+
+#include <cstring> /* For std::strstr. */
+
 #include <QDebug>
 #include <QNetworkProxy>
 #include <QNetworkReply>
@@ -7,13 +11,50 @@
 #include "utils/common/request_param.h"
 #include "utils/math/space_mapper.h"
 #include "utils/common/json.h"
+#include "utils/common/enum_name_mapper.h"
 
-#include "media_server_connection.h"
-#include "media_server_connection_p.h"
 #include "session_manager.h"
 
 #include <api/serializer/serializer.h>
 #include <api/media_server_statistics_data.h>
+
+namespace {
+    QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
+        ((StorageStatusObject,      "storageStatus"))
+    );
+
+    QnTimePeriodList parseBinaryTimePeriods(const QByteArray &reply) {
+        QnTimePeriodList result;
+
+        QByteArray localReply = reply;
+        QBuffer buffer(&localReply);
+        buffer.open(QIODevice::ReadOnly);
+
+        char format[3];
+        buffer.read(format, 3);
+        if (QByteArray(format, 3) != "BIN")
+            return result;
+        while (buffer.size() - buffer.pos() >= 12)
+        {
+            qint64 startTimeMs = 0;
+            qint64 durationMs = 0;
+            buffer.read(((char*) &startTimeMs), 6);
+            buffer.read(((char*) &durationMs), 6);
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+            startTimeMs <<= 16;
+            durationMs <<= 16;
+#else
+            startTimeMs >>= 16;
+            durationMs >>= 16;
+#endif
+            result << QnTimePeriod(ntohll(startTimeMs), ntohll(durationMs));
+        }
+
+        return result;
+    }
+
+} // anonymous namespace
+
 
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
@@ -113,40 +154,50 @@ QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 }
 
 
-namespace {
-    // for video server methods
-    QnTimePeriodList parseBinaryTimePeriods(const QByteArray &reply)
-    {
-        QnTimePeriodList result;
 
-        QByteArray localReply = reply;
-        QBuffer buffer(&localReply);
-        buffer.open(QIODevice::ReadOnly);
 
-        char format[3];
-        buffer.read(format, 3);
-        if (QByteArray(format, 3) != "BIN")
-            return result;
-        while (buffer.size() - buffer.pos() >= 12)
-        {
-            qint64 startTimeMs = 0;
-            qint64 durationMs = 0;
-            buffer.read(((char*) &startTimeMs), 6);
-            buffer.read(((char*) &durationMs), 6);
-#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-            startTimeMs <<= 16;
-            durationMs <<= 16;
-#else
-            startTimeMs >>= 16;
-            durationMs >>= 16;
-#endif
-            result << QnTimePeriod(ntohll(startTimeMs), ntohll(durationMs));
+// -------------------------------------------------------------------------- //
+// QnMediaServerReplyProcessor
+// -------------------------------------------------------------------------- //
+QnMediaServerReplyProcessor::QnMediaServerReplyProcessor(int object): 
+    m_object(object) 
+{}
+
+QnMediaServerReplyProcessor::~QnMediaServerReplyProcessor() {
+    return;
+}
+
+void QnMediaServerReplyProcessor::connectNotify(const char *signal) {
+    if(std::strstr(signal, "QVariant")) {
+        m_emitVariant = true;
+    } else {
+        m_emitDefault = true;
+    }
+}
+
+void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
+    switch(m_object) {
+    case StorageStatusObject: {
+        int status = response.status;
+
+        QnStorageStatusReply reply;
+        if(response.status == 0) {
+            QVariantMap map;
+            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
+                status = 1;
+        } else {
+            qnWarning("Could not get storage spaces.", response.errorString);
         }
 
-        return result;
+        emitFinished(status, reply, handle);
+    }
+    default:
+        break; // TODO: #Elric warning?
     }
 
-} // anonymous namespace
+    deleteLater();
+}
+
 
 void detail::QnMediaServerConnectionReplyProcessor::at_replyReceived(int status, const QnTimePeriodList &result, int handle)
 {
@@ -240,15 +291,17 @@ namespace detail
 
 // ---------------------------------- QnMediaServerConnection ---------------------
 
-QnMediaServerConnection::QnMediaServerConnection( const QUrl& mediaServerApiUrl, QObject *parent )
-:
+QnMediaServerConnection::QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent):
     QObject(parent),
     m_url(mediaServerApiUrl),
-    m_proxyPort(0)
+    m_proxyPort(0),
+    m_nameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()))
 {
 }
 
-QnMediaServerConnection::~QnMediaServerConnection() {}
+QnMediaServerConnection::~QnMediaServerConnection() {
+    return;
+}
 
 QnRequestParamList QnMediaServerConnection::createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions)
 {
@@ -696,3 +749,23 @@ void detail::QnMediaServerStorageSpaceReplyProcessor::at_replyReceived(const QnH
 
     emit finished(status, reply, handle);
 }
+
+int QnMediaServerConnection::asyncGetStorageStatus(const QString &storageUrl, QObject *target, const char *slot) {
+    QnMediaServerReplyProcessor *processor = new QnMediaServerReplyProcessor(StorageStatusObject);
+    connect(processor, SIGNAL(finished(int, const QnStorageStatusReply &, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("path", storageUrl);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("storageStatus"), QnRequestHeaderList(), requestParams, processor, SLOT(processReply(QnHTTPRawResponse, int)));
+}
+
+bool QnMediaServerConnection::connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType) {
+    if(strstr(method, "QVariant")) {
+        return base_type::connect(sender, SIGNAL(finished(int, const QVariant &, int)), receiver, method, connectionType);
+    } else {
+        return base_type::connect(sender, signal, receiver, method, connectionType);
+    }
+}
+
+

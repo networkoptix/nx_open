@@ -7,23 +7,14 @@
 
 #include <utils/common/json.h>
 
-struct QnStorageSpaceData {
-	QString path;
-	int storageId;
-	qint64 totalSpace;
-	qint64 freeSpace;
-    qint64 reservedSpace;
-    bool isWritable;
-    bool isUsedForWriting;
-};
+#include "storage_status_reply.h"
 
 struct QnStorageSpaceReply {
     QList<QnStorageSpaceData> storages;
-    QList<QString> storagePlugins;
+    QList<QString> storageProtocols;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isWritable)(isUsedForWriting), inline)
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storagePlugins), inline)
+QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storageProtocols), inline)
 
 Q_DECLARE_METATYPE(QnStorageSpaceReply);
 
