@@ -1088,7 +1088,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     QnResourceList eventResources;
     for (int i = 0; i < pb_businessRule.eventresource_size(); i++) {
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i));
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::rfAllResources);
         if (resource)
             eventResources << resource;
         else
