@@ -40,6 +40,7 @@ namespace {
     const int FreeSpaceRole = Qt::UserRole + 1;
     const int TotalSpaceRole = Qt::UserRole + 2;
     const int StorageIdRole = Qt::UserRole + 3;
+    const int ExternalRole = Qt::UserRole + 4;
 
     enum Column {
         CheckBoxColumn,
@@ -272,6 +273,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setFlags(flags);
     checkBoxItem->setCheckState(item.isUsedForWriting && item.isWritable ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, item.storageId);
+    checkBoxItem->setData(ExternalRole, item.isExternal);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -316,6 +318,7 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
         item.isWritable = ui->storagesTable->item(row, CheckBoxColumn)->flags() & Qt::ItemIsEnabled;
         item.isUsedForWriting = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
         item.storageId = qvariant_cast<int>(ui->storagesTable->item(row, CheckBoxColumn)->data(StorageIdRole), -1);
+        item.isExternal = qvariant_cast<bool>(ui->storagesTable->item(row, CheckBoxColumn)->data(ExternalRole), true);
 
         item.path = ui->storagesTable->item(row, PathColumn)->text();
 
@@ -356,7 +359,7 @@ void QnServerSettingsDialog::submitToResources() {
 
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && item.storageId == -1) {
+            if(!item.isUsedForWriting && (item.storageId == -1 || item.isExternal)) {
                 serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
                 continue;
             }
@@ -514,6 +517,7 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
     if(item.storageId != -1)
         return;
     item.isUsedForWriting = true;
+    item.isExternal = true;
     
     addTableItem(item);
     

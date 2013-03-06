@@ -41,6 +41,7 @@ int QnFileSystemHandler::executeGet(const QString &, const QnRequestParamList &p
     reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
     reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
+    reply.storage.isExternal = storageUrl.contains(QLatin1String("://")) || storageUrl.trimmed().startsWith(QLatin1String("\\\\")); // TODO: #Elric not consistent with space_handler
     reply.storage.isWritable = storage ? storage->isStorageAvailableForWriting() : false;
     reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
         
