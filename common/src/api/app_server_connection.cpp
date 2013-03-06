@@ -1098,7 +1098,7 @@ int QnAppServerConnection::restoreDatabase(const QByteArray& data, QObject *targ
     return QnSessionManager::instance()->sendAsyncPostRequest(m_url, m_objectNameMapper->name(RestoreDbObject), m_requestHeaders, m_requestParams, data, target, slot);
 }
 
-bool QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
+int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction, QObject *target, const char *slot)
 {
     m_lastError.clear();
 
@@ -1108,13 +1108,7 @@ bool QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActi
     QByteArray body;
     m_serializer.serializeBusinessAction(businessAction, body);
 
-    QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendPostRequest(m_url, m_objectNameMapper->name(BusinessActionObject), requestHeaders, requestParams, body, response);
-
-    if (result)
-        m_lastError = response.errorString;
-
-    return result;
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, m_objectNameMapper->name(BusinessActionObject), requestHeaders, requestParams, body, target, slot);
 }
 
 int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)

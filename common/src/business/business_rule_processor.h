@@ -62,6 +62,7 @@ protected slots:
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
+    void at_sendPopupFinished(QnHTTPRawResponse response, int handle);
     void at_sendEmailFinished(int status, const QByteArray& errorString, bool result, int handle);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);

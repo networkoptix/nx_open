@@ -394,14 +394,18 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray 
 
 }
 
+void QnBusinessRuleProcessor::at_sendPopupFinished(QnHTTPRawResponse response, int handle)
+{
+    if (response.status == 0)
+        return;
+
+    qWarning() << "error delivering popup message #" << handle << "error:" << response.errorString;
+}
+
 bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if( appServerConnection->broadcastBusinessAction(action))
-    {
-        qWarning() << "Error processing action broadcastBusinessAction";
-        return false;
-    }
+    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_sendPopupFinished(QnHTTPRawResponse, int)));
     return true;
 }
 

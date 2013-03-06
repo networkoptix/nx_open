@@ -147,7 +147,7 @@ public:
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
-    bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    int broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction, QObject *target, const char *slot);
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
