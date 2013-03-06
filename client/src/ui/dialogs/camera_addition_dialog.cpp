@@ -7,7 +7,7 @@
 
 #include <core/resource/media_server_resource.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -62,9 +62,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
     connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
 
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->validateLabelSearch->setPalette(palette);
+    setWarningStyle(ui->validateLabelSearch);
 
     updateSubnetMode();
 }

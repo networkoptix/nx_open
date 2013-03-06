@@ -5,24 +5,24 @@
 
 //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
-
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <licensing/license.h>
 
-#include <utils/math/color_transformations.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/export_camera_settings_dialog.h>
-#include <ui/style/globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/math/color_transformations.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -530,7 +530,7 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 
     QPalette palette = this->palette();
     if(used > total)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
     ui->licensesLabel->setPalette(palette);
 
     QString usageText = tr("%n license(s) are used out of %1.", NULL, used).arg(total);

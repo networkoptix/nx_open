@@ -17,7 +17,7 @@
 #include <core/resource_managment/resource_pool.h>
 #include <common/customization.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
@@ -93,7 +93,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     QPalette palette = this->palette();
     if(useRedLabel)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
     ui->infoLabel->setPalette(palette);
 }
 

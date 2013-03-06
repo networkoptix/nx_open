@@ -7,7 +7,7 @@
 #include <licensing/license.h>
 
 #include <ui/models/resource_pool_model.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 
 
@@ -28,9 +28,7 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
 
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->motionLabel->setPalette(palette);
+    setWarningStyle(ui->motionLabel);
     ui->motionLabel->setVisible(false);
 
     at_resourceModel_dataChanged();
@@ -106,7 +104,7 @@ void QnExportCameraSettingsDialog::updateLicensesStatus(){
 
     QPalette palette = this->palette();
     if(used > total)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
     ui->licenseLabel->setPalette(palette);
 
     QString usageText = tr("%n license(s) will be used out of %1.", NULL, used).arg(total);
