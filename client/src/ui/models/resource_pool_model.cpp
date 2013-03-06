@@ -472,13 +472,13 @@ public:
         changeInternal();
     }
 
-    Node *recorder(QString groupName) {
-        if (m_recorders.contains(groupName))
-            return m_recorders[groupName];
+    Node *recorder(const QString &groupId, const QString &groupName) {
+        if (m_recorders.contains(groupId))
+            return m_recorders[groupId];
 
         Node* recorder = new Node(m_model, Qn::RecorderNode, groupName);
         recorder->setParent(this);
-        m_recorders[groupName] = recorder;
+        m_recorders[groupId] = recorder;
         return recorder;
     }
 
@@ -731,15 +731,17 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
 
         Node* parent = this->node(parentResource);
 
-        //TODO: #GDM remove debug
-        //QString groupName = node->resource()->getName().contains(QLatin1String("31")) ? QLatin1String("Debug Recorder") : QString();
         QnSecurityCamResourcePtr camRes = node->resource().dynamicCast<QnSecurityCamResource>();
+        QString groupId;
         QString groupName;
-        if (camRes)
+        if (camRes) {
             groupName = camRes->getGroupName();
-        if (groupName.isEmpty())
+            groupId = camRes->getGroupId();
+            qDebug() << camRes->getName() << camRes->getGroupId() << camRes->getGroupName();
+        }
+        if (groupId.isEmpty())
             return parent;
-        return parent->recorder(groupName);
+        return parent->recorder(groupId, groupName);
     }
 }
 
