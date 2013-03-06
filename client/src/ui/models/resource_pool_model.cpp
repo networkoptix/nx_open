@@ -15,6 +15,7 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/common/resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_item.h>
@@ -33,16 +34,6 @@ namespace {
             if(r.contains(s))
                 return true;
         return false;
-    }
-
-    QString extractHost(const QString &url) {
-        /* Try it as a host address first. */
-        QHostAddress hostAddress(url);
-        if(!hostAddress.isNull())
-            return hostAddress.toString();
-
-        /* Then go default QUrl route. */
-        return QUrl(url).host();
     }
 
 } // namespace
@@ -187,19 +178,12 @@ public:
                 m_searchString = QString();
                 m_icon = QIcon();
             } else {
-                m_displayName = m_name = m_resource->getName();
+                m_name = m_resource->getName();
                 m_flags = m_resource->flags();
                 m_status = m_resource->getStatus();
                 m_searchString = m_resource->toSearchString();
                 m_icon = qnResIconCache->icon(m_flags, m_status);
-
-                if(m_model->m_urlsShown) {
-                    if((m_flags & QnResource::network) || (m_flags & QnResource::server && m_flags & QnResource::remote)) {
-                        QString host = extractHost(m_resource->getUrl());
-                        if(!host.isEmpty())
-                            m_displayName = tr("%1 (%2)").arg(m_name).arg(host);
-                    }
-                }
+                m_displayName = getResourceName(m_resource);
             }
         }
 
