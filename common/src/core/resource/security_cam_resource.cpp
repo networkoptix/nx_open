@@ -513,3 +513,27 @@ void QnSecurityCamResource::recordingEventDetached()
 {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
 }
+
+QString QnSecurityCamResource::getGroupName() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_groupName;
+}
+
+void QnSecurityCamResource::setGroupName(const QString& value)
+{
+    QMutexLocker lk( &m_mutex );
+    m_groupName = value;
+}
+
+QString QnSecurityCamResource::getGroupId() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_groupId;
+}
+
+void QnSecurityCamResource::setGroupId(const QString& value)
+{
+    QMutexLocker lk( &m_mutex );
+    m_groupId = value;
+}
