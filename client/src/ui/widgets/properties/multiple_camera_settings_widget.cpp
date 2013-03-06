@@ -5,16 +5,18 @@
 
 #include <QtGui/QMessageBox>
 
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
-#include "ui/common/read_only.h"
-#include "ui/widgets/properties/camera_schedule_widget.h"
-#include "ui/widgets/properties/camera_motion_mask_widget.h"
-#include "ui/graphics/items/resource/resource_widget.h"
-
 //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+
+#include <ui/common/read_only.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/style/warning_style.h>
+#include <ui/widgets/properties/camera_schedule_widget.h>
+#include <ui/widgets/properties/camera_motion_mask_widget.h>
+
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
@@ -42,6 +44,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
+
+    setWarningStyle(ui->dtsViewWarningLabel);
 
     updateFromResources();
 }
@@ -145,6 +149,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setChangesDisabled(true);
         ui->cameraScheduleWidget->setMotionAvailable(false);
+        ui->dtsViewCheckBox->setVisible(false);
+        ui->dtsViewWarningLabel->setVisible(false);
     } else {
         /* Aggregate camera parameters first. */
 
@@ -155,6 +161,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->checkBoxEnableAudio->setEnabled(true);
     
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
+        ui->dtsViewCheckBox->setVisible(false);
+        ui->dtsViewWarningLabel->setVisible(false);
 
         bool firstCamera = true;
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
@@ -165,8 +173,11 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             if (!camera->isAudioSupported())
                 ui->checkBoxEnableAudio->setEnabled(false);
 
-            if (camera->isDtsBased())
+            if (camera->isDtsBased()) {
                 ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
+                ui->dtsViewCheckBox->setVisible(true);
+                ui->dtsViewWarningLabel->setVisible(true);
+            }
 
             Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
             if (firstCamera) {

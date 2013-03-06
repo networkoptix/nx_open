@@ -18,6 +18,7 @@
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/style/warning_style.h>
 
 //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -78,6 +79,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
+
+    setWarningStyle(ui->dtsViewWarningLabel);
 
     updateFromResource();
 }
@@ -336,6 +339,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
+        ui->dtsViewCheckBox->setVisible(false);
+        ui->dtsViewWarningLabel->setVisible(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
 
@@ -388,6 +393,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedSettingsTab, !dtsBased);
+        ui->dtsViewCheckBox->setVisible(dtsBased);
+        ui->dtsViewWarningLabel->setVisible(dtsBased);
     }
 
     updateMotionWidgetFromResource();
