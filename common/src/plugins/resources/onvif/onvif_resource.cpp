@@ -1894,7 +1894,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
     return false;
 }
 
-const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnOnvifStreamReader* onvifReader = dynamic_cast<const QnOnvifStreamReader*>(dataProvider);
