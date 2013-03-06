@@ -30,11 +30,6 @@ public:
     void removeAbsentStorages(QnAbstractStorageResourceList newStorages);
     void addStorage(QnStorageResourcePtr storage);
 
-    /**
-     * Check that there is at least one storage available for writing.
-     */
-    void checkStorages();
-
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
     bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);

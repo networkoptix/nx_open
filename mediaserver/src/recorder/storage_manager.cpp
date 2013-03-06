@@ -191,11 +191,6 @@ void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
     }
 }
 
-void QnStorageManager::checkStorages() {
-    if (getWritableStorages().isEmpty())
-        emit noStoragesAvailable();
-}
-
 bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
 {
     foreach(const QnAbstractStorageResourcePtr& storage, storages)
@@ -428,7 +423,10 @@ void QnStorageManager::updateStorageStatistics()
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
+    if (!m_isWritableStorageAvail)
+        emit noStoragesAvailable();
     m_storagesStatisticsReady = true;
+    m_warnSended = false;
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
