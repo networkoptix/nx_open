@@ -28,6 +28,7 @@ class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
+class QnCameraAdditionDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
 
@@ -198,6 +199,10 @@ protected:
 
     QnPopupCollectionWidget *popupCollectionWidget() const {
         return m_popupCollectionWidget.data();
+    }
+
+    QnCameraAdditionDialog *cameraAdditionDialog() const {
+        return m_cameraAdditionDialog.data();
     }
 
 protected slots:
@@ -383,6 +388,7 @@ private:
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
+    QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

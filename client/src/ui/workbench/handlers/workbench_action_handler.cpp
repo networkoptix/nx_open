@@ -335,6 +335,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     if (popupCollectionWidget())
         delete popupCollectionWidget();
 
+    if (cameraAdditionDialog())
+        delete cameraAdditionDialog();
+
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
 }
@@ -1409,37 +1412,11 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
-//    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
         m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
         newlyCreated = true;
-/*
-        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
-        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
-        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
-        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
-        */
     }
-/*
-    if(cameraSettingsDialog()->widget()->resources() != resources) {
-        if(cameraSettingsDialog()->isVisible() && (
-           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
-        {
-            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-                widget(),
-                QnResourceList(cameraSettingsDialog()->widget()->resources()),
-                tr("Camera(s) not Saved"),
-                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
-                QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-            if(button == QDialogButtonBox::Yes)
-                saveCameraSettingsFromDialog();
-        }
-    }*/
-//    cameraSettingsDialog()->widget()->setResources(resources);
-//    updateCameraSettingsEditibility();
-
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     if(!newlyCreated)
@@ -1876,9 +1853,15 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
     if(resources.size() != 1)
         return;
 
-    QScopedPointer<QnCameraAdditionDialog> dialog(new QnCameraAdditionDialog(resources[0], widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    bool newlyCreated = false;
+    if(!cameraAdditionDialog()) {
+        m_cameraAdditionDialog = new QnCameraAdditionDialog(resources[0], widget());
+        newlyCreated = true;
+    }
+    QRect oldGeometry = cameraAdditionDialog()->geometry();
+    cameraAdditionDialog()->show();
+    if(!newlyCreated)
+        cameraAdditionDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
