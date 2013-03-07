@@ -130,9 +130,6 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
         // flags can be set if analog and dts-based cameras are selected together
         // and checkBox "Use Analog License" was checked
-        if (camera->isDtsBased())
-            continue;
-
         if (camera->isAnalog()) {
             if (ui->analogViewCheckBox->checkState() != Qt::PartiallyChecked)
                 camera->setScheduleDisabled(ui->analogViewCheckBox->checkState() == Qt::Checked);

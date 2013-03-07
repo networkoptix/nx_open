@@ -283,7 +283,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
     setChannelLayout(qn_resourceWidget_defaultContentLayout());
 
-
     /* Init static text. */
     m_noDataStaticText.setText(tr("NO DATA"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -295,6 +294,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_analogLicenseStaticText.setText(tr("This camera requires analog license to be watched"));
+    m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
 
     /* Run handlers. */
@@ -890,6 +891,9 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     } else if (overlay == UnauthorizedOverlay) {
         paintFlashingText(painter, m_unauthorizedStaticText, 0.1);
         paintFlashingText(painter, m_unauthorizedStaticText2, 0.025, QPointF(0.0, 0.1));
+    } else if (overlay == AnalogWithoutLicenseOverlay) {
+        for (int i = -5; i < 6; i++)
+            paintFlashingText(painter, m_analogLicenseStaticText, 0.025, QPointF(0.0, 0.05*i));
     }
 
 }
