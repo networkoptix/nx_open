@@ -39,6 +39,10 @@ public slots:
 signals:
     void finished(int status, const QVariant &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
+    void finished(int status, const QnStorageSpaceReply &reply, int handle);
+    void finished(int status, const QnTimePeriodList &reply, int handle);
+    void finished(int status, const QnStatisticsDataList &reply, int handle);
+    void finished(int status, const QnPtzSpaceMapper &reply, int handle);
 
 protected:
     virtual void connectNotify(const char *signal) override;
@@ -86,18 +90,6 @@ private:
 
 namespace detail {
     // TODO: #Elric merge into single processor
-    class QnMediaServerConnectionReplyProcessor: public QObject {
-        Q_OBJECT;
-    public:
-        QnMediaServerConnectionReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-        public slots:
-            void at_replyReceived(int status, const QnTimePeriodList &result, int handle);
-
-    signals:
-            void finished(int, const QnTimePeriodList &timePeriods, int handle);
-    };
-
     class QnMediaServerSimpleReplyProcessor: public QObject
     {
         Q_OBJECT;
@@ -109,32 +101,6 @@ namespace detail {
 
     signals:
         void finished(int status, int handle);
-    };
-
-    class QnMediaServerTimePeriodsReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerTimePeriodsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, const QnTimePeriodList& timePeriods, int handle);
-    };
-
-    class QnMediaServerStatisticsReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
-
-    signals:
-        void finished(const QnStatisticsDataList &/* usage data */);
     };
 
     class QnMediaServerManualCameraReplyProcessor: public QObject
@@ -226,30 +192,6 @@ namespace detail {
 
     signals:
         void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
-    };
-
-    class QnMediaServerPtzGetSpaceMapperReplyProcessor: public QObject {
-        Q_OBJECT
-    public:
-        QnMediaServerPtzGetSpaceMapperReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
-
-    signals:
-        void finished(int status, const QnPtzSpaceMapper &mapper, int handle);
-    };
-
-    class QnMediaServerStorageSpaceReplyProcessor: public QObject {
-        Q_OBJECT;
-    public:
-        QnMediaServerStorageSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
-
-    signals:
-        void finished(int status, const QnStorageSpaceReply &reply, int handle);
     };
 
 } // namespace detail
@@ -345,8 +287,9 @@ protected:
 
 private:
     int recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &timePeriodList, QByteArray &errorString);
-
     int asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot);
+
+    int sendAsyncRequest(QnMediaServerReplyProcessor *processor, const QnRequestParamList &params = QnRequestParamList(), const QnRequestHeaderList &headers = QnRequestHeaderList());
 
 private:
     QScopedPointer<QnEnumNameMapper> m_nameMapper;
