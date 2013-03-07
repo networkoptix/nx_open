@@ -124,7 +124,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             resource->updateToChannel(channel-1);
 
         if (rpResource->getMaxChannels() > 1 ) {
-            resource->setGroupId(resource->getPhysicalId());
+            resource->setGroupId(rpResource->getPhysicalId());
             resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
         }
 
