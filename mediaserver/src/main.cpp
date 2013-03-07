@@ -1061,7 +1061,7 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
-delete QnSoapServer::instance();
+    delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
 }
 
