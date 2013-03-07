@@ -216,9 +216,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    bool storagesAvailable = qnStorageMan->isWritableStoragesAvailable();
-
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && storagesAvailable)
+    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline)
     {
         if (providerHi)
         {
