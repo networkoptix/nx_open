@@ -52,9 +52,26 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         {
             QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
             if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getGuid() != getGuid())
-                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
-            else
+            {
+                // delivery to other server
+                QUrl serverUrl = routeToServer->getApiUrl();
+                QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
+#if 0
+                // do proxy via EC builtin proxy. It is dosn't work. I don't know why
+                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+#else
+                // do proxy via CPP media proxy
+                proxyUrl.setScheme(QLatin1String("http"));
+                proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
+                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+#endif
+
+                QString url = proxyUrl.toString();
+                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], url); 
+            }
+            else {
                 executeActionInternal(action, resList[i]);
+            }
         }
     }
 }
@@ -135,7 +152,8 @@ void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
     QMutexLocker lock(&m_mutex);
     m_rules << value;
 
-    notifyResourcesAboutEventIfNeccessary( value, true );
+    if( !value->disabled() )
+        notifyResourcesAboutEventIfNeccessary( value, true );
 }
 
 void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bEvent)
@@ -393,14 +411,18 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, const QByteArray 
 
 }
 
+void QnBusinessRuleProcessor::at_sendPopupFinished(QnHTTPRawResponse response, int handle)
+{
+    if (response.status == 0)
+        return;
+
+    qWarning() << "error delivering popup message #" << handle << "error:" << response.errorString;
+}
+
 bool QnBusinessRuleProcessor::showPopup(QnPopupBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if( appServerConnection->broadcastBusinessAction(action))
-    {
-        qWarning() << "Error processing action broadcastBusinessAction";
-        return false;
-    }
+    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_sendPopupFinished(QnHTTPRawResponse, int)));
     return true;
 }
 
@@ -411,15 +433,20 @@ void QnBusinessRuleProcessor::at_businessRuleChanged(QnBusinessEventRulePtr bRul
     {
         if (m_rules[i]->id() == bRule->id())
         {
-            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
-            notifyResourcesAboutEventIfNeccessary( bRule, true );
+            if( !m_rules[i]->disabled() )
+                notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+            if( !bRule->disabled() )
+                notifyResourcesAboutEventIfNeccessary( bRule, true );
             terminateRunningRule(m_rules[i]);
             m_rules[i] = bRule;
             return;
         }
     }
+
+    //adding new rule
     m_rules << bRule;
-    notifyResourcesAboutEventIfNeccessary( bRule, true );
+    if( !bRule->disabled() )
+        notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
 void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
@@ -463,7 +490,8 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
     {
         if (m_rules[i]->id() == id)
         {
-            notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
+            if( !m_rules[i]->disabled() )
+                notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);
             break;

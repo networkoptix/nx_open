@@ -123,7 +123,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        QString userName = resource->getAuth().user();
+        if (rpResource->getMaxChannels() > 1 ) {
+            resource->setGroupId(resource->getPhysicalId());
+            resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+        }
 
         resList << resource;
         return resList;
@@ -162,11 +165,17 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             // checking for multichannel encoders
             if (doMultichannelCheck)
             {
+                if (resource->getMaxChannels() > 1)
+                {
+                    resource->setGroupId(resource->getPhysicalId());
+                    resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+                }
+
                 for (int i = 1; i < resource->getMaxChannels(); ++i) 
                 {
                     QnPlOnvifResourcePtr res(new QnPlOnvifResource());
                     res->setPhysicalId(resource->getPhysicalId());
-                    res->update(resource);
+                    res->update(resource, true);
                     res->updateToChannel(i);
                     resList << res;
                 }

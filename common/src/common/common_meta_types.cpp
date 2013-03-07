@@ -9,6 +9,7 @@
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
+#include <api/model/storage_status_reply.h>
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
 #include <api/media_server_statistics_data.h>
@@ -101,6 +102,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnAbstractDataPacketPtr>();
 
     qRegisterMetaType<QnStorageSpaceReply>();
+    qRegisterMetaType<QnStorageStatusReply>();
     
     qn_commonMetaTypes_initialized = true;
 }

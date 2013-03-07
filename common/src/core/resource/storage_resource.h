@@ -123,22 +123,23 @@ private:
     mutable QMutex m_writedSpaceMtx;
 };
 
-typedef QnStorageResource* (*StorageTypeInstance)();
 
 class QnStoragePluginFactory
 {
 public:
+    typedef QnStorageResource *(*StorageResourceFactory)();
+
     QnStoragePluginFactory();
     virtual ~QnStoragePluginFactory();
-    static QnStoragePluginFactory* instance();
+    static QnStoragePluginFactory *instance();
 
-    void registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol = false);
-    QnStorageResource* createStorage(const QString& storageType, bool useDefaultForUnknownPrefix = true);
+    void registerStoragePlugin(const QString &protocol, const StorageResourceFactory &factory, bool isDefaultProtocol = false);
+    QnStorageResource *createStorage(const QString &url, bool useDefaultForUnknownPrefix = true);
 
 private:
-    QMap<QString, StorageTypeInstance> m_storageTypes;
-    StorageTypeInstance m_defaultStoragePlugin;
-    QMutex m_mutex;
+    QHash<QString, StorageResourceFactory> m_factoryByProtocol;
+    StorageResourceFactory m_defaultFactory;
+    QMutex m_mutex; // TODO: #VASILENKO this mutex is not used, is it intentional?
 };
 
 #endif // QN_STORAGE_RESOURCE_H

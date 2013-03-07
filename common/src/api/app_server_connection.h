@@ -1,5 +1,5 @@
-#ifndef APPSERVERCONNECTIONIMPL_H
-#define APPSERVERCONNECTIONIMPL_H
+#ifndef QN_APP_SERVER_CONNECTION_H
+#define QN_APP_SERVER_CONNECTION_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
@@ -37,7 +37,7 @@ public:
     virtual ~QnAppServerReplyProcessor();
 
 public slots:
-    void finished(const QnHTTPRawResponse &response, int handle);
+    void processReply(const QnHTTPRawResponse &response, int handle);
 
 signals:
     void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
@@ -147,7 +147,7 @@ public:
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
-    bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    int broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction, QObject *target, const char *slot);
 
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
@@ -219,4 +219,4 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
 bool initLicenses(QnAppServerConnectionPtr appServerConnection);
 bool initCameraHistory(QnAppServerConnectionPtr appServerConnection);
 
-#endif // APPSERVERCONNECTIONIMPL_H
+#endif // QN_APP_SERVER_CONNECTION_H

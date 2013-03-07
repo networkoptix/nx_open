@@ -423,7 +423,10 @@ void QnStorageManager::updateStorageStatistics()
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
+    if (!m_isWritableStorageAvail)
+        emit noStoragesAvailable();
     m_storagesStatisticsReady = true;
+    m_warnSended = false;
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)

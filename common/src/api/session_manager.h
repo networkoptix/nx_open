@@ -30,6 +30,7 @@ private:
     QWaitCondition m_condition;
 };
 
+
 class QnSessionManagerAsyncReplyProcessor: public QObject {
     Q_OBJECT
 

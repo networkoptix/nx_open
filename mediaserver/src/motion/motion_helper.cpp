@@ -7,6 +7,7 @@
 #include "recorder/file_deletor.h"
 #include "serverutil.h"
 
+
 QnMotionHelper::QnMotionHelper()
 {
 }
@@ -76,11 +77,18 @@ QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnReso
     return QnTimePeriod::mergeTimePeriods(data);
 }
 
-Q_GLOBAL_STATIC(QnMotionHelper, inst);
+//Q_GLOBAL_STATIC(QnMotionHelper, inst);
+static QnMotionHelper* globalInstance = NULL;
+
+void QnMotionHelper::initStaticInstance( QnMotionHelper* inst )
+{
+    globalInstance = inst;
+}
 
 QnMotionHelper* QnMotionHelper::instance()
 {
-    return inst();
+    return globalInstance;
+    //return inst();
 }
 
 QString QnMotionHelper::getBaseDir(const QString& macAddress)

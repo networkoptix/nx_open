@@ -17,17 +17,36 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamList &, QByteArray &result, QByteArray &contentType) {
+int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList &, JsonResult &result) {
     QnStorageSpaceReply reply;
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo();
+    for(int i = 0; i < partitions.size(); i++) {
+        QString path = QDir::toNativeSeparators(partitions[i].path);
+        if(!path.endsWith(QDir::separator()))
+            path.append(QDir::separator());
+        partitions[i].path = path;
+    }
 
     QList<QString> storagePaths;
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
+        QString path = QDir::toNativeSeparators(storage->getUrl());
+        
+        bool hasPartition = false;
+        foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
+            if(path.startsWith(partition.path)) {
+                hasPartition = true;
+                break;
+            }
+        }
+
         QnStorageSpaceData data;
-        data.path = QDir::toNativeSeparators(storage->getUrl());
+        data.path = storage->getUrl();
         data.storageId = storage->getId();
         data.totalSpace = storage->getTotalSpace();
         data.freeSpace = storage->getFreeSpace();
         data.reservedSpace = storage->getSpaceLimit();
+        data.isExternal = !hasPartition;
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
@@ -38,17 +57,13 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
             data.freeSpace = -1;
 
         reply.storages.push_back(data);
-        storagePaths.push_back(data.path);
+        storagePaths.push_back(path);
     }
 
-    foreach(const QnPlatformMonitor::PartitionSpace &partition, m_monitor->totalPartitionSpaceInfo()) {
-        QString path = QDir::toNativeSeparators(partition.path);
-        if(!path.endsWith(QDir::separator()))
-            path.append(QDir::separator());
-
+    foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
         bool hasStorage = false;
         foreach(const QString &storagePath, storagePaths) {
-            if(storagePath.startsWith(path)) {
+            if(storagePath.startsWith(partition.path)) {
                 hasStorage = true;
                 break;
             }
@@ -57,11 +72,12 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
             continue;
 
         QnStorageSpaceData data;
-        data.path = path + lit(QN_MEDIA_FOLDER_NAME);
+        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME);
         data.storageId = -1;
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = -1;
+        data.isExternal = false;
         data.isUsedForWriting = false;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
@@ -76,22 +92,14 @@ int QnStorageSpaceHandler::executeGet(const QString &path, const QnRequestParamL
     }
 
 #ifdef Q_OS_WIN
-    reply.storagePlugins.push_back(lit("smb"));
+    reply.storageProtocols.push_back(lit("smb"));
 #endif
     // TODO: #Elric check for other plugins, e.g. coldstore
 
-    QVariantMap root;
-    QJson::serialize(reply, "reply", &root);
-    QJson::serialize(root, &result);
-    contentType = "application/json";
-
+    result.setReply(reply);
     return CODE_OK;
 }
 
-int QnStorageSpaceHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &, QByteArray &result, QByteArray &contentType) {
-    return executeGet(path, params, result, contentType);
-}
-
-QString QnStorageSpaceHandler::description(TCPSocket *tcpSocket) const {
+QString QnStorageSpaceHandler::description(TCPSocket *) const {
     return QString(); // TODO: #Elric
 }

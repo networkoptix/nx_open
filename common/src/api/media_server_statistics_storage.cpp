@@ -53,11 +53,14 @@ void QnMediaServerStatisticsStorage::update() {
             return;
     }
 
-    m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataList &)));
+    m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(int, const QnStatisticsDataList &, int)));
     m_alreadyUpdating = true;
 }
 
-void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data) {
+void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsDataList &data, int handle) {
+    if(status != 0)
+        return;
+
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 

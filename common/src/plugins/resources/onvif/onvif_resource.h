@@ -169,7 +169,7 @@ public:
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
-    const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);

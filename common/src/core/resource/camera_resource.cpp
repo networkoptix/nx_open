@@ -66,6 +66,7 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
         m_scheduleDisabled = camera->isScheduleDisabled();
         m_audioEnabled = camera->isAudioEnabled();
         m_manuallyAdded = camera->isManuallyAdded();
+        m_model = camera->m_model;
     }
 }
 

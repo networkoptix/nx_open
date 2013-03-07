@@ -28,6 +28,7 @@ class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
+class QnCameraAdditionDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
 
@@ -186,7 +187,7 @@ protected:
 
     void rotateItems(int degrees);
 
-    void setItemsResolutionMode(Qn::ResolutionMode resolutionMode);
+    void setResolutionMode(Qn::ResolutionMode resolutionMode);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
@@ -200,6 +201,10 @@ protected:
         return m_popupCollectionWidget.data();
     }
 
+    QnCameraAdditionDialog *cameraAdditionDialog() const {
+        return m_cameraAdditionDialog.data();
+    }
+
 protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
@@ -211,6 +216,7 @@ protected slots:
     void at_workbench_layoutsChanged();
     void at_workbench_cellAspectRatioChanged();
     void at_workbench_cellSpacingChanged();
+    void at_workbench_currentLayoutChanged();
 
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();
@@ -383,6 +389,7 @@ private:
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
+    QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */

@@ -39,6 +39,7 @@
 #include <client/client_connection_data.h>
 
 #include <recording/time_period_list.h>
+#include <redass/redass_controller.h>
 
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -181,7 +182,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
-    connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -191,8 +191,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
+    connect(workbench(),                                        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
@@ -334,6 +336,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (popupCollectionWidget())
         delete popupCollectionWidget();
+
+    if (cameraAdditionDialog())
+        delete cameraAdditionDialog();
 
     if (m_layoutExportCamera)
         m_layoutExportCamera->deleteLater();
@@ -710,14 +715,8 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
     }
 }
 
-void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    foreach (QnResourceWidget* widget, widgets) {
-        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-        if (!mediaWidget)
-            continue;
-        //TODO: #vasilenko #gdm call redAssController method
-    }
+void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
+    qnRedAssController->setMode(resolutionMode);
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -846,6 +845,10 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
         action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     else
         action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
+}
+
+void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
+    qnRedAssController->setMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
@@ -1409,37 +1412,11 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
-//    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
         m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
         newlyCreated = true;
-/*
-        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
-        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
-        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
-        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
-        */
     }
-/*
-    if(cameraSettingsDialog()->widget()->resources() != resources) {
-        if(cameraSettingsDialog()->isVisible() && (
-           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
-        {
-            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-                widget(),
-                QnResourceList(cameraSettingsDialog()->widget()->resources()),
-                tr("Camera(s) not Saved"),
-                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
-                QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-            if(button == QDialogButtonBox::Yes)
-                saveCameraSettingsFromDialog();
-        }
-    }*/
-//    cameraSettingsDialog()->widget()->setResources(resources);
-//    updateCameraSettingsEditibility();
-
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     if(!newlyCreated)
@@ -1876,9 +1853,15 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
     if(resources.size() != 1)
         return;
 
-    QScopedPointer<QnCameraAdditionDialog> dialog(new QnCameraAdditionDialog(resources[0], widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    bool newlyCreated = false;
+    if(!cameraAdditionDialog()) {
+        m_cameraAdditionDialog = new QnCameraAdditionDialog(resources[0], widget());
+        newlyCreated = true;
+    }
+    QRect oldGeometry = cameraAdditionDialog()->geometry();
+    cameraAdditionDialog()->show();
+    if(!newlyCreated)
+        cameraAdditionDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
@@ -3047,15 +3030,15 @@ void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_radassAutoAction_triggered() {
-    setItemsResolutionMode(Qn::AutoResolution);
+    setResolutionMode(Qn::AutoResolution);
 }
 
 void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
-    setItemsResolutionMode(Qn::LowResolution);
+    setResolutionMode(Qn::LowResolution);
 }
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
-    setItemsResolutionMode(Qn::HighResolution);
+    setResolutionMode(Qn::HighResolution);
 }
 
 void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
@@ -3079,6 +3062,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
             tr("Could not get position from camera"), 
             tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
         );
+        return;
     }
 
     bool ok = false;

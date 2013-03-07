@@ -28,6 +28,10 @@
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
 
+#include "storage_url_dialog.h"
+
+//#define QN_SHOW_ARCHIVE_SPACE_COLUMN
+
 namespace {
     const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
     const qint64 minimalReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
@@ -38,12 +42,14 @@ namespace {
     const int FreeSpaceRole = Qt::UserRole + 1;
     const int TotalSpaceRole = Qt::UserRole + 2;
     const int StorageIdRole = Qt::UserRole + 3;
+    const int ExternalRole = Qt::UserRole + 4;
 
     enum Column {
         CheckBoxColumn,
         PathColumn,
         CapacityColumn,
-        ArchiveSpaceColumn
+        ArchiveSpaceColumn,
+        ColumnCount
     };
 
     QString formatStorageSize(qint64 size) {
@@ -219,8 +225,12 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
     ui->storagesTable->horizontalHeader()->setResizeMode(PathColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
+#ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->horizontalHeader()->setResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
+#else
+    ui->storagesTable->setColumnCount(ColumnCount - 1);
+#endif
 
     setButtonBox(ui->buttonBox);
 
@@ -270,6 +280,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     checkBoxItem->setFlags(flags);
     checkBoxItem->setCheckState(item.isUsedForWriting && item.isWritable ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, item.storageId);
+    checkBoxItem->setData(ExternalRole, item.isExternal);
 
     QTableWidgetItem *pathItem = new QTableWidgetItem();
     pathItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -279,8 +290,12 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : formatStorageSize(item.totalSpace));
 
+#ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
     archiveSpaceItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+#else
+    QTableWidgetItem *archiveSpaceItem = capacityItem;
+#endif
     archiveSpaceItem->setData(ReservedSpaceRole, item.reservedSpace);
     archiveSpaceItem->setData(TotalSpaceRole, item.totalSpace);
     archiveSpaceItem->setData(FreeSpaceRole, item.freeSpace);
@@ -288,8 +303,10 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     ui->storagesTable->setItem(row, CheckBoxColumn, checkBoxItem);
     ui->storagesTable->setItem(row, PathColumn, pathItem);
     ui->storagesTable->setItem(row, CapacityColumn, capacityItem);
+#ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     ui->storagesTable->setItem(row, ArchiveSpaceColumn, archiveSpaceItem);
     ui->storagesTable->openPersistentEditor(archiveSpaceItem);
+#endif
 }
 
 void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &items) {
@@ -298,6 +315,7 @@ void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &item
     ui->storagesTable->setSpan(0, 0, 1, 4);
     m_tableBottomLabel = new QLabel();
     m_tableBottomLabel->setAlignment(Qt::AlignCenter);
+    connect(m_tableBottomLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_tableBottomLabel_linkActivated()));
     ui->storagesTable->setCellWidget(0, 0, m_tableBottomLabel);
 
     foreach(const QnStorageSpaceData &item, items)
@@ -310,15 +328,25 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++) {
         QnStorageSpaceData item;
 
-        item.isWritable = ui->storagesTable->item(row, CheckBoxColumn)->flags() & Qt::ItemIsEnabled;
-        item.isUsedForWriting = ui->storagesTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked;
-        item.storageId = qvariant_cast<int>(ui->storagesTable->item(row, CheckBoxColumn)->data(StorageIdRole), -1);
+        QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
+        QTableWidgetItem *pathItem = ui->storagesTable->item(row, PathColumn);
+        QTableWidgetItem *capacityItem = ui->storagesTable->item(row, CapacityColumn);
+#ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
+        QTableWidgetItem *archiveSpaceItem = ui->storagesTable->item(row, ArchiveSpaceColumn);
+#else
+        QTableWidgetItem *archiveSpaceItem = capacityItem;
+#endif
 
-        item.path = ui->storagesTable->item(row, PathColumn)->text();
+        item.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
+        item.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
+        item.storageId = qvariant_cast<int>(checkBoxItem->data(StorageIdRole), -1);
+        item.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
-        item.totalSpace = ui->storagesTable->item(row, ArchiveSpaceColumn)->data(TotalSpaceRole).toLongLong();
-        item.freeSpace = ui->storagesTable->item(row, ArchiveSpaceColumn)->data(FreeSpaceRole).toLongLong();
-        item.reservedSpace = ui->storagesTable->item(row, ArchiveSpaceColumn)->data(ReservedSpaceRole).toLongLong();
+        item.path = pathItem->text();
+
+        item.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
+        item.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();
+        item.reservedSpace = archiveSpaceItem->data(ReservedSpaceRole).toLongLong();
 
         result.push_back(item);
     }
@@ -353,7 +381,7 @@ void QnServerSettingsDialog::submitToResources() {
 
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && item.storageId == -1) {
+            if(!item.isUsedForWriting && (item.storageId == -1 || item.isExternal)) {
                 serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
                 continue;
             }
@@ -377,133 +405,24 @@ void QnServerSettingsDialog::submitToResources() {
     m_server->setName(ui->nameLineEdit->text());
 }
 
-#if 0
-bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages) {
-    return true;
-
-    if(storages.isEmpty()) {
-        QMessageBox::critical(this, tr("No storages specified"), tr("At least one storage must be specified."));
-        return false;
-    }
-
-    foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-        if (storage->getUrl().isEmpty()) {
-            QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path must not be empty."));
-            return false;
-        }
-
-        if (storage->getSpaceLimit() < 0) {
-            QMessageBox::critical(this, tr("Invalid space limit"), tr("Space limit must be a non-negative integer."));
-            return false;
-        }
-    }
-
-    QScopedPointer<QnCounter> counter(new QnCounter(storages.size()));
-    QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
-    connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
-
-    QScopedPointer<detail::CheckFreeSpaceReplyProcessor> processor(new detail::CheckFreeSpaceReplyProcessor());
-    connect(processor.data(), SIGNAL(replyReceived(int, qint64, qint64, int)), counter.data(), SLOT(decrement()));
-
-    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
-    foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-        int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));
-        storageByHandle[handle] = storage;
-    }
-
-    eventLoop->exec();
-
-    detail::FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
-    for (detail::FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
-    {
-        QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
-        if (!storage)
-            continue;
-
-        //qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
-        qint64 availableSpace = itr.value().totalSpace;
-        if (itr.value().errorCode == detail::INVALID_PATH)
-        {
-            QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
-            return false;
-        }
-        if (itr.value().errorCode == detail::SERVER_ERROR)
-        {
-            QMessageBox::critical(this, tr("Can't verify storage path"), tr("Cannot verify storage path '%1'. Cannot establish connection to the media server.").arg(storage->getUrl()));
-            return false;
-        }
-        else if (availableSpace < storage->getSpaceLimit())
-        {
-            QMessageBox::critical(this, tr("Not enough disk space"),
-                tr("Storage '%1'\nYou have less storage space available than reserved free space value. Additional %2Gb are required.")
-                .arg(storage->getUrl())
-                .arg(formatGbStr(storage->getSpaceLimit() - availableSpace)));
-            return false;
-        }
-        /*
-        else if (availableSpace < 0)
-        {
-            QMessageBox::critical(this, tr("Not enough disk space"),
-                tr("Storage '%1'\nYou have less storage space available than reserved free space value. Additional %2Gb are required.")
-                .arg(storage->getUrl())
-                .arg(formatGbStr(MIN_RECORD_FREE_SPACE - availableSpace)));
-            return false;
-        }
-        else if (availableSpace < MIN_RECORD_FREE_SPACE)
-        {
-            QMessageBox::warning(this, tr("Low space for archive"),
-                tr("Storage '%1'\nYou have only %2Gb left for video archive.")
-                .arg(storage->getUrl())
-                .arg(formatGbStr(availableSpace)));
-        }
-        */
-    }
-
-    return true;
-}
-
-void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
-    QTableWidgetItem *urlItem = ui->storagesTable->item(row, 0);
-    QTableWidgetItem *spaceItem = ui->storagesTable->item(row, 1);
-    if(!urlItem || !spaceItem)
-        return;
-
-    QString url = urlItem->data(Qt::DisplayRole).toString();
-
-    bool newSupportsSpaceLimit = !url.trimmed().startsWith(QLatin1String("coldstore://")); // TODO: evil hack, move out the check somewhere into storage factory.
-    bool oldSupportsSpaceLimit = spaceItem->flags() & Qt::ItemIsEditable;
-    if(newSupportsSpaceLimit != oldSupportsSpaceLimit || force) {
-        spaceItem->setFlags(newSupportsSpaceLimit ? (spaceItem->flags() | Qt::ItemIsEditable) : (spaceItem->flags() & ~Qt::ItemIsEditable));
-        
-        /* Adjust value. */
-        if(newSupportsSpaceLimit) {
-            bool ok;
-            int spaceLimitGb = spaceItem->data(Qt::DisplayRole).toInt(&ok);
-            if(!ok)
-                spaceLimitGb = defaultSpaceLimitGb;
-            spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
-        } else {
-            spaceItem->setData(Qt::DisplayRole, QVariant());
-        }
-        
-        /* Open/close editor. */
-        if(newSupportsSpaceLimit) {
-            ui->storagesTable->openPersistentEditor(spaceItem);
-        } else {
-            ui->storagesTable->closePersistentEditor(spaceItem);
-        }
-    }
-}
-#endif
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnServerSettingsDialog::at_storageAddButton_clicked() {
-    // TODO: #Elric implement me
+void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
+    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
+    dialog->setProtocols(m_storageProtocols);
+    if(dialog->exec() != QDialog::Accepted)
+        return;
 
+    QnStorageSpaceData item = dialog->storage();
+    if(item.storageId != -1)
+        return;
+    item.isUsedForWriting = true;
+    item.isExternal = true;
+    
+    addTableItem(item);
+    
     m_hasStorageChanges = true;
 }
 
@@ -548,6 +467,8 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
     qSort(items.begin(), items.end(), StorageSpaceDataLess());
 
     setTableItems(items);
+
+    m_storageProtocols = reply.storageProtocols;
     m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
 }
 

@@ -104,6 +104,10 @@ private:
 
     void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant = false);
 
+    void processPtzClick(const QPointF &pos);
+    void processPtzDrag(const QRectF &rect);
+    void processPtzDoubleClick();
+
 private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
@@ -131,6 +135,7 @@ private:
     bool m_isClick;
     bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
+    bool m_skipNextAction;
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;

@@ -9,6 +9,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/common/resource_name.h>
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -62,7 +63,7 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
 
         QLabel* labelName = new QLabel(ui->resourcesListWidget);
         labelName->setText( QString(htmlTemplate)
-                            .arg(resource->getName())
+                            .arg(getResourceName(resource))
                             .arg(QString::number(resource->getId().toInt()))
                             .arg(tr("( Fix... )"))
                            );

@@ -88,14 +88,19 @@ public:
     bool add( Socket* const sock, EventType eventType, void* userData = NULL );
     //!Do not monitor event \a eventType on socket \a sock anymore
     /*!
+        \return User data, associated with \a sock. NULL, if \a sock was not found
         \note Ivalidates all iterators
     */
-    void remove( Socket* const sock, EventType eventType );
+    void* remove( Socket* const sock, EventType eventType );
     //!Returns number of sockets, monitored for \a eventType
     /*!
         Returned value should only be used for compare with \a maxPollSetSize(). Returned absolute value may be unexpected sometimes
     */
     size_t size( EventType eventType ) const;
+    /*!
+        \return NULL if \a sock is not listnened for \a eventType
+    */
+    void* getUserData( Socket* const sock, EventType eventType ) const;
 
     /*!
         \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.

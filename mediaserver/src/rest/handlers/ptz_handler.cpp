@@ -158,10 +158,10 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         const QnPtzSpaceMapper *spaceMapper = ptzController ? ptzController->getSpaceMapper() : NULL;
         if(spaceMapper) {
             QVariantMap map;
-            QJson::serialize(*spaceMapper, "data", &map);
+            QJson::serialize(*spaceMapper, "reply", &map);
             QJson::serialize(map, &result);
         } else {
-            result = "{ \"mapper\": null }";
+            result = "{ \"reply\": null }";
         }
         contentType = "application/json";
     }
