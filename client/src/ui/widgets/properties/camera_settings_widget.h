@@ -34,6 +34,14 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
+    int activeDigital() const {
+        return activeCameraCountByClass(false);
+    }
+
+    int activeAnalog() const {
+        return activeCameraCountByClass(true);
+    }
+
     int activeCameraCountByClass(bool analog) const;
     void setCamerasActive(bool active);
 

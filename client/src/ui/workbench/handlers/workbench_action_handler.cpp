@@ -642,14 +642,23 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         return; 
 
     /* Limit the number of active cameras. */
-    int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras)
-        if (!camera->isScheduleDisabled())
-            activeCameras--;
+    int activeDigital = resourcePool()->activeDigital() + cameraSettingsDialog()->widget()->activeDigital();
+    int activeAnalog  = resourcePool()->activeAnalog() + cameraSettingsDialog()->widget()->activeAnalog();
 
-    if (activeCameras > qnLicensePool->getLicenses().totalCameras()) {
-        QString message = tr("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.").arg(activeCameras).arg(qnLicensePool->getLicenses().totalCameras());
-        QMessageBox::warning(widget(), tr("Could not enable recording"), message);
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (!camera->isScheduleDisabled()) {
+            if (camera->isAnalog())
+                activeAnalog--;
+            else
+                activeDigital--;
+        }
+    }
+
+    //TODO: #GDM dtsBased?
+    QnLicenseList licenses = qnLicensePool->getLicenses();
+    if (activeAnalog > licenses.totalAnalog() || activeDigital > licenses.totalDigital()) {
+        QString message = tr("Licenses limit exceeded. Your schedule will be saved, but will not take effect.");
+        QMessageBox::warning(widget(), tr("Could not apply changes"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
 

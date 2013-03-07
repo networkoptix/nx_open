@@ -65,11 +65,12 @@ private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
-    void at_cameraScheduleWidget_scheduleEnabledChanged();
+    void at_scheduleEnabledChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_cameraScheduleWidget_controlsChangesApplied();
     void at_enableAudioCheckBox_clicked();
     void updateMaxFPS();
+    void updateAnalogLicensesText();
 private:
     void setHasDbChanges(bool hasChanges);
 

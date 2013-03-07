@@ -25,17 +25,17 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QWidget" name="dtsWidget" native="true">
+        <widget class="QWidget" name="analogWidget" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QCheckBox" name="dtsViewCheckBox">
+           <widget class="QCheckBox" name="analogViewCheckBox">
             <property name="text">
              <string>Use analog license to view this camera</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="dtsViewWarningLabel">
+           <widget class="QLabel" name="analogLicensesUsageLabel">
             <property name="text">
              <string/>
             </property>

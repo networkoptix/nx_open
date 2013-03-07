@@ -79,9 +79,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
-    connect(ui->dtsViewCheckBox,        SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-
-    setWarningStyle(ui->dtsViewWarningLabel);
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
 
     updateFromResource();
 }
@@ -285,12 +283,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-        if (m_camera->isDtsBased()) {
-            m_camera->setScheduleDisabled(!ui->dtsViewCheckBox->isChecked());
-        }
+        if (m_camera->isAnalog())
+            m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
         else
-        {
-            m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
+        if (!m_camera->isDtsBased()) {
+            m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeDigitalCount() == 0);
 
             if (m_hasScheduleChanges) {
                 QnScheduleTaskList scheduleTasks;
@@ -347,7 +344,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-        ui->dtsWidget->setVisible(false);
+        ui->analogWidget->setVisible(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
 
@@ -361,14 +358,15 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
-        bool dtsBased = camera()->isDtsBased();
+        bool dtsBased = m_camera->isDtsBased();
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedSettingsTab, !dtsBased);
-        ui->dtsWidget->setVisible(dtsBased);
-        if (dtsBased) {
-            ui->dtsViewCheckBox->setChecked(dtsBased && !m_camera->isScheduleDisabled());
-        } else {
+
+        ui->analogWidget->setVisible(m_camera->isAnalog());
+        ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
+
+        if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
             if (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow))
                 ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
@@ -408,7 +406,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
-    updateDtsLicenses();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
@@ -529,14 +526,6 @@ void QnSingleCameraSettingsWidget::updateMotionAvailability() {
         motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != Qn::MT_NoMotion);
 
     ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
-}
-
-void QnSingleCameraSettingsWidget::updateDtsLicenses() {
-    ui->dtsViewWarningLabel->setVisible(false);
-    if (!m_camera || !m_camera->isDtsBased())
-        return;
-
-
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
