@@ -1,6 +1,33 @@
 ----------------------------------------------- 1.4.3 - Beta2 -----------------------------------------------
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - AXISP1354
 
+IMPROVEMENTS:
+ - It is possible to switch resolution manually (Scene's Context Menu). Available options: Auto (default), Low, High. Changes are applied to all items on Scene. If go to another tab and return back the setting is reset to "Auto"
+ - Some E-Mail Server fixes:
+   - password is not displayed
+   - presets were adjusted
+ - Notifications look more neat: borders are added around them
+ - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming (since 1.4)
+ - Tour can be stopped by any key. Info message added
+ - Manual Camera Addition Dialog is improved: (since 1.4)
+   - Last entered data is filled automatically
+   - It is possible to perform other actions while manual camera addition is in progress
 
+BUGS FIXED:
+ - VMAX Proxy is installed in the "client only" mode
+ - When quickly restarting screen recording, it is not started (since 1.4)
+ - Suggest simple mode for E-mail presets
+ - If click ESC many times, main window is getting bigger (since 1.4)
+ - action execution does not work on other media server
+ - Switch camera status Recording -> Online if storages are not configured 
+ - "No Licenses" notification appeared even if the licenses were activated. Fixed
+ - It was possible to drop a user to tab navigator. In this case an empty layout was opened. Fixed
+ - PTZ OSD color is customized
+ - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed (since 1.4)
+ - Playback could stuck if seeking through VMAX archive. Fixed
+ - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously (since 1.4)
+ 
 ----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
