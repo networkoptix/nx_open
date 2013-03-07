@@ -183,7 +183,7 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
             }
             else
             {
-                nx_http::HttpRequest foundDeviceReply;
+                nx_http::Request foundDeviceReply;
                 if( !foundDeviceReply.parse( reply ) )
                     continue;
                 nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
