@@ -10,40 +10,50 @@ NEW FEATURES (since 1.4):
    - Licensed To - License Name and the provider the license has been obtained from
    - Type (analog/digital)
    - Expiration Date - specified only for trial licenses, "never" for permanent-ones
- 
+
 IMPROVEMENTS:
- - It is possible to switch resolution manually (Scene's Context Menu). Available options: Auto (default), Low, High. Changes are applied to all items on Scene. If go to another tab and return back the setting is reset to "Auto"
- - Some E-Mail Server fixes:
-   - password is not displayed
-   - presets were adjusted
- - Storage dialog is improved. Free space setting is removed to make the dialog simpler. Now it is 5 Gb per storage
- - Storage capacity is displayed more accurate
- - Notifications look more neat: borders are added around them
- - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming (since 1.4)
- - Tour can be stopped by any key. Info message added
- - PTZ is improved:
-   - If select a small zoom area it is ignored
-   - Zoom area selection can be canceled any time by right click
- - Manual Camera Addition Dialog is improved: (since 1.4)
+
+Since 1.4
+ - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
+ - Manual Camera Addition Dialog is improved:
    - Last entered data is filled automatically
    - It is possible to perform other actions while manual camera addition is in progress
 
+Since previous Beta (1.4.2)
+ - It is possible to switch resolution manually (Scene's Context Menu). Available options: Auto (default), Low, High. Changes are applied to all items on Scene
+ - Simple mode is always suggested for E-mail presets for the first time
+ - Some E-Mail Server fixes:
+   - password is not displayed
+   - presets were adjusted
+ - Storage dialog is improved:
+   - Free space setting is removed to make the dialog simpler. Now server always tries to keep 5 Gb free per storage
+   - Storage capacity is displayed more accurately
+   - If storages are not configured (no storage is selected for writing) the corresponding notification is fired
+ - Notifications look more neat: borders are added around them
+ - Tour can be stopped by any key.The corresponding info message is displayed if start Tour
+ - Recorders and its analog cameras are displayed as tree structure
+ - VMAX channels are named properly
+ - PTZ is improved 
+   - PTZ OSD color is customized
+   - If select a small zoom area it is ignored. Used to try zooming in this area causing incorrect zoom
+   - Zoom area selection can be canceled any time by right click
+
 BUGS FIXED:
- - If restore database from backup statuses were incorrect sometimes. Fixed for most cases however media server and client restart may be required. 
- - Actions did not work in certain cases i.e. if event is received from one media server and action should be performed on another media server
- - VMAX Proxy is installed in the "client only" mode
- - When quickly restarting screen recording, it is not started (since 1.4)
- - Suggest simple mode for E-mail presets
- - If click ESC many times, main window is getting bigger (since 1.4)
- - action execution does not work on other media server
- - Switch camera status Recording -> Online if storages are not configured 
- - "No Licenses" notification appeared even if the licenses were activated. Fixed
+
+Since 1.4
+ - If restart screen recording quickly, it is not started. Fixed
+ - If click ESC many times, main window was getting bigger
+ - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed
+ - If physically delete a file that was containing in a saved layout it was displayed incorrectly (Loading... was drawn). Fixed
+ - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously
+
+Since previous Beta (1.4.2)
+ - If restore database from backup, then statuses were incorrect sometimes. Fixed for most cases however media server and client restart may be required 
+ - Actions did not work in certain cases i.e. if event is received from one media server and action should be performed on another media server. Fixed
+ - VMAX Proxy was installed in the "client only" mode. Fixed
+ - "No Licenses" notification appeared sometimes even if the licenses were activated. Fixed
  - It was possible to drop a user to tab navigator. In this case an empty layout was opened. Fixed
- - PTZ OSD color is customized
- - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed (since 1.4)
  - Playback could stuck if seeking through VMAX archive. Fixed
- - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously (since 1.4)
- - If physically delete a file that was containing in a saved layout it was displayed incorectly (Loading... was drawn). Fixed (since 1.4)
  
 ----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 
