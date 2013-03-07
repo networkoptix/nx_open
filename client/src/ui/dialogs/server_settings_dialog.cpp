@@ -278,7 +278,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
     if (item.isWritable)
         flags |= Qt::ItemIsEnabled;
     checkBoxItem->setFlags(flags);
-    checkBoxItem->setCheckState(item.isUsedForWriting && item.isWritable ? Qt::Checked : Qt::Unchecked);
+    checkBoxItem->setCheckState(item.isUsedForWriting ? Qt::Checked : Qt::Unchecked);
     checkBoxItem->setData(StorageIdRole, item.storageId);
     checkBoxItem->setData(ExternalRole, item.isExternal);
 
@@ -381,7 +381,7 @@ void QnServerSettingsDialog::submitToResources() {
 
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && (item.storageId == -1 || item.isExternal)) {
+            if(!item.isUsedForWriting && item.storageId == -1) {
                 serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
                 continue;
             }
