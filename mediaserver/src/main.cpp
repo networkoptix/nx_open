@@ -837,6 +837,8 @@ void QnMain::run()
 
         QnSleep::msleep(1000);
     }
+    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());

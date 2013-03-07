@@ -52,9 +52,26 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         {
             QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
             if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getGuid() != getGuid())
-                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
-            else
+            {
+                // delivery to other server
+                QUrl serverUrl = routeToServer->getApiUrl();
+                QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
+#if 0
+                // do proxy via EC builtin proxy. It is dosn't work. I don't know why
+                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+#else
+                // do proxy via CPP media proxy
+                proxyUrl.setScheme(QLatin1String("http"));
+                proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
+                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+#endif
+
+                QString url = proxyUrl.toString();
+                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], url); 
+            }
+            else {
                 executeActionInternal(action, resList[i]);
+            }
         }
     }
 }
