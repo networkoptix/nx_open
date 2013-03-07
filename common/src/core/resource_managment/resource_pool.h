@@ -87,7 +87,15 @@ public:
 
     QStringList allTags() const;
 
-    int activeCameras() const;
+    int activeDigital() const {
+        return activeCamerasByClass(false);
+    }
+
+    int activeAnalog() const {
+        return activeCamerasByClass(true);
+    }
+
+    int activeCamerasByClass(bool analog) const;
 
     // TODO #gdm: this is a hack. Fix.
     bool isLayoutsUpdated() const;

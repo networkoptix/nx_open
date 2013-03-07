@@ -174,6 +174,10 @@ bool QnLicense::isValid(const QByteArray& hardwareId) const
     return (m_isValid1 || m_isValid2) && (hardwareId == m_hardwareId);
 }
 
+bool QnLicense::isAnalog() const {
+    return m_class.toLower() == QLatin1String("analog");
+}
+
 QByteArray QnLicense::toString() const
 {
     return m_rawLicense;
@@ -323,11 +327,12 @@ void QnLicenseList::clear()
     m_licenses.clear();
 }
 
-int QnLicenseList::totalCameras() const
+int QnLicenseList::totalCamerasByClass(bool analog) const
 {
     int n = 0;
     foreach (QnLicensePtr license, m_licenses.values())
-        n += license->cameraCount();
+        if (license->isAnalog() == analog)
+            n += license->cameraCount();
 
     return n;
 }

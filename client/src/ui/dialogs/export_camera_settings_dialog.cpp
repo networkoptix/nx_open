@@ -87,30 +87,52 @@ void QnExportCameraSettingsDialog::at_resourceModel_dataChanged(){
 }
 
 void QnExportCameraSettingsDialog::updateLicensesStatus(){
-    int alreadyActive = 0;
+    int activeAnalog = 0;
+    int activeDigital = 0;
 
+    int countDigital = 0;
+    int countAnalog = 0;
     QnVirtualCameraResourceList cameras = getSelectedCameras();
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras)
-        if (!camera->isScheduleDisabled())
-            alreadyActive++;
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
+        if (camera->isAnalog())
+            countAnalog++;
+        else
+            countDigital++;
+
+        if (!camera->isScheduleDisabled()) {
+            if (camera->isAnalog())
+                activeAnalog++;
+            else
+                activeDigital++;
+        }
+    }
 
     // how many licensed will be used if OK clicked
-    int used = qnResPool->activeCameras() - alreadyActive;
-    if (m_recordingEnabled)
-        used += cameras.size();
+    int usedDigital = qnResPool->activeDigital() - activeDigital;
+    int usedAnalog = qnResPool->activeAnalog() - activeAnalog;
+    if (m_recordingEnabled) {
+        usedDigital += countDigital;
+        usedAnalog += countAnalog;
+    }
 
     // how many licenses do we have
-    int total = qnLicensePool->getLicenses().totalCameras();
+    int totalDigital = qnLicensePool->getLicenses().totalDigital();
+    int totalAnalog = qnLicensePool->getLicenses().totalAnalog();
 
     QPalette palette = this->palette();
-    if(used > total)
+    m_licensesOk = usedDigital <= totalDigital && usedAnalog <= totalAnalog;
+    if(!m_licensesOk)
         setWarningStyle(&palette);
     ui->licenseLabel->setPalette(palette);
 
-    QString usageText = tr("%n license(s) will be used out of %1.", NULL, used).arg(total);
+    QString usageText = tr("%1 digital license(s) will be used out of %2.\n"\
+                           "%3 analog  license(s) will be used out of %4.")
+            .arg(usedDigital)
+            .arg(totalDigital)
+            .arg(usedAnalog)
+            .arg(totalAnalog);
     ui->licenseLabel->setText(usageText);
 
-    m_licensesOk = used <= total;
     updateOkStatus();
 }
 

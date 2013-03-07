@@ -116,12 +116,12 @@ void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     setCurrentTab(mode(), tab);
 }
 
-int QnCameraSettingsWidget::activeCameraCount() const {
+int QnCameraSettingsWidget::activeCameraCountByClass(bool analog) const {
     switch(mode()) {
     case SingleMode:
-        return m_singleWidget->isCameraActive() ? 1 : 0;
+        return m_singleWidget->activeCameraCountByClass(analog);
     case MultiMode:
-        return m_multiWidget->activeCameraCount();
+        return m_multiWidget->activeCameraCountByClass(analog);
     default:
         return 0;
     }

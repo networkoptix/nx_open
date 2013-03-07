@@ -18,6 +18,11 @@ public:
       */
     bool isValid(const QByteArray& hardwareId) const;
 
+    /**
+     * @return True if license is for analog cameras
+     */
+    bool isAnalog() const;
+
     const QString &name() const;
     const QByteArray &key() const;
     qint32 cameraCount() const;
@@ -75,7 +80,22 @@ public:
     bool isEmpty() const;
     void clear();
 
-    int totalCameras() const;
+    /**
+     * Count total number of digital cameras allowed.
+     */
+    int totalDigital() const {
+        return totalCamerasByClass(false);
+    }
+
+    /**
+     * Count total number of analog cameras allowed.
+     */
+    int totalAnalog() const {
+        return totalCamerasByClass(true);
+    }
+
+    int totalCamerasByClass(bool analog) const;
+
     bool haveLicenseKey(const QByteArray& key) const;
 	QnLicensePtr getLicenseByKey(const QByteArray& key) const;
 

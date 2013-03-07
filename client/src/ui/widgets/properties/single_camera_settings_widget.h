@@ -33,7 +33,7 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    bool isCameraActive() const;
+    bool activeCameraCountByClass(bool analog) const;
     void setCameraActive(bool active);
 
     bool hasCameraChanges() const {

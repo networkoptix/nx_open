@@ -97,8 +97,8 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     }
 }
 
-int QnMultipleCameraSettingsWidget::activeCameraCount() const {
-    return ui->cameraScheduleWidget->activeCameraCount();
+int QnMultipleCameraSettingsWidget::activeCameraCountByClass(bool analog) const {
+    return ui->cameraScheduleWidget->activeCameraCountByClass(analog);
 }
 
 void QnMultipleCameraSettingsWidget::setCamerasActive(bool active) {

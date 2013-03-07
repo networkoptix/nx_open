@@ -469,20 +469,25 @@ void QnCameraScheduleWidget::setScheduleEnabled(bool enabled)
     ui->enableRecordingCheckBox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
 }
 
-int QnCameraScheduleWidget::activeCameraCount() const 
+int QnCameraScheduleWidget::activeCameraCountByClass(bool analog) const
 {
     switch(ui->enableRecordingCheckBox->checkState()) {
-    case Qt::Checked:
-        return m_cameras.size();
+    case Qt::Checked: {
+            int result = 0;
+            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
+                if (camera->isAnalog() == analog)
+                    result++;
+            return result;
+        }
     case Qt::Unchecked:
         return 0;
     case Qt::PartiallyChecked: {
-        int result = 0;
-        foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-            if (!camera->isScheduleDisabled())
-                result++;
-        return result;
-    }
+            int result = 0;
+            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
+                if (!camera->isScheduleDisabled() && camera->isAnalog() == analog)
+                    result++;
+            return result;
+        }
     default:
         return 0;
     }
@@ -514,41 +519,83 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText() 
 {
-    int alreadyActive = 0;
-    foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-        if (!camera->isScheduleDisabled())
-            alreadyActive++;
+    int activeAnalog = 0;
+    int activeDigital = 0;
+
+    int countDigital = 0;
+    int countAnalog = 0;
+    foreach (const QnVirtualCameraResourcePtr &camera, m_cameras) {
+        if (camera->isAnalog())
+            countAnalog++;
+        else
+            countDigital++;
+
+        if (!camera->isScheduleDisabled()) {
+            if (camera->isAnalog())
+                activeAnalog++;
+            else
+                activeDigital++;
+        }
+    }
 
     // how many licenses will be used if recording will be enabled on all cameras
-    int toBeUsed = qnResPool->activeCameras() + m_cameras.size() - alreadyActive;
+    int toBeUsedDigital = qnResPool->activeDigital() + countDigital - activeDigital;
+    int toBeUsedAnalog  = qnResPool->activeAnalog()  + countAnalog  - activeAnalog;
 
     // how many licensed is used really
-    int used = qnResPool->activeCameras() + activeCameraCount() - alreadyActive;
+    int usedDigital = qnResPool->activeDigital() + activeDigitalCount() - activeDigital;
+    int usedAnalog  = qnResPool->activeAnalog()  + activeAnalogCount() - activeAnalog;
 
     // how many licenses do we have
-    int total = qnLicensePool->getLicenses().totalCameras();
+    int totalDigital = qnLicensePool->getLicenses().totalDigital();
+    int totalAnalog  = qnLicensePool->getLicenses().totalAnalog();
 
+    QString usageText = tr("%1 digital license(s) are used out of %2.\n"\
+                           "%3 analog  license(s) are used out of %4.")
+            .arg(usedDigital)
+            .arg(totalDigital)
+            .arg(usedAnalog)
+            .arg(totalAnalog);
+
+    ui->licensesUsageLabel->setText(usageText);
+
+    if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
+        ui->licensesLabel->setVisible(false);
+        return;
+    }
+
+    ui->licensesLabel->setVisible(true);
     QPalette palette = this->palette();
-    if(used > total)
+    if (usedDigital > totalDigital || usedAnalog > totalAnalog)
         setWarningStyle(&palette);
     ui->licensesLabel->setPalette(palette);
 
-    QString usageText = tr("%n license(s) are used out of %1.", NULL, used).arg(total);
-
-    if (ui->enableRecordingCheckBox->checkState() == Qt::Checked) {
-        ui->licensesLabel->setText(usageText);
-    } else if (toBeUsed > total){
-        ui->licensesLabel->setText(
-            QString(QLatin1String("%1 %2")).
-                arg(tr("Activate %n more license(s).", NULL, toBeUsed - total)).
-                arg(usageText)
-        );
+    if (toBeUsedDigital > totalDigital && toBeUsedAnalog > totalAnalog) {
+        ui->licensesLabel->setText(tr("Activate %1 more digital and %2 more analog licenses.")
+                                   .arg(toBeUsedDigital - totalDigital)
+                                   .arg(toBeUsedAnalog - totalAnalog)
+            );
+    } else if (toBeUsedDigital > totalDigital) {
+        ui->licensesLabel->setText(tr("Activate %1 more digital licenses.")
+                                   .arg(toBeUsedDigital - totalDigital)
+            );
+    } else if (toBeUsedAnalog > totalAnalog) {
+        ui->licensesLabel->setText(tr("Activate %1 more analog licenses.")
+                                   .arg(toBeUsedAnalog - totalAnalog)
+            );
+    } else if (countDigital > activeDigital && countAnalog > activeAnalog) {
+        ui->licensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
+                                   .arg(countDigital - activeDigital)
+                                   .arg(countAnalog - activeAnalog)
+            );
+    } else if (countDigital > activeDigital) {
+        ui->licensesLabel->setText(tr("%1 more digital licenses will be used.")
+                                   .arg(countDigital - activeDigital)
+            );
     } else {
-        ui->licensesLabel->setText(
-            QString(QLatin1String("%1 %2")).
-                arg(tr("%n license(s) will be used.", NULL, m_cameras.size() - alreadyActive)).
-                arg(usageText)
-        );
+        ui->licensesLabel->setText(tr("%1 more analog licenses will be used.")
+                                   .arg(countAnalog - activeAnalog)
+            );
     }
 }
 

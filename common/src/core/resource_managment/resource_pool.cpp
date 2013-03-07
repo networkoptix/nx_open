@@ -462,20 +462,17 @@ QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
     return QnNetworkResourcePtr(0);
 }
 
-int QnResourcePool::activeCameras() const
+int QnResourcePool::activeCamerasByClass(bool analog) const
 {
     int count = 0;
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
+        if (!camera || camera->isDisabled() || camera->isScheduleDisabled() || camera->isAnalog() != analog)
             continue;
-
-        if (!camera->isDisabled() && !camera->isScheduleDisabled())
-            count++;
+        count++;
     }
-
     return count;
 }
 

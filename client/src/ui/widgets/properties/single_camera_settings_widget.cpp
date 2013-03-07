@@ -267,8 +267,8 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     }
 }
 
-bool QnSingleCameraSettingsWidget::isCameraActive() const {
-    return ui->cameraScheduleWidget->activeCameraCount() != 0;
+bool QnSingleCameraSettingsWidget::activeCameraCountByClass(bool analog) const {
+    return ui->cameraScheduleWidget->activeCameraCountByClass(analog);
 }
 
 void QnSingleCameraSettingsWidget::setCameraActive(bool active) {

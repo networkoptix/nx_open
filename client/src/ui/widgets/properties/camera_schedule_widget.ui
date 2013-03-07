@@ -56,6 +56,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="licensesUsageLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
       <string>Schedule Grid</string>

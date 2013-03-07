@@ -55,7 +55,15 @@ public:
      */
     int getGridMaxFps(bool motionPlusLqOnly = false);
 
-    int activeCameraCount() const;
+    int activeCameraCountByClass(bool analog) const;
+
+    int activeDigitalCount() const {
+        return activeCameraCountByClass(false);
+    }
+
+    int activeAnalogCount() const {
+        return activeCameraCountByClass(true);
+    }
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);

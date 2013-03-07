@@ -107,10 +107,20 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
-        int totalCameras = m_licenses.totalCameras();
-        int usingCameras = qnResPool->activeCameras();
-        ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras. Currently using %2.")).arg(totalCameras).arg(usingCameras));
-        useRedLabel = usingCameras > totalCameras;
+        int totalDigital    = m_licenses.totalDigital();
+        int totalAnalog     = m_licenses.totalAnalog();
+
+        int usingDigital    = qnResPool->activeDigital();
+        int usingAnalog     = qnResPool->activeAnalog();
+
+        ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                          "Currently using %3 digital and %4 analog."))
+                               .arg(totalDigital)
+                               .arg(totalAnalog)
+                               .arg(usingDigital)
+                               .arg(usingAnalog))
+                ;
+        useRedLabel = usingDigital > totalDigital || usingAnalog > totalAnalog;
     } else {
         if (m_licenses.hardwareId().isEmpty()) {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
