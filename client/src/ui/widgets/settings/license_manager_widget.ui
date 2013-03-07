@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>428</width>
-    <height>337</height>
+    <width>703</width>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
              <bool>true</bool>
             </property>
             <property name="columnCount">
-             <number>3</number>
+             <number>5</number>
             </property>
             <attribute name="headerStretchLastSection">
              <bool>true</bool>
@@ -45,12 +45,22 @@
             </column>
             <column>
              <property name="text">
+              <string>Type</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
               <string>Cameras</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>License key</string>
+              <string>License Key</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Expiration Date</string>
              </property>
             </column>
            </widget>

@@ -19,6 +19,37 @@
 
 #include <ui/style/warning_style.h>
 
+namespace {
+
+    QString getLicenseName(QnLicensePtr license) {
+
+        //TODO: #GDM hate Ivan
+        if (license->name().toLower().startsWith(QLatin1String("free")))
+            return QObject::tr("Free");
+
+        QString name;
+        //TODO: #GDM hate Ivan
+        if (license->xclass().toLower() == QLatin1String("digital"))
+            name = QObject::tr("Enterprise");
+        else
+            name = QObject::tr("Analog");
+
+        if (!license->expiration().isEmpty())
+            name = QString(QLatin1String("%1 (%2)")).arg(name).arg(QObject::tr("Trial"));
+        return name;
+    }
+
+    enum Columns {
+        NameColumn,
+        ClassColumn,
+        CameraCountColumn,
+        KeyColumn,
+        ExpirationDateColumn,
+        ColumnCount
+    };
+
+}
+
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -63,10 +94,12 @@ void QnLicenseManagerWidget::updateLicenses() {
     int idx = 0;
     foreach(const QnLicensePtr &license, m_licenses.licenses()) {
         QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setData(0, Qt::DisplayRole, license->name());
-        item->setData(0, Qt::UserRole, idx++);
-        item->setData(1, Qt::DisplayRole, license->cameraCount());
-        item->setData(2, Qt::DisplayRole, license->key());
+        item->setText(NameColumn, license->name());
+        item->setData(NameColumn, Qt::UserRole, idx++);
+        item->setText(ClassColumn, license->xclass().toLower());
+        item->setText(CameraCountColumn, QString::number(license->cameraCount()));
+        item->setText(KeyColumn, QString::fromLatin1(license->key()));
+        item->setText(ExpirationDateColumn, license->expiration().isEmpty() ? tr("Never") : license->expiration());
         ui->gridLicenses->addTopLevelItem(item);
     }
 
@@ -244,16 +277,16 @@ void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
 }
 
 void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int) {
-    int idx = item->data(0, Qt::UserRole).toInt();
+    int idx = item->data(NameColumn, Qt::UserRole).toInt();
     const QnLicensePtr license = m_licenses.licenses().at(idx);
     showLicenseDetails(license);
 }
 
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
-    QModelIndex model = ui->gridLicenses->selectionModel()->selectedRows().front();
-    if (model.column() > 0)
-        model = model.sibling(model.row(), 0);
-    int idx = model.data(Qt::UserRole).toInt();
+    QModelIndex index = ui->gridLicenses->selectionModel()->selectedRows().front();
+    if (index.column() > NameColumn)
+        index = index.sibling(index.row(), NameColumn);
+    int idx = index.data(Qt::UserRole).toInt();
     const QnLicensePtr license = m_licenses.licenses().at(idx);
     showLicenseDetails(license);
 }
