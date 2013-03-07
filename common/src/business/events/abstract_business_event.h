@@ -6,7 +6,7 @@
 #include "core/resource/resource_fwd.h"
 #include <business/business_logic_common.h>
 
-
+// TODO: #Elric have BE_ prefix => namespace not needed
 namespace BusinessEventType
 {
     enum Value

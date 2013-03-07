@@ -38,7 +38,7 @@ public:
     int getRecordAfter() const;
 
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
-    static bool isResourcesListValid(const QnResourceList &resources);
+    static bool isResourcesListValid(const QnResourceList &resources); // TODO: #Elric move out, generalize
     static int  invalidResourcesCount(const QnResourceList &resources);
 };
 
