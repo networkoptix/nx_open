@@ -2,19 +2,35 @@
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - AXISP1354
 
+NEW FEATURES (since 1.4):  
+ - New license type is introduced. It will be used for analog cameras. Analog cameras are divided into 2 types:
+   - DTS Based (i.e. VMAX Channels). For those cameras analog license is required for view live stream and archive (set on camera settings on the "General" tab). Recording is performed on DTS so the software only acruires recorded data from it.
+   - Encoder channels (i.e. Flex Watch channels). Those cameras require a license for recording and may be viewed live without one. Recording is configured as usual. Such cameras are recorded directly by Media server.
+ - License form is redesigned. Now the following data is displayed:
+   - Licensed To - License Name and the provider the license has been obtained from
+   - Type (analog/digital)
+   - Expiration Date - specified only for trial licenses, "never" for permanent-ones
+ 
 IMPROVEMENTS:
  - It is possible to switch resolution manually (Scene's Context Menu). Available options: Auto (default), Low, High. Changes are applied to all items on Scene. If go to another tab and return back the setting is reset to "Auto"
  - Some E-Mail Server fixes:
    - password is not displayed
    - presets were adjusted
+ - Storage dialog is improved. Free space setting is removed to make the dialog simpler. Now it is 5 Gb per storage
+ - Storage capacity is displayed more accurate
  - Notifications look more neat: borders are added around them
  - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming (since 1.4)
  - Tour can be stopped by any key. Info message added
+ - PTZ is improved:
+   - If select a small zoom area it is ignored
+   - Zoom area selection can be canceled any time by right click
  - Manual Camera Addition Dialog is improved: (since 1.4)
    - Last entered data is filled automatically
    - It is possible to perform other actions while manual camera addition is in progress
 
 BUGS FIXED:
+ - If restore database from backup statuses were incorrect sometimes. Fixed for most cases however media server and client restart may be required. 
+ - Actions did not work in certain cases i.e. if event is received from one media server and action should be performed on another media server
  - VMAX Proxy is installed in the "client only" mode
  - When quickly restarting screen recording, it is not started (since 1.4)
  - Suggest simple mode for E-mail presets
@@ -27,6 +43,7 @@ BUGS FIXED:
  - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed (since 1.4)
  - Playback could stuck if seeking through VMAX archive. Fixed
  - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously (since 1.4)
+ - If physically delete a file that was containing in a saved layout it was displayed incorectly (Loading... was drawn). Fixed (since 1.4)
  
 ----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 
