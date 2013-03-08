@@ -10,6 +10,8 @@
 #include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/license_usage_helper.h>
+
 
 QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
@@ -92,6 +94,9 @@ void QnExportCameraSettingsDialog::at_resourceModel_dataChanged(){
 }
 
 void QnExportCameraSettingsDialog::updateLicensesStatus(){
+
+    QnLicenseUsageHelper helper(getSelectedCameras(), m_recordingEnabled);
+
     int activeAnalog = 0;
     int activeDigital = 0;
 
