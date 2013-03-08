@@ -16,6 +16,10 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(const QnVirtualCameraResourceList &pr
     m_digitalChange(0),
     m_analogChange(0)
 {
+    propose(proposedCameras, proposedEnable);
+}
+
+void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
     foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) {
         // if schedule is disabled and we are enabling it
         if (camera->isScheduleDisabled() == proposedEnable) {
@@ -31,32 +35,40 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(const QnVirtualCameraResourceList &pr
     }
 }
 
-int QnLicenseUsageHelper::totalDigital() {
+int QnLicenseUsageHelper::totalDigital() const {
     return m_licenses.totalDigital();
 }
 
-int QnLicenseUsageHelper::totalAnalog() {
+int QnLicenseUsageHelper::totalAnalog() const {
     return m_licenses.totalAnalog();
 }
 
-int QnLicenseUsageHelper::usedDigital() {
+int QnLicenseUsageHelper::usedDigital() const {
     int requiredDigitalInsteadAnalog = qMax(totalAnalog() - usedAnalog(), 0);
     return qMin(requiredDigital() + requiredDigitalInsteadAnalog, totalDigital());
 }
 
-int QnLicenseUsageHelper::usedAnalog() {
+int QnLicenseUsageHelper::usedAnalog() const {
     return qMin(totalAnalog(), qnResPool->activeAnalog() + m_analogChange);
 }
 
-int QnLicenseUsageHelper::requiredDigital() {
+int QnLicenseUsageHelper::requiredDigital() const {
     return qnResPool->activeDigital() + m_digitalChange;
 }
 
-int QnLicenseUsageHelper::requiredAnalog() {
+int QnLicenseUsageHelper::requiredAnalog() const {
     int freeDigital = qMax(totalDigital() - requiredDigital(), 0);
     return qMax(qnResPool->activeAnalog() + m_analogChange - freeDigital, 0);
 }
 
-bool QnLicenseUsageHelper::isValid() {
+int QnLicenseUsageHelper::proposedDigital() const {
+    return isValid() ? usedDigital() : requiredDigital();
+}
+
+int QnLicenseUsageHelper::proposedAnalog() const {
+    return isValid() ? usedAnalog() : requiredAnalog();
+}
+
+bool QnLicenseUsageHelper::isValid() const {
     return requiredDigital() <= totalDigital() && requiredAnalog() <= totalAnalog();
 }

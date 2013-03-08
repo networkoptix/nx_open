@@ -10,16 +10,21 @@ public:
     QnLicenseUsageHelper();
     QnLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
 
-    int totalDigital();
-    int totalAnalog();
+    void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
 
-    int usedDigital();
-    int usedAnalog();
+    int totalDigital() const;
+    int totalAnalog() const;
 
-    int requiredDigital();
-    int requiredAnalog();
+    int usedDigital() const;
+    int usedAnalog() const;
 
-    bool isValid();
+    int requiredDigital() const;
+    int requiredAnalog() const;
+
+    int proposedDigital() const;
+    int proposedAnalog() const;
+
+    bool isValid() const;
 private:
     QnLicenseList m_licenses;
 
