@@ -33,16 +33,11 @@
              <bool>true</bool>
             </property>
             <property name="columnCount">
-             <number>5</number>
+             <number>4</number>
             </property>
             <attribute name="headerStretchLastSection">
              <bool>true</bool>
             </attribute>
-            <column>
-             <property name="text">
-              <string>Licensed To</string>
-             </property>
-            </column>
             <column>
              <property name="text">
               <string>Type</string>
@@ -60,7 +55,7 @@
             </column>
             <column>
              <property name="text">
-              <string>Expiration Date</string>
+              <string>Expired</string>
              </property>
             </column>
            </widget>

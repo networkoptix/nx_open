@@ -23,25 +23,20 @@ namespace {
 
     QString getLicenseName(QnLicensePtr license) {
 
-        //TODO: #GDM hate Ivan
-        if (license->name().toLower().startsWith(QLatin1String("free")))
+        if (license->key() == qnProductFeatures().freeLicenseKey.toAscii())
             return QObject::tr("Free");
 
-        QString name;
-        //TODO: #GDM hate Ivan
-        if (license->xclass().toLower() == QLatin1String("digital"))
-            name = QObject::tr("Enterprise");
-        else
-            name = QObject::tr("Analog");
-
         if (!license->expiration().isEmpty())
-            name = QString(QLatin1String("%1 (%2)")).arg(name).arg(QObject::tr("Trial"));
-        return name;
+            return QObject::tr("Trial");
+
+        if (license->xclass().toLower() == QLatin1String("analog"))
+            return QObject::tr("Analog");
+        return QObject::tr("Enterprise");
     }
 
     enum Columns {
         NameColumn,
-        ClassColumn,
+        //ClassColumn,
         CameraCountColumn,
         KeyColumn,
         ExpirationDateColumn,
@@ -94,9 +89,9 @@ void QnLicenseManagerWidget::updateLicenses() {
     int idx = 0;
     foreach(const QnLicensePtr &license, m_licenses.licenses()) {
         QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setText(NameColumn, license->name());
+        item->setText(NameColumn, getLicenseName(license));
         item->setData(NameColumn, Qt::UserRole, idx++);
-        item->setText(ClassColumn, license->xclass().toLower());
+        //item->setText(ClassColumn, license->xclass().toLower());
         item->setText(CameraCountColumn, QString::number(license->cameraCount()));
         item->setText(KeyColumn, QString::fromLatin1(license->key()));
         item->setText(ExpirationDateColumn, license->expiration().isEmpty() ? tr("Never") : license->expiration());
@@ -199,13 +194,13 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
 
 void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
     QString details = tr("<b>Generic:</b><br />\n"
-        "License Owner: %1<br />\n"
-        "License key: %2<br />\n"
+        "License Type: %1<br />\n"
+        "License Key: %2<br />\n"
         "Locked to Hardware ID: %3<br />\n"
         "<br />\n"
         "<b>Features:</b><br />\n"
         "Archive Streams Allowed: %4")
-        .arg(license->name())
+        .arg(getLicenseName(license))
         .arg(QLatin1String(license->key()))
         .arg(QLatin1String(m_licenses.hardwareId()))
         .arg(license->cameraCount());
