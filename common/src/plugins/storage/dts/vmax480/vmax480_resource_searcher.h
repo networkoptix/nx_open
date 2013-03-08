@@ -15,7 +15,8 @@ public:
 
     static QnPlVmax480ResourceSearcher& instance();
 
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const QString& friendlyName, const QString& manufacturer, const QString& modelName, const QString& serialNumber, QnResourceList& result) override;
+
+    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const BonjurDeviceInfo& devInfo, QnResourceList& result) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 protected:

@@ -16,13 +16,17 @@
 using namespace std;
 
 const char* QnActiResource::MANUFACTURE = "ACTI";
-static const float MAX_AR_EPS = 0.04f;
-static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-static const quint16 DEFAULT_AXIS_API_PORT = 80;
+static const int TCP_TIMEOUT = 3000;
+static const int DEFAULT_RTSP_PORT = 7070;
 
-QnActiResource::QnActiResource()
+QString AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
+QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
+
+QnActiResource::QnActiResource():
+    m_hasDualStreaming(false),
+    m_rtspPort(DEFAULT_RTSP_PORT)
 {
-    setAuth(QLatin1String("root"), QLatin1String("123456"));
+    setAuth(QLatin1String("admin"), QLatin1String("123456"));
 }
 
 QnActiResource::~QnActiResource()
@@ -54,9 +58,81 @@ void QnActiResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
+QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
+{
+    QList<QByteArray> params = resolutionStr.split('x');
+    if (params.size() < 2 || params[0].isEmpty() || params[1].isEmpty())
+        return QSize();
+    bool isDigit = params[0].at(0) >= '0' && params[0].at(0) <= '9';
+    if (!isDigit)
+        params[0] = params[0].mid(1);
+    
+    return QSize(params[0].trimmed().toInt(), params[1].trimmed().toInt());
+}
+
+QByteArray unquoteStr(const QByteArray& value)
+{
+    int pos1 = value.startsWith('\'') ? 1 : 0;
+    int pos2 = value.endsWith('\'') ? 1 : 0;
+    return value.mid(pos1, value.length()-pos1-pos2);
+}
+
+QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status) const
+{
+    QByteArray result;
+
+    QUrl url(getUrl());
+    QAuthenticator auth = getAuth();
+    CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
+    QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
+    status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
+    if (status == CL_HTTP_SUCCESS)
+        client.readAll(result);
+    return unquoteStr(result.mid(command.size()+1).trimmed());
+}
+
 bool QnActiResource::initInternal()
 {
-    return false;
+    CLHttpStatus status;
+        
+    QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);
+
+    if (status == CL_HTTP_AUTH_REQUIRED) 
+        setStatus(QnResource::Unauthorized);
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+    QList<QByteArray> resList = resolutions.split(',');
+    m_hasDualStreaming = resList.size() > 1;
+    m_maxResolution[0] = extractResolution(resList[0]);
+    if (m_hasDualStreaming)
+        m_maxResolution[1] = extractResolution(resList[1]);
+    if (m_maxResolution[0].isEmpty())
+        return false;
+
+    QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+    QList<QByteArray> fpsList = fpsString.split(';');
+    
+    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i) {
+        QList<QByteArray> fps = fpsList[i].split(',');
+        foreach(const QByteArray& data, fps)
+            m_availFps[i] << data.toInt();
+    }
+
+    QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+    m_rtspPort = rtspPortString.trimmed().toInt();
+    if (m_rtspPort == 0)
+        m_rtspPort = DEFAULT_RTSP_PORT;
+
+    setParam(DUAL_STREAMING_PARAM_NAME, m_hasDualStreaming ? 1 : 0, QnDomainDatabase);
+    save();
+
+    return true;
 }
 
 bool QnActiResource::isResourceAccessible()
@@ -75,4 +151,13 @@ const QnResourceAudioLayout* QnActiResource::getAudioLayout(const QnAbstractStre
     }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+QString QnActiResource::getRtspUrl(int actiChannelNum) const
+{
+    QUrl url(getUrl());
+    url.setScheme(QLatin1String("rtsp"));
+    url.setPort(m_rtspPort);
+    url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
+    return url.toString();
 }

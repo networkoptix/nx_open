@@ -22,6 +22,8 @@ class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
 {
+    BonjurDeviceInfo m_deviceInfo;
+    QString m_currentElementName;
 public:
     virtual bool startDocument()
     {
@@ -37,13 +39,15 @@ public:
     virtual bool characters( const QString& ch )
     {
         if( m_currentElementName == QLatin1String("friendlyName") )
-            m_friendlyName = ch;
+            m_deviceInfo.friendlyName = ch;
         else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_manufacturer = ch;
+            m_deviceInfo.manufacturer = ch;
         else if( m_currentElementName == QLatin1String("modelName") )
-            m_modelName = ch;
+            m_deviceInfo.modelName = ch;
         else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_serialNumber = ch;
+            m_deviceInfo.serialNumber = ch;
+        else if( m_currentElementName == QLatin1String("presentationURL") )
+            m_deviceInfo.presentationUrl = ch;
 
         return true;
     }
@@ -59,17 +63,14 @@ public:
         return true;
     }
 
+    /*
     QString friendlyName() const { return m_friendlyName; }
     QString manufacturer() const { return m_manufacturer; }
     QString modelName() const { return m_modelName; }
     QString serialNumber() const { return m_serialNumber; }
-
-private:
-    QString m_currentElementName;
-    QString m_friendlyName;
-    QString m_manufacturer;
-    QString m_modelName;
-    QString m_serialNumber;
+    QString presentationUrl() const { return m_presentationUrl; }
+    */
+    BonjurDeviceInfo deviceInfo() const { return m_deviceInfo; }
 };
 
 
@@ -162,19 +163,22 @@ QnResourceList QnBonjourResourceSearcher::findResources(void)
             if( locationHeader == foundDeviceReply.headers.end() )
                 continue;
 
-            nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "uuid" );
+            nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
             if( uuidHeader == foundDeviceReply.headers.end() )
                 continue;
 
             QByteArray uuidStr = uuidHeader->second;
-            if (uuidStr.isEmpty())
+            if (!uuidStr.startsWith("uuid:"))
                 continue;
+            uuidStr = uuidStr.split(':')[1];
+
+            const QUrl descritionUrl( QLatin1String(locationHeader->second) );
+            uuidStr += descritionUrl.toString();
 
             if (processedUuid.contains(uuidStr))
                 continue;
             processedUuid << uuidStr;
 
-            const QUrl descritionUrl( QLatin1String(locationHeader->second) );
             QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
 
 
@@ -191,7 +195,7 @@ QnResourceList QnBonjourResourceSearcher::findResources(void)
             if( !xmlReader.parse( &input ) )
                 continue;
 
-            processPacket(iface.address, descritionUrl.host(), xmlHandler.friendlyName(), xmlHandler.manufacturer(), xmlHandler.modelName(), xmlHandler.serialNumber(), result);
+            processPacket(iface.address, descritionUrl.host(), xmlHandler.deviceInfo(), result);
         }
     }
 

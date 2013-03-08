@@ -6,6 +6,15 @@
 
 class CLSimpleHTTPClient;
 
+struct BonjurDeviceInfo
+{
+    QString friendlyName;
+    QString manufacturer;
+    QString modelName;
+    QString serialNumber;
+    QString presentationUrl;
+};
+
 class QnBonjourResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
 public:
@@ -13,7 +22,7 @@ public:
     ~QnBonjourResourceSearcher();
     QnResourceList findResources(void);
 protected:
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& hostAddr, const QString& friendlyName, const QString& manufacturer, const QString& modelName, const QString& serialNumber, QnResourceList& result) = 0;
+    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const BonjurDeviceInfo& devInfo, QnResourceList& result) = 0;
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
 private:

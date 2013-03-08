@@ -20,6 +20,8 @@ class QnActiResource : public QnPhysicalCameraResource
 public:
     static const char* MANUFACTURE;
 
+    static const int MAX_STREAMS = 2;
+
     QnActiResource();
     ~QnActiResource();
 
@@ -40,6 +42,12 @@ public:
     bool readMotionInfo();
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+
+    virtual bool hasDualStreaming() const override { return m_hasDualStreaming; }
+
+    QString getRtspUrl(int actiChannelNum) const; // in range 1..N
+
+    QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status) const;
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -60,6 +68,13 @@ protected:
 
     virtual void setCropingPhysical(QRect croping) override;
     virtual bool isResourceAccessible();
+private:
+    QSize extractResolution(const QByteArray& resolutionStr) const;
+private:
+    bool m_hasDualStreaming;
+    QSize m_maxResolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
+    QList<int> m_availFps[MAX_STREAMS];
+    int m_rtspPort;
 };
 
 #endif // __ACTI_RESOURCE_H__

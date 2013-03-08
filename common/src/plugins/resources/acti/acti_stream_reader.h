@@ -25,6 +25,7 @@ protected:
     virtual void pleaseStop() override;
 private:
     QnMulticodecRtpReader m_multiCodec;
+    QnActiResourcePtr m_actiRes;
 };
 
 #endif // ACTI_STREAM_REDER_H__

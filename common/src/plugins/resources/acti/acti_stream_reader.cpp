@@ -4,11 +4,13 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
+#include "utils/network/tcp_connection_priv.h"
 
 QnActiStreamReader::QnActiStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
     m_multiCodec(res)
 {
+    m_actiRes = res.dynamicCast<QnActiResource>();
 }
 
 QnActiStreamReader::~QnActiStreamReader()
@@ -18,8 +20,19 @@ QnActiStreamReader::~QnActiStreamReader()
 
 void QnActiStreamReader::openStream()
 {
-    if (isStreamOpened())
-        return;
+    // set fps
+    //http://192.168.0.100/cgi-bin/encoder?USER=Admin&PWD=123456&CHANNEL=2&VIDEO_FPS_NUM
+
+    // set resolution
+    // http://192.168.0.100/cgi-bin/encoder?USER=Admin&PWD=123456&CHANNEL=2&VIDEO_RESOLUTION
+
+    QString streamUrl = m_actiRes->getRtspUrl(m_role == QnResource::Role_LiveVideo ? 1 : 2);
+
+    m_multiCodec.setRequest(streamUrl);
+    m_multiCodec.openStream();
+    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
+        m_resource->setStatus(QnResource::Unauthorized);
+
 }
 
 void QnActiStreamReader::closeStream()

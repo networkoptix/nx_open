@@ -4,6 +4,9 @@
 
 extern QString getValueFromString(const QString& line);
 
+static const QString DEFAULT_LOGIN(QLatin1String("admin"));
+static const QString DEFAULT_PASSWORD(QLatin1String("123456"));
+
 QnActiResourceSearcher::QnActiResourceSearcher()
 {
 }
@@ -16,8 +19,6 @@ QnActiResourceSearcher& QnActiResourceSearcher::instance()
 
 QnActiResourceSearcher::~QnActiResourceSearcher()
 {
-    foreach(QUdpSocket* sock, m_socketList)
-        delete sock;
 }
 
 QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
@@ -62,99 +63,27 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     return QList<QnResourcePtr>();
 }
 
-/*
-QList<QnNetworkResourcePtr> QnActiResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
+void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const BonjurDeviceInfo& devInfo, QnResourceList& result)
 {
+    if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
+        return;
 
-    QString smac;
-    QString name;
-
-    QList<QnNetworkResourcePtr> local_results;
-
-    int iqpos = responseData.indexOf("-A-XX-");
-
-
-    if (iqpos<0)
-        return local_results;
-
-    int macpos = responseData.indexOf("00", iqpos);
-    if (macpos < 0)
-        return local_results;
-
-    for (int i = iqpos; i < macpos; i++)
-    {
-        name += QLatin1Char(responseData[i]);
-    }
-
-    name.replace(QLatin1Char(' '), QString()); // remove spaces
-    name.replace(QLatin1Char('-'), QString()); // remove spaces
-    name.replace(QLatin1Char('\t'), QString()); // remove tabs
-
-    if (macpos+12 > responseData.size())
-        return local_results;
-
-
-    //macpos++; // -
-
-    while(responseData.at(macpos)==' ')
-        ++macpos;
-
-
-    if (macpos+12 > responseData.size())
-        return local_results;
-
-
-
-    for (int i = 0; i < 12; i++)
-    {
-        if (i > 0 && i % 2 == 0)
-            smac += QLatin1Char('-');
-
-        smac += QLatin1Char(responseData[macpos + i]);
-    }
-
-
-    //response.fromDatagram(responseData);
-
-    smac = smac.toUpper();
-
-    foreach(QnResourcePtr res, result)
-    {
-        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-
-        if (net_res->getMAC().toString() == smac) {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
-            return local_results; // already found;
-        }
-    }
-
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
+    if (!rt.isValid())
+        return;
 
     QnActiResourcePtr resource ( new QnActiResource() );
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
-        return local_results;
-
     resource->setTypeId(rt);
-    resource->setName(name);
-    resource->setModel(name);
-    resource->setMAC(smac);
+    resource->setName(manufacture() +  QString(QLatin1String("-")) + devInfo.modelName);
+    resource->setModel(devInfo.modelName);
+    resource->setUrl(devInfo.presentationUrl);
+    resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(devInfo.serialNumber));
+    QAuthenticator auth;
+    
+    auth.setUser(DEFAULT_LOGIN);
+    auth.setPassword(DEFAULT_PASSWORD);
+    resource->setAuth(auth);
 
-    local_results.push_back(resource);
-
-
-
-
-    int channesl = 1;
-
-    if (resource->hasParam(QLatin1String("channelsAmount")))
-    {
-        QVariant val;
-        resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-        channesl = val.toUInt();
-    }
-
-    return local_results;
+    result << resource;
 }
-*/

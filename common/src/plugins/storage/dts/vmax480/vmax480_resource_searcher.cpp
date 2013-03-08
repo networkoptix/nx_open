@@ -33,23 +33,20 @@ QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
 
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
                                                 const QString& host, 
-                                                const QString& friendlyName, 
-                                                const QString& manufacturer, 
-                                                const QString& modelName, 
-                                                const QString& serialNumber, 
+                                                const BonjurDeviceInfo& devInfo,
                                                 QnResourceList& result)
 {
-    QString mac = serialNumber;
-    const int channelCountEndIndex = modelName.indexOf( QLatin1String("CH") );
+    QString mac = devInfo.serialNumber;
+    const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;
-    int channelCountStartIndex = modelName.lastIndexOf( QLatin1String(" "), channelCountEndIndex );
+    int channelCountStartIndex = devInfo.modelName.lastIndexOf( QLatin1String(" "), channelCountEndIndex );
     if( channelCountStartIndex == -1 )
         return;
     ++channelCountStartIndex;
     if( channelCountStartIndex >= channelCountEndIndex )
         return;
-    int channles = modelName.mid( channelCountStartIndex, channelCountEndIndex-channelCountStartIndex ).toInt();
+    int channles = devInfo.modelName.mid( channelCountStartIndex, channelCountEndIndex-channelCountStartIndex ).toInt();
     QString name = QLatin1String("DW-VF") + QString::number(channles);  //DW-VF is a registered resource type
 
 
@@ -94,7 +91,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         resource->setMAC(mac);
 
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(host).arg(API_PORT).arg(i+1));
-        resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
+        resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
         resource->setDiscoveryAddr(discoveryAddr);
         resource->setAuth(auth);
         resource->setGroupName(groupName);
