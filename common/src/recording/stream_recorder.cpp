@@ -299,7 +299,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
             return true; // skip audio packets before first video packet
         if (!initFfmpegContainer(vd))
         {
-            emit recordingFailed(m_lastErrMessage);
+            if (!m_fileName.isEmpty())
+                emit recordingFailed(m_lastErrMessage); // ommit storageFailure because of exists separate error if no storages at all
             if (m_stopOnWriteError)
             {
                 m_needStop = true;
