@@ -19,7 +19,8 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
     m_motionUsed(false),
     m_dualStreamingUsed(false),
     m_licensesOk(true),
-    m_motionOk(true)
+    m_motionOk(true),
+    m_dtsOk(true)
 {
     ui->setupUi(this);
 
@@ -30,6 +31,9 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
 
     setWarningStyle(ui->motionLabel);
     ui->motionLabel->setVisible(false);
+
+    setWarningStyle(ui->dtsLabel);
+    ui->dtsLabel->setVisible(false);
 
     at_resourceModel_dataChanged();
 }
@@ -84,6 +88,7 @@ void QnExportCameraSettingsDialog::keyPressEvent(QKeyEvent *event) {
 void QnExportCameraSettingsDialog::at_resourceModel_dataChanged(){
     updateLicensesStatus();
     updateMotionStatus();
+    updateDtsStatus();
 }
 
 void QnExportCameraSettingsDialog::updateLicensesStatus(){
@@ -157,6 +162,20 @@ void QnExportCameraSettingsDialog::updateMotionStatus(){
     updateOkStatus();
 }
 
+void QnExportCameraSettingsDialog::updateDtsStatus() {
+    m_dtsOk = true;
+
+    QnVirtualCameraResourceList cameras = getSelectedCameras();
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+        if (camera->isDtsBased()) {
+            m_dtsOk = false;
+            break;
+        }
+    }
+    ui->dtsLabel->setVisible(!m_dtsOk);
+    updateOkStatus();
+}
+
 void QnExportCameraSettingsDialog::updateOkStatus(){
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_licensesOk && m_motionOk);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_licensesOk && m_motionOk && m_dtsOk);
 }

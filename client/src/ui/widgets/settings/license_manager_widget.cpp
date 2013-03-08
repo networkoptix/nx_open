@@ -18,6 +18,7 @@
 #include <common/customization.h>
 
 #include <ui/style/warning_style.h>
+#include <utils/license_usage_helper.h>
 
 namespace {
 
@@ -102,20 +103,26 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
-        int totalDigital    = m_licenses.totalDigital();
-        int totalAnalog     = m_licenses.totalAnalog();
+        QnLicenseUsageHelper helper;
 
-        int usingDigital    = qnResPool->activeDigital();
-        int usingAnalog     = qnResPool->activeAnalog();
+        if (!helper.isValid()) {
+            useRedLabel = true;
+            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                              "Requiered at least %3 digital and %4 analog."))
+                                   .arg(helper.totalDigital())
+                                   .arg(helper.totalAnalog())
+                                   .arg(helper.requiredDigital())
+                                   .arg(helper.requiredAnalog()));
 
-        ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                          "Currently using %3 digital and %4 analog."))
-                               .arg(totalDigital)
-                               .arg(totalAnalog)
-                               .arg(usingDigital)
-                               .arg(usingAnalog))
-                ;
-        useRedLabel = usingDigital > totalDigital || usingAnalog > totalAnalog;
+        } else {
+            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                              "Currently using %3 digital and %4 analog."))
+                                   .arg(helper.totalDigital())
+                                   .arg(helper.totalAnalog())
+                                   .arg(helper.usedDigital())
+                                   .arg(helper.usedAnalog()));
+
+        }
     } else {
         if (m_licenses.hardwareId().isEmpty()) {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));

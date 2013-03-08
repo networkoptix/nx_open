@@ -94,12 +94,12 @@ public:
         return totalCamerasByClass(true);
     }
 
-    int totalCamerasByClass(bool analog) const;
-
     bool haveLicenseKey(const QByteArray& key) const;
 	QnLicensePtr getLicenseByKey(const QByteArray& key) const;
 
 private:
+    int totalCamerasByClass(bool analog) const;
+
     QMap<QByteArray, QnLicensePtr> m_licenses;
     QByteArray m_hardwareId;
 	QByteArray m_oldHardwareId;
