@@ -303,11 +303,6 @@ bool QnPlOnvifResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlOnvifResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlOnvifResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);

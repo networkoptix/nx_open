@@ -110,7 +110,6 @@ public:
 
 
     virtual bool isResourceAccessible() override;
-    virtual bool updateMACAddress() override;
     virtual QString manufacture() const override;
 
     virtual int getMaxFps() override;

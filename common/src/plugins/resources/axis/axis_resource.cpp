@@ -39,11 +39,6 @@ bool QnPlAxisResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlAxisResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlAxisResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);

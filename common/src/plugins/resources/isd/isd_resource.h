@@ -18,8 +18,6 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual bool updateMACAddress();
-
     virtual int getMaxFps() override;
 
     QSize getPrimaryResolution() const;
