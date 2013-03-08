@@ -797,11 +797,11 @@ int QnAppServerConnection::getBusinessRules(QnBusinessEventRules &businessRules)
     return status;
 }
 
-Q_GLOBAL_STATIC(QnAppServerConnectionFactory, theAppServerConnectionFactory)
+Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
 QString QnAppServerConnectionFactory::authKey()
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_authKey;
     }
 
@@ -810,7 +810,7 @@ QString QnAppServerConnectionFactory::authKey()
 
 QString QnAppServerConnectionFactory::clientGuid()
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_clientGuid;
     }
 
@@ -819,7 +819,7 @@ QString QnAppServerConnectionFactory::clientGuid()
 
 QUrl QnAppServerConnectionFactory::defaultUrl()
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_defaultUrl;
     }
 
@@ -828,14 +828,14 @@ QUrl QnAppServerConnectionFactory::defaultUrl()
 
 void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_authKey = authKey;
     }
 }
 
 void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_clientGuid = guid;
     }
 }
@@ -845,14 +845,14 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
     Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
     Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_defaultUrl = url;
     }
 }
 
 void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resourceFactory)
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_resourceFactory = resourceFactory;
     }
 }
@@ -865,10 +865,10 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QU
     cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url,
-                                                              *(theAppServerConnectionFactory()->m_resourceFactory),
-                                                               theAppServerConnectionFactory()->m_serializer,
-                                                              theAppServerConnectionFactory()->m_clientGuid,
-                                                              theAppServerConnectionFactory()->m_authKey));
+                                                              *(qn_appServerConnectionFactory_instance()->m_resourceFactory),
+                                                               qn_appServerConnectionFactory_instance()->m_serializer,
+                                                              qn_appServerConnectionFactory_instance()->m_clientGuid,
+                                                              qn_appServerConnectionFactory_instance()->m_authKey));
 }
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
@@ -1132,21 +1132,21 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
 
 void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_defaultMediaProxyPort = port;
     }
 }
 
 void QnAppServerConnectionFactory::setCurrentVersion(const QString& version)
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_currentVersion = version;
     }
 }
 
 int QnAppServerConnectionFactory::defaultMediaProxyPort()
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_defaultMediaProxyPort;
     }
 
@@ -1155,7 +1155,7 @@ int QnAppServerConnectionFactory::defaultMediaProxyPort()
 
 QString QnAppServerConnectionFactory::currentVersion()
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_currentVersion;
     }
 
@@ -1164,7 +1164,7 @@ QString QnAppServerConnectionFactory::currentVersion()
 
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
 {
-    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         return factory->m_resourceFactory;
     }
 

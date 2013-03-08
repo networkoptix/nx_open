@@ -3,6 +3,7 @@
 
 #include "abstract_business_action.h"
 
+// TODO: #Elric move out
 namespace BusinessActionParameters {
     /** UserGroup contains 1 if action is Admin-Only, otherwise 0. */
     quint64 getUserGroup(const QnBusinessParams &params);

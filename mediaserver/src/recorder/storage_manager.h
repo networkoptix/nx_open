@@ -59,7 +59,7 @@ public:
     QnStorageResourceList getStorages() const;
     void clearSpace();
 
-    bool isWritableStoragesAvailable();
+    bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 signals:
     void noStoragesAvailable();
 public slots:

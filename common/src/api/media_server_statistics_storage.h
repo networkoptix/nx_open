@@ -58,7 +58,7 @@ private slots:
     /**
      * Private slot for the handling data received from the server.
      */
-    void at_statisticsReceived(const QnStatisticsDataList &data);
+    void at_statisticsReceived(int status, const QnStatisticsDataList &data, int handle);
 
 private:
     bool m_alreadyUpdating;

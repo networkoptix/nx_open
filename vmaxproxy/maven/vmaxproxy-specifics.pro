@@ -5,6 +5,8 @@ win32 {
   QMAKE_LFLAGS += /MACHINE:x86  
 }
 
+ LIBS -= -lcommon
+
 CONFIG(debug, debug|release) {
   DESTDIR = ../../build-environment/${arch}/bin/debug/${project.artifactId}
   LIBS -= -L${environment.dir}/qt/bin/x64/debug

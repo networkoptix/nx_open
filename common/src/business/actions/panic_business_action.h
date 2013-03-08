@@ -20,6 +20,6 @@ public:
 private:
 };
 
-typedef QSharedPointer<QnPanicBusinessAction> QnPanicBusinessActionPtr;
+typedef QSharedPointer<QnPanicBusinessAction> QnPanicBusinessActionPtr; // TODO: #Elric move to _fwd header
 
 #endif  //PANICBUSINESSACTION_H

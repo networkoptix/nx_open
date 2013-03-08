@@ -393,12 +393,6 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
-bool QnStorageManager::isWritableStoragesAvailable()
-{
-    updateStorageStatistics();
-    return m_isWritableStorageAvail;
-}
-
 void QnStorageManager::updateStorageStatistics()
 {
     QMutexLocker lock(&m_mutexStorages);
@@ -423,8 +417,6 @@ void QnStorageManager::updateStorageStatistics()
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
-    if (!m_isWritableStorageAvail)
-        emit noStoragesAvailable();
     m_storagesStatisticsReady = true;
     m_warnSended = false;
 }

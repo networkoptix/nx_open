@@ -1,5 +1,5 @@
-#ifndef APPSERVERCONNECTIONIMPL_H
-#define APPSERVERCONNECTIONIMPL_H
+#ifndef QN_APP_SERVER_CONNECTION_H
+#define QN_APP_SERVER_CONNECTION_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
@@ -219,4 +219,4 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
 bool initLicenses(QnAppServerConnectionPtr appServerConnection);
 bool initCameraHistory(QnAppServerConnectionPtr appServerConnection);
 
-#endif // APPSERVERCONNECTIONIMPL_H
+#endif // QN_APP_SERVER_CONNECTION_H
