@@ -187,11 +187,15 @@ QnLicensePtr readLicenseFromStream(QTextStream& stream)
 {
 	QByteArray licenseBlock;
 	while (!stream.atEnd()) {
-		QString line = stream.readLine();
-        if (line.isEmpty())
-			return QnLicensePtr(new QnLicense(licenseBlock));
+        QString line = stream.readLine();
+        if (line.isEmpty()) {
+            if (!licenseBlock.isEmpty())
+			    return QnLicensePtr(new QnLicense(licenseBlock));
+            else
+                continue;
+        }
 
-		licenseBlock.append(line + QLatin1String("\n"));
+		licenseBlock.append(line.toUtf8() + "\n");
 	}
 
 	if (licenseBlock.isEmpty())

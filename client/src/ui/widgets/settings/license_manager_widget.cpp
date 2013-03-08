@@ -262,8 +262,9 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
         QByteArray replyData = reply->readAll();
         QTextStream is(&replyData);
+        is.setCodec("UTF-8");
 
-        for (;;) {
+        while (!is.atEnd()) {
             QnLicensePtr license = readLicenseFromStream(is);
             if (!license )
                 break;
