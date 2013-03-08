@@ -5,7 +5,7 @@ QnAbstractStorageResource::QnAbstractStorageResource():
     QnResource(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
-    m_usedForWriting(true),
+    m_usedForWriting(false),
     m_index(0)
 {
     setStatus(Offline);
