@@ -779,7 +779,6 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state) {
-    qDebug() << "at_cameraScheduleWidget_scheduleEnabledChanged" << state;
     if (m_camera && m_camera->isAnalog())
         ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
 }
