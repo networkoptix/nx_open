@@ -97,12 +97,12 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     }
 }
 
-int QnMultipleCameraSettingsWidget::activeCameraCountByClass(bool analog) const {
-    return ui->cameraScheduleWidget->activeCameraCountByClass(analog);
+void QnMultipleCameraSettingsWidget::setScheduleEnabled(bool enabled) {
+    ui->cameraScheduleWidget->setScheduleEnabled(enabled);
 }
 
-void QnMultipleCameraSettingsWidget::setCamerasActive(bool active) {
-    ui->cameraScheduleWidget->setScheduleEnabled(active);
+bool QnMultipleCameraSettingsWidget::isScheduleEnabled() const {
+    return ui->cameraScheduleWidget->isScheduleEnabled();
 }
 
 void QnMultipleCameraSettingsWidget::submitToResources() {

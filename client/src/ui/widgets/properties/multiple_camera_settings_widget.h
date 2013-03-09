@@ -25,8 +25,8 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    int activeCameraCountByClass(bool analog) const;
-    void setCamerasActive(bool active);
+    void setScheduleEnabled(bool enabled);
+    bool isScheduleEnabled() const;
 
     void updateFromResources();
     void submitToResources();

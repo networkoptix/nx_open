@@ -34,16 +34,8 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    int activeDigital() const {
-        return activeCameraCountByClass(false);
-    }
-
-    int activeAnalog() const {
-        return activeCameraCountByClass(true);
-    }
-
-    int activeCameraCountByClass(bool analog) const;
-    void setCamerasActive(bool active);
+    void setScheduleEnabled(bool enabled);
+    bool isScheduleEnabled() const;
 
     bool hasDbChanges() const;
     bool hasCameraChanges() const;

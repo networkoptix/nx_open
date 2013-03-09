@@ -38,6 +38,7 @@ public:
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
     void setScheduleEnabled(bool enabled);
+    bool isScheduleEnabled() const;
 
     /**
      * @brief setMaxFps             Set maximum fps value that can be placed on the grid.

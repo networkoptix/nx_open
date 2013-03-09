@@ -95,6 +95,8 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
+#include <utils/license_usage_helper.h>
+
 #include "client_message_processor.h"
 #include "file_processor.h"
 #include "version.h"
@@ -641,25 +643,11 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
         return; 
 
-    /* Limit the number of active cameras. */
-    int activeDigital = resourcePool()->activeDigital() + cameraSettingsDialog()->widget()->activeDigital();
-    int activeAnalog  = resourcePool()->activeAnalog() + cameraSettingsDialog()->widget()->activeAnalog();
-
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!camera->isScheduleDisabled()) {
-            if (camera->isAnalog())
-                activeAnalog--;
-            else
-                activeDigital--;
-        }
-    }
-
-    //TODO: #GDM dtsBased?
-    QnLicenseList licenses = qnLicensePool->getLicenses();
-    if (activeAnalog > licenses.totalAnalog() || activeDigital > licenses.totalDigital()) {
-        QString message = tr("Licenses limit exceeded. Your schedule will be saved, but will not take effect.");
+    QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
+    if (!helper.isValid()) {
+        QString message = tr("Licenses limit exceeded. Your changes will be saved, but will not take effect.");
         QMessageBox::warning(widget(), tr("Could not apply changes"), message);
-        cameraSettingsDialog()->widget()->setCamerasActive(false);
+        cameraSettingsDialog()->widget()->setScheduleEnabled(false);
     }
 
     /* Submit and save it. */

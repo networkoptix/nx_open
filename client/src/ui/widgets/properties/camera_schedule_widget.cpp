@@ -470,6 +470,10 @@ void QnCameraScheduleWidget::setScheduleEnabled(bool enabled)
     ui->enableRecordingCheckBox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
 }
 
+bool QnCameraScheduleWidget::isScheduleEnabled() const {
+    return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
+}
+
 int QnCameraScheduleWidget::activeCameraCountByClass(bool analog) const
 {
     switch(ui->enableRecordingCheckBox->checkState()) {
