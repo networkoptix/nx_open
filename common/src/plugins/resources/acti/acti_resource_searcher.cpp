@@ -7,6 +7,7 @@ extern QString getValueFromString(const QString& line);
 
 static const QString DEFAULT_LOGIN(QLatin1String("admin"));
 static const QString DEFAULT_PASSWORD(QLatin1String("123456"));
+static const int ACTI_DEVICEXML_PORT = 49152;
 
 QnActiResourceSearcher::QnActiResourceSearcher()
 {
@@ -33,7 +34,7 @@ QnResourceList QnActiResourceSearcher::findResources(void)
             if (processedUuid.contains(uuidStr))
                 continue;
 
-            processDeviceXml(uuidStr, QString(QLatin1String("http://%1:49152/devicedesc.xml")).arg(removeAddress), removeAddress, result);
+            processDeviceXml(uuidStr, QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(removeAddress).arg(ACTI_DEVICEXML_PORT), removeAddress, result);
             processedUuid << uuidStr;
         }
     }
@@ -89,7 +90,15 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
 {
     Q_UNUSED(doMultichannelCheck)
 
-    return QList<QnResourcePtr>();
+    QnResourceList result;
+
+    QByteArray uuidStr("ACTI");
+    uuidStr += url.host().toUtf8();
+    processDeviceXml(uuidStr, QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(url.host()).arg(ACTI_DEVICEXML_PORT), url.host(), result);
+    foreach(QnResourcePtr res, result)
+        res.dynamicCast<QnNetworkResource>()->setAuth(auth);
+
+    return result;
 }
 
 void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result)
