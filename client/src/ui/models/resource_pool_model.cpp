@@ -721,7 +721,6 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         if (camRes) {
             groupName = camRes->getGroupName();
             groupId = camRes->getGroupId();
-            qDebug() << camRes->getName() << camRes->getGroupId() << camRes->getGroupName();
         }
         if (groupId.isEmpty())
             return parent;

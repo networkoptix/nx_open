@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 #include <utils/common/email.h>
 
@@ -54,10 +54,7 @@ QnCheckResourceAndWarnDelegate<ResourceType>::~QnCheckResourceAndWarnDelegate() 
 template<class ResourceType>
 void QnCheckResourceAndWarnDelegate<ResourceType>::init(QWidget* parent) {
     m_warningLabel = new QLabel(parent);
-    QPalette palette = parent->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    m_warningLabel->setPalette(palette);
-
+    setWarningStyle(m_warningLabel);
     parent->layout()->addWidget(m_warningLabel);
 }
 

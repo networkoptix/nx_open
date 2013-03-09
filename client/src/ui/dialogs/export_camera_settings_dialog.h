@@ -37,6 +37,7 @@ private slots:
 
     void updateLicensesStatus();
     void updateMotionStatus();
+    void updateDtsStatus();
     void updateOkStatus();
 
 private:
@@ -50,6 +51,7 @@ private:
 
     bool m_licensesOk;
     bool m_motionOk;
+    bool m_dtsOk;
 };
 
 #endif // RESOURCE_TREE_DIALOG_H

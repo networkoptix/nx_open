@@ -5,7 +5,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -63,9 +63,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     m_timeoutTimer->setSingleShot(false);
 
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->detectErrorLabel->setPalette(palette);
+    setWarningStyle(ui->detectErrorLabel);
 
     ui->portComboBox->addItem(tr("Auto"), 0);
     for (int i = 0; i < QnEmail::ConnectionTypeCount; i++) {

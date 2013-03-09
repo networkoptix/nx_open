@@ -683,6 +683,8 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
             return EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return NoDataOverlay;
+    } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
+        return AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
         return PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
