@@ -236,8 +236,17 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        if (index.data(Qn::NodeTypeRole) == Qn::RecorderNode) {
+            for (int i = 0; i < index.model()->rowCount(index); i++) {
+                QModelIndex subIndex = index.model()->index(i, 0, index);
+                QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                if(resource && !result.contains(resource))
+                    result.append(resource);
+            }
+        }
+
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource)
+        if(resource && !result.contains(resource))
             result.append(resource);
     }
 

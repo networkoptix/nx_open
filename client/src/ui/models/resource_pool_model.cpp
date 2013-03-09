@@ -355,6 +355,9 @@ public:
             if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user))
                 result |= Qt::ItemIsDragEnabled;
             break;
+        case Qn::RecorderNode:
+            result |= Qt::ItemIsDragEnabled;
+            break;
         default:
             break;
         }
@@ -822,7 +825,16 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
             QnResourceList resources;
             foreach (const QModelIndex &index, indexes) {
                 Node *node = this->node(index);
-                if(node && node->resource())
+
+                if (node && node->type() == Qn::RecorderNode) {
+                    foreach (Node* child, node->children()) {
+                        if (child->resource() && !resources.contains(child->resource()))
+                            resources.append(child->resource());
+                    }
+                    pureTreeResourcesOnly = false;
+                }
+
+                if(node && node->resource() && !resources.contains(node->resource()))
                     resources.append(node->resource());
 
                 if(node && node->type() == Qn::ItemNode)
