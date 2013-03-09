@@ -246,6 +246,7 @@ QnAbstractStorageResourcePtr createStorage(const QString& path)
     storage->setName("Initial");
     storage->setUrl(path);
     storage->setSpaceLimit(5ll * 1000000000);
+    storage->setUsedForWriting(true);
 
     return storage;
 }
