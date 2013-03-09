@@ -22,12 +22,15 @@ static const int DEFAULT_RTSP_PORT = 7070;
 QString AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
 QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
+static int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
 
 QnActiResource::QnActiResource():
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false)
 {
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
+    for (int i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
+        m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
 }
 
 QnActiResource::~QnActiResource()
@@ -109,6 +112,33 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     return result;
 }
 
+QMap<QByteArray, QByteArray> QnActiResource::parseReport(const QByteArray& report) const
+{
+    QMap<QByteArray, QByteArray> result;
+    QList<QByteArray> lines = report.split('\n');
+    foreach(const QByteArray& line, lines) {
+        QList<QByteArray> tmp = line.split('=');
+        result.insert(tmp[0].trimmed().toLower(), tmp.size() >= 2 ? tmp[1].trimmed() : "");
+    }
+
+    return result;
+}
+
+QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
+{
+    QList<int> result;
+    foreach(QByteArray bitrate, bitrateCap.split(','))
+    {
+        bitrate = bitrate.trimmed().toUpper();
+        int coeff = 1;
+        if (bitrate.endsWith("M"))
+            coeff = 1000;
+        bitrate.chop(1);
+        result << bitrate.toFloat()*coeff;
+    }
+    return result;
+}
+
 bool QnActiResource::initInternal()
 {
     CLHttpStatus status;
@@ -160,6 +190,19 @@ bool QnActiResource::initInternal()
 
     QByteArray audioString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_AUDIO_ENABLED"), status);
     m_hasAudio = audioString.startsWith("OK");
+
+
+    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status);
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+    QMap<QByteArray, QByteArray> report = parseReport(serverReport);
+    setFirmware(QString::fromUtf8(report.value("firmware version")));
+    setMAC(QString::fromUtf8(report.value("mac address")));
+    
+    QByteArray bitrateCap = report.value("video_bitrate_cap");
+    if (!bitrateCap.isEmpty())
+        m_availBitrate = parseVideoBitrateCap(bitrateCap);
+
 
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
@@ -223,18 +266,16 @@ int QnActiResource::roundFps(int srcFps, QnResource::ConnectionRole role) const
     return result;
 }
 
-static int AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
-
 int QnActiResource::roundBitrate(int srcBitrateKbps) const
 {
     int minDistance = INT_MAX;
     int result = srcBitrateKbps;
-    for (int i = 0; i < sizeof(AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
+    for (int i = 0; i < m_availBitrate.size(); ++i)
     {
-        int distance = qAbs(AVAIL_BITRATE_KBPS[i] - srcBitrateKbps);
+        int distance = qAbs(m_availBitrate[i] - srcBitrateKbps);
         if (distance <= minDistance) { // preffer higher bitrate if same distance
             minDistance = distance;
-            result = AVAIL_BITRATE_KBPS[i];
+            result = m_availBitrate[i];
         }
     }
 

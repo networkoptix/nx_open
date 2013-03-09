@@ -68,10 +68,13 @@ protected:
 private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
+    QMap<QByteArray, QByteArray> parseReport(const QByteArray& report) const;
+    QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
 private:
     bool m_hasAudio;
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
+    QList<int> m_availBitrate;
     int m_rtspPort;
 };
 

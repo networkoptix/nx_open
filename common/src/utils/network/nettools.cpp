@@ -140,10 +140,8 @@ QString MACToString (const unsigned char* mac)
     return result;
 }
 
-unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
+unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep)
 {
-
-    const char cSep = '-';
     QByteArray arr = macs.toLatin1();
     const char *pszMACAddress = arr.data();
 
