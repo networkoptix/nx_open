@@ -21,9 +21,9 @@ static const int DEFAULT_RTSP_PORT = 7070;
 
 QString AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
 QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
+QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 
 QnActiResource::QnActiResource():
-    m_hasDualStreaming(false),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false)
 {
@@ -136,7 +136,6 @@ bool QnActiResource::initInternal()
         m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSecondaryRes, availResolutions);
         if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
             m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSecondaryRes, availResolutions); // try to get resolution ignoring aspect ration
-        m_hasDualStreaming = !m_resolution[1].isEmpty();
     }
 
     QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
@@ -162,8 +161,9 @@ bool QnActiResource::initInternal()
     QByteArray audioString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_AUDIO_ENABLED"), status);
     m_hasAudio = audioString.startsWith("OK");
 
-    setParam(DUAL_STREAMING_PARAM_NAME, m_hasDualStreaming ? 1 : 0, QnDomainDatabase);
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
+    setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
+    setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
     save();
 
     return true;
@@ -194,6 +194,11 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     url.setPort(m_rtspPort);
     url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
     return url.toString();
+}
+
+int QnActiResource::getMaxFps()
+{
+    return m_availFps[0].last();
 }
 
 QSize QnActiResource::getResolution(QnResource::ConnectionRole role) const
@@ -239,4 +244,12 @@ int QnActiResource::roundBitrate(int srcBitrateKbps) const
 bool QnActiResource::isAudioSupported() const
 {
     return m_hasAudio;
+}
+
+bool QnActiResource::hasDualStreaming() const
+{
+    QVariant mediaVariant;
+    QnActiResource* this_casted = const_cast<QnActiResource*>(this);
+    this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toInt();
 }

@@ -34,8 +34,8 @@ public:
     virtual bool shoudResolveConflicts() const override;
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
-
-    virtual bool hasDualStreaming() const override { return m_hasDualStreaming; }
+    virtual bool hasDualStreaming() const override;
+    virtual int getMaxFps() override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
@@ -69,7 +69,6 @@ private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
 private:
-    bool m_hasDualStreaming;
     bool m_hasAudio;
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
