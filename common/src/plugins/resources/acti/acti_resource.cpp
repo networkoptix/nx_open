@@ -155,22 +155,33 @@ bool QnActiResource::initInternal()
     if (status != CL_HTTP_SUCCESS)
         return false;
 
+    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status);
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+    QMap<QByteArray, QByteArray> report = parseReport(serverReport);
+    setFirmware(QString::fromUtf8(report.value("firmware version")));
+    setMAC(QString::fromUtf8(report.value("mac address")));
+
+    bool dualStreaming = report.value("channels").toInt() > 1;
+
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
         return false;
 
     m_resolution[0] = availResolutions.first();
 
-    resolutions = makeActiRequest(QLatin1String("system"), QLatin1String("CHANNEL=2&VIDEO_RESOLUTION_CAP"), status);
-    if (status == CL_HTTP_SUCCESS)
-    {
-        availResolutions = parseResolutionStr(resolutions);
-        int maxSecondaryRes = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    if (dualStreaming) {
+        resolutions = makeActiRequest(QLatin1String("system"), QLatin1String("CHANNEL=2&VIDEO_RESOLUTION_CAP"), status);
+        if (status == CL_HTTP_SUCCESS)
+        {
+            availResolutions = parseResolutionStr(resolutions);
+            int maxSecondaryRes = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
 
-        float currentAspect = getResolutionAspectRatio(m_resolution[0]);
-        m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSecondaryRes, availResolutions);
-        if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
-            m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSecondaryRes, availResolutions); // try to get resolution ignoring aspect ration
+            float currentAspect = getResolutionAspectRatio(m_resolution[0]);
+            m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSecondaryRes, availResolutions);
+            if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
+                m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSecondaryRes, availResolutions); // try to get resolution ignoring aspect ration
+        }
     }
 
     QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
@@ -196,14 +207,6 @@ bool QnActiResource::initInternal()
     QByteArray audioString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_AUDIO_ENABLED"), status);
     m_hasAudio = audioString.startsWith("OK");
 
-
-    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status);
-    if (status != CL_HTTP_SUCCESS)
-        return false;
-    QMap<QByteArray, QByteArray> report = parseReport(serverReport);
-    setFirmware(QString::fromUtf8(report.value("firmware version")));
-    setMAC(QString::fromUtf8(report.value("mac address")));
-    
     QByteArray bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
         m_availBitrate = parseVideoBitrateCap(bitrateCap);
