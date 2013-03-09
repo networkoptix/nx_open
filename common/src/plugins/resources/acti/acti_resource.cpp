@@ -81,7 +81,7 @@ QByteArray unquoteStr(const QByteArray& value)
     return value.mid(pos1, value.length()-pos1-pos2);
 }
 
-QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status) const
+QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData) const
 {
     QByteArray result;
 
@@ -97,7 +97,10 @@ QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& 
             return QByteArray();
         }
     }
-    return unquoteStr(result.mid(result.indexOf('=')+1).trimmed());
+    if (keepAllData)
+        return result;
+    else
+        return unquoteStr(result.mid(result.indexOf('=')+1).trimmed());
 }
 
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -155,7 +158,7 @@ bool QnActiResource::initInternal()
     if (status != CL_HTTP_SUCCESS)
         return false;
 
-    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status);
+    QByteArray serverReport = makeActiRequest(QLatin1String("system"), QLatin1String("SERVER_REPORT"), status, true);
     if (status != CL_HTTP_SUCCESS)
         return false;
     QMap<QByteArray, QByteArray> report = parseReport(serverReport);

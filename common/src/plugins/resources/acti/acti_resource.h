@@ -39,7 +39,7 @@ public:
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
-    QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status) const;
+    QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData = false) const;
     QSize getResolution(QnResource::ConnectionRole role) const;
     int roundFps(int srcFps, QnResource::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
