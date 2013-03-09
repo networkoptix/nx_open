@@ -106,13 +106,6 @@ int QnLicenseUsageHelper::requiredAnalog() const {
     return m_requiredAnalog;
 }
 
-int QnLicenseUsageHelper::proposedDigital() const {
-    return m_proposedDigital;
-}
-
-int QnLicenseUsageHelper::proposedAnalog() const {
-    return m_proposedAnalog;
-}
 
 bool QnLicenseUsageHelper::isValid() const {
     return m_isValid;

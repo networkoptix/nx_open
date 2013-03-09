@@ -502,6 +502,9 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 {
     QnLicenseUsageHelper helper;
 
+    int usedDigitalChange = helper.usedDigital();
+    int usedAnalogChange = helper.usedAnalog();
+
     switch(ui->enableRecordingCheckBox->checkState()) {
     case Qt::Checked:
         helper.propose(m_cameras, true);
@@ -512,6 +515,9 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     default:
         break;
     }
+
+    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
+    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
 
     { // digital licenses
         QString usageText = tr("%1 digital license(s) are used out of %2.")
@@ -561,18 +567,18 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         ui->requiredLicensesLabel->setText(tr("Activate %1 more analog licenses.")
                                            .arg(helper.requiredAnalog())
                                            );
-    } else if (helper.proposedDigital() > 0 && helper.proposedAnalog() > 0) {
+    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
         ui->requiredLicensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
-                                           .arg(helper.proposedDigital())
-                                           .arg(helper.proposedAnalog())
+                                           .arg(usedDigitalChange)
+                                           .arg(usedAnalogChange)
                                            );
-    } else if (helper.proposedDigital() > 0) {
+    } else if (usedDigitalChange > 0) {
         ui->requiredLicensesLabel->setText(tr("%1 more digital licenses will be used.")
-                                           .arg(helper.proposedDigital())
+                                           .arg(usedDigitalChange)
                                            );
-    } else if (helper.proposedAnalog() > 0) {
+    } else if (usedAnalogChange > 0) {
         ui->requiredLicensesLabel->setText(tr("%1 more analog licenses will be used.")
-                                           .arg(helper.proposedAnalog())
+                                           .arg(usedAnalogChange)
                                            );
     }
     else {

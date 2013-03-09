@@ -139,7 +139,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         // and checkBox "Use Analog License" was checked
         if (camera->isAnalog()) {
             if (ui->analogViewCheckBox->checkState() != Qt::PartiallyChecked)
-                camera->setScheduleDisabled(ui->analogViewCheckBox->checkState() == Qt::Checked);
+                camera->setScheduleDisabled(ui->analogViewCheckBox->checkState() == Qt::Unchecked);
         } else
         if (m_hasScheduleEnabledChanges)
             camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());

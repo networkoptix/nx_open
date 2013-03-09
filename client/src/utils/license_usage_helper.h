@@ -21,9 +21,6 @@ public:
     int requiredDigital() const;
     int requiredAnalog() const;
 
-    int proposedDigital() const;
-    int proposedAnalog() const;
-
     bool isValid() const;
 private:
     void update();
