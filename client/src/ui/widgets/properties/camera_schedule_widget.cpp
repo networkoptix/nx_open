@@ -79,7 +79,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     connect(ui->exportScheduleButton,   SIGNAL(clicked()),                  this,   SLOT(at_exportScheduleButton_clicked()));
     ui->exportWarningLabel->setVisible(false);
-    
+
     QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
     releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
     connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
@@ -533,63 +533,73 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         break;
     }
 
-    QString usageText = tr("%1 digital license(s) are used out of %2.\n"\
-                           "%3 analog  license(s) are used out of %4.")
-            .arg(helper.proposedDigital())
-            .arg(helper.totalDigital())
-            .arg(helper.proposedAnalog())
-            .arg(helper.totalAnalog());
+    { // digital licenses
+        QString usageText = tr("%1 digital license(s) are used out of %2.")
+                .arg(helper.usedDigital())
+                .arg(helper.totalDigital());
+        ui->digitalLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.requiredDigital() > 0)
+            setWarningStyle(&palette);
+        ui->digitalLicensesLabel->setPalette(palette);
+    }
 
-    ui->licensesUsageLabel->setText(usageText);
+    { // analog licenses
+        QString usageText = tr("%1 analog license(s) are used out of %2.")
+                .arg(helper.usedAnalog())
+                .arg(helper.totalAnalog());
+        ui->analogLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.requiredAnalog() > 0)
+            setWarningStyle(&palette);
+        ui->analogLicensesLabel->setPalette(palette);
+    }
 
-    QPalette palette = this->palette();
-    if (!helper.isValid())
-        setWarningStyle(&palette);
-    ui->licensesUsageLabel->setPalette(palette);
-
-    ui->licensesLabel->setVisible(false);
-/*
     if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
-        ui->licensesLabel->setVisible(false);
+        ui->requiredLicensesLabel->setVisible(false);
         return;
     }
 
-    ui->licensesLabel->setVisible(true);
-    QPalette palette = this->palette();
-    if (usedDigital > totalDigital || usedAnalog > totalAnalog)
-        setWarningStyle(&palette);
-    ui->licensesLabel->setPalette(palette);
-
-
-
-    if (toBeUsedDigital > totalDigital && toBeUsedAnalog > totalAnalog) {
-        ui->licensesLabel->setText(tr("Activate %1 more digital and %2 more analog licenses.")
-                                   .arg(toBeUsedDigital - totalDigital)
-                                   .arg(toBeUsedAnalog - totalAnalog)
-            );
-    } else if (toBeUsedDigital > totalDigital) {
-        ui->licensesLabel->setText(tr("Activate %1 more digital licenses.")
-                                   .arg(toBeUsedDigital - totalDigital)
-            );
-    } else if (toBeUsedAnalog > totalAnalog) {
-        ui->licensesLabel->setText(tr("Activate %1 more analog licenses.")
-                                   .arg(toBeUsedAnalog - totalAnalog)
-            );
-    } else if (countDigital > activeDigital && countAnalog > activeAnalog) {
-        ui->licensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
-                                   .arg(countDigital - activeDigital)
-                                   .arg(countAnalog - activeAnalog)
-            );
-    } else if (countDigital > activeDigital) {
-        ui->licensesLabel->setText(tr("%1 more digital licenses will be used.")
-                                   .arg(countDigital - activeDigital)
-            );
-    } else {
-        ui->licensesLabel->setText(tr("%1 more analog licenses will be used.")
-                                   .arg(countAnalog - activeAnalog)
-            );
+    { // required licenses
+        QPalette palette = this->palette();
+        if (!helper.isValid())
+            setWarningStyle(&palette);
+        ui->requiredLicensesLabel->setPalette(palette);
+        ui->requiredLicensesLabel->setVisible(true);
     }
-    */
+
+    if (helper.requiredDigital() > 0 && helper.requiredAnalog() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital and %2 more analog licenses.")
+                                           .arg(helper.requiredDigital())
+                                           .arg(helper.requiredAnalog())
+                                           );
+    } else if (helper.requiredDigital() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital licenses.")
+                                           .arg(helper.requiredDigital())
+                                           );
+    } else if (helper.requiredAnalog() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more analog licenses.")
+                                           .arg(helper.requiredAnalog())
+                                           );
+    } else if (helper.proposedDigital() > 0 && helper.proposedAnalog() > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
+                                           .arg(helper.proposedDigital())
+                                           .arg(helper.proposedAnalog())
+                                           );
+    } else if (helper.proposedDigital() > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more digital licenses will be used.")
+                                           .arg(helper.proposedDigital())
+                                           );
+    } else if (helper.proposedAnalog() > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more analog licenses will be used.")
+                                           .arg(helper.proposedAnalog())
+                                           );
+    }
+    else {
+        ui->requiredLicensesLabel->setText(QString());
+    }
+
+
 }
 
 void QnCameraScheduleWidget::updateLicensesButtonVisible() {

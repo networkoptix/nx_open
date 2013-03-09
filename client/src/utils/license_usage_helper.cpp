@@ -6,16 +6,28 @@
 
 QnLicenseUsageHelper::QnLicenseUsageHelper():
     m_licenses(qnLicensePool->getLicenses()),
-    m_digitalChange(0),
-    m_analogChange(0)
+    m_usedDigital(0),
+    m_usedAnalog(0),
+    m_requiredDigital(0),
+    m_requiredAnalog(0),
+    m_proposedDigital(0),
+    m_proposedAnalog(0),
+    m_isValid(true)
 {
+    update();
 }
 
 QnLicenseUsageHelper::QnLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable):
     m_licenses(qnLicensePool->getLicenses()),
-    m_digitalChange(0),
-    m_analogChange(0)
+    m_usedDigital(0),
+    m_usedAnalog(0),
+    m_requiredDigital(0),
+    m_requiredAnalog(0),
+    m_proposedDigital(0),
+    m_proposedAnalog(0),
+    m_isValid(true)
 {
+    // update will be called inside
     propose(proposedCameras, proposedEnable);
 }
 
@@ -24,15 +36,50 @@ void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCa
         // if schedule is disabled and we are enabling it
         if (camera->isScheduleDisabled() == proposedEnable) {
             if (camera->isAnalog())
-                m_analogChange++;
+                m_proposedAnalog++;
             else
-                m_digitalChange++;
+                m_proposedDigital++;
         }
     }
     if (!proposedEnable) {
-        m_digitalChange *= -1;
-        m_analogChange *= -1;
+        m_proposedDigital *= -1;
+        m_proposedAnalog *= -1;
     }
+    update();
+}
+
+void QnLicenseUsageHelper::update() {
+    int activeAnalog = qnResPool->activeAnalog() + m_proposedAnalog;
+    int activeDigital = qnResPool->activeDigital() + m_proposedDigital;
+    int freeDigital = totalDigital() - activeDigital;
+    if (freeDigital < 0) {
+        m_isValid = false;
+        m_usedDigital = activeDigital;
+        m_requiredDigital = -freeDigital;
+
+        m_usedAnalog = activeAnalog;
+        m_requiredAnalog = qMax(activeAnalog - totalAnalog(), 0);
+        return;
+    }
+
+    int freeAnalog = totalAnalog() + freeDigital - activeAnalog;
+    if (freeAnalog < 0) {
+        m_isValid = false;
+        m_usedDigital = totalDigital();
+        m_requiredDigital = 0;
+
+        m_usedAnalog = activeAnalog;
+        m_requiredAnalog = -freeAnalog;
+        return;
+    }
+
+    m_isValid = true;
+
+    int requiredDigitalInsteadAnalog = qMax(activeAnalog - totalAnalog(), 0);
+    m_usedDigital = activeDigital + requiredDigitalInsteadAnalog;
+    m_usedAnalog = activeAnalog - requiredDigitalInsteadAnalog;
+
+    m_requiredDigital = m_requiredAnalog = 0;
 }
 
 int QnLicenseUsageHelper::totalDigital() const {
@@ -44,31 +91,29 @@ int QnLicenseUsageHelper::totalAnalog() const {
 }
 
 int QnLicenseUsageHelper::usedDigital() const {
-    int requiredDigitalInsteadAnalog = qMax(totalAnalog() - usedAnalog(), 0);
-    return qMin(requiredDigital() + requiredDigitalInsteadAnalog, totalDigital());
+    return m_usedDigital;
 }
 
 int QnLicenseUsageHelper::usedAnalog() const {
-    return qMin(totalAnalog(), qnResPool->activeAnalog() + m_analogChange);
+    return m_usedAnalog;
 }
 
 int QnLicenseUsageHelper::requiredDigital() const {
-    return qnResPool->activeDigital() + m_digitalChange;
+    return m_requiredDigital;
 }
 
 int QnLicenseUsageHelper::requiredAnalog() const {
-    int freeDigital = qMax(totalDigital() - requiredDigital(), 0);
-    return qMax(qnResPool->activeAnalog() + m_analogChange - freeDigital, 0);
+    return m_requiredAnalog;
 }
 
 int QnLicenseUsageHelper::proposedDigital() const {
-    return isValid() ? usedDigital() : requiredDigital();
+    return m_proposedDigital;
 }
 
 int QnLicenseUsageHelper::proposedAnalog() const {
-    return isValid() ? usedAnalog() : requiredAnalog();
+    return m_proposedAnalog;
 }
 
 bool QnLicenseUsageHelper::isValid() const {
-    return requiredDigital() <= totalDigital() && requiredAnalog() <= totalAnalog();
+    return m_isValid;
 }

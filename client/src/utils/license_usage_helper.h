@@ -26,10 +26,20 @@ public:
 
     bool isValid() const;
 private:
+    void update();
+
     QnLicenseList m_licenses;
 
-    int m_digitalChange;
-    int m_analogChange;
+    int m_usedDigital;
+    int m_usedAnalog;
+
+    int m_requiredDigital;
+    int m_requiredAnalog;
+
+    int m_proposedDigital;
+    int m_proposedAnalog;
+
+    bool m_isValid;
 };
 
 #endif // LICENSE_USAGE_HELPER_H

@@ -40,9 +40,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="licensesLabel">
+      <widget class="QLabel" name="requiredLicensesLabel">
        <property name="text">
-        <string>...</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -56,7 +56,14 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="licensesUsageLabel">
+    <widget class="QLabel" name="digitalLicensesLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="analogLicensesLabel">
      <property name="text">
       <string/>
      </property>
