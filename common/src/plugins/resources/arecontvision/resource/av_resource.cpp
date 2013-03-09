@@ -267,6 +267,10 @@ bool QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
+    const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
+    setFirmware(firmware);
+    save();
+
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
 

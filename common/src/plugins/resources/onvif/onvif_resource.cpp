@@ -617,7 +617,8 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
     QString hardwareId;
     
     //Trying to get name
-    if (getName().isEmpty() || getModel().isEmpty() || getFirmware().isEmpty())
+    //if (getName().isEmpty() || getModel().isEmpty() || getFirmware().isEmpty())
+    if (1)
     {
         DeviceInfoReq request;
         DeviceInfoResp response;
