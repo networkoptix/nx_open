@@ -75,7 +75,7 @@ void QnActiStreamReader::openStream()
 
     if (m_actiRes->isAudioSupported())
     {
-        result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_AUDIO.arg(ch).arg(audioStr), status);
+        result = m_actiRes->makeActiRequest(QLatin1String("system"), SET_AUDIO.arg(ch).arg(audioStr), status);
         if (status != CL_HTTP_SUCCESS)
             return;
     }
