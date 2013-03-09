@@ -75,7 +75,7 @@ void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, co
     QnActiResourcePtr resource ( new QnActiResource() );
 
     resource->setTypeId(rt);
-    resource->setName(manufacture() +  QString(QLatin1String("-")) + devInfo.modelName);
+    resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);
     resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(devInfo.serialNumber));
