@@ -845,6 +845,7 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
+    action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
 }
 
