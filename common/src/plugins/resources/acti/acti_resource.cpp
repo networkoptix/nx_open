@@ -90,8 +90,13 @@ QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& 
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
     QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
     status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
-    if (status == CL_HTTP_SUCCESS)
+    if (status == CL_HTTP_SUCCESS) {
         client.readAll(result);
+        if (result.startsWith("ERROR: bad account")) {
+            status = CL_HTTP_AUTH_REQUIRED; 
+            return QByteArray();
+        }
+    }
     return unquoteStr(result.mid(result.indexOf('=')+1).trimmed());
 }
 
