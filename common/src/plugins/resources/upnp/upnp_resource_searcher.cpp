@@ -82,13 +82,6 @@ QnUpnpResourceSearcher::QnUpnpResourceSearcher():
 {
     m_cacheLivetime.restart();
 
-    m_receiveSocket = new UDPSocket();
-    m_receiveSocket->setReuseAddrFlag(true);
-    m_receiveSocket->setLocalPort(GROUP_PORT);
-
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
-        m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
-    }
 }
 
 QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
@@ -100,6 +93,17 @@ QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
 
 UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
 {
+    if (m_receiveSocket == 0) {
+        m_receiveSocket = new UDPSocket();
+        m_receiveSocket->setReuseAddrFlag(true);
+        m_receiveSocket->setLocalPort(GROUP_PORT);
+    }
+
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
+        m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+    }
+
+
     QMap<QString, UDPSocket*>::iterator it = m_socketList.find(iface.address.toString());
     if (it == m_socketList.end())
     {
@@ -168,6 +172,26 @@ QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
     return QHostAddress(result);
 }
 
+void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result)
+{
+    QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
+
+    //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
+
+    //parsing description xml
+    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    QXmlSimpleReader xmlReader;
+    xmlReader.setContentHandler( &xmlHandler );
+    xmlReader.setErrorHandler( &xmlHandler );
+
+    QXmlInputSource input;
+    input.setData( foundDeviceDescription );
+    if( !xmlReader.parse( &input ) )
+        return;
+
+    processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), result);
+}
+
 void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
 {
     while(socket->hasData())
@@ -205,23 +229,8 @@ void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& 
             continue;
         processedUuid << uuidStr;
 
-        QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
+        processDeviceXml(uuidStr, descritionUrl, sender, result);
 
-
-        //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
-
-        //parsing description xml
-        UpnpDeviceDescriptionSaxHandler xmlHandler;
-        QXmlSimpleReader xmlReader;
-        xmlReader.setContentHandler( &xmlHandler );
-        xmlReader.setErrorHandler( &xmlHandler );
-
-        QXmlInputSource input;
-        input.setData( foundDeviceDescription );
-        if( !xmlReader.parse( &input ) )
-            continue;
-
-        processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), result);
     }
 }
 

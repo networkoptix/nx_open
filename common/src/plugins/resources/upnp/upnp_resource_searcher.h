@@ -31,6 +31,8 @@ private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const QString& host);
     void processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
+protected:
+    void processDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result);
 private:
     QMap<QString, UDPSocket*> m_socketList;
     UDPSocket* sockByName(const QnInterfaceAndAddr& iface);

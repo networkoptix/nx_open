@@ -1,6 +1,7 @@
 #include "acti_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "acti_resource.h"
+#include "../mdns/mdns_listener.h"
 
 extern QString getValueFromString(const QString& line);
 
@@ -9,6 +10,34 @@ static const QString DEFAULT_PASSWORD(QLatin1String("123456"));
 
 QnActiResourceSearcher::QnActiResourceSearcher()
 {
+    QnMdnsListener::instance()->registerConsumer((long) this);
+}
+
+QnResourceList QnActiResourceSearcher::findResources(void)
+{
+    // find via pnp
+    QnResourceList result = QnUpnpResourceSearcher::findResources();
+
+    // find via MDNS
+    QList<QByteArray> processedUuid;
+    QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((long) this);
+    for (int i = 0; i < data.size(); ++i)
+    {
+        QString removeAddress = data[i].remoteAddress;
+        QByteArray uuidStr("ACTI");
+        uuidStr += data[i].remoteAddress.toUtf8();
+        QByteArray response = data[i].response;
+
+        if (response.contains("_http") && response.contains("_tcp") && response.contains("local"))
+        {
+            if (processedUuid.contains(uuidStr))
+                continue;
+
+            processDeviceXml(uuidStr, QString(QLatin1String("http://%1:49152/devicedesc.xml")).arg(removeAddress), removeAddress, result);
+            processedUuid << uuidStr;
+        }
+    }
+    return result;
 }
 
 QnActiResourceSearcher& QnActiResourceSearcher::instance()

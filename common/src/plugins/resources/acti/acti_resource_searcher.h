@@ -19,6 +19,8 @@ public:
     virtual QString manufacture() const;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+
+    virtual QnResourceList findResources(void) override;
 protected:
     virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
 };
