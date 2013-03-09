@@ -472,13 +472,7 @@ int QnResourcePool::activeCamerasByClass(bool analog) const
         if (!camera || camera->isDisabled() || camera->isScheduleDisabled() || camera->isAnalog() != analog)
             continue;
         count++;
-        qDebug() << "active camera" << camera->getName();
     }
-
-    if (analog)
-        qDebug() << "active analog" << count;
-    else
-        qDebug() << "active digital" << count;
     return count;
 }
 

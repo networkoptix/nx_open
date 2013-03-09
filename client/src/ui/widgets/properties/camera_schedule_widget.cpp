@@ -71,7 +71,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->displayFpsCheckBox,     SIGNAL(stateChanged(int)),          this,   SLOT(at_displayFpsCheckBox_stateChanged(int)));
     connect(ui->enableRecordingCheckBox,SIGNAL(clicked()),                  this,   SLOT(at_enableRecordingCheckBox_clicked()));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
-    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged()));
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged(int)));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
     connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
 
@@ -472,30 +472,6 @@ void QnCameraScheduleWidget::setScheduleEnabled(bool enabled)
 
 bool QnCameraScheduleWidget::isScheduleEnabled() const {
     return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
-}
-
-int QnCameraScheduleWidget::activeCameraCountByClass(bool analog) const
-{
-    switch(ui->enableRecordingCheckBox->checkState()) {
-    case Qt::Checked: {
-            int result = 0;
-            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-                if (camera->isAnalog() == analog)
-                    result++;
-            return result;
-        }
-    case Qt::Unchecked:
-        return 0;
-    case Qt::PartiallyChecked: {
-            int result = 0;
-            foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-                if (!camera->isScheduleDisabled() && camera->isAnalog() == analog)
-                    result++;
-            return result;
-        }
-    default:
-        return 0;
-    }
 }
 
 void QnCameraScheduleWidget::setMotionAvailable(bool available) {

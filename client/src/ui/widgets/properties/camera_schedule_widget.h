@@ -56,16 +56,6 @@ public:
      */
     int getGridMaxFps(bool motionPlusLqOnly = false);
 
-    int activeCameraCountByClass(bool analog) const;
-
-    int activeDigitalCount() const {
-        return activeCameraCountByClass(false);
-    }
-
-    int activeAnalogCount() const {
-        return activeCameraCountByClass(true);
-    }
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
@@ -90,7 +80,7 @@ public:
 signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
-    void scheduleEnabledChanged();
+    void scheduleEnabledChanged(int);
     void moreLicensesRequested();
     void gridParamsChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
