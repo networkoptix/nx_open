@@ -29,6 +29,7 @@ protected:
     virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) = 0;
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
+    QHostAddress findBestIface(const QString& host);
 private:
     QMap<QString, UDPSocket*> m_socketList;
     UDPSocket* sockByName(const QnInterfaceAndAddr& iface);
@@ -36,6 +37,7 @@ private:
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
     QTime m_cacheLivetime;
     bool m_sendRequests;
+    UDPSocket* m_receiveSocket;
 
     static QAtomicInt m_isntanceCnt;
 };

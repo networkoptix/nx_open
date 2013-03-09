@@ -204,8 +204,7 @@ bool QnActiResource::initInternal()
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
 
-    QByteArray audioString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_AUDIO_ENABLED"), status);
-    m_hasAudio = audioString.startsWith("OK");
+    m_hasAudio = report.value("audio").toInt() > 0;
 
     QByteArray bitrateCap = report.value("video_bitrate_cap");
     if (!bitrateCap.isEmpty())
@@ -243,7 +242,10 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     QUrl url(getUrl());
     url.setScheme(QLatin1String("rtsp"));
     url.setPort(m_rtspPort);
-    url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
+    if (isAudioSupported())
+        url.setPath(QString(QLatin1String("stream%1")).arg(actiChannelNum));
+    else
+        url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
     return url.toString();
 }
 

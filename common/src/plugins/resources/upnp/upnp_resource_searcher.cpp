@@ -6,6 +6,7 @@
 
 #include <QXmlDefaultHandler>
 #include "core/resource_managment/resource_pool.h"
+#include "utils/network/nettools.h"
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 
@@ -78,16 +79,26 @@ public:
 
 
 //====================================================================
-QnUpnpResourceSearcher::QnUpnpResourceSearcher()
+QnUpnpResourceSearcher::QnUpnpResourceSearcher():
+    m_receiveSocket(0)
 {
     m_sendRequests = m_isntanceCnt.fetchAndAddAcquire(1) == 0;
     m_cacheLivetime.restart();
+
+    m_receiveSocket = new UDPSocket();
+    m_receiveSocket->setReuseAddrFlag(true);
+    m_receiveSocket->setLocalPort(GROUP_PORT);
+
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
+        m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+    }
 }
 
 QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
 {
     foreach(UDPSocket* sock, m_socketList)
         delete sock;
+    delete m_receiveSocket;
 }
 
 UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
@@ -106,11 +117,13 @@ UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
 
         sock->setMulticastIF(localAddress);
 
+        /*
         if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
         {
             delete sock;
             return 0;
         }
+        */
 
         sock->setReadBufferSize(1024*512);
 
@@ -142,94 +155,107 @@ QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidSt
     return result;
 }
 
+QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
+{
+    QString oldAddress;
+    QString result;
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    {
+        QString newAddress = iface.address.toString();
+        if (isNewDiscoveryAddressBetter(host, newAddress, oldAddress))
+        {
+            oldAddress = newAddress;
+            result = newAddress;
+        }
+    }
+    return QHostAddress(result);
+}
+
 QnResourceList QnUpnpResourceSearcher::findResources(void)
 {
     QnResourceList result;
     QSet<QByteArray> processedUuid;
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    if (m_sendRequests) 
     {
-        UDPSocket* sock = sockByName(iface);
+        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+        {
+            UDPSocket* sock = sockByName(iface);
+            if (!sock)
+                continue;
 
-        QString tmp = iface.address.toString();
+            QByteArray data;
 
-        if (!sock)
-            continue;
-
-        QByteArray data;
-        //data.append("OPTIONS /ietf/ipp/printer HTTP/1.1\n");
-        //data.append("Host: ").append(sock->localAddress().toString().toAscii()).append(":").append(QByteArray::number(sock->localPort())).append('\n');
-        //data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\n\n");
-
-        if (m_sendRequests) {
             data.append("M-SEARCH * HTTP/1.1\r\n");
             data.append("Host: 192.168.0.150:1900\r\n");
+            //data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
             data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
             data.append("Man:\"ssdp:discover\"\r\n");
             data.append("MX:3\r\n\r\n");
-
             sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+
+            /*
+            data.clear();
+            data.append("OPTIONS /ietf/ipp/printer HTTP/1.1\r\n");
+            data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
+            data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n");
+            sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+            */
         }
+    }
 
-        while(sock->hasData())
-        {
+    while(m_receiveSocket->hasData())
+    {
 
-            char buffer[1024*16+1];
+        char buffer[1024*16+1];
 
-            QString sender;
-            quint16 senderPort;
-            int readed = sock->recvFrom(buffer, sizeof(buffer), sender, senderPort);
-            if (readed > 0)
-                buffer[readed] = 0;
-            QByteArray reply = QByteArray::fromRawData(buffer, readed);
+        QString sender;
+        quint16 senderPort;
+        int readed = m_receiveSocket->recvFrom(buffer, sizeof(buffer), sender, senderPort);
+        if (readed > 0)
+            buffer[readed] = 0;
+        QByteArray reply = QByteArray::fromRawData(buffer, readed);
 
-            qDebug() << "gotdata=" << sender;
-            if (sender == QLatin1String("192.168.0.100"))
-            {
-                int gg = 4;
-            }
+        nx_http::HttpRequest foundDeviceReply;
+        if( !foundDeviceReply.parse( reply ) )
+            continue;
+        nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
+        if( locationHeader == foundDeviceReply.headers.end() )
+            continue;
 
-            nx_http::HttpRequest foundDeviceReply;
-            if( !foundDeviceReply.parse( reply ) )
-                continue;
-            nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
-            if( locationHeader == foundDeviceReply.headers.end() )
-                continue;
+        nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
+        if( uuidHeader == foundDeviceReply.headers.end() )
+            continue;
 
-            nx_http::HttpHeaders::const_iterator uuidHeader = foundDeviceReply.headers.find( "USN" );
-            if( uuidHeader == foundDeviceReply.headers.end() )
-                continue;
+        QByteArray uuidStr = uuidHeader->second;
+        if (!uuidStr.startsWith("uuid:"))
+            continue;
+        uuidStr = uuidStr.split(':')[1];
 
-            QByteArray uuidStr = uuidHeader->second;
-            if (!uuidStr.startsWith("uuid:"))
-                continue;
-            uuidStr = uuidStr.split(':')[1];
+        const QUrl descritionUrl( QLatin1String(locationHeader->second) );
+        uuidStr += descritionUrl.toString();
 
-            const QUrl descritionUrl( QLatin1String(locationHeader->second) );
-            uuidStr += descritionUrl.toString();
+        if (processedUuid.contains(uuidStr))
+            continue;
+        processedUuid << uuidStr;
 
-            if (processedUuid.contains(uuidStr))
-                continue;
-            processedUuid << uuidStr;
-
-            QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
+        QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
 
 
-            //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
+        //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
 
-            //parsing description xml
-            UpnpDeviceDescriptionSaxHandler xmlHandler;
-            QXmlSimpleReader xmlReader;
-            xmlReader.setContentHandler( &xmlHandler );
-            xmlReader.setErrorHandler( &xmlHandler );
+        //parsing description xml
+        UpnpDeviceDescriptionSaxHandler xmlHandler;
+        QXmlSimpleReader xmlReader;
+        xmlReader.setContentHandler( &xmlHandler );
+        xmlReader.setErrorHandler( &xmlHandler );
 
-            QXmlInputSource input;
-            input.setData( foundDeviceDescription );
-            if( !xmlReader.parse( &input ) )
-                continue;
+        QXmlInputSource input;
+        input.setData( foundDeviceDescription );
+        if( !xmlReader.parse( &input ) )
+            continue;
 
-            processPacket(iface.address, descritionUrl.host(), xmlHandler.deviceInfo(), result);
-        }
+        processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), result);
     }
 
     return result;

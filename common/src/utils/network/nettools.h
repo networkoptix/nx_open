@@ -53,4 +53,7 @@ QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface
 QN_EXPORT bool isIpv4Address(const QString& addr);
 QN_EXPORT QHostAddress resolveAddress(const QString& addr);
 
+QN_EXPORT int strEqualAmount(const char* str1, const char* str2);
+QN_EXPORT bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
+
 #endif //cl_net_tools_1232
