@@ -19,8 +19,6 @@ static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
 
-QAtomicInt QnUpnpResourceSearcher::m_isntanceCnt(0);
-
 //!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
@@ -82,7 +80,6 @@ public:
 QnUpnpResourceSearcher::QnUpnpResourceSearcher():
     m_receiveSocket(0)
 {
-    m_sendRequests = m_isntanceCnt.fetchAndAddAcquire(1) == 0;
     m_cacheLivetime.restart();
 
     m_receiveSocket = new UDPSocket();
@@ -171,47 +168,16 @@ QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
     return QHostAddress(result);
 }
 
-QnResourceList QnUpnpResourceSearcher::findResources(void)
+void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
 {
-    QnResourceList result;
-    QSet<QByteArray> processedUuid;
-
-    if (m_sendRequests) 
-    {
-        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
-        {
-            UDPSocket* sock = sockByName(iface);
-            if (!sock)
-                continue;
-
-            QByteArray data;
-
-            data.append("M-SEARCH * HTTP/1.1\r\n");
-            data.append("Host: 192.168.0.150:1900\r\n");
-            //data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
-            data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
-            data.append("Man:\"ssdp:discover\"\r\n");
-            data.append("MX:3\r\n\r\n");
-            sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
-
-            /*
-            data.clear();
-            data.append("OPTIONS /ietf/ipp/printer HTTP/1.1\r\n");
-            data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
-            data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n");
-            sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
-            */
-        }
-    }
-
-    while(m_receiveSocket->hasData())
+    while(socket->hasData())
     {
 
         char buffer[1024*16+1];
 
         QString sender;
         quint16 senderPort;
-        int readed = m_receiveSocket->recvFrom(buffer, sizeof(buffer), sender, senderPort);
+        int readed = socket->recvFrom(buffer, sizeof(buffer), sender, senderPort);
         if (readed > 0)
             buffer[readed] = 0;
         QByteArray reply = QByteArray::fromRawData(buffer, readed);
@@ -257,11 +223,39 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 
         processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), result);
     }
-
-    return result;
 }
 
-void QnUpnpResourceSearcher::setSendRequests(bool value)
+QnResourceList QnUpnpResourceSearcher::findResources(void)
 {
-    m_sendRequests = value;
+    QnResourceList result;
+    QSet<QByteArray> processedUuid;
+
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    {
+        UDPSocket* sock = sockByName(iface);
+        if (!sock)
+            continue;
+
+        QByteArray data;
+
+        data.append("M-SEARCH * HTTP/1.1\r\n");
+        //data.append("Host: 192.168.0.150:1900\r\n");
+        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
+        data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
+        data.append("Man:\"ssdp:discover\"\r\n");
+        data.append("MX:3\r\n\r\n");
+        sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+
+        /*
+        data.clear();
+        data.append("OPTIONS /ietf/ipp/printer HTTP/1.1\r\n");
+        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
+        data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n");
+        sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+        */
+        processSocket(sock, processedUuid, result);
+    }
+    processSocket(m_receiveSocket, processedUuid, result);
+
+    return result;
 }

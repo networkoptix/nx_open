@@ -30,16 +30,14 @@ protected:
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const QString& host);
+    void processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
 private:
     QMap<QString, UDPSocket*> m_socketList;
     UDPSocket* sockByName(const QnInterfaceAndAddr& iface);
 
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
     QTime m_cacheLivetime;
-    bool m_sendRequests;
     UDPSocket* m_receiveSocket;
-
-    static QAtomicInt m_isntanceCnt;
 };
 
 #endif // upnp_resource_searcher_h_1806
