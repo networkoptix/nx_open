@@ -1,10 +1,10 @@
 #ifndef _ACTI_RESOURCE_SEARCHER_H__
 #define _ACTI_RESOURCE_SEARCHER_H__
 
-#include "plugins/resources/bonjour/bonjour_resource_searcher.h"
+#include "plugins/resources/upnp/upnp_resource_searcher.h"
 
 
-class QnActiResourceSearcher : public QnBonjourResourceSearcher
+class QnActiResourceSearcher : public QnUpnpResourceSearcher
 {
     QnActiResourceSearcher();
 
@@ -20,7 +20,7 @@ public:
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 protected:
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const BonjurDeviceInfo& devInfo, QnResourceList& result) override;
+    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

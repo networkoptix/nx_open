@@ -64,7 +64,7 @@ StrictResolution strictResolutionList[] =
 
 
 //width > height is prefered
-bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
+static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
 {
     long long res1 = s1.width() * s1.height();
     long long res2 = s2.width() * s2.height();
@@ -443,53 +443,10 @@ QSize QnPlOnvifResource::getMaxResolution() const
     return m_resolutionList.isEmpty()? EMPTY_RESOLUTION_PAIR: m_resolutionList.front();
 }
 
-float QnPlOnvifResource::getResolutionAspectRatio(const QSize& resolution)
-{
-    return resolution.height() == 0 ? 0: static_cast<double>(resolution.width()) / resolution.height();
-}
-
 QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const
 {
     QMutexLocker lock(&m_mutex);
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
-}
-
-QSize QnPlOnvifResource::getNearestResolution(const QSize& resolution, float aspectRatio,
-    double maxResolutionSquare, const QList<QSize>& resolutionList)
-{
-    double requestSquare = resolution.width() * resolution.height();
-    if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
-
-    int bestIndex = -1;
-    double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
-
-    for (int i = 0; i < resolutionList.size(); ++i) {
-        QSize tmp;
-
-        tmp.setWidth(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].width() + 1), 8));
-        tmp.setHeight(qPower2Floor(static_cast<unsigned int>(resolutionList[i].height() - 1), 8));
-        float ar1 = getResolutionAspectRatio(tmp);
-
-        tmp.setWidth(qPower2Floor(static_cast<unsigned int>(resolutionList[i].width() - 1), 8));
-        tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
-        float ar2 = getResolutionAspectRatio(tmp);
-
-        if (aspectRatio != 0 && !qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
-        {
-            continue;
-        }
-
-        double square = resolutionList[i].width() * resolutionList[i].height();
-        if (square < MAX_EPS) continue;
-
-        double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-        if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
-            bestIndex = i;
-            bestMatchCoeff = matchCoeff;
-        }
-    }
-
-    return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
@@ -513,11 +470,6 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
     checkPrimaryResolution(m_primaryResolution);
     float currentAspect = getResolutionAspectRatio(m_primaryResolution);
 
-    // SD NTCS/PAL resolutions have non standart SAR. fix it
-    if (m_primaryResolution.width() == 720 && (m_primaryResolution.height() == 480 || m_primaryResolution.height() == 576))
-    {
-        currentAspect = float(4.0 / 3.0);
-    }
     m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
     if (m_secondaryResolution == EMPTY_RESOLUTION_PAIR)
         m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0); // try to get resolution ignoring aspect ration

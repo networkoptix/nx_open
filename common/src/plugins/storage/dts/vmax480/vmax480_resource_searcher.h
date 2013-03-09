@@ -1,11 +1,11 @@
 #ifndef vmax480_resource_searcher_h_1806
 #define vmax480_resource_searcher_h_1806
 
-#include "plugins/resources/bonjour/bonjour_resource_searcher.h"
+#include "plugins/resources/upnp/upnp_resource_searcher.h"
 
 class CLSimpleHTTPClient;
 
-class QnPlVmax480ResourceSearcher : public QnBonjourResourceSearcher
+class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcher
 {
     QnPlVmax480ResourceSearcher();
 
@@ -16,7 +16,7 @@ public:
     static QnPlVmax480ResourceSearcher& instance();
 
 
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const BonjurDeviceInfo& devInfo, QnResourceList& result) override;
+    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 protected:

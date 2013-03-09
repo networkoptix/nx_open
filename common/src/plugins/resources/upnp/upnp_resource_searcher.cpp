@@ -1,4 +1,4 @@
-#include "bonjour_resource_searcher.h"
+#include "upnp_resource_searcher.h"
 #include "utils/common/sleep.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/http/httptypes.h"
@@ -16,13 +16,16 @@ QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
+static const int GROUP_PORT = 1900;
+
+QAtomicInt QnUpnpResourceSearcher::m_isntanceCnt(0);
 
 //!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler
 {
-    BonjurDeviceInfo m_deviceInfo;
+    UpnpDeviceInfo m_deviceInfo;
     QString m_currentElementName;
 public:
     virtual bool startDocument()
@@ -70,39 +73,46 @@ public:
     QString serialNumber() const { return m_serialNumber; }
     QString presentationUrl() const { return m_presentationUrl; }
     */
-    BonjurDeviceInfo deviceInfo() const { return m_deviceInfo; }
+    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
 };
 
 
 //====================================================================
-QnBonjourResourceSearcher::QnBonjourResourceSearcher()
+QnUpnpResourceSearcher::QnUpnpResourceSearcher()
 {
+    m_sendRequests = m_isntanceCnt.fetchAndAddAcquire(1) == 0;
     m_cacheLivetime.restart();
 }
 
-QnBonjourResourceSearcher::~QnBonjourResourceSearcher()
+QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
 {
-    foreach(QUdpSocket* sock, m_socketList)
+    foreach(UDPSocket* sock, m_socketList)
         delete sock;
 }
 
-QUdpSocket* QnBonjourResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
+UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
 {
-    QMap<QString, QUdpSocket*>::iterator it = m_socketList.find(iface.address.toString());
+    QMap<QString, UDPSocket*>::iterator it = m_socketList.find(iface.address.toString());
     if (it == m_socketList.end())
     {
-        QUdpSocket* sock = new QUdpSocket();
-        if (!bindToInterface(*sock, iface,1900, QUdpSocket::ReuseAddressHint))
+        UDPSocket* sock = new UDPSocket();
+        QString localAddress = iface.address.toString();
+
+        if (!sock->bindToInterface(iface))
         {
             delete sock;
             return 0;
         }
 
-        if (!multicastJoinGroup(*sock, groupAddress, iface.address))
+        sock->setMulticastIF(localAddress);
+
+        if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
         {
             delete sock;
             return 0;
         }
+
+        sock->setReadBufferSize(1024*512);
 
         m_socketList.insert(iface.address.toString(), sock);
 
@@ -111,7 +121,7 @@ QUdpSocket* QnBonjourResourceSearcher::sockByName(const QnInterfaceAndAddr& ifac
     return it.value();
 }
 
-QByteArray QnBonjourResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
+QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
     if (m_cacheLivetime.elapsed() > CACHE_TIME_TIME) {
         m_cacheLivetime.restart();
@@ -132,29 +142,52 @@ QByteArray QnBonjourResourceSearcher::getDeviceDescription(const QByteArray& uui
     return result;
 }
 
-QnResourceList QnBonjourResourceSearcher::findResources(void)
+QnResourceList QnUpnpResourceSearcher::findResources(void)
 {
     QnResourceList result;
     QSet<QByteArray> processedUuid;
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        QUdpSocket* sock = sockByName(iface);
+        UDPSocket* sock = sockByName(iface);
 
         QString tmp = iface.address.toString();
-
 
         if (!sock)
             continue;
 
-        while(sock->hasPendingDatagrams())
-        {
-            QByteArray reply;
-            reply.resize(sock->pendingDatagramSize());
+        QByteArray data;
+        //data.append("OPTIONS /ietf/ipp/printer HTTP/1.1\n");
+        //data.append("Host: ").append(sock->localAddress().toString().toAscii()).append(":").append(QByteArray::number(sock->localPort())).append('\n');
+        //data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\n\n");
 
-            QHostAddress sender;
+        if (m_sendRequests) {
+            data.append("M-SEARCH * HTTP/1.1\r\n");
+            data.append("Host: 192.168.0.150:1900\r\n");
+            data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
+            data.append("Man:\"ssdp:discover\"\r\n");
+            data.append("MX:3\r\n\r\n");
+
+            sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
+        }
+
+        while(sock->hasData())
+        {
+
+            char buffer[1024*16+1];
+
+            QString sender;
             quint16 senderPort;
-            sock->readDatagram(reply.data(), reply.size(),    &sender, &senderPort);
+            int readed = sock->recvFrom(buffer, sizeof(buffer), sender, senderPort);
+            if (readed > 0)
+                buffer[readed] = 0;
+            QByteArray reply = QByteArray::fromRawData(buffer, readed);
+
+            qDebug() << "gotdata=" << sender;
+            if (sender == QLatin1String("192.168.0.100"))
+            {
+                int gg = 4;
+            }
 
             nx_http::HttpRequest foundDeviceReply;
             if( !foundDeviceReply.parse( reply ) )
@@ -200,4 +233,9 @@ QnResourceList QnBonjourResourceSearcher::findResources(void)
     }
 
     return result;
+}
+
+void QnUpnpResourceSearcher::setSendRequests(bool value)
+{
+    m_sendRequests = value;
 }

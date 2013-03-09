@@ -63,7 +63,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     return QList<QnResourcePtr>();
 }
 
-void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const BonjurDeviceInfo& devInfo, QnResourceList& result)
+void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result)
 {
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;

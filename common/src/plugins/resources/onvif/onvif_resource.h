@@ -39,10 +39,6 @@ typedef onvifXsd__VideoSourceConfiguration VideoSource;
 class VideoOptionsLocal;
 
 //first = width, second = height
-const QSize EMPTY_RESOLUTION_PAIR(0, 0);
-const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
-
 
 class QDomElement;
 
@@ -246,8 +242,6 @@ private:
 
     int round(float value);
     QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
-    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList);
-    static float getResolutionAspectRatio(const QSize& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);

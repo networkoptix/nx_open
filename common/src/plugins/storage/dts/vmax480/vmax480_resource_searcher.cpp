@@ -33,7 +33,7 @@ QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
 
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
                                                 const QString& host, 
-                                                const BonjurDeviceInfo& devInfo,
+                                                const UpnpDeviceInfo& devInfo,
                                                 QnResourceList& result)
 {
     QString mac = devInfo.serialNumber;

@@ -33,14 +33,6 @@ public:
 
     virtual bool shoudResolveConflicts() const override;
 
-    QByteArray getMaxResolution() const;
-    QString getNearestResolution(const QByteArray& resolution, float aspectRatio) const;
-    float getResolutionAspectRatio(const QByteArray& resolution) const;
-
-    QRect getMotionWindow(int num) const;
-    QMap<int, QRect>  getMotionWindows() const;
-    bool readMotionInfo();
-
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
     virtual bool hasDualStreaming() const override { return m_hasDualStreaming; }
@@ -48,6 +40,11 @@ public:
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
     QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status) const;
+    QSize getResolution(QnResource::ConnectionRole role) const;
+    int roundFps(int srcFps, QnResource::ConnectionRole role) const;
+    int roundBitrate(int srcBitrateKbps) const;
+
+    bool isAudioSupported() const;
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -70,9 +67,11 @@ protected:
     virtual bool isResourceAccessible();
 private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
+    QList<QSize> parseResolutionStr(const QByteArray& resolutions);
 private:
     bool m_hasDualStreaming;
-    QSize m_maxResolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
+    bool m_hasAudio;
+    QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
     int m_rtspPort;
 };

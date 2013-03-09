@@ -24,7 +24,8 @@ QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 
 QnActiResource::QnActiResource():
     m_hasDualStreaming(false),
-    m_rtspPort(DEFAULT_RTSP_PORT)
+    m_rtspPort(DEFAULT_RTSP_PORT),
+    m_hasAudio(false)
 {
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
 }
@@ -88,7 +89,24 @@ QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& 
     status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
     if (status == CL_HTTP_SUCCESS)
         client.readAll(result);
-    return unquoteStr(result.mid(command.size()+1).trimmed());
+    return unquoteStr(result.mid(result.indexOf('=')+1).trimmed());
+}
+
+static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
+{
+    long long res1 = s1.width() * s1.height();
+    long long res2 = s2.width() * s2.height();
+    return res1 > res2? true: (res1 == res2 && s1.width() > s2.width()? true: false);
+}
+
+QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
+{
+    QList<QSize> result;
+    QList<QSize> availResolutions;
+    foreach(const QByteArray& r, resolutions.split(','))
+        result << extractResolution(r);
+    qSort(result.begin(), result.end(), resolutionGreaterThan);
+    return result;
 }
 
 bool QnActiResource::initInternal()
@@ -102,13 +120,24 @@ bool QnActiResource::initInternal()
     if (status != CL_HTTP_SUCCESS)
         return false;
 
-    QList<QByteArray> resList = resolutions.split(',');
-    m_hasDualStreaming = resList.size() > 1;
-    m_maxResolution[0] = extractResolution(resList[0]);
-    if (m_hasDualStreaming)
-        m_maxResolution[1] = extractResolution(resList[1]);
-    if (m_maxResolution[0].isEmpty())
+    QList<QSize> availResolutions = parseResolutionStr(resolutions);
+    if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
         return false;
+
+    m_resolution[0] = availResolutions.first();
+
+    resolutions = makeActiRequest(QLatin1String("system"), QLatin1String("CHANNEL=2&VIDEO_RESOLUTION_CAP"), status);
+    if (status == CL_HTTP_SUCCESS)
+    {
+        availResolutions = parseResolutionStr(resolutions);
+        int maxSecondaryRes = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+
+        float currentAspect = getResolutionAspectRatio(m_resolution[0]);
+        m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSecondaryRes, availResolutions);
+        if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
+            m_resolution[1] = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSecondaryRes, availResolutions); // try to get resolution ignoring aspect ration
+        m_hasDualStreaming = !m_resolution[1].isEmpty();
+    }
 
     QByteArray fpsString = makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_FPS_CAP"), status);
     if (status != CL_HTTP_SUCCESS)
@@ -120,6 +149,7 @@ bool QnActiResource::initInternal()
         QList<QByteArray> fps = fpsList[i].split(',');
         foreach(const QByteArray& data, fps)
             m_availFps[i] << data.toInt();
+        qSort(m_availFps[i]);
     }
 
     QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);
@@ -129,7 +159,11 @@ bool QnActiResource::initInternal()
     if (m_rtspPort == 0)
         m_rtspPort = DEFAULT_RTSP_PORT;
 
+    QByteArray audioString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_AUDIO_ENABLED"), status);
+    m_hasAudio = audioString.startsWith("OK");
+
     setParam(DUAL_STREAMING_PARAM_NAME, m_hasDualStreaming ? 1 : 0, QnDomainDatabase);
+    setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     save();
 
     return true;
@@ -160,4 +194,49 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     url.setPort(m_rtspPort);
     url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
     return url.toString();
+}
+
+QSize QnActiResource::getResolution(QnResource::ConnectionRole role) const
+{
+    return (role == QnResource::Role_LiveVideo ? m_resolution[0] : m_resolution[1]);
+}
+
+int QnActiResource::roundFps(int srcFps, QnResource::ConnectionRole role) const
+{
+    QList<int> availFps = (role == QnResource::Role_LiveVideo ? m_availFps[0] : m_availFps[1]);
+    int minDistance = INT_MAX;
+    int result = srcFps;
+    for (int i = 0; i < availFps.size(); ++i)
+    {
+        int distance = qAbs(availFps[i] - srcFps);
+        if (distance <= minDistance) { // preffer higher fps if same distance
+            minDistance = distance;
+            result = availFps[i];
+        }
+    }
+
+    return result;
+}
+
+static int AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
+
+int QnActiResource::roundBitrate(int srcBitrateKbps) const
+{
+    int minDistance = INT_MAX;
+    int result = srcBitrateKbps;
+    for (int i = 0; i < sizeof(AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
+    {
+        int distance = qAbs(AVAIL_BITRATE_KBPS[i] - srcBitrateKbps);
+        if (distance <= minDistance) { // preffer higher bitrate if same distance
+            minDistance = distance;
+            result = AVAIL_BITRATE_KBPS[i];
+        }
+    }
+
+    return result;
+}
+
+bool QnActiResource::isAudioSupported() const
+{
+    return m_hasAudio;
 }
