@@ -360,7 +360,7 @@ MediaIndex* QnVideoCamera::mediaIndex()
     return &m_mediaIndex;
 }
 
-const HLSLivePlaylistManager* QnVideoCamera::hlsLivePlaylistManager() const
+const nx_hls::HLSLivePlaylistManager* QnVideoCamera::hlsLivePlaylistManager() const
 {
     return m_hlsLivePlaylistManager.get();
 }
@@ -388,7 +388,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr
         return false;
 
     m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
-    m_hlsLivePlaylistManager.reset( new HLSLivePlaylistManager( m_liveCache.get(), &m_mediaIndex ) );
+    m_hlsLivePlaylistManager.reset( new nx_hls::HLSLivePlaylistManager( m_liveCache.get(), &m_mediaIndex ) );
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache.get() );
     m_cameraUsers << this;

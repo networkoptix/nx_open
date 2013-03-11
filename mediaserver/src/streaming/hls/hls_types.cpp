@@ -56,4 +56,26 @@ namespace nx_hls
 
         return playlistStr;
     }
+
+
+    QByteArray VariantPlaylist::toString() const
+    {
+        QByteArray str;
+        str += "#EXTM3U\r\n";
+
+        for( std::vector<VariantPlaylistData>::size_type
+            i = 0;
+            i < playlists.size();
+            ++i )
+        {
+            str += "#EXT-X-STREAM-INF:";
+            if( playlists[i].bandwidth.present )
+                str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.value);
+            str += "\r\n";
+            str += playlists[i].url.toString().toLatin1();
+            str += "\r\n";
+        }
+
+        return str;
+    }
 }

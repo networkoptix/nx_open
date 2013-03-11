@@ -11,6 +11,40 @@
 #include <QUrl>
 
 
+//TODO/IMPL move OptionalField somewhere else...
+template<class T>
+    class OptionalField
+{
+public:
+    bool present;
+    T value;
+
+    OptionalField()
+    :
+        present( false ),
+        value( T() )
+    {
+    }
+
+    OptionalField( const T& val )
+    :
+        present( true ),
+        value( val )
+    {
+    }
+
+    operator T() const
+    {
+        return value;
+    }
+
+    operator T()
+    {
+        return value;
+    }
+};
+
+//!Consolidates hls implementation types
 namespace nx_hls
 {
     class Chunk
@@ -30,6 +64,21 @@ namespace nx_hls
         std::vector<Chunk> chunks;
 
         Playlist();
+
+        QByteArray toString() const;
+    };
+
+    class VariantPlaylistData
+    {
+    public:
+        QUrl url;
+        OptionalField<unsigned int> bandwidth;
+    };
+
+    class VariantPlaylist
+    {
+    public:
+        std::vector<VariantPlaylistData> playlists;
 
         QByteArray toString() const;
     };

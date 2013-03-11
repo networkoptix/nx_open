@@ -25,6 +25,7 @@ class OnDemandMediaDataProvider
 {
 public:
     OnDemandMediaDataProvider( const QSharedPointer<QnAbstractStreamDataProvider>& dataProvider ) throw();
+    virtual ~OnDemandMediaDataProvider() throw();
 
     //!Implementation of AbstractOnDemandDataProvider::tryRead
     virtual bool tryRead( QnAbstractDataPacketPtr* const data ) override;

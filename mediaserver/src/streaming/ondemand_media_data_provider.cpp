@@ -14,6 +14,12 @@ OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbs
     m_dataProvider( dataProvider ),
     m_prevPacketTimestamp( 0 )
 {
+    m_dataProvider->addDataProcessor( this );
+}
+
+OnDemandMediaDataProvider::~OnDemandMediaDataProvider() throw()
+{
+    m_dataProvider->removeDataProcessor( this );
 }
 
 //!Implementation of AbstractOnDemandDataProvider::tryRead

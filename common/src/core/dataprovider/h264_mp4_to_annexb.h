@@ -14,7 +14,7 @@
 /*!
     Takes sequence header from media packet's extradata and inserts it before first packet.
     
-    If source stream is not h.264 or is already in Annex B format, this class jusat forwards data from source to the reader
+    If source stream is not h.264 or is already in Annex B format, this class just forwards data from source to the reader
 */
 class H264Mp4ToAnnexB
 :

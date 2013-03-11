@@ -13,7 +13,10 @@
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
-class HLSLivePlaylistManager;
+namespace nx_hls
+{
+    class HLSLivePlaylistManager;
+}
 
 class QnVideoCamera: public QObject
 {
@@ -52,7 +55,7 @@ public:
     const MediaIndex* mediaIndex() const;
     MediaIndex* mediaIndex();
 
-    const HLSLivePlaylistManager* hlsLivePlaylistManager() const;
+    const nx_hls::HLSLivePlaylistManager* hlsLivePlaylistManager() const;
 
     //!Starts caching live stream, if not started
     /*!
@@ -75,7 +78,7 @@ private:
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     std::auto_ptr<MediaStreamCache> m_liveCache;
-    std::auto_ptr<HLSLivePlaylistManager> m_hlsLivePlaylistManager;
+    std::auto_ptr<nx_hls::HLSLivePlaylistManager> m_hlsLivePlaylistManager;
     MediaIndex m_mediaIndex;
 
     bool ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader );
