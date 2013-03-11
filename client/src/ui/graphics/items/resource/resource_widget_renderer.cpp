@@ -94,7 +94,10 @@ qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) co
     //return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
 
     if( ctx.timestampBlocked || (ctx.framesSinceJump == 0 && ctx.forcedTimestampValue != AV_NOPTS_VALUE) )
+    {
+        qDebug()<<"QnResourceWidgetRenderer::getTimestampOfNextFrameToRender (1) "<<ctx.forcedTimestampValue;
         return ctx.forcedTimestampValue;
+    }
 
     if( !ctx.uploader || !ctx.renderer )
         return AV_NOPTS_VALUE;
@@ -102,14 +105,16 @@ qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) co
     if( ts == (qint64)AV_NOPTS_VALUE )
         ts = ctx.renderer->lastDisplayedTime();
 
+    qDebug()<<"QnResourceWidgetRenderer::getTimestampOfNextFrameToRender (2) "<<ts;
+
     return ts;
 }
 
 void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const 
 {
     RenderingTools& ctx = m_channelRenderers[channelNumber];
-    if (ctx.renderer) 
-        ctx.renderer->blockTimeValue(timestamp);
+    //if (ctx.renderer) 
+    //    ctx.renderer->blockTimeValue(timestamp);
 
     ctx.timestampBlocked = true;
     ctx.forcedTimestampValue = timestamp;
@@ -118,8 +123,8 @@ void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timesta
 void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const 
 {  
     RenderingTools& ctx = m_channelRenderers[channelNumber];
-    if (ctx.renderer) 
-        ctx.renderer->unblockTimeValue();
+    if( !ctx.timestampBlocked )
+        return; //TODO/IMPL is nested blocking needed?
     ctx.timestampBlocked = false;
     ctx.framesSinceJump = 0;
 }
@@ -127,7 +132,7 @@ void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const
 bool QnResourceWidgetRenderer::isTimeBlocked(int channelNumber) const
 {
     const RenderingTools& ctx = m_channelRenderers[channelNumber];
-    return ctx.renderer && ctx.renderer->isTimeBlocked();
+    return ctx.timestampBlocked;
 }
 
 
