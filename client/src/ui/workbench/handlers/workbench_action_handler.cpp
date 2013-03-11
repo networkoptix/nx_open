@@ -95,6 +95,8 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
+#include <utils/license_usage_helper.h>
+
 #include "client_message_processor.h"
 #include "file_processor.h"
 #include "version.h"
@@ -641,16 +643,11 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
         return; 
 
-    /* Limit the number of active cameras. */
-    int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras)
-        if (!camera->isScheduleDisabled())
-            activeCameras--;
-
-    if (activeCameras > qnLicensePool->getLicenses().totalCameras()) {
-        QString message = tr("Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.").arg(activeCameras).arg(qnLicensePool->getLicenses().totalCameras());
-        QMessageBox::warning(widget(), tr("Could not enable recording"), message);
-        cameraSettingsDialog()->widget()->setCamerasActive(false);
+    QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
+    if (!helper.isValid()) {
+        QString message = tr("Licenses limit exceeded. Your changes will be saved, but will not take effect.");
+        QMessageBox::warning(widget(), tr("Could not apply changes"), message);
+        cameraSettingsDialog()->widget()->setScheduleEnabled(false);
     }
 
     /* Submit and save it. */
@@ -848,6 +845,7 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
+    action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
 }
 

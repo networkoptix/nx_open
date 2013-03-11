@@ -38,6 +38,7 @@ public:
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
     void setScheduleEnabled(bool enabled);
+    bool isScheduleEnabled() const;
 
     /**
      * @brief setMaxFps             Set maximum fps value that can be placed on the grid.
@@ -54,8 +55,6 @@ public:
      * @return                      Maximum fps value.
      */
     int getGridMaxFps(bool motionPlusLqOnly = false);
-
-    int activeCameraCount() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -81,7 +80,7 @@ public:
 signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
-    void scheduleEnabledChanged();
+    void scheduleEnabledChanged(int);
     void moreLicensesRequested();
     void gridParamsChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);

@@ -42,9 +42,6 @@ public:
     bool isLowQualityImage() const;
     
     qint64 lastDisplayedTime() const;
-    void blockTimeValue(qint64  timestamp );
-    void unblockTimeValue();
-    bool isTimeBlocked() const;
 
     QnMetaDataV1Ptr lastFrameMetadata() const; 
     bool isHardwareDecoderUsed() const;

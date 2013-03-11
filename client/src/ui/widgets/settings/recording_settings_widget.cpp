@@ -8,7 +8,7 @@
 
 #include <ui/widgets/dwm.h>
 #include <ui/style/skin.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 #ifdef Q_OS_WIN
 #   include "device_plugins/desktop_win/win_audio_helper.h"
@@ -86,11 +86,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
         );
     }
 
-    {
-        QPalette palette = ui->recordingWarningLabel->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-        ui->recordingWarningLabel->setPalette(palette);
-    }
+    setWarningStyle(ui->recordingWarningLabel);
 
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
     connect(ui->resolutionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));

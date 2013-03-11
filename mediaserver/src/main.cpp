@@ -240,13 +240,13 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
 }
 
-QnAbstractStorageResourcePtr createStorage(const QString& path)
+QnStorageResourcePtr createStorage(const QString& path)
 {
-    QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
+    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
     storage->setSpaceLimit(5ll * 1000000000);
-    storage->setUsedForWriting(true);
+    storage->setUsedForWriting(storage->isStorageAvailableForWriting());
 
     return storage;
 }
@@ -267,17 +267,21 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    QString maxFreeSpaceDrive;
-    int maxFreeSpace = 0;
+    //QString maxFreeSpaceDrive;
+    //int maxFreeSpace = 0;
 
     foreach (QFileInfo drive, QDir::drives()) {
         if (!drive.isWritable())
             continue;
 
+        
         QString path = drive.absolutePath();
+        
         if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
             continue;
 
+        folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        /*
         int freeSpace = freeGB(path);
 
         if (maxFreeSpaceDrive.isEmpty() || freeSpace > maxFreeSpace) {
@@ -289,12 +293,14 @@ static QStringList listRecordFolders()
             cl_log.log(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
             folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
         }
+        */
     }
-
+    /*
     if (folderPaths.isEmpty()) {
         cl_log.log(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
         folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
     }
+    */
 #endif
 
 #ifdef Q_OS_LINUX
@@ -306,11 +312,22 @@ static QStringList listRecordFolders()
 
 QnAbstractStorageResourceList createStorages()
 {
-    QnAbstractStorageResourceList storages;
+    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
 
+    QnAbstractStorageResourceList storages;
+    bool isBigStorageExist = false;
     foreach(QString folderPath, listRecordFolders()) {
-        storages.append(createStorage(folderPath));
+        QnStorageResourcePtr storage = createStorage(folderPath);
+        isBigStorageExist |= storage->isUsedForWriting() && storage->getTotalSpace() > BIG_STORAGE_THRESHOLD;
+        storages.append(storage);
         cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+    }
+    if (isBigStorageExist) {
+        for (int i = 0; i < storages.size(); ++i) {
+            QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
+            if (storage->getTotalSpace() <= BIG_STORAGE_THRESHOLD)
+                storage->setUsedForWriting(false);
+        }
     }
 
     return storages;

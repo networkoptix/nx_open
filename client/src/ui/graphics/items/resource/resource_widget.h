@@ -266,7 +266,8 @@ protected:
         LoadingOverlay,
         NoDataOverlay,
         OfflineOverlay,
-        UnauthorizedOverlay
+        UnauthorizedOverlay,
+        AnalogWithoutLicenseOverlay
     };
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
@@ -431,6 +432,7 @@ private:
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
     QStaticText m_loadingStaticText;
+    QStaticText m_analogLicenseStaticText;
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;

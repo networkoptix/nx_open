@@ -108,8 +108,8 @@ qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) co
 void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timestamp ) const 
 {
     RenderingTools& ctx = m_channelRenderers[channelNumber];
-    if (ctx.renderer) 
-        ctx.renderer->blockTimeValue(timestamp);
+    //if (ctx.renderer) 
+    //    ctx.renderer->blockTimeValue(timestamp);
 
     ctx.timestampBlocked = true;
     ctx.forcedTimestampValue = timestamp;
@@ -118,8 +118,8 @@ void QnResourceWidgetRenderer::blockTimeValue(int channelNumber, qint64  timesta
 void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const 
 {  
     RenderingTools& ctx = m_channelRenderers[channelNumber];
-    if (ctx.renderer) 
-        ctx.renderer->unblockTimeValue();
+    if( !ctx.timestampBlocked )
+        return; //TODO/IMPL is nested blocking needed?
     ctx.timestampBlocked = false;
     ctx.framesSinceJump = 0;
 }
@@ -127,7 +127,7 @@ void QnResourceWidgetRenderer::unblockTimeValue(int channelNumber) const
 bool QnResourceWidgetRenderer::isTimeBlocked(int channelNumber) const
 {
     const RenderingTools& ctx = m_channelRenderers[channelNumber];
-    return ctx.renderer && ctx.renderer->isTimeBlocked();
+    return ctx.timestampBlocked;
 }
 
 

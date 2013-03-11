@@ -339,27 +339,9 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_mutex);
+    if( !m_timeChangeEnabled )
+        int x = 0;
     return m_lastDisplayedTime;
-}
-
-void QnGLRenderer::blockTimeValue( qint64 timestamp )
-{
-    QMutexLocker lock(&m_mutex);
-    m_lastDisplayedTime = timestamp;
-    m_timeChangeEnabled = false;
-    //qDebug() << "QnGLRenderer::blockTimeValue ("<<m_lastDisplayedTime<<")" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
-}
-
-void QnGLRenderer::unblockTimeValue()
-{  
-    QMutexLocker lock(&m_mutex);
-    //qDebug() << "unblockTimeValue";
-    m_timeChangeEnabled = true;
-}
-
-bool QnGLRenderer::isTimeBlocked() const
-{
-    return !m_timeChangeEnabled;
 }
 
 bool QnGLRenderer::isLowQualityImage() const
