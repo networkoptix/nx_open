@@ -105,8 +105,11 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     
     if (!isOpened()) {
         open(m_res);
-        if (!isOpened())
+        if (!isOpened()) {
+			if (m_lastPacketTime != AV_NOPTS_VALUE)
+            	m_lastPacketTime += 60*1000; // try to skip problem place
             return result;
+        }
     }
 
     if (m_lastSeekPos == AV_NOPTS_VALUE && m_lastPacketTime != AV_NOPTS_VALUE) {
