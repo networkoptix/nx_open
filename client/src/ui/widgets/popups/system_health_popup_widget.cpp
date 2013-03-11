@@ -9,6 +9,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/common/resource_name.h>
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -53,16 +54,19 @@ bool QnSystemHealthPopupWidget::showSystemHealthMessage(QnSystemHealth::MessageT
     QnResourceList localResources = resources;
     qSort(localResources.begin(), localResources.end(), localResource_less_than);
     foreach (const QnResourcePtr &resource, localResources) {
+        QWidget* labelsWidget = new QWidget(ui->resourcesListWidget);
         QHBoxLayout* layout = new QHBoxLayout();
-        ui->resourcesListLayout->addLayout(layout);
+        labelsWidget->setLayout(layout);
+        layout->setContentsMargins(0, 0, 0, 0);
+        ui->resourcesListLayout->addWidget(labelsWidget);
 
-        QLabel* labelIcon = new QLabel(ui->resourcesListWidget);
+        QLabel* labelIcon = new QLabel(labelsWidget);
         labelIcon->setPixmap(qnResIconCache->icon(resource->flags(), resource->getStatus()).pixmap(18, 18));
         layout->addWidget(labelIcon);
 
-        QLabel* labelName = new QLabel(ui->resourcesListWidget);
+        QLabel* labelName = new QLabel(labelsWidget);
         labelName->setText( QString(htmlTemplate)
-                            .arg(resource->getName())
+                            .arg(getResourceName(resource))
                             .arg(QString::number(resource->getId().toInt()))
                             .arg(tr("( Fix... )"))
                            );
@@ -121,6 +125,15 @@ void QnSystemHealthPopupWidget::at_fixUserLabel_linkActivated(const QString &anc
     QnActionParameters params(user);
     params.setFocusElement(QLatin1String("email"));
     menu()->trigger(Qn::UserSettingsAction, params);
+
+    QWidget* p = dynamic_cast<QWidget *>(sender()->parent());
+    if (!p)
+        return;
+
+    ui->resourcesListLayout->removeWidget(p);
+    p->hide();
+    if (ui->resourcesListLayout->count() == 0)
+        emit closed(m_messageType, ui->ignoreCheckBox->isChecked());
 }
 
 void QnSystemHealthPopupWidget::at_fixStoragesLabel_linkActivated(const QString &anchor) {
@@ -130,6 +143,15 @@ void QnSystemHealthPopupWidget::at_fixStoragesLabel_linkActivated(const QString 
         return;
     QnActionParameters params(server);
     menu()->trigger(Qn::ServerSettingsAction, params);
+
+    QWidget* p = dynamic_cast<QWidget *>(sender()->parent());
+    if (!p)
+        return;
+
+    ui->resourcesListLayout->removeWidget(p);
+    p->hide();
+    if (ui->resourcesListLayout->count() == 0)
+        emit closed(m_messageType, ui->ignoreCheckBox->isChecked());
 }
 
 void QnSystemHealthPopupWidget::at_postponeButton_clicked() {

@@ -46,6 +46,17 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
+
+    // TODO: #Elric move out?
+    struct ProtocolDescription {
+        QString protocol;
+        QString name;
+        QString urlTemplate;
+        QString urlPattern;
+    };
+
+    static ProtocolDescription protocolDescription(const QString &protocol);
+
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted

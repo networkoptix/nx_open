@@ -121,7 +121,24 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     // checking for multichannel encoders
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
-    if (onvifRes) {
+    if (onvifRes && onvifRes->getMaxChannels() > 1) 
+    {
+        QString groupName;
+        QString groupId;
+
+        if (onvifRes->getGroupId().isEmpty())
+        {
+            groupId = info.uniqId;
+            groupName = onvifRes->getModel() + QLatin1String(" ") + onvifRes->getHostAddress();
+        }
+        else {
+            groupId = onvifRes->getGroupId();
+            groupName = onvifRes->getGroupName();
+        }
+
+        res->setGroupId(groupId);
+        res->setGroupName(groupName);
+
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
         {
             res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
@@ -131,6 +148,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
                 res->setUrl(endpoint + suffix);
                 res->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
                 res->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
+                res->setGroupId(groupId);
+                res->setGroupName(groupName);
                 result << res;
             }
         }

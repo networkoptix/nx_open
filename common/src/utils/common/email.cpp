@@ -216,12 +216,18 @@ QnEmail::Settings QnEmail::settings() const {
 }
 
 QnEmail::Settings::Settings():
-    timeout(TIMEOUT) {}
+    connectionType(QnEmail::Unsecure),
+    port(0),
+    timeout(TIMEOUT),
+    simple(true)
+{}
 
 QnEmail::Settings::Settings(const QnKvPairList &values):
-    timeout(TIMEOUT)
+    port(0),
+    timeout(TIMEOUT),
+    simple(true)
 {
-    bool useTls = true;
+    bool useTls = false;
     bool useSsl = false;
 
     foreach (const QnKvPair &setting, values) {

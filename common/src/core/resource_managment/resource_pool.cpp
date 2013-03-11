@@ -15,8 +15,6 @@
 #   define TRACE(...)
 #endif
 
-Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
-
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
@@ -28,16 +26,26 @@ QnResourcePool::QnResourcePool() : QObject(),
 QnResourcePool::~QnResourcePool()
 {
     bool signalsBlocked = blockSignals(false);
-    emit aboutToBeDestroyed();
+    //emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
     QMutexLocker locker(&m_resourcesMtx);
     m_resources.clear();
 }
 
-QnResourcePool *QnResourcePool::instance()
+//Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
+
+static QnResourcePool* resourcePool = NULL;
+
+void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    return globalResourcePool();
+    resourcePool = inst;
+}
+
+QnResourcePool* QnResourcePool::instance()
+{
+    //return globalResourcePool();
+    return resourcePool;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {
@@ -454,20 +462,17 @@ QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
     return QnNetworkResourcePtr(0);
 }
 
-int QnResourcePool::activeCameras() const
+int QnResourcePool::activeCamerasByClass(bool analog) const
 {
     int count = 0;
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
+        if (!camera || camera->isDisabled() || camera->isScheduleDisabled() || camera->isAnalog() != analog)
             continue;
-
-        if (!camera->isDisabled() && !camera->isScheduleDisabled())
-            count++;
+        count++;
     }
-
     return count;
 }
 

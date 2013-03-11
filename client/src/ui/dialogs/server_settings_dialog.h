@@ -16,48 +16,6 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-namespace detail {
-    static const int INVALID_PATH = -1;
-    static const int SERVER_ERROR = -2;
-    struct FreeSpaceInfo 
-    {
-        FreeSpaceInfo(): freeSpace(0), totalSpace(0), errorCode(0) {}
-        FreeSpaceInfo(qint64 _freeSpace, qint64 _totalSpace, int _errorCode): freeSpace(_freeSpace), totalSpace(_totalSpace), errorCode(_errorCode) {}
-        qint64 freeSpace;
-        qint64 totalSpace;
-        int errorCode;
-    };
-    typedef QMap<int, FreeSpaceInfo> FreeSpaceMap;
-
-    class CheckFreeSpaceReplyProcessor: public QObject 
-    {
-        Q_OBJECT
-    public:
-
-        CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-        FreeSpaceMap freeSpaceInfo() const {
-            return m_freeSpace;
-        }
-
-    signals:
-        void replyReceived(int status, qint64 freeSpace, qint64 usedSpace, int handle);
-
-    public slots:
-        void processReply(int status, qint64 freeSpace, qint64 totalSpace,  int handle) 
-        {
-            int errCode = status == 0 ? (freeSpace > 0 ? 0 : INVALID_PATH) : SERVER_ERROR;
-            m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, totalSpace, errCode));
-            emit replyReceived(status, freeSpace, totalSpace, handle);
-        }
-
-    private:
-        FreeSpaceMap m_freeSpace;
-    };
-
-} // namespace detail
-
-
 class QnServerSettingsDialog: public QnButtonBoxDialog {
     Q_OBJECT;
 
@@ -89,7 +47,7 @@ private:
     //void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
-    void at_storageAddButton_clicked();
+    void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
@@ -97,6 +55,7 @@ private slots:
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
+    QList<QString> m_storageProtocols;
     QLabel *m_tableBottomLabel;
 
     bool m_hasStorageChanges;

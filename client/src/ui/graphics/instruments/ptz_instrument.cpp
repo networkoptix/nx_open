@@ -57,7 +57,7 @@ namespace {
     const qreal speedUpdateThreshold = 0.001;
     const int speedUpdateIntervalMSec = 500;
 
-    const qreal minPtzZoomRectSize = 0.04;
+    const double minPtzZoomRectSize = 0.08;
 }
 
 
@@ -794,6 +794,45 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
     }
 }
 
+void PtzInstrument::processPtzClick(const QPointF &pos) {
+    if(!target() || m_skipNextAction)
+        return;
+
+    PtzSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(PtzSplashItem::Circular);
+    splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
+    splashItem->setPos(pos);
+    m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+
+    ptzMoveTo(target(), pos);
+}
+
+void PtzInstrument::processPtzDrag(const QRectF &rect) {
+    if(!target() || m_skipNextAction)
+        return;
+
+    PtzSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(PtzSplashItem::Rectangular);
+    splashItem->setPos(rect.center());
+    splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
+    m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+
+    ptzMoveTo(target(), rect);
+}
+
+void PtzInstrument::processPtzDoubleClick() {
+    if(!target() || m_skipNextAction)
+        return;
+
+    PtzSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(PtzSplashItem::Rectangular);
+    splashItem->setPos(target()->rect().center());
+    QSizeF size = target()->size() * 1.1;
+    splashItem->setRect(QRectF(-toPoint(size) / 2, size));
+    m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
+
+    ptzUnzoom(target());
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -848,8 +887,6 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
 
-    PtzData &data = m_dataByWidget[object];
-    //TODO: #elric fix unused variable warning. Is it really unused?
     m_dataByWidget.remove(object);
 }
 
@@ -857,13 +894,7 @@ void PtzInstrument::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_clickTimer.timerId()) {
         m_clickTimer.stop();
 
-        PtzSplashItem *splashItem = newSplashItem(target());
-        splashItem->setSplashType(PtzSplashItem::Circular);
-        splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
-        splashItem->setPos(m_clickPos);
-        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
-
-        ptzMoveTo(target(), m_clickPos);
+        processPtzClick(m_clickPos);
     } else if(event->timerId() == m_movementTimer.timerId()) { 
         if(!target())
             return;
@@ -917,14 +948,14 @@ bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMou
 }
 
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    if(!dragProcessor()->isWaiting())
-        return false; /* Prevent click-through scenarios. */
-
     bool clickTimerWasActive = m_clickTimer.isActive();
     m_clickTimer.stop();
 
-    if(event->button() != Qt::LeftButton)
+    if(event->button() != Qt::LeftButton) {
+        m_skipNextAction = true; /* Interrupted by RMB? Do nothing. */
+        reset(); 
         return false;
+    }
 
     QGraphicsObject *object = item->toGraphicsObject();
     if(!object)
@@ -947,6 +978,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::AbsolutePtzCapability))
         return false;
 
+    m_skipNextAction = false;
     m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
     m_target = target;
     m_manipulator = manipulator;
@@ -1045,7 +1077,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo *) {
+void PtzInstrument::finishDrag(DragInfo *info) {
     if(target()) {
         if(!manipulator()) {
             ensureSelectionItem();
@@ -1056,15 +1088,9 @@ void PtzInstrument::finishDrag(DragInfo *) {
 
             qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
             if(relativeSize < minPtzZoomRectSize) {
-                m_isClick = true; /* Handle it as a click. */
+                processPtzClick(selectionRect.center());
             } else {
-                PtzSplashItem *splashItem = newSplashItem(target());
-                splashItem->setSplashType(PtzSplashItem::Rectangular);
-                splashItem->setPos(selectionRect.center());
-                splashItem->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
-                m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
-
-                ptzMoveTo(target(), selectionRect);
+                processPtzDrag(selectionRect);
             }
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
@@ -1080,14 +1106,7 @@ void PtzInstrument::finishDrag(DragInfo *) {
 void PtzInstrument::finishDragProcess(DragInfo *info) {
     if(target()) {
         if(!manipulator() && m_isClick && m_isDoubleClick) {
-            PtzSplashItem *splashItem = newSplashItem(target());
-            splashItem->setSplashType(PtzSplashItem::Rectangular);
-            splashItem->setPos(target()->rect().center());
-            QSizeF size = target()->size() * 1.1;
-            splashItem->setRect(QRectF(-toPoint(size) / 2, size));
-            m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
-
-            ptzUnzoom(target());
+            processPtzDoubleClick();
         } else if(!manipulator() && m_isClick) {
             m_clickTimer.start(m_clickDelayMSec, this);
             m_clickPos = info->mousePressItemPos();

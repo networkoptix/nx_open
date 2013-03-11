@@ -5,24 +5,25 @@
 
 //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
-
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <licensing/license.h>
 
-#include <utils/math/color_transformations.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/export_camera_settings_dialog.h>
-#include <ui/style/globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/math/color_transformations.h>
+#include <utils/license_usage_helper.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -70,7 +71,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->displayFpsCheckBox,     SIGNAL(stateChanged(int)),          this,   SLOT(at_displayFpsCheckBox_stateChanged(int)));
     connect(ui->enableRecordingCheckBox,SIGNAL(clicked()),                  this,   SLOT(at_enableRecordingCheckBox_clicked()));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
-    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged()));
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged(int)));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
     connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
 
@@ -78,7 +79,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     connect(ui->exportScheduleButton,   SIGNAL(clicked()),                  this,   SLOT(at_exportScheduleButton_clicked()));
     ui->exportWarningLabel->setVisible(false);
-    
+
     QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
     releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
     connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
@@ -469,23 +470,8 @@ void QnCameraScheduleWidget::setScheduleEnabled(bool enabled)
     ui->enableRecordingCheckBox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
 }
 
-int QnCameraScheduleWidget::activeCameraCount() const 
-{
-    switch(ui->enableRecordingCheckBox->checkState()) {
-    case Qt::Checked:
-        return m_cameras.size();
-    case Qt::Unchecked:
-        return 0;
-    case Qt::PartiallyChecked: {
-        int result = 0;
-        foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-            if (!camera->isScheduleDisabled())
-                result++;
-        return result;
-    }
-    default:
-        return 0;
-    }
+bool QnCameraScheduleWidget::isScheduleEnabled() const {
+    return ui->enableRecordingCheckBox->checkState() != Qt::Unchecked;
 }
 
 void QnCameraScheduleWidget::setMotionAvailable(bool available) {
@@ -514,42 +500,92 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText() 
 {
-    int alreadyActive = 0;
-    foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-        if (!camera->isScheduleDisabled())
-            alreadyActive++;
+    QnLicenseUsageHelper helper;
 
-    // how many licenses will be used if recording will be enabled on all cameras
-    int toBeUsed = qnResPool->activeCameras() + m_cameras.size() - alreadyActive;
+    int usedDigitalChange = helper.usedDigital();
+    int usedAnalogChange = helper.usedAnalog();
 
-    // how many licensed is used really
-    int used = qnResPool->activeCameras() + activeCameraCount() - alreadyActive;
-
-    // how many licenses do we have
-    int total = qnLicensePool->getLicenses().totalCameras();
-
-    QPalette palette = this->palette();
-    if(used > total)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->licensesLabel->setPalette(palette);
-
-    QString usageText = tr("%n license(s) are used out of %1.", NULL, used).arg(total);
-
-    if (ui->enableRecordingCheckBox->checkState() == Qt::Checked) {
-        ui->licensesLabel->setText(usageText);
-    } else if (toBeUsed > total){
-        ui->licensesLabel->setText(
-            QString(QLatin1String("%1 %2")).
-                arg(tr("Activate %n more license(s).", NULL, toBeUsed - total)).
-                arg(usageText)
-        );
-    } else {
-        ui->licensesLabel->setText(
-            QString(QLatin1String("%1 %2")).
-                arg(tr("%n license(s) will be used.", NULL, m_cameras.size() - alreadyActive)).
-                arg(usageText)
-        );
+    switch(ui->enableRecordingCheckBox->checkState()) {
+    case Qt::Checked:
+        helper.propose(m_cameras, true);
+        break;
+    case Qt::Unchecked:
+        helper.propose(m_cameras, false);
+        break;
+    default:
+        break;
     }
+
+    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
+    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
+
+    { // digital licenses
+        QString usageText = tr("%1 digital license(s) are used out of %2.")
+                .arg(helper.usedDigital())
+                .arg(helper.totalDigital());
+        ui->digitalLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.requiredDigital() > 0)
+            setWarningStyle(&palette);
+        ui->digitalLicensesLabel->setPalette(palette);
+    }
+
+    { // analog licenses
+        QString usageText = tr("%1 analog license(s) are used out of %2.")
+                .arg(helper.usedAnalog())
+                .arg(helper.totalAnalog());
+        ui->analogLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.requiredAnalog() > 0)
+            setWarningStyle(&palette);
+        ui->analogLicensesLabel->setPalette(palette);
+    }
+
+    if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
+        ui->requiredLicensesLabel->setVisible(false);
+        return;
+    }
+
+    { // required licenses
+        QPalette palette = this->palette();
+        if (!helper.isValid())
+            setWarningStyle(&palette);
+        ui->requiredLicensesLabel->setPalette(palette);
+        ui->requiredLicensesLabel->setVisible(true);
+    }
+
+    if (helper.requiredDigital() > 0 && helper.requiredAnalog() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital and %2 more analog licenses.")
+                                           .arg(helper.requiredDigital())
+                                           .arg(helper.requiredAnalog())
+                                           );
+    } else if (helper.requiredDigital() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital licenses.")
+                                           .arg(helper.requiredDigital())
+                                           );
+    } else if (helper.requiredAnalog() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more analog licenses.")
+                                           .arg(helper.requiredAnalog())
+                                           );
+    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
+                                           .arg(usedDigitalChange)
+                                           .arg(usedAnalogChange)
+                                           );
+    } else if (usedDigitalChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more digital licenses will be used.")
+                                           .arg(usedDigitalChange)
+                                           );
+    } else if (usedAnalogChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more analog licenses will be used.")
+                                           .arg(usedAnalogChange)
+                                           );
+    }
+    else {
+        ui->requiredLicensesLabel->setText(QString());
+    }
+
+
 }
 
 void QnCameraScheduleWidget::updateLicensesButtonVisible() {

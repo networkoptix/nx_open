@@ -190,6 +190,7 @@ void QnNetworkResource::updateInner(QnResourcePtr other)
     if (other_casted)
     {
         m_auth = other_casted->m_auth;
+        m_macAddress = other_casted->m_macAddress;
     }
 }
 

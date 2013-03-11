@@ -8,107 +8,57 @@
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "recorder/storage_manager.h"
+#include "api/model/storage_status_reply.h"
 
-QnFileSystemHandler::QnFileSystemHandler(bool detectAvailableOnly):
-    m_detectAvailableOnly(detectAvailableOnly)
+int QnFileSystemHandler::executeGet(const QString &, const QnRequestParamList &params, JsonResult &result)
 {
+    QString storageUrl;
+    QString error;
 
-}
-
-int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(path)
-    Q_UNUSED(contentType)
-
-    QString pathStr;
-    QString errStr;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "path")
-        {
-            pathStr = params[i].second;
+    for (int i = 0; i < params.size(); ++i) {
+        if (params[i].first == "path") {
+            storageUrl = params[i].second;
             break;
         }
     }
-
-    if (pathStr.isEmpty())
-        errStr += "Parameter path is absent or empty. \n";
-
-    if (!errStr.isEmpty())
-    {
-        result.append("<root>\n");
-        result.append(errStr);
-        result.append("</root>\n");
+    if (storageUrl.isEmpty()) {
+        result.setErrorText("Parameter 'path' is absent or empty.");
         return CODE_INVALID_PARAMETER;
     }
 
-    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(pathStr);
-    if (storage == 0) 
-        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(pathStr, false));
-
-    int prefixPos = pathStr.indexOf("://");
-    QString prefix;
-    if (prefixPos != -1)
-        prefix = pathStr.left(prefixPos+3);
-    if (storage == 0)
-    {
-        result.append("<root>\n");
-        result.append(QString("Unknown storage plugin '%1'").arg(prefix));
-        result.append("</root>\n");
-        return CODE_OK;
+    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(storageUrl);
+    bool exists = storage;
+    if (!storage) {
+        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
+        if(storage)
+            storage->setUrl(storageUrl);
     }
+    
+    QnStorageStatusReply reply;
+    reply.pluginExists = storage;
+    reply.storage.storageId = exists ? storage->getId().toInt() : -1;
+    reply.storage.path = storageUrl;
+    reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
+    reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
+    reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
+    reply.storage.isExternal = storageUrl.contains(QLatin1String("://")) || storageUrl.trimmed().startsWith(QLatin1String("\\\\")); // TODO: #Elric not consistent with space_handler
+    reply.storage.isWritable = storage ? storage->isStorageAvailableForWriting() : false;
+    reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
+        
+    // TODO: #Elric remove once UnknownSize is dropped.
+    if(reply.storage.totalSpace == QnStorageResource::UnknownSize)
+        reply.storage.totalSpace = -1;
+    if(reply.storage.freeSpace == QnStorageResource::UnknownSize)
+        reply.storage.freeSpace = -1;
 
-    pathStr = pathStr.mid(prefix.length());
-    storage->setUrl(pathStr);
-    QString rezStr;
-    if (storage->isStorageAvailableForWriting()) {
-        if (m_detectAvailableOnly)
-            rezStr = "OK";
-        else {
-            rezStr.append("<freeSpace>\n");
-            rezStr.append(QByteArray::number(storage->getFreeSpace()));
-            rezStr.append("</freeSpace>\n");
-            rezStr.append("<totalSpace>\n");
-            rezStr.append(QByteArray::number(storage->getTotalSpace()));
-            rezStr.append("</totalSpace>\n");
-        }
-    }
-    else {
-        if (m_detectAvailableOnly)
-            rezStr = "FAIL";
-        else
-            rezStr = "-1";
-    }
-
-    result.append("<root>\n");
-    result.append(rezStr);
-    result.append("</root>\n");
-
+    result.setReply(reply);
     return CODE_OK;
 }
 
-int QnFileSystemHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+QString QnFileSystemHandler::description(TCPSocket *) const
 {
-    Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
-}
-
-QString QnFileSystemHandler::description(TCPSocket* tcpSocket) const
-{
-    Q_UNUSED(tcpSocket)
-    QString rez;
-    if (m_detectAvailableOnly) 
-    {
-        rez += "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n";
-        rez += "<BR>Param <b>path</b> - Folder.";
-        rez += "<BR><b>Return</b> XML - with 'OK' or 'FAIL' message";
-    }
-    else 
-    {
-        rez += "Returns storage free space and current usage in bytes. if specified folder can not be used for writing or not available returns -1.\n";
-        rez += "<BR>Param <b>path</b> - Folder.";
-        rez += "<BR><b>Return</b> XML - free space in bytes or -1";
-    }
-    return rez;
+    return 
+        "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n"
+        "<BR>Param <b>path</b> - Folder."
+        "<BR><b>Return</b> JSON with path validity.";
 }

@@ -22,7 +22,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
@@ -121,9 +121,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->readOnlyWarningLabel->hide();
     }
     else {
-        QPalette palette = this->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-        ui->readOnlyWarningLabel->setPalette(palette);
+        setWarningStyle(ui->readOnlyWarningLabel);
         ui->readOnlyWarningLabel->setText(
                      #ifdef Q_OS_LINUX
                              tr("Settings file is read-only. Please contact your system administrator.\n" \

@@ -34,6 +34,7 @@
 #include "qtservice.h"
 #include "server_message_processor.h"
 #include "settings.h"
+#include "motion/motion_helper.h"
 
 #include <fstream>
 #include "soap/soapserver.h"
@@ -240,12 +241,13 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
 }
 
-QnAbstractStorageResourcePtr createStorage(const QString& path)
+QnStorageResourcePtr createStorage(const QString& path)
 {
-    QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
+    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
     storage->setSpaceLimit(5ll * 1000000000);
+    storage->setUsedForWriting(storage->isStorageAvailableForWriting());
 
     return storage;
 }
@@ -266,17 +268,21 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    QString maxFreeSpaceDrive;
-    int maxFreeSpace = 0;
+    //QString maxFreeSpaceDrive;
+    //int maxFreeSpace = 0;
 
     foreach (QFileInfo drive, QDir::drives()) {
         if (!drive.isWritable())
             continue;
 
+        
         QString path = drive.absolutePath();
+        
         if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
             continue;
 
+        folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        /*
         int freeSpace = freeGB(path);
 
         if (maxFreeSpaceDrive.isEmpty() || freeSpace > maxFreeSpace) {
@@ -288,12 +294,14 @@ static QStringList listRecordFolders()
             cl_log.log(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
             folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
         }
+        */
     }
-
+    /*
     if (folderPaths.isEmpty()) {
         cl_log.log(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
         folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
     }
+    */
 #endif
 
 #ifdef Q_OS_LINUX
@@ -305,11 +313,22 @@ static QStringList listRecordFolders()
 
 QnAbstractStorageResourceList createStorages()
 {
-    QnAbstractStorageResourceList storages;
+    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
 
+    QnAbstractStorageResourceList storages;
+    bool isBigStorageExist = false;
     foreach(QString folderPath, listRecordFolders()) {
-        storages.append(createStorage(folderPath));
+        QnStorageResourcePtr storage = createStorage(folderPath);
+        isBigStorageExist |= storage->isUsedForWriting() && storage->getTotalSpace() > BIG_STORAGE_THRESHOLD;
+        storages.append(storage);
         cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+    }
+    if (isBigStorageExist) {
+        for (int i = 0; i < storages.size(); ++i) {
+            QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
+            if (storage->getTotalSpace() <= BIG_STORAGE_THRESHOLD)
+                storage->setUsedForWriting(false);
+        }
     }
 
     return storages;
@@ -727,8 +746,7 @@ void QnMain::initTcpListener()
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true)); // TODO: deprecated
-    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnFileSystemHandler());
     QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
@@ -817,6 +835,16 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
+    //starting soap server to accept event notifications from onvif servers
+    QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::instance()->start();
+
+    QnResourcePool::initStaticInstance( new QnResourcePool() );
+
+    QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
+
+    QnMotionHelper::initStaticInstance( new QnMotionHelper() );
+
     QnBusinessEventConnector::initStaticInstance( new QnBusinessEventConnector() );
     std::auto_ptr<QThread> connectorThread( new QThread() );
     connectorThread->start();
@@ -839,6 +867,10 @@ void QnMain::run()
 
         QnSleep::msleep(1000);
     }
+    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+
+
+    QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
@@ -949,6 +981,7 @@ void QnMain::run()
     }
     qnStorageMan->loadFullFileCatalog();
 
+    QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
@@ -1036,6 +1069,12 @@ void QnMain::run()
 
     exec();
 
+    delete QnRecordingManager::instance();
+    QnRecordingManager::initStaticInstance( NULL );
+
+    delete QnMServerResourceSearcher::instance();
+    QnMServerResourceSearcher::initStaticInstance( NULL );
+
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
 
@@ -1045,6 +1084,17 @@ void QnMain::run()
     //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
     delete QnBusinessEventConnector::instance();
     QnBusinessEventConnector::initStaticInstance( NULL );
+
+    delete QnMotionHelper::instance();
+    QnMotionHelper::initStaticInstance( NULL );
+
+    delete QnVideoCameraPool::instance();
+    QnVideoCameraPool::initStaticInstance( NULL );
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
+    delete QnSoapServer::instance();
+    QnSoapServer::initStaticInstance( NULL );
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
@@ -1061,8 +1111,6 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-
-        initializeSingleToneObjects();
 
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
@@ -1112,23 +1160,11 @@ private:
     int m_argc;
     char **m_argv;
 
-    void initializeSingleToneObjects()
-    {
-        //starting soap server to accept event notifications from onvif servers
-        QnSoapServer::initGlobalInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
-        QnSoapServer::instance()->start();
-    }
-
     void destroySingleToneObjects()
     {
         QThreadPool::globalInstance()->waitForDone();
 
-        QnRecordingManager::instance()->stop(); //since global objects destruction order is not specified
-
         QnBusinessRuleProcessor::fini();
-
-        delete QnSoapServer::instance();
-        QnSoapServer::initGlobalInstance( NULL );
     }
 };
 
@@ -1137,18 +1173,17 @@ void stopServer(int signal)
     Q_UNUSED(signal)
 
     QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance()->stop();
-    QnRecordingManager::instance()->stop();
+    //QnResourceDiscoveryManager::instance()->stop();
+    //QnRecordingManager::instance()->stop();
     if (serviceMainInstance)
     {
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
-    QnVideoCameraPool::instance()->stop();
+    //QnVideoCameraPool::instance()->stop();
     av_lockmgr_register(NULL);
     qApp->quit();
     qSettings.setValue("lastRunningTime", 0);
-    QnResourcePool::instance()->clear();
 }
 
 int main(int argc, char* argv[])

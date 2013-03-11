@@ -41,7 +41,8 @@ public:
     QnResourcePool();
     ~QnResourcePool();
 
-    static QnResourcePool *instance();
+    static void initStaticInstance( QnResourcePool* inst );
+    static QnResourcePool* instance();
 
     // this function will add or update existing resources
     // keeps database ID ( if possible )
@@ -86,7 +87,15 @@ public:
 
     QStringList allTags() const;
 
-    int activeCameras() const;
+    int activeCamerasByClass(bool analog) const;
+
+    int activeDigital() const {
+        return activeCamerasByClass(false);
+    }
+
+    int activeAnalog() const {
+        return activeCamerasByClass(true);
+    }
 
     // TODO #gdm: this is a hack. Fix.
     bool isLayoutsUpdated() const;

@@ -11,15 +11,16 @@
 class QnVideoCameraPool
 {
 public:
+    static void initStaticInstance( QnVideoCameraPool* inst );
     static QnVideoCameraPool* instance();
+
     virtual ~QnVideoCameraPool();
 
     void stop();
 
     QnVideoCamera* getVideoCamera(QnResourcePtr res);
     void removeVideoCamera(QnResourcePtr res);
-private:
-    QnVideoCameraPool();
+
 private:
     typedef QMap<QnResourcePtr, QnVideoCamera*> CameraMap;
     CameraMap m_cameras;

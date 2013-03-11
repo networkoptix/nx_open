@@ -170,7 +170,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     }
 
 	const QnScheduleTask task = currentScheduleTask();
-    bool isRecording = task.getRecordingType() != Qn::RecordingType_Never;
+    bool isRecording = task.getRecordingType() != Qn::RecordingType_Never && qnStorageMan->isWritableStoragesAvailable();
     if (!m_device->isDisabled()) {
         if (isRecording) {
             if(m_device->getStatus() == QnResource::Online)

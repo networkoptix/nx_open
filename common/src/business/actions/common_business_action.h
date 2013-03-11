@@ -7,7 +7,7 @@
 
 #include "abstract_business_action.h"
 
-
+// TODO: #Elric what is the purpose of this class?
 class QnCommonBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;

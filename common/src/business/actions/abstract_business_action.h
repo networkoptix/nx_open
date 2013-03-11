@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
 
+// TODO: #Elric have BA_ prefix => namespace not needed
 namespace BusinessActionType
 {
     enum Value

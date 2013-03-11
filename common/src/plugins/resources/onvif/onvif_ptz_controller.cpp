@@ -92,6 +92,9 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     if(m_resource->getModel() == lit("FD8162")) {
         m_capabilities &= ~Qn::AbsolutePtzCapability;
     }
+    if(m_resource->getModel() == lit("IPC-HDB3200C")) {
+        m_capabilities = Qn::NoCapabilities;
+    }
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }

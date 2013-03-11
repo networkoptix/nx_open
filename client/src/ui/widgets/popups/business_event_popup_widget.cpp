@@ -7,11 +7,11 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/resource_name.h>
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
-#include <utils/settings.h>
 
 namespace {
 
@@ -24,29 +24,6 @@ namespace {
         ConflictsRole
 
     };
-
-
-    QString extractHost(const QString &url) {
-        /* Try it as a host address first. */
-        QHostAddress hostAddress(url);
-        if(!hostAddress.isNull())
-            return hostAddress.toString();
-
-        /* Then go default QUrl route. */
-        return QUrl(url).host();
-    }
-
-    QString getResourceName(const QnResourcePtr& resource) {
-        QnResource::Flags flags = resource->flags();
-        if (qnSettings->isIpShownInTree()) {
-            if((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote)) {
-                QString host = extractHost(resource->getUrl());
-                if(!host.isEmpty())
-                    return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
-            }
-        }
-        return resource->getName();
-    }
 }
 
 QnBusinessEventPopupWidget::QnBusinessEventPopupWidget(QWidget *parent) :

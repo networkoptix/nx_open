@@ -30,7 +30,6 @@ public:
     void removeAbsentStorages(QnAbstractStorageResourceList newStorages);
     void addStorage(QnStorageResourcePtr storage);
 
-
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
     bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
@@ -59,6 +58,8 @@ public:
 
     QnStorageResourceList getStorages() const;
     void clearSpace();
+
+    bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 signals:
     void noStoragesAvailable();
 public slots:
@@ -98,6 +99,7 @@ private:
     QMutex m_cacheMutex;
     bool m_catalogLoaded;
     bool m_warnSended;
+    bool m_isWritableStorageAvail;
 };
 
 #define qnStorageMan QnStorageManager::instance()

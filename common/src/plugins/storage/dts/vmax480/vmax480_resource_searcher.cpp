@@ -249,6 +249,9 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
             QMap<int, QByteArray> camNames;
             bool camNamesReaded = false;
 
+            QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host).arg(API_PORT);
+            QString groupName = QString(QLatin1String("VMAX %1")).arg(host);
+
             for (int i = 0; i < channles; ++i)
             {
                 QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
@@ -279,6 +282,8 @@ QnResourceList QnPlVmax480ResourceSearcher::findResources(void)
                 resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(mac).arg(i+1));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setAuth(auth);
+                resource->setGroupName(groupName);
+                resource->setGroupId(groupId);
 
                 result << resource;
             }
@@ -519,6 +524,9 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     if (!rt.isValid())
         return result;
 
+    QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(url.host()).arg(API_PORT);
+    QString groupName = QString(QLatin1String("VMAX %1")).arg(url.host());
+
     for (int i = 0; i < channels; ++i)
     {
         QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
@@ -534,6 +542,8 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3")).arg(url.host()).arg(API_PORT).arg(i+1));
         resource->setPhysicalId(QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1));
         resource->setAuth(auth);
+        resource->setGroupId(groupId);
+        resource->setGroupName(groupName);
 
         result << resource;
 

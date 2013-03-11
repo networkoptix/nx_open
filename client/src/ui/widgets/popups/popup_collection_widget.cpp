@@ -31,6 +31,10 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
     resizeSignalizer->setEventType(QEvent::Resize);
     parent->installEventFilter(resizeSignalizer);
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
+
+    ui->verticalWidget->setVisible(false);
+
+    connect(ui->expandButton, SIGNAL(toggled(bool)), ui->verticalWidget, SLOT(setVisible(bool)));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -82,7 +86,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         QnBusinessEventPopupWidget* pw = m_businessEventWidgets[eventType];
         pw->addBusinessAction(businessAction);
     } else {
-        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(this);
+        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(ui->verticalWidget);
         if (!pw->addBusinessAction(businessAction))
             return false;
         ui->verticalLayout->insertWidget(0, pw);
@@ -105,7 +109,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         QnSystemHealthPopupWidget* pw = m_systemHealthWidgets[message];
         pw->show();
     } else {
-        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(this);
+        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(ui->verticalWidget);
         if (!pw->showSystemHealthMessage(message, resources))
             return false;
         ui->verticalLayout->addWidget(pw);
@@ -139,9 +143,12 @@ void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void QnPopupCollectionWidget::updatePosition() {
+    //TODO: #GDM will not be used when will be placed on scene
+    const int offset = 3;
+
     QSize parentSize = parentWidget()->size();
     QSize size = this->size();
-    move(parentSize.width() - size.width(), parentSize.height() - size.height());
+    move(parentSize.width() - size.width() - offset, parentSize.height() - size.height() - offset);
 }
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {

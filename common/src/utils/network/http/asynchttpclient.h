@@ -29,6 +29,7 @@ namespace nx_http
         \note This class methods are not thread-safe
         \note All signals are emitted from aio::AIOService threads
         \note State is changed just before emitting signal
+        \note It is strongly recommended to call terminate before scheduleForRemoval!
         \todo pipelining support
         \todo keep-alive connection support
     */
@@ -110,7 +111,7 @@ namespace nx_http
         virtual ~AsyncHttpClient();
 
         //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) override;
+        virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) throw() override;
 
     private:
         State m_state;
@@ -128,7 +129,6 @@ namespace nx_http
         std::map<BufferType, BufferType> m_customHeaders;
         bool m_terminated;
         mutable QMutex m_mutex;
-        bool m_inEventHandler;
 
         bool doGetPrivate( const QUrl& url );
         /*!
@@ -150,6 +150,7 @@ namespace nx_http
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequstWithAuthorization( const nx_http::Response& response );
+        void eventTriggeredPrivate( Socket* sock, PollSet::EventType eventType );
 
         static const char* toString( State state );
     };

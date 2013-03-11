@@ -132,10 +132,17 @@ public:
 };
 
 
-Q_GLOBAL_STATIC(QnMServerResourceSearcher, inst)
+//Q_GLOBAL_STATIC(QnMServerResourceSearcher, inst)
+static QnMServerResourceSearcher* staticInstance = NULL;
+
+void QnMServerResourceSearcher::initStaticInstance( QnMServerResourceSearcher* inst )
+{
+    staticInstance = inst;
+}
+
 QnMServerResourceSearcher* QnMServerResourceSearcher::instance()
 {
-    return inst();
+    return staticInstance;
 }
 
 QnMServerResourceSearcher::~QnMServerResourceSearcher()

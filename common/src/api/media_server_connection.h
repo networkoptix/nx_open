@@ -17,11 +17,78 @@
     
 #include "api_fwd.h"
 #include "model/storage_space_reply.h"
+#include "model/storage_status_reply.h"
 
 class QnPtzSpaceMapper;
+class QnEnumNameMapper;
+
+class QnMediaServerReplyProcessor: public QObject {
+    Q_OBJECT
+
+    typedef QObject base_type;
+
+public:
+    QnMediaServerReplyProcessor(int object);
+    virtual ~QnMediaServerReplyProcessor();
+
+    int object() const { return m_object; }
+
+public slots:
+    void processReply(const QnHTTPRawResponse &response, int handle);
+
+signals:
+    void finished(int status, const QVariant &reply, int handle);
+    void finished(int status, const QnStorageStatusReply &reply, int handle);
+    void finished(int status, const QnStorageSpaceReply &reply, int handle);
+    void finished(int status, const QnTimePeriodList &reply, int handle);
+    void finished(int status, const QnStatisticsDataList &reply, int handle);
+    void finished(int status, const QnPtzSpaceMapper &reply, int handle);
+
+protected:
+    virtual void connectNotify(const char *signal) override;
+
+private:
+    template<class T>
+    void emitFinished(int status, const T &reply, int handle) {
+        if(m_emitDefault)
+            emit finished(status, reply, handle);
+        if(m_emitVariant)
+            emit finished(status, QVariant::fromValue<T>(reply), handle);
+    }
+
+private:
+    int m_object;
+    bool m_emitVariant, m_emitDefault;
+};
+
+
+class QnMediaServerRequestResult: public QObject {
+    Q_OBJECT
+public:
+    int status() const { return m_status; }
+    int handle() const { return m_handle; }
+    const QVariant &reply() const { return m_reply; }
+
+signals:
+    void replyProcessed();
+
+public slots:
+    void processReply(int status, const QVariant &reply, int handle) {
+        m_status = status;
+        m_reply = reply;
+        m_handle = handle;
+
+        emit replyProcessed();
+    }
+
+private:
+    int m_status;
+    int m_handle;
+    QVariant m_reply;
+};
+
 
 namespace detail {
-
     // TODO: #Elric merge into single processor
     class QnMediaServerSimpleReplyProcessor: public QObject
     {
@@ -34,32 +101,6 @@ namespace detail {
 
     signals:
         void finished(int status, int handle);
-    };
-
-    class QnMediaServerTimePeriodsReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerTimePeriodsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, const QnTimePeriodList& timePeriods, int handle);
-    };
-
-    class QnMediaServerStatisticsReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
-
-    signals:
-        void finished(const QnStatisticsDataList &/* usage data */);
     };
 
     class QnMediaServerManualCameraReplyProcessor: public QObject
@@ -153,31 +194,6 @@ namespace detail {
         void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
     };
 
-    class QnMediaServerPtzGetSpaceMapperReplyProcessor: public QObject {
-        Q_OBJECT
-    public:
-        QnMediaServerPtzGetSpaceMapperReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
-
-    signals:
-        void finished(int status, const QnPtzSpaceMapper &mapper, int handle);
-    };
-
-    class QnMediaServerStorageSpaceReplyProcessor: public QObject {
-        Q_OBJECT;
-    public:
-        QnMediaServerStorageSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
-
-    signals:
-        void finished(int status, const QnStorageSpaceReply &reply, int handle);
-    };
-
-
 } // namespace detail
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
@@ -190,8 +206,11 @@ Q_DECLARE_METATYPE(QnStringVariantPairList);
 class QN_EXPORT QnMediaServerConnection: public QObject
 {
     Q_OBJECT
+
+    typedef QObject base_type;
+
 public:
-    QnMediaServerConnection( const QUrl& mediaServerApiUrl, QObject *parent = 0 );
+    QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
@@ -254,18 +273,26 @@ public:
 
     int asyncGetStorageSpace(QObject *target, const char *slot);
 
+    int asyncGetStorageStatus(const QString &storageUrl, QObject *target, const char *slot);
+
     int asyncGetTime(QObject *target, const char *slot);
 
     QString getUrl() const { return m_url.toString(); }
+
+    using base_type::connect;
+    static bool connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
+
 protected:
     QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
 
 private:
     int recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &timePeriodList, QByteArray &errorString);
-
     int asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot);
 
+    int sendAsyncRequest(QnMediaServerReplyProcessor *processor, const QnRequestParamList &params = QnRequestParamList(), const QnRequestHeaderList &headers = QnRequestHeaderList());
+
 private:
+    QScopedPointer<QnEnumNameMapper> m_nameMapper;
     QUrl m_url;
     QString m_proxyAddr;
     int m_proxyPort;

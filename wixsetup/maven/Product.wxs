@@ -942,16 +942,6 @@
 			<ComponentRef Id="TrayToolOpenSSL"/>
 		</Feature>
 
-		<?if $(var.vmax) = true?>	
-			<Feature Id="VMaxFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
-				<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !VMaxFeature <> 3 ]]> </Condition>-->
-
-				<ComponentRef Id="vmaxproxy.exe"/>
-				<ComponentRef Id="VmaxProxyQTLibraries"/>
-				<ComponentRef Id="VmaxProxySDK"/>
-			</Feature>		
-		<?endif?>		
-		
 		<Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 			<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
@@ -966,6 +956,12 @@
 			<ComponentRef Id="ServerSigar"/>
 			<ComponentRef Id="ServerQjson"/>
 			<ComponentRef Id="sysfomediaservercomponent"/>
+
+			<?if $(var.vmax) = true?>	
+					<ComponentRef Id="vmaxproxy.exe"/>
+					<ComponentRef Id="VmaxProxyQTLibraries"/>
+					<ComponentRef Id="VmaxProxySDK"/>
+			<?endif?>		
 		</Feature>
 
 		<Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
