@@ -18,10 +18,9 @@ namespace nx_hls
     class HLSSession
     {
     public:
-        HLSSession( const QString& id );
+        HLSSession( const QString& id, bool _isLive );
 
         const QString& id() const;
-        void setLive( bool value );
         bool isLive() const;
 
         void setPlaylistManager( const QSharedPointer<AbstractPlaylistManager>& value );
@@ -29,6 +28,7 @@ namespace nx_hls
 
     private:
         QString m_id;
+        bool m_live;
         QSharedPointer<AbstractPlaylistManager> m_playlistManager;
     };
 

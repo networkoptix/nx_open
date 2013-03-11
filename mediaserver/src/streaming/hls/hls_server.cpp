@@ -380,16 +380,13 @@ namespace nx_hls
         HLSSession* session = HLSSessionPool::instance()->find( sessionID );
         if( !session )
         {
-            session = new HLSSession( sessionID );
-            HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT );
             std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
-            if( startDatetimeIter == requestParams.end() )
+            session = new HLSSession(
+                sessionID,
+                startDatetimeIter == requestParams.end() ); //if no start date specified, providing live stream
+            HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT );
+            if( startDatetimeIter != requestParams.end() )
             {
-                session->setLive( true );
-            }
-            else
-            {
-                session->setLive( false );
                 //TODO/IMPL/HLS
                     //converting startDatetime to timestamp
                 quint64 startTimestamp = 0;

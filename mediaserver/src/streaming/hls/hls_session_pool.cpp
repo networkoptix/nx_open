@@ -7,15 +7,21 @@
 
 namespace nx_hls
 {
-    HLSSession::HLSSession( const QString& id )
+    HLSSession::HLSSession( const QString& id, bool _isLive )
     :
-        m_id( id )
+        m_id( id ),
+        m_live( _isLive )
     {
     }
 
     const QString& HLSSession::id() const
     {
         return m_id;
+    }
+
+    bool HLSSession::isLive() const
+    {
+        return m_live;
     }
 
     void HLSSession::setPlaylistManager( const QSharedPointer<AbstractPlaylistManager>& value )
