@@ -1,3 +1,20 @@
+----------------------------------------------- 1.4.4 - RC -----------------------------------------------
+
+BUGS FIXED:
+
+Since 1.4
+
+Since previous Beta (1.4.2)
+if you press fix button on this notification - notification does not disappear
+
+IMPROVEMENTS:
+
+Since 1.4
+ - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
+
+Since previous Beta (1.4.3)
+ - 
+
 ----------------------------------------------- 1.4.3 - Beta2 -----------------------------------------------
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - AXISP1354

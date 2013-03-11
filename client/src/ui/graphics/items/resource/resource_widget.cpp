@@ -295,7 +295,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     //TODO: #GDM check if 'an' should be used and correct text size in tis case to match 4:3 cameras
-    m_analogLicenseStaticText.setText(tr("This camera requires analog license to be watched"));
+    m_analogLicenseStaticText.setText(tr("Activate License to remove this message"));
     m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
 
