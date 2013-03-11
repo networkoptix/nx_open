@@ -40,6 +40,8 @@ private:
     bool m_reverseMode;
     QMap<qint64, bool> m_ThumbnailsSeekPoints; // key - time, value - isRecordingHole detected
     bool m_thumbnailsMode;
+    qint64 m_lastSeekPos;
+    qint64 m_lastPacketTime;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

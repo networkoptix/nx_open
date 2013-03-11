@@ -13,6 +13,8 @@ QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& pa
 
     if (!result->waitForConnected(1000 * 5))
     {
+        qDebug() << "can not connect to VMAX server!";
+
         result->disconnect();
         delete result;
         result = 0;
