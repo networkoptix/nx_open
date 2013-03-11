@@ -94,18 +94,13 @@ qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) co
     //return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
 
     if( ctx.timestampBlocked || (ctx.framesSinceJump == 0 && ctx.forcedTimestampValue != AV_NOPTS_VALUE) )
-    {
-        qDebug()<<"QnResourceWidgetRenderer::getTimestampOfNextFrameToRender (1) "<<ctx.forcedTimestampValue;
         return ctx.forcedTimestampValue;
-    }
 
     if( !ctx.uploader || !ctx.renderer )
         return AV_NOPTS_VALUE;
     qint64 ts = ctx.uploader->nextFrameToDisplayTimestamp();
     if( ts == (qint64)AV_NOPTS_VALUE )
         ts = ctx.renderer->lastDisplayedTime();
-
-    qDebug()<<"QnResourceWidgetRenderer::getTimestampOfNextFrameToRender (2) "<<ts;
 
     return ts;
 }
