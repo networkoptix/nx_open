@@ -10,7 +10,6 @@
 #include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
-static const qint64 MIN_SPACE_FOR_WRITTING = 1000000ll * 100; // 100Mb
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -24,7 +23,8 @@ QnStorageManager::QnStorageManager():
     m_storagesStatisticsReady(false),
     m_catalogLoaded(false),
     m_warnSended(false),
-    m_isWritableStorageAvail(false)
+    m_isWritableStorageAvail(false),
+    m_bigStorageExists(false)
 {
 }
 
@@ -375,6 +375,11 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
+qint64 QnStorageManager::minSpaceForWritting() const
+{
+    return m_bigStorageExists ? BIG_STORAGE_THRESHOLD : 0;
+}
+
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
@@ -385,7 +390,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > MIN_SPACE_FOR_WRITTING)
+            if (available > minSpaceForWritting())
                 result << fileStorage;
         }
     }
@@ -402,11 +407,13 @@ void QnStorageManager::updateStorageStatistics()
     double totalSpace = 0;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     m_isWritableStorageAvail = !storages.isEmpty();
+    m_bigStorageExists = false;
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
+        m_bigStorageExists |= storageSpace > BIG_STORAGE_THRESHOLD;
     }
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -616,4 +623,10 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         return false;
     catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
     return true;
+}
+
+qint64 QnStorageManager::isBigStorageExists() const 
+{
+    QMutexLocker lock(&m_mutexStorages);
+    return m_bigStorageExists; 
 }

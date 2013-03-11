@@ -60,6 +60,11 @@ public:
     void clearSpace();
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
+
+    qint64 minSpaceForWritting() const;
+    qint64 isBigStorageExists() const;
+
+    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
 signals:
     void noStoragesAvailable();
 public slots:
@@ -100,6 +105,7 @@ private:
     bool m_catalogLoaded;
     bool m_warnSended;
     bool m_isWritableStorageAvail;
+    bool m_bigStorageExists;
 };
 
 #define qnStorageMan QnStorageManager::instance()
