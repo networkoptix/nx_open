@@ -18,10 +18,10 @@ isEmpty(BUILDLIB) {
 
 CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ../../build-environment/${arch}/bin/debug
+	DESTDIR = ../../build_environment/${arch}/bin/debug
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
 	} else {
-    DESTDIR = ../../build-environment/${arch}/build/bin/debug
+    DESTDIR = ../../build_environment/${arch}/build/bin/debug
   }  
   OBJECTS_DIR = ../${arch}/build/debug
   MOC_DIR = ../${arch}/build/debug/generated
@@ -32,10 +32,10 @@ CONFIG(debug, debug|release) {
 
 CONFIG(release, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ../../build-environment/${arch}/bin/release
+	DESTDIR = ../../build_environment/${arch}/bin/release
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
   } else {
-    DESTDIR = ../../build-environment/${arch}/build/bin/release
+    DESTDIR = ../../build_environment/${arch}/build/bin/release
   }  
   OBJECTS_DIR  = ../${arch}/build/release
   MOC_DIR = ../${arch}/build/release/generated

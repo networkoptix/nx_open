@@ -1,4 +1,4 @@
-NX_BUILDENV=`pwd`/../build-environment/x86/build/
+NX_BUILDENV=`pwd`/../build_environment/x86/build/
 CXX=g++
 AR=ar
 ARFLAGS=rcs

@@ -42,7 +42,7 @@
 						<configuration>
 							<files>
 								<file>../build-${customization}.properties</file>
-								<file>../build-environment/${arch}/libdir.properties</file>
+								<file>../build_environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>

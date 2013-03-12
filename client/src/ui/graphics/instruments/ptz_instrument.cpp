@@ -668,7 +668,7 @@ void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
-    widget->addOverlayWidget(overlay, false, false);
+    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, false, false);
 }
 
 void PtzInstrument::ensureSelectionItem() {
@@ -694,7 +694,8 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
         ensureOverlayWidget(widget);
 
     if(PtzOverlayWidget *overlay = overlayWidget(widget)) {
-        opacityAnimator(overlay, 0.5)->animateTo(hasCrosshair ? 1.0 : 0.0);
+        widget->setOverlayWidgetVisibility(overlay, hasCrosshair ? QnResourceWidget::AutoVisible : QnResourceWidget::Invisible);
+        //opacityAnimator(overlay, 0.5)->animateTo(hasCrosshair ? 1.0 : 0.0);
 
         overlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
     }

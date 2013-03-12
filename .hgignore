@@ -25,8 +25,8 @@ compatibility_info.cpp
 Debug
 Release
 
-build-environment/x86
-build-environment/x64
+build_environment/x86
+build_environment/x64
 
 appserver/.idea
 appserver/env

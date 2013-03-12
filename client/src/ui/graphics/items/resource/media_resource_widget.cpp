@@ -340,7 +340,7 @@ void QnMediaResourceWidget::invalidateMotionSelectionCache() {
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     base_type::paint(painter, option, widget);
 
-    if(isDecorationsVisible() && isInfoVisible())
+    if(isOverlayVisible() && isInfoVisible())
         updateInfoTextLater();
 }
 

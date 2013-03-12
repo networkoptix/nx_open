@@ -221,7 +221,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->setupUi(this);
     
     ui->storagesTable->resizeColumnsToContents();
-    ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
+    ui->storagesTable->horizontalHeader()->setClickable(false);
     ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
     ui->storagesTable->horizontalHeader()->setResizeMode(PathColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
@@ -433,7 +433,7 @@ void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
     m_hasStorageChanges = true;
 }
 
-void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle) {
+void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int) {
     if(status != 0) {
         m_tableBottomLabel->setText(tr("Could not load storages from server."));
         return;

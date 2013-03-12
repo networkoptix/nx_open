@@ -10,7 +10,7 @@
 	<groupId>com.networkoptix.hdwitness</groupId>
 	<version>1.4.3-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>build-environment</artifactId>
+	<artifactId>build_environment</artifactId>
 	<packaging>pom</packaging>
 	<name>Build Environment for QT projects</name>
 
