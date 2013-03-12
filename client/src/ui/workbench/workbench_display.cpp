@@ -1435,7 +1435,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(hasTimeLabels) {
-            widget->setDecorationsVisible(true, false);
+            widget->setOverlayVisible(true, false);
             widget->setInfoVisible(true, false);
             
             qint64 displayTime = time;
