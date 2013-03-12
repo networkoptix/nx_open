@@ -31,10 +31,6 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
     resizeSignalizer->setEventType(QEvent::Resize);
     parent->installEventFilter(resizeSignalizer);
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
-
-    ui->verticalWidget->setVisible(false);
-
-    connect(ui->expandButton, SIGNAL(toggled(bool)), ui->verticalWidget, SLOT(setVisible(bool)));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -86,7 +82,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         QnBusinessEventPopupWidget* pw = m_businessEventWidgets[eventType];
         pw->addBusinessAction(businessAction);
     } else {
-        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(ui->verticalWidget);
+        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(this);
         if (!pw->addBusinessAction(businessAction))
             return false;
         ui->verticalLayout->insertWidget(0, pw);
@@ -94,6 +90,8 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_businessEventWidget_closed(BusinessEventType::Value, bool)));
     }
 
+    if (!isVisible())
+        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -109,7 +107,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         QnSystemHealthPopupWidget* pw = m_systemHealthWidgets[message];
         pw->show();
     } else {
-        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(ui->verticalWidget);
+        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(this);
         if (!pw->showSystemHealthMessage(message, resources))
             return false;
         ui->verticalLayout->addWidget(pw);
@@ -117,6 +115,8 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         connect(pw, SIGNAL(closed(QnSystemHealth::MessageType, bool)), this, SLOT(at_systemHealthWidget_closed(QnSystemHealth::MessageType, bool)));
     }
 
+    if (!isVisible())
+        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -129,7 +129,12 @@ void QnPopupCollectionWidget::clear() {
     }
     m_businessEventWidgets.clear();
     m_systemHealthWidgets.clear();
+    action(Qn::TogglePopupsAction)->setChecked(false);
     hide();
+}
+
+bool QnPopupCollectionWidget::isEmpty() const {
+    return ui->verticalLayout->isEmpty();
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {

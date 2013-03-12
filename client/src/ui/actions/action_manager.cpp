@@ -406,6 +406,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Check System Health..."));
 
+    factory(Qn::TogglePopupsAction).
+        flags(Qn::NoTarget).
+        checkable().
+        icon(qnSkin->icon("titlebar/panic.png")).
+        text(tr("Show notifications"));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).

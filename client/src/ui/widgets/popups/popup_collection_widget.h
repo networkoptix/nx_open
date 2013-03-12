@@ -30,8 +30,9 @@ public:
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
     bool addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources);
 
-    void clear();
+    bool isEmpty() const;
 
+    void clear();
 protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
