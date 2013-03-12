@@ -13,8 +13,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_reverseMode(false),
     m_thumbnailsMode(false),
-    m_lastSeekPos(AV_NOPTS_VALUE),
-    m_lastPacketTime(AV_NOPTS_VALUE)
+    m_lastSeekPos(AV_NOPTS_VALUE)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
@@ -78,7 +77,7 @@ qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 
     m_internalQueue.clear();
     vmaxArchivePlay(time, m_sequence, m_reverseMode ? -1 : 1);
-    m_lastSeekPos = m_lastPacketTime = time;
+    m_lastSeekPos = m_lastMediaTime = time;
     return time;
 }
 
@@ -106,14 +105,15 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     if (!isOpened()) {
         open(m_res);
         if (!isOpened()) {
-			if (m_lastPacketTime != AV_NOPTS_VALUE)
-            	m_lastPacketTime += 60*1000; // try to skip problem place
+			if (m_lastMediaTime != AV_NOPTS_VALUE)
+            	m_lastMediaTime += 60*1000; // try to skip problem place
             return result;
         }
     }
 
-    if (m_lastSeekPos == AV_NOPTS_VALUE && m_lastPacketTime != AV_NOPTS_VALUE) {
-        seek(m_lastPacketTime, true);
+    if (m_lastSeekPos == AV_NOPTS_VALUE && m_lastMediaTime != AV_NOPTS_VALUE) {
+        vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
+        m_lastSeekPos = m_lastMediaTime;
     }
 
     if (m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
@@ -142,7 +142,8 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
             return QnAbstractMediaDataPtr();
     }
     if (result) {
-        m_lastPacketTime = result->timestamp;
+
+
         result->opaque = 0;
         if (m_reverseMode) {
             result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
@@ -199,6 +200,7 @@ void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
             QnSleep::msleep(1);
         }
     }
+    QnSleep::msleep(2); // reduce vmax downloading speed
 
     m_internalQueue.push(mediaData);
     m_lastMediaTime = mediaData->timestamp;
