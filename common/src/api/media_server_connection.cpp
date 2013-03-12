@@ -182,6 +182,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         }
 
         emitFinished(status, reply, handle);
+        break;
     }
     case TimePeriodsObject: {
         int status = response.status;
@@ -197,6 +198,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         }
 
         emit finished(status, reply, handle);
+        break;
     }
     case StatisticsObject: {
         const QByteArray &data = response.data;
@@ -233,6 +235,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         }
         
         emit finished(status, reply, handle); 
+        break;
     }
     case PtzSpaceMapperObject: {
         int status = response.status;
@@ -247,6 +250,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         }
 
         emit finished(status, reply, handle);
+        break;
     }
     case StorageSpaceObject: {
         int status = response.status;
@@ -261,6 +265,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         }
 
         emit finished(status, reply, handle);
+        break;
     }
     default:
         break; // TODO: #Elric warning?
