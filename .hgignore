@@ -44,6 +44,9 @@ appserver/setup/version.py
 appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
+appserver/packages/llutil/build
+appserver/packages/llutil/dist
+appserver/packages/llutil/llutil.egg-info
 
 client/bin
 client/build

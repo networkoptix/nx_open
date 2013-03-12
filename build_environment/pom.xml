@@ -112,7 +112,6 @@
 						<configuration>
 							<files>
 								<file>../build-${customization}.properties</file>
-								<file>../build-environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -308,6 +307,11 @@
 												<include>*/${qtplugin3}/**</include>
 											</includes>										
 										</resource>	
+										<resource>
+											<file>${basedir}/../cpp/shared-resources/version.h</file>
+											<targetPath>${project.build.directory}/build/include</targetPath>
+											<filtering>true</filtering>
+										</resource>											
 										<resource>
 											<targetPaths>
 												<targetPath>${project.build.directory}/bin/debug</targetPath>
