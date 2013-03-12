@@ -39,6 +39,8 @@ class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
 
+static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
+
 // ------------- ServerTrackInfo --------------------
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
@@ -953,7 +955,8 @@ int QnRtspConnectionProcessor::composePlay()
             return CODE_INTERNAL_ERROR;
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        d->socket->setReadTimeOut(d->socketTimeout);
+        d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
+        d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
         createPredefinedTracks();
     }
 
@@ -1270,6 +1273,8 @@ void QnRtspConnectionProcessor::run()
     Q_D(QnRtspConnectionProcessor);
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
+    d->socket->setReadTimeOut(1000*1000);
+    d->socket->setWriteTimeOut(1000*1000);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();
