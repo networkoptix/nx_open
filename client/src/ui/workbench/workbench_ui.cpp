@@ -1602,7 +1602,7 @@ void QnWorkbenchUi::at_activityStopped() {
 
     foreach(QnResourceWidget *widget, display()->widgets())
         if(!(widget->options() & QnResourceWidget::DisplayInfo))
-            widget->setDecorationsVisible(false);
+            widget->setOverlayVisible(false);
 }
 
 void QnWorkbenchUi::at_activityStarted() {
@@ -1612,7 +1612,7 @@ void QnWorkbenchUi::at_activityStarted() {
 
     foreach(QnResourceWidget *widget, display()->widgets())
         if(widget->isInfoVisible()) // TODO: wrong place?
-            widget->setDecorationsVisible(true);
+            widget->setOverlayVisible(true);
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
