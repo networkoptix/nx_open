@@ -108,7 +108,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         if (!helper.isValid()) {
             useRedLabel = true;
             ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Required at least %3 digital and %4 analog."))
+                                              "Required at least %3 digital and %4 analog licenses."))
                                    .arg(helper.totalDigital())
                                    .arg(helper.totalAnalog())
                                    .arg(helper.requiredDigital())
@@ -116,7 +116,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         } else {
             ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Currently using %3 digital and %4 analog."))
+                                              "Currently using %3 digital and %4 analog licenses."))
                                    .arg(helper.totalDigital())
                                    .arg(helper.totalAnalog())
                                    .arg(helper.usedDigital())
