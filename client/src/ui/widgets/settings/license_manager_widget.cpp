@@ -1,6 +1,8 @@
 #include "license_manager_widget.h"
 #include "ui_license_manager_widget.h"
 
+#include "version.h"
+
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 #include <QtCore/QTextStream>
@@ -146,9 +148,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-//    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
-    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/new/vms.dev/activate.php"));
-
+    QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
     request.setUrl(url);
 
