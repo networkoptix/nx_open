@@ -11,15 +11,9 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
-#ifdef Q_OS_MAC
-#include <IOKit/IOKitLib.h>
-#endif
+#include "version.h"
 
-QT_STATIC_CONST char networkOptixRSAPublicKey[] =
-        "-----BEGIN PUBLIC KEY-----\n"
-        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n"
-        "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
-        "-----END PUBLIC KEY-----";
+QT_STATIC_CONST char networkOptixRSAPublicKey[] = QN_RSA_PUBLIC_KEY;
 
 static bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
 {
@@ -53,7 +47,7 @@ Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
 QnLicense::QnLicense(const QByteArray &licenseBlock)
     : m_rawLicense(licenseBlock),
-	  m_isValid1(false),
+      m_isValid1(false),
       m_isValid2(false)
 {
     QByteArray v1LicenseBlock, v2LicenseBlock;
@@ -166,7 +160,7 @@ const QString &QnLicense::expiration() const
 
 const QByteArray& QnLicense::rawLicense() const
 {
-	return m_rawLicense;
+    return m_rawLicense;
 }
 
 bool QnLicense::isValid(const QByteArray& hardwareId) const
@@ -185,21 +179,21 @@ QByteArray QnLicense::toString() const
 
 QnLicensePtr readLicenseFromStream(QTextStream& stream)
 {
-	QByteArray licenseBlock;
-	while (!stream.atEnd()) {
+    QByteArray licenseBlock;
+    while (!stream.atEnd()) {
         QString line = stream.readLine();
         if (line.isEmpty()) {
             if (!licenseBlock.isEmpty())
-			    return QnLicensePtr(new QnLicense(licenseBlock));
+                return QnLicensePtr(new QnLicense(licenseBlock));
             else
                 continue;
         }
 
-		licenseBlock.append(line.toUtf8() + "\n");
-	}
+        licenseBlock.append(line.toUtf8() + "\n");
+    }
 
-	if (licenseBlock.isEmpty())
-		return QnLicensePtr();
+    if (licenseBlock.isEmpty())
+        return QnLicensePtr();
 
     return QnLicensePtr(new QnLicense(licenseBlock));
 }
@@ -230,7 +224,7 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
     QMutexLocker locker(&m_mutex);
 
     m_licenses.setHardwareId(licenses.hardwareId());
-	m_licenses.setOldHardwareId(licenses.oldHardwareId());
+    m_licenses.setOldHardwareId(licenses.oldHardwareId());
     m_licenses.clear();
     foreach (QnLicensePtr license, licenses.licenses())
         m_licenses.append(license);
@@ -242,11 +236,11 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
     QMutexLocker locker(&m_mutex);
 
-	if (license) {
-		m_licenses.append(license);
+    if (license) {
+        m_licenses.append(license);
 
-		emit licensesChanged();
-	}
+        emit licensesChanged();
+    }
 }
 
 void QnLicensePool::reset()
@@ -272,13 +266,13 @@ QList<QnLicensePtr> QnLicenseList::licenses() const
 
 QList<QByteArray> QnLicenseList::allLicenseKeys() const
 {
-	QList<QByteArray> result;
+    QList<QByteArray> result;
 
-	foreach (const QnLicensePtr& license, m_licenses.values()) {
-		result.append(license->key());
-	}
+    foreach (const QnLicensePtr& license, m_licenses.values()) {
+        result.append(license->key());
+    }
 
-	return result;
+    return result;
 }
 
 void QnLicenseList::setHardwareId(const QByteArray &hardwareId)
@@ -303,13 +297,13 @@ QByteArray QnLicenseList::oldHardwareId() const
 
 void QnLicenseList::append(QnLicensePtr license)
 {
-	if (m_licenses.contains(license->key())) {
-		// Update if resulting license is valid with newHardwareId
-		if (license->isValid(m_hardwareId))
-			m_licenses[license->key()] = license;
+    if (m_licenses.contains(license->key())) {
+        // Update if resulting license is valid with newHardwareId
+        if (license->isValid(m_hardwareId))
+            m_licenses[license->key()] = license;
 
         return;
-	}
+    }
 
     if (license->isValid(m_hardwareId) || license->isValid(m_oldHardwareId))
         m_licenses.insert(license->key(), license);
@@ -348,10 +342,10 @@ bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
 
 QnLicensePtr QnLicenseList::getLicenseByKey(const QByteArray& key) const
 {
-	if (m_licenses.contains(key))
-		return m_licenses[key];
-	else
-		return QnLicensePtr();
+    if (m_licenses.contains(key))
+        return m_licenses[key];
+    else
+        return QnLicensePtr();
 }
 
 QnLicensePool::QnLicensePool()
