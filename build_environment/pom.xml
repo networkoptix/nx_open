@@ -249,6 +249,13 @@
 										<include>*/${qtplugin3}/**</include>
 									</includes>										
 								</resource>																			
+								<resource>
+									<targetPaths>
+										<targetPath>${project.build.directory}/bin/debug</targetPath>
+										<targetPath>${project.build.directory}/bin/release</targetPath>
+									</targetPaths>
+									<file>${basedir}/../quicksyncdecoder/hw_decoding_conf.xml</file>
+								</resource>								
 							</resources>								
 						</configuration>
 					</execution>
