@@ -21,6 +21,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
+#include <ui/style/statistics_colors.h>
 #include <ui/workbench/workbench_context.h>
 
 /** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
@@ -34,26 +35,12 @@ namespace {
 
     /** Get corresponding color from config */
     QColor getColorByKey(const QString &key) {
-        QnColorVector colors = qnGlobals->systemHealthColors();
+        QnStatisticsColors colors = qnGlobals->statisticsColors();
         if (key == QLatin1String("CPU"))
-            return colors[0];
+            return colors.cpu();
         if (key == QLatin1String("RAM"))
-            return colors[1];
-
-        int id;
-        if (key.contains(QLatin1Char(':'))) {
-            // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
-            id = key.at(0).toAscii() - 'C';
-        }
-        else if (key.startsWith(QLatin1String("sd")))
-            id = key.compare(QLatin1String("sda"));
-        else if (key.startsWith(QLatin1String("hd")))
-            id = key.compare(QLatin1String("hda"));
-        else
-            id = 3;
-
-        int hddColorsCount = colors.size() - 2; // fixed colors for cpu and ram
-        return colors[2 + id % hddColorsCount];
+            return colors.ram();
+        return colors.hdd(key);
     }
 
     /** Create path for the chart */
@@ -298,7 +285,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     /** Draw grid */
     {
         QPen grid;
-        grid.setColor(qnGlobals->systemHealthColorGrid());
+        grid.setColor(qnGlobals->statisticsColors().grid());
         grid.setWidthF(pen_width);
 
         QPainterPath grid_path;
@@ -346,7 +333,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         Q_UNUSED(penRollback)
 
         QPen main_pen;
-        main_pen.setColor(getColorByKey(QLatin1String("CPU")));
+        main_pen.setColor(qnGlobals->statisticsColors().frame());
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::MiterJoin);
 

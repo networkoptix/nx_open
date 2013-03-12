@@ -4,9 +4,12 @@
 #include <functional> /* For std::mem_fun_ref. */
 
 #include <QtCore/QMetaType>
+#include <QColor>
 
 #include <qjson/serializer.h>
 #include <qjson/parser.h>
+
+#include <utils/common/color.h>
 
 #include "warnings.h"
 
@@ -48,6 +51,17 @@ bool deserialize(const QVariant &value, QUuid *target) {
         return false;
 
     *target = result;
+    return true;
+}
+
+void serialize(const QColor &value, QVariant *target) {
+    *target = value.name();
+}
+
+bool deserialize(const QVariant &value, QColor *target) {
+    if(value.type() != QVariant::String)
+        return false;
+    *target = parseColor(value);
     return true;
 }
 
