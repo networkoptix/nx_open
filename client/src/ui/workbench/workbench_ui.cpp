@@ -1386,7 +1386,8 @@ void QnWorkbenchUi::updatePopupButtonAnimation() {
     if (!m_popupShowButton->isVisible())
         return;
 
-    VariantAnimator* animator = opacityAnimator(m_popupShowButton, 0.5);
+    VariantAnimator* animator = opacityAnimator(m_popupShowButton);
+    animator->setTimeLimit(1000);
     qreal opacity = m_popupShowButton->opacity();
     if (qFuzzyCompare(opacity, 1.0))
         animator->animateTo(0.1);
