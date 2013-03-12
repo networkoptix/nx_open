@@ -30,6 +30,7 @@
 		<testcamera.name>${company.name} Test Camera</testcamera.name>
 		<traytool.name>${product.name} Tray Assistant</traytool.name>
 		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+		<license.environment>production</license.environment>
 
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>

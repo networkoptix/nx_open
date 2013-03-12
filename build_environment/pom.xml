@@ -111,7 +111,8 @@
 						</goals>
 						<configuration>
 							<files>
-								<file>../build-${customization}.properties</file>
+								<file>../rsa-key-${license.environment}.properties</file>
+								<file>../build-${customization}.properties</file>								
 							</files>
 						</configuration>
 					</execution>

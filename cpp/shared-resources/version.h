@@ -25,14 +25,15 @@
 #define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
 #define QN_FREE_LICENSE_COUNT       ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY         "${freeLicenseKey}"
-
+#define QN_LICENSE_URL              "${license.url}"
+#define QN_RSA_PUBLIC_KEY           ${rsa.public.key}
 
 // TODO: Beauoreeze, define these variables conditionally. 1st for production, 2nd for testing.
 
-// #define QN_RSA_PUBLIC_KEY         "-----BEGIN PUBLIC KEY-----\n" \
-//        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n" \
-//        "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n" \
-//        "-----END PUBLIC KEY-----";
+#define QN_RSA_PUBLIC_KEY "-----BEGIN PUBLIC KEY-----\n" \
+"MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n" \
+"EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n" \
+"-----END PUBLIC KEY-----";
 
 #define QN_RSA_PUBLIC_KEY "-----BEGIN PUBLIC KEY-----\n" \
 "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALgdetuLJ0NKq16D5cD6bixLOp27gQDj\n" \
