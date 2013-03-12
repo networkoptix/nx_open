@@ -35,20 +35,13 @@ private:
 
     void addTableItem(const QnStorageSpaceData &item);
     void setTableItems(const QList<QnStorageSpaceData> &items);
+    QnStorageSpaceData tableItem(int row) const;
     QList<QnStorageSpaceData> tableItems() const;
-
-    //int addTableRow(int id, const QString &url, int spaceLimitGb);
-
-    //void setTableStorages(const QnAbstractStorageResourceList &storages);
-    //QnAbstractStorageResourceList tableStorages() const;
-
-    //bool validateStorages(const QnAbstractStorageResourceList &storages);
-
-    //void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
+    void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 
@@ -57,6 +50,7 @@ private:
     QnMediaServerResourcePtr m_server;
     QList<QString> m_storageProtocols;
     QLabel *m_tableBottomLabel;
+    QAction *m_removeAction;
 
     bool m_hasStorageChanges;
 };
