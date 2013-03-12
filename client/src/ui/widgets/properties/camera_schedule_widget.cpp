@@ -560,11 +560,11 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
                                            .arg(helper.requiredAnalog())
                                            );
     } else if (helper.requiredDigital() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital licenses.")
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital license(s).")
                                            .arg(helper.requiredDigital())
                                            );
     } else if (helper.requiredAnalog() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %1 more analog licenses.")
+        ui->requiredLicensesLabel->setText(tr("Activate %1 more analog license(s).")
                                            .arg(helper.requiredAnalog())
                                            );
     } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
@@ -573,11 +573,11 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
                                            .arg(usedAnalogChange)
                                            );
     } else if (usedDigitalChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more digital licenses will be used.")
+        ui->requiredLicensesLabel->setText(tr("%1 more digital license(s) will be used.")
                                            .arg(usedDigitalChange)
                                            );
     } else if (usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more analog licenses will be used.")
+        ui->requiredLicensesLabel->setText(tr("%1 more analog license(s) will be used.")
                                            .arg(usedAnalogChange)
                                            );
     }

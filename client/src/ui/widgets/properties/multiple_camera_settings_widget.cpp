@@ -173,10 +173,9 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->checkBoxEnableAudio->setEnabled(true);
     
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
-        ui->analogGroupBox->setVisible(false);
+        ui->analogGroupBox->setVisible(true);
 
         bool firstCamera = true;
-        bool firstAnalog = true;
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
         {
             logins.insert(camera->getAuth().user());
@@ -189,13 +188,14 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
 
             if (camera->isAnalog()) {
-                ui->analogGroupBox->setVisible(true);
                 Qt::CheckState viewState = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
-                if (firstAnalog)
+                if (firstCamera)
                     ui->analogViewCheckBox->setCheckState(viewState);
                 else if (viewState != ui->analogViewCheckBox->checkState())
-                    ui->analogViewCheckBox->setCheckable(Qt::PartiallyChecked);
-                firstAnalog = false;
+                    ui->analogViewCheckBox->setCheckState(Qt::PartiallyChecked);
+            } else {
+                ui->analogGroupBox->setVisible(false);
+                ui->analogViewCheckBox->setCheckState(Qt::PartiallyChecked);
             }
 
             Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
