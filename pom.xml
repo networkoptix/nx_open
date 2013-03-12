@@ -58,7 +58,7 @@
 		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>
-		<module>build-environment</module>
+		<module>build_environment</module>
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
