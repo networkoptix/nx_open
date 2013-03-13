@@ -116,6 +116,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
         result.user = ui->simpleEmailLineEdit->text();
         result.password = ui->simplePasswordLineEdit->text();
         result.simple = true;
+        result.signature = ui->simpleSignatureTextEdit->toPlainText();
         return result;
     }
 
@@ -131,6 +132,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() {
     if (result.port == 0)
         result.port = QnEmail::defaultPort(result.connectionType);
     result.simple = false;
+    result.signature = ui->signatureTextEdit->toPlainText();
     return result;
 }
 
@@ -218,9 +220,11 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         }
         ui->userLineEdit->setText(value);
         ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
+        ui->signatureTextEdit->setPlainText(ui->simpleSignatureTextEdit->toPlainText());
     } else {
         ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
+        ui->simpleSignatureTextEdit->setPlainText(ui->signatureTextEdit->toPlainText());
     }
     ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
 }
@@ -314,6 +318,8 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
     ui->simpleEmailLineEdit->setText(settings.user);
     ui->passwordLineEdit->setText(settings.password);
     ui->simplePasswordLineEdit->setText(settings.password);
+    ui->signatureTextEdit->setPlainText(settings.signature);
+    ui->simpleSignatureTextEdit->setPlainText(settings.signature);
     ui->advancedCheckBox->setChecked(!settings.simple);
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
                                        ? AdvancedPage

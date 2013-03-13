@@ -3315,25 +3315,8 @@ void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByt
     if(status != 0)
         return;
 
-    const QLatin1String nameHost("EMAIL_HOST");
-    const QLatin1String nameUser("EMAIL_HOST_USER");
-    const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
-
-    QString hostname;
-    QString user;
-    QString password;
-
-    foreach (const QnKvPair &setting, settings) {
-        if (setting.name() == nameHost) {
-            hostname = setting.value();
-        } else if (setting.name() == nameUser) {
-            user = setting.value();
-        } else if (setting.name() == namePassword) {
-            password = setting.value();
-        }
-    }
-
-    if (!hostname.isEmpty() && !user.isEmpty() && !password.isEmpty())
+    QnEmail::Settings email(settings);
+    if (!email.server.isEmpty() && !email.user.isEmpty() && !email.password.isEmpty())
         return;
 
     ensurePopupCollectionWidget();
