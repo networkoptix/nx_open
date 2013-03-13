@@ -1,11 +1,25 @@
 #include <QUrl>
 #include <qDebug>
+#include <QThread>
 
 #include "vmax480_reader.h"
 #include "socket.h"
 #include "acs_codec.h"
 #include "nalconstructor.h"
 
+
+class QnSleep : public QThread
+{
+public:
+
+    static void msleep ( unsigned long msecs )
+    {
+        QThread::msleep(msecs);
+    }
+};
+
+
+static const int CHANNEL_TIMEOUT = 1000 * 5;
 
 int create_vmax_sps_pps(
                    int frameWidth,
@@ -315,9 +329,18 @@ void QnVMax480Provider::addChannel(const VMaxParamList& params)
         return;
 
     int channel = params.value("channel").toInt();
-    m_channelMask |= channel;
     qDebug() << "m_ACSStream->openChannel=" << channel;
+
+
+    QMutexLocker lock(&m_channelMutex);
+    m_channelProcessed = false;
     m_ACSStream->openChannel(channel);
+    m_channelMask |= channel;
+
+    QTime t;
+    t.restart();
+    while (!m_channelProcessed && t.elapsed() < CHANNEL_TIMEOUT)
+        m_channelCond.wait(&m_channelMutex, CHANNEL_TIMEOUT);
 }
 
 void QnVMax480Provider::removeChannel(const VMaxParamList& params)
@@ -326,8 +349,17 @@ void QnVMax480Provider::removeChannel(const VMaxParamList& params)
         return;
 
     int channel = params.value("channel").toInt();
+    qDebug() << "m_ACSStream->closeChannel" << channel;
+
+    QMutexLocker lock(&m_channelMutex);
+    m_channelProcessed = false;
     m_ACSStream->closeChannel(channel);
     m_channelMask &= ~channel;
+
+    QTime t;
+    t.restart();
+    while (!m_channelProcessed && t.elapsed() < CHANNEL_TIMEOUT)
+        m_channelCond.wait(&m_channelMutex, CHANNEL_TIMEOUT);
 }
 
 void QnVMax480Provider::requestMonthInfo(const VMaxParamList& params, quint8 sequence)
@@ -404,6 +436,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 
         if (m_reqSequence != m_curSequence) {
             qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
+            QnSleep::msleep(10);
             return;
         }
 
@@ -545,7 +578,14 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
         }
     case RESULT_OPEN_VIDEO:
         m_connectedInternal = true;
-        m_callbackCond.wakeOne();
+        m_callbackCond.wakeAll();
+        
+        m_channelProcessed = true;
+        m_channelCond.wakeAll();
+        break;
+    case RESULT_CLOSE_VIDEO:
+        m_channelProcessed = true;
+        m_channelCond.wakeAll();
         break;
     case RESULT_ALIVECHK:
         {

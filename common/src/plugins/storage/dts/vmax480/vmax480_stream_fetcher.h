@@ -20,6 +20,8 @@ public:
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) {}
     virtual void onGotMonthInfo(const QDate& month, int monthInfo)  {}
     virtual void onGotDayInfo(int dayNum, const QByteArray& data)  {}
+
+    virtual void beforeSeek() {}
 };
 
 class QnVMax480ConnectionProcessor;
@@ -47,8 +49,8 @@ public:
     void notInUse();
     int usageCount() const { return m_usageCount; }
 public:
-    bool vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, quint8 sequence, int speed);
-    bool vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec, quint8 sequence);
+    bool vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed);
+    bool vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec);
 
     bool vmaxRequestMonthInfo(const QDate& month);
     bool vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
@@ -63,6 +65,7 @@ private:
     int getCurrentChannelMask() const;
     bool waitForConnected();
     void doExtraDelay();
+    int getChannelUsage(int ch);
 protected:
     QnNetworkResourcePtr m_res;
 private:
@@ -76,9 +79,11 @@ private:
     QSet<QnVmax480DataConsumer*> m_dataConsumers;
     bool m_isLive;
     int m_usageCount;
+    QnVmax480DataConsumer* m_mainConsumer;
 
     static QMutex m_instMutex;
     static QMap<QString, VMaxStreamFetcher*> m_instances;
+    int m_sequence;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

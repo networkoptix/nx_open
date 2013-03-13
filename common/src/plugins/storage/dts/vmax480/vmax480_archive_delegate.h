@@ -29,6 +29,7 @@ public:
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     virtual int getChannel() const override;
+    virtual void beforeSeek() override;
 private:
     void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
     qint64 seekInternal(qint64 time, bool findIFrame);
@@ -37,7 +38,6 @@ private:
     QnPlVmax480ResourcePtr m_res;
     CLDataQueue m_internalQueue;
     bool m_needStop;
-    quint8 m_sequence;
     bool m_vmaxPaused;
     qint64 m_lastMediaTime;
     bool m_reverseMode;
@@ -45,6 +45,8 @@ private:
     bool m_thumbnailsMode;
     qint64 m_lastSeekPos;
     bool m_isOpened;
+    bool m_waitingSeek;
+    mutable QMutex m_seekMtx;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

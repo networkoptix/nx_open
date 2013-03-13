@@ -71,6 +71,10 @@ private:
 
     enum PointsPlayState {PP_None, PP_WaitAnswer, PP_GotAnswer};
     PointsPlayState m_ppState;
+
+    QMutex m_channelMutex;
+    QWaitCondition m_channelCond;
+    bool m_channelProcessed;
     //bool m_pointsNeedFrame;
 };
 

@@ -14,7 +14,9 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_vMaxProxy(0),
     m_vmaxConnection(0),
     m_isLive(isLive),
-    m_usageCount(0)
+    m_usageCount(0),
+    m_sequence(0),
+    m_mainConsumer(0)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
     start();
@@ -31,35 +33,33 @@ bool VMaxStreamFetcher::isOpened() const
     return m_vMaxProxy && !m_tcpID.isEmpty() && m_vmaxConnection && m_vmaxConnection->isRunning();
 }
 
-bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, quint8 sequence, int speed)
+bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed)
 {
     if (!waitForConnected())
         return false;
+
 
     int ch = consumer->getChannel();
 
     QMutexLocker  lock(&m_mutex);
-    for(QMap<QString, VMaxStreamFetcher*>::iterator itr = m_instances.begin(); itr != m_instances.end(); ++itr)
-    {
-        int channel = itr.value()->getChannel();
-        if (channel >=0 && channel < ch) {
-            // allow seek commands from archive with minimum channel ID (ignore -1 channel. -1 means that consumer does not use media data
-            return true; 
-        }
-    }
 
-    m_vmaxConnection->vMaxArchivePlay(timeUsec, sequence, speed);
+    if (consumer == m_mainConsumer) {
+        ++m_sequence;
+        foreach(QnVmax480DataConsumer* c, m_dataConsumers)
+            c->beforeSeek();
+        m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
+    }
 
     return true;
 }
 
-bool VMaxStreamFetcher::vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec, quint8 sequence)
+bool VMaxStreamFetcher::vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec)
 {
     if (!waitForConnected())
         return false;
 
-    m_vmaxConnection->vmaxPlayRange(pointsUsec, sequence);
-
+    QMutexLocker  lock(&m_mutex);
+    m_vmaxConnection->vmaxPlayRange(pointsUsec, ++m_sequence);
     return true;
 }
 
@@ -225,6 +225,10 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 {
     QMutexLocker lock(&m_mutex);
 
+    if (mediaData->opaque != m_sequence)
+        return;
+    mediaData->opaque = 0;
+
     int ch = mediaData->channelNumber;
     mediaData->channelNumber = 0;
     mediaData->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
@@ -255,11 +259,27 @@ void VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
     {
         QMutexLocker lock(&m_mutex);
         m_dataConsumers << consumer;
+        if (m_mainConsumer == 0)
+            m_mainConsumer = consumer;
         if (isOpened()) {
-            if (consumer->getChannel() != -1)
-                m_vmaxConnection->vMaxAddChannel(1 << consumer->getChannel());
+            if (consumer->getChannel() != -1) 
+            {
+                if (getChannelUsage(consumer->getChannel()) == 1)
+                    m_vmaxConnection->vMaxAddChannel(1 << consumer->getChannel());
+            }
         }
     }
+}
+
+int VMaxStreamFetcher::getChannelUsage(int ch)
+{
+    int channelUsage = 0;
+    foreach(QnVmax480DataConsumer* c, m_dataConsumers)
+    {
+        if (c->getChannel() == ch)
+            channelUsage++;
+    }
+    return channelUsage;
 }
 
 void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
@@ -270,17 +290,16 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
     {
         int ch = consumer->getChannel();
         if (ch != -1) {
-            int channelUsage = 0;
-            foreach(QnVmax480DataConsumer* c, m_dataConsumers)
-            {
-                if (c->getChannel() == ch)
-                    channelUsage++;
-            }
-            if (channelUsage == 1)
-                m_vmaxConnection->vMaxRemoveChannel(ch);
+            if (getChannelUsage(ch) == 1)
+                m_vmaxConnection->vMaxRemoveChannel(1 << consumer->getChannel());
         }
     }
     m_dataConsumers.remove(consumer);
+    if (m_mainConsumer == consumer) {
+        m_mainConsumer = 0;
+        if (!m_dataConsumers.isEmpty())
+            m_mainConsumer = *m_dataConsumers.begin();
+    }
     //if (m_dataConsumers.isEmpty())
     //    vmaxDisconnect();
 }
