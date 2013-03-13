@@ -42,6 +42,9 @@ private slots:
 
     void at_businessEventWidget_closed(BusinessEventType::Value actionType, bool ignore);
     void at_systemHealthWidget_closed(QnSystemHealth::MessageType message, bool ignore);
+
+    void at_postponeAllButton_clicked();
+    void at_minimizeButton_clicked();
 private:
     QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
