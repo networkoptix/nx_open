@@ -239,7 +239,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     }
 }
 
-void VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
+bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
 {
     /*
     QMutexLocker lock(&m_mutex);
@@ -261,13 +261,19 @@ void VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
         m_dataConsumers << consumer;
         if (m_mainConsumer == 0)
             m_mainConsumer = consumer;
-        if (isOpened()) {
-            if (consumer->getChannel() != -1) 
-            {
-                if (getChannelUsage(consumer->getChannel()) == 1)
-                    m_vmaxConnection->vMaxAddChannel(1 << consumer->getChannel());
-            }
+    }
+    if (waitForConnected()) {
+        if (consumer->getChannel() != -1) 
+        {
+            QMutexLocker lock(&m_mutex);
+            if (getChannelUsage(consumer->getChannel()) == 1)
+                m_vmaxConnection->vMaxAddChannel(1 << consumer->getChannel());
         }
+        return true;
+    }
+    else {
+        unregisterConsumer(consumer);
+        return false;
     }
 }
 

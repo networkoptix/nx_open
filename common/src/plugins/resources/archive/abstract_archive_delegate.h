@@ -36,7 +36,8 @@ public:
         Flag_CanProcessMediaStep = 4,      // flag inform that delegate is going to process media step itself.
         Flag_CanSendMotion       = 8,      // motion supported
         Flag_CanOfflineRange     = 16,     // delegate can return range immediatly withouht opening archive
-        Flag_CanSeekImmediatly   = 32      // delegate can perform seek operation immediatly, without 'open' function call
+        Flag_CanSeekImmediatly   = 32,     // delegate can perform seek operation immediatly, without 'open' function call
+        Flag_CanOfflineLayout    = 64      // delegate can return audio/video layout immediatly withouht opening archive
 	
     };
     Q_DECLARE_FLAGS(Flags, Flag);

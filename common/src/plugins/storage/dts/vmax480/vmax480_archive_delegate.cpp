@@ -21,6 +21,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
+    m_flags |= Flag_CanOfflineLayout;
 
     m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, res, false);
 }
@@ -43,8 +44,8 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     m_lastSeekPos = AV_NOPTS_VALUE;
     qDebug() << "before vmaxConnect";
 
-    m_maxStream->registerConsumer(this);
-    return true;
+    m_isOpened = m_maxStream->registerConsumer(this);
+    return m_isOpened;
 }
 
 void QnVMax480ArchiveDelegate::beforeClose()
@@ -85,9 +86,11 @@ qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 void QnVMax480ArchiveDelegate::close()
 {
     m_needStop = true;
-    m_maxStream->unregisterConsumer(this);
-    m_isOpened = false;
     m_waitingSeek = false;
+    if (m_isOpened) {
+        m_maxStream->unregisterConsumer(this);
+        m_isOpened = false;
+    }
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime()

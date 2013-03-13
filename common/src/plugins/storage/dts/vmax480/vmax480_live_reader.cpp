@@ -68,8 +68,7 @@ void QnVMax480LiveProvider::openStream()
         channel--;
 
 
-    m_maxStream->registerConsumer(this); 
-    m_opened = true;
+    m_opened = m_maxStream->registerConsumer(this); 
 
     /*
     vmaxDisconnect();
