@@ -37,10 +37,10 @@ namespace {
     QColor getColorByKey(const QString &key) {
         QnStatisticsColors colors = qnGlobals->statisticsColors();
         if (key == QLatin1String("CPU"))
-            return colors.cpu();
+            return colors.cpu;
         if (key == QLatin1String("RAM"))
-            return colors.ram();
-        return colors.hdd(key);
+            return colors.ram;
+        return colors.hddByKey(key);
     }
 
     /** Create path for the chart */
@@ -285,7 +285,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     /** Draw grid */
     {
         QPen grid;
-        grid.setColor(qnGlobals->statisticsColors().grid());
+        grid.setColor(qnGlobals->statisticsColors().grid);
         grid.setWidthF(pen_width);
 
         QPainterPath grid_path;
@@ -333,7 +333,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         Q_UNUSED(penRollback)
 
         QPen main_pen;
-        main_pen.setColor(qnGlobals->statisticsColors().frame());
+        main_pen.setColor(qnGlobals->statisticsColors().frame);
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::MiterJoin);
 

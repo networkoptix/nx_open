@@ -165,6 +165,9 @@ namespace QJson {
         QJson::serialize(value, &(*target)[QLatin1String(key)]);
     }
 
+    // TODO: #Elric this function is picked up when deserialize(const QString &, T *)
+    // is invoked, which is confusing. QVariant's conversion constructor must
+    // be forbidden for this function.
     template<class T>
     bool deserialize(const QVariant &value, T *target) {
         assert(target);

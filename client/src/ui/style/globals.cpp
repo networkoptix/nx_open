@@ -4,6 +4,8 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
+#include <QtCore/QStringList>
+
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
@@ -46,7 +48,15 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
     } else if (type == qMetaTypeId<QnStatisticsColors>()) {
         QnStatisticsColors colors;
 
-        colors.update(settings->value(name(id)).toString());
+        QVariant value = settings->value(name(id));
+        QString serializedValue;
+        if (value.type() == QVariant::String)
+            serializedValue = value.toString();
+        else if (value.type() == QVariant::StringList)
+            serializedValue = value.value<QStringList>().join(QLatin1String(", "));
+
+        if (!serializedValue.isEmpty())
+            colors.update(serializedValue.toLatin1());
         return QVariant::fromValue<QnStatisticsColors>(colors);
     }
     else {

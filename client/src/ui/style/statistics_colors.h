@@ -2,6 +2,9 @@
 #define STATISTICS_COLORS_H
 
 #include <QColor>
+#include <QtCore/QMetaType>
+
+#include <utils/common/json.h>
 
 class QnStatisticsColors
 {
@@ -10,36 +13,27 @@ public:
     QnStatisticsColors(const QnStatisticsColors &source);
     ~QnStatisticsColors();
 
-    QColor grid() const;
-    void setGrid(const QColor& value);
+    QColor grid;
+    QColor frame;
+    QColor cpu;
+    QColor ram;
+    QVector<QColor> hdds;
 
-    QColor frame() const;
-    void setFrame(const QColor& value);
+    QColor hddByKey(const QString &key) const;
 
-    QColor cpu() const;
-    void setCpu(const QColor& value);
-
-    QColor ram() const;
-    void setRam(const QColor& value);
-
-    QColor hdd(const QString &key) const;
-    QVector<QColor> hdds() const;
-
-    void update(const QString &serializedValue);
+    void update(const QByteArray &serializedValue);
 private:
-    QColor m_grid;
-    QColor m_frame;
-    QColor m_cpu;
-    QColor m_ram;
-    QVector<QColor> m_hdds;
 
+    /**
+     * @brief ensureHdds        Make sure hdd's color array contain at least one element.
+     *                          Fill by default values if it is empty.
+     */
+    void ensureHdds();
 };
 
 Q_DECLARE_METATYPE(QnStatisticsColors)
-/*
-qRegisterMetaType<QnStatisticsColors>();
-qRegisterMetaTypeStreamOperators<QnStatisticsColors>();
-*/
+
+QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), inline)
 
 
 #endif // STATISTICS_COLORS_H
