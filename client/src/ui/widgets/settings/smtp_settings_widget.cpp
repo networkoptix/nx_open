@@ -286,7 +286,7 @@ void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, const QByteA
             ? tr("Error while testing settings")
             : result
               ? tr("Success")
-              : tr("Error") + QString::fromLatin1(errorString)
+              : tr("Error: ") + QString::fromLatin1(errorString)
                 );
 }
 
