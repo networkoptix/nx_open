@@ -80,6 +80,11 @@ namespace {
         presets.insert(_("li.ru"),              server(_("smtp.li.ru"), QnEmail::Ssl));
         presets.insert(_("nic.ru"),             server(_("mail.nic.ru"), QnEmail::Unsecure));
 
+        presets.insert(_("lavabit.com"),        server(_("lavabit.com"), QnEmail::Ssl));
+        presets.insert(_("zoho.com"),           server(_("smtp.zoho.com"), QnEmail::Ssl));
+        presets.insert(_("gmx.com"),            server(_("mail.gmx.com"), QnEmail::Ssl));
+        presets.insert(_("shortmail.com"),      server(_("smtp.shortmail.com")));
+
         addPresets(QStringList()
                    << _("sympatico.ca")
                    << _("bell.net"),
