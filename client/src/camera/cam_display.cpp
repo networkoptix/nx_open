@@ -846,15 +846,10 @@ void QnCamDisplay::processNewSpeed(float speed)
     m_executingChangeSpeed = false;
 }
 
-bool QnCamDisplay::isSyncAllowed() const
-{
-    return m_extTimeSrc && m_extTimeSrc->isEnabled();
-}
-
 bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
     //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
-    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
+    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync));
 }
 
 void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
