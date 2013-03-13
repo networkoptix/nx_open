@@ -71,6 +71,10 @@ namespace nx_hls
                         m_state = sDone;
                     break;
 
+                case sProcessingMessage:
+                    Q_ASSERT( false );
+                    break;
+
                 case sSending:
                 {
                     Q_ASSERT( !m_writeBuffer.isEmpty() );
@@ -137,7 +141,7 @@ namespace nx_hls
                 arg(remoteHostAddress()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
             return false;
         }
-        if( bytesProcessed == m_readBuffer.size() )
+        if( bytesProcessed == (size_t)m_readBuffer.size() )
             m_readBuffer.clear();    //small optimization. may be excessive
         else
             m_readBuffer.remove( 0, bytesProcessed );

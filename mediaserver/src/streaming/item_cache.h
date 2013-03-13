@@ -91,7 +91,7 @@ public:
 
         //requesting item from item provider
         int itemCost = 1;
-        item = m_itemProvider->get( key, &itemCost );
+        CachedType* item = m_itemProvider->get( key, &itemCost );
         if( !item )
             return NULL;
 
@@ -132,7 +132,7 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
+        typename std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter != m_usedItems.end() )
         {
             ++usedItemIter->second->usageCount;
@@ -180,7 +180,7 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
+        typename std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter == m_usedItems.end() )
             return false;
 

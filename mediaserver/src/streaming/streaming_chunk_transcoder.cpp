@@ -43,7 +43,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
     m_newTranscodeID( 1 )
 {
     m_transcodeThreads.resize( TRANSCODE_THREAD_COUNT );
-    for( int i = 0; i < m_transcodeThreads.size(); ++i )
+    for( size_t i = 0; i < m_transcodeThreads.size(); ++i )
     {
         m_transcodeThreads[i] = new StreamingChunkTranscoderThread();
         m_transcodeThreads[i]->start();
@@ -330,7 +330,7 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
     return true;
 }
 
-bool StreamingChunkTranscoder::validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams )
+bool StreamingChunkTranscoder::validateTranscodingParameters( const StreamingChunkCacheKey& /*transcodeParams*/ )
 {
     //TODO/IMPL/HLS
     return true;

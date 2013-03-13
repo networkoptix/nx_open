@@ -1,6 +1,8 @@
 #ifndef __VIDEO_CAMERA_H__
 #define __VIDEO_CAMERA_H__
 
+#include <memory>
+
 #include <QScopedPointer>
 
 #include <core/dataconsumer/abstract_data_consumer.h>
