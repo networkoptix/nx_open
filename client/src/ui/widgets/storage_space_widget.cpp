@@ -88,4 +88,5 @@ void QnStorageSpaceWidget::paintEvent(QPaintEvent *ev)
     p.drawPixmap(handleRect, handlePic);
 
   //  base_type::paintEvent(ev);
+    Q_UNUSED(ev)
 }

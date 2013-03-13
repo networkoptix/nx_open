@@ -132,10 +132,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
+    m_overlayVisible(0),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_overlayRotation(Qn::Angle0),
-    m_overlayVisible(0)
+    m_overlayRotation(Qn::Angle0)
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
