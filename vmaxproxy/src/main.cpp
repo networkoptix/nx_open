@@ -117,6 +117,14 @@ int main(int argc, char* argv[])
                 qDebug() << "before exec Command_OpenArchive";
                 connection = openVMaxConnection(&mServerConnect, params, sequence, false);
                 break;
+            case Command_AddChannel:
+                qDebug() << "before exec Command_AddChannel";
+                connection->addChannel(params);
+                break;
+            case Command_RemoveChannel:
+                qDebug() << "before exec Command_RemoveChannel";
+                connection->removeChannel(params);
+                break;
             case Command_RecordedMonth:
                 if (connection) {
                     qDebug() << "before request month info";

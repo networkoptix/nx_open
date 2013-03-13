@@ -30,6 +30,9 @@ public:
 
     void keepAlive();
     bool waitForConnected(int timeoutMs);
+
+    void addChannel(const VMaxParamList& params);
+    void removeChannel(const VMaxParamList& params);
 private:
     static void receiveAudioStramCallback(PS_ACS_AUDIO_STREAM _stream, long long _user);
     static void receiveVideoStramCallback(PS_ACS_VIDEO_STREAM _stream, long long _user);
@@ -56,7 +59,7 @@ private:
     TCPSocket* m_socket;
     quint8 m_reqSequence;
     quint8 m_curSequence;
-    int m_channelNum;
+    //int m_channelNum;
     QQueue<int> m_monthRequests;
     QQueue<int> m_daysRequests;
     unsigned char recordedDayInfo[VMAX_MAX_CH][1440+60];
@@ -64,6 +67,7 @@ private:
     VMaxParamList m_newPlayCommand;
     QQueue<qint64> m_playPoints;
     bool m_pointsPlayMode;
+    int m_channelMask;
 
     enum PointsPlayState {PP_None, PP_WaitAnswer, PP_GotAnswer};
     PointsPlayState m_ppState;

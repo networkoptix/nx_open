@@ -8,19 +8,25 @@
 #include "vmax480_resource.h"
 
 
+static const QString GROUP_ID(QLatin1String("sdlkfjlkj"));
+
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
 QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
     CLServerPushStreamreader(dev),
-    VMaxStreamFetcher(dev),
-    m_internalQueue(16)
+    m_internalQueue(16),
+    m_maxStream(0),
+    m_opened(false)
 {
+    m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, dev, true);
+
     m_networkRes = dev.dynamicCast<QnNetworkResource>();
 }
 
 QnVMax480LiveProvider::~QnVMax480LiveProvider()
 {
-    vmaxDisconnect();
+    closeStream();
+    m_maxStream->freeInstance(GROUP_ID, m_resource, true);
 }
 
 QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
@@ -54,25 +60,33 @@ void QnVMax480LiveProvider::onGotData(QnAbstractMediaDataPtr mediaData)
 
 void QnVMax480LiveProvider::openStream()
 {
-    if (isOpened())
+    if (m_opened)
         return;
 
-    vmaxDisconnect();
-
-    int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
+    int channel = QUrl(m_resource->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
         channel--;
+
+
+    m_maxStream->registerConsumer(this); 
+    m_opened = true;
+
+    /*
+    vmaxDisconnect();
     vmaxConnect(true, channel);
+    */
 }
 
 void QnVMax480LiveProvider::closeStream()
 {
-    vmaxDisconnect();
+    m_opened = false;
+    m_maxStream->unregisterConsumer(this);
+    //vmaxDisconnect();
 }
 
 bool QnVMax480LiveProvider::isStreamOpened() const
 {
-    return isOpened();
+    return m_opened;
 }
 
 void QnVMax480LiveProvider::beforeRun()
@@ -96,4 +110,9 @@ void QnVMax480LiveProvider::updateStreamParamsBasedOnFps()
 {
     if (isRunning())
         pleaseReOpen();
+}
+
+int QnVMax480LiveProvider::getChannel() const
+{
+    return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();
 }

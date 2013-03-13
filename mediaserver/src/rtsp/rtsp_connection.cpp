@@ -855,7 +855,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-    if (camera)    
+    if (camera && d->liveMode == Mode_Live)
     {
         if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
@@ -880,10 +880,10 @@ void QnRtspConnectionProcessor::createDataProvider()
             }
         }
     }
-    if (!d->archiveDP) 
+    if (!d->archiveDP)
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive)));
 
-    if (!d->thumbnailsDP) 
+    if (!d->thumbnailsDP && d->liveMode == d->liveMode == Mode_ThumbNails) 
         d->thumbnailsDP = QSharedPointer<QnThumbnailsStreamReader>(new QnThumbnailsStreamReader(d->mediaRes));
 }
 

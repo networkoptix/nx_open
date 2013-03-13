@@ -5,7 +5,7 @@
 #include "vmax480_resource.h"
 #include "vmax480_stream_fetcher.h"
 
-class QnVMax480ArchiveDelegate: public QnAbstractArchiveDelegate, public VMaxStreamFetcher
+class QnVMax480ArchiveDelegate: public QnAbstractArchiveDelegate, public QnVmax480DataConsumer
 {
 public:
     QnVMax480ArchiveDelegate(QnResourcePtr res);
@@ -27,10 +27,13 @@ public:
 
     virtual void onReverseMode(qint64 displayTime, bool value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+
+    virtual int getChannel() const override;
 private:
     void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
     qint64 seekInternal(qint64 time, bool findIFrame);
 private:
+    VMaxStreamFetcher* m_maxStream;
     QnPlVmax480ResourcePtr m_res;
     CLDataQueue m_internalQueue;
     bool m_needStop;
@@ -41,6 +44,7 @@ private:
     QMap<qint64, bool> m_ThumbnailsSeekPoints; // key - time, value - isRecordingHole detected
     bool m_thumbnailsMode;
     qint64 m_lastSeekPos;
+    bool m_isOpened;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

@@ -6,14 +6,16 @@
 #include "vmax480_stream_fetcher.h"
 
 class QnVMax480ConnectionProcessor;
+class VMaxStreamFetcher;
 
-class QnVMax480LiveProvider: public CLServerPushStreamreader, public VMaxStreamFetcher
+class QnVMax480LiveProvider: public CLServerPushStreamreader, public QnVmax480DataConsumer
 {
 public:
     QnVMax480LiveProvider(QnResourcePtr dev );
     virtual ~QnVMax480LiveProvider();
 
     virtual void onGotData(QnAbstractMediaDataPtr mediaData) override;
+    virtual int getChannel() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;
@@ -29,6 +31,9 @@ protected:
 private:
     QnNetworkResourcePtr m_networkRes;
     CLDataQueue m_internalQueue;
+
+    VMaxStreamFetcher* m_maxStream;
+    bool m_opened;
     //QnVMax480ConnectionProcessor* m_processor;
 };
 
