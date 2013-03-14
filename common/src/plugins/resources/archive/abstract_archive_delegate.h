@@ -84,7 +84,7 @@ public:
     virtual void setSendMotion(bool value) {Q_UNUSED(value); }
 
     /** This function used for multi-view delegate to help connect different streams together (VMAX) */
-    virtual void setGroupId(const QByteArray& groupId) {}
+    virtual void setGroupId(const QByteArray& groupId) { Q_UNUSED(groupId); }
 protected:
     Flags m_flags;
 };

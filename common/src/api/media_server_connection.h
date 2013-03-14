@@ -40,6 +40,7 @@ public slots:
     void processReply(const QnHTTPRawResponse &response, int handle);
 
 signals:
+    void finished(int status, int handle);
     void finished(int status, const QVariant &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
@@ -58,6 +59,13 @@ private:
             emit finished(status, reply, handle);
         if(m_emitVariant)
             emit finished(status, QVariant::fromValue<T>(reply), handle);
+    }
+
+    void emitFinished(int status, int handle) {
+        if(m_emitDefault)
+            emit finished(status, handle);
+        if(m_emitVariant)
+            emit finished(status, QVariant(), handle);
     }
 
 private:
@@ -93,20 +101,6 @@ private:
 
 
 namespace detail {
-    // TODO: #Elric merge into single processor
-    class QnMediaServerSimpleReplyProcessor: public QObject
-    {
-        Q_OBJECT;
-    public:
-        QnMediaServerSimpleReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, int handle);
-    };
-
     class QnMediaServerManualCameraReplyProcessor: public QObject
     {
         Q_OBJECT
@@ -183,19 +177,6 @@ namespace detail {
 
     private:
          QList<QPair<QString, bool> > m_operationResult;
-    };
-
-
-    class QnMediaServerPtzGetPosReplyProcessor: public QObject {
-        Q_OBJECT
-    public:
-        QnMediaServerPtzGetPosReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
-
-    signals:
-        void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
     };
 
 } // namespace detail
