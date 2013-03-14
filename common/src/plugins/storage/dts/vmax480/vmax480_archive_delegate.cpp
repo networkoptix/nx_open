@@ -139,6 +139,10 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
             m_ThumbnailsSeekPoints.erase(m_ThumbnailsSeekPoints.begin());
         }
+        if (result->dataType == QnAbstractMediaData::EMPTY_DATA)
+        {
+            result->timestamp = m_reverseMode ? 0 : DATETIME_NOW;
+        }
     }
     else {
         close();
