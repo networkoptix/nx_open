@@ -3,6 +3,7 @@
 #include "utils/common/sleep.h"
 #include "core/resource/network_resource.h"
 #include "vmax480_resource.h"
+#include "utils/common/synctime.h"
 
 static const int PROCESS_TIMEOUT = 1000;
 
@@ -20,11 +21,11 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
     start();
+    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
 }
 
 VMaxStreamFetcher::~VMaxStreamFetcher()
 {
-    vmaxDisconnect();
     stop();
 }
 
@@ -99,8 +100,11 @@ void VMaxStreamFetcher::run()
                     doExtraDelay();
             }
         }
-        msleep(10);
+        msleep(1);
     }
+
+    QMutexLocker lock(&m_mutex);
+    vmaxDisconnect();
 }
 
 int VMaxStreamFetcher::getCurrentChannelMask() const
@@ -154,6 +158,7 @@ bool VMaxStreamFetcher::vmaxConnect()
 
 void VMaxStreamFetcher::vmaxDisconnect()
 {
+    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
     if (m_vmaxConnection) {
         m_vmaxConnection->vMaxDisconnect();
         delete m_vmaxConnection;
@@ -221,6 +226,13 @@ bool VMaxStreamFetcher::vmaxRequestRange()
     return true;
 }
 
+QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
+{
+    QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
+    rez->timestamp = timestamp;
+    return rez;
+}
+
 void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 {
     QMutexLocker lock(&m_mutex);
@@ -229,13 +241,21 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
         return;
     mediaData->opaque = 0;
 
-    int ch = mediaData->channelNumber;
+    int ch = mediaData->channelNumber & 0xff;
+    qint64 ct = qnSyncTime->currentUSecsSinceEpoch();
+    m_lastChannelTime[ch] = ct;
+
     mediaData->channelNumber = 0;
     mediaData->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
     foreach(QnVmax480DataConsumer* consumer, m_dataConsumers)
     {
-        if (consumer->getChannel() == ch)
+        int curChannel = consumer->getChannel();
+        if (curChannel == ch)
             consumer->onGotData(mediaData);
+        else if (ct - m_lastChannelTime[curChannel] > 1000000ll) {
+            m_lastChannelTime[curChannel] = ct;
+            consumer->onGotData(createEmptyPacket(mediaData->timestamp));
+        }
     }
 }
 
@@ -263,11 +283,15 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
             m_mainConsumer = consumer;
     }
     if (waitForConnected()) {
-        if (consumer->getChannel() != -1) 
+        int channel = consumer->getChannel();
+        if (channel != -1) 
         {
             QMutexLocker lock(&m_mutex);
-            if (getChannelUsage(consumer->getChannel()) == 1)
+            if (getChannelUsage(channel) == 1) {
                 m_vmaxConnection->vMaxAddChannel(1 << consumer->getChannel());
+                m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
+
+            }
         }
         return true;
     }
@@ -345,13 +369,21 @@ void VMaxStreamFetcher::freeInstance(const QString& clientGroupID, QnResourcePtr
     QString vmaxIP = QUrl(res->getUrl()).host();
     const QString key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
-    QMutexLocker lock(&m_instMutex);
-    VMaxStreamFetcher* result = m_instances.value(key);
-    if (result) {
-        result->notInUse();
-        if (result->usageCount() == 0) {
-            delete result;
-            m_instances.remove(key);
+    VMaxStreamFetcher* result = 0;
+    {
+        QMutexLocker lock(&m_instMutex);
+        result = m_instances.value(key);
+        if (result) {
+            result->notInUse();
+            if (result->usageCount() == 0) {
+                m_instances.remove(key);
+            }
+            else {
+                result = 0;
+            }
         }
     }
+
+    if (result)
+        delete result;
 }

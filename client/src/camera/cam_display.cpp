@@ -482,6 +482,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
+    m_isLongWaiting = false;
     int channel = vd->channelNumber;
 
     if (m_singleShotMode && m_singleShotQuantProcessed)
@@ -1004,6 +1005,23 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (speed == 0)
             return true;
+
+        if (emptyData->timestamp > 0 && emptyData->timestamp < DATETIME_NOW)
+        {
+            // long waiting filler
+            m_isLongWaiting = true;
+            if (m_buffering && m_executingJump == 0) 
+            {
+                m_timeMutex.lock();
+                m_buffering = 0;
+                m_timeMutex.unlock();
+                if (m_extTimeSrc)
+                    m_extTimeSrc->onBufferingFinished(this);
+                unblockTimeValue();
+            }
+            return true;
+        }
+
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)

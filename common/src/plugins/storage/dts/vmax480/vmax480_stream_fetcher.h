@@ -66,6 +66,7 @@ private:
     bool waitForConnected();
     void doExtraDelay();
     int getChannelUsage(int ch);
+    QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
 protected:
     QnNetworkResourcePtr m_res;
 private:
@@ -84,6 +85,7 @@ private:
     static QMutex m_instMutex;
     static QMap<QString, VMaxStreamFetcher*> m_instances;
     int m_sequence;
+    qint64 m_lastChannelTime[256];
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

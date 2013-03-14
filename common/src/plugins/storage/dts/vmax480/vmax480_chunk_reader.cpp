@@ -28,7 +28,9 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 
 void QnVMax480ChunkReader::run()
 {
-    m_streamFetcher->registerConsumer(this);
+    bool registered = false;
+    while (!m_needStop && !registered)
+        registered = m_streamFetcher->registerConsumer(this);
 
     while (!m_needStop)
     {
