@@ -7,7 +7,7 @@
 
 static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
-static const QString GROUP_ID(QLatin1String("sdlkfjlkj"));
+static const QByteArray GROUP_ID("{C30B7CCB-D64E-4f72-9417-A7F3CA133F69}");
 
 QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
     QnLongRunnable(),

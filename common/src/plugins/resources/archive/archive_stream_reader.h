@@ -79,6 +79,7 @@ public:
     bool offlineRangeSupported() const;
 
     virtual void afterRun() override;
+    virtual void setGroupId(const QByteArray& groupId) override;
 protected:
     virtual bool init();
 

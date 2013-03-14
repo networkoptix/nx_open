@@ -7,8 +7,7 @@
 
 #include "vmax480_resource.h"
 
-
-static const QString GROUP_ID(QLatin1String("sdlkfjlkj"));
+static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 

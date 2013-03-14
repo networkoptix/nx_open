@@ -9,7 +9,7 @@ static const int PROCESS_TIMEOUT = 1000;
 static const int MAX_QUEUE_SIZE = 150;
 
 QMutex VMaxStreamFetcher::m_instMutex;
-QMap<QString, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
+QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
 
 
 VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
@@ -369,9 +369,9 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
     //    vmaxDisconnect();
 }
 
-QString getInstanceKey(const QString& clientGroupID, const QString& vmaxIP, bool isLive)
+QByteArray getInstanceKey(const QByteArray& clientGroupID, const QByteArray& vmaxIP, bool isLive)
 {
-    return QString(QLatin1String("%1-%2-%3")).arg(clientGroupID).arg(vmaxIP).arg(isLive);
+    return clientGroupID + QByteArray("-") + vmaxIP + QByteArray("-") + (isLive ? QByteArray("1") : QByteArray("0"));
 };
 
 void VMaxStreamFetcher::inUse()
@@ -384,10 +384,10 @@ void VMaxStreamFetcher::notInUse()
     m_usageCount--;
 }
 
-VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QString& clientGroupID, QnResourcePtr res, bool isLive)
+VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive)
 {
-    QString vmaxIP = QUrl(res->getUrl()).host();
-    const QString key = getInstanceKey(clientGroupID, vmaxIP, isLive);
+    QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
+    const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
     QMutexLocker lock(&m_instMutex);
     VMaxStreamFetcher* result = m_instances.value(key);
@@ -399,10 +399,10 @@ VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QString& clientGroupID, 
     return result;
 }
 
-void VMaxStreamFetcher::freeInstance(const QString& clientGroupID, QnResourcePtr res, bool isLive)
+void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive)
 {
-    QString vmaxIP = QUrl(res->getUrl()).host();
-    const QString key = getInstanceKey(clientGroupID, vmaxIP, isLive);
+    QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
+    const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
     VMaxStreamFetcher* result = 0;
     {

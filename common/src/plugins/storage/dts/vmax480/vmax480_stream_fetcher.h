@@ -30,8 +30,9 @@ public:
     bool registerConsumer(QnVmax480DataConsumer* consumer);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
-    static VMaxStreamFetcher* getInstance(const QString& clientGroupID, QnResourcePtr res, bool isLive);
-    static void freeInstance(const QString& clientGroupID, QnResourcePtr res, bool isLive);
+    static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
+
+    static void freeInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
 public:
@@ -85,7 +86,7 @@ private:
     QnVmax480DataConsumer* m_mainConsumer;
 
     static QMutex m_instMutex;
-    static QMap<QString, VMaxStreamFetcher*> m_instances;
+    static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
     int m_sequence;
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;

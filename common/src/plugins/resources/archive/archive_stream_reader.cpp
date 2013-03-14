@@ -1175,3 +1175,9 @@ void QnArchiveStreamReader::afterRun()
     if (m_delegate)
         m_delegate->close();
 }
+
+void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
+{
+    if (m_delegate)
+        m_delegate->setGroupId(guid);
+}

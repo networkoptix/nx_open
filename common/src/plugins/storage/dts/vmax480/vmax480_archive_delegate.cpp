@@ -3,34 +3,35 @@
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 
-static const QString GROUP_ID(QLatin1String("sfsdf"));
-
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
     m_needStop(false),
     m_reverseMode(false),
     m_thumbnailsMode(false),
     m_lastSeekPos(AV_NOPTS_VALUE),
-    m_isOpened(false)
+    m_isOpened(false),
+    m_maxStream(0)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanOfflineLayout;
-
-    m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, res, false);
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
 {
     close();
-    VMaxStreamFetcher::freeInstance(GROUP_ID, m_res, false);
+    VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
 }
 
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
     Q_UNUSED(resource)
+
+    if (!m_maxStream)
+        return false;
+
     if (m_isOpened)
         return true;
 
@@ -203,4 +204,11 @@ void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64
 int QnVMax480ArchiveDelegate::getChannel() const
 {
     return m_res.dynamicCast<QnPhysicalCameraResource>()->getChannel();
+}
+
+void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
+{
+    VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
+    m_groupId = data;
+    m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
 }
