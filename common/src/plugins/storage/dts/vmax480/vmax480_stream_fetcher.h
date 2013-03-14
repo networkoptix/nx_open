@@ -16,12 +16,10 @@ public:
     virtual ~QnVmax480DataConsumer() {}
     virtual int getChannel() const { return -1; }
 
-    virtual void onGotData(QnAbstractMediaDataPtr mediaData) {}
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) {}
     virtual void onGotMonthInfo(const QDate& month, int monthInfo)  {}
     virtual void onGotDayInfo(int dayNum, const QByteArray& data)  {}
 
-    virtual void beforeSeek() {}
 };
 
 class QnVMax480ConnectionProcessor;
@@ -34,6 +32,8 @@ public:
 
     static VMaxStreamFetcher* getInstance(const QString& clientGroupID, QnResourcePtr res, bool isLive);
     static void freeInstance(const QString& clientGroupID, QnResourcePtr res, bool isLive);
+
+    QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
 public:
     VMaxStreamFetcher(QnResourcePtr dev, bool isLive);
     virtual ~VMaxStreamFetcher();
@@ -43,7 +43,7 @@ public:
     virtual void onGotDayInfo(int dayNum, const QByteArray& data) override;
 
     void onConnectionEstablished(QnVMax480ConnectionProcessor* conection);
-    virtual void onGotData(QnAbstractMediaDataPtr mediaData) override;
+    void onGotData(QnAbstractMediaDataPtr mediaData);
 
     void inUse();
     void notInUse();
@@ -67,17 +67,19 @@ private:
     void doExtraDelay();
     int getChannelUsage(int ch);
     QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
-protected:
-    QnNetworkResourcePtr m_res;
+    int getMaxQueueSize() const;
 private:
-    QMutex m_mutex;
+    QnNetworkResourcePtr m_res;
+    typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
+
+    mutable QMutex m_mutex;
     QProcess* m_vMaxProxy;
     QString m_tcpID;
 
     QMutex m_connectMtx;
     QWaitCondition m_vmaxConnectionCond;
     QnVMax480ConnectionProcessor* m_vmaxConnection;
-    QSet<QnVmax480DataConsumer*> m_dataConsumers;
+    ConsumersMap m_dataConsumers;
     bool m_isLive;
     int m_usageCount;
     QnVmax480DataConsumer* m_mainConsumer;
@@ -86,6 +88,8 @@ private:
     static QMap<QString, VMaxStreamFetcher*> m_instances;
     int m_sequence;
     qint64 m_lastChannelTime[256];
+    qint64 m_lastMediaTime;
+    bool m_streamPaused;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

@@ -7,15 +7,11 @@ static const QString GROUP_ID(QLatin1String("sfsdf"));
 
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
-    m_internalQueue(100),
     m_needStop(false),
-    m_vmaxPaused(false),
-    m_lastMediaTime(AV_NOPTS_VALUE),
     m_reverseMode(false),
     m_thumbnailsMode(false),
     m_lastSeekPos(AV_NOPTS_VALUE),
-    m_isOpened(false),
-    m_waitingSeek(false)
+    m_isOpened(false)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
@@ -60,9 +56,9 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
     }
 
     m_thumbnailsMode = false;
-    QnTimePeriodList chunks = m_res->getChunks();
-    if (!chunks.isEmpty())
-        time = chunks.roundTimeToPeriodUSec(time, true);
+    //QnTimePeriodList chunks = m_res->getChunks();
+    //if (!chunks.isEmpty())
+    //    time = chunks.roundTimeToPeriodUSec(time, true);
 
     return seekInternal(time, findIFrame);
 }
@@ -72,21 +68,14 @@ qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
     Q_UNUSED(findIFrame)
     qDebug() << "QnVMax480ArchiveDelegate::seek";
 
-    {
-        QMutexLocker lock(&m_seekMtx);
-        m_waitingSeek = true;
-        m_internalQueue.clear();
-    }
-
     m_maxStream->vmaxArchivePlay(this, time, m_reverseMode ? -1 : 1);
-    m_lastSeekPos = m_lastMediaTime = time;
+    m_lastSeekPos = time;
     return time;
 }
 
 void QnVMax480ArchiveDelegate::close()
 {
     m_needStop = true;
-    m_waitingSeek = false;
     if (m_isOpened) {
         m_maxStream->unregisterConsumer(this);
         m_isOpened = false;
@@ -112,18 +101,6 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         open(m_res);
     }
 
-    /*
-    if (m_lastSeekPos == AV_NOPTS_VALUE && m_lastMediaTime != AV_NOPTS_VALUE) {
-        vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
-        m_lastSeekPos = m_lastMediaTime;
-    }
-    */
-
-    if (m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
-        m_maxStream->vmaxArchivePlay(this, m_lastMediaTime, 1);
-        m_vmaxPaused = false;
-    }
-
     if (m_thumbnailsMode) {
         if (m_ThumbnailsSeekPoints.isEmpty()) {
             close();
@@ -135,8 +112,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     QTime getTimer;
     getTimer.restart();
     while (m_isOpened) {
-        QnAbstractDataPacketPtr tmp;
-        m_internalQueue.pop(tmp, 100);
+        QnAbstractDataPacketPtr tmp = m_maxStream->getNextData(this);
         result = tmp.dynamicCast<QnAbstractMediaData>();
 
         if (result)
@@ -179,46 +155,6 @@ static QnEmptyResourceAudioLayout audioLayout;
 QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
 {
     return &audioLayout;
-}
-
-void QnVMax480ArchiveDelegate::beforeSeek()
-{
-    QMutexLocker lock(&m_seekMtx);
-    m_internalQueue.clear();
-    m_waitingSeek = false;
-}
-
-void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
-{
-    {
-        QMutexLocker lock(&m_seekMtx);
-        if (m_waitingSeek)
-            return;
-    }
-
-    /*
-    QTime waitTimer;
-    waitTimer.restart();
-
-    //qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(mediaData->timestamp/1000).toString(QLatin1String("dd.MM.yyyy hh:mm.ss"));
-
-    while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize() && !m_vmaxPaused)
-    {
-        if (waitTimer.elapsed() > MAX_FRAME_DURATION) {
-            if (!m_vmaxPaused) {
-                vmaxArchivePlay(m_lastMediaTime, m_sequence, 0);
-                m_vmaxPaused = true;
-            }
-        }
-        else {
-            QnSleep::msleep(1);
-        }
-    }
-    QnSleep::msleep(2); // reduce vmax downloading speed
-    */
-
-    m_internalQueue.push(mediaData);
-    m_lastMediaTime = mediaData->timestamp;
 }
 
 void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)

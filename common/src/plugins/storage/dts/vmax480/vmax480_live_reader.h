@@ -14,7 +14,6 @@ public:
     QnVMax480LiveProvider(QnResourcePtr dev );
     virtual ~QnVMax480LiveProvider();
 
-    virtual void onGotData(QnAbstractMediaDataPtr mediaData) override;
     virtual int getChannel() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -30,7 +29,6 @@ protected:
 
 private:
     QnNetworkResourcePtr m_networkRes;
-    CLDataQueue m_internalQueue;
 
     VMaxStreamFetcher* m_maxStream;
     bool m_opened;

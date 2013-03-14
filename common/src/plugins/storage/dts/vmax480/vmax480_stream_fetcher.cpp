@@ -6,6 +6,7 @@
 #include "utils/common/synctime.h"
 
 static const int PROCESS_TIMEOUT = 1000;
+static const int MAX_QUEUE_SIZE = 150;
 
 QMutex VMaxStreamFetcher::m_instMutex;
 QMap<QString, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
@@ -17,7 +18,9 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_isLive(isLive),
     m_usageCount(0),
     m_sequence(0),
-    m_mainConsumer(0)
+    m_mainConsumer(0),
+    m_lastMediaTime(AV_NOPTS_VALUE),
+    m_streamPaused(false)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
     start();
@@ -44,10 +47,12 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
     QMutexLocker  lock(&m_mutex);
 
+    CLDataQueue* dataQueue = m_dataConsumers.value(consumer);
+    if (dataQueue)
+        dataQueue->clear();
+
     if (consumer == m_mainConsumer) {
         ++m_sequence;
-        foreach(QnVmax480DataConsumer* c, m_dataConsumers)
-            c->beforeSeek();
         m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
     }
 
@@ -110,7 +115,7 @@ void VMaxStreamFetcher::run()
 int VMaxStreamFetcher::getCurrentChannelMask() const
 {
     int mask = 0;
-    foreach(QnVmax480DataConsumer* consumer,  m_dataConsumers)
+    foreach(QnVmax480DataConsumer* consumer,  m_dataConsumers.keys())
     {
         if (consumer->getChannel() != -1)
             mask |= 1 << consumer->getChannel();
@@ -179,21 +184,21 @@ void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDate
     m_res.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
 
     QMutexLocker lock(&m_mutex);
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers)
+    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
         consumer->onGotArchiveRange(startDateTime, endDateTime);
 }
 
 void VMaxStreamFetcher::onGotMonthInfo(const QDate& month, int monthInfo)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers)
+    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
         consumer->onGotMonthInfo(month, monthInfo);
 }
 
 void VMaxStreamFetcher::onGotDayInfo(int dayNum, const QByteArray& data)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers)
+    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
         consumer->onGotDayInfo(dayNum, data);
 }
 
@@ -233,52 +238,77 @@ QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
     return rez;
 }
 
+int VMaxStreamFetcher::getMaxQueueSize() const
+{
+    int maxQueueSize = 0;
+    QMutexLocker lock(&m_mutex);
+    for (ConsumersMap::const_iterator itr = m_dataConsumers.constBegin(); itr != m_dataConsumers.constEnd(); ++itr)
+    {
+        QnVmax480DataConsumer* consumer = itr.key();
+        CLDataQueue* queue = itr.value();
+        maxQueueSize = qMax(queue->size(), maxQueueSize);
+    }
+    return maxQueueSize;
+}
+
 void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 {
-    QMutexLocker lock(&m_mutex);
-
     if (mediaData->opaque != m_sequence)
         return;
+
     mediaData->opaque = 0;
+    m_lastMediaTime = mediaData->timestamp;
 
     int ch = mediaData->channelNumber & 0xff;
-    qint64 ct = qnSyncTime->currentUSecsSinceEpoch();
-    m_lastChannelTime[ch] = ct;
 
-    mediaData->channelNumber = 0;
-    mediaData->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers)
+    QTime t;
+    t.restart();
+
+
+    bool needWait = false;
+    int maxQueueSize = 0;
+    do 
     {
-        int curChannel = consumer->getChannel();
-        if (curChannel == ch)
-            consumer->onGotData(mediaData);
-        else if (ct - m_lastChannelTime[curChannel] > 1000000ll) {
-            m_lastChannelTime[curChannel] = ct;
-            consumer->onGotData(createEmptyPacket(mediaData->timestamp));
+        maxQueueSize = getMaxQueueSize();
+        needWait = maxQueueSize > 10 && t.elapsed() < 1000 * 10 && !needToStop();
+        if (needWait)
+            msleep(1);
+    } while (needWait);
+
+    if (maxQueueSize > MAX_QUEUE_SIZE) {
+        m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, 0);
+        m_streamPaused = true;
+    }
+
+    {
+        QMutexLocker lock(&m_mutex);
+
+        qint64 ct = qnSyncTime->currentUSecsSinceEpoch();
+        m_lastChannelTime[ch] = ct;
+
+        mediaData->channelNumber = 0;
+        mediaData->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
+        for (ConsumersMap::Iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
+        {
+            QnVmax480DataConsumer* consumer = itr.key();
+            int curChannel = consumer->getChannel();
+            if (curChannel == ch) 
+            {
+                itr.value()->push(mediaData);
+            }
+            else if (ct - m_lastChannelTime[curChannel] > 1000000ll) {
+                m_lastChannelTime[curChannel] = ct;
+                itr.value()->push(createEmptyPacket(mediaData->timestamp));
+            }
         }
     }
 }
 
 bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
 {
-    /*
-    QMutexLocker lock(&m_mutex);
-
-
-    if (m_vmaxConnection == 0) {
-        vmaxConnect();
-        if (m_vmaxConnection == 0)
-            return;
-    }
-
-    if (consumer->getChannel() != -1)
-        m_vmaxConnection->vMaxAddChannel(consumer->getChannel());
-    m_dataConsumers << consumer;
-    */
-
     {
         QMutexLocker lock(&m_mutex);
-        m_dataConsumers << consumer;
+        m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
         if (m_mainConsumer == 0)
             m_mainConsumer = consumer;
     }
@@ -304,7 +334,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
 int VMaxStreamFetcher::getChannelUsage(int ch)
 {
     int channelUsage = 0;
-    foreach(QnVmax480DataConsumer* c, m_dataConsumers)
+    foreach(QnVmax480DataConsumer* c, m_dataConsumers.keys())
     {
         if (c->getChannel() == ch)
             channelUsage++;
@@ -324,11 +354,16 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
                 m_vmaxConnection->vMaxRemoveChannel(1 << consumer->getChannel());
         }
     }
-    m_dataConsumers.remove(consumer);
+    ConsumersMap::Iterator itr = m_dataConsumers.find(consumer);
+    if (itr != m_dataConsumers.end()) {
+        delete itr.value();
+        m_dataConsumers.erase(itr);
+    }
+
     if (m_mainConsumer == consumer) {
         m_mainConsumer = 0;
         if (!m_dataConsumers.isEmpty())
-            m_mainConsumer = *m_dataConsumers.begin();
+            m_mainConsumer = m_dataConsumers.begin().key();
     }
     //if (m_dataConsumers.isEmpty())
     //    vmaxDisconnect();
@@ -386,4 +421,29 @@ void VMaxStreamFetcher::freeInstance(const QString& clientGroupID, QnResourcePtr
 
     if (result)
         delete result;
+}
+
+QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* consumer)
+{
+    CLDataQueue* dataQueue = 0;
+    {
+        QMutexLocker lock(&m_mutex);
+        ConsumersMap::Iterator itr = m_dataConsumers.find(consumer);
+        if (itr == m_dataConsumers.end())
+            return QnAbstractDataPacketPtr();
+        dataQueue = itr.value();
+    }
+    QnAbstractDataPacketPtr result;
+    dataQueue->pop(result, 100);
+
+    if (result && m_streamPaused)
+    {
+        int maxQueueSize = getMaxQueueSize();
+        if (maxQueueSize < MAX_QUEUE_SIZE / 4) {
+            m_streamPaused = false;
+            m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, 1);
+        }
+    }
+
+    return result;
 }

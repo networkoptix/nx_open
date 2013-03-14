@@ -1010,6 +1010,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         {
             // long waiting filler
             m_isLongWaiting = true;
+            m_eofSignalSended = true;
             if (m_buffering && m_executingJump == 0) 
             {
                 m_timeMutex.lock();

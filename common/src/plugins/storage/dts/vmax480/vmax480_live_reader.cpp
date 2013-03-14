@@ -14,7 +14,6 @@ static const QString GROUP_ID(QLatin1String("sdlkfjlkj"));
 
 QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
     CLServerPushStreamreader(dev),
-    m_internalQueue(16),
     m_maxStream(0),
     m_opened(false)
 {
@@ -45,17 +44,12 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     getTimer.restart();
     while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
     {
-        m_internalQueue.pop(result, 100);
+        result = m_maxStream->getNextData(this);
     }
 
     if (!result)
         closeStream();
     return result.dynamicCast<QnAbstractMediaData>();
-}
-
-void QnVMax480LiveProvider::onGotData(QnAbstractMediaDataPtr mediaData)
-{
-    m_internalQueue.push(mediaData);
 }
 
 void QnVMax480LiveProvider::openStream()
