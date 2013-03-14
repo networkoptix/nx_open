@@ -74,10 +74,10 @@ bool QnCheckResourceAndWarnDelegate<ResourceType>::validate(const QnResourceList
     return true;
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnMotionEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnMotionEnabledDelegate::QnMotionEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -93,10 +93,10 @@ QString QnMotionEnabledDelegate::getText(int invalid, int total) const {
     return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnRecordingEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnRecordingEnabledDelegate::QnRecordingEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -111,10 +111,10 @@ QString QnRecordingEnabledDelegate::getText(int invalid, int total) const {
     return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnInputEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnInputEnabledDelegate::QnInputEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -129,10 +129,10 @@ QString QnInputEnabledDelegate::getText(int invalid, int total) const {
     return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnOutputEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnOutputEnabledDelegate::QnOutputEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -147,10 +147,10 @@ QString QnOutputEnabledDelegate::getText(int invalid, int total) const {
     return tr("%1 of %2 selected cameras have not output relays.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnEmailValidDelegate
 // -------------------------------------------------------------------------- //
-
 QnEmailValidDelegate::QnEmailValidDelegate(QWidget *parent):
     base_type(parent) {
 }
