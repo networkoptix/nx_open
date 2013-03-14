@@ -3,9 +3,11 @@
 BUGS FIXED:
 
 Since 1.4
+If perform search and then clear all search criterias all available items were placed on scene causing freezes. Now search results are removed in this case
 
 Since previous Beta (1.4.2)
-if you press fix button on this notification - notification does not disappear
+if press fix button on storage notification it didn't disappear
+If switch between layouts RADASS setting (if had been set manually) remained the same. Fixed: now it is reset to "Auto"
 
 IMPROVEMENTS:
 
