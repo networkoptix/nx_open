@@ -22,15 +22,11 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
 {
     close();
-    VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
 }
 
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
     Q_UNUSED(resource)
-
-    if (!m_maxStream)
-        return false;
 
     if (m_isOpened)
         return true;
@@ -41,6 +37,8 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     m_lastSeekPos = AV_NOPTS_VALUE;
     qDebug() << "before vmaxConnect";
 
+    if (m_maxStream == 0)
+        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
     m_isOpened = m_maxStream->registerConsumer(this);
     return m_isOpened;
 }
@@ -81,6 +79,9 @@ void QnVMax480ArchiveDelegate::close()
         m_maxStream->unregisterConsumer(this);
         m_isOpened = false;
     }
+    if (m_maxStream)
+        VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
+    m_maxStream = 0;
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime()
@@ -208,7 +209,5 @@ int QnVMax480ArchiveDelegate::getChannel() const
 
 void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
 {
-    VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
     m_groupId = data;
-    m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
 }

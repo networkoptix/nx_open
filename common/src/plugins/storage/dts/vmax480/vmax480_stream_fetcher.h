@@ -24,7 +24,7 @@ public:
 
 class QnVMax480ConnectionProcessor;
 
-class VMaxStreamFetcher: public QnVmax480DataConsumer, public QnLongRunnable
+class VMaxStreamFetcher: public QnVmax480DataConsumer
 {
 public:
     bool registerConsumer(QnVmax480DataConsumer* consumer);
@@ -56,19 +56,16 @@ public:
     bool vmaxRequestMonthInfo(const QDate& month);
     bool vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
     bool vmaxRequestRange();
-protected:
-    virtual void run() override;
 private:
     bool isOpened() const;
     bool vmaxConnect();
     void vmaxDisconnect();
     int getPort();
     int getCurrentChannelMask() const;
-    bool waitForConnected();
-    void doExtraDelay();
     int getChannelUsage(int ch);
     QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
     int getMaxQueueSize() const;
+    bool safeOpen();
 private:
     QnNetworkResourcePtr m_res;
     typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;

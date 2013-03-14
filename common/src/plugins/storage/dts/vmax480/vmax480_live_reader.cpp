@@ -16,15 +16,12 @@ QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
     m_maxStream(0),
     m_opened(false)
 {
-    m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, dev, true);
-
     m_networkRes = dev.dynamicCast<QnNetworkResource>();
 }
 
 QnVMax480LiveProvider::~QnVMax480LiveProvider()
 {
     closeStream();
-    m_maxStream->freeInstance(GROUP_ID, m_resource, true);
 }
 
 QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
@@ -61,6 +58,8 @@ void QnVMax480LiveProvider::openStream()
         channel--;
 
 
+    if (m_maxStream == 0)
+        m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource, true);
     m_opened = m_maxStream->registerConsumer(this); 
 
     /*
@@ -71,8 +70,14 @@ void QnVMax480LiveProvider::openStream()
 
 void QnVMax480LiveProvider::closeStream()
 {
-    m_opened = false;
-    m_maxStream->unregisterConsumer(this);
+    if (m_opened) {
+        m_opened = false;
+        m_maxStream->unregisterConsumer(this);
+    }
+    if (m_maxStream)
+        m_maxStream->freeInstance(GROUP_ID, m_resource, true);
+    m_maxStream = 0;
+
     //vmaxDisconnect();
 }
 
