@@ -31,6 +31,8 @@ namespace nx_hls
     private:
         quint64 m_startTimestamp;
         unsigned int m_maxChunkNumberInPlaylist;
+
+        quint64 endTimestamp() const;
     };
 }
 

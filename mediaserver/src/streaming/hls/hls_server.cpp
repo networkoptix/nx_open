@@ -189,8 +189,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME" "QN_APPLICATION_VERSION ) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //findRequestedFile can override this
 
-        //HttpFile file;
-        response.statusLine.statusCode = getRequestedFile( request, &response/*, &file*/ );
+        response.statusLine.statusCode = getRequestedFile( request, &response );
         if( response.statusLine.reasonPhrase.isEmpty() )
             response.statusLine.reasonPhrase = StatusCode::toString( response.statusLine.statusCode );
 
@@ -273,7 +272,6 @@ namespace nx_hls
     #endif
             if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
                 return getHLSPlaylist(
-                    //session,
                     request,
                     shortFileName,
                     requestParams,
@@ -363,7 +361,6 @@ namespace nx_hls
     //TODO/IMPL move SocketAddress somewhere else...
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
-        //HLSSession* const session,
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
         const std::multimap<QString, QString>& requestParams,
@@ -375,7 +372,8 @@ namespace nx_hls
             ? sessionIDIter->second
             : HLSSessionPool::generateUniqueID();
 
-        //TODO/IMPL/HLS session search and add MUST be atomic
+        //session search and add MUST be atomic
+        HLSSessionPool::ScopedSessionIDLock lk( HLSSessionPool::instance(), sessionID );
 
         HLSSession* session = HLSSessionPool::instance()->find( sessionID );
         if( !session )
@@ -591,8 +589,8 @@ namespace nx_hls
         Q_ASSERT( camera->liveCache() );
 
         Q_ASSERT( camera->hlsLivePlaylistManager() );
-        unsigned int chunksGenerated = 0;
-        if( (chunksGenerated = camera->hlsLivePlaylistManager()->generateChunkList( chunkList, NULL )) == 0 )
+        const unsigned int chunksGenerated = camera->hlsLivePlaylistManager()->generateChunkList( chunkList, NULL );
+        if( chunksGenerated == 0 )
         {
             NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(mediaResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
@@ -623,8 +621,8 @@ namespace nx_hls
 
         //timestamp here - is a duration from beginning of the archive
 
-        unsigned int chunksGenerated = 0;
-        if( (chunksGenerated = session->playlistManager()->generateChunkList( chunkList, isPlaylistClosed )) == 0 )
+        const unsigned int chunksGenerated = session->playlistManager()->generateChunkList( chunkList, isPlaylistClosed );
+        if( chunksGenerated == 0 )
         {
             NX_LOG( QString::fromLatin1("Failed to get archive chunks of resource %1").arg(mediaResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;

@@ -46,6 +46,7 @@ public:
     /* Unmark some camera activity (RTSP client connection for example) */
     void notInUse(void* user);
 
+    //!Returns cache holding several last seconds of media stream
     /*!
         \return Can be NULL
     */
@@ -55,6 +56,9 @@ public:
     const MediaIndex* mediaIndex() const;
     MediaIndex* mediaIndex();
 
+    /*!
+        \todo Should remove it from here
+    */
     const nx_hls::HLSLivePlaylistManager* hlsLivePlaylistManager() const;
 
     //!Starts caching live stream, if not started

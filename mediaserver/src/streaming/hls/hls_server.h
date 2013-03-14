@@ -82,7 +82,6 @@ namespace nx_hls
         */
         bool prepareDataToSend();
         nx_http::StatusCode::Value getHLSPlaylist(
-            //HLSSession* const session,
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
             const std::multimap<QString, QString>& requestParams,
