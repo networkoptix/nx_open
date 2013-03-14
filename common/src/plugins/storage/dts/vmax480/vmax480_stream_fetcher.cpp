@@ -143,6 +143,7 @@ void VMaxStreamFetcher::vmaxDisconnect()
         m_vMaxProxy = 0;
     }
     QnVMax480Server::instance()->unregisterProvider(this);
+    m_lastMediaTime = AV_NOPTS_VALUE;
 }
 
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
@@ -391,7 +392,7 @@ bool VMaxStreamFetcher::safeOpen()
     if (!isOpened()) {
         if (!vmaxConnect())
             return false;
-        if (!m_isLive)
+        if (!m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
             m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
     }
 
