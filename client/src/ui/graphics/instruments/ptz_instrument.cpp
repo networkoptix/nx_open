@@ -1065,6 +1065,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
                 speed.setX(0.0);
             if(qFuzzyIsNull(speed.y()))
                 speed.setY(0.0);
+            // TODO: #Elric rebound to 1.0
         }
 
         qreal speedMagnitude = length(speed);
