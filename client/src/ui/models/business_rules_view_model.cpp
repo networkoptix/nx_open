@@ -725,7 +725,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
                          : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
-        return tr("%n Camera(s)", NULL, cameras.size());
+        return tr("%n Camera(s)", "", cameras.size());
     }
 
     QnResourceList resources = m_eventResources; //TODO: filtered by type
@@ -738,12 +738,12 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
         if (resources.size() == 0)
             return tr("<Any Server>");
         else
-            return tr("%n Server(s)", NULL, resources.size());
+            return tr("%n Server(s)", "", resources.size());
     } else /*if (BusinessEventType::requiresCameraResource(eventType))*/ {
         if (resources.size() == 0)
             return tr("<Any Camera>");
         else
-            return tr("%n Camera(s)", NULL, resources.size());
+            return tr("%n Camera(s)", "", resources.size());
     }
 }
 
@@ -798,7 +798,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
                          : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
-        return tr("%n Camera(s)", NULL, cameras.size());
+        return tr("%n Camera(s)", "", cameras.size());
     }
 
     QnResourceList resources = m_actionResources;
@@ -810,7 +810,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     } else if (resources.isEmpty()) {
         return tr("Select at least one camera");
     } else {
-        return tr("%n Camera(s)", NULL, resources.size());
+        return tr("%n Camera(s)", "", resources.size());
     }
 
 }

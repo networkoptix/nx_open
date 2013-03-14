@@ -2288,13 +2288,17 @@ for recording at
         <source>%1 of %2 cameras</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="728"/>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="746"/>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="801"/>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="813"/>
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="733"/>
@@ -2307,10 +2311,14 @@ for recording at
         <source>&lt;Any Server&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="741"/>
         <source>%n Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="758"/>
@@ -4259,20 +4267,28 @@ AVAILABLE</source>
         <source>Close Layouts</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="468"/>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="496"/>
         <source>Saving Layouts</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="497"/>
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="498"/>
@@ -4403,10 +4419,14 @@ AVAILABLE</source>
         <source>Camera(s) not Saved</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1779"/>
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1904"/>
@@ -4451,10 +4471,14 @@ AVAILABLE</source>
         <source>Delete Resources</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2022"/>
         <source>Do you really want to delete the following %n item(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2067"/>
@@ -4691,10 +4715,14 @@ Do you want to continue?</source>
         <source>Could not export layout</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2795"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2813"/>
@@ -4780,20 +4808,32 @@ The camera is probably in continuous movement mode. Please stop the camera and t
 Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3139"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3140"/>
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3156"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3157"/>
@@ -4801,10 +4841,14 @@ Please wait for the camera to go online.</source>
 %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3180"/>
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3181"/>
@@ -4866,20 +4910,32 @@ Please wait for the camera to go online.</source>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="45"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="46"/>
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="62"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="63"/>
@@ -4894,10 +4950,14 @@ Please wait for the camera to go online.</source>
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="87"/>
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="88"/>

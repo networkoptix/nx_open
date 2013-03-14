@@ -2203,9 +2203,11 @@ for recording at
         <source>%1 of %2 cameras</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;System&gt;</source>
@@ -2215,9 +2217,11 @@ for recording at
         <source>&lt;Any Server&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>User %1 has empty email</source>
@@ -4440,17 +4444,21 @@ AVAILABLE</source>
         <source>Close Layouts</source>
         <translation type="unfinished">关闭视窗</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="unfinished">以下%n视窗没有保存。需要保存这些视窗吗？</translation>
+        <translation type="unfinished">
+            <numerusform>以下%n视窗没有保存。需要保存这些视窗吗？</numerusform>
+        </translation>
     </message>
     <message>
         <source>Saving Layouts</source>
         <translation type="unfinished">保存视窗</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="unfinished">以下%n视窗正在保存</translation>
+        <translation type="unfinished">
+            <numerusform>以下%n视窗正在保存</numerusform>
+        </translation>
     </message>
     <message>
         <source>Please wait.</source>
@@ -4512,9 +4520,11 @@ AVAILABLE</source>
         <source>Camera(s) not Saved</source>
         <translation type="unfinished">摄像机没有保存</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished">保存以下%n摄像机修改？</translation>
+        <translation type="unfinished">
+            <numerusform>保存以下%n摄像机修改？</numerusform>
+        </translation>
     </message>
     <message>
         <source>Delete Files</source>
@@ -4548,9 +4558,11 @@ AVAILABLE</source>
         <source>Delete Resources</source>
         <translation type="unfinished">删除资源</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
-        <translation type="unfinished">确认要删除以下的%n条目？</translation>
+        <translation type="unfinished">
+            <numerusform>确认要删除以下的%n条目？</numerusform>
+        </translation>
     </message>
     <message>
         <source>New Layout</source>
@@ -4634,9 +4646,11 @@ Do you want to continue?</source>
         <source>Cannot export file</source>
         <translation type="obsolete">无法导出文件</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="unfinished">一个条目需要选择导出，但是目前选择了%n个条目</translation>
+        <translation type="unfinished">
+            <numerusform>一个条目需要选择导出，但是目前选择了%n个条目</numerusform>
+        </translation>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
@@ -4672,17 +4686,23 @@ Do you want to continue?</source>
         <source>Could not export video</source>
         <translation type="unfinished">无法导出视频</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished">无法保存以下的%n的视窗到系统控制器</translation>
+        <translation type="unfinished">
+            <numerusform>无法保存以下的%n的视窗到系统控制器</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">需要还原这些%n视窗吗？</translation>
+        <translation type="unfinished">
+            <numerusform>需要还原这些%n视窗吗？</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished">无法保存以下%n条目到系统控制器。</translation>
+        <translation type="unfinished">
+            <numerusform>无法保存以下%n条目到系统控制器。</numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description: 
@@ -4695,9 +4715,11 @@ Do you want to continue?</source>
 Error description: &apos;%2&apos;</source>
         <translation type="obsolete">无法从系统控制器中删除资源。错误描述：&apos;%2&apos;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished">无法保存对于以下%n资源的修改</translation>
+        <translation type="unfinished">
+            <numerusform>无法保存对于以下%n资源的修改</numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description:
@@ -5002,17 +5024,23 @@ Error description: &apos;%2&apos;</source>
         <source>Error</source>
         <translation type="unfinished">错误</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished">无法保存以下的%n的视窗到系统控制器</translation>
+        <translation type="unfinished">
+            <numerusform>无法保存以下的%n的视窗到系统控制器</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">需要还原这些%n视窗吗？</translation>
+        <translation type="unfinished">
+            <numerusform>需要还原这些%n视窗吗？</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished">无法保存以下%n条目到系统控制器。</translation>
+        <translation type="unfinished">
+            <numerusform>无法保存以下%n条目到系统控制器。</numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description: 
@@ -5025,9 +5053,11 @@ Error description: &apos;%2&apos;</source>
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished">无法从系统控制器中删除资源。错误描述：&apos;%2&apos;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished">无法保存对于以下%n资源的修改</translation>
+        <translation type="unfinished">
+            <numerusform>无法保存对于以下%n资源的修改</numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description:
