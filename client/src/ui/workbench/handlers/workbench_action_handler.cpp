@@ -2679,8 +2679,12 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     m_exportStorage.clear();
     m_exportedCamera = 0;
 
-    if (m_layoutExportMode == LayoutExport_Export)
+    if (m_layoutExportMode == LayoutExport_Export) {
+        if(m_exportProgressDialog)
+            m_exportProgressDialog.data()->setValue(m_exportProgressDialog.data()->maximum());
+
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+    }
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
@@ -2919,6 +2923,7 @@ Do you want to continue?"),
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setRange(0, 100);
         exportProgressDialog->setMinimumDuration(1000);
+        m_exportProgressDialog = exportProgressDialog;
 
         m_exportedCamera = widget->display()->camera();
 
@@ -2954,6 +2959,10 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
     file->setStatus(QnResource::Online);
     resourcePool()->addResource(file);
     m_exportedCamera = 0;
+
+    if(m_exportProgressDialog)
+        m_exportProgressDialog.data()->setValue(m_exportProgressDialog.data()->maximum());
+
     QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
 }
 
