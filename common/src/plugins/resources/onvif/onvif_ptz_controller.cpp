@@ -88,6 +88,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     // TODO: #Elric make configurable
     if(m_resource->getModel() == lit("FW3471-PS-E")) {
         m_capabilities |= Qn::OctagonalPtzCapability;
+        m_capabilities &= ~Qn::AbsolutePtzCapability;
     }
     if(m_resource->getModel() == lit("FD8162")) {
         m_capabilities = Qn::NoCapabilities;
