@@ -175,12 +175,8 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
         for (int i = 1; i < VMAX_MAX_CH; ++i)
         {
             QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
-            if (otherRes) {
+            if (otherRes)
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec);
-            }
-            else {
-                break;
-            }
         }
     }
 }

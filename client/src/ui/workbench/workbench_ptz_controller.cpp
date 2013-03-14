@@ -139,7 +139,7 @@ void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
-    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, qreal, qreal, qreal, int)));
+    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
     m_cameraByHandle[handle] = camera;
 
     PtzData &data = m_dataByCamera[camera];
@@ -222,7 +222,7 @@ void QnWorkbenchPtzController::at_resource_statusChanged(const QnResourcePtr &re
         tryInitialize(camera);
 }
 
-void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle) {
+void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle) {
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
     if(!camera)
         return; /* Already removed from the pool. */
@@ -233,7 +233,6 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
     if(status == 0) {
         bool positionChanged = false;
         if(qFuzzyIsNull(data.movement)) {
-            QVector3D position(xPos, yPox, zoomPos);
             positionChanged = !qFuzzyCompare(position, data.position);
             data.position = position;
             if(const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera))

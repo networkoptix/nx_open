@@ -440,6 +440,8 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
     }
 
     QString scopes = QLatin1String(source->Scopes->__item);
+
+
     int posStart = scopes.indexOf(QLatin1String(SCOPES_HARDWARE_PREFIX));
     if (posStart == -1) {
         return QString();
@@ -573,11 +575,14 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
 
     QUdpSocket qSocket;
 
-    if (iface) {
+    if (iface) 
+    {
         if (!bindToInterface(qSocket, *iface))
             return;
-    } else {
-        qSocket.bind(QHostAddress(QString::fromLatin1("192.168.0.111")), 0);
+    } 
+    else 
+    {
+        return;
     }
 
     QStringList addrPrefixes = getAddrPrefixes(iface ? iface->address.toString() : camAddr->toString());

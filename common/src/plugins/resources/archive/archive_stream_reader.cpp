@@ -59,7 +59,9 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_pausedStart(false),
     m_sendMotion(false),
     m_prevSendMotion(false),
-    m_outOfPlaybackMask(false)
+    m_outOfPlaybackMask(false),
+    m_latPacketTime(DATETIME_NOW),
+    m_stopCond(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -190,13 +192,15 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
 
 const QnResourceVideoLayout* QnArchiveStreamReader::getDPVideoLayout() const
 {
-    m_delegate->open(m_resource);
+    if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
+    	m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
 const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 {
-    m_delegate->open(m_resource);
+	if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
+    	m_delegate->open(m_resource);
     return m_delegate->getAudioLayout();
 }
 
@@ -330,6 +334,16 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
+
+    if (m_stopCond) {
+        QMutexLocker lock(&m_stopMutex);
+        m_delegate->close();
+        while (m_stopCond && !m_needStop)
+            m_stopWaitCond.wait(&m_stopMutex);
+        if (m_needStop)
+            return QnAbstractMediaDataPtr();
+        m_delegate->seek(m_latPacketTime, true);
+    }
 
     if (m_pausedStart)
     {
@@ -794,7 +808,8 @@ begin_label:
             }
         }
     }
-
+    if (m_currentData) 
+        m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : m_currentData->timestamp;
     return m_currentData;
 }
 
@@ -914,6 +929,7 @@ void QnArchiveStreamReader::pleaseStop()
     if (m_delegate)
         m_delegate->beforeClose();
     m_singleShowWaitCond.wakeAll();
+    m_stopWaitCond.wakeAll();
 }
 
 void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast)
@@ -1176,4 +1192,33 @@ void QnArchiveStreamReader::afterRun()
 {
     if (m_delegate)
         m_delegate->close();
+}
+
+void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
+{
+    if (m_delegate)
+        m_delegate->setGroupId(guid);
+}
+
+void QnArchiveStreamReader::pause() 
+{
+    if (getResource()->hasParam(lit("groupplay"))) {
+        QMutexLocker lock(&m_stopMutex);
+        m_stopCond = true; // for VMAX
+    }
+    else {
+        QnAbstractArchiveReader::pause();
+    }
+}
+
+void QnArchiveStreamReader::resume() 
+{
+    if (getResource()->hasParam(lit("groupplay"))) {
+        QMutexLocker lock(&m_stopMutex);
+        m_stopCond = false; // for VMAX
+        m_stopWaitCond.wakeAll();
+    }
+    else {
+        QnAbstractArchiveReader::resume();
+    }
 }

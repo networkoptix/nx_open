@@ -94,6 +94,18 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
 #ifdef Q_OS_WIN
     reply.storageProtocols.push_back(lit("smb"));
 #endif
+    // if storage total amount is low, and large storages is presents, remove small storages from the user control
+    // (writer ommits these storages too)
+    if (qnStorageMan->isBigStorageExists()) {
+        for (int i = 0; i < reply.storages.size(); ++i)
+        {
+            if (reply.storages[i].totalSpace < QnStorageManager::BIG_STORAGE_THRESHOLD) {
+                reply.storages[i].isWritable = false;
+                reply.storages[i].isUsedForWriting = false;
+            }
+        }
+    }
+
     // TODO: #Elric check for other plugins, e.g. coldstore
 
     result.setReply(reply);

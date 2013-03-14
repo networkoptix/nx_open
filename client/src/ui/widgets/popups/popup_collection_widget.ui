@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>231</width>
-    <height>214</height>
+    <width>374</width>
+    <height>85</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,15 +34,18 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
-      </property>
-     </layout>
+     <layout class="QVBoxLayout" name="verticalLayout"/>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="minimizeButton">
+       <property name="text">
+        <string>Minimize</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -57,12 +60,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="expandButton">
+      <widget class="QPushButton" name="postponeAllButton">
        <property name="text">
-        <string>You have unread messages!</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
+        <string>Postpone All</string>
        </property>
       </widget>
      </item>

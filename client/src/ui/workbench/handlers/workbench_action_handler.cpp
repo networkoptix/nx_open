@@ -280,6 +280,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
+    connect(action(Qn::TogglePopupsAction),                     SIGNAL(toggled(bool)),  this,   SLOT(at_togglePopupsAction_toggled(bool)));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -464,7 +465,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             widget(),
             QnResourceList(saveableResources),
             tr("Close Layouts"),
-            tr("The following %n layout(s) are not saved. Do you want to save them?", NULL, saveableResources.size()),
+            tr("The following %n layout(s) are not saved. Do you want to save them?", "", saveableResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
             false
         );
@@ -493,7 +494,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
         } else {
             QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
             dialog->setWindowTitle(tr("Saving Layouts"));
-            dialog->setText(tr("The following %n layout(s) are being saved.", NULL, saveableResources.size()));
+            dialog->setText(tr("The following %n layout(s) are being saved.", "", saveableResources.size()));
             dialog->setBottomText(tr("Please wait."));
             dialog->setStandardButtons(0);
             dialog->setResources(QnResourceList(saveableResources));
@@ -858,10 +859,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     if (!widget())
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    if (popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost))
-        popupCollectionWidget()->show();
+    ensurePopupCollectionWidget();
+    popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -875,11 +874,8 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-
-    if (popupCollectionWidget()->addBusinessAction(businessAction))
-        popupCollectionWidget()->show();
+    ensurePopupCollectionWidget();
+    popupCollectionWidget()->addBusinessAction(businessAction);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1368,6 +1364,11 @@ void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts
     }
 }
 
+void QnWorkbenchActionHandler::ensurePopupCollectionWidget() {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+}
+
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     notifyAboutUpdate(false);
 }
@@ -1775,7 +1776,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
                 widget(),
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),
                 tr("Camera(s) not Saved"),
-                tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
+                tr("Save changes to the following %n camera(s)?", "", cameraSettingsDialog()->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
             if(button == QDialogButtonBox::Yes)
@@ -1901,7 +1902,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
         widget(), 
         resources.toList(),
         tr("Delete Files"), 
-        tr("Are you sure you want to permanently delete these %n file(s)?", 0, resources.size()), 
+        tr("Are you sure you want to permanently delete these %n file(s)?", "", resources.size()), 
         QDialogButtonBox::Yes | QDialogButtonBox::No
     );
     if(button != QDialogButtonBox::Yes)
@@ -1918,7 +1919,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
             widget(),
             QnActionParameterTypes::resources(items),
             tr("Remove Items"),
-            tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()),
+            tr("Are you sure you want to remove these %n item(s) from layout?", "", items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         if(button != QDialogButtonBox::Yes)
@@ -2018,7 +2019,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             widget(), 
             resources, 
             tr("Delete Resources"), 
-            tr("Do you really want to delete the following %n item(s)?", NULL, resources.size()), 
+            tr("Do you really want to delete the following %n item(s)?", "", resources.size()), 
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         okToDelete = button == QDialogButtonBox::Yes;
@@ -2678,8 +2679,12 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     m_exportStorage.clear();
     m_exportedCamera = 0;
 
-    if (m_layoutExportMode == LayoutExport_Export)
+    if (m_layoutExportMode == LayoutExport_Export) {
+        if(m_exportProgressDialog)
+            m_exportProgressDialog.data()->setValue(m_exportProgressDialog.data()->maximum());
+
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+    }
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
@@ -2787,7 +2792,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
                 QMessageBox::critical(
                             this->widget(),
                             tr("Could not export file"),
-                            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()),
+                            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", "", parameters.size()),
                             QMessageBox::Ok
                             );
                 return;
@@ -2918,6 +2923,7 @@ Do you want to continue?"),
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setRange(0, 100);
         exportProgressDialog->setMinimumDuration(1000);
+        m_exportProgressDialog = exportProgressDialog;
 
         m_exportedCamera = widget->display()->camera();
 
@@ -2953,6 +2959,10 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
     file->setStatus(QnResource::Online);
     resourcePool()->addResource(file);
     m_exportedCamera = 0;
+
+    if(m_exportProgressDialog)
+        m_exportProgressDialog.data()->setValue(m_exportProgressDialog.data()->maximum());
+
     QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
 }
 
@@ -3126,8 +3136,8 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to Enterprise Controller.", NULL, reopeningLayoutResources.size()),
-            tr("Do you want to restore these %n layout(s)?", NULL, reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Enterprise Controller.", "", reopeningLayoutResources.size()),
+            tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         if(button == QMessageBox::Yes) {
@@ -3143,7 +3153,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n items to Enterprise Controller.", NULL, resources.size()),
+            tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
             tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
             QDialogButtonBox::Ok
         );
@@ -3167,7 +3177,7 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
         widget(),
         resources,
         tr("Error"),
-        tr("Could not save changes made to the following %n resource(s).", NULL, resources.size()),
+        tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
         tr("Error description:\n%1").arg(QLatin1String(errorString.constData())),
         QDialogButtonBox::Ok
     );
@@ -3261,19 +3271,16 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (!context()->user())
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    ensurePopupCollectionWidget();
     popupCollectionWidget()->clear();
 
-    bool any = false;
-
     if (!QnEmail::isValid(context()->user()->getEmail())) {
-        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
+        popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
 
     if (qnLicensePool->isEmpty() &&
             (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+        popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
     }
 
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
@@ -3295,12 +3302,17 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
             usersWithNoEmail << user;
         }
         if (!usersWithNoEmail.isEmpty())
-            any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
+            popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
     }
+}
 
-    if (any)
+void QnWorkbenchActionHandler::at_togglePopupsAction_toggled(bool checked) {
+    if (checked)
+        return;
+
+    ensurePopupCollectionWidget();
+    if (!popupCollectionWidget()->isEmpty())
         popupCollectionWidget()->show();
-
 }
 
 void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
@@ -3312,29 +3324,10 @@ void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByt
     if(status != 0)
         return;
 
-    const QLatin1String nameHost("EMAIL_HOST");
-    const QLatin1String nameUser("EMAIL_HOST_USER");
-    const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
-
-    QString hostname;
-    QString user;
-    QString password;
-
-    foreach (const QnKvPair &setting, settings) {
-        if (setting.name() == nameHost) {
-            hostname = setting.value();
-        } else if (setting.name() == nameUser) {
-            user = setting.value();
-        } else if (setting.name() == namePassword) {
-            password = setting.value();
-        }
-    }
-
-    if (!hostname.isEmpty() && !user.isEmpty() && !password.isEmpty())
+    QnEmail::Settings email(settings);
+    if (!email.server.isEmpty() && !email.user.isEmpty() && !email.password.isEmpty())
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
-    popupCollectionWidget()->show();
 }

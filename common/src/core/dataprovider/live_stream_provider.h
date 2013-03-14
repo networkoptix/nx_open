@@ -61,6 +61,7 @@ protected:
 private:
     //int m_NumaberOfVideoChannels;
     QnStreamQuality m_quality;
+    bool m_qualityUpdatedAtLeastOnce;
 
     mutable float m_fps; //used only for live providers
     unsigned int m_framesSinceLastMetaData; // used only for live providers

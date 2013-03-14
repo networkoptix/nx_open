@@ -1,6 +1,8 @@
 #include "license_manager_widget.h"
 #include "ui_license_manager_widget.h"
 
+#include "version.h"
+
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 #include <QtCore/QTextStream>
@@ -108,7 +110,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         if (!helper.isValid()) {
             useRedLabel = true;
             ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Required at least %3 digital and %4 analog."))
+                                              "Required at least %3 digital and %4 analog licenses."))
                                    .arg(helper.totalDigital())
                                    .arg(helper.totalAnalog())
                                    .arg(helper.requiredDigital())
@@ -116,7 +118,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         } else {
             ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Currently using %3 digital and %4 analog."))
+                                              "Currently using %3 digital and %4 analog licenses."))
                                    .arg(helper.totalDigital())
                                    .arg(helper.totalAnalog())
                                    .arg(helper.usedDigital())
@@ -146,9 +148,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-//    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
-    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/new/vms.dev/activate.php"));
-
+    QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
     request.setUrl(url);
 

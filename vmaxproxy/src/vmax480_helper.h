@@ -8,12 +8,14 @@ typedef QMap<QByteArray, QByteArray> VMaxParamList;
 
 enum MServerCommand {
     Command_OpenLive, 
-    Command_OpenArchive, 
-    Command_ArchivePlay, 
-    Command_PlayPoints, 
-    Command_RecordedMonth, 
-    Command_RecordedTime, 
-    Command_GetRange, 
+    Command_OpenArchive,
+    Command_ArchivePlay,
+    Command_AddChannel,
+    Command_RemoveChannel,
+    Command_PlayPoints,
+    Command_RecordedMonth,
+    Command_RecordedTime,
+    Command_GetRange,
     Command_CloseConnect
 };
 

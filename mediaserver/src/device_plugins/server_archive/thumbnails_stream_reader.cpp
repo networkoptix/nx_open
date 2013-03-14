@@ -138,3 +138,8 @@ void QnThumbnailsStreamReader::afterRun()
     if (m_delegate)
         m_delegate->close();
 }
+
+void QnThumbnailsStreamReader::setGroupId(const QByteArray& groupId)
+{
+    m_delegate->setGroupId(groupId);
+}

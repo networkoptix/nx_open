@@ -32,6 +32,7 @@ public:
     struct Settings {
         Settings();
         Settings(const QnKvPairList &values);
+        ~Settings();
 
         bool isNull() const {
             return server.isEmpty();
@@ -42,6 +43,7 @@ public:
         QString server;
         QString user;
         QString password;
+        QString signature;
         ConnectionType connectionType;
         int port;
         int timeout;

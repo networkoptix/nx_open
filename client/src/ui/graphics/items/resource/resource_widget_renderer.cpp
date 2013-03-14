@@ -93,7 +93,7 @@ qint64 QnResourceWidgetRenderer::getTimestampOfNextFrameToRender(int channel) co
     const RenderingTools& ctx = m_channelRenderers[channel];
     //return ctx.renderer ? ctx.renderer->lastDisplayedTime() : AV_NOPTS_VALUE;
 
-    if( ctx.timestampBlocked || (ctx.framesSinceJump == 0 && ctx.forcedTimestampValue != AV_NOPTS_VALUE) )
+    if( ctx.timestampBlocked || (ctx.framesSinceJump == 0 && ctx.forcedTimestampValue != (qint64)AV_NOPTS_VALUE) )
         return ctx.forcedTimestampValue;
 
     if( !ctx.uploader || !ctx.renderer )

@@ -55,7 +55,7 @@
             </column>
             <column>
              <property name="text">
-              <string>Expired</string>
+              <string>Expire Date</string>
              </property>
             </column>
            </widget>

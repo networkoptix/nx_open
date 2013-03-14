@@ -1,3 +1,22 @@
+----------------------------------------------- 1.4.4 - RC -----------------------------------------------
+
+BUGS FIXED:
+
+Since 1.4
+If perform search and then clear all search criterias all available items were placed on scene causing freezes. Now search results are removed in this case
+
+Since previous Beta (1.4.2)
+if press fix button on storage notification it didn't disappear
+If switch between layouts RADASS setting (if had been set manually) remained the same. Fixed: now it is reset to "Auto"
+
+IMPROVEMENTS:
+
+Since 1.4
+ - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
+
+Since previous Beta (1.4.3)
+ - 
+
 ----------------------------------------------- 1.4.3 - Beta2 -----------------------------------------------
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - AXISP1354

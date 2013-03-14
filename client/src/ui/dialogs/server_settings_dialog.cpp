@@ -14,6 +14,7 @@
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
 #include <utils/common/variant.h>
+#include <utils/common/event_processors.h>
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
@@ -33,10 +34,10 @@
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
 namespace {
-    const qint64 defaultReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
-    const qint64 minimalReservedSpace = 5ll * 1000ll * 1000ll * 1000ll;
+    const qint64 defaultReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
+    const qint64 minimalReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
 
-    const qint64 bytesInMb = 1000 * 1000;
+    const qint64 bytesInMiB = 1024 * 1024;
 
     const int ReservedSpaceRole = Qt::UserRole;
     const int FreeSpaceRole = Qt::UserRole + 1;
@@ -86,7 +87,7 @@ namespace {
                 return m_textFormat;
             } else {
                 if(isSliderDown()) {
-                    return formatStorageSize(sliderPosition() * bytesInMb);
+                    return formatStorageSize(sliderPosition() * bytesInMiB);
                 } else {
                     return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
                 }
@@ -188,8 +189,8 @@ namespace {
             qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
             qint64 videoSpace = totalSpace - index.data(ReservedSpaceRole).toLongLong();
 
-            slider->setRange(0, totalSpace / bytesInMb);
-            slider->setValue(videoSpace / bytesInMb);
+            slider->setRange(0, totalSpace / bytesInMiB);
+            slider->setValue(videoSpace / bytesInMiB);
         }
 
         virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
@@ -200,7 +201,7 @@ namespace {
             }
 
             qint64 totalSpace = index.data(TotalSpaceRole).toLongLong();
-            qint64 videoSpace = slider->value() * bytesInMb;
+            qint64 videoSpace = slider->value() * bytesInMiB;
             model->setData(index, totalSpace - videoSpace, ReservedSpaceRole);
         }
 
@@ -221,7 +222,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->setupUi(this);
     
     ui->storagesTable->resizeColumnsToContents();
-    ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
+    ui->storagesTable->horizontalHeader()->setClickable(false);
     ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
     ui->storagesTable->horizontalHeader()->setResizeMode(PathColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->horizontalHeader()->setResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
@@ -233,6 +234,13 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 #endif
 
     setButtonBox(ui->buttonBox);
+
+    m_removeAction = new QAction(tr("Remove Storage"), this);
+
+    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
+    signalizer->setEventType(QEvent::ContextMenu);
+    ui->storagesTable->installEventFilter(signalizer);
+    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -322,35 +330,38 @@ void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &item
         addTableItem(item);
 }
 
-QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
-    QList<QnStorageSpaceData> result;
+QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
+    QnStorageSpaceData result;
+    if(row < 0 || row >= ui->storagesTable->rowCount() - 1)
+        return result;
 
-    for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++) {
-        QnStorageSpaceData item;
-
-        QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
-        QTableWidgetItem *pathItem = ui->storagesTable->item(row, PathColumn);
-        QTableWidgetItem *capacityItem = ui->storagesTable->item(row, CapacityColumn);
+    QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
+    QTableWidgetItem *pathItem = ui->storagesTable->item(row, PathColumn);
+    QTableWidgetItem *capacityItem = ui->storagesTable->item(row, CapacityColumn);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
-        QTableWidgetItem *archiveSpaceItem = ui->storagesTable->item(row, ArchiveSpaceColumn);
+    QTableWidgetItem *archiveSpaceItem = ui->storagesTable->item(row, ArchiveSpaceColumn);
 #else
-        QTableWidgetItem *archiveSpaceItem = capacityItem;
+    QTableWidgetItem *archiveSpaceItem = capacityItem;
 #endif
 
-        item.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
-        item.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-        item.storageId = qvariant_cast<int>(checkBoxItem->data(StorageIdRole), -1);
-        item.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
+    result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
+    result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
+    result.storageId = qvariant_cast<int>(checkBoxItem->data(StorageIdRole), -1);
+    result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
-        item.path = pathItem->text();
+    result.path = pathItem->text();
 
-        item.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
-        item.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();
-        item.reservedSpace = archiveSpaceItem->data(ReservedSpaceRole).toLongLong();
+    result.totalSpace = archiveSpaceItem->data(TotalSpaceRole).toLongLong();
+    result.freeSpace = archiveSpaceItem->data(FreeSpaceRole).toLongLong();
+    result.reservedSpace = archiveSpaceItem->data(ReservedSpaceRole).toLongLong();
 
-        result.push_back(item);
-    }
+    return result;
+}
 
+QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
+    QList<QnStorageSpaceData> result;
+    for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++)
+        result.push_back(tableItem(row));
     return result;
 }
 
@@ -433,7 +444,23 @@ void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
     m_hasStorageChanges = true;
 }
 
-void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle) {
+void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent *) {
+    int row = ui->storagesTable->currentRow();
+    QnStorageSpaceData item = tableItem(row);
+    if(item.path.isEmpty() || !item.isExternal)
+        return;
+
+    QScopedPointer<QMenu> menu(new QMenu());
+    menu->addAction(m_removeAction);
+
+    QAction *action = menu->exec(QCursor::pos());
+    if(action == m_removeAction) {
+        ui->storagesTable->removeRow(row);
+        m_hasStorageChanges = true;
+    }
+}
+
+void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int) {
     if(status != 0) {
         m_tableBottomLabel->setText(tr("Could not load storages from server."));
         return;
@@ -470,5 +497,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
 
     m_storageProtocols = reply.storageProtocols;
     m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
+
+    m_hasStorageChanges = false;
 }
 
