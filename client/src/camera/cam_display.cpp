@@ -1006,7 +1006,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (speed == 0)
             return true;
 
-        if (emptyData->timestamp > 0 && emptyData->timestamp < DATETIME_NOW)
+        if (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync)
         {
             // long waiting filler
             m_isLongWaiting = true;
@@ -1018,6 +1018,10 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_timeMutex.unlock();
                 if (m_extTimeSrc)
                     m_extTimeSrc->onBufferingFinished(this);
+                if (m_speed >= 0)
+                    blockTimeValue(DATETIME_NOW);
+                else if (m_speed >= 0)
+                    blockTimeValue(0);
                 unblockTimeValue();
             }
             return true;

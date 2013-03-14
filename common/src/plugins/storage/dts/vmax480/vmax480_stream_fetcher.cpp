@@ -198,6 +198,7 @@ QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
 {
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
     rez->timestamp = timestamp;
+    rez->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
     return rez;
 }
 
