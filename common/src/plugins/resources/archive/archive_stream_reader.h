@@ -80,6 +80,10 @@ public:
 
     virtual void afterRun() override;
     virtual void setGroupId(const QByteArray& groupId) override;
+
+    virtual void pause() override;
+    virtual void resume() override;
+
 protected:
     virtual bool init();
 
@@ -165,6 +169,11 @@ private:
     bool m_sendMotion;
     bool m_prevSendMotion;
     bool m_outOfPlaybackMask;
+    qint64 m_latPacketTime;
+    
+    bool m_stopCond;
+    QMutex m_stopMutex;
+    QWaitCondition m_stopWaitCond;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);
