@@ -21,6 +21,7 @@ namespace {
     const QLatin1String nameSsl("EMAIL_USE_SSL");
     const QLatin1String nameSimple("EMAIL_SIMPLE");
     const QLatin1String nameTimeout("EMAIL_TIMEOUT");
+    const QLatin1String nameSignature("EMAIL_SIGNATURE");
     const int TIMEOUT = 20; //seconds
 
     static void addPresets(const QStringList &domains, QnEmail::SmtpServerPreset server, QnSmtpPresets* presets) {
@@ -57,7 +58,6 @@ namespace {
         presets.insert(_("aol.com"),            server(_("smtp.aol.com")));
 
         presets.insert(_("lycos.com"),          server(_("smtp.mail.lycos.com"), QnEmail::Unsecure));
-        presets.insert(_("mail.com"),           server(_("smtp.mail.com"), QnEmail::Ssl));
         presets.insert(_("netscape.com"),       server(_("mail.netscape.ca")));
         presets.insert(_("rogers.com"),         server(_("smtp.broadband.rogers.com")));
         presets.insert(_("ntlworld.com"),       server(_("smtp.ntlworld.com"), QnEmail::Ssl));
@@ -79,6 +79,11 @@ namespace {
 
         presets.insert(_("li.ru"),              server(_("smtp.li.ru"), QnEmail::Ssl));
         presets.insert(_("nic.ru"),             server(_("mail.nic.ru"), QnEmail::Unsecure));
+
+        presets.insert(_("lavabit.com"),        server(_("lavabit.com"), QnEmail::Ssl));
+        presets.insert(_("zoho.com"),           server(_("smtp.zoho.com"), QnEmail::Ssl));
+        presets.insert(_("gmx.com"),            server(_("mail.gmx.com"), QnEmail::Ssl));
+        presets.insert(_("shortmail.com"),      server(_("smtp.shortmail.com")));
 
         addPresets(QStringList()
                    << _("sympatico.ca")
@@ -245,6 +250,8 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
             useSsl = setting.value() == QLatin1String("True");
         } else if (setting.name() == nameSimple) {
             simple = setting.value() == QLatin1String("True");
+        } else if (setting.name() == nameSignature) {
+            signature = setting.value();
         }
     }
 
@@ -255,6 +262,9 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
               : QnEmail::Unsecure;
     if (port == defaultPort(connectionType))
         port = 0;
+}
+
+QnEmail::Settings::~Settings() {
 }
 
 QnKvPairList QnEmail::Settings::serialized() const {
@@ -272,7 +282,8 @@ QnKvPairList QnEmail::Settings::serialized() const {
     << QnKvPair(nameTls, useTls)
     << QnKvPair(nameSsl, useSsl)
     << QnKvPair(nameSimple, simple)
-    << QnKvPair(nameTimeout, TIMEOUT);
+    << QnKvPair(nameTimeout, TIMEOUT)
+    << QnKvPair(nameSignature, signature);
     return result;
 
 }

@@ -203,6 +203,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::TakeScreenshotAction));
     addAction(action(Qn::TogglePanicModeAction));
     addAction(action(Qn::ToggleTourModeHotkeyAction));
+    addAction(action(Qn::TogglePopupsAction));
     addAction(action(Qn::DebugIncrementCounterAction));
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));

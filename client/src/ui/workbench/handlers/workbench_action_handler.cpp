@@ -280,6 +280,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
+    connect(action(Qn::TogglePopupsAction),                     SIGNAL(toggled(bool)),  this,   SLOT(at_togglePopupsAction_toggled(bool)));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -858,10 +859,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     if (!widget())
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-    if (popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost))
-        popupCollectionWidget()->show();
+    ensurePopupCollectionWidget();
+    popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -875,11 +874,8 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
     if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
-
-    if (popupCollectionWidget()->addBusinessAction(businessAction))
-        popupCollectionWidget()->show();
+    ensurePopupCollectionWidget();
+    popupCollectionWidget()->addBusinessAction(businessAction);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1366,6 +1362,11 @@ void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts
         else
             connection()->deleteAsync(layout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
+}
+
+void QnWorkbenchActionHandler::ensurePopupCollectionWidget() {
+    if (!popupCollectionWidget())
+        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -3261,19 +3262,16 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
     if (!context()->user())
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    ensurePopupCollectionWidget();
     popupCollectionWidget()->clear();
 
-    bool any = false;
-
     if (!QnEmail::isValid(context()->user()->getEmail())) {
-        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
+        popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::EmailIsEmpty);
     }
 
     if (qnLicensePool->isEmpty() &&
             (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
+        popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::NoLicenses);
     }
 
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
@@ -3295,12 +3293,17 @@ void QnWorkbenchActionHandler::at_checkSystemHealthAction_triggered() {
             usersWithNoEmail << user;
         }
         if (!usersWithNoEmail.isEmpty())
-            any |= popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
+            popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::UsersEmailIsEmpty, usersWithNoEmail);
     }
+}
 
-    if (any)
+void QnWorkbenchActionHandler::at_togglePopupsAction_toggled(bool checked) {
+    if (checked)
+        return;
+
+    ensurePopupCollectionWidget();
+    if (!popupCollectionWidget()->isEmpty())
         popupCollectionWidget()->show();
-
 }
 
 void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle) {
@@ -3312,29 +3315,10 @@ void QnWorkbenchActionHandler::at_serverSettings_received(int status, const QByt
     if(status != 0)
         return;
 
-    const QLatin1String nameHost("EMAIL_HOST");
-    const QLatin1String nameUser("EMAIL_HOST_USER");
-    const QLatin1String namePassword("EMAIL_HOST_PASSWORD");
-
-    QString hostname;
-    QString user;
-    QString password;
-
-    foreach (const QnKvPair &setting, settings) {
-        if (setting.name() == nameHost) {
-            hostname = setting.value();
-        } else if (setting.name() == nameUser) {
-            user = setting.value();
-        } else if (setting.name() == namePassword) {
-            password = setting.value();
-        }
-    }
-
-    if (!hostname.isEmpty() && !user.isEmpty() && !password.isEmpty())
+    QnEmail::Settings email(settings);
+    if (!email.server.isEmpty() && !email.user.isEmpty() && !email.password.isEmpty())
         return;
 
-    if (!popupCollectionWidget())
-        m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+    ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::SmtpIsNotSet);
-    popupCollectionWidget()->show();
 }

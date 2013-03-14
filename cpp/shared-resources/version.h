@@ -25,6 +25,8 @@
 #define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
 #define QN_FREE_LICENSE_COUNT       ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY         "${freeLicenseKey}"
+#define QN_LICENSE_URL              "${license.url}"
+#define QN_RSA_PUBLIC_KEY           ${rsa.public.key}
 
 /* 
  * These constans are here for windows resouce file.

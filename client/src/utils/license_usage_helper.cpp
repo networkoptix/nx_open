@@ -68,7 +68,7 @@ void QnLicenseUsageHelper::update() {
         m_usedDigital = totalDigital();
         m_requiredDigital = 0;
 
-        m_usedAnalog = activeAnalog;
+        m_usedAnalog = activeAnalog - freeDigital;
         m_requiredAnalog = -freeAnalog;
         return;
     }

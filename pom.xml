@@ -30,6 +30,7 @@
 		<testcamera.name>${company.name} Test Camera</testcamera.name>
 		<traytool.name>${product.name} Tray Assistant</traytool.name>
 		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+		<license.environment>test</license.environment>
 
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
@@ -58,7 +59,7 @@
 		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>
-		<module>build-environment</module>
+		<module>build_environment</module>
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>

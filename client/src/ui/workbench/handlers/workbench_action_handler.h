@@ -347,6 +347,8 @@ protected slots:
 
     void at_checkSystemHealthAction_triggered();
 
+    void at_togglePopupsAction_toggled(bool checked);
+
     void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
 private:
@@ -379,6 +381,7 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
+    void ensurePopupCollectionWidget();
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

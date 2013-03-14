@@ -30,11 +30,10 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
     parent->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
+    connect(resizeSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
 
-    ui->verticalWidget->setVisible(false);
-
-    connect(ui->expandButton, SIGNAL(toggled(bool)), ui->verticalWidget, SLOT(setVisible(bool)));
+    connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
+    connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -94,6 +93,8 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_businessEventWidget_closed(BusinessEventType::Value, bool)));
     }
 
+    if (!isVisible())
+        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -117,6 +118,8 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         connect(pw, SIGNAL(closed(QnSystemHealth::MessageType, bool)), this, SLOT(at_systemHealthWidget_closed(QnSystemHealth::MessageType, bool)));
     }
 
+    if (!isVisible())
+        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -129,7 +132,12 @@ void QnPopupCollectionWidget::clear() {
     }
     m_businessEventWidgets.clear();
     m_systemHealthWidgets.clear();
+    action(Qn::TogglePopupsAction)->setChecked(false);
     hide();
+}
+
+bool QnPopupCollectionWidget::isEmpty() const {
+    return ui->verticalLayout->isEmpty();
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
@@ -184,3 +192,14 @@ void QnPopupCollectionWidget::at_systemHealthWidget_closed(QnSystemHealth::Messa
     if (ui->verticalLayout->count() == 0)
         hide();
 }
+
+void QnPopupCollectionWidget::at_postponeAllButton_clicked() {
+    clear();
+}
+
+void QnPopupCollectionWidget::at_minimizeButton_clicked() {
+    action(Qn::TogglePopupsAction)->setChecked(ui->verticalLayout->count() > 0);
+    hide();
+}
+
+
