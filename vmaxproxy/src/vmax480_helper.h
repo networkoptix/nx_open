@@ -48,7 +48,7 @@ static const char VMAX_PARAM_DELIMITER = '\\';
 
 static const int VMAX_MAX_CH = 16;
 static const int VMAX_SLICE_OF_HOUR	= 60;
-static const int VMAX_MAX_SLICE_DAY = VMAX_SLICE_OF_HOUR*24;
+static const int VMAX_MAX_SLICE_DAY = VMAX_SLICE_OF_HOUR*25;
 
 
 class QnVMax480Helper {

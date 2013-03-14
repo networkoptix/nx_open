@@ -193,7 +193,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     int year =  dayNum / 10000;
     int month =(dayNum % 10000)/100;
     int day =   dayNum % 100;
-    qint64 dayBase = QDateTime(QDate(year, month, day)).toMSecsSinceEpoch();
+    QDate date(year, month, day);
 
     const char* curPtr = data.data();
 
@@ -204,12 +204,12 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
         for(int min = 0; min < VMAX_MAX_SLICE_DAY; ++min)
         {
             char recordType = *curPtr & 0x0f;
-            if (recordType)
-                addChunk(dayPeriods, QnTimePeriod(dayBase + min*60*1000ll, 60*1000));
+            if (recordType) {
+                QTime time(min/60, min%60, 0);
+                addChunk(dayPeriods, QnTimePeriod(QDateTime(date,time).toMSecsSinceEpoch(), 60*1000));
+            }
             curPtr++;
         }
-
-        curPtr += 60; // skip reserved hour
 
         if (!dayPeriods.isEmpty()) {
             QVector<QnTimePeriodList> allPeriods;
