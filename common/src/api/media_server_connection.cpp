@@ -25,6 +25,7 @@ namespace {
         ((TimePeriodsObject,        "RecordedTimePeriods"))
         ((StatisticsObject,         "statistics"))
         ((PtzSpaceMapperObject,     "ptz/getSpaceMapper"))
+        ((PtzPositionObject,        "ptz/getPosition"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -616,13 +617,13 @@ int QnMediaServerConnection::asyncPtzMoveTo(const QnNetworkResourcePtr &camera, 
 }
 
 int QnMediaServerConnection::asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-    detail::QnMediaServerPtzGetPosReplyProcessor *processor = new detail::QnMediaServerPtzGetPosReplyProcessor();
-    connect(processor, SIGNAL(finished(int, qreal, qreal, qreal, int)), target, slot, Qt::QueuedConnection);
+    QnMediaServerReplyProcessor *processor = new QnMediaServerReplyProcessor(PtzPositionObject);
+    connect(processor, SIGNAL(finished(int, const QVector3D &, int)), target, slot, Qt::QueuedConnection);
 
-    QnRequestParamList requestParams;
-    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+    QnRequestParamList params;
+    params << QnRequestParam("res_id", camera->getPhysicalId());
 
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getPosition"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
+    return sendAsyncRequest(processor, params);
 }
 
 int QnMediaServerConnection::asyncGetTime(QObject *target, const char *slot) {

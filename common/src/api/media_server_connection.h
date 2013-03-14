@@ -1,23 +1,26 @@
 #ifndef QN_MEDIA_SERVER_CONNECTION_H
 #define QN_MEDIA_SERVER_CONNECTION_H
 
-#include <QUrl>
-#include <QRegion>
-#include <QScopedPointer>
-#include <QSharedPointer>
-#include <QAuthenticator>
-
-#include "core/resource/network_resource.h"
-#include "utils/common/util.h"
-#include "recording/time_period_list.h"
+#include <QtCore/QUrl>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
+#include <QtGui/QVector3D>
+#include <QtGui/QRegion>
 
 #include <utils/common/request_param.h>
-#include <api/media_server_statistics_data.h>
-#include <api/media_server_cameras_data.h>
-    
+#include <utils/common/util.h>
+
+#include <api/model/storage_space_reply.h>
+#include <api/model/storage_status_reply.h>
+
+#include <core/resource/resource_fwd.h>
+
+#include <recording/time_period_list.h>
+
 #include "api_fwd.h"
-#include "model/storage_space_reply.h"
-#include "model/storage_status_reply.h"
+#include "media_server_statistics_data.h"
+#include "media_server_cameras_data.h"
+
 
 class QnPtzSpaceMapper;
 class QnEnumNameMapper;
@@ -43,6 +46,7 @@ signals:
     void finished(int status, const QnTimePeriodList &reply, int handle);
     void finished(int status, const QnStatisticsDataList &reply, int handle);
     void finished(int status, const QnPtzSpaceMapper &reply, int handle);
+    void finished(int status, const QVector3D &reply, int handle);
 
 protected:
     virtual void connectNotify(const char *signal) override;
