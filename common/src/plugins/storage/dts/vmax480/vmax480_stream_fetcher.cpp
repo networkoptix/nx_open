@@ -20,7 +20,8 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_sequence(0),
     m_mainConsumer(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
-    m_streamPaused(false)
+    m_streamPaused(false),
+    m_lastSpeed(1)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
     memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
@@ -38,6 +39,8 @@ bool VMaxStreamFetcher::isOpened() const
 
 bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed)
 {
+    m_lastSpeed = speed;
+
     if (!safeOpen())
         return false;
 
@@ -385,17 +388,21 @@ void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource
 bool VMaxStreamFetcher::safeOpen()
 {
     QMutexLocker lock(&m_mutex);
-    if (!isOpened())
-        return vmaxConnect();
-    else
-        return true;
+    if (!isOpened()) {
+        if (!vmaxConnect())
+            return false;
+        if (!m_isLive)
+            m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
+    }
+
+    return true;
 }
 
 QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* consumer)
 {
     if (!safeOpen()) 
         return QnAbstractDataPacketPtr();
-
+            
     CLDataQueue* dataQueue = 0;
     {
         QMutexLocker lock(&m_mutex);
@@ -412,7 +419,7 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
         int maxQueueSize = getMaxQueueSize();
         if (maxQueueSize < MAX_QUEUE_SIZE / 4) {
             m_streamPaused = false;
-            m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, 1);
+            m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
         }
     }
 

@@ -88,6 +88,7 @@ private:
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;
     bool m_streamPaused;
+    int m_lastSpeed;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__
