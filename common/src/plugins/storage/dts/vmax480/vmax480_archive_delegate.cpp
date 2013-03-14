@@ -5,47 +5,42 @@
 
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
-    VMaxStreamFetcher(res),
-    m_internalQueue(100),
     m_needStop(false),
-    m_sequence(0),
-    m_vmaxPaused(false),
-    m_lastMediaTime(AV_NOPTS_VALUE),
     m_reverseMode(false),
     m_thumbnailsMode(false),
-    m_lastSeekPos(AV_NOPTS_VALUE)
+    m_lastSeekPos(AV_NOPTS_VALUE),
+    m_isOpened(false),
+    m_maxStream(0)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
+    m_flags |= Flag_CanOfflineLayout;
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
 {
-    vmaxDisconnect();
-
+    close();
 }
 
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
     Q_UNUSED(resource)
-    if (isOpened())
+
+    if (m_isOpened)
         return true;
 
-    close();
-
+    m_isOpened = true;
     m_needStop = false;
-    m_sequence = 0;
-
-    int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
-    if (channel > 0)
-        channel--;
 
     m_lastSeekPos = AV_NOPTS_VALUE;
     qDebug() << "before vmaxConnect";
 
-    return vmaxConnect(false, channel);
+    if (m_maxStream == 0)
+        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
+    m_isOpened = m_maxStream->registerConsumer(this);
+    return m_isOpened;
 }
 
 void QnVMax480ArchiveDelegate::beforeClose()
@@ -55,16 +50,14 @@ void QnVMax480ArchiveDelegate::beforeClose()
 
 qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-    if (!isOpened()) {
+    if (!m_isOpened) {
         open(m_res);
-        if (!isOpened())
-            return -1;
     }
 
     m_thumbnailsMode = false;
-    QnTimePeriodList chunks = m_res->getChunks();
-    if (!chunks.isEmpty())
-        time = chunks.roundTimeToPeriodUSec(time, true);
+    //QnTimePeriodList chunks = m_res->getChunks();
+    //if (!chunks.isEmpty())
+    //    time = chunks.roundTimeToPeriodUSec(time, true);
 
     return seekInternal(time, findIFrame);
 }
@@ -72,19 +65,23 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 {
     Q_UNUSED(findIFrame)
-    m_sequence++;
-    qDebug() << "QnVMax480ArchiveDelegate::seek" << "m_sequence" << m_sequence;
+    qDebug() << "QnVMax480ArchiveDelegate::seek";
 
-    m_internalQueue.clear();
-    vmaxArchivePlay(time, m_sequence, m_reverseMode ? -1 : 1);
-    m_lastSeekPos = m_lastMediaTime = time;
+    m_maxStream->vmaxArchivePlay(this, time, m_reverseMode ? -1 : 1);
+    m_lastSeekPos = time;
     return time;
 }
 
 void QnVMax480ArchiveDelegate::close()
 {
     m_needStop = true;
-    vmaxDisconnect();
+    if (m_isOpened) {
+        m_maxStream->unregisterConsumer(this);
+        m_isOpened = false;
+    }
+    if (m_maxStream)
+        VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
+    m_maxStream = 0;
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime()
@@ -102,23 +99,8 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     QnAbstractMediaDataPtr result;
 
     
-    if (!isOpened()) {
+    if (!m_isOpened) {
         open(m_res);
-        if (!isOpened()) {
-			if (m_lastMediaTime != AV_NOPTS_VALUE)
-            	m_lastMediaTime += 60*1000; // try to skip problem place
-            return result;
-        }
-    }
-
-    if (m_lastSeekPos == AV_NOPTS_VALUE && m_lastMediaTime != AV_NOPTS_VALUE) {
-        vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
-        m_lastSeekPos = m_lastMediaTime;
-    }
-
-    if (m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
-        vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
-        m_vmaxPaused = false;
     }
 
     if (m_thumbnailsMode) {
@@ -131,20 +113,16 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
     QTime getTimer;
     getTimer.restart();
-    while (isOpened()) {
-        QnAbstractDataPacketPtr tmp;
-        m_internalQueue.pop(tmp, 100);
+    while (m_isOpened) {
+        QnAbstractDataPacketPtr tmp = m_maxStream->getNextData(this);
         result = tmp.dynamicCast<QnAbstractMediaData>();
 
-        if (result && result->opaque == m_sequence)
+        if (result)
             break;
         if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*3)
             return QnAbstractMediaDataPtr();
     }
     if (result) {
-
-
-        result->opaque = 0;
         if (m_reverseMode) {
             result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
             result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -179,31 +157,6 @@ static QnEmptyResourceAudioLayout audioLayout;
 QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
 {
     return &audioLayout;
-}
-
-void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
-{
-    QTime waitTimer;
-    waitTimer.restart();
-
-    //qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(mediaData->timestamp/1000).toString(QLatin1String("dd.MM.yyyy hh:mm.ss"));
-
-    while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize() && !m_vmaxPaused)
-    {
-        if (waitTimer.elapsed() > MAX_FRAME_DURATION) {
-            if (!m_vmaxPaused) {
-                vmaxArchivePlay(m_lastMediaTime, m_sequence, 0);
-                m_vmaxPaused = true;
-            }
-        }
-        else {
-            QnSleep::msleep(1);
-        }
-    }
-    QnSleep::msleep(2); // reduce vmax downloading speed
-
-    m_internalQueue.push(mediaData);
-    m_lastMediaTime = mediaData->timestamp;
 }
 
 void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
@@ -247,4 +200,14 @@ void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64
 
     //m_sequence++;
     //vmaxPlayRange(m_ThumbnailsSeekPoints.keys(), m_sequence);
+}
+
+int QnVMax480ArchiveDelegate::getChannel() const
+{
+    return m_res.dynamicCast<QnPhysicalCameraResource>()->getChannel();
+}
+
+void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
+{
+    m_groupId = data;
 }

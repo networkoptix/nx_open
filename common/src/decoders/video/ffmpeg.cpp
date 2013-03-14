@@ -526,6 +526,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
         outFrame->format = GetPixelFormat();
+        outFrame->sample_aspect_ratio = getSampleAspectRatio();
         return m_context->pix_fmt != PIX_FMT_NONE;
     }
     return false; // no picture decoded at current step
@@ -533,7 +534,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
 
 double CLFFmpegVideoDecoder::getSampleAspectRatio() const
 {
-    if (!m_context)
+    if (!m_context || !m_context->width || !m_context->height)
         return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);

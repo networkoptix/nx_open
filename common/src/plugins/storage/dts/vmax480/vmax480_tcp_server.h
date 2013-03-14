@@ -16,6 +16,7 @@ class QnVMax480Server: public QnTcpListener
 {
 public:
     QnVMax480Server();
+    virtual ~QnVMax480Server();
 
     static QnVMax480Server* instance();
 
@@ -45,6 +46,9 @@ public:
     void vMaxRequestMonthInfo(const QDate& month);
     void vMaxRequestDayInfo(int dayNum);
     void vMaxRequestRange();
+
+    void vMaxAddChannel(int channel);
+    void vMaxRemoveChannel(int channel);
 protected:
     virtual void run() override;
 private:
