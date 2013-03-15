@@ -30,6 +30,7 @@ public:
 
     virtual void setGroupId(const QByteArray& data) override;
     virtual QnTimePeriodList chunks() override;
+    virtual void beforeSeek(qint64 time) override;
 private:
     void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
     qint64 seekInternal(qint64 time, bool findIFrame);
@@ -44,6 +45,7 @@ private:
     bool m_isOpened;
     mutable QMutex m_seekMtx;
     QByteArray m_groupId;
+    bool m_beforeSeek;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

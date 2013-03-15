@@ -69,7 +69,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_AfterDrop = 1024*8, // some data were dropped before current data
 
         MediaFlags_HWDecodingUsed = 1024*16, //hardware decoding used
-        MediaFlags_PlayUnsync = 1024*32 // ignore syncplay mode
+        MediaFlags_PlayUnsync = 1024*32, // ignore syncplay mode
+        MediaFlags_Skip = 1024*64 // ignore packet at all
     };
 
     enum DataType {

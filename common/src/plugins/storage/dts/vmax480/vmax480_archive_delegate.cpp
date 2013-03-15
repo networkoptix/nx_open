@@ -50,6 +50,8 @@ void QnVMax480ArchiveDelegate::beforeClose()
 
 qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    m_beforeSeek = false;
+
     if (!m_isOpened) {
         open(m_res);
     }
@@ -119,6 +121,11 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
         if (result)
             break;
+        if (m_beforeSeek) {
+            result = m_maxStream->createEmptyPacket(); // cancel waiting
+            result->flags |= QnAbstractMediaData::MediaFlags_Skip;
+            return result;
+        }
         if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*3)
             return QnAbstractMediaDataPtr();
     }
@@ -219,4 +226,9 @@ void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
 QnTimePeriodList QnVMax480ArchiveDelegate::chunks() 
 { 
     return m_res->getChunks();
+}
+
+void QnVMax480ArchiveDelegate::beforeSeek(qint64 time) 
+{ 
+    m_beforeSeek = true;
 }

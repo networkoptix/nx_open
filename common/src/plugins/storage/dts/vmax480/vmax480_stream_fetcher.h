@@ -58,6 +58,7 @@ public:
     bool vmaxRequestMonthInfo(const QDate& month);
     bool vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
     bool vmaxRequestRange();
+    QnAbstractMediaDataPtr createEmptyPacket();
 private:
     bool isOpened() const;
     bool vmaxConnect();
@@ -65,7 +66,6 @@ private:
     int getPort();
     int getCurrentChannelMask() const;
     int getChannelUsage(int ch);
-    QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
     int getMaxQueueSize() const;
     bool safeOpen();
 private:
@@ -82,7 +82,6 @@ private:
     ConsumersMap m_dataConsumers;
     bool m_isLive;
     int m_usageCount;
-    QnVmax480DataConsumer* m_mainConsumer;
 
     static QMutex m_instMutex;
     static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
@@ -91,6 +90,9 @@ private:
     qint64 m_lastMediaTime;
     bool m_streamPaused;
     int m_lastSpeed;
+    qint64 m_lastSeekPos;
+    bool m_beforeSeek;
+    QTime m_seekTimer;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

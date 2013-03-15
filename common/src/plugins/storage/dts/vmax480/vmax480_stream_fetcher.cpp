@@ -18,10 +18,10 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_isLive(isLive),
     m_usageCount(0),
     m_sequence(0),
-    m_mainConsumer(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_streamPaused(false),
-    m_lastSpeed(1)
+    m_lastSpeed(1),
+    m_lastSeekPos(AV_NOPTS_VALUE)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
     memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
@@ -49,6 +49,16 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
     QMutexLocker  lock(&m_mutex);
 
+    if (timeUsec == m_lastSeekPos && m_seekTimer.elapsed() < 5000)
+        return true;
+    m_lastSeekPos = timeUsec;
+    m_seekTimer.restart();
+
+
+    CLDataQueue* dataQueue = m_dataConsumers.value(consumer);
+    if (dataQueue)
+        dataQueue->clear();
+
     qint64 time = m_lastSpeed >= 0 ? DATETIME_NOW : 0;
     bool dataFound = false;
     for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
@@ -65,19 +75,8 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
     if (dataFound)
         timeUsec = time;
 
-    //QnTimePeriodList chunks = m_res->getChunks();
-    //if (!chunks.isEmpty())
-    //    time = chunks.roundTimeToPeriodUSec(time, true);
-
-
-    CLDataQueue* dataQueue = m_dataConsumers.value(consumer);
-    if (dataQueue)
-        dataQueue->clear();
-
-    if (consumer == m_mainConsumer) {
-        ++m_sequence;
-        m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
-    }
+    ++m_sequence;
+    m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
 
     return true;
 }
@@ -165,6 +164,7 @@ void VMaxStreamFetcher::vmaxDisconnect()
     }
     QnVMax480Server::instance()->unregisterProvider(this);
     m_lastMediaTime = AV_NOPTS_VALUE;
+    m_lastSeekPos = AV_NOPTS_VALUE;
 }
 
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
@@ -219,10 +219,10 @@ bool VMaxStreamFetcher::vmaxRequestRange()
     return true;
 }
 
-QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
+QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket()
 {
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
-    rez->timestamp = timestamp;
+    rez->timestamp = m_lastSpeed >= 0 ? DATETIME_NOW : 0;
     rez->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
     return rez;
 }
@@ -287,7 +287,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
             }
             else if (ct - m_lastChannelTime[curChannel] > 1000000ll) {
                 m_lastChannelTime[curChannel] = ct;
-                itr.value()->push(createEmptyPacket(mediaData->timestamp));
+                itr.value()->push(createEmptyPacket());
             }
         }
     }
@@ -300,8 +300,6 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
 
     QMutexLocker lock(&m_mutex);
     m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
-    if (m_mainConsumer == 0)
-        m_mainConsumer = consumer;
 
     int channel = consumer->getChannel();
     if (channel != -1) 
@@ -328,29 +326,25 @@ int VMaxStreamFetcher::getChannelUsage(int ch)
 
 void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
 {
+    int ch = consumer->getChannel();
+
     QMutexLocker lock(&m_mutex);
 
-    if (m_vmaxConnection)
-    {
-        int ch = consumer->getChannel();
-        if (ch != -1) {
-            if (getChannelUsage(ch) == 1)
-                m_vmaxConnection->vMaxRemoveChannel(1 << consumer->getChannel());
-        }
-    }
     ConsumersMap::Iterator itr = m_dataConsumers.find(consumer);
     if (itr != m_dataConsumers.end()) {
         delete itr.value();
         m_dataConsumers.erase(itr);
     }
 
-    if (m_mainConsumer == consumer) {
-        m_mainConsumer = 0;
-        if (!m_dataConsumers.isEmpty())
-            m_mainConsumer = m_dataConsumers.begin().key();
+    if (m_vmaxConnection)
+    {
+        if (ch != -1) {
+            if (getChannelUsage(ch) == 1) 
+            {
+                m_vmaxConnection->vMaxRemoveChannel(1 << ch);
+            }
+        }
     }
-    //if (m_dataConsumers.isEmpty())
-    //    vmaxDisconnect();
 }
 
 QByteArray getInstanceKey(const QByteArray& clientGroupID, const QByteArray& vmaxIP, bool isLive)
@@ -434,7 +428,7 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
         dataQueue = itr.value();
     }
     QnAbstractDataPacketPtr result;
-    dataQueue->pop(result, 100);
+    dataQueue->pop(result, 10);
 
     if (result && m_streamPaused)
     {

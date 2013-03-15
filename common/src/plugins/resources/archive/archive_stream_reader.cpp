@@ -541,6 +541,9 @@ begin_label:
     if (m_currentData == 0)
         return m_currentData;
 
+    if (m_currentData->flags & QnAbstractMediaData::MediaFlags_Skip)
+        goto begin_label;
+
     videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
 
     if (m_currentData->timestamp != qint64(AV_NOPTS_VALUE)) {
