@@ -29,7 +29,7 @@ class QnVMax480ConnectionProcessor;
 class VMaxStreamFetcher: public QnVmax480DataConsumer
 {
 public:
-    bool registerConsumer(QnVmax480DataConsumer* consumer);
+    bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
     static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);

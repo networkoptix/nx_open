@@ -292,13 +292,15 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     }
 }
 
-bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
+bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count)
 {
     if (!safeOpen())
         return false;
 
     QMutexLocker lock(&m_mutex);
     m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
+    if (count)
+        *count = m_dataConsumers.size();
 
     int channel = consumer->getChannel();
     if (channel != -1) 

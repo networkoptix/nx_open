@@ -10,14 +10,15 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_thumbnailsMode(false),
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_isOpened(false),
-    m_maxStream(0)
+    m_maxStream(0),
+    m_ignoreNextSeek(false)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanOfflineLayout;
-    m_flags |= Flag_CanSeekImmediatly;
+    //m_flags |= Flag_CanSeekImmediatly;
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
@@ -40,7 +41,9 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 
     if (m_maxStream == 0)
         m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
-    m_isOpened = m_maxStream->registerConsumer(this);
+    int consumerCount = 0;
+    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount);
+    m_ignoreNextSeek = consumerCount > 1;
     return m_isOpened;
 }
 
@@ -55,6 +58,11 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 
     if (!m_isOpened) {
         open(m_res);
+    }
+
+    if (m_ignoreNextSeek) {
+        m_ignoreNextSeek = false;
+        return time;
     }
 
     m_thumbnailsMode = false;

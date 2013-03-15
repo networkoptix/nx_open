@@ -46,6 +46,7 @@ private:
     mutable QMutex m_seekMtx;
     QByteArray m_groupId;
     bool m_beforeSeek;
+    bool m_ignoreNextSeek;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE
