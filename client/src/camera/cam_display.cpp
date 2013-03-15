@@ -1008,11 +1008,12 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        if (m_emptyPacketCounter >= 3 || (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync))
+        bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
+        if (m_emptyPacketCounter >= 3 || playUnsync)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
+            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !playUnsync) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }

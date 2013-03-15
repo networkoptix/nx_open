@@ -810,7 +810,7 @@ begin_label:
         }
     }
     if (m_currentData) 
-        m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : m_currentData->timestamp;
+        m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : qMin(qnSyncTime->currentUSecsSinceEpoch(), m_currentData->timestamp);
     return m_currentData;
 }
 
