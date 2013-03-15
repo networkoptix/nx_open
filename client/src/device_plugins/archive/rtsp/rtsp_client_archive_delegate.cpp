@@ -873,7 +873,7 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
-    if (m_resource->hasParam(lit("groupplay")))
+    if (m_resource && m_resource->hasParam(lit("groupplay")))
         return; // avoid close/open for VMAX
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
