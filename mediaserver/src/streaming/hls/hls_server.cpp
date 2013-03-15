@@ -190,7 +190,7 @@ namespace nx_hls
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL/HLS get timezone
-        response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME" "QN_APPLICATION_VERSION ) );
+        response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //findRequestedFile can override this
 
         response.statusLine.statusCode = getRequestedFile( request, &response );
@@ -715,7 +715,7 @@ namespace nx_hls
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
         if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )   //TODO/IMPL is condition sutisfying?
-            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(m_currentChunk->sizeInBytes()) ) );
+	  response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
         else
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
         response->statusLine.version = nx_http::Version::http_1_1;
