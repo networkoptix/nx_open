@@ -122,12 +122,14 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
         if (result)
             break;
-        if (m_beforeSeek) {
+        if (!m_thumbnailsMode && m_beforeSeek) {
             result = m_maxStream->createEmptyPacket(); // cancel waiting
             result->flags |= QnAbstractMediaData::MediaFlags_Skip;
             return result;
         }
         if (getTimer.elapsed() > MAX_FRAME_DURATION*2) {
+            if (m_thumbnailsMode)
+                return result;
             close();
             open(m_res);
             getTimer.restart();
