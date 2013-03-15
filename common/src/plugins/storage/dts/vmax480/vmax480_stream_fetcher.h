@@ -59,6 +59,7 @@ public:
     bool vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
     bool vmaxRequestRange();
     QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
+    bool isPlaying() const;
 private:
     bool isOpened() const;
     bool vmaxConnect();
@@ -93,6 +94,7 @@ private:
     qint64 m_lastSeekPos;
     bool m_beforeSeek;
     QTime m_seekTimer;
+    bool m_isPlaying;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

@@ -54,7 +54,6 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
     m_lastSeekPos = timeUsec;
     m_seekTimer.restart();
 
-
     CLDataQueue* dataQueue = m_dataConsumers.value(consumer);
     if (dataQueue)
         dataQueue->clear();
@@ -443,4 +442,10 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
     }
 
     return result;
+}
+
+bool VMaxStreamFetcher::isPlaying() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_lastSeekPos != AV_NOPTS_VALUE;
 }

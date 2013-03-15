@@ -47,6 +47,7 @@ private:
     QByteArray m_groupId;
     bool m_beforeSeek;
     bool m_ignoreNextSeek;
+    qint64 m_lastMediaTime;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE

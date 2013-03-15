@@ -1203,6 +1203,7 @@ void QnArchiveStreamReader::pause()
 {
     if (getResource()->hasParam(lit("groupplay"))) {
         QMutexLocker lock(&m_stopMutex);
+        m_delegate->beforeClose();
         m_stopCond = true; // for VMAX
     }
     else {

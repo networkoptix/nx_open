@@ -11,7 +11,8 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_isOpened(false),
     m_maxStream(0),
-    m_ignoreNextSeek(false)
+    m_ignoreNextSeek(false),
+    m_lastMediaTime(0)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
@@ -36,7 +37,6 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     m_isOpened = true;
     m_needStop = false;
 
-    m_lastSeekPos = AV_NOPTS_VALUE;
     qDebug() << "before vmaxConnect";
 
     if (m_maxStream == 0)
@@ -140,6 +140,8 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
                 return result;
             close();
             open(m_res);
+            if (!m_maxStream->isPlaying())
+                m_maxStream->vmaxArchivePlay(this, m_lastMediaTime, m_reverseMode ? -1 : 1);
             getTimer.restart();
         }
         if (m_needStop)
@@ -162,6 +164,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
             m_ThumbnailsSeekPoints.erase(m_ThumbnailsSeekPoints.begin());
         }
+        m_lastMediaTime = result->timestamp;
     }
     else {
         close();
