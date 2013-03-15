@@ -58,7 +58,7 @@ public:
     bool vmaxRequestMonthInfo(const QDate& month);
     bool vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
     bool vmaxRequestRange();
-    QnAbstractMediaDataPtr createEmptyPacket();
+    QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
 private:
     bool isOpened() const;
     bool vmaxConnect();

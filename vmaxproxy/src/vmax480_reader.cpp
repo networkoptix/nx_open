@@ -573,6 +573,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_callbackCond.wakeOne();
                 }
             }
+            m_socket->close();
             break;
         }
     case RESULT_OPEN_VIDEO:

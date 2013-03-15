@@ -131,7 +131,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         if (result)
             break;
         if (!m_thumbnailsMode && m_beforeSeek) {
-            result = m_maxStream->createEmptyPacket(); // cancel waiting
+            result = m_maxStream->createEmptyPacket(0); // cancel waiting
             result->flags |= QnAbstractMediaData::MediaFlags_Skip;
             return result;
         }
@@ -161,10 +161,6 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
                 << "point=" << QDateTime::fromMSecsSinceEpoch(m_ThumbnailsSeekPoints.begin().key()/1000).toString(QLatin1String("dd hh.mm.ss.zzz"));
 
             m_ThumbnailsSeekPoints.erase(m_ThumbnailsSeekPoints.begin());
-        }
-        if (result->dataType == QnAbstractMediaData::EMPTY_DATA)
-        {
-            result->timestamp = m_reverseMode ? 0 : DATETIME_NOW;
         }
     }
     else {

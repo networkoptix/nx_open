@@ -218,10 +218,10 @@ bool VMaxStreamFetcher::vmaxRequestRange()
     return true;
 }
 
-QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket()
+QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
 {
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
-    rez->timestamp = m_lastSpeed >= 0 ? DATETIME_NOW : 0;
+    rez->timestamp = timestamp; //m_lastSpeed >= 0 ? DATETIME_NOW : 0;
     rez->flags |= QnAbstractMediaData::MediaFlags_PlayUnsync;
     return rez;
 }
@@ -284,9 +284,9 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
             {
                 itr.value()->push(mediaData);
             }
-            else if (ct - m_lastChannelTime[curChannel] > 1000000ll) {
+            else if (ct - m_lastChannelTime[curChannel] > 1000ll * 100 && itr.value()->size() < 5) {
                 m_lastChannelTime[curChannel] = ct;
-                itr.value()->push(createEmptyPacket());
+                itr.value()->push(createEmptyPacket(mediaData->timestamp));
             }
         }
     }
