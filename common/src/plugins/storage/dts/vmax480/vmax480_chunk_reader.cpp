@@ -201,14 +201,20 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     {
         QnTimePeriodList dayPeriods;
 
-        for(int min = 0; min < VMAX_MAX_SLICE_DAY; ++min)
+        for (int hour = 0; hour < 25; ++hour) 
         {
-            char recordType = *curPtr & 0x0f;
-            if (recordType) {
-                QTime time(min/60, min%60, 0);
-                addChunk(dayPeriods, QnTimePeriod(QDateTime(date,time).toMSecsSinceEpoch(), 60*1000));
+            for(int min = 0; min < 60; ++min)
+            {
+                char recordType = *curPtr & 0x0f;
+                // I do not know how to handle 25-th hour
+                if (recordType && hour < 24) 
+                {
+                    QTime time(hour, min, 0);
+                    QDateTime dt (date, time);
+                    addChunk(dayPeriods, QnTimePeriod(dt.toMSecsSinceEpoch(), 60*1000));
+                }
+                curPtr++;
             }
-            curPtr++;
         }
 
         if (!dayPeriods.isEmpty()) {

@@ -7,6 +7,7 @@
 
 static const int PROCESS_TIMEOUT = 1000;
 static const int MAX_QUEUE_SIZE = 150;
+static const qint64 EMPTY_PACKET_REPEAT_INTERVAL = 1000ll * 400;
 
 QMutex VMaxStreamFetcher::m_instMutex;
 QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
@@ -245,6 +246,11 @@ int VMaxStreamFetcher::getMaxQueueSize() const
     return maxQueueSize;
 }
 
+int sign(int value)
+{
+    return value >= 0 ? 1 : -1;
+}
+
 void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 {
     if (mediaData->opaque != m_sequence)
@@ -290,9 +296,9 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
             {
                 itr.value()->push(mediaData);
             }
-            else if (ct - m_lastChannelTime[curChannel] > 1000ll * 100 && itr.value()->size() < 5) {
+            else if (ct - m_lastChannelTime[curChannel] > EMPTY_PACKET_REPEAT_INTERVAL && itr.value()->size() < 5) {
                 m_lastChannelTime[curChannel] = ct;
-                itr.value()->push(createEmptyPacket(mediaData->timestamp));
+                itr.value()->push(createEmptyPacket(mediaData->timestamp + EMPTY_PACKET_REPEAT_INTERVAL*sign(m_lastSpeed)));
             }
         }
     }

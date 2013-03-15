@@ -3,6 +3,8 @@
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 
+static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
+
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
     m_needStop(false),
@@ -151,8 +153,8 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
                 return result; // tell error
         }
         else {
-            if (getTimer.elapsed() > 1000) {
-                if (++m_noDataCounter == 10)
+            if (getTimer.elapsed() > EMPTY_PACKET_REPEAT_INTERVAL) {
+                if (++m_noDataCounter == MAX_FRAME_DURATION*2/EMPTY_PACKET_REPEAT_INTERVAL)
                     reconnect();
                 return m_maxStream->createEmptyPacket(m_lastMediaTime);
             }
