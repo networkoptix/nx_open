@@ -59,7 +59,7 @@ void QnVMax480ArchiveDelegate::beforeClose()
 qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     m_beforeSeek = false;
-
+    m_lastMediaTime = time;
     if (!m_isOpened) {
         open(m_res);
     }
@@ -262,6 +262,5 @@ QnTimePeriodList QnVMax480ArchiveDelegate::chunks()
 
 void QnVMax480ArchiveDelegate::beforeSeek(qint64 time) 
 { 
-    m_lastMediaTime = time;
     m_beforeSeek = true;
 }
