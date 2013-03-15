@@ -29,6 +29,7 @@ public:
     virtual int getChannel() const override;
 
     virtual void setGroupId(const QByteArray& data) override;
+    virtual QnTimePeriodList chunks() override;
 private:
     void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
     qint64 seekInternal(qint64 time, bool findIFrame);

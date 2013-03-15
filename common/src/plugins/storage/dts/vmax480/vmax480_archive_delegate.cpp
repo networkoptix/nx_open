@@ -215,3 +215,8 @@ void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
 {
     m_groupId = data;
 }
+
+QnTimePeriodList QnVMax480ArchiveDelegate::chunks() 
+{ 
+    return m_res->getChunks();
+}

@@ -425,7 +425,7 @@ void QnVMax480Provider::receiveResultCallback(PS_ACS_RESULT _result, long long _
 void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 {
 
-    //qDebug() << "receiveVideoStream";
+    //qDebug() << "receiveVideoStream" << _stream->mCh;
     quint8 VMaxHeader[16];
     bool isIFrame = false;
     {

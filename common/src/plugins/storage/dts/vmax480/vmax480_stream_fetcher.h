@@ -7,6 +7,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include "vmax480_tcp_server.h"
 #include "core/resource/network_resource.h"
+#include "recording/time_period_list.h"
 
 class VMaxStreamFetcherPtr;
 
@@ -20,6 +21,7 @@ public:
     virtual void onGotMonthInfo(const QDate& month, int monthInfo)  {}
     virtual void onGotDayInfo(int dayNum, const QByteArray& data)  {}
 
+    virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
 };
 
 class QnVMax480ConnectionProcessor;

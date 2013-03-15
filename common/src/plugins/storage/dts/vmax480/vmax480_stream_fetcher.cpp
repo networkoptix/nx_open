@@ -49,6 +49,27 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
     QMutexLocker  lock(&m_mutex);
 
+    qint64 time = m_lastSpeed >= 0 ? DATETIME_NOW : 0;
+    bool dataFound = false;
+    for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
+    {
+        QnTimePeriodList chunks = itr.key()->chunks();
+        if (!chunks.isEmpty()) {
+            dataFound = true;
+            if (m_lastSpeed >= 0)
+                time = qMin(time, chunks.roundTimeToPeriodUSec(timeUsec, true));
+            else
+                time = qMax(time, chunks.roundTimeToPeriodUSec(timeUsec, false));
+        }
+    }
+    if (dataFound)
+        timeUsec = time;
+
+    //QnTimePeriodList chunks = m_res->getChunks();
+    //if (!chunks.isEmpty())
+    //    time = chunks.roundTimeToPeriodUSec(time, true);
+
+
     CLDataQueue* dataQueue = m_dataConsumers.value(consumer);
     if (dataQueue)
         dataQueue->clear();
@@ -286,7 +307,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer)
     if (channel != -1) 
     {
         if (getChannelUsage(channel) == 1) {
-            m_vmaxConnection->vMaxAddChannel(1 << consumer->getChannel());
+            m_vmaxConnection->vMaxAddChannel(1 << channel);
             m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
 
         }
