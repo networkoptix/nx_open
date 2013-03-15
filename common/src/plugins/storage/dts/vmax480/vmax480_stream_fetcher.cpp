@@ -163,7 +163,6 @@ void VMaxStreamFetcher::vmaxDisconnect()
         m_vMaxProxy = 0;
     }
     QnVMax480Server::instance()->unregisterProvider(this);
-    m_lastMediaTime = AV_NOPTS_VALUE;
     m_lastSeekPos = AV_NOPTS_VALUE;
 }
 
@@ -345,6 +344,8 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
             }
         }
     }
+    if (m_dataConsumers.isEmpty())
+        m_lastMediaTime = AV_NOPTS_VALUE;
 }
 
 QByteArray getInstanceKey(const QByteArray& clientGroupID, const QByteArray& vmaxIP, bool isLive)
