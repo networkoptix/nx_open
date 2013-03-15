@@ -409,7 +409,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::TogglePopupsAction).
         flags(Qn::NoTarget).
         checkable().
-        icon(qnSkin->icon("titlebar/panic.png")).
+        icon(qnSkin->icon("popup.png")).
         text(tr("Show notifications"));
 
     /* Context menu actions. */
