@@ -266,9 +266,8 @@ void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 
     else
         playMode = ACS_stream_source::BACKWARDPLAY;
 
-    qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
-
     if (!m_archivePlayProcessing) {
+        qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
         m_archivePlayProcessing = true;
         m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
     }
@@ -609,6 +608,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_curSequence = m_reqSequence;
                 else
                     archivePlayInternal(m_newPlayCommand, m_reqSequence);
+                m_newPlayCommand.clear();
             }
             break;
         }

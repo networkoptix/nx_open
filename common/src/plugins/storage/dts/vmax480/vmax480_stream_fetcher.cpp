@@ -338,14 +338,14 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
     if (m_vmaxConnection)
     {
         if (ch != -1) {
-            if (getChannelUsage(ch) == 1) 
+            if (getChannelUsage(ch) == 0) 
             {
                 m_vmaxConnection->vMaxRemoveChannel(1 << ch);
             }
         }
     }
-    if (m_dataConsumers.isEmpty())
-        m_lastMediaTime = AV_NOPTS_VALUE;
+    //if (m_dataConsumers.isEmpty())
+    //    m_lastMediaTime = AV_NOPTS_VALUE;
 }
 
 QByteArray getInstanceKey(const QByteArray& clientGroupID, const QByteArray& vmaxIP, bool isLive)

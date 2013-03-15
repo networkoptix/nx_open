@@ -17,6 +17,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanOfflineLayout;
+    m_flags |= Flag_CanSeekImmediatly;
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
@@ -126,8 +127,13 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
             result->flags |= QnAbstractMediaData::MediaFlags_Skip;
             return result;
         }
-        if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*3)
-            return QnAbstractMediaDataPtr();
+        if (getTimer.elapsed() > MAX_FRAME_DURATION*2) {
+            close();
+            open(m_res);
+            getTimer.restart();
+        }
+        if (m_needStop)
+            break;
     }
     if (result) {
         if (m_reverseMode) {
