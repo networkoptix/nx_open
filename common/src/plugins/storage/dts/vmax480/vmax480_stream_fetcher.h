@@ -69,6 +69,7 @@ private:
     int getChannelUsage(int ch);
     int getMaxQueueSize() const;
     bool safeOpen();
+    qint64 findRoundTime(qint64 timeUsec, bool* dataFound) const;
 private:
     QnNetworkResourcePtr m_res;
     typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;

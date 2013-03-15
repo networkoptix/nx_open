@@ -12,7 +12,8 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_isOpened(false),
     m_maxStream(0),
     m_ignoreNextSeek(false),
-    m_lastMediaTime(0)
+    m_lastMediaTime(0),
+    m_noDataCounter(0)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
@@ -44,6 +45,7 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     int consumerCount = 0;
     m_isOpened = m_maxStream->registerConsumer(this, &consumerCount);
     m_ignoreNextSeek = consumerCount > 1;
+    m_noDataCounter = 0;
     return m_isOpened;
 }
 
@@ -105,6 +107,14 @@ qint64 QnVMax480ArchiveDelegate::endTime()
     return m_res->endTime();
 }
 
+void QnVMax480ArchiveDelegate::reconnect()
+{
+    close();
+    open(m_res);
+    if (!m_maxStream->isPlaying())
+        m_maxStream->vmaxArchivePlay(this, m_lastMediaTime, m_reverseMode ? -1 : 1);
+}
+
 QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
@@ -135,19 +145,24 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
             result->flags |= QnAbstractMediaData::MediaFlags_Skip;
             return result;
         }
-        if (getTimer.elapsed() > MAX_FRAME_DURATION*2) {
-            if (m_thumbnailsMode)
-                return result;
-            close();
-            open(m_res);
-            if (!m_maxStream->isPlaying())
-                m_maxStream->vmaxArchivePlay(this, m_lastMediaTime, m_reverseMode ? -1 : 1);
-            getTimer.restart();
+
+        if (m_thumbnailsMode) {
+            if (getTimer.elapsed() > MAX_FRAME_DURATION*2)
+                return result; // tell error
         }
+        else {
+            if (getTimer.elapsed() > 1000) {
+                if (++m_noDataCounter == 10)
+                    reconnect();
+                return m_maxStream->createEmptyPacket(m_lastMediaTime);
+            }
+        }
+
         if (m_needStop)
             break;
     }
     if (result) {
+        m_noDataCounter = 0;
         if (m_reverseMode) {
             result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
             result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -245,5 +260,6 @@ QnTimePeriodList QnVMax480ArchiveDelegate::chunks()
 
 void QnVMax480ArchiveDelegate::beforeSeek(qint64 time) 
 { 
+    m_lastMediaTime = time;
     m_beforeSeek = true;
 }

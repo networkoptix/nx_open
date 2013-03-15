@@ -37,6 +37,24 @@ bool VMaxStreamFetcher::isOpened() const
     return m_vMaxProxy && !m_tcpID.isEmpty() && m_vmaxConnection && m_vmaxConnection->isRunning();
 }
 
+qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const
+{
+    *dataFound = false;
+    qint64 time = m_lastSpeed >= 0 ? DATETIME_NOW : 0;
+    for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
+    {
+        QnTimePeriodList chunks = itr.key()->chunks();
+        if (!chunks.isEmpty()) {
+            *dataFound = true;
+            if (m_lastSpeed >= 0)
+                time = qMin(time, chunks.roundTimeToPeriodUSec(timeUsec, true));
+            else
+                time = qMax(time, chunks.roundTimeToPeriodUSec(timeUsec, false));
+        }
+    }
+    return time;
+}
+
 bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed)
 {
     m_lastSpeed = speed;
@@ -58,19 +76,8 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
     if (dataQueue)
         dataQueue->clear();
 
-    qint64 time = m_lastSpeed >= 0 ? DATETIME_NOW : 0;
     bool dataFound = false;
-    for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
-    {
-        QnTimePeriodList chunks = itr.key()->chunks();
-        if (!chunks.isEmpty()) {
-            dataFound = true;
-            if (m_lastSpeed >= 0)
-                time = qMin(time, chunks.roundTimeToPeriodUSec(timeUsec, true));
-            else
-                time = qMax(time, chunks.roundTimeToPeriodUSec(timeUsec, false));
-        }
-    }
+    qint64 time = findRoundTime(timeUsec, &dataFound);
     if (dataFound)
         timeUsec = time;
 
@@ -345,6 +352,15 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
             }
         }
     }
+
+    if (!m_dataConsumers.isEmpty() && !m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
+    {
+        bool dataFound = false;
+        qint64 time = findRoundTime(m_lastMediaTime, &dataFound);
+        if (dataFound && time != m_lastMediaTime)
+            m_vmaxConnection->vMaxArchivePlay(time, m_sequence, m_lastSpeed);
+    }
+
     //if (m_dataConsumers.isEmpty())
     //    m_lastMediaTime = AV_NOPTS_VALUE;
 }

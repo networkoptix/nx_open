@@ -34,6 +34,7 @@ public:
 private:
     void calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep);
     qint64 seekInternal(qint64 time, bool findIFrame);
+    void reconnect();
 private:
     VMaxStreamFetcher* m_maxStream;
     QnPlVmax480ResourcePtr m_res;
@@ -48,6 +49,7 @@ private:
     bool m_beforeSeek;
     bool m_ignoreNextSeek;
     qint64 m_lastMediaTime;
+    int m_noDataCounter;
 };
 
 #endif // __VMAX480_ARCHIVE_DELEGATE
