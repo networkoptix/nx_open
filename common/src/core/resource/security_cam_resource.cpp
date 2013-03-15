@@ -274,8 +274,6 @@ bool QnSecurityCamResource::isDtsBased() const
 
 bool QnSecurityCamResource::isAnalog() const
 {
-    return false;
-
     if (!hasParam(lit("analog")))
         return false;
 
