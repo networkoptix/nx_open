@@ -1006,27 +1006,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (speed == 0)
             return true;
 
-        if (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync)
-        {
-            // long waiting filler
-            m_isLongWaiting = true;
-            m_eofSignalSended = true;
-            if (m_buffering && m_executingJump == 0) 
-            {
-                m_timeMutex.lock();
-                m_buffering = 0;
-                m_timeMutex.unlock();
-                if (m_extTimeSrc)
-                    m_extTimeSrc->onBufferingFinished(this);
-                if (m_speed >= 0)
-                    blockTimeValue(DATETIME_NOW);
-                else if (m_speed >= 0)
-                    blockTimeValue(0);
-                unblockTimeValue();
-            }
-            return true;
-        }
-
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3 || (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync))
