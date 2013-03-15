@@ -22,7 +22,8 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_streamPaused(false),
     m_lastSpeed(1),
-    m_lastSeekPos(AV_NOPTS_VALUE)
+    m_lastSeekPos(AV_NOPTS_VALUE),
+    m_keepAllChannels(false)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
     memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
@@ -298,13 +299,13 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
             }
             else if (ct - m_lastChannelTime[curChannel] > EMPTY_PACKET_REPEAT_INTERVAL && itr.value()->size() < 5) {
                 m_lastChannelTime[curChannel] = ct;
-                itr.value()->push(createEmptyPacket(mediaData->timestamp + EMPTY_PACKET_REPEAT_INTERVAL*sign(m_lastSpeed)));
+                itr.value()->push(createEmptyPacket(mediaData->timestamp /*+ EMPTY_PACKET_REPEAT_INTERVAL*sign(m_lastSpeed)*/ ));
             }
         }
     }
 }
 
-bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count)
+bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count, bool openAllChannels)
 {
     if (!safeOpen())
         return false;
@@ -315,13 +316,14 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         *count = m_dataConsumers.size();
 
     int channel = consumer->getChannel();
-    if (channel != -1) 
+    if (openAllChannels) {
+        m_vmaxConnection->vMaxAddChannel(OPEN_ALL);
+        m_keepAllChannels = true;
+    }
+    else if (channel != -1) 
     {
-        if (getChannelUsage(channel) == 1) {
-            m_vmaxConnection->vMaxAddChannel(1 << channel);
-            m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
-
-        }
+        m_vmaxConnection->vMaxAddChannel(1 << channel);
+        m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
     }
     return true;
 }
@@ -351,7 +353,8 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
 
     if (m_vmaxConnection)
     {
-        if (ch != -1) {
+        if (ch != -1 && !m_keepAllChannels)
+        {
             if (getChannelUsage(ch) == 0) 
             {
                 m_vmaxConnection->vMaxRemoveChannel(1 << ch);

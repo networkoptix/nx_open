@@ -45,7 +45,7 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     if (m_maxStream == 0)
         m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
     int consumerCount = 0;
-    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount);
+    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode);
     m_ignoreNextSeek = consumerCount > 1;
     m_noDataCounter = 0;
     return m_isOpened;

@@ -29,7 +29,7 @@ class QnVMax480ConnectionProcessor;
 class VMaxStreamFetcher: public QnVmax480DataConsumer
 {
 public:
-    bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0);
+    bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0, bool keepAllChannels = false);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
     static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
@@ -71,6 +71,8 @@ private:
     bool safeOpen();
     qint64 findRoundTime(qint64 timeUsec, bool* dataFound) const;
 private:
+    static const int OPEN_ALL = 0xffff;
+
     QnNetworkResourcePtr m_res;
     typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
 
@@ -96,6 +98,7 @@ private:
     bool m_beforeSeek;
     QTime m_seekTimer;
     bool m_isPlaying;
+    bool m_keepAllChannels;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__
