@@ -63,7 +63,7 @@ install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${COMPANY_NAME}-ent
 install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
 
 # Copy libraries
-install -m 644 $PROXY_LIB_PATH/*.so* $LIBSTAGE
+cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
 
 # Strip and remove rpath
 for f in `find $LIBSTAGE -type f`
