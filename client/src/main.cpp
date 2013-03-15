@@ -330,16 +330,16 @@ int qnMain(int argc, char *argv[])
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         platform->monitor()->totalPartitionSpaceInfo();
 
-    #ifdef Q_WS_X11
+#ifdef Q_WS_X11
      //   QnX11LauncherWorkaround x11LauncherWorkaround;
      //   application->installEventFilter(&x11LauncherWorkaround);
-    #endif
+#endif
 
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
         QnIexploreUrlHandler iexploreUrlHanderWorkaround;
         // all effects are placed in the constructor
         Q_UNUSED(iexploreUrlHanderWorkaround)
-    #endif
+#endif
 
         if(!noSingleApplication) {
             QString argsMessage;
@@ -410,7 +410,7 @@ int qnMain(int argc, char *argv[])
             QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
         }
 
-    #ifdef STANDALONE_MODE
+#ifdef STANDALONE_MODE
         QnPlArecontResourceSearcher::instance().setLocal(true);
         QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
 
@@ -437,12 +437,11 @@ int qnMain(int argc, char *argv[])
 
         QnPlPulseSearcher::instance().setLocal(true);
         QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
-        
-    #endif
+#endif
 
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
     //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
-    #endif // Q_OS_WIN
+#endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
         qApp->setStyle(qnSkin->style());
@@ -476,9 +475,9 @@ int qnMain(int argc, char *argv[])
         if(!noSingleApplication)
             QObject::connect(application.data(), SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
-    #ifdef TEST_RTSP_SERVER
+#ifdef TEST_RTSP_SERVER
         addTestData();
-    #endif
+#endif
 
         if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
             QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
@@ -512,10 +511,10 @@ int qnMain(int argc, char *argv[])
             context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
         }
 
-    #ifdef _DEBUG
+#ifdef _DEBUG
         /* Show FPS in debug. */
         context->menu()->trigger(Qn::ShowFpsAction);
-    #endif
+#endif
 
         result = application->exec();
 

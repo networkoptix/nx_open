@@ -1067,7 +1067,7 @@ QByteArray combineV1LicenseBlock(const QString& name, const QString& serial, con
 		QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
 		QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
 		QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
-		QLatin1String("COUNT=") + count + QLatin1String("\n") +
+        QLatin1String("COUNT=") + QString::number(count) + QLatin1String("\n") +
 		QLatin1String("SIGNATURE=") + signature).toUtf8();
 }
 
@@ -1088,7 +1088,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QB
 	}
 
 	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
-	if (QnLicense(block).isValid(hardwareId)) {
+	if (QnLicense(block).isValid(oldHardwareId)) {
 		license = QnLicensePtr(new QnLicense(block));
 		return;
 	}
