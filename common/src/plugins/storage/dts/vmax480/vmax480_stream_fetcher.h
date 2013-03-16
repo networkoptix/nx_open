@@ -8,6 +8,7 @@
 #include "vmax480_tcp_server.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period_list.h"
+#include "plugins/resources/archive/playbackmask_helper.h"
 
 class VMaxStreamFetcherPtr;
 
@@ -23,6 +24,7 @@ public:
 
     virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
 };
+
 
 class QnVMax480ConnectionProcessor;
 
@@ -70,6 +72,7 @@ private:
     int getMaxQueueSize() const;
     bool safeOpen();
     qint64 findRoundTime(qint64 timeUsec, bool* dataFound) const;
+    void updatePlaybackMask();
 private:
     static const int OPEN_ALL = 0xffff;
 
@@ -99,6 +102,7 @@ private:
     QTime m_seekTimer;
     bool m_isPlaying;
     bool m_keepAllChannels;
+    QnPlaybackMaskHelper m_playbackMaskHelper;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

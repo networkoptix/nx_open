@@ -204,8 +204,11 @@ QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
 
 void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
-    m_reverseMode = value;
-    seek(displayTime, true);
+    if (m_reverseMode != value) {
+        m_reverseMode = value;
+        m_ignoreNextSeek = false;
+        seek(displayTime, true);
+    }
 }
 
 void QnVMax480ArchiveDelegate::calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep)

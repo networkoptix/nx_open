@@ -39,6 +39,14 @@ bool VMaxStreamFetcher::isOpened() const
     return m_vMaxProxy && !m_tcpID.isEmpty() && m_vmaxConnection && m_vmaxConnection->isRunning();
 }
 
+void VMaxStreamFetcher::updatePlaybackMask()
+{
+    QVector<QnTimePeriodList> allChunks;
+    for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
+        allChunks << itr.key()->chunks();
+    m_playbackMaskHelper.setPlaybackMask(QnTimePeriod::mergeTimePeriods(allChunks));
+}
+
 qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const
 {
     *dataFound = false;
@@ -266,6 +274,11 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     QTime t;
     t.restart();
 
+    qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);
+    if (newTime != mediaData->timestamp) {
+        if (newTime != DATETIME_NOW && newTime != -1)
+            m_vmaxConnection->vMaxArchivePlay(newTime, ++m_sequence, m_lastSpeed);
+    }
 
     bool needWait = false;
     int maxQueueSize = 0;
@@ -327,6 +340,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         m_vmaxConnection->vMaxAddChannel(1 << channel);
         m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
     }
+    updatePlaybackMask();
     return true;
 }
 
@@ -363,6 +377,8 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
             }
         }
     }
+
+    updatePlaybackMask();
 
     if (!m_dataConsumers.isEmpty() && !m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
     {
