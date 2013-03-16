@@ -461,8 +461,10 @@ bool VMaxStreamFetcher::safeOpen()
 {
     QMutexLocker lock(&m_mutex);
     if (!isOpened()) {
-        if (!vmaxConnect())
-            return false;
+        if (!vmaxConnect()) {
+            QnSleep::msleep(1000);
+            return false; // prevent reconnect flood
+        }
         if (!m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
             m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
     }
