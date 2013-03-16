@@ -269,6 +269,7 @@ struct QUuid;
 void serialize(const QUuid &value, QVariant *target);
 bool deserialize(const QVariant &value, QUuid *target);
 
+class QColor;
 void serialize(const QColor &value, QVariant *target);
 bool deserialize(const QVariant &value, QColor *target);
 
