@@ -21,7 +21,7 @@ QnX11Images::~QnX11Images() {
 }
 
 QCursor QnX11Images::bitmapCursor(Qt::CursorShape shape) const {
-    QApplication::setOverrideCursor(cursor);
+    QApplication::setOverrideCursor(shape);
     XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
     QApplication::restoreOverrideCursor();
     if(!xImage)
