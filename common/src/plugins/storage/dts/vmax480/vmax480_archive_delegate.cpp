@@ -89,6 +89,7 @@ qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 
 void QnVMax480ArchiveDelegate::close()
 {
+    m_noDataCounter = 0;
     m_needStop = true;
     if (m_isOpened) {
         m_maxStream->unregisterConsumer(this);
