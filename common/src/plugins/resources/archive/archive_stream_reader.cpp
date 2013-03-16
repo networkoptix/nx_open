@@ -694,7 +694,7 @@ begin_label:
                     m_nextData.clear();
                     if (tmp && tmp->dataType == QnAbstractMediaData::EMPTY_DATA)
                     {
-                        return createEmptyPacket(reverseMode); // EOF/BOF reached
+                        return tmp; //createEmptyPacket(reverseMode); // EOF/BOF reached
                     }
                 }
             }

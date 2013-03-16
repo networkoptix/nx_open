@@ -85,6 +85,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
     ++m_sequence;
     m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
+    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
 
     return true;
 }
@@ -298,8 +299,9 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
                 itr.value()->push(mediaData);
             }
             else if (ct - m_lastChannelTime[curChannel] > EMPTY_PACKET_REPEAT_INTERVAL && itr.value()->size() < 5) {
+                if (m_lastChannelTime[curChannel])
+                    itr.value()->push(createEmptyPacket(mediaData->timestamp /*+ EMPTY_PACKET_REPEAT_INTERVAL*sign(m_lastSpeed)*/ ));
                 m_lastChannelTime[curChannel] = ct;
-                itr.value()->push(createEmptyPacket(mediaData->timestamp /*+ EMPTY_PACKET_REPEAT_INTERVAL*sign(m_lastSpeed)*/ ));
             }
         }
     }
