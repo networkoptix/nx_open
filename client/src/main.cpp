@@ -328,7 +328,6 @@ int qnMain(int argc, char *argv[])
         application->setStartDragDistance(20);
 
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-        platform->images()->bitmapCursor(Qt::DragCopyCursor);
 
 #ifdef Q_WS_X11
      //   QnX11LauncherWorkaround x11LauncherWorkaround;
