@@ -1,7 +1,6 @@
 #ifndef QN_X11_IMAGES_H
 #define QN_X11_IMAGES_H
 
-#include <QtGui/QPixmap>
 #include "platform_images.h"
 
 class QnX11Images: public QnPlatformImages {

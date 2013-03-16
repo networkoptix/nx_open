@@ -2,7 +2,7 @@
 #define QN_PLATFORM_IMAGES_H
 
 #include <QtCore/QObject>
-#include <QtGui/QPixmap>
+#include <QtGui/QCursor>
 
 /**
  * The <tt>QnPlatformImages</tt> class is intended for access to platform's standard images.
