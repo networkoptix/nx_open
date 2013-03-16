@@ -17,7 +17,7 @@ public:
     QnGenericImages(QObject *parent = NULL);
     virtual ~QnGenericImages();
 
-    virtual QPixmap cursorImage(Qt::CursorShape shape) const;
+    virtual QCursor bitmapCursor(Qt::CursorShape shape) const override;
 };
 
 

@@ -1,7 +1,5 @@
 #include "images_unix.h"
 
-#ifdef Q_WS_X11
-
 #include <QtGui/QCursor>
 #include <QtGui/QPixmap>
 #include <QtGui/QX11Info>
@@ -19,16 +17,22 @@ QnX11Images::~QnX11Images() {
     return;
 }
 
-QPixmap QnX11Images::cursorImageInt(QCursor &cursor) const {
+QCursor QnX11Images::bitmapCursor(Qt::CursorShape shape) const {
     QApplication::setOverrideCursor(cursor);
-    XFixesCursorImage *xfcursorImage = XFixesGetCursorImage( QX11Info::display() );
+    XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
     QApplication::restoreOverrideCursor();
+    if(!xImage)
+        return QCursor(QPixmap());
 
-    QImage mouseCursor( (uchar*)xfcursorImage->pixels, xfcursorImage->width,xfcursorImage->height, QImage::Format_ARGB32_Premultiplied );
+    // TODO: #GDM xCursorImage->pixels is unsigned long *, and sizeof(unsigned long) is 8 on x64, but RGBA is always 4 bytes. 
+    // I'm somewhat confused about this, so please re-test that it works on x64.
+    QCursor result(
+        QPixmap::fromImage(QImage(reinterpret_cast<uchar *>(xImage->pixels), xImage->width, xImage->height, QImage::Format_ARGB32_Premultiplied)), 
+        xImage->xhot,
+        xImage->yhot
+    );
 
-    QPixmap pixmapCursor;
-    pixmapCursor.convertFromImage(mouseCursor);
-    return pixmapCursor;
+    XFree(xImage);
+    return result;
 }
 
-#endif

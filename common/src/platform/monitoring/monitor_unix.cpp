@@ -1,7 +1,5 @@
 #include "monitor_unix.h"
 
-#ifdef Q_OS_LINUX
-
 #include <QtCore/QHash>
 
 #include <time.h>
@@ -218,4 +216,3 @@ QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad() {
     return d_func()->totalHddLoad();
 }
 
-#endif

@@ -1,11 +1,8 @@
 #include "images_win.h"
 
-#ifdef Q_OS_WIN
-
 #include <Windows.h>
 
 namespace {
-
     /**
      * This functions is an exact copy of <tt>qt_fromWinHBITMAP</tt>
      * from <tt>qpixmap_win.cpp</tt> of Qt 4.7.4.
@@ -45,18 +42,23 @@ namespace {
 
     /**
      * The code is copied from <tt>QPixmap::fromWinHICON</tt>. Original code contained 
-     * a bug in bitmap size extimation, which is fixed in this version.
+     * a bug in bitmap size estimation, which is fixed in this version. 
      */
-    QPixmap QPixmap_fromWinHICON(HICON icon) {
+    QPixmap QPixmap_fromWinHICON(HICON icon, QPoint *hotSpot) {
         bool foundAlpha = false;
         HDC screenDevice = GetDC(0);
         HDC hdc = CreateCompatibleDC(screenDevice);
         ReleaseDC(0, screenDevice);
 
         ICONINFO iconinfo;
-        bool result = GetIconInfo(icon, &iconinfo);
-        if (!result)
-            qWarning("QPixmap::fromWinHICON(), failed to GetIconInfo()");
+        BOOL status = GetIconInfo(icon, &iconinfo);
+        if (!status)
+            qWarning("QPixmap_fromWinHICON(), failed to GetIconInfo()");
+
+        if(status && hotSpot) {
+            hotSpot->setX(iconinfo.xHotspot);
+            hotSpot->setY(iconinfo.yHotspot);
+        }
 
         int w = 0, h = 0;
         bool bwCursor = iconinfo.hbmColor == NULL;
@@ -78,7 +80,7 @@ namespace {
         bitmapInfo.biYPelsPerMeter = 0;
         bitmapInfo.biClrUsed       = 0;
         bitmapInfo.biClrImportant  = 0;
-        DWORD* bits;
+        DWORD *bits;
 
         HBITMAP winBitmap = CreateDIBSection(hdc, (BITMAPINFO*)&bitmapInfo, DIB_RGB_COLORS, (VOID**)&bits, NULL, 0);
         HGDIOBJ oldhdc = (HBITMAP)SelectObject(hdc, winBitmap);
@@ -118,6 +120,7 @@ namespace {
         SelectObject(hdc, oldhdc); //restore state
         DeleteObject(winBitmap);
         DeleteDC(hdc);
+        
         return QPixmap::fromImage(image);
     }
 
@@ -132,134 +135,15 @@ QnWindowsImages::~QnWindowsImages() {
     return;
 }
 
-QPixmap QnWindowsImages::cursorImage(Qt::CursorShape shape) const {
-
+QCursor QnWindowsImages::bitmapCursor(Qt::CursorShape shape) const {
     QCursor cursor(shape);
     HCURSOR handle = cursor.handle();
+    // TODO: There is a bug in Qt 4.7.4 that results in drag cursors returning NULL handle. We don't care.
 
-    QPixmap result = QPixmap_fromWinHICON(handle);
+    QPoint hotSpot;
+    QPixmap pixmap = QPixmap_fromWinHICON(handle, &hotSpot);
 
-    
-    QDialog *d = new QDialog();
-  
-    QLabel *label = new QLabel();
-    label->setPixmap(result);
-
-    d->exec();
-
-    /*PICONINFOEXW iconInfo;
-    iconInfo.cbSize = sizeof(iconInfo);
-
-    if(!GetIconInfoExW(handle, &iconInfo))
-        return QPixmap();
-
-    QPixmap result = QPixmap::fromWinHICON();
-
-    DeleteObject(iconInfo.hbmColor);
-    DeleteObject(iconInfo.hbmMask);*/
-
-    return QPixmap();
-
-#if 0
-    HICON hicon;
-    ICONINFO icInfo;
-
-    CURSORINFO ci;
-    ci.cbSize = sizeof(ci);
-
-    if(GetCursorInfo(out ci))
-    {
-        if (ci.flags == Win32Stuff.CURSOR_SHOWING)
-        { 
-            hicon = Win32Stuff.CopyIcon(ci.hCursor);
-            if(Win32Stuff.GetIconInfo(hicon, out icInfo))
-            {
-                x = ci.ptScreenPos.x - ((int)icInfo.xHotspot);
-                y = ci.ptScreenPos.y - ((int)icInfo.yHotspot);
-                Icon ic = Icon.FromHandle(hicon);
-                bmp = ic.ToBitmap(); 
-
-                return bmp;
-            }
-        }
-    }
-    return null;
-#endif
-
-#if 0
-    if (shape == Qt::WhatsThisCursor) {
-        QCursor cursor(shape);
-        return QPixmap::fromWinHICON(cursor.handle());
-    }
-
-    HBITMAP hbitmap;
-    BITMAP bitmap;
-    HDC hdcScreen = GetDC(NULL);
-    HDC hdcMem = CreateCompatibleDC(hdcScreen);
-
-    CURSORINFO cursorInfo = { 0 };
-    cursorInfo.cbSize = sizeof(cursorInfo);
-
-    GetCursorInfo(&cursorInfo);
-
-    ICONINFO ii = {0};
-    GetIconInfo(cursorInfo.hCursor, &ii);
-
-    hbitmap = ii.hbmColor;
-
-    SelectObject(hdcMem, hbitmap);
-    GetObject(hbitmap, sizeof(BITMAP), &bitmap);
-
-
-    int w = bitmap.bmWidth;
-    int h = bitmap.bmHeight;
-
-    BITMAPINFO bmi;
-    memset(&bmi, 0, sizeof(bmi));
-    bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth       = w;
-    bmi.bmiHeader.biHeight      = -h;
-    bmi.bmiHeader.biPlanes      = 1;
-    bmi.bmiHeader.biBitCount    = 32;
-    bmi.bmiHeader.biCompression = BI_RGB;
-    bmi.bmiHeader.biSizeImage   = w * h * 4;
-    uchar *data = (uchar *) qMalloc(bmi.bmiHeader.biSizeImage);
-
-    GetDIBits(hdcMem, hbitmap, 0, h, data, &bmi, DIB_RGB_COLORS);
-    QImage::Format imageFormat = QImage::Format_ARGB32_Premultiplied;
-    uint mask = 0;
-//    if (format == NoAlpha) {
-        imageFormat = QImage::Format_RGB32;
-        mask = 0xff000000;
-//    }
-
-    QImage result;
-    // Create image and copy data into image.
-    QImage image(w, h, imageFormat);
-    if (!image.isNull()) { // failed to alloc?
-        int bytes_per_line = w * sizeof(QRgb);
-        for (int y=0; y<h; ++y) {
-            QRgb *dest = (QRgb *) image.scanLine(y);
-            const QRgb *src = (const QRgb *) (data + y * bytes_per_line);
-            for (int x=0; x<w; ++x) {
-                const uint pixel = src[x];
-                if ((pixel & 0xff000000) == 0 && (pixel & 0x00ffffff) != 0)
-                    dest[x] = pixel | 0xff000000;
-                else
-                    dest[x] = pixel | mask;
-            }
-        }
-    }
-    result = image;
-    ReleaseDC(0, hdcScreen);
-
-    return QPixmap::fromImage(result);
-
-    //QCursor cursor(shape);
-   // return QPixmap::fromWinHICON(cursor.handle());
-//     return QPixmap::fromWinHBITMAP(hbitmap);
-#endif
+    return QCursor(pixmap, hotSpot.x(), hotSpot.y());
 }
 
 
-#endif

@@ -5,7 +5,7 @@
 #include <QtGui/QPixmap>
 
 /**
- * @brief The QnPlatformImages class is intended for access to platform's standard images
+ * The <tt>QnPlatformImages</tt> class is intended for access to platform's standard images.
  */
 class QnPlatformImages: public QObject {
     Q_OBJECT
@@ -15,7 +15,18 @@ public:
 
     static QnPlatformImages *newInstance(QObject *parent = NULL);
 
-    virtual QPixmap cursorImage(Qt::CursorShape shape) const = 0;
+    /**
+     * This function creates a bitmap cursor for the given cursor shape.
+     * The result differs from a cursor constructed directly in that its
+     * pixmap and hot spot are valid and can be accessed.
+     *
+     * \param shape                     Standard cursor shape.
+     * \returns                         Bitmap cursor for the given standard 
+     *                                  cursor shape, or bitmap cursor with a 
+     *                                  null pixmap in case of an error.
+     */
+    virtual QCursor bitmapCursor(Qt::CursorShape shape) const = 0;
+
 private:
     Q_DISABLE_COPY(QnPlatformImages)
 };

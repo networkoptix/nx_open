@@ -1,9 +1,6 @@
 #ifndef QN_WINDOWS_NOTIFIER_H
 #define QN_WINDOWS_NOTIFIER_H
 
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
 #include "platform_notifier.h"
 
 class QnWindowsNotifier: public QnPlatformNotifier {
@@ -23,7 +20,5 @@ private:
 private:
     qint64 m_timeZoneOffset;
 };
-
-#endif // Q_OS_WIN
 
 #endif // QN_WINDOWS_NOTIFIER_H

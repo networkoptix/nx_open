@@ -1,9 +1,6 @@
 #ifndef QN_WINDOWS_MONITOR_H
 #define QN_WINDOWS_MONITOR_H
 
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
 #include "sigar_monitor.h"
 
 class QnWindowsMonitorPrivate;
@@ -23,7 +20,5 @@ private:
     Q_DECLARE_PRIVATE(QnWindowsMonitor);
     QScopedPointer<QnWindowsMonitorPrivate> d_ptr;
 };
-
-#endif // Q_OS_WIN
 
 #endif // QN_WINDOWS_MONITOR_H
