@@ -13,6 +13,12 @@ QMutex VMaxStreamFetcher::m_instMutex;
 QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
 
 
+void VMaxStreamFetcher::initPacketTime()
+{
+    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
+    m_emptyPacketTime = 0;
+}
+
 VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_vMaxProxy(0),
     m_vmaxConnection(0),
@@ -26,7 +32,7 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_keepAllChannels(false)
 {
     m_res = dev.dynamicCast<QnNetworkResource>();
-    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
+    initPacketTime();
 }
 
 VMaxStreamFetcher::~VMaxStreamFetcher()
@@ -93,8 +99,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
     ++m_sequence;
     m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
-    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
-
+    initPacketTime();
     return true;
 }
 
@@ -166,7 +171,7 @@ bool VMaxStreamFetcher::vmaxConnect()
 
 void VMaxStreamFetcher::vmaxDisconnect()
 {
-    memset(m_lastChannelTime, 0, sizeof(m_lastChannelTime));
+    initPacketTime();
     if (m_vmaxConnection) {
         m_vmaxConnection->vMaxDisconnect();
         delete m_vmaxConnection;
@@ -268,6 +273,12 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     mediaData->opaque = 0;
     m_lastMediaTime = mediaData->timestamp;
+    if (m_emptyPacketTime == 0)
+        m_emptyPacketTime = m_lastMediaTime;
+    else if (m_lastSpeed >= 0)
+        m_emptyPacketTime = qMax(m_emptyPacketTime, m_lastMediaTime);
+    else
+        m_emptyPacketTime = qMin(m_emptyPacketTime, m_lastMediaTime);
 
     int ch = mediaData->channelNumber & 0xff;
 
@@ -312,8 +323,8 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
                 itr.value()->push(mediaData);
             }
             else if (ct - m_lastChannelTime[curChannel] > EMPTY_PACKET_REPEAT_INTERVAL && itr.value()->size() < 5) {
-                if (m_lastChannelTime[curChannel])
-                    itr.value()->push(createEmptyPacket(mediaData->timestamp /*+ EMPTY_PACKET_REPEAT_INTERVAL*sign(m_lastSpeed)*/ ));
+                if (m_lastChannelTime[curChannel]) 
+                    itr.value()->push(createEmptyPacket(m_emptyPacketTime));
                 m_lastChannelTime[curChannel] = ct;
             }
         }

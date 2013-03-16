@@ -73,6 +73,7 @@ private:
     bool safeOpen();
     qint64 findRoundTime(qint64 timeUsec, bool* dataFound) const;
     void updatePlaybackMask();
+    void initPacketTime();
 private:
     static const int OPEN_ALL = 0xffff;
 
@@ -95,6 +96,7 @@ private:
     int m_sequence;
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;
+    qint64 m_emptyPacketTime;
     bool m_streamPaused;
     int m_lastSpeed;
     qint64 m_lastSeekPos;
