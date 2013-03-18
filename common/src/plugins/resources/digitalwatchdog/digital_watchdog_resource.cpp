@@ -85,6 +85,8 @@ bool QnPlWatchDogResource::initInternal()
         speedX *= -1.0;
     if(data.contains("flipmode1: 1"))
         speedY *= -1.0;
+    if(data.contains("mirrormode1: 1"))
+        speedX *= -1.0;
     if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) 
     {
         QMatrix4x4 transform;
