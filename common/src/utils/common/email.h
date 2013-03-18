@@ -3,8 +3,11 @@
 
 #include <QString>
 #include <QStringList>
+#include <QtCore/QMetaType>
 
 #include <api/model/kvpair.h>
+
+#include <utils/common/json.h>
 
 class QnEmail {
 public:
@@ -60,12 +63,37 @@ public:
     static int defaultPort(ConnectionType connectionType);
 
     bool isValid() const;
+
+    /**
+     * @brief smtpServer        This function should be called only from GUI thread
+     *                          because it may call initSmtpPresets().
+     * @return                  Corresponding smtp server preset if exists.
+     */
     SmtpServerPreset smtpServer() const;
+
     Settings settings() const;
     QString domain() const;
 private:
+    /**
+     * @brief initSmtpPresets   This function should be called only from GUI thread
+     *                          because sync checks are not implemented.
+     */
+    void initSmtpPresets() const;
+
     QString m_email;
 };
+
+inline void serialize(const QnEmail::ConnectionType &value, QVariant *target) {
+    *target = (int)value;
+}
+
+inline bool deserialize(const QVariant &value, QnEmail::ConnectionType *target) {
+    *target = (QnEmail::ConnectionType)value.toInt();
+    return true;
+}
+
+Q_DECLARE_METATYPE(QnEmail::SmtpServerPreset)
+QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port), inline)
 
 
 #endif // EMAIL_H
