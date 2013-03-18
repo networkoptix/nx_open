@@ -38,7 +38,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     ui->camerasTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
     ui->camerasTable->horizontalHeader()->setResizeMode(ManufColumn, QHeaderView::ResizeToContents);
     ui->camerasTable->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::ResizeToContents);
-    ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::ResizeToContents);
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),    this, SLOT(at_startIPLineEdit_editingFinished()));
@@ -65,6 +64,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     setWarningStyle(ui->validateLabelSearch);
 
     updateSubnetMode();
+    fillTable(QnCamerasFoundInfoList());
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -99,6 +99,11 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, NameColumn, nameItem);
         ui->camerasTable->setItem(row, UrlColumn, urlItem);
     }
+
+    if (ui->camerasTable->rowCount() > 0)
+        ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::ResizeToContents);
+    else
+        ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::Stretch);
 }
 
 void QnCameraAdditionDialog::removeAddedCameras(){
