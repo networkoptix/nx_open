@@ -630,7 +630,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     if(m_currentWidget) {
         if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
             foreach(QnResourceWidget *widget, m_syncedWidgets)
-                updateItemDataFromSlider(widget); //TODO: #GDM may be it should be done at every selection change? ask #elrik
+                updateItemDataFromSlider(widget); //TODO: #GDM ask #elric: should it be done at every selection change?
         else
             updateItemDataFromSlider(m_currentWidget);
     } else {

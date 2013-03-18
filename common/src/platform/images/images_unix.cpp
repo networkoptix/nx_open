@@ -27,42 +27,42 @@ QCursor QnX11Images::bitmapCursor(Qt::CursorShape shape) const {
     if(!xImage)
         return QCursor(QPixmap());
 
-    uchar* cursor_data;
-    bool free_cursor_data;
+    uchar* cursorData;
+    bool freeCursorData;
 
     /* Like all X APIs, XFixesGetCursorImage() returns arrays of 32-bit
      * quantities as arrays of long; we need to convert on 64 bit */
     if (sizeof(long) == 4) {
-        cursor_data = reinterpret_cast<uchar *>(xImage->pixels);
-        free_cursor_data = false;
+        cursorData = reinterpret_cast<uchar *>(xImage->pixels);
+        freeCursorData = false;
     }
     else
     {
         int i, j;
-        quint32 *cursor_words;
+        quint32 *cursorWords;
         ulong *p;
         quint32 *q;
 
-        cursor_words = new quint32[xImage->width * xImage->height];
-        cursor_data = (uchar *)cursor_words;
+        cursorWords = new quint32[xImage->width * xImage->height];
+        cursorData = (uchar *)cursorWords;
 
         p = xImage->pixels;
-        q = cursor_words;
+        q = cursorWords;
         for (j = 0; j < xImage->height; j++)
             for (i = 0; i < xImage->width; i++)
                 *(q++) = *(p++);
 
-        free_cursor_data = true;
+        freeCursorData = true;
     }
 
     QCursor result(
-        QPixmap::fromImage(QImage(cursor_data, xImage->width, xImage->height, QImage::Format_ARGB32_Premultiplied)),
+        QPixmap::fromImage(QImage(cursorData, xImage->width, xImage->height, QImage::Format_ARGB32_Premultiplied)),
         xImage->xhot,
         xImage->yhot
     );
 
-    if (free_cursor_data)
-        delete [] cursor_data;
+    if (freeCursorData)
+        delete [] cursorData;
 
     XFree(xImage);
     return result;

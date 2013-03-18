@@ -8,7 +8,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
-//TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
