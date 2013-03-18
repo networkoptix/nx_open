@@ -79,7 +79,7 @@ namespace QJson_detail {
     }
 
     template<class T, class Map>
-    void deserialize_string_map(const QVariant &value, Map *target) {
+    bool deserialize_string_map(const QVariant &value, Map *target) {
         if(value.type() != QVariant::Map)
             return false;
 
@@ -111,7 +111,7 @@ namespace QJson_detail {
     }
 
     template<class T, class Map>
-    void deserialize_any_map(const QVariant &value, Map *target) {
+    bool deserialize_any_map(const QVariant &value, Map *target) {
         if(value.type() != QVariant::List)
             return false;
 
