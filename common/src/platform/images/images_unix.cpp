@@ -27,13 +27,42 @@ QCursor QnX11Images::bitmapCursor(Qt::CursorShape shape) const {
     if(!xImage)
         return QCursor(QPixmap());
 
-    // TODO: #GDM xCursorImage->pixels is unsigned long *, and sizeof(unsigned long) is 8 on x64, but RGBA is always 4 bytes. 
-    // I'm somewhat confused about this, so please re-test that it works on x64.
+    uchar* cursor_data;
+    bool free_cursor_data;
+
+    /* Like all X APIs, XFixesGetCursorImage() returns arrays of 32-bit
+     * quantities as arrays of long; we need to convert on 64 bit */
+    if (sizeof(long) == 4) {
+        cursor_data = reinterpret_cast<uchar *>(xImage->pixels);
+        free_cursor_data = false;
+    }
+    else
+    {
+        int i, j;
+        quint32 *cursor_words;
+        ulong *p;
+        quint32 *q;
+
+        cursor_words = new quint32[xImage->width * xImage->height];
+        cursor_data = (uchar *)cursor_words;
+
+        p = xImage->pixels;
+        q = cursor_words;
+        for (j = 0; j < xImage->height; j++)
+            for (i = 0; i < xImage->width; i++)
+                *(q++) = *(p++);
+
+        free_cursor_data = true;
+    }
+
     QCursor result(
-        QPixmap::fromImage(QImage(reinterpret_cast<uchar *>(xImage->pixels), xImage->width, xImage->height, QImage::Format_ARGB32_Premultiplied)), 
+        QPixmap::fromImage(QImage(cursor_data, xImage->width, xImage->height, QImage::Format_ARGB32_Premultiplied)),
         xImage->xhot,
         xImage->yhot
     );
+
+    if (free_cursor_data)
+        delete [] cursor_data;
 
     XFree(xImage);
     return result;
