@@ -898,20 +898,20 @@
 								</Component>
 							
 								<Directory Id="styles_1_4" Name="styles">
-									<Component Id="bespin_1_4" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
+									<Component Id="bespin_1_4" Guid="{54b3dc36-52e5-4185-9f89-05e61cec5b94}">
 										<File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
 									</Component>
 								</Directory>
 
 								<Directory Id="ImageFormats_1_4" Name="imageformats">
-									<Component Id="ImageFormats_1_4" Guid="{74793EF7-61C1-4e9c-81D6-A120E85D984F}">
+									<Component Id="ImageFormats_1_4" Guid="{0df00b7f-00f1-4e01-a552-c8cb4056b989}">
 										<File Id="qgif4.dll_1_4" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
 										<File Id="qjpeg4.dll_1_4" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
 										<File Id="qtiff4.dll_1_4" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
 									</Component>
 								</Directory>							
 
-								<Component Id="ClientFFmpegLibraries_1_4" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
+								<Component Id="ClientFFmpegLibraries_1_4" Guid="{cde99ce0-fd22-444b-9470-723bd31e6b19}">
 									<File Id="ClientAvcodecDll_1_4" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
 									<File Id="ClientAvdeviceDll_1_4" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
 									<File Id="ClientAvfilterDll_1_4" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
@@ -925,7 +925,7 @@
 									<File Id="ClientX264_1_4" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
 								</Component>							
 
-								<Component Id="ClientQTLibraries_1_4" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
+								<Component Id="ClientQTLibraries_1_4" Guid="{79233909-d581-4262-a047-6e663776d1bf}">
 									<File Id="ClientQtCore$(var.suffix)4.dll_1_4" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
 									<File Id="ClientQtGui$(var.suffix)4.dll_1_4" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
 									<File Id="ClientQtMultimedia$(var.suffix)4.dll_1_4" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
@@ -934,21 +934,21 @@
 									<File Id="ClientQtXml$(var.suffix)4.dll_1_4" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
 								</Component>
 
-								<Component Id="ClientOpenAL_1_4" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
+								<Component Id="ClientOpenAL_1_4" Guid="{eb004356-7e18-4d80-a014-b17d580bf32d}">
 									<File Id="OpenAL32.dll_1_4" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
 									<File Id="wrap_oal.dll_1_4" Name="wrap_oal.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
 								</Component>
 
-								<Component Id="ClientOpenSSL_1_4" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
+								<Component Id="ClientOpenSSL_1_4" Guid="{128cbf33-c061-4785-a5f4-4af387473db8}">
 									<File Id="Clientlibeay32.dll_1_4" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
 									<File Id="Clientssleay32.dll_1_4" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 								</Component>						
 
-								<Component Id="ClientSigar_1_4" Guid="{B2CBBF7C-55F2-4c8a-89A6-2F9053BC4E7B}">
+								<Component Id="ClientSigar_1_4" Guid="{fef67ee8-329a-4e22-9b47-ee4a542f59d2}">
 									<File Id="ClientSigar.dll_1_4" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
 								</Component>
 
-								<Component Id="ClientQtColorPicker_1_4" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
+								<Component Id="ClientQtColorPicker_1_4" Guid="{88ab6ad3-22b2-4f12-845a-536543c2fd6a}">
 									<File Id="ColorPicker26$(var.suffix).dll_1_4" Name="QtSolutions_ColorPicker-2.6$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
 								</Component>
 							</Directory>							
