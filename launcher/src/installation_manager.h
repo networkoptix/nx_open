@@ -38,6 +38,15 @@ public:
     struct AppData
     {
         QString installationDirectory;
+
+        AppData()
+        {
+        }
+        AppData( const QString& _installationDirectory )
+        :
+            installationDirectory( _installationDirectory )
+        {
+        }
     };
 
     InstallationManager( QObject* const parent = NULL );

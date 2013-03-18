@@ -6,6 +6,8 @@
 
 #include <cstdlib>
 
+#include <QDir>
+
 #include <utils/common/log.h>
 
 #include "version.h"
@@ -130,6 +132,7 @@ void InstallationManager::readInstalledVersions()
     for( int i = 0; i < entries.size(); ++i )
     { 
         //each entry - is a version
+        m_installedProductsByVersion.insert( std::make_pair( entries[i], AppData(QString::fromLatin1("%1/%2").arg(productRootInstallDir).arg(entries[i])) ) );
     }
 }
 
