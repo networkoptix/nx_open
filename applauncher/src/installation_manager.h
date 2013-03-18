@@ -10,21 +10,6 @@
 #include <QObject>
 
 
-class ApplicationVersionData
-{
-public:
-    //!e.g. 1.4.3
-    QString version;
-    //!x86/x64
-    QString arch;
-    //!windows/linux
-    QString platform;
-
-    QString toString() const;
-
-    static ApplicationVersionData fromString( const QString& );
-};
-
 class InstallationManager
 :
     public QObject
@@ -52,12 +37,12 @@ public:
     InstallationManager( QObject* const parent = NULL );
 
     int count() const;
-    ApplicationVersionData getMostRecentVersion() const;
-    bool isVersionInstalled( const ApplicationVersionData& version ) const;
+    QString getMostRecentVersion() const;
+    bool isVersionInstalled( const QString& version ) const;
     /*!
         \return false, if \a version not found. Otherwise, true and \a *appData filled
     */
-    bool getInstalledVersionData( const ApplicationVersionData& version, AppData* const appData ) const;
+    bool getInstalledVersionData( const QString& version, AppData* const appData ) const;
     //!installs package \a packagePath
     /*!
         If error occured, false is returned and \a errorString() returns error description

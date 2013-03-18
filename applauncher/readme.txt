@@ -6,7 +6,7 @@ Accepts tasks from clients and other launcher instances via named pipe.
 Task has following format:
 
     run\n
-    1.4.3-win32-x86\n
+    1.4.3\n
     -e --log-level=DEBUG\n
     \n
     

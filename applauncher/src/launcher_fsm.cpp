@@ -187,8 +187,7 @@ bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* c
     }
     else if( m_installationManager.count() > 0 )
     {
-        const ApplicationVersionData& appVersionData = m_installationManager.getMostRecentVersion();
-        *versionToLaunch = appVersionData.toString();
+        *versionToLaunch = m_installationManager.getMostRecentVersion();
         //leaving default cmd params
     }
     else
