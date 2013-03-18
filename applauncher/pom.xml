@@ -16,12 +16,12 @@
 	<groupId>com.networkoptix.hdwitness</groupId>
 	<version>1.4.3-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>launcher</artifactId>
+	<artifactId>applauncher</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Launcher</name>    
 
 	<properties>
-		<product.title>${launcher.name}</product.title>  
+		<product.title>${applauncher.name}</product.title>  
         <!--Global libs-->		
 		<global.libs></global.libs>
 		<!--Specific os libs used-->
