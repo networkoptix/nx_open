@@ -15,7 +15,7 @@ LauncherCommonData::LauncherCommonData( const InstallationManager& installationM
 
 bool LauncherCommonData::isRequiredVersionInstalled() const
 {
-    return m_installationManager.isVersionInstalled( ApplicationVersionData::fromString(currentTask.version) );
+    return m_installationManager.isVersionInstalled( currentTask.version );
 }
 
 bool LauncherCommonData::areThereAnyVersionInstalledBesidesJustTriedOne() const

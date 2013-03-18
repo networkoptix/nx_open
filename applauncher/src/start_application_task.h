@@ -12,7 +12,7 @@
 class StartApplicationTask
 {
 public:
-    //!Version in serialized format (as returned by ApplicationVersionData::toString)
+    //!Version in serialized format (e.g., 1.4.3)
     QString version;
     //!Command-line params to pass to application instance
     QString appArgs;

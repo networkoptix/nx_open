@@ -15,18 +15,6 @@
 
 //static const QLatin1String packageConfigurationFileName( "install.xml" );
 
-QString ApplicationVersionData::toString() const
-{
-    return version+"-"+platform+"-"+arch;
-}
-
-ApplicationVersionData ApplicationVersionData::fromString( const QString& str )
-{
-    //TODO/IMPL
-    return ApplicationVersionData();
-}
-
-
 InstallationManager::InstallationManager( QObject* const parent )
 :
     QObject( parent )
@@ -35,28 +23,29 @@ InstallationManager::InstallationManager( QObject* const parent )
 
 int InstallationManager::count() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_installedProductsByVersion.size();
 }
 
-ApplicationVersionData InstallationManager::getMostRecentVersion() const
+QString InstallationManager::getMostRecentVersion() const
 {
-    //TODO/IMPL
-    return ApplicationVersionData();
+    //TODO/IMPL numeric sorting of versions is required
+    return m_installedProductsByVersion.empty() ? QString() : m_installedProductsByVersion.begin()->first;
 }
 
-bool InstallationManager::isVersionInstalled( const ApplicationVersionData& version ) const
+bool InstallationManager::isVersionInstalled( const QString& version ) const
 {
-    //TODO/IMPL
-    return false;
+    return m_installedProductsByVersion.find(version) != m_installedProductsByVersion.end();
 }
 
 bool InstallationManager::getInstalledVersionData(
-    const ApplicationVersionData& version,
+    const QString& version,
     InstallationManager::AppData* const appData ) const
 {
-    //TODO/IMPL
-    return false;
+    std::map<QString, AppData>::const_iterator it = m_installedProductsByVersion.find(version);
+    if( it == m_installedProductsByVersion.end() )
+        return false;
+    *appData = it->second;
+    return true;
 }
 
 bool InstallationManager::install( const QString& packagePath )
@@ -130,7 +119,7 @@ void InstallationManager::readInstalledVersions()
     const QString& productRootInstallDir = QString::fromLatin1("%1/%2").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME));
     const QStringList& entries = QDir(productRootInstallDir).entryList( QDir::Dirs );
     for( int i = 0; i < entries.size(); ++i )
-    { 
+    {
         //each entry - is a version
         m_installedProductsByVersion.insert( std::make_pair( entries[i], AppData(QString::fromLatin1("%1/%2").arg(productRootInstallDir).arg(entries[i])) ) );
     }
