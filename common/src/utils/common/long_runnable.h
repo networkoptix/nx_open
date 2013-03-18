@@ -3,11 +3,9 @@
 
 #include "config.h" 
 
-#include <cassert>
-#include <typeinfo>
-
 #include <QtCore/QThread>
 #include <QtCore/QSemaphore>
+#include <QtCore/QSharedPointer>
 
 #include "singleton.h"
 

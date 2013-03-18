@@ -1,6 +1,11 @@
 #include "long_runnable.h"
 
 #include <cassert>
+#include <typeinfo>
+
+#include <QtCore/QSet>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 
 // -------------------------------------------------------------------------- //
@@ -192,6 +197,7 @@ void QnLongRunnable::at_finished() {
     if(m_pool)
         m_pool->finishedNotify(this);
 }
+
 
 
 
