@@ -16,6 +16,9 @@ class UserChoosesWhatToLaunch
 
 public:
     UserChoosesWhatToLaunch( QState* const parent );
+
+signals:
+    void cancelled();
 };
 
 #endif  //USER_CHOOSES_WHAT_TO_LAUNCH_H

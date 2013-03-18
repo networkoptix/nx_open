@@ -23,6 +23,9 @@ public:
         const LauncherCommonData& launcherCommonData,
         InstallationManager* const installationManager );
 
+public slots:
+    void prepareResultMessage();
+
 signals:
     void succeeded();
     void failed();

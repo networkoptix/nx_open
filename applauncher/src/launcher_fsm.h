@@ -14,6 +14,7 @@
 #include "installation_manager.h"
 #include "launcher_common_data.h"
 #include "task_server.h"
+#include "task_queue_watcher.h"
 
 
 class LauncherFSM
@@ -49,13 +50,14 @@ private:
     QSettings m_settings;
     int m_bindTriesCount;
     QLocalSocket::LocalSocketError m_previousAddTaskToPipeOperationResult;
+    TaskQueueWatcher m_taskQueueWatcher;
 
     void initFSM();
 
 private slots:
     void onBindingToLocalAddressEntered();
     void onAddingTaskToNamedPipeEntered();
-    void addTaskToTheQueue();
+    bool addTaskToTheQueue();
     bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );
 };
 

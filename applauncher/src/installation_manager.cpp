@@ -19,6 +19,7 @@ InstallationManager::InstallationManager( QObject* const parent )
 :
     QObject( parent )
 {
+    readInstalledVersions();
 }
 
 int InstallationManager::count() const
@@ -121,6 +122,8 @@ void InstallationManager::readInstalledVersions()
     for( int i = 0; i < entries.size(); ++i )
     {
         //each entry - is a version
+        if( entries[i] == QLatin1String(".") || entries[i] == QLatin1String("..") )
+            continue;
         m_installedProductsByVersion.insert( std::make_pair( entries[i], AppData(QString::fromLatin1("%1/%2").arg(productRootInstallDir).arg(entries[i])) ) );
     }
 }

@@ -30,6 +30,10 @@ public:
         LauncherCommonData* const fsmSharedData,
         BlockingQueue<StartApplicationTask>* const taskQueue );
 
+protected:
+    virtual void onEntry( QEvent* _event ) override;
+    virtual void onExit( QEvent* _event ) override;
+
 private:
     QSettings* const m_settings;
     InstallationManager* const m_installationManager;

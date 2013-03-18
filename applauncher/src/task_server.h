@@ -5,8 +5,11 @@
 #ifndef TASK_SERVER_H
 #define TASK_SERVER_H
 
+#include <memory>
+
 #include <QObject>
 #include <QLocalServer>
+#include <QSystemSemaphore>
 
 #include "start_application_task.h"
 #include "blocking_queue.h"
@@ -36,6 +39,7 @@ signals:
 private:
     BlockingQueue<StartApplicationTask>* const m_taskQueue;
     QLocalServer m_server;
+    std::auto_ptr<QSystemSemaphore> m_sema;
 
 private slots:
     void onNewConnection();

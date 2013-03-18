@@ -24,6 +24,11 @@ InstallingApplication::InstallingApplication(
 {
 }
 
+void InstallingApplication::prepareResultMessage()
+{
+    //TODO/IMPL
+}
+
 void InstallingApplication::onEntry( QEvent* _event )
 {
     QState::onEntry( _event );

@@ -10,3 +10,8 @@ Downloading::Downloading( QState* const parent )
     QState( parent )
 {
 }
+
+void Downloading::prepareResultMessage()
+{
+    //TODO/IMPL
+}

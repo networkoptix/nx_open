@@ -6,6 +6,8 @@
 
 #include <QFinalState>
 
+#include <utils/common/log.h>
+
 #include "custom_transition.h"
 #include "state/analyzing_stop_task_in_queue.h"
 #include "state/download_setup.h"
@@ -31,6 +33,16 @@ ProcessingApplicationTask::ProcessingApplicationTask(
     m_taskQueue( taskQueue )
 {
     initFsm();
+}
+
+void ProcessingApplicationTask::onEntry( QEvent* /*event*/ )
+{
+    NX_LOG( QString::fromLatin1("ProcessingApplicationTask entered"), cl_logDEBUG1 );
+}
+
+void ProcessingApplicationTask::onExit( QEvent* /*event*/ )
+{
+    NX_LOG( QString::fromLatin1("ProcessingApplicationTask exited"), cl_logDEBUG1 );
 }
 
 void ProcessingApplicationTask::initFsm()
@@ -123,7 +135,7 @@ void ProcessingApplicationTask::initFsm()
             new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", false) ) );
 
         //from criticalErrorMessage
-    criticalErrorMessage->addTransition( this, SIGNAL(ok()), finalState );
+    criticalErrorMessage->addTransition( criticalErrorMessage, SIGNAL(ok()), finalState );
 
         //from installingApplication
     installingApplication->addTransition( installingApplication, SIGNAL(succeeded()), launchingApplication );

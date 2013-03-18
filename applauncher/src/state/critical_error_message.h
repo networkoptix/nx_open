@@ -16,6 +16,9 @@ class CriticalErrorMessage
 
 public:
     CriticalErrorMessage( QState* const parent );
+
+signals:
+    void ok();
 };
 
 #endif  //CRITICAL_ERROR_MESSAGE_H

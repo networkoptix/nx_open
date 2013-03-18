@@ -16,6 +16,9 @@ class DownloadSetup
 
 public:
     DownloadSetup( QState* const parent );
+
+signals:
+    void ok();
 };
 
 #endif  //DOWNLOAD_SETUP_H

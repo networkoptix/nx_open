@@ -22,9 +22,11 @@ LauncherFSM::LauncherFSM()
     m_taskServer( &m_taskQueue ),
     m_settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ),
     m_bindTriesCount( 0 ),
-    m_previousAddTaskToPipeOperationResult( QLocalSocket::UnknownSocketError )
+    m_previousAddTaskToPipeOperationResult( QLocalSocket::UnknownSocketError ),
+    m_taskQueueWatcher( &m_taskQueue )
 {
     initFSM();
+    m_taskQueueWatcher.start();
 }
 
 bool LauncherFSM::isTaskQueueEmpty() const
@@ -54,6 +56,8 @@ void LauncherFSM::initFSM()
     connect( addingTaskToNamedPipe, SIGNAL(entered()), this, SLOT(onAddingTaskToNamedPipeEntered()) );
 
     QState* waitingForTaskQueueBecomeNonEmpty = new QState( this );
+    connect( waitingForTaskQueueBecomeNonEmpty, SIGNAL(entered()), &m_taskQueueWatcher, SLOT(startMonitoring()) );
+    connect( waitingForTaskQueueBecomeNonEmpty, SIGNAL(exited()), &m_taskQueueWatcher, SLOT(stopMonitoring()) );
 
     ProcessingApplicationTask* processingApplicationTask = new ProcessingApplicationTask(
         this,
@@ -101,7 +105,7 @@ void LauncherFSM::initFSM()
 
     //from waitingForTaskQueueBecomeNonEmpty
     waitingForTaskQueueBecomeNonEmpty->addTransition(
-        &m_taskServer,
+        &m_taskQueueWatcher,
         SIGNAL(taskReceived()),
         processingApplicationTask );
 
@@ -140,17 +144,24 @@ void LauncherFSM::onBindingToLocalAddressEntered()
 void LauncherFSM::onAddingTaskToNamedPipeEntered()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
+    qDebug()<<"Entered AddingTaskToNamedPipe";
 
     QString versionToLaunch;
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
-        ;   //TODO/IMPL
+    {
+        qDebug()<<"Failed to find what to launch. Will not post any task to the named pipe";
+        NX_LOG( QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1 );
+        emit failedToAddTaskToThePipe();
+        return;
+    }
 
     //posting to the pipe 
     QLocalSocket sock;
     sock.connectToServer( taskPipeName );
     if( !sock.waitForConnected( -1 ) )
     {
+        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(taskPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
         NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(taskPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
@@ -160,22 +171,28 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     const QByteArray& serializedTask = StartApplicationTask(versionToLaunch, appArgs).serialize();
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
+        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(taskPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
         NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(taskPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
     }
 
+    sock.waitForReadyRead(-1);
+    sock.readAll();
+
+    qDebug()<<"Task added to the pipe";
     emit taskAddedToThePipe();
 }
 
-void LauncherFSM::addTaskToTheQueue()
+bool LauncherFSM::addTaskToTheQueue()
 {
     QString versionToLaunch;
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
-        ;   //TODO/IMPL
+        return false;   //TODO/IMPL
     m_taskQueue.push( StartApplicationTask(versionToLaunch, appArgs) );
+    return true;
 }
 
 bool LauncherFSM::getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs )

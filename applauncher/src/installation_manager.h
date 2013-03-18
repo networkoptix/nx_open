@@ -10,6 +10,10 @@
 #include <QObject>
 
 
+//!Provides access to installed versions, installs new one
+/*!
+    \todo installation API MUST be asynchronous
+*/
 class InstallationManager
 :
     public QObject

@@ -16,6 +16,12 @@ class Downloading
 
 public:
     Downloading( QState* const parent );
+
+public slots:
+    void prepareResultMessage();
+
+signals:
+    void succeeded();
 };
 
 #endif  //DOWNLOADING_H
