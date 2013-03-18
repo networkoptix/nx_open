@@ -30,6 +30,7 @@
 		<testcamera.name>${company.name} Test Camera</testcamera.name>
 		<traytool.name>${product.name} Tray Assistant</traytool.name>
 		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+		<applauncher.name>${company.name} Launcher</applauncher.name>
 		<license.environment>production</license.environment>
 
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
@@ -66,6 +67,7 @@
 		<module>mediaproxy</module>
 		<module>client</module>		
 		<module>testcamera</module>
+                <module>applauncher</module>
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>

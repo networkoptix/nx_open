@@ -1,0 +1,42 @@
+////////////////////////////////////////////////////////////
+// 14 mar 2013    Andrey Kolesnikov
+////////////////////////////////////////////////////////////
+
+#ifndef PROCESSING_APPLICATION_TASK_H
+#define PROCESSING_APPLICATION_TASK_H
+
+#include <QSettings>
+#include <QState>
+
+#include "installation_manager.h"
+#include "../blocking_queue.h"
+#include "../start_application_task.h"
+
+
+class InstallationManager;
+class LauncherCommonData;
+
+class ProcessingApplicationTask
+:
+    public QState
+{
+    Q_OBJECT
+
+public:
+    ProcessingApplicationTask(
+        QState* const parent,
+        QSettings* const settings,
+        InstallationManager* const installationManager,
+        LauncherCommonData* const fsmSharedData,
+        BlockingQueue<StartApplicationTask>* const taskQueue );
+
+private:
+    QSettings* const m_settings;
+    InstallationManager* const m_installationManager;
+    LauncherCommonData* const m_fsmSharedData;
+    BlockingQueue<StartApplicationTask>* const m_taskQueue;
+
+    void initFsm();
+};
+
+#endif  //PROCESSING_APPLICATION_TASK_H

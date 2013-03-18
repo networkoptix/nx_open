@@ -10,6 +10,11 @@
 #define QN_ORGANIZATION_NAME        "${company.name}"
 #define QN_APPLICATION_NAME         "${product.title}"
 #define QN_APPLICATION_VERSION      "${release.version}.${buildNumber}"
+#ifdef _WIN32
+#define QN_PRODUCT_NAME             "${product.name}"
+#else
+#define QN_PRODUCT_NAME             "${namespace.additional}"
+#endif
 #define QN_ENGINE_VERSION           "${release.version}.${buildNumber}"
 #define QN_APPLICATION_REVISION     "${changeSet}"
 #define QN_APPLICATION_PLATFORM     "${platform}"

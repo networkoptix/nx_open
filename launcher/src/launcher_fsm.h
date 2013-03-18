@@ -1,0 +1,62 @@
+////////////////////////////////////////////////////////////
+// 13 mar 2013    Andrey Kolesnikov
+////////////////////////////////////////////////////////////
+
+#ifndef LAUNCHER_FSM_H
+#define LAUNCHER_FSM_H
+
+#include <memory>
+
+#include <QLocalSocket>
+#include <QSettings>
+#include <QStateMachine>
+
+#include "installation_manager.h"
+#include "launcher_common_data.h"
+#include "task_server.h"
+
+
+class LauncherFSM
+:
+    public QStateMachine
+{
+    Q_OBJECT
+
+    Q_PROPERTY( bool isTaskQueueEmpty READ isTaskQueueEmpty )
+    //!Tries to bind to listening named pipe
+    Q_PROPERTY( int bindTriesCount READ bindTriesCount )
+    //!true, if adding task to the named pipe failed with serverNotFound error
+    Q_PROPERTY( bool isLocalServerWasNotFound READ isLocalServerWasNotFound );
+
+public:
+    LauncherFSM();
+
+    bool isTaskQueueEmpty() const;
+    int bindTriesCount() const;
+    bool isLocalServerWasNotFound() const;
+
+signals:
+    void bindSucceeded();
+    void bindFailed();
+    void taskAddedToThePipe();
+    void failedToAddTaskToThePipe();
+
+private:
+    InstallationManager m_installationManager;
+    LauncherCommonData m_fsmSharedData;
+    BlockingQueue<StartApplicationTask> m_taskQueue;
+    TaskServer m_taskServer;
+    QSettings m_settings;
+    int m_bindTriesCount;
+    QLocalSocket::LocalSocketError m_previousAddTaskToPipeOperationResult;
+
+    void initFSM();
+
+private slots:
+    void onBindingToLocalAddressEntered();
+    void onAddingTaskToNamedPipeEntered();
+    void addTaskToTheQueue();
+    bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );
+};
+
+#endif  //LAUNCHER_FSM_H
