@@ -69,7 +69,6 @@
 		<module>mediaproxy</module>
 		<module>client</module>		
 		<module>testcamera</module>
-                <module>applauncher</module>
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>
