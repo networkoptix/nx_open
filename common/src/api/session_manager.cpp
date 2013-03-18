@@ -21,7 +21,15 @@
 void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
     QNetworkReply *reply = (QNetworkReply *)sender();
 
-    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), reply->errorString().toAscii()), m_handle);
+    QString errorString = reply->errorString();
+    // Common EC error looks like:
+    // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
+    // displaying plaint-text password is unsecure and strongly not recommended
+    if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
+        int n = errorString.lastIndexOf(QLatin1String(":"));
+        errorString = errorString.mid(n + 1).trimmed();
+    }
+    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toAscii()), m_handle);
 
     qnDeleteLater(reply);
     qnDeleteLater(this);

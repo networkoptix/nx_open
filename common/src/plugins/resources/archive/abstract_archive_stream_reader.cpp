@@ -97,7 +97,7 @@ void QnAbstractArchiveReader::run()
 
         QnAbstractMediaDataPtr data = getNextData();
 
-        if (data==0 && !m_needStop)
+        if (data==0 && !needToStop())
         {
             setNeedKeyData();
             mFramesLost++;

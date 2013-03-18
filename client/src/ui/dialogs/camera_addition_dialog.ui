@@ -414,6 +414,9 @@
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
      <property name="rowCount">
       <number>0</number>
      </property>
@@ -427,17 +430,17 @@
       <bool>true</bool>
      </attribute>
      <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>40</number>
+      <number>20</number>
      </attribute>
      <attribute name="horizontalHeaderMinimumSectionSize">
-      <number>40</number>
+      <number>20</number>
      </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
      <column>
       <property name="text">
-       <string>Add</string>
+       <string notr="true"/>
       </property>
      </column>
      <column>

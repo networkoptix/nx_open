@@ -35,7 +35,7 @@ QnDroidControlPortProcessor::QnDroidControlPortProcessor(TCPSocket* socket, QnTc
 void QnDroidControlPortProcessor::run()
 {
     Q_D(QnDroidControlPortProcessor);
-    while (!m_needStop)
+    while (!needToStop())
     {
         quint8 recvBuffer[1024*4];
         int readed = d->socket->recv(recvBuffer, sizeof(recvBuffer));
