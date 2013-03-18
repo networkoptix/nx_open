@@ -53,7 +53,7 @@ void QnClientPullMediaStreamProvider::run()
 
         if (data==0)
         {
-            if (m_needStop)
+            if (needToStop())
                 continue;
 
             setNeedKeyData();

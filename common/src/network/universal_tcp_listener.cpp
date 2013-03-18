@@ -48,7 +48,7 @@ void QnUniversalRequestProcessor::run()
             QByteArray protocol = header[2].split('/')[0].toUpper();
             QMutexLocker lock(&d->mutex);
             d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])).path());
-            if (d->processor && !m_needStop) 
+            if (d->processor && !needToStop()) 
             {
                 copyClientRequestTo(*d->processor);
                 d->ssl = 0;

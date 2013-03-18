@@ -32,12 +32,14 @@ QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
 
 QnBufferedScreenGrabber::~QnBufferedScreenGrabber()
 {
+    // TODO: #VASILENKO call proper stop() here.
     m_needStop = true;
     wait();
 }
 
 void QnBufferedScreenGrabber::stop()
 {
+    // TODO: #VASILENKO this is bad. This override changes the semantics of stop(). Can we fix it?
     m_needStop = true;
 }
 
@@ -45,14 +47,14 @@ void QnBufferedScreenGrabber::run()
 {
     m_grabber.restartTimer();
     //m_timer.start();
-    while (!m_needStop)
+    while (!needToStop())
     {
-        if (!m_needStop && m_queue.size() == m_queue.maxSize())
+        if (!needToStop() && m_queue.size() == m_queue.maxSize())
         {
             msleep(1);
             continue;
         }
-        if (m_needStop)
+        if (needToStop())
             break;
         AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;

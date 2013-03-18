@@ -336,9 +336,9 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     if (m_stopCond) {
         QMutexLocker lock(&m_stopMutex);
         m_delegate->close();
-        while (m_stopCond && !m_needStop)
+        while (m_stopCond && !needToStop())
             m_stopWaitCond.wait(&m_stopMutex);
-        if (m_needStop)
+        if (needToStop())
             return QnAbstractMediaDataPtr();
         m_delegate->seek(m_latPacketTime, true);
     }
@@ -347,14 +347,14 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     {
         m_pausedStart = false;
         QMutexLocker mutex(&m_jumpMtx);
-        while (m_singleShot && m_singleQuantProcessed && !m_needStop)
+        while (m_singleShot && m_singleQuantProcessed && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
     //=================
     {
         QMutexLocker mutex(&m_jumpMtx);
-        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !m_needStop)
+        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
         //QnLongRunnable::pause();
     }
@@ -362,7 +362,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     bool singleShotMode = m_singleShot;
 
 begin_label:
-    if (m_needStop)
+    if (needToStop())
         return QnAbstractMediaDataPtr();
 
     if (mFirstTime)
@@ -747,7 +747,7 @@ begin_label:
     }
 
     // ensure Pos At playback mask
-    if (!m_needStop && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (!needToStop() && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
@@ -844,12 +844,12 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
 {
     QnAbstractMediaDataPtr result;
-    while (!m_needStop)
+    while (!needToStop())
     {
 
         result = m_delegate->getNextData();
 
-        if (result == 0 && !m_needStop)
+        if (result == 0 && !needToStop())
         {
             if (m_cycleMode)
             {
