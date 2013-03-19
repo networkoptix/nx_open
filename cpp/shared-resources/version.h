@@ -28,7 +28,7 @@
 #ifdef _WIN32
 #define QN_CLIENT_EXECUTABLE_NAME   "${product.name}.exe"
 #else
-#define QN_CLIENT_EXECUTABLE_NAME   "client"
+#define QN_CLIENT_EXECUTABLE_NAME   "client-bin"
 #endif
 #define QN_LICENSING_MAIL_ADDRESS   "${company.license.address}"
 #define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
