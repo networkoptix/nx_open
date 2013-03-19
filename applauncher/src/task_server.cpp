@@ -24,17 +24,17 @@ bool TaskServer::listen( const QString& pipeName )
     Q_ASSERT( singleApp );
     if( singleApp->isRunning() )
     {
-        qDebug()<<"Application instance already running. Not listening to pipe";
+        NX_LOG( QString::fromLatin1("Application instance already running. Not listening to pipe"), cl_logDEBUG1 );
         return false;
     }
 
     if( !m_server.listen( pipeName ) )
     {
-        qDebug()<<"Failed to listen named pipe";
+        NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(m_server.errorString()), cl_logDEBUG1 );
         return false;
     }
 
-    qDebug()<<"Listening named pipe...";
+    NX_LOG( QString::fromLatin1("Listening pipe %1").arg(pipeName), cl_logDEBUG1 );
 
     connect( &m_server, SIGNAL(newConnection()), this, SLOT(onNewConnection()) );
     return true;

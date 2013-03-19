@@ -144,13 +144,11 @@ void LauncherFSM::onBindingToLocalAddressEntered()
 void LauncherFSM::onAddingTaskToNamedPipeEntered()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
-    qDebug()<<"Entered AddingTaskToNamedPipe";
 
     QString versionToLaunch;
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
     {
-        qDebug()<<"Failed to find what to launch. Will not post any task to the named pipe";
         NX_LOG( QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
@@ -161,7 +159,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     sock.connectToServer( taskPipeName );
     if( !sock.waitForConnected( -1 ) )
     {
-        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(taskPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
         NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(taskPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
@@ -171,7 +168,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     const QByteArray& serializedTask = StartApplicationTask(versionToLaunch, appArgs).serialize();
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
-        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(taskPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
         NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(taskPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
@@ -181,7 +177,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     sock.waitForReadyRead(-1);
     sock.readAll();
 
-    qDebug()<<"Task added to the pipe";
     emit taskAddedToThePipe();
 }
 
