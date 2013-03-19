@@ -6,6 +6,7 @@
 #include "acti_resource.h"
 
 static const qreal DIGITAL_ZOOM_COEFF = 5.0;
+static const QString ENCODER_STR(lit("encoder"));
 
 namespace {
     int sign2(qreal value)
@@ -46,7 +47,7 @@ QnActiPtzController::~QnActiPtzController() {
 void QnActiPtzController::init() 
 {
     CLHttpStatus status;
-    QByteArray zoomString = m_resource->makeActiRequest(QLatin1String("encoder"), QLatin1String("ZOOM_CAP_GET"), status, true);
+    QByteArray zoomString = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_CAP_GET"), status, true);
     if (status != CL_HTTP_SUCCESS || !zoomString.startsWith("ZOOM_CAP_GET="))
         return;
 
@@ -79,7 +80,7 @@ void QnActiPtzController::init()
 int QnActiPtzController::stopZoomInternal()
 {
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=STOP"), status);
+    QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM=STOP"), status);
     int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
     if (result == 0)
         m_zoomVelocity = 0.0;
@@ -89,7 +90,7 @@ int QnActiPtzController::stopZoomInternal()
 int QnActiPtzController::stopMoveInternal()
 {
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), lit("MOVE=STOP"), status);
+    QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("MOVE=STOP"), status);
     int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
     if (result == 0)
         m_moveVelocity = QPair<qreal, qreal>(0.0, 0.0);
@@ -103,16 +104,11 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
 
     stopZoomInternal();
 
-    QString direction;
-    if (zoomVelocity >= 0)
-        direction = lit("TELE");
-    else
-        direction = lit("WIDE");
-
+    QString direction = zoomVelocity >= 0 ? lit("TELE") : lit("WIDE");
     int zoomVelocityI = qAbs(scaleValue(zoomVelocity, 2, 7));
 
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), QString(lit("ZOOM=%1,%2")).arg(direction).arg(zoomVelocityI), status);
+    QByteArray data = m_resource->makeActiRequest(ENCODER_STR, QString(lit("ZOOM=%1,%2")).arg(direction).arg(zoomVelocityI), status);
     int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
     
     if (result == 0)
@@ -147,7 +143,7 @@ int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
         requestStr += QString(lit(",%1")).arg(yVelocityI);
 
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), requestStr, status);
+    QByteArray data = m_resource->makeActiRequest(ENCODER_STR, requestStr, status);
     int result =  (status == CL_HTTP_SUCCESS ? 0 : -1);
 
     if (result == 0)
@@ -187,11 +183,11 @@ int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 
     CLHttpStatus status;
 
-    QByteArray result = m_resource->makeActiRequest(lit("encoder"), lit("POSITION=ABSOLUTE,%1,%2,5,5").arg(int(xPos)).arg(int(yPos)), status);
+    QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION=ABSOLUTE,%1,%2,5,5").arg(int(xPos)).arg(int(yPos)), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
 
-    result = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=DIRECT,%1").arg(zoomPos), status);
+    result = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM=DIRECT,%1").arg(zoomPos), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
 
@@ -204,7 +200,7 @@ int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
 
     CLHttpStatus status;
 
-    QByteArray result = m_resource->makeActiRequest(lit("encoder"), lit("POSITION_GET"), status);
+    QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION_GET"), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
     QList<QByteArray> params = result.split(',');
@@ -213,7 +209,7 @@ int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     *xPos = params[0].toInt();
     *yPos = params[1].toInt();
 
-    result = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM_POSITION"), status);
+    result = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_POSITION"), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
     
