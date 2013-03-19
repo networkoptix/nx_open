@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include <QDir>
+#include <QRegExp>
 
 #include <utils/common/log.h>
 
@@ -119,12 +120,13 @@ static const QLatin1String MODULE_NAME("Client");
 
 void InstallationManager::readInstalledVersions()
 {
+    QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
     const QString& productRootInstallDir = QString::fromLatin1("%1/%2/%3").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME)).arg(MODULE_NAME);
     const QStringList& entries = QDir(productRootInstallDir).entryList( QDir::Dirs );
     for( int i = 0; i < entries.size(); ++i )
     {
         //each entry - is a version
-        if( entries[i] == QLatin1String(".") || entries[i] == QLatin1String("..") )
+        if( entries[i] == QLatin1String(".") || entries[i] == QLatin1String("..") || !versionDirMatch.exactMatch(entries[i]) )
             continue;
         m_installedProductsByVersion.insert( std::make_pair( entries[i], AppData(QString::fromLatin1("%1/%2").arg(productRootInstallDir).arg(entries[i])) ) );
     }
