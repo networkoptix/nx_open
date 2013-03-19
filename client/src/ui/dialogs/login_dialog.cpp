@@ -7,12 +7,16 @@
 #include <QtGui/QInputDialog>
 #include <QtGui/QStandardItemModel>
 
+#include <QtNetwork/QLocalSocket>
+
 #include <client/client_connection_data.h>
 
 #include <core/resource/resource.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
+#include <api/ipc_pipe_names.h>
+#include <api/start_application_task.h>
 
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>
@@ -256,9 +260,25 @@ void LoginDialog::resetAutoFoundConnectionsModel() {
 
 }
 
-bool sendToLauncher(const QString &version, const QStringList &arguments) {
-    //DUMMY
-    return false;
+bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
+    QLocalSocket sock;
+    sock.connectToServer( launcherPipeName );
+    if( !sock.waitForConnected( -1 ) )
+    {
+        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
+        return false;
+    }
+
+    const QByteArray& serializedTask = StartApplicationTask(version, arguments).serialize();
+    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
+    {
+        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
+        return false;
+    }
+
+    sock.waitForReadyRead(-1);
+    sock.readAll();
+    return true;
 }
 
 void LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
@@ -268,7 +288,7 @@ void LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     arguments << QLatin1String("--auth");
     arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
 
-    if (sendToLauncher(connectInfo->version, arguments))
+    if (sendCommandToLauncher(connectInfo->version, arguments))
         qApp->exit();
     else
         QMessageBox::critical(this, tr("Launcher is not found"), tr("Launcher process is stopped."));
@@ -337,9 +357,10 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         if (QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
-            tr("Client version is %1.\n"\
-               "You are trying to connect to EC %2.\n"\
-               "Do you want to restart client in compatibility mode?")
+            tr("You are about to connect to Enterprise Controller which has a different version:\n"\
+               " - Client version: %1.\n"\
+               " - EC version: %2.\n"\
+               "Would you like to restart client in compatibility mode?")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
                     .arg(connectInfo->version),
                     QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)

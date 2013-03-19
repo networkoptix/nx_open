@@ -7,7 +7,7 @@
 
 #include <QObject>
 
-#include "start_application_task.h"
+#include <api/start_application_task.h>
 
 
 class InstallationManager;

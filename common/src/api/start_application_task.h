@@ -6,6 +6,7 @@
 #define APPLICATION_TASK_H
 
 #include <QString>
+#include <QStringList>
 
 
 //!Task, sent by application, to start specified application version
@@ -21,6 +22,9 @@ public:
     StartApplicationTask(
         const QString& _version,
         const QString& _appParams );
+    StartApplicationTask(
+        const QString& _version,
+        const QStringList& _appParams );
 
     QByteArray serialize() const;
     bool deserialize( const QByteArray& data );

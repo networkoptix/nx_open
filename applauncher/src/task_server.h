@@ -11,7 +11,7 @@
 #include <QLocalServer>
 #include <QSystemSemaphore>
 
-#include "start_application_task.h"
+#include <api/start_application_task.h>
 #include "blocking_queue.h"
 
 

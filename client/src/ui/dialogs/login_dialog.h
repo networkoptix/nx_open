@@ -55,6 +55,8 @@ protected:
      * close the current instance of the client.
      */
     void restartInCompatibilityMode(QnConnectInfoPtr connectInfo);
+
+    bool sendCommandToLauncher(const QString &version, const QStringList &arguments);
 private slots:
     void updateAcceptibility();
     void updateFocus();

@@ -6,11 +6,11 @@
 
 #include <QFinalState>
 
+#include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
 
 #include "custom_transition.h"
 #include "state/processing_application_task.h"
-#include "task_pipe_name.h"
 #include "version.h"
 
 
@@ -135,7 +135,7 @@ void LauncherFSM::onBindingToLocalAddressEntered()
     ++m_bindTriesCount;
 
     //binding to the pipe address
-    if( m_taskServer.listen( taskPipeName ) )
+    if( m_taskServer.listen( launcherPipeName ) )
         emit bindSucceeded();
     else
         emit bindFailed();
@@ -158,12 +158,12 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
 
     //posting to the pipe 
     QLocalSocket sock;
-    sock.connectToServer( taskPipeName );
+    sock.connectToServer( launcherPipeName );
     if( !sock.waitForConnected( -1 ) )
     {
-        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(taskPipeName).arg(sock.errorString());
+        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
-        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(taskPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
     }
@@ -171,9 +171,9 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     const QByteArray& serializedTask = StartApplicationTask(versionToLaunch, appArgs).serialize();
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
-        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(taskPipeName).arg(sock.errorString());
+        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
-        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(taskPipeName).arg(sock.errorString()), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
     }

@@ -20,6 +20,15 @@ StartApplicationTask::StartApplicationTask(
 {
 }
 
+StartApplicationTask::StartApplicationTask(
+    const QString& _version,
+    const QStringList& _appParams )
+:
+    version( _version ),
+    appArgs( _appParams.join(QLatin1String(" ")) )
+{
+}
+
 QByteArray StartApplicationTask::serialize() const
 {
     return QString::fromLatin1("run\n%1\n%2\n\n").arg(version).arg(appArgs).toLatin1();
@@ -32,8 +41,8 @@ bool StartApplicationTask::deserialize( const QByteArray& data )
         return false;
     if( lines[0] != "run" )
         return false;
-    version = lines[1];
-    appArgs = lines[2];
+    version = QLatin1String(lines[1]);
+    appArgs = QLatin1String(lines[2]);
 
     return true;
 }
