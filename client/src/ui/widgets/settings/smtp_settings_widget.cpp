@@ -88,9 +88,7 @@ void QnSmtpSettingsWidget::update() {
 
 void QnSmtpSettingsWidget::submit() {
     QnEmail::Settings result = settings();
-    //if (!result.isNull())
-        QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
-    //TODO: #GDM else?
+    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -306,8 +304,7 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QByteArray &er
 
     bool success = (status == 0);
     if(!success) {
-        //TODO: #GDM remove password from error message
-        //QMessageBox::critical(this, tr("Error while receiving settings"), QString::fromLatin1(errorString));
+        QMessageBox::critical(this, tr("Error while receiving settings"), QString::fromLatin1(errorString));
         m_settingsReceived = true;
         return;
     }

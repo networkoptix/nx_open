@@ -4,7 +4,7 @@
 #include <functional> /* For std::mem_fun_ref. */
 
 #include <QtCore/QMetaType>
-#include <QColor>
+#include <QtGui/QColor>
 
 #include <qjson/serializer.h>
 #include <qjson/parser.h>

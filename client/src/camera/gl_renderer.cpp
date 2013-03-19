@@ -339,8 +339,6 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_mutex);
-    if( !m_timeChangeEnabled )
-        int x = 0;
     return m_lastDisplayedTime;
 }
 

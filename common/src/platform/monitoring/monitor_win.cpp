@@ -1,7 +1,5 @@
 #include "monitor_win.h"
 
-#ifdef Q_OS_WIN
-
 #include <cassert>
 
 #include <QtCore/QVector>
@@ -284,4 +282,3 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     return result;
 }
 
-#endif // Q_OS_WIN

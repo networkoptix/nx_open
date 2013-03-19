@@ -425,7 +425,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
-                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
+                while (!m_afterJump && !m_buffering && !needToStop() && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     qint64 newDisplayedTime = getCurrentTime();
@@ -1006,34 +1006,14 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (speed == 0)
             return true;
 
-        if (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync)
-        {
-            // long waiting filler
-            m_isLongWaiting = true;
-            m_eofSignalSended = true;
-            if (m_buffering && m_executingJump == 0) 
-            {
-                m_timeMutex.lock();
-                m_buffering = 0;
-                m_timeMutex.unlock();
-                if (m_extTimeSrc)
-                    m_extTimeSrc->onBufferingFinished(this);
-                if (m_speed >= 0)
-                    blockTimeValue(DATETIME_NOW);
-                else if (m_speed >= 0)
-                    blockTimeValue(0);
-                unblockTimeValue();
-            }
-            return true;
-        }
-
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        if (m_emptyPacketCounter >= 3)
+        bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
+        if (m_emptyPacketCounter >= 3 || playUnsync)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
+            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !playUnsync) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }

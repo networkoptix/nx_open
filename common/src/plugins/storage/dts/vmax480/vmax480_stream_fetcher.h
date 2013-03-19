@@ -7,6 +7,8 @@
 #include "core/datapacket/media_data_packet.h"
 #include "vmax480_tcp_server.h"
 #include "core/resource/network_resource.h"
+#include "recording/time_period_list.h"
+#include "plugins/resources/archive/playbackmask_helper.h"
 
 class VMaxStreamFetcherPtr;
 
@@ -16,18 +18,20 @@ public:
     virtual ~QnVmax480DataConsumer() {}
     virtual int getChannel() const { return -1; }
 
-    virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) {}
-    virtual void onGotMonthInfo(const QDate& month, int monthInfo)  {}
-    virtual void onGotDayInfo(int dayNum, const QByteArray& data)  {}
+    virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) { Q_UNUSED(startDateTime) Q_UNUSED(endDateTime) }
+    virtual void onGotMonthInfo(const QDate& month, int monthInfo)  { Q_UNUSED(month) Q_UNUSED(monthInfo) }
+    virtual void onGotDayInfo(int dayNum, const QByteArray& data)  { Q_UNUSED(dayNum) Q_UNUSED(data) }
 
+    virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
 };
+
 
 class QnVMax480ConnectionProcessor;
 
 class VMaxStreamFetcher: public QnVmax480DataConsumer
 {
 public:
-    bool registerConsumer(QnVmax480DataConsumer* consumer);
+    bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0, bool keepAllChannels = false);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
     static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
@@ -56,6 +60,8 @@ public:
     bool vmaxRequestMonthInfo(const QDate& month);
     bool vmaxRequestDayInfo(int dayNum); // dayNum at vMax internal format
     bool vmaxRequestRange();
+    QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
+    bool isPlaying() const;
 private:
     bool isOpened() const;
     bool vmaxConnect();
@@ -63,10 +69,14 @@ private:
     int getPort();
     int getCurrentChannelMask() const;
     int getChannelUsage(int ch);
-    QnAbstractMediaDataPtr createEmptyPacket(qint64 timestamp);
     int getMaxQueueSize() const;
     bool safeOpen();
+    qint64 findRoundTime(qint64 timeUsec, bool* dataFound) const;
+    void updatePlaybackMask();
+    void initPacketTime();
 private:
+    static const int OPEN_ALL = 0xffff;
+
     QnNetworkResourcePtr m_res;
     typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
 
@@ -80,14 +90,21 @@ private:
     ConsumersMap m_dataConsumers;
     bool m_isLive;
     int m_usageCount;
-    QnVmax480DataConsumer* m_mainConsumer;
 
     static QMutex m_instMutex;
     static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
     int m_sequence;
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;
+    qint64 m_emptyPacketTime;
     bool m_streamPaused;
+    int m_lastSpeed;
+    qint64 m_lastSeekPos;
+    bool m_beforeSeek;
+    QTime m_seekTimer;
+    bool m_isPlaying;
+    bool m_keepAllChannels;
+    QnPlaybackMaskHelper m_playbackMaskHelper;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

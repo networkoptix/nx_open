@@ -127,6 +127,8 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         if (archiveDelegate) {
             QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
             archiveReader->setArchiveDelegate(archiveDelegate);
+            if (hasFlags(still_image) || hasFlags(utc))
+                archiveReader->setCycleMode(false);
             return archiveReader;
         }
     }
@@ -272,8 +274,6 @@ bool QnSecurityCamResource::isDtsBased() const
 
 bool QnSecurityCamResource::isAnalog() const
 {
-    return false;
-
     if (!hasParam(lit("analog")))
         return false;
 

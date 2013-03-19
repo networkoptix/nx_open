@@ -428,11 +428,13 @@ bool QnDesktopFileEncoder::start()
 
 void QnDesktopFileEncoder::stop()
 {
+    // TODO: #VASILENKO this is bad as it changes stop() semantics. Can we fix it?
     m_needStop = true;
 }
 
 QnDesktopFileEncoder::~QnDesktopFileEncoder()
 {
+    // TODO: #VASILENKO use proper stop() here.
     m_needStop = true;
     wait();
     closeStream();
@@ -798,9 +800,9 @@ int QnDesktopFileEncoder::processData(bool flush)
 
 void QnDesktopFileEncoder::run()
 {
-    while (!m_needStop || m_grabber->dataExist())
+    while (!needToStop() || m_grabber->dataExist())
     {
-        if (m_needStop && !m_capturingStopped)
+        if (needToStop() && !m_capturingStopped)
         {
             stopCapturing();
             m_capturingStopped = true;

@@ -670,13 +670,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Notifications button */
 
-    m_popupShowButton = new QnImageButtonWidget(m_controlsWidget);
-    m_popupShowButton->resize(80, 32);
-    m_popupShowButton->setDefaultAction(action(Qn::TogglePopupsAction));
+    m_popupShowButton = newActionButton(action(Qn::TogglePopupsAction), 2.5, -1, m_controlsWidget);
     m_popupShowButton->setProperty(Qn::NoHandScrollOver, true);
     m_popupShowButton->setVisible(false);
     connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
-    //setHelpTopic(m_popupShowButton, Qn::MainWindow_Pin_Help);
     connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
 
 
@@ -1387,7 +1384,8 @@ void QnWorkbenchUi::updatePopupButtonAnimation() {
         return;
 
     VariantAnimator* animator = opacityAnimator(m_popupShowButton);
-    animator->setTimeLimit(1000);
+    if(!animator->isRunning())
+        animator->setTimeLimit(1000);
     qreal opacity = m_popupShowButton->opacity();
     if (qFuzzyCompare(opacity, 1.0))
         animator->animateTo(0.1);

@@ -19,6 +19,7 @@ public:
     QString tcpID;
     QnMediaContextPtr context;
     VMaxStreamFetcher* streamFetcher;
+    int openedChannels;
 };
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
@@ -26,6 +27,7 @@ QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, Qn
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
+    d->openedChannels = 0;
 }
 
 QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()
@@ -72,6 +74,11 @@ void QnVMax480ConnectionProcessor::vMaxAddChannel(int channel)
 {
     Q_D(QnVMax480ConnectionProcessor);
 
+    int newMask = d->openedChannels | channel;
+    if (newMask == d->openedChannels)
+        return;
+    d->openedChannels = newMask;
+
     VMaxParamList params;
     params["channel"] = QString::number(channel).toUtf8();
     QByteArray data = QnVMax480Helper::serializeCommand(Command_AddChannel, 0, params);
@@ -82,6 +89,12 @@ void QnVMax480ConnectionProcessor::vMaxAddChannel(int channel)
 void QnVMax480ConnectionProcessor::vMaxRemoveChannel(int channel)
 {
     Q_D(QnVMax480ConnectionProcessor);
+
+    int newMask = d->openedChannels & ~channel;
+    if (newMask == d->openedChannels)
+        return;
+    d->openedChannels = newMask;
+
 
     VMaxParamList params;
     params["channel"] = QString::number(channel).toUtf8();

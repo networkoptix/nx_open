@@ -29,10 +29,10 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 void QnVMax480ChunkReader::run()
 {
     bool registered = false;
-    while (!m_needStop && !registered)
+    while (!needToStop() && !registered)
         registered = m_streamFetcher->registerConsumer(this);
 
-    while (!m_needStop)
+    while (!needToStop())
     {
         QnResource::Status status = m_res->getStatus();
 
@@ -193,7 +193,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     int year =  dayNum / 10000;
     int month =(dayNum % 10000)/100;
     int day =   dayNum % 100;
-    qint64 dayBase = QDateTime(QDate(year, month, day)).toMSecsSinceEpoch();
+    QDate date(year, month, day);
 
     const char* curPtr = data.data();
 
@@ -201,15 +201,21 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     {
         QnTimePeriodList dayPeriods;
 
-        for(int min = 0; min < VMAX_MAX_SLICE_DAY; ++min)
+        for (int hour = 0; hour < 25; ++hour) 
         {
-            char recordType = *curPtr & 0x0f;
-            if (recordType)
-                addChunk(dayPeriods, QnTimePeriod(dayBase + min*60*1000ll, 60*1000));
-            curPtr++;
+            for(int min = 0; min < 60; ++min)
+            {
+                char recordType = *curPtr & 0x0f;
+                // I do not know how to handle 25-th hour
+                if (recordType && hour < 24) 
+                {
+                    QTime time(hour, min, 0);
+                    QDateTime dt (date, time);
+                    addChunk(dayPeriods, QnTimePeriod(dt.toMSecsSinceEpoch(), 60*1000));
+                }
+                curPtr++;
+            }
         }
-
-        curPtr += 60; // skip reserved hour
 
         if (!dayPeriods.isEmpty()) {
             QVector<QnTimePeriodList> allPeriods;

@@ -3,6 +3,7 @@
 
 #include <QtCore/QMutex>
 #include <QtCore/QPair>
+#include <QtGui/QMatrix4x4>
 
 #include "core/resource/resource_fwd.h"
 #include "core/resource/interface/abstract_ptz_controller.h"
@@ -21,6 +22,10 @@ public:
     virtual Qn::CameraCapabilities getCapabilities() override;
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
+    // TODO: #Elric need to implement this one properly.
+    const QMatrix4x4 &speedTransform() const;
+    void setSpeedTransform(const QMatrix4x4 &speedTransform);
+
     QString getPtzConfigurationToken();
     void setMediaProfileToken(const QString& value);
 
@@ -37,6 +42,8 @@ private:
     QPair<qreal, qreal> m_yNativeVelocityCoeff;
     QPair<qreal, qreal> m_zoomNativeVelocityCoeff;
     mutable QMutex m_mutex;
+
+    QMatrix4x4 m_speedTransform;
 };
 
 #endif // QN_ONVIF_PTZ_CONTROLLER_H

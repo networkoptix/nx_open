@@ -133,36 +133,39 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
         if (m_loading[i].handle == requstHandle)
         {
             if (status == 0) {
-                QVector<QnTimePeriodList> allPeriods;
-                if (!timePeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1) 
+                if (!timePeriods.isEmpty()) 
                 {
-                    if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs)
-                        m_loadedData.last().durationMs = 0;
-                }
-                allPeriods << m_loadedData << timePeriods;
-                m_loadedData = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
+                    QVector<QnTimePeriodList> allPeriods;
+                    if (!timePeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1) 
+                    {
+                        if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs)
+                            m_loadedData.last().durationMs = 0;
+                    }
+                    allPeriods << m_loadedData << timePeriods;
+                    m_loadedData = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
 
-                QnTimePeriod loadedPeriod = m_loading[i].period;
-                loadedPeriod.durationMs = qMax(0ll, loadedPeriod.durationMs - 60 * 1000); /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
-                if(loadedPeriod.durationMs > 0) {
-                    QnTimePeriodList loadedPeriods;
-                    loadedPeriods.push_back(loadedPeriod);
+                    QnTimePeriod loadedPeriod = m_loading[i].period;
+                    loadedPeriod.durationMs = qMax(0ll, loadedPeriod.durationMs - 60 * 1000); /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
+                    if(loadedPeriod.durationMs > 0) {
+                        QnTimePeriodList loadedPeriods;
+                        loadedPeriods.push_back(loadedPeriod);
 
-                    QVector<QnTimePeriodList> allLoadedPeriods;
-                    allLoadedPeriods << m_loadedPeriods << loadedPeriods;
+                        QVector<QnTimePeriodList> allLoadedPeriods;
+                        allLoadedPeriods << m_loadedPeriods << loadedPeriods;
 
-                    m_loadedPeriods = QnTimePeriod::mergeTimePeriods(allLoadedPeriods); // union loaded time range info 
-                }
+                        m_loadedPeriods = QnTimePeriod::mergeTimePeriods(allLoadedPeriods); // union loaded time range info 
+                    }
 
-                // reduce right edge of loaded period info if last period under writing now
-                if (!m_loadedPeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1)
-                {
-                    qint64 lastDataTime = m_loadedData.last().startTimeMs;
-                    while (!m_loadedPeriods.isEmpty() && m_loadedPeriods.last().startTimeMs > lastDataTime)
-                        m_loadedPeriods.pop_back();
-                    if (!m_loadedPeriods.isEmpty()) {
-                        QnTimePeriod& lastPeriod = m_loadedPeriods.last();
-                        lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
+                    // reduce right edge of loaded period info if last period under writing now
+                    if (!m_loadedPeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1)
+                    {
+                        qint64 lastDataTime = m_loadedData.last().startTimeMs;
+                        while (!m_loadedPeriods.isEmpty() && m_loadedPeriods.last().startTimeMs > lastDataTime)
+                            m_loadedPeriods.pop_back();
+                        if (!m_loadedPeriods.isEmpty()) {
+                            QnTimePeriod& lastPeriod = m_loadedPeriods.last();
+                            lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
+                        }
                     }
                 }
 

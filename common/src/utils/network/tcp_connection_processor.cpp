@@ -171,7 +171,7 @@ int QnTCPConnectionProcessor::sendData(const char* data, int size)
     Q_D(QnTCPConnectionProcessor);
     QMutexLocker lock(&d->sockMutex);
     int bytesSent = 0;
-    while (!m_needStop && size > 0 && d->socket->isConnected())
+    while (!needToStop() && size > 0 && d->socket->isConnected())
     {
         int sended;
         if (d->ssl)
@@ -358,7 +358,7 @@ bool QnTCPConnectionProcessor::readRequest()
         
     }
 
-    while (!m_needStop && d->socket->isConnected())
+    while (!needToStop() && d->socket->isConnected())
     {
         int readed;
         if (d->ssl) 

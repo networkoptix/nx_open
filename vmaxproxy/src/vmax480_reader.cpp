@@ -266,9 +266,8 @@ void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 
     else
         playMode = ACS_stream_source::BACKWARDPLAY;
 
-    qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
-
     if (!m_archivePlayProcessing) {
+        qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
         m_archivePlayProcessing = true;
         m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
     }
@@ -425,7 +424,7 @@ void QnVMax480Provider::receiveResultCallback(PS_ACS_RESULT _result, long long _
 void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 {
 
-    //qDebug() << "receiveVideoStream";
+    //qDebug() << "receiveVideoStream" << _stream->mCh;
     quint8 VMaxHeader[16];
     bool isIFrame = false;
     {
@@ -574,6 +573,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_callbackCond.wakeOne();
                 }
             }
+            m_socket->close();
             break;
         }
     case RESULT_OPEN_VIDEO:
@@ -609,6 +609,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_curSequence = m_reqSequence;
                 else
                     archivePlayInternal(m_newPlayCommand, m_reqSequence);
+                m_newPlayCommand.clear();
             }
             break;
         }

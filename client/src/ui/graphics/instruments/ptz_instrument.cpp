@@ -1080,6 +1080,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
 }
 
 void PtzInstrument::finishDrag(DragInfo *info) {
+    Q_UNUSED(info)
     if(target()) {
         if(!manipulator()) {
             ensureSelectionItem();

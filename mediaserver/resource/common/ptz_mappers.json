@@ -17,30 +17,81 @@
                 "AXIS Q6035-E"
             ],
             "fromCamera": {
-                "x" : {
+                "x": {
                     "extrapolationMode": "PeriodicExtrapolation",
                     "logical":  [-1,   1],
                     "physical": [ 0, 360]
                 },
-                "y" : {
+                "y": {
                     "extrapolationMode": "ConstantExtrapolation",
-                    "logical":  [-0.5, 0.111],
-                    "physical": [ -90,    20]
+                    "logical":  [-0.5, 0.1111111111111],
+                    "physical": [ -90,              20]
                 },
-                "z" : {
+                "z": {
                     "extrapolationMode": "ConstantExtrapolation",
-                    "logical":  [   0,     1],
+                    "logical":  [    0,     1],
                     "physical": [35.25, 711.1]
                 }
             },
             "toCamera": {
-                "x" : null,
-                "y" : {
+                "x": null,
+                "y": {
                     "extrapolationMode": "ConstantExtrapolation",
                     "logical":  [-0.5, 0.0, 1.0],
                     "physical": [ -90, 0.0,  20]
                 },
-                "z" : null
+                "z": null
+            }
+        },
+        {
+            "models": [
+                "DWC-MPTZ20X"
+            ],
+            "fromCamera": {
+                "x": {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [-1,   1],
+                    "physical": [ 0, 360]
+                },
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [  0,    1],
+                    "physical": [  0,  -90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [0.004167, 0.083333],
+                    "physical": [   35.25,    705.0]
+                }
+            },
+            "toCamera": {
+                "x": null,
+                "y": null,
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [  0.0, 0.0456405, 0.0674902, 0.0772117, 0.118116, 0.14102, 0.16285, 0.188699, 0.217177, 0.239685, 0.292689, 0.340981, 0.387979, 0.435761, 0.462228, 0.498923, 0.5],
+                    "physical": [35.25,   43.3717,   47.2548,   48.9807,  56.2648, 60.3426, 64.2257,  68.8196,  78.4048,  87.7447,  112.457,  148.285,  201.727,  285.905,  353.501,  498.236, 705],
+                    "comment": [
+                        "req","resp",
+                        0.0000000000,0.0041670000,
+                        0.0456405000,0.0051270000,
+                        0.0674902000,0.0055860000,
+                        0.0772117000,0.0057900000,
+                        0.1181160000,0.0066510000,
+                        0.1410200000,0.0071330000,
+                        0.1628500000,0.0075920000,
+                        0.1886990000,0.0081350000,
+                        0.2171770000,0.0092680000,
+                        0.2396850000,0.0103720000,
+                        0.2926890000,0.0132930000,
+                        0.3409810000,0.0175280000,
+                        0.3879790000,0.0238450000,
+                        0.4357610000,0.0337950000,
+                        0.4622280000,0.0417850000,
+                        0.4989230000,0.0588930000,
+                        0.5000000000,0.0833330000
+                    ]
+                }
             }
         }
     ]

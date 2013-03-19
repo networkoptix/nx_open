@@ -87,6 +87,7 @@
 #include "client/client_module.h"
 #include <client/client_connection_data.h>
 #include "platform/platform_abstraction.h"
+#include "utils/common/long_runnable.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -249,7 +250,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 #ifndef API_TEST_MAIN
 
-int qnMain(int argc, char *argv[])
+int main(int argc, char **argv)
 {
 #ifdef Q_WS_X11
     XInitThreads();
@@ -328,7 +329,7 @@ int qnMain(int argc, char *argv[])
         application->setStartDragDistance(20);
 
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-        platform->monitor()->totalPartitionSpaceInfo();
+        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
 
 #ifdef Q_WS_X11
      //   QnX11LauncherWorkaround x11LauncherWorkaround;
@@ -538,19 +539,6 @@ int qnMain(int argc, char *argv[])
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
-
-    return result;
-}
-
-int main(int argc, char *argv[]) {
-    // TODO: this is an ugly hack for a problem with threads not being stopped before globals are destroyed.
-
-    int result = qnMain(argc, argv);
-#if defined(Q_OS_WIN)
-    Sleep(3000);
-#elif defined(Q_OS_LINUX)
-    sleep(3);
-#endif
 
     return result;
 }

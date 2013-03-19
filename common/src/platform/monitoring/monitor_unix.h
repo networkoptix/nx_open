@@ -1,9 +1,6 @@
 #ifndef QN_LINUX_MONITOR_H
 #define QN_LINUX_MONITOR_H
 
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_LINUX
 #include "sigar_monitor.h"
 
 class QnLinuxMonitorPrivate;
@@ -23,6 +20,5 @@ private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor)
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;
 };
-#endif // Q_OS_LINUX
 
 #endif // QN_LINUX_MONITOR_H
