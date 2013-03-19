@@ -63,8 +63,8 @@
 	<modules>
 		<module>build_environment</module>
 		<module>appserver</module>
-		<module>applauncher</module>
 		<module>common</module>
+		<module>applauncher</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
 		<module>client</module>		
