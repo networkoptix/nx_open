@@ -7,12 +7,12 @@ static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
 
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
+    m_maxStream(NULL),
     m_needStop(false),
     m_reverseMode(false),
     m_thumbnailsMode(false),
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_isOpened(false),
-    m_maxStream(0),
     m_ignoreNextSeek(false),
     m_lastMediaTime(0),
     m_noDataCounter(0)
@@ -266,5 +266,6 @@ QnTimePeriodList QnVMax480ArchiveDelegate::chunks()
 
 void QnVMax480ArchiveDelegate::beforeSeek(qint64 time) 
 { 
+    Q_UNUSED(time)
     m_beforeSeek = true;
 }

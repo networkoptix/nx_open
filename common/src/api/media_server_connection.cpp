@@ -383,9 +383,9 @@ namespace detail
 
 QnMediaServerConnection::QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent):
     QObject(parent),
+    m_nameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>())),
     m_url(mediaServerApiUrl),
-    m_proxyPort(0),
-    m_nameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()))
+    m_proxyPort(0)
 {
 }
 
