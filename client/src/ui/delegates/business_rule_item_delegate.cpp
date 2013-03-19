@@ -109,9 +109,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
                 BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(QnBusiness::EventTypeRole).toInt();
-                if (eventType == BusinessEventType::BE_Camera_Motion)
+                if (eventType == BusinessEventType::Camera_Motion)
                     btn->setDialogDelegate(new QnMotionEnabledDelegate(btn));
-                else if (eventType == BusinessEventType::BE_Camera_Input)
+                else if (eventType == BusinessEventType::Camera_Input)
                     btn->setDialogDelegate(new QnInputEnabledDelegate(btn));
 
                 return btn;
@@ -120,7 +120,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
 
-                if (actionType == BusinessActionType::BA_ShowPopup) {
+                if (actionType == BusinessActionType::ShowPopup) {
                     QComboBox* comboBox = new QComboBox(parent);
                     comboBox->addItem(tr("For All Users"), 0);
                     comboBox->addItem(tr("For Administrators Only"), 1);
@@ -131,13 +131,13 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-                if (actionType == BusinessActionType::BA_CameraRecording) {
+                if (actionType == BusinessActionType::CameraRecording) {
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
                 }
-                else if (actionType == BusinessActionType::BA_CameraOutput) {
+                else if (actionType == BusinessActionType::CameraOutput) {
                     btn->setDialogDelegate(new QnOutputEnabledDelegate(btn));
                 }
-                else if (actionType == BusinessActionType::BA_SendMail) {
+                else if (actionType == BusinessActionType::SendMail) {
                     btn->setDialogDelegate(new QnEmailValidDelegate(btn));
                     btn->setNodeType(Qn::UsersNode);
                 }
@@ -146,7 +146,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case QnBusiness::EventColumn:
             {
                 QComboBox* comboBox = new QComboBox(parent);
-                for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+                for (int i = 0; i < BusinessEventType::Count; i++) {
                     BusinessEventType::Value val = (BusinessEventType::Value)i;
                     comboBox->addItem(BusinessEventType::toString(val), val);
                 }
@@ -157,7 +157,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 bool instant = index.data(QnBusiness::InstantActionRole).toBool();
                 QComboBox* comboBox = new QComboBox(parent);
-                for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+                for (int i = 0; i < BusinessActionType::Count; i++) {
                     BusinessActionType::Value val = (BusinessActionType::Value)i;
                     if (instant && BusinessActionType::hasToggleState(val))
                         continue;
@@ -190,7 +190,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
 
-                if (actionType == BusinessActionType::BA_ShowPopup) {
+                if (actionType == BusinessActionType::ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
                     }
@@ -236,7 +236,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
 
-                if (actionType == BusinessActionType::BA_ShowPopup) {
+                if (actionType == BusinessActionType::ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         model->setData(index, comboBox->itemData(comboBox->currentIndex()));
                     }

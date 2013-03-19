@@ -26,8 +26,6 @@ public:
         qint64 timeStamp,
         const QString& inputPortID);
 
-    virtual QString toString() const;
-
     const QString& inputPortID() const;
 
     virtual bool checkCondition(ToggleState::Value state, const QnBusinessParams &params) const override;
