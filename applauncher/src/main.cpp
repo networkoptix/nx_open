@@ -5,6 +5,7 @@
 #include <QtSingleApplication>
 #include <qtservice.h>
 
+#include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 
 #include "launcher_fsm.h"
@@ -33,7 +34,9 @@ class LauncherService
 public:
     LauncherService( int argc, char **argv )
     : 
-        QtService<QtSingleApplication>(argc, argv, SERVICE_NAME)
+        QtService<QtSingleApplication>(argc, argv, SERVICE_NAME),
+        m_argc( argc ),
+        m_argv( argv )
     {
         setServiceDescription(SERVICE_NAME);
     }
@@ -41,9 +44,20 @@ public:
 protected:
     virtual void start() override
     {
-        //TODO initialize logging based on args
-        //cl_log.create( "C:/launcher.log", 1024*1024*10, 5, cl_logDEBUG1 );
-        //QnLog::initLog("DEBUG2");
+        QString logLevel;
+        QString logFilePath;
+
+        QnCommandLineParser commandLineParser;
+        commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
+        commandLineParser.addParameter( &logFilePath, "--log-file", NULL, QString() );
+        commandLineParser.parse( m_argc, m_argv, stderr );
+
+        //initialize logging based on args
+        if( !logFilePath.isEmpty() && !logLevel.isEmpty() )
+        {
+            cl_log.create( logFilePath, 1024*1024*10, 5, cl_logDEBUG1 );
+            QnLog::initLog( logLevel );
+        }
 
         cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
         cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
@@ -62,6 +76,8 @@ protected:
 
 private:
     LauncherFSM m_fsm;
+    int m_argc;
+    char** m_argv;
 };
 
 

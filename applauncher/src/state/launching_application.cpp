@@ -47,6 +47,7 @@ void LaunchingApplication::onEntry( QEvent* _event )
     }
 
     const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
+    NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(m_launcherCommonData.currentTask.version).arg(binPath), cl_logDEBUG2 );
     if( QProcess::startDetached(
             appData.installationDirectory + "/" + APPLICATION_BIN_NAME,
             m_launcherCommonData.currentTask.appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
