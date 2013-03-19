@@ -22,7 +22,7 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-
+QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 
 static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
 
@@ -57,7 +57,13 @@ protected:
         QObject::connect( &m_fsm, SIGNAL(stopped()), application(), SLOT(quit()) );
         m_fsm.start();
 
-        ::Sleep( 20 );
+        int ms = 20;
+#if defined(Q_OS_WIN)
+        ::Sleep(DWORD(ms));
+#else
+        struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
+        nanosleep(&ts, NULL);
+#endif
     }
 
     virtual void stop() override
