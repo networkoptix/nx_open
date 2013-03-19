@@ -64,7 +64,11 @@ void ProcessingApplicationTask::initFsm()
 
     InstallingApplication* installingApplication = new InstallingApplication( this, *m_fsmSharedData, m_installationManager );
 
-    LaunchingApplication* launchingApplication = new LaunchingApplication( this, *m_fsmSharedData, *m_installationManager );
+    LaunchingApplication* launchingApplication = new LaunchingApplication(
+        this,
+        *m_fsmSharedData,
+        *m_installationManager,
+        m_settings );
 
     QFinalState* finalState = new QFinalState( this );
 

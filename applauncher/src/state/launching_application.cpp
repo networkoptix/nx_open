@@ -17,11 +17,13 @@
 LaunchingApplication::LaunchingApplication(
     QState* const parent,
     const LauncherCommonData& launcherCommonData,
-    const InstallationManager& installationManager )
+    const InstallationManager& installationManager,
+    QSettings* const settings )
 :
     QState( parent ),
     m_launcherCommonData( launcherCommonData ),
-    m_installationManager( installationManager )
+    m_installationManager( installationManager ),
+    m_settings( settings )
 {
 }
 
@@ -54,6 +56,7 @@ void LaunchingApplication::onEntry( QEvent* _event )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(m_launcherCommonData.currentTask.version).arg(binPath), cl_logDEBUG1 );
         emit succeeded();
+        m_settings->setValue( QLatin1String("previousLaunchedVersion"), m_launcherCommonData.currentTask.version );
     }
     else
     {
