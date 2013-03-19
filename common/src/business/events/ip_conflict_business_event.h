@@ -11,7 +11,6 @@ class QnIPConflictBusinessEvent: public QnConflictBusinessEvent
     typedef QnConflictBusinessEvent base_type;
 public:
     QnIPConflictBusinessEvent(const QnResourcePtr& resource, const QHostAddress& address, const QStringList& macAddrList,  qint64 timeStamp);
-    virtual QString toString() const override;
 };
 
 typedef QSharedPointer<QnIPConflictBusinessEvent> QnIPConflictBusinessEventPtr;

@@ -871,7 +871,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+    if (businessAction->actionType() != BusinessActionType::ShowPopup)
         return;
 
     ensurePopupCollectionWidget();

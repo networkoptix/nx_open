@@ -14,15 +14,15 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
 
     switch(action->actionType())
     {
-    case BusinessActionType::BA_Bookmark:
+    case BusinessActionType::Bookmark:
         // TODO: implement me
         break;
-    case BusinessActionType::BA_CameraOutput:
+    case BusinessActionType::CameraOutput:
         return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
         break;
-    case BusinessActionType::BA_CameraRecording:
+    case BusinessActionType::CameraRecording:
         return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
-    case BusinessActionType::BA_PanicRecording:
+    case BusinessActionType::PanicRecording:
         return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
     default:
         break;
