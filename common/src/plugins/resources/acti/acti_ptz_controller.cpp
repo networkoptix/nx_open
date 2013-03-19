@@ -112,6 +112,8 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
     if (m_zoomVelocity == zoomVelocity)
         return 0;
 
+    stopZoomInternal();
+
     QString direction;
     if (zoomVelocity >= 0)
         direction = lit("TELE");
@@ -134,6 +136,8 @@ int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
 {
     if (m_moveVelocity.first == xVelocity && m_moveVelocity.second == yVelocity)
         return 0;
+
+    stopMoveInternal();
 
     static const QString directions[3][3] =
     {
@@ -180,8 +184,6 @@ int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomV
 
     QByteArray result;
     int errCode1 = 0, errCode2 = 0;
-
-    stopMoveInternal();
 
     if (zoomVelocity) 
         errCode1 = startZoomInternal(zoomVelocity);
