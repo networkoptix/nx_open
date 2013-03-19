@@ -159,7 +159,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     sock.connectToServer( launcherPipeName );
     if( !sock.waitForConnected( -1 ) )
     {
-        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
         NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
@@ -169,7 +168,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     const QByteArray& serializedTask = StartApplicationTask(versionToLaunch, appArgs).serialize();
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
-        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
         m_previousAddTaskToPipeOperationResult = sock.error();
         NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
