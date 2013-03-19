@@ -27,13 +27,17 @@ CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 
 # Prepare stage dir
 rm -rf $STAGEBASE
-mkdir -p $BINSTAGE
+mkdir -p $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+mkdir -p $BINSTAGE/1.4
 mkdir -p $BINSTAGE/styles
 mkdir -p $LIBSTAGE
 
 # Copy client binary and x264
-cp -r $CLIENT_BIN_PATH/client* $BINSTAGE
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE
+cp -r $CLIENT_BIN_PATH/client* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE$/{parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+cp -r $CLIENT_BIN_PATH/client* $BINSTAGE/1.4
+cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
+cp -r $CLIENT_BIN_PATH/applauncher* $BINSTAGE
 
 # Copy client startup script
 cp bin/client $BINSTAGE

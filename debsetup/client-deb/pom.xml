@@ -20,6 +20,16 @@
 	<packaging>pom</packaging>
 	<name>Client Deb Package</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>client</artifactId>
+			<version>1.4-SNAPSHOT</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${customization}</classifier>
+		</dependency>
+	</dependencies>	
+	
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
