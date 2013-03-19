@@ -277,9 +277,10 @@ bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringLis
     }
 
     sock.waitForReadyRead(-1);
-    QByteArray result = sock.readAll();
-    if (result != "ok")
-        return false;
+//    QByteArray result =
+            sock.readAll();
+//    if (result != "ok")
+//        return false;
 
     return true;
 }
