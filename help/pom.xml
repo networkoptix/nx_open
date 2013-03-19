@@ -71,6 +71,7 @@
 									<directory>${project.build.directory}</directory>
 								</fileset>									
 							</filesets>
+							<skip>${clean-skip}</skip>							
 						</configuration>
 					</execution>
 				</executions>
