@@ -83,9 +83,14 @@ int QnActiPtzController::stopMoveInternal()
     return status == CL_HTTP_SUCCESS ? 0 : -1;
 }
 
-int sign(qreal value)
+int sign2(qreal value)
 {
     return value >= 0 ? 1 : -1;
+}
+
+int sign3(qreal value)
+{
+    return value > 0 ? 1 : (value < 0 ? -1 : 0);
 }
 
 int scaleValue(qreal value, int min, int max)
@@ -93,7 +98,7 @@ int scaleValue(qreal value, int min, int max)
     if (value == 0)
         return 0;
 
-    return int (value * (max-min) + 0.5*sign(value)) + sign(value)*min;
+    return int (value * (max-min) + 0.5*sign2(value)) + sign2(value)*min;
 }
 
 int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
@@ -118,34 +123,15 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
 
 int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
 {
-    QString direction;
+    static const QString directions[3][3] =
+    {
+        { lit("UPLEFT"),   lit("UP"),   lit("UPRIGHT") },
+        { lit("LEFT"),     lit("STOP"), lit("RIGHT") },
+        { lit("DOWNLEFT"), lit("DOWN"), lit("DOWNRIGHT") }
+    };
+
+    QString direction = directions[1-sign3(yVelocity)][sign3(xVelocity)+1];
     QString requestStr;
-
-    if (xVelocity > 0)
-    {
-        if (yVelocity > 0)
-            direction = lit("UPRIGHT");
-        else if (yVelocity == 0)
-            direction = lit("RIGHT");
-        else 
-            direction = lit("DOWNRIGHT");
-    }
-    else if (xVelocity == 0) 
-    {
-        if (yVelocity > 0)
-            direction = lit("UP");
-        else
-            direction = lit("DOWN");
-    }
-    else {
-        if (yVelocity > 0)
-            direction = lit("UPLEFT");
-        else if (yVelocity == 0)
-            direction = lit("LEFT");
-        else 
-            direction = lit("DOWNLEFT");
-    }
-
 
     int xVelocityI = qAbs(scaleValue(xVelocity, 1,5));
     int yVelocityI = qAbs(scaleValue(yVelocity, 1,5));
@@ -154,8 +140,10 @@ int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
         requestStr = QString(lit("MOVE=%1,%2,%3")).arg(direction).arg(xVelocityI).arg(yVelocityI);
     else if (xVelocity)
         requestStr = QString(lit("MOVE=%1,%2")).arg(direction).arg(xVelocityI);
-    else
+    else if (yVelocity)
         requestStr = QString(lit("MOVE=%1,%2")).arg(direction).arg(yVelocityI);
+    else
+        requestStr = QString(lit("MOVE=%1")).arg(direction);
 
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(lit("encoder"), requestStr, status);
