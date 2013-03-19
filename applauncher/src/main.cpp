@@ -39,16 +39,12 @@ public:
     }
 
 protected:
-    //virtual int executeApplication() override
-    //{ 
-    //    return application()->exec();
-    //}
-
     virtual void start() override
     {
-        cl_log.create( "C:/launcher.log", 1024*1024*10, 5, cl_logDEBUG1 );
+        //TODO initialize logging based on args
+        //cl_log.create( "C:/launcher.log", 1024*1024*10, 5, cl_logDEBUG1 );
+        //QnLog::initLog("DEBUG2");
 
-        QnLog::initLog("DEBUG2");
         cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
         cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
         cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
@@ -56,25 +52,12 @@ protected:
         QObject::connect( &m_fsm, SIGNAL(finished()), application(), SLOT(quit()) );
         QObject::connect( &m_fsm, SIGNAL(stopped()), application(), SLOT(quit()) );
         m_fsm.start();
-
-        int ms = 20;
-#if defined(Q_OS_WIN)
-        ::Sleep(DWORD(ms));
-#else
-        struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
-        nanosleep(&ts, NULL);
-#endif
     }
 
     virtual void stop() override
     {
         m_fsm.stop();
         application()->quit();
-#if 0
-        m_main.exit();
-        m_main.wait();
-        stopServer(0);
-#endif
     }
 
 private:
