@@ -277,7 +277,10 @@ bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringLis
     }
 
     sock.waitForReadyRead(-1);
-    sock.readAll();
+    QByteArray result = sock.readAll();
+    if (result != "ok")
+        return false;
+
     return true;
 }
 
@@ -288,7 +291,7 @@ void LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     arguments << QLatin1String("--auth");
     arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
 
-    if (sendCommandToLauncher(connectInfo->version, arguments))
+    if (sendCommandToLauncher(stripVersion(connectInfo->version), arguments))
         qApp->exit();
     else
         QMessageBox::critical(this, tr("Launcher is not found"), tr("Launcher process is stopped."));
@@ -354,6 +357,22 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
     }
 
     if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+        QString minSupportedVersion = QLatin1String("1.4");
+        if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) {
+            QMessageBox::warning(
+                        this,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("You are about to connect to Enterprise Controller which has a different version:\n"\
+                           " - Client version: %1.\n"\
+                           " - EC version: %2.\n"\
+                           "Compatibility mode for versions lower than %3 is not supported.")
+                        .arg(QLatin1String(QN_ENGINE_VERSION))
+                        .arg(connectInfo->version)
+                        .arg(minSupportedVersion));
+            updateFocus();
+            return;
+        }
+
         if (QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
