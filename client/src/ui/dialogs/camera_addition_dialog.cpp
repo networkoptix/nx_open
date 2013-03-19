@@ -115,6 +115,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     m_header->setResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
     m_header->setResizeMode(ManufColumn, QHeaderView::ResizeToContents);
     m_header->setResizeMode(NameColumn, QHeaderView::ResizeToContents);
+    m_header->setResizeMode(UrlColumn, QHeaderView::Stretch);
     m_header->setClickable(true);
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
@@ -178,13 +179,6 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, ManufColumn, manufItem);
         ui->camerasTable->setItem(row, NameColumn, nameItem);
         ui->camerasTable->setItem(row, UrlColumn, urlItem);
-    }
-
-    if (ui->camerasTable->rowCount() > 0) {
-        ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::ResizeToContents);
-    }
-    else {
-        ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::Stretch);
     }
 }
 

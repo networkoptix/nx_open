@@ -79,7 +79,8 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
         return false;
 
 
-    int ch = consumer->getChannel();
+    //TODO: #vasilenko what was it for?
+    //int ch = consumer->getChannel();
 
     QMutexLocker  lock(&m_mutex);
 
@@ -105,6 +106,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
 bool VMaxStreamFetcher::vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec)
 {
+    Q_UNUSED(consumer)
     if (!safeOpen())
         return false;
 
@@ -254,7 +256,7 @@ int VMaxStreamFetcher::getMaxQueueSize() const
     QMutexLocker lock(&m_mutex);
     for (ConsumersMap::const_iterator itr = m_dataConsumers.constBegin(); itr != m_dataConsumers.constEnd(); ++itr)
     {
-        QnVmax480DataConsumer* consumer = itr.key();
+        //QnVmax480DataConsumer* consumer = itr.key();
         CLDataQueue* queue = itr.value();
         maxQueueSize = qMax(queue->size(), maxQueueSize);
     }
@@ -391,7 +393,7 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
 
     updatePlaybackMask();
 
-    if (!m_dataConsumers.isEmpty() && !m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
+    if (!m_dataConsumers.isEmpty() && !m_isLive && m_lastMediaTime != (qint64)AV_NOPTS_VALUE)
     {
         bool dataFound = false;
         qint64 time = findRoundTime(m_lastMediaTime, &dataFound);
@@ -465,7 +467,7 @@ bool VMaxStreamFetcher::safeOpen()
             QnSleep::msleep(1000);
             return false; // prevent reconnect flood
         }
-        if (!m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
+        if (!m_isLive && m_lastMediaTime != (qint64)AV_NOPTS_VALUE)
             m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
     }
 
@@ -503,5 +505,5 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
 bool VMaxStreamFetcher::isPlaying() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_lastSeekPos != AV_NOPTS_VALUE;
+    return m_lastSeekPos != (qint64)AV_NOPTS_VALUE;
 }

@@ -18,9 +18,9 @@ public:
     virtual ~QnVmax480DataConsumer() {}
     virtual int getChannel() const { return -1; }
 
-    virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) {}
-    virtual void onGotMonthInfo(const QDate& month, int monthInfo)  {}
-    virtual void onGotDayInfo(int dayNum, const QByteArray& data)  {}
+    virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) { Q_UNUSED(startDateTime) Q_UNUSED(endDateTime) }
+    virtual void onGotMonthInfo(const QDate& month, int monthInfo)  { Q_UNUSED(month) Q_UNUSED(monthInfo) }
+    virtual void onGotDayInfo(int dayNum, const QByteArray& data)  { Q_UNUSED(dayNum) Q_UNUSED(data) }
 
     virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
 };

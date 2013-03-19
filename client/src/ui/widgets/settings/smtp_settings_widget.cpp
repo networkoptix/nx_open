@@ -88,9 +88,7 @@ void QnSmtpSettingsWidget::update() {
 
 void QnSmtpSettingsWidget::submit() {
     QnEmail::Settings result = settings();
-    //if (!result.isNull())
-        QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
-    //TODO: #GDM else?
+    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized());
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {

@@ -153,6 +153,8 @@ namespace aio
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
                     //TODO/IMPL if we changing socket handler MUST not remove task
+                    //TODO: #AK gcc warning: comparison between 'enum PollSet::EventType' and 'enum aio::SocketAddRemoveTask::TaskType' [-Wenum-compare]
+                    // use static cast and write corresponding comments near enums declarations.
                     if( it->eventType == SocketAddRemoveTask::tRemoving )
                     {
                         //cancelling remove task

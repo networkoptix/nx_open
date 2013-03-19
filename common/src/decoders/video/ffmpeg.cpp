@@ -265,6 +265,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
 {
+    //TODO: #AK
     //TODO/IMPL
 }
 
@@ -275,6 +276,8 @@ unsigned int CLFFmpegVideoDecoder::getDecoderCaps() const
 
 void CLFFmpegVideoDecoder::setSpeed( float newValue )
 {
+    Q_UNUSED(newValue)
+    //TODO: #AK
 }
 
 int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
