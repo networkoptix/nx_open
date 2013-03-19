@@ -151,6 +151,8 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
+    qDebug() << "SENT POSITION" << position;
+
     int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
     m_requestByHandle[handle] = position;
@@ -226,6 +228,8 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
     if(!camera)
         return; /* Already removed from the pool. */
+
+    qDebug() << "GOT POSITION" << QVector3D(xPos, yPox, zoomPos);
 
     m_cameraByHandle.remove(handle);
     

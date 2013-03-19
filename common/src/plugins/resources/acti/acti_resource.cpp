@@ -11,9 +11,8 @@
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
+#include "acti_ptz_controller.h"
 
-
-using namespace std;
 
 const char* QnActiResource::MANUFACTURE = "ACTI";
 static const int TCP_TIMEOUT = 3000;
@@ -74,8 +73,9 @@ QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
     return QSize(params[0].trimmed().toInt(), params[1].trimmed().toInt());
 }
 
-QByteArray unquoteStr(const QByteArray& value)
+QByteArray QnActiResource::unquoteStr(const QByteArray& v)
 {
+    QByteArray value = v.trimmed();
     int pos1 = value.startsWith('\'') ? 1 : 0;
     int pos2 = value.endsWith('\'') ? 1 : 0;
     return value.mid(pos1, value.length()-pos1-pos2);
@@ -214,6 +214,8 @@ bool QnActiResource::initInternal()
         m_availBitrate = parseVideoBitrateCap(bitrateCap);
 
 
+    initializePtz();
+
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
     setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
@@ -306,4 +308,19 @@ bool QnActiResource::hasDualStreaming() const
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toInt();
+}
+
+QnAbstractPtzController* QnActiResource::getPtzController()
+{
+    return m_ptzController.data();
+}
+
+void QnActiResource::initializePtz()
+{
+    m_ptzController.reset(new QnActiPtzController(this));
+    Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
+    if(capabilities == Qn::NoCapabilities)
+        m_ptzController.reset();
+
+    setCameraCapabilities((getCameraCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }

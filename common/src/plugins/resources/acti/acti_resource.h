@@ -11,7 +11,7 @@
 #include "utils/network/simple_http_client.h"
 #include <utils/network/http/multipartcontentparser.h>
 
-class QnAxisPtzController;
+class QnActiPtzController;
 
 class QnActiResource : public QnPhysicalCameraResource
 {
@@ -45,6 +45,9 @@ public:
     int roundBitrate(int srcBitrateKbps) const;
 
     bool isAudioSupported() const;
+    virtual QnAbstractPtzController* getPtzController() override;
+
+    static QByteArray unquoteStr(const QByteArray& value);
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -70,12 +73,14 @@ private:
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QMap<QByteArray, QByteArray> parseReport(const QByteArray& report) const;
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
+    void initializePtz();
 private:
     bool m_hasAudio;
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
     QList<int> m_availBitrate;
     int m_rtspPort;
+    QScopedPointer<QnActiPtzController> m_ptzController;
 };
 
 #endif // __ACTI_RESOURCE_H__
