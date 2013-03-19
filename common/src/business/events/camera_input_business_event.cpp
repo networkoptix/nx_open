@@ -52,7 +52,7 @@ bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusine
 }
 
 bool QnCameraInputEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return (camera->getCameraCapabilities() & Qn::relayInput);
+    return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
 }
 
 bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {

@@ -45,7 +45,7 @@ QString QnCameraOutputBusinessAction::getExternalUniqKey() const
 }
 
 bool QnCameraOutputBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return camera->getCameraCapabilities() & Qn::relayOutput;
+    return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
 }
 
 bool QnCameraOutputBusinessAction::isResourcesListValid(const QnResourceList &resources) {
