@@ -9,7 +9,7 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
     base_type(QnBusinessParams())
 {
     QnBusinessParams runtimeParams;
-    QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::Value(BusinessEventType::BE_SystemHealthMessage + message));
+    QnBusinessEventRuntime::setEventType(&runtimeParams, BusinessEventType::Value(BusinessEventType::SystemHealthMessage + message));
     QnBusinessEventRuntime::setEventTimestamp(&runtimeParams, qnSyncTime->currentUSecsSinceEpoch());
     QnBusinessEventRuntime::setEventResourceId(&runtimeParams, eventResourceId);
     setRuntimeParams(runtimeParams);

@@ -9,8 +9,6 @@ class QnMServerConflictBusinessEvent: public QnConflictBusinessEvent
     typedef QnConflictBusinessEvent base_type;
 public:
     QnMServerConflictBusinessEvent(const QnResourcePtr& mServerRes, qint64 timeStamp, const QList<QByteArray>& conflictList);
-
-    virtual QString toString() const override;
 };
 
 typedef QSharedPointer<QnMServerConflictBusinessEvent> QnMServerConflictBusinessEventPtr;

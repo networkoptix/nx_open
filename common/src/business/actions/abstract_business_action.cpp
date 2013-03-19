@@ -9,35 +9,35 @@ namespace BusinessActionType {
 
     QString toString(Value val) {
         switch(val) {
-            case BA_NotDefined:         return QObject::tr("---");
-            case BA_CameraOutput:       return QObject::tr("Camera output");
-            case BA_Bookmark:           return QObject::tr("Bookmark");
-            case BA_CameraRecording:    return QObject::tr("Camera recording");
-            case BA_PanicRecording:     return QObject::tr("Panic recording");
-            case BA_SendMail:           return QObject::tr("Send mail");
-            case BA_Alert:              return QObject::tr("Alert");
-            case BA_ShowPopup:          return QObject::tr("Show notification");
+            case NotDefined:         return QObject::tr("---");
+            case CameraOutput:       return QObject::tr("Camera output");
+            case Bookmark:           return QObject::tr("Bookmark");
+            case CameraRecording:    return QObject::tr("Camera recording");
+            case PanicRecording:     return QObject::tr("Panic recording");
+            case SendMail:           return QObject::tr("Send mail");
+            case Alert:              return QObject::tr("Alert");
+            case ShowPopup:          return QObject::tr("Show notification");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);
     }
 
     bool requiresCameraResource(Value val) {
         switch(val) {
-            case BA_NotDefined:         return false;
-            case BA_CameraOutput:       return true;
-            case BA_Bookmark:           return true;
-            case BA_CameraRecording:    return true;
-            case BA_PanicRecording:     return false;
-            case BA_SendMail:           return false;
-            case BA_Alert:              return false;
-            case BA_ShowPopup:          return false;
+            case NotDefined:         return false;
+            case CameraOutput:       return true;
+            case Bookmark:           return true;
+            case CameraRecording:    return true;
+            case PanicRecording:     return false;
+            case SendMail:           return false;
+            case Alert:              return false;
+            case ShowPopup:          return false;
         }
         return false;
     }
 
     bool requiresUserResource(Value val) {
         switch(val) {
-            case BA_SendMail:           return true;
+            case SendMail:           return true;
         default:
             break;
         }
@@ -46,14 +46,14 @@ namespace BusinessActionType {
 
     bool hasToggleState(Value val) {
         switch(val) {
-            case BA_NotDefined:         return false;
-            case BA_CameraOutput:       return true;
-            case BA_Bookmark:           return false;
-            case BA_CameraRecording:    return true;
-            case BA_PanicRecording:     return true;
-            case BA_SendMail:           return false;
-            case BA_Alert:              return false;
-            case BA_ShowPopup:          return false;
+            case NotDefined:         return false;
+            case CameraOutput:       return true;
+            case Bookmark:           return false;
+            case CameraRecording:    return true;
+            case PanicRecording:     return true;
+            case SendMail:           return false;
+            case Alert:              return false;
+            case ShowPopup:          return false;
         }
         return false;
     }

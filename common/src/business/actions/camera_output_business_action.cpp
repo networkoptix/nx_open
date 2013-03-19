@@ -27,7 +27,7 @@ namespace BusinessActionParameters {
 
 
 QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(const QnBusinessParams &runtimeParams):
-    base_type(BusinessActionType::BA_CameraOutput, runtimeParams)
+    base_type(BusinessActionType::CameraOutput, runtimeParams)
 {
 }
 

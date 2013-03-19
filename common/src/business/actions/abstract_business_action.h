@@ -7,21 +7,21 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
 
-// TODO: #Elric have BA_ prefix => namespace not needed
+// TODO: #Elric have  prefix => namespace not needed
 namespace BusinessActionType
 {
     enum Value
     {
-        BA_CameraRecording,    // start camera recording
-        BA_PanicRecording,     // activate panic recording mode
+        CameraRecording,    // start camera recording
+        PanicRecording,     // activate panic recording mode
         // these actions can be executed from any endpoint. actually these actions call specified function at ec
         /*!
             parameters:\n
                 - emailAddress (string, required)
         */
-        BA_SendMail,
+        SendMail,
 
-        BA_ShowPopup,
+        ShowPopup,
 
         //!change camera output state
         /*!
@@ -29,19 +29,19 @@ namespace BusinessActionType
                 - relayOutputID (string, required)          - id of output to trigger
                 - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
         */
-        BA_CameraOutput,
+        CameraOutput,
 
-        BA_Alert,              // write a record to the server's log
-        BA_Bookmark,           // mark part of camera archive as undeleted
+        Alert,              // write a record to the server's log
+        Bookmark,           // mark part of camera archive as undeleted
 
         // media server based actions
-        BA_NotDefined,
+        NotDefined,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        BA_Count = BA_Alert
+        Count = Alert
 
     };
 
@@ -72,8 +72,8 @@ public:
 
     /*
     * Resource depend of action type.
-    * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
-    * For actions: BA_SendMail, BA_Alert, BA_ShowPopup resource is not used
+    * For actions: CameraOutput, Bookmark, CameraRecording, PanicRecording resource MUST be camera
+    * For actions: SendMail, Alert, ShowPopup resource is not used
     */
     void setResources(const QnResourceList& resources);
 
@@ -104,7 +104,7 @@ public:
     */
     virtual QString getExternalUniqKey() const;
 
-private:
+protected:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;
     bool m_receivedFromRemoteHost;

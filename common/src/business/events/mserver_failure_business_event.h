@@ -7,9 +7,7 @@ class QnMServerFailureBusinessEvent: public QnReasonedBusinessEvent
 {
     typedef QnReasonedBusinessEvent base_type;
 public:
-    QnMServerFailureBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp, int reasonCode);
-
-    virtual QString toString() const override;
+    QnMServerFailureBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp, QnBusiness::EventReason reasonCode);
 };
 
 typedef QSharedPointer<QnMServerFailureBusinessEvent> QnMServerFailureBusinessEventPtr;

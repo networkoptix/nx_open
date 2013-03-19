@@ -17,6 +17,22 @@ namespace ToggleState
 
     };
 }
+
+namespace QnBusiness {
+
+    enum EventReason {
+        NoReason,
+        NetworkIssueNoFrame,
+        NetworkIssueConnectionClosed,
+        NetworkIssueRtpPacketLoss,
+        MServerIssueTerminated,
+        MServerIssueStarted,
+        StorageIssueIoError,
+        StorageIssueNotEnoughSpeed
+    };
+
+}
+
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 
 
