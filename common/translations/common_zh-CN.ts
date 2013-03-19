@@ -154,34 +154,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="39"/>
-        <source>%1 Event received from resource %2 (%3)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="43"/>
-        <source>%1 Event received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="60"/>
-        <source>Event %1 caught from %2 (address %3):
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="62"/>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="63"/>
-        <source>UNKNOWN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="68"/>
-        <source>Adresates:
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="11"/>
         <source>User Defined (%1)</source>
         <translation type="unfinished"></translation>
@@ -227,90 +199,93 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="183"/>
-        <source>event type: %1
-</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="38"/>
+        <source>User defined event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="184"/>
-        <source>timestamp: %1
-</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="51"/>
+        <source>Camera %1 disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/ip_conflict_business_event.cpp" line="15"/>
-        <source> conflicting cameras:</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="54"/>
+        <source>Input signal on camera %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_conflict_business_event.cpp" line="23"/>
-        <source>  several media servers are running on different EC! current EC connection %1 conflict with EC(s): </source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="57"/>
+        <source>Motion detected on camera %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_failure_business_event.cpp" line="20"/>
-        <source>Media server was terminated unexpectedly</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="98"/>
+        <source>Input port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_failure_business_event.cpp" line="23"/>
-        <source>Media server is started after an unexpected shutdown</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="147"/>
+        <source>at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_failure_business_event.cpp" line="31"/>
-        <source>. Reason: %1.
-</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="149"/>
+        <source>%1 times since %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="23"/>
-        <source>No video frame during %1 seconds</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="156"/>
+        <source>Adresates:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="26"/>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="173"/>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="176"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="195"/>
+        <source>No video frame received during last %1 seconds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="200"/>
         <source>Connection to camera was unexpectedly closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="33"/>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="207"/>
         <source>RTP packet loss detected. Prev seq.=%1 next seq.=%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="44"/>
-        <source>  reason: %1
-</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="214"/>
+        <source>Server terminated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="38"/>
-        <source>IO error occured.</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="218"/>
+        <source>Server started after crash.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="41"/>
-        <source>Not enough HDD/SSD speed for recording.</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="222"/>
+        <source>I/O Error occured at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="49"/>
-        <source>  reason%1
-</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="227"/>
+        <source>Not enough HDD/SSD speed for recording at %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="51"/>
-        <source>  storage%1
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="53"/>
-        <source>  no storage for writting
-</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="245"/>
+        <source>conflicted with</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

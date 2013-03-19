@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">添加</translation>
+        <translation type="obsolete">添加</translation>
     </message>
     <message>
         <source>Name</source>
@@ -597,7 +597,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Expire Date</source>
+        <source>Expiry Date</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3838,7 +3838,7 @@ All changes will be lost after program exit.</source>
         <translation type="unfinished">加载中</translation>
     </message>
     <message>
-        <source>Activate License to remove this message</source>
+        <source>Activate analog license to remove this message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4147,6 +4147,10 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Error: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while receiving settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
