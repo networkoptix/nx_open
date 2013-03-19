@@ -21,61 +21,13 @@ namespace {
 } // anonymous namespace
 
 
-class QnActiParameterMap {
-public:
-    QnActiParameterMap() {};
-
-    void insert(const QString &key, const QString &value) {
-        m_data[key] = value;
-    }
-
-    template<class T>
-    T value(const char *key, const T &defaultValue = T()) const {
-        QString result = m_data.value(QLatin1String(key));
-        if(result.isNull())
-            return defaultValue;
-
-        QVariant variant(result); // TODO: use sane lexical cast here.
-        if(variant.convert(static_cast<QVariant::Type>(qMetaTypeId<T>()))) {
-            return variant.value<T>();
-        } else {
-            return defaultValue;
-        }
-    }
-
-    template<class T>
-    bool value(const char *key, T *value) const {
-        QString result = m_data.value(QLatin1String(key));
-        if(result.isNull())
-            return false;
-
-        QVariant variant(result); // TODO: use sane lexical cast here.
-        if(variant.convert(static_cast<QVariant::Type>(qMetaTypeId<T>()))) {
-            *value = variant.value<T>();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-private:
-#ifdef _DEBUG /* QMap is easier to look through in debug. */
-    QMap<QString, QString> m_data;
-#else
-    QHash<QString, QString> m_data;
-#endif
-};
-
-
 QnActiPtzController::QnActiPtzController(QnActiResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),
     m_spaceMapper(NULL),
     m_zoomInProgress(0),
-    m_moveInProgress(0),
-    m_minAngle(0),
-    m_maxAngle(0)
+    m_moveInProgress(0)
 {
     init();
 }
@@ -91,8 +43,9 @@ void QnActiPtzController::init()
     if (status != CL_HTTP_SUCCESS || !zoomString.startsWith("ZOOM_CAP_GET="))
         return;
 
-    m_capabilities |= Qn::AllPtzCapabilities;
-
+    m_capabilities |= QnCommonGlobals::AbsolutePtzCapability;
+    m_capabilities |= QnCommonGlobals::ContinuousPanTiltCapability;
+    m_capabilities |= QnCommonGlobals::ContinuousZoomCapability;
 
     qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
     qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
@@ -105,28 +58,15 @@ void QnActiPtzController::init()
     if (zoomParams.size() > 1)
         maxAngle = m_resource->unquoteStr(zoomParams[1]).toInt();
 
-
-    /* These are in 1/10th of a degree, so we convert them away. */
-    //minAngle /= 10.0;
-    //maxAngle /= 10.0;
-
-    /* We implement E-Flip, so we don't want strange tilt angles. */
-    maxTiltPhysical = qMin(maxTiltPhysical, 90.0);
-    minTiltPhysical = qMax(minTiltPhysical, -90.0);
-
     QnScalarSpaceMapper xMapper(minPanLogical, maxPanLogical, minPanPhysical, maxPanPhysical, Qn::PeriodicExtrapolation);
     QnScalarSpaceMapper yMapper(minTiltLogical, maxTiltLogical, minTiltPhysical, maxTiltPhysical, Qn::ConstantExtrapolation);
 
-    m_minAngle = minAngle;
-    m_maxAngle = maxAngle/DIGITAL_ZOOM_COEFF;
-
-    QnScalarSpaceMapper zMapper(minAngle, maxAngle, m_minAngle, m_maxAngle, Qn::ConstantExtrapolation); // 30.972, 505.445
-    //QnScalarSpaceMapper zMapper(minAngle, maxAngle, 1, 1000, Qn::ConstantExtrapolation); // 30.972, 505.445
-
-    /* Note that we do not care about actual zoom limits on the camera. 
-     * It's up to the camera to enforce them. */
+    QnScalarSpaceMapper zMapper(minAngle, maxAngle, minAngle, maxAngle/DIGITAL_ZOOM_COEFF, Qn::ConstantExtrapolation);
+    QnScalarSpaceMapper toCameraZMapper(minAngle, maxAngle/DIGITAL_ZOOM_COEFF, 0.0, 1000.0, Qn::ConstantExtrapolation);
     
-    m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), QStringList());
+    m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), 
+                                         QnVectorSpaceMapper(xMapper, yMapper, toCameraZMapper),
+                                         QStringList());
 }
 
 int QnActiPtzController::stopZoomInternal()
@@ -272,18 +212,6 @@ int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomV
     return errCode;
 }
 
-int QnActiPtzController::f35ZoomToNativeZoom(qreal f35Zoom)
-{
-    qreal percent = (f35Zoom - m_minAngle) / (m_maxAngle - m_minAngle);
-    return percent * 1000 + 0.5;
-}
-
-qreal QnActiPtzController::nativeZoomToF35Zoom(int value)
-{
-    qreal percent = (value - m_minAngle) / (m_maxAngle*DIGITAL_ZOOM_COEFF - m_minAngle);
-    return percent * (m_maxAngle-m_minAngle) + m_minAngle;
-}
-
 int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) 
 {
     QMutexLocker lock(&m_mutex);
@@ -294,7 +222,7 @@ int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     if (status != CL_HTTP_SUCCESS)
         return -1;
 
-    result = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=DIRECT,%1").arg(f35ZoomToNativeZoom(zoomPos)), status);
+    result = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=DIRECT,%1").arg(zoomPos), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
 
@@ -320,7 +248,7 @@ int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     if (status != CL_HTTP_SUCCESS)
         return -1;
     
-    *zoomPos = nativeZoomToF35Zoom(result.toInt());
+    *zoomPos = result.toInt();
 
     return 0;
 }

@@ -27,9 +27,6 @@ private:
     int startMoveInternal(qreal xVelocity, qreal yVelocity);
     int stopZoomInternal();
     int stopMoveInternal();
-
-    int f35ZoomToNativeZoom(qreal f35Zoom);
-    qreal nativeZoomToF35Zoom(int value);
 private:
     QMutex m_mutex;
     QnActiResource* m_resource;
@@ -38,9 +35,6 @@ private:
 
     bool m_zoomInProgress;
     bool m_moveInProgress;
-    
-    qreal m_minAngle;
-    qreal m_maxAngle;
 };
 
 
