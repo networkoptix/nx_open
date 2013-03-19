@@ -33,8 +33,8 @@ private:
     Qn::CameraCapabilities m_capabilities;
     QnPtzSpaceMapper *m_spaceMapper;
 
-    bool m_zoomInProgress;
-    bool m_moveInProgress;
+    qreal m_zoomVelocity;
+    QPair<qreal, qreal> m_moveVelocity;
 };
 
 

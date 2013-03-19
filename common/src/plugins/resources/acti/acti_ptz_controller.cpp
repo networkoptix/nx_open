@@ -26,8 +26,8 @@ QnActiPtzController::QnActiPtzController(QnActiResource* resource):
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),
     m_spaceMapper(NULL),
-    m_zoomInProgress(0),
-    m_moveInProgress(0)
+    m_zoomVelocity(0.0),
+    m_moveVelocity(0.0, 0.0)
 {
     init();
 }
@@ -72,15 +72,21 @@ void QnActiPtzController::init()
 int QnActiPtzController::stopZoomInternal()
 {
     CLHttpStatus status;
-    QByteArray result = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=STOP"), status);
-    return status == CL_HTTP_SUCCESS ? 0 : -1;
+    QByteArray data = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=STOP"), status);
+    int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
+    if (result == 0)
+        m_zoomVelocity = 0.0;
+    return result;
 }
 
 int QnActiPtzController::stopMoveInternal()
 {
     CLHttpStatus status;
-    QByteArray result = m_resource->makeActiRequest(lit("encoder"), lit("MOVE=STOP"), status);
-    return status == CL_HTTP_SUCCESS ? 0 : -1;
+    QByteArray data = m_resource->makeActiRequest(lit("encoder"), lit("MOVE=STOP"), status);
+    int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
+    if (result == 0)
+        m_moveVelocity = QPair<qreal, qreal>(0.0, 0.0);
+    return result;
 }
 
 int sign2(qreal value)
@@ -103,6 +109,9 @@ int scaleValue(qreal value, int min, int max)
 
 int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
 {
+    if (m_zoomVelocity == zoomVelocity)
+        return 0;
+
     QString direction;
     if (zoomVelocity >= 0)
         direction = lit("TELE");
@@ -116,13 +125,16 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
     int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
     
     if (result == 0)
-        m_zoomInProgress = true;
+        m_zoomVelocity = zoomVelocity;
 
     return result;
 }
 
 int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
 {
+    if (m_moveVelocity.first == xVelocity && m_moveVelocity.second == yVelocity)
+        return 0;
+
     static const QString directions[3][3] =
     {
         { lit("UPLEFT"),   lit("UP"),   lit("UPRIGHT") },
@@ -146,7 +158,7 @@ int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
     int result =  (status == CL_HTTP_SUCCESS ? 0 : -1);
 
     if (result == 0)
-        m_moveInProgress = true;
+        m_moveVelocity = QPair<qreal, qreal>(xVelocity, yVelocity);
 
     return result;
 }
@@ -155,22 +167,11 @@ int QnActiPtzController::stopMove()
 {
     QMutexLocker lock(&m_mutex);
 
-    int result1 = 0, result2 = 0;
-    if (m_zoomInProgress) {
-        result1 = stopZoomInternal();
-        m_zoomInProgress = false;
-    }
-    if (m_moveInProgress) {
-        result2 = stopMoveInternal();
-        m_moveInProgress = false;
-    }
+    int errCode1 = 0, errCode2 = 0;
+    errCode1 = stopZoomInternal();
+    errCode2 = stopMoveInternal();
 
-    if (result1)
-        return result1;
-    else if (result2)
-        return result2;
-    else
-        return 0;
+    return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }
 
 int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) 
@@ -178,22 +179,16 @@ int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomV
     QMutexLocker lock(&m_mutex);
 
     QByteArray result;
-    int errCode = 0;
+    int errCode1 = 0, errCode2 = 0;
 
     stopMoveInternal();
 
     if (zoomVelocity) 
-    {
-        errCode = startZoomInternal(zoomVelocity);
-        m_zoomInProgress = true;
-    }
-    else if (xVelocity || yVelocity) 
-    {
-        startMoveInternal(xVelocity, yVelocity);
-        m_moveInProgress = true;
-    }
+        errCode1 = startZoomInternal(zoomVelocity);
+    if (xVelocity || yVelocity) 
+        errCode2 = startMoveInternal(xVelocity, yVelocity);
 
-    return errCode;
+    return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }
 
 int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) 
