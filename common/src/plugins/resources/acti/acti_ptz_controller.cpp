@@ -2,11 +2,9 @@
 
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
-#include <utils/network/simple_http_client.h>
 
 #include "acti_resource.h"
 
-static const quint16 DEFAULT_ACTI_API_PORT = 80;
 static const qreal DIGITAL_ZOOM_COEFF = 5.0;
 
 namespace {
@@ -232,4 +230,3 @@ Qn::CameraCapabilities QnActiPtzController::getCapabilities() {
 const QnPtzSpaceMapper *QnActiPtzController::getSpaceMapper() {
     return m_spaceMapper;
 }
-
