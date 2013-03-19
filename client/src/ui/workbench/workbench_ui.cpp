@@ -1368,7 +1368,7 @@ QRectF QnWorkbenchUi::updatedPopupButtonGeometry(const QRectF &sliderGeometry, c
     if (m_calendarVisible)
         geometry.moveBottom(calendarGeometry.top());
     else if (m_sliderVisible)
-        geometry.moveBottom(sliderGeometry.top());
+        geometry.moveBottom(qMin(sliderGeometry.top(), m_controlsWidgetRect.bottom()));
     else
         geometry.moveBottom(m_controlsWidgetRect.bottom());
     return geometry;
