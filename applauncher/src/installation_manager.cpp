@@ -42,7 +42,7 @@ bool InstallationManager::getInstalledVersionData(
     const QString& version,
     InstallationManager::AppData* const appData ) const
 {
-    std::map<QString, AppData>::const_iterator it = m_installedProductsByVersion.find(version);
+    std::map<QString, AppData, std::greater<QString> >::const_iterator it = m_installedProductsByVersion.find(version);
     if( it == m_installedProductsByVersion.end() )
         return false;
     *appData = it->second;

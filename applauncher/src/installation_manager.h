@@ -57,8 +57,8 @@ public:
 
 private:
     QString m_errorString;
-    //!map<version, AppData>
-    std::map<QString, AppData> m_installedProductsByVersion;
+    //!map<version, AppData>. Most recent version first
+    std::map<QString, AppData, std::greater<QString> > m_installedProductsByVersion;
 
     void setErrorString( const QString& _errorString );
     void readInstalledVersions();
