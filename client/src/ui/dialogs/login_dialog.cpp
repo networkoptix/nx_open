@@ -256,6 +256,24 @@ void LoginDialog::resetAutoFoundConnectionsModel() {
 
 }
 
+bool sendToLauncher(const QString &version, const QStringList &arguments) {
+    //DUMMY
+    return false;
+}
+
+void LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
+
+    QStringList arguments;
+    arguments << QLatin1String("--no-single-application");
+    arguments << QLatin1String("--auth");
+    arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+
+    if (sendToLauncher(connectInfo->version, arguments))
+        qApp->exit();
+    else
+        QMessageBox::critical(this, tr("Launcher is not found"), tr("Launcher process is stopped."));
+}
+
 void LoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
@@ -316,11 +334,16 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
     }
 
     if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
-        QMessageBox::warning(
+        if (QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
-            tr("Connection could not be established.\nThe Enterprise Controller is incompatible with this client. Please upgrade your client or contact your VMS administrator.")
-        );
+            tr("Client version is %1.\n"\
+               "You are trying to connect to EC %2.\n"\
+               "Do you want to restart client in compatibility mode?")
+                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(connectInfo->version),
+                    QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+            restartInCompatibilityMode(connectInfo);
         updateFocus();
         return;
     }

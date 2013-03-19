@@ -48,6 +48,13 @@ protected:
      * Reset part of connections model containing auto-found controllers.
      */
     void resetAutoFoundConnectionsModel();
+
+    /**
+     * Write to the settings file last connect info,
+     * send the required version to the applauncher,
+     * close the current instance of the client.
+     */
+    void restartInCompatibilityMode(QnConnectInfoPtr connectInfo);
 private slots:
     void updateAcceptibility();
     void updateFocus();
