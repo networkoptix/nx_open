@@ -10,12 +10,14 @@ static const quint16 DEFAULT_ACTI_API_PORT = 80;
 static const qreal DIGITAL_ZOOM_COEFF = 5.0;
 
 namespace {
-    /**
-     * \param fovDegreees               Width-based FOV in degrees.
-     * \returns                         Width-based 35mm-equivalent focal length.
-     */
-    qreal fovTo35mmEquiv(qreal fovDegreees) {
-        return (36.0 / 2) / std::tan((fovDegreees / 2) * (M_PI / 180));
+    int sign2(qreal value)
+    {
+        return value >= 0 ? 1 : -1;
+    }
+
+    int sign3(qreal value)
+    {
+        return value > 0 ? 1 : (value < 0 ? -1 : 0);
     }
 
 } // anonymous namespace
@@ -87,16 +89,6 @@ int QnActiPtzController::stopMoveInternal()
     if (result == 0)
         m_moveVelocity = QPair<qreal, qreal>(0.0, 0.0);
     return result;
-}
-
-int sign2(qreal value)
-{
-    return value >= 0 ? 1 : -1;
-}
-
-int sign3(qreal value)
-{
-    return value > 0 ? 1 : (value < 0 ? -1 : 0);
 }
 
 int scaleValue(qreal value, int min, int max)
@@ -182,7 +174,6 @@ int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomV
 {
     QMutexLocker lock(&m_mutex);
 
-    QByteArray result;
     int errCode1 = 0, errCode2 = 0;
 
     if (zoomVelocity) 
