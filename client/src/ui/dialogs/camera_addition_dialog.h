@@ -50,6 +50,19 @@ namespace detail{
             m_lastError = QString();
             m_cameras = cameras;
 
+            /*
+            m_cameras
+                    << QnCamerasFoundInfo(tr("http://10.0.0.2/testcamera/tescamera_url/tescamera_url/tescamera_url/tescamera_url"),
+                                            tr("Test Camera 0"),
+                                            tr("Network Optix"))
+                    << QnCamerasFoundInfo(tr("http://10.0.0.2/testcamera/tescamera_url/tescamera_url/tescamera_url/tescamera_url"),
+                                            tr("Test Camera 1 Omg ololo camera"),
+                                            tr("Network Optix"))
+                    << QnCamerasFoundInfo(tr("http://10.0.0.2/testcamera/tescamera_url/tescamera_url/tescamera_url/tescamera_url"),
+                                            tr("Test Camera 2"),
+                                            tr("Network Optix the best menufacturer"));
+
+            */
             emit replyReceived();
         }
 
