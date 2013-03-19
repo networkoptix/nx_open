@@ -30,7 +30,7 @@ void LaunchingApplication::prepareResultMessage()
     //TODO/IMPL
 }
 
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("Client/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
+static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
 
 void LaunchingApplication::onEntry( QEvent* _event )
 {

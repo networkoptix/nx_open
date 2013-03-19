@@ -115,9 +115,11 @@ void InstallationManager::setErrorString( const QString& _errorString )
     m_errorString = _errorString;
 }
 
+static const QLatin1String MODULE_NAME("Client");
+
 void InstallationManager::readInstalledVersions()
 {
-    const QString& productRootInstallDir = QString::fromLatin1("%1/%2").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME));
+    const QString& productRootInstallDir = QString::fromLatin1("%1/%2/%3").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME)).arg(MODULE_NAME);
     const QStringList& entries = QDir(productRootInstallDir).entryList( QDir::Dirs );
     for( int i = 0; i < entries.size(); ++i )
     {
