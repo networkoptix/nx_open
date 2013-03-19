@@ -18,6 +18,13 @@ namespace {
         return value > 0 ? 1 : (value < 0 ? -1 : 0);
     }
 
+    int scaleValue(qreal value, int min, int max)
+    {
+        if (value == 0)
+            return 0;
+
+        return int (value * (max-min) + 0.5*sign2(value)) + sign2(value)*min;
+    }
 } // anonymous namespace
 
 
@@ -87,14 +94,6 @@ int QnActiPtzController::stopMoveInternal()
     if (result == 0)
         m_moveVelocity = QPair<qreal, qreal>(0.0, 0.0);
     return result;
-}
-
-int scaleValue(qreal value, int min, int max)
-{
-    if (value == 0)
-        return 0;
-
-    return int (value * (max-min) + 0.5*sign2(value)) + sign2(value)*min;
 }
 
 int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
