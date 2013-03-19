@@ -100,7 +100,7 @@ void LauncherFSM::initFSM()
         addingTaskToNamedPipe->addTransition( tran );
     }
 
-    addingTaskToNamedPipe->addTransition( this, SIGNAL(failedToAddTaskToThePipe()), bindingToLocalAddress );
+    addingTaskToNamedPipe->addTransition( this, SIGNAL(failedToAddTaskToThePipe()), finalState );
 
 
     //from waitingForTaskQueueBecomeNonEmpty
