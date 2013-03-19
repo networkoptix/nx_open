@@ -81,6 +81,9 @@
 						<goals>
 							<goal>clean</goal>
 						</goals>
+						<configuration>
+							<skip>${clean-skip}</skip>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
