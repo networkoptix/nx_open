@@ -4,6 +4,10 @@
 
 #include "task_server.h"
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 #include <QLocalSocket>
 #include <QtSingleApplication>
 
@@ -28,10 +32,17 @@ bool TaskServer::listen( const QString& pipeName )
         return false;
     }
 
+#ifndef _WIN32
+    //removing unix socket file in case it hanged after process crash
+    const QByteArray filePath = (QLatin1String("/tmp/")+pipeName).toLatin1();
+    unlink( filePath.constData() );
+#endif
+
     if( !m_server.listen( pipeName ) )
     {
         NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(m_server.errorString()), cl_logDEBUG1 );
         return false;
+
     }
 
     NX_LOG( QString::fromLatin1("Listening pipe %1").arg(pipeName), cl_logDEBUG1 );
@@ -53,6 +64,7 @@ void TaskServer::onNewConnection()
     }
     QByteArray data = conn->readAll();
     conn->write( QByteArray("ok") );
+    conn->flush();
 
     StartApplicationTask task;
     if( !task.deserialize( data ) )
