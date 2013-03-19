@@ -11,6 +11,9 @@
 #include "launcher_fsm.h"
 #include "version.h"
 
+//!if defined, launcher compiles as daemon (linux) or win32 service
+//#define I_AM_DAEMON
+
 #ifdef _WIN32
 #include <windows.h>
 
@@ -27,6 +30,7 @@ QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common 
 
 static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
 
+#ifdef I_AM_DAEMON
 class LauncherService
 :
     public QtService<QtSingleApplication>
@@ -44,25 +48,6 @@ public:
 protected:
     virtual void start() override
     {
-        QString logLevel;
-        QString logFilePath;
-
-        QnCommandLineParser commandLineParser;
-        commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
-        commandLineParser.addParameter( &logFilePath, "--log-file", NULL, QString() );
-        commandLineParser.parse( m_argc, m_argv, stderr );
-
-        //initialize logging based on args
-        if( !logFilePath.isEmpty() && !logLevel.isEmpty() )
-        {
-            cl_log.create( logFilePath, 1024*1024*10, 5, cl_logDEBUG1 );
-            QnLog::initLog( logLevel );
-        }
-
-        cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-        cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
-        cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
-
         QObject::connect( &m_fsm, SIGNAL(finished()), application(), SLOT(quit()) );
         QObject::connect( &m_fsm, SIGNAL(stopped()), application(), SLOT(quit()) );
         m_fsm.start();
@@ -79,13 +64,44 @@ private:
     int m_argc;
     char** m_argv;
 };
+#endif
 
 
 int main( int argc, char* argv[] )
 {
-    LauncherService service( argc, argv );
+    QString logLevel;
+    QString logFilePath;
+
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
+    commandLineParser.addParameter( &logFilePath, "--log-file", NULL, QString() );
+    commandLineParser.parse( argc, argv, stderr );
+
+    //initialize logging based on args
+    if( !logFilePath.isEmpty() && !logLevel.isEmpty() )
+    {
+        cl_log.create( logFilePath, 1024*1024*10, 5, cl_logDEBUG1 );
+        QnLog::initLog( logLevel );
+    }
+
+    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
+
+
 #ifdef _WIN32
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
+
+#ifdef I_AM_DAEMON
+    LauncherService service( argc, argv );
     return service.exec();
+#else
+    QtSingleApplication app( SERVICE_NAME, argc, argv );
+    LauncherFSM fsm;
+    QObject::connect( &fsm, SIGNAL(finished()), &app, SLOT(quit()) );
+    QObject::connect( &fsm, SIGNAL(stopped()), &app, SLOT(quit()) );
+    fsm.start();
+    return app.exec();
+#endif
 }
