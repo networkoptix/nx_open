@@ -406,13 +406,16 @@
 		<CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
-
+		<CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
+                      Value="&quot;[${installer.customization}AppLauncherDir]applauncher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+		<CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
 
 		<CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db"/>
 
 		<CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-		<CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="client.exe" ExeCommand=""/>
+		<CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand="-e"/>
 
 		<CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
 
@@ -477,6 +480,13 @@
 
 			<!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
 			<!--            <RemoveExistingProducts After="InstallInitialize" />-->
+			<Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
+				<![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+			</Custom>
+			<Custom Action="CloseAppLauncherAction" Before="RemoveFiles">
+				<![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+			</Custom>
+
 			<Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
 				<![CDATA[ NOT $(var.VmsInstalling) ]]>
 			</Custom>
@@ -763,12 +773,9 @@
 							<Directory Id="${installer.customization}HelpDir" Name="help"/>
 
 							<Component Id="AppLauncherExecutable" Guid="{486c2632-c229-4ce5-b976-e87d0a82a2dc}">
-								<File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes">
-									<Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-											  WorkingDirectory='${installer.customization}ClientDir' Advertise="yes" Icon="icon_menu.exe" >
-									</Shortcut>
-								</File>
-								<ServiceInstall Id="${installer.customization}AppLauncherService"
+								<File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes" />
+
+								<!--<ServiceInstall Id="${installer.customization}AppLauncherService"
                                                 Name="${installer.customization}AppLauncher"
                                                 DisplayName="${applauncher.name}"
                                                 Type="ownProcess"
@@ -779,27 +786,24 @@
 								</ServiceInstall>
 
 								<ServiceControl Id="Start${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Start="install" Wait="no" />
-								<ServiceControl Id="Stop${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Stop="both" Wait="yes" Remove="uninstall" />								
+								<ServiceControl Id="Stop${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Stop="both" Wait="yes" Remove="uninstall" />	-->
+								<Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
+											  WorkingDirectory='${installer.customization}ClientDir' Target="[#applauncher.exe]" Arguments='-e' Icon="icon_menu.exe" >
+								</Shortcut>
 							</Component>
-								
+
 							<Component Id="clientShortcutDesktop" Guid="{56799FF5-5B77-442e-9A39-3F27F0FC8307}">
 								<Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
 								<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
 								<Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-										  WorkingDirectory='${installer.customization}ClientDir' Target="[#applauncher.exe] -e" Icon="icon_desktop.exe">
+										  WorkingDirectory='${installer.customization}ClientDir' Target="[#applauncher.exe]" Arguments='-e' Icon="icon_desktop.exe">
 								</Shortcut>
 							</Component>							
-							
+
 							<Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_${parsedVersion.incrementalVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
 
-								<Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-									<File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
-										<fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
-									</File>
-								</Component>
-							
 								<Directory Id="styles" Name="styles">
 									<Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
 										<File Id="bespin$(var.suffix).dll_1_4" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
@@ -813,6 +817,12 @@
 										<File Id="qtiff4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
 									</Component>
 								</Directory>							
+
+								<Component Id="ClientExecutable" Guid="{77621eff-6d51-4809-b41e-e605172e77ab}">
+									<File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
+										<fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
+									</File>
+								</Component>								
 
 								<Component Id="ClientConfiguration" Guid="{8AC01524-8F3A-46ba-8A85-24B3709CEDDE}" Permanent="yes">
 									<Condition>
@@ -888,15 +898,9 @@
 									<File Id="VcRedistexe" Name="vcredist_${arch}.exe" Source="${libdir}/bin/${build.configuration}\vcredist_${arch}.exe"/>
 								</Component>
 							</Directory>	
-							
+
 							<Directory Id="${installer.customization}_1_4_Dir" Name="1.4">
 
-								<Component Id="ClientExecutable_1_4" Guid="{5a883bac-6ae3-46d7-b0c5-ea03cf41be33}">
-									<File Id="client.exe_1_4" Name="${product.name} 1.4.exe" Source="${project.build.directory}/bin/${build.configuration}/1.4/${customization}_1_4.exe" KeyPath="yes">
-										<fire:FirewallException Id="FirewallExceptionClient_1_4" Name="${product.name} 1.4" Scope="any" IgnoreFailure="yes"/>
-									</File>
-								</Component>
-							
 								<Directory Id="styles_1_4" Name="styles">
 									<Component Id="bespin_1_4" Guid="{54b3dc36-52e5-4185-9f89-05e61cec5b94}">
 										<File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
@@ -910,6 +914,12 @@
 										<File Id="qtiff4.dll_1_4" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
 									</Component>
 								</Directory>							
+
+								<Component Id="ClientExecutable_1_4" Guid="{5a883bac-6ae3-46d7-b0c5-ea03cf41be33}">
+									<File Id="client.exe_1_4" Name="${product.name} 1.4.exe" Source="${project.build.directory}/bin/${build.configuration}/1.4/${customization}_1_4.exe" KeyPath="yes">
+										<fire:FirewallException Id="FirewallExceptionClient_1_4" Name="${product.name} 1.4" Scope="any" IgnoreFailure="yes"/>
+									</File>
+								</Component>
 
 								<Component Id="ClientFFmpegLibraries_1_4" Guid="{cde99ce0-fd22-444b-9470-723bd31e6b19}">
 									<File Id="ClientAvcodecDll_1_4" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
@@ -1071,6 +1081,7 @@
 			<ComponentRef Id="ClientVsRedistributable"/>
 			<ComponentRef Id="bespin" />
 
+			<ComponentRef Id="ClientExecutable_1_4" />			
 			<ComponentRef Id="ClientFFmpegLibraries_1_4"/>
 			<ComponentRef Id="ClientQTLibraries_1_4" />
 			<ComponentRef Id="ImageFormats_1_4" />
