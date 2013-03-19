@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QRegExp>
 
@@ -120,8 +121,12 @@ static const QLatin1String MODULE_NAME("Client");
 
 void InstallationManager::readInstalledVersions()
 {
+    QDir appDir( QCoreApplication::applicationDirPath() );
+    appDir.cdUp();
+
     QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
-    const QString& productRootInstallDir = QString::fromLatin1("%1/%2/%3").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME)).arg(MODULE_NAME);
+    //const QString& productRootInstallDir = QString::fromLatin1("%1/%2/%3").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME)).arg(MODULE_NAME);
+    const QString& productRootInstallDir = appDir.absolutePath();
     const QStringList& entries = QDir(productRootInstallDir).entryList( QDir::Dirs );
     for( int i = 0; i < entries.size(); ++i )
     {
