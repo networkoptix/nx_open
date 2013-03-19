@@ -89,6 +89,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
         return QString();
 
     case BusinessEventType::Camera_Disconnect:
+        break;
     case BusinessEventType::Camera_Motion:
         messageBody += stateString();
         break;
@@ -166,11 +167,19 @@ QString QnSendMailBusinessAction::adresatesString() const {
 }
 
 QString QnSendMailBusinessAction::stateString() const {
-    QString result = QObject::tr("State: %1")
-            .arg(getToggleState() == ToggleState::On
-                 ? QObject::tr("On")
-                 : QObject::tr("Off"));
-    result += QLatin1Char('\n');
+    QString result;
+    switch (m_toggleState) {
+    case ToggleState::On:
+        result = QObject::tr("On");
+        break;
+    case ToggleState::Off:
+        result += QObject::tr("Off");
+        break;
+    default:
+        break;
+    }
+    if (!result.isEmpty())
+        result += QLatin1Char('\n');
     return result;
 }
 
