@@ -19,37 +19,13 @@ namespace QnBusinessEventRuntime
 QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
-        int reasonCode,
+        QnBusiness::EventReason reasonCode,
         QnResourcePtr storageResource):
-    base_type(BusinessEventType::BE_Storage_Failure,
+    base_type(BusinessEventType::Storage_Failure,
                             resource,
                             timeStamp,
                             reasonCode)
 {
     if (storageResource)
         m_reasonText = storageResource->getUrl();
-}
-
-QString QnStorageFailureBusinessEvent::toString() const
-{
-    QString reasonText;
-    switch (m_reasonCode) {
-        case QnBusiness::StorageIssueIoError:
-            reasonText = QObject::tr("IO error occured.");
-            break;
-        case QnBusiness::StorageIssueNotEnoughSpeed:
-            reasonText = QObject::tr("Not enough HDD/SSD speed for recording.");
-            break;
-        default:
-            break;
-    }
-
-
-    QString text = QnAbstractBusinessEvent::toString();
-    text += QObject::tr("  reason%1\n").arg(reasonText);
-    if (!m_reasonText.isEmpty())
-        text += QObject::tr("  storage%1\n").arg(m_reasonText);
-    else
-        text += QObject::tr("  no storage for writting\n");
-    return text;
 }

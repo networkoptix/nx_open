@@ -5,6 +5,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include "utils/network/rtpsession.h"
 
+#include <business/business_logic_common.h>
 
 
 class QnRtpStreamParser;
@@ -32,7 +33,7 @@ public:
     int getLastResponseCode() const;
     void pleaseStop();
 signals:
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, int reasonCode, const QString& reasonText);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);

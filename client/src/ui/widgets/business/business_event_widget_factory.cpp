@@ -7,7 +7,7 @@ QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(Busin
                                                                            QnWorkbenchContext *context) {
     Q_UNUSED(context);
     switch (eventType) {
-    case BusinessEventType::BE_Camera_Input:
+    case BusinessEventType::Camera_Input:
         return new QnCameraInputBusinessEventWidget(parent);
     default:
         return new QnEmptyBusinessEventWidget(parent);

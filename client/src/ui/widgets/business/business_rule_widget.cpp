@@ -172,7 +172,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
         ui->actionResourcesFrame->setVisible(isResourceRequired);
-        ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::BA_SendMail ? tr("to") : tr("at"));
+        ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
         bool actionIsInstant = !BusinessActionType::hasToggleState(m_model->actionType());
         ui->actionAggregationFrame->setVisible(actionIsInstant);
@@ -357,9 +357,9 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
     QnResourceSelectionDialog dialog(this); //TODO: #GDM or servers?
 
     BusinessEventType::Value eventType = m_model->eventType();
-    if (eventType == BusinessEventType::BE_Camera_Motion)
+    if (eventType == BusinessEventType::Camera_Motion)
         dialog.setDelegate(new QnMotionEnabledDelegate(this));
-    else if (eventType == BusinessEventType::BE_Camera_Input)
+    else if (eventType == BusinessEventType::Camera_Input)
         dialog.setDelegate(new QnInputEnabledDelegate(this));
     dialog.setSelectedResources(m_model->eventResources());
 
@@ -383,11 +383,11 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     QnResourceSelectionDialog dialog(this, node);
 
     BusinessActionType::Value actionType = m_model->actionType();
-    if (actionType == BusinessActionType::BA_CameraRecording)
+    if (actionType == BusinessActionType::CameraRecording)
         dialog.setDelegate(new QnRecordingEnabledDelegate(this));
-    else if (actionType == BusinessActionType::BA_CameraOutput)
+    else if (actionType == BusinessActionType::CameraOutput)
         dialog.setDelegate(new QnOutputEnabledDelegate(this));
-    else if (actionType == BusinessActionType::BA_SendMail)
+    else if (actionType == BusinessActionType::SendMail)
         dialog.setDelegate(new QnEmailValidDelegate(this));
     dialog.setSelectedResources(m_model->actionResources());
 

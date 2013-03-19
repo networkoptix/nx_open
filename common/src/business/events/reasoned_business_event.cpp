@@ -5,12 +5,12 @@ namespace QnBusinessEventRuntime {
     static QLatin1String reasonCodeStr("reasonCode");
     static QLatin1String reasonTextStr("reasonText");
 
-    int getReasonCode(const QnBusinessParams &params) {
-        return params[reasonCodeStr].toInt();
+    QnBusiness::EventReason getReasonCode(const QnBusinessParams &params) {
+        return (QnBusiness::EventReason)params[reasonCodeStr].toInt();
     }
 
-    void setReasonCode(QnBusinessParams* params, int value) {
-        (*params)[reasonCodeStr] = value;
+    void setReasonCode(QnBusinessParams* params, QnBusiness::EventReason value) {
+        (*params)[reasonCodeStr] = (int)value;
     }
 
     QString getReasonText(const QnBusinessParams &params) {
@@ -25,7 +25,7 @@ namespace QnBusinessEventRuntime {
 QnReasonedBusinessEvent::QnReasonedBusinessEvent(const BusinessEventType::Value eventType,
                                                  const QnResourcePtr &resource,
                                                  const qint64 timeStamp,
-                                                 const int reasonCode,
+                                                 const QnBusiness::EventReason reasonCode,
                                                  const QString &reasonText):
     base_type(eventType, resource, timeStamp),
     m_reasonCode(reasonCode),
