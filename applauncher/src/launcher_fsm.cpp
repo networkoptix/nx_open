@@ -144,13 +144,11 @@ void LauncherFSM::onBindingToLocalAddressEntered()
 void LauncherFSM::onAddingTaskToNamedPipeEntered()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
-    qDebug()<<"Entered AddingTaskToNamedPipe";
 
     QString versionToLaunch;
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
     {
-        qDebug()<<"Failed to find what to launch. Will not post any task to the named pipe";
         NX_LOG( QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1 );
         emit failedToAddTaskToThePipe();
         return;
@@ -181,7 +179,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
     sock.waitForReadyRead(-1);
     sock.readAll();
 
-    qDebug()<<"Task added to the pipe";
     emit taskAddedToThePipe();
 }
 
