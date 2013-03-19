@@ -131,19 +131,15 @@ int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
     };
 
     QString direction = directions[1-sign3(yVelocity)][sign3(xVelocity)+1];
-    QString requestStr;
+    QString requestStr = QString(lit("MOVE=%1")).arg(direction);
 
     int xVelocityI = qAbs(scaleValue(xVelocity, 1,5));
     int yVelocityI = qAbs(scaleValue(yVelocity, 1,5));
 
-    if (xVelocity && yVelocity)
-        requestStr = QString(lit("MOVE=%1,%2,%3")).arg(direction).arg(xVelocityI).arg(yVelocityI);
-    else if (xVelocity)
-        requestStr = QString(lit("MOVE=%1,%2")).arg(direction).arg(xVelocityI);
-    else if (yVelocity)
-        requestStr = QString(lit("MOVE=%1,%2")).arg(direction).arg(yVelocityI);
-    else
-        requestStr = QString(lit("MOVE=%1")).arg(direction);
+    if (xVelocity)
+        requestStr += QString(lit(",%1")).arg(xVelocityI);
+    if (yVelocity)
+        requestStr += QString(lit(",%1")).arg(yVelocityI);
 
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(lit("encoder"), requestStr, status);
