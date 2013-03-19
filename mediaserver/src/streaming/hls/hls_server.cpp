@@ -482,9 +482,6 @@ namespace nx_hls
 
         Q_ASSERT( session );
 
-        //std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_DATETIME_PARAM_NAME);
-        //const bool liveStreamRequested = startDatetimeIter == requestParams.end();
-
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunkList;
         bool isPlaylistClosed = false;
         const nx_http::StatusCode::Value playlistResult = session->isLive()
@@ -496,7 +493,6 @@ namespace nx_hls
             : getArchiveChunkPlaylist(
                 session,
                 mediaResource,
-                //QDateTime::fromString(startDatetimeIter->second, Qt::ISODate),
                 requestParams,
                 &chunkList,
                 &isPlaylistClosed );
