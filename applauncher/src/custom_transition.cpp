@@ -49,7 +49,8 @@ ConditionalSignalTransition::ConditionalSignalTransition(
         sourceState )
 {
     setTargetState( targetState );
-    addCondition( condition );
+    if( condition )
+        addCondition( condition );
 }
 
 bool ConditionalSignalTransition::eventTest( QEvent* _event )
