@@ -295,7 +295,7 @@ bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
     arguments << QLatin1String("--auth");
-    arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+    arguments << QLatin1String(currentUrl().toEncoded());
 
     bool result = sendCommandToLauncher(stripVersion(connectInfo->version), arguments);
     if (!result)
