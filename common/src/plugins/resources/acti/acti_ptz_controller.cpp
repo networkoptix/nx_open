@@ -28,59 +28,8 @@ namespace {
 
         return int (value * (max-min) + 0.5*sign2(value)) + sign2(value)*min;
     }
-} // anonymous namespace
 
-
-QnActiPtzController::QnActiPtzController(QnActiResource* resource):
-    QnAbstractPtzController(resource),
-    m_resource(resource),
-    m_capabilities(Qn::NoCapabilities),
-    m_spaceMapper(NULL),
-    m_zoomVelocity(0.0),
-    m_moveVelocity(0, 0)
-{
-    init();
-}
-
-QnActiPtzController::~QnActiPtzController() {
-    return;
-}
-
-qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)
-{
-    return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
-}
-
-void QnActiPtzController::init() 
-{
-    CLHttpStatus status;
-    QByteArray zoomString = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_CAP_GET"), status, true);
-    if (status != CL_HTTP_SUCCESS || !zoomString.startsWith("ZOOM_CAP_GET="))
-        return;
-
-    m_capabilities |= QnCommonGlobals::AbsolutePtzCapability;
-    m_capabilities |= QnCommonGlobals::ContinuousPanTiltCapability;
-    m_capabilities |= QnCommonGlobals::ContinuousZoomCapability;
-
-    qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
-    qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
-    qreal minTiltLogical = 0, maxTiltLogical = 9000; //  // todo: move to camera XML
-    qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
-    qreal minAngle = 0, maxAngle = 0;
-
-    QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
-    minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
-    if (zoomParams.size() > 1)
-        maxAngle = m_resource->unquoteStr(zoomParams[1]).toInt();
-
-    QnScalarSpaceMapper xMapper(minPanLogical, maxPanLogical, minPanPhysical, maxPanPhysical, Qn::PeriodicExtrapolation);
-    QnScalarSpaceMapper yMapper(minTiltLogical, maxTiltLogical, minTiltPhysical, maxTiltPhysical, Qn::ConstantExtrapolation);
-
-    qreal f35Max = maxAngle/DIGITAL_ZOOM_COEFF;
-    qreal f35Min = f35Max / ANALOG_ZOOM;
-
-    //QnScalarSpaceMapper zMapper(minAngle, maxAngle, minAngle, maxAngle/DIGITAL_ZOOM_COEFF, Qn::ConstantExtrapolation);
-
+    // ACTi 8111
     qreal pointsData[][2] = {
         {0, 1.0},
         {100, 1.2},
@@ -101,15 +50,75 @@ void QnActiPtzController::init()
         {1000, 16.0},
     };
 
+} // anonymous namespace
+
+
+QnActiPtzController::QnActiPtzController(QnActiResource* resource):
+    QnAbstractPtzController(resource),
+    m_resource(resource),
+    m_capabilities(Qn::NoCapabilities),
+    m_spaceMapper(NULL),
+    m_zoomVelocity(0.0),
+    m_moveVelocity(0, 0),
+    m_isFliped(false),
+    m_isMirrored(false),
+    m_minAngle(0.0),
+    m_maxAngle(0.0)
+{
+    init();
+}
+
+QnActiPtzController::~QnActiPtzController() {
+    return;
+}
+
+qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)
+{
+    return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
+}
+
+void QnActiPtzController::init() 
+{
+    CLHttpStatus status;
+    QByteArray zoomString = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_CAP_GET"), status, true);
+    if (status != CL_HTTP_SUCCESS || !zoomString.startsWith("ZOOM_CAP_GET="))
+        return;
+
+    QByteArray flipMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_FLIP_MODE"), status);
+    m_isFliped = flipMode.toInt() == 1;
+
+    QByteArray mirrorMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_MIRROR_MODE"), status);
+    m_isMirrored = mirrorMode.toInt() == 1;
+
+    m_capabilities |= QnCommonGlobals::AbsolutePtzCapability;
+    m_capabilities |= QnCommonGlobals::ContinuousPanTiltCapability;
+    m_capabilities |= QnCommonGlobals::ContinuousZoomCapability;
+
+    qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
+    qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
+    qreal minTiltLogical = 0, maxTiltLogical = 9000; //  // todo: move to camera XML
+    
+    qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
+    if (!m_isFliped)
+        qSwap(minTiltPhysical, maxTiltPhysical);
+
+    QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
+    m_minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
+    if (zoomParams.size() > 1)
+        m_maxAngle = m_resource->unquoteStr(zoomParams[1]).toInt();
+
+    QnScalarSpaceMapper xMapper(minPanLogical, maxPanLogical, minPanPhysical, maxPanPhysical, Qn::PeriodicExtrapolation);
+    QnScalarSpaceMapper yMapper(minTiltLogical, maxTiltLogical, minTiltPhysical, maxTiltPhysical, Qn::ConstantExtrapolation);
+
+    qreal f35Max = m_maxAngle/DIGITAL_ZOOM_COEFF;
+    qreal f35Min = f35Max / ANALOG_ZOOM;
+
     QVector<QPair<qreal, qreal> > data;
     for (int i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
-        data << QPair<qreal, qreal>(toLogicalScale(pointsData[i][0], minAngle, maxAngle), pointsData[i][1] * f35Min);
-    QnScalarSpaceMapper zMapper(data, Qn::LinearExtrapolation);
+        data << QPair<qreal, qreal>(toLogicalScale(pointsData[i][0], m_minAngle, m_maxAngle), pointsData[i][1] * f35Min);
+    QnScalarSpaceMapper zMapper(data, Qn::ConstantExtrapolation);
 
-    //QnScalarSpaceMapper toCameraZMapper(minAngle, maxAngle, 0.0, 1000.0, Qn::ConstantExtrapolation);
-
-    m_minAngle = minAngle;
-    m_maxAngle = maxAngle;
+    //QnScalarSpaceMapper toCameraZMapper(0.0, 1000.0, f35Min, f35Min*ANALOG_ZOOM, Qn::ConstantExtrapolation);
 
     m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), 
                                          //QnVectorSpaceMapper(xMapper, yMapper, toCameraZMapper),
@@ -159,6 +168,11 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
 int QnActiPtzController::startMoveInternal(qreal xVelocityR, qreal yVelocityR)
 {
     stopMoveInternal();
+
+    if (!m_isFliped) {
+        yVelocityR *= -1;
+    }
+
 
     int xVelocity = qRound(xVelocityR*5.0);
     int yVelocity = qRound(yVelocityR*5.0);

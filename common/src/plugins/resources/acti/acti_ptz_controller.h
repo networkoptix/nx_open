@@ -37,6 +37,8 @@ private:
     QPair<int, int> m_moveVelocity;
     qreal m_minAngle;
     qreal m_maxAngle;
+    bool m_isFliped;
+    bool m_isMirrored;
 };
 
 
