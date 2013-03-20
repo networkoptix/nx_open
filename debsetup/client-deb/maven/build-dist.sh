@@ -27,20 +27,20 @@ CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 
 # Prepare stage dir
 rm -rf $STAGEBASE
-mkdir -p $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/styles
+mkdir -p $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/styles
 mkdir -p $BINSTAGE/1.4/styles
 mkdir -p $LIBSTAGE
 
 # Copy client binary and x264
-cp -r $CLIENT_BIN_PATH/client-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-cp -r $CLIENT_BIN_PATH/applauncher-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+cp -r $CLIENT_BIN_PATH/client-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
+cp -r $CLIENT_BIN_PATH/applauncher-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
+cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r ${project.build.directory}/bin/client-bin $BINSTAGE/1.4
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
-cp -r ${project.build.directory}/bin/applauncher* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+cp -r ${project.build.directory}/bin/applauncher* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 
 # Copy client startup script
-#cp bin/client $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+#cp bin/client $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 #cp bin/client $BINSTAGE/1.4
 
 # Copy icons
@@ -51,7 +51,7 @@ cp -r $CLIENT_HELP_PATH $BINSTAGE
 
 # Copy libraries
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
-cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/styles
+cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/styles
 cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.4/styles
 
 for f in `find $LIBSTAGE -type f` `find $BINSTAGE/**/styles -type f` $BINSTAGE/**/client-bin
