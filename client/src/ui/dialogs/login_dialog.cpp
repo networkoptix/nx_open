@@ -274,7 +274,7 @@ bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringLis
         return false;
     }
 
-    const QByteArray& serializedTask = StartApplicationTask(version, arguments).serialize();
+    const QByteArray& serializedTask = applauncher::api::StartApplicationTask(version, arguments).serialize();
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
         qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());

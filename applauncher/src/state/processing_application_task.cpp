@@ -4,6 +4,7 @@
 
 #include "processing_application_task.h"
 
+#include <QApplication>
 #include <QFinalState>
 
 #include <utils/common/log.h>
@@ -24,7 +25,7 @@ ProcessingApplicationTask::ProcessingApplicationTask(
     QSettings* const settings,
     InstallationManager* const installationManager,
     LauncherCommonData* const fsmSharedData,
-    BlockingQueue<StartApplicationTask>* const taskQueue )
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
 :
     QState( parent ),
     m_settings( settings ),
@@ -75,21 +76,38 @@ void ProcessingApplicationTask::initFsm()
 
     //creating transitions
         //from analyzingTopTaskInQueue
-    analyzingTopTaskInQueue->addTransition(
-        new ConditionalSignalTransition(
+    {
+        ConditionalSignalTransition* tran = new ConditionalSignalTransition(
             analyzingTopTaskInQueue,
             SIGNAL(done()),
             analyzingTopTaskInQueue,
-            launchingApplication,
-            new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", true) ) );
+            launchingApplication );
+        tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "currentTaskType", (int)applauncher::api::TaskType::startApplication) );
+        tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", true) );
+        analyzingTopTaskInQueue->addTransition( tran );
+    }
 
-    analyzingTopTaskInQueue->addTransition(
-        new ConditionalSignalTransition(
+    {
+        ConditionalSignalTransition* tran = new ConditionalSignalTransition(
             analyzingTopTaskInQueue,
             SIGNAL(done()),
             analyzingTopTaskInQueue,
-            downloadSetup,
-            new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", false) ) );
+            downloadSetup );
+        tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "currentTaskType", (int)applauncher::api::TaskType::startApplication) );
+        tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "isRequiredVersionInstalled", false) );
+        analyzingTopTaskInQueue->addTransition( tran );
+    }
+
+    {
+        ConditionalSignalTransition* tran = new ConditionalSignalTransition(
+            analyzingTopTaskInQueue,
+            SIGNAL(done()),
+            analyzingTopTaskInQueue,
+            finalState );
+        tran->addCondition( new ObjectPropertyEqualConditionHelper<bool>::CondType(m_fsmSharedData, "currentTaskType", (int)applauncher::api::TaskType::quit) );
+        connect( tran, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()) );
+        analyzingTopTaskInQueue->addTransition( tran );
+    }
 
         //from downloadSetup
     downloadSetup->addTransition( downloadSetup, SIGNAL(ok()), downloading );

@@ -6,11 +6,13 @@
 #define PROCESSING_APPLICATION_TASK_H
 
 #include <QSettings>
+#include <QSharedPointer>
 #include <QState>
+
+#include <api/start_application_task.h>
 
 #include "installation_manager.h"
 #include "../blocking_queue.h"
-#include <api/start_application_task.h>
 
 
 class InstallationManager;
@@ -28,7 +30,7 @@ public:
         QSettings* const settings,
         InstallationManager* const installationManager,
         LauncherCommonData* const fsmSharedData,
-        BlockingQueue<StartApplicationTask>* const taskQueue );
+        BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
 
 protected:
     virtual void onEntry( QEvent* _event ) override;
@@ -38,7 +40,7 @@ private:
     QSettings* const m_settings;
     InstallationManager* const m_installationManager;
     LauncherCommonData* const m_fsmSharedData;
-    BlockingQueue<StartApplicationTask>* const m_taskQueue;
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
 
     void initFsm();
 };

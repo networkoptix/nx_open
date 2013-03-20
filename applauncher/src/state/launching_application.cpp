@@ -32,7 +32,11 @@ void LaunchingApplication::prepareResultMessage()
     //TODO/IMPL
 }
 
+#ifdef AK_DEBUG
+static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
+#else
 static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
+#endif
 
 void LaunchingApplication::onEntry( QEvent* _event )
 {
@@ -40,27 +44,30 @@ void LaunchingApplication::onEntry( QEvent* _event )
 
     NX_LOG( QString::fromLatin1("Entered LaunchingApplication"), cl_logDEBUG1 );
 
+    Q_ASSERT( m_launcherCommonData.currentTask->type == applauncher::api::TaskType::startApplication );
+    applauncher::api::StartApplicationTask* startTask = m_launcherCommonData.currentTask.staticCast<applauncher::api::StartApplicationTask>().data();
+
     InstallationManager::AppData appData;
-    if( !m_installationManager.getInstalledVersionData( m_launcherCommonData.currentTask.version, &appData ) )
+    if( !m_installationManager.getInstalledVersionData( startTask->version, &appData ) )
     {
-        NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(m_launcherCommonData.currentTask.version), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(startTask->version), cl_logDEBUG1 );
         emit failed();
         return;
     }
 
     const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
-    NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(m_launcherCommonData.currentTask.version).arg(binPath), cl_logDEBUG2 );
+    NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(startTask->version).arg(binPath), cl_logDEBUG2 );
     if( QProcess::startDetached(
             binPath,
-            m_launcherCommonData.currentTask.appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
+            startTask->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
     {
-        NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(m_launcherCommonData.currentTask.version).arg(binPath), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(startTask->version).arg(binPath), cl_logDEBUG1 );
         emit succeeded();
-        m_settings->setValue( QLatin1String("previousLaunchedVersion"), m_launcherCommonData.currentTask.version );
+        m_settings->setValue( QLatin1String("previousLaunchedVersion"), startTask->version );
     }
     else
     {
-        NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(m_launcherCommonData.currentTask.version).arg(binPath), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(startTask->version).arg(binPath), cl_logDEBUG1 );
         emit failed();
     }
 }

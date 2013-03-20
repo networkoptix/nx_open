@@ -124,7 +124,11 @@ void InstallationManager::readInstalledVersions()
     QDir appDir( QCoreApplication::applicationDirPath() );
     appDir.cdUp();
 
+#ifdef AK_DEBUG
+    QRegExp versionDirMatch( ".*" );
+#else
     QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
+#endif
     //const QString& productRootInstallDir = QString::fromLatin1("%1/%2/%3").arg(getRootInstallDirectory()).arg(QLatin1String(QN_PRODUCT_NAME)).arg(MODULE_NAME);
     const QString& productRootInstallDir = appDir.absolutePath();
     const QStringList& entries = QDir(productRootInstallDir).entryList( QDir::Dirs );
@@ -133,6 +137,10 @@ void InstallationManager::readInstalledVersions()
         //each entry - is a version
         if( entries[i] == QLatin1String(".") || entries[i] == QLatin1String("..") || !versionDirMatch.exactMatch(entries[i]) )
             continue;
+#ifdef AK_DEBUG
+        if( entries[i] != QLatin1String("debug") )
+            continue;
+#endif
         m_installedProductsByVersion.insert( std::make_pair( entries[i], AppData(QString::fromLatin1("%1/%2").arg(productRootInstallDir).arg(entries[i])) ) );
     }
 }

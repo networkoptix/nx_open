@@ -7,7 +7,7 @@
 #include <QMutexLocker>
 
 
-TaskQueueWatcher::TaskQueueWatcher( BlockingQueue<StartApplicationTask>* const taskQueue )
+TaskQueueWatcher::TaskQueueWatcher( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
 :
     m_taskQueue( taskQueue ),
     m_started( false )

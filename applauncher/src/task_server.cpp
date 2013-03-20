@@ -14,7 +14,7 @@
 #include <utils/common/log.h>
 
 
-TaskServer::TaskServer( BlockingQueue<StartApplicationTask>* const taskQueue )
+TaskServer::TaskServer( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
 :
     m_taskQueue( taskQueue )
 {
@@ -66,13 +66,18 @@ void TaskServer::onNewConnection()
     conn->write( QByteArray("ok") );
     conn->flush();
 
-    StartApplicationTask task;
-    if( !task.deserialize( data ) )
+    applauncher::api::BaseTask* task = NULL;
+    if( !applauncher::api::deserializeTask( data, &task ) )
     {
         NX_LOG( QString::fromLatin1("Failed to deserialize received task data"), cl_logDEBUG1 );
         return;
     }
 
-    m_taskQueue->push( task );
+#ifdef AK_DEBUG
+    if( task->type == applauncher::api::TaskType::startApplication )
+        ((applauncher::api::StartApplicationTask*)task)->version = "debug";
+#endif
+
+    m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
     emit taskReceived();
 }

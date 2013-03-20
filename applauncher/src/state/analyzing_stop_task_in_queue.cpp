@@ -10,7 +10,7 @@
 AnalyzingTopTaskInQueue::AnalyzingTopTaskInQueue(
     QState* const parent,
     LauncherCommonData* const fsmSharedData,
-    BlockingQueue<StartApplicationTask>* const taskQueue )
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
 :
     QState( parent ),
     m_fsmSharedData( fsmSharedData ),

@@ -28,13 +28,16 @@ class LauncherFSM
     Q_PROPERTY( int bindTriesCount READ bindTriesCount )
     //!true, if adding task to the named pipe failed with serverNotFound error
     Q_PROPERTY( bool isLocalServerWasNotFound READ isLocalServerWasNotFound );
+    //!true, if application has been launched to kill existing instance
+    Q_PROPERTY( bool quitMode READ quitMode );
 
 public:
-    LauncherFSM();
+    LauncherFSM( bool quitMode );
 
     bool isTaskQueueEmpty() const;
     int bindTriesCount() const;
     bool isLocalServerWasNotFound() const;
+    bool quitMode() const;
 
 signals:
     void bindSucceeded();
@@ -43,9 +46,10 @@ signals:
     void failedToAddTaskToThePipe();
 
 private:
+    const bool m_quitMode;
     InstallationManager m_installationManager;
     LauncherCommonData m_fsmSharedData;
-    BlockingQueue<StartApplicationTask> m_taskQueue;
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> > m_taskQueue;
     TaskServer m_taskServer;
     QSettings m_settings;
     int m_bindTriesCount;

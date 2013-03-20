@@ -25,7 +25,7 @@ class TaskQueueWatcher
     Q_OBJECT
 
 public:
-    TaskQueueWatcher( BlockingQueue<StartApplicationTask>* const taskQueue );
+    TaskQueueWatcher( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
     ~TaskQueueWatcher();
 
     virtual void pleaseStop() override;
@@ -41,7 +41,7 @@ protected:
     virtual void run();
 
 private:
-    BlockingQueue<StartApplicationTask>* const m_taskQueue;
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
     bool m_started;

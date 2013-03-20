@@ -15,11 +15,17 @@ LauncherCommonData::LauncherCommonData( const InstallationManager& installationM
 
 bool LauncherCommonData::isRequiredVersionInstalled() const
 {
-    return m_installationManager.isVersionInstalled( currentTask.version );
+    Q_ASSERT( currentTask->type == applauncher::api::TaskType::startApplication );
+    return m_installationManager.isVersionInstalled( currentTask.staticCast<applauncher::api::StartApplicationTask>()->version );
 }
 
 bool LauncherCommonData::areThereAnyVersionInstalledBesidesJustTriedOne() const
 {
     //TODO/IMPL
     return false;
+}
+
+int LauncherCommonData::currentTaskType() const
+{
+    return currentTask->type;
 }

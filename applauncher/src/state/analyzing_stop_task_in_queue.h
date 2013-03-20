@@ -5,6 +5,7 @@
 #ifndef ANALYZING_SETTINGS_H
 #define ANALYZING_SETTINGS_H
 
+#include <QSharedPointer>
 #include <QState>
 
 #include "../blocking_queue.h"
@@ -24,7 +25,7 @@ public:
     AnalyzingTopTaskInQueue(
         QState* const parent,
         LauncherCommonData* const fsmSharedData,
-        BlockingQueue<StartApplicationTask>* const taskQueue );
+        BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
 
 signals:
     void done();
@@ -34,7 +35,7 @@ protected:
 
 private:
     LauncherCommonData* const m_fsmSharedData;
-    BlockingQueue<StartApplicationTask>* const m_taskQueue;
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
 };
 
 #endif  //ANALYZING_SETTINGS_H

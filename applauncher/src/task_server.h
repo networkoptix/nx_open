@@ -9,7 +9,7 @@
 
 #include <QObject>
 #include <QLocalServer>
-#include <QSystemSemaphore>
+#include <QSharedPointer>
 
 #include <api/start_application_task.h>
 #include "blocking_queue.h"
@@ -23,7 +23,7 @@ class TaskServer
     Q_OBJECT
 
 public:
-    TaskServer( BlockingQueue<StartApplicationTask>* const taskQueue );
+    TaskServer( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
 
     //!
     /*!
@@ -37,9 +37,8 @@ signals:
     void taskReceived();
 
 private:
-    BlockingQueue<StartApplicationTask>* const m_taskQueue;
+    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
     QLocalServer m_server;
-    std::auto_ptr<QSystemSemaphore> m_sema;
 
 private slots:
     void onNewConnection();

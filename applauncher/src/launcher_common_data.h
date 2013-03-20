@@ -6,6 +6,7 @@
 #define LAUNCHER_COMMON_DATA_H
 
 #include <QObject>
+#include <QSharedPointer>
 
 #include <api/start_application_task.h>
 
@@ -23,19 +24,21 @@ class LauncherCommonData
     Q_PROPERTY( bool isRequiredVersionInstalled READ isRequiredVersionInstalled )
     //!true, if there is installed version different from current task version
     Q_PROPERTY( bool areThereAnyVersionInstalledBesidesJustTriedOne READ areThereAnyVersionInstalledBesidesJustTriedOne )
+    Q_PROPERTY( int currentTaskType READ currentTaskType )
 
 public: 
-    StartApplicationTask currentTask;
+    QSharedPointer<applauncher::api::BaseTask> currentTask;
     QString downloadedFilePath;
 
     LauncherCommonData( const InstallationManager& installationManager );
 
     bool isRequiredVersionInstalled() const;
     bool areThereAnyVersionInstalledBesidesJustTriedOne() const;
+    int currentTaskType() const;
 
 private:
     const InstallationManager& m_installationManager;
-    StartApplicationTask m_currentTask;
+    applauncher::api::StartApplicationTask m_currentTask;
 };
 
 #endif  //LAUNCHER_COMMON_DATA_H

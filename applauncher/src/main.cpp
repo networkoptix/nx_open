@@ -2,6 +2,8 @@
 // 13 mar 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include <QtSingleApplication>
 #include <qtservice.h>
 
@@ -67,15 +69,36 @@ private:
 #endif
 
 
+static void printHelp()
+{
+    std::cout<<
+        "Arguments:\n"
+        "  --log-level={log level}. Can be ERROR, WARN, INFO, DEBUG, DEBUG2. By default, WARN\n"
+        "  --log-file=/path/to/log/file. If not specified, no log is written\n"
+        "  quit. Tells another running launcher to terminate\n"
+        "  --help. This help message\n"
+        "\n";
+}
+
 int main( int argc, char* argv[] )
 {
-    QString logLevel;
+    QString logLevel = "WARN";
     QString logFilePath;
+    bool quitMode = false;
+    bool displayHelp = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
     commandLineParser.addParameter( &logFilePath, "--log-file", NULL, QString() );
+    commandLineParser.addParameter( &quitMode, "quit", NULL, false );
+    commandLineParser.addParameter( &displayHelp, "--help", NULL, false );
     commandLineParser.parse( argc, argv, stderr );
+
+    if( displayHelp )
+    {
+        printHelp();
+        return 0;
+    }
 
     //initialize logging based on args
     if( !logFilePath.isEmpty() && !logLevel.isEmpty() )
@@ -98,7 +121,7 @@ int main( int argc, char* argv[] )
     return service.exec();
 #else
     QtSingleApplication app( SERVICE_NAME, argc, argv );
-    LauncherFSM fsm;
+    LauncherFSM fsm( quitMode );
     QObject::connect( &fsm, SIGNAL(finished()), &app, SLOT(quit()) );
     QObject::connect( &fsm, SIGNAL(stopped()), &app, SLOT(quit()) );
     fsm.start();

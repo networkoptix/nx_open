@@ -16,8 +16,9 @@
 
 static const int maxBindTriesCount = 3;
 
-LauncherFSM::LauncherFSM()
+LauncherFSM::LauncherFSM( bool quitMode )
 :
+    m_quitMode( quitMode ),
     m_fsmSharedData( m_installationManager ),
     m_taskServer( &m_taskQueue ),
     m_settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ),
@@ -46,6 +47,11 @@ bool LauncherFSM::isLocalServerWasNotFound() const
         || m_previousAddTaskToPipeOperationResult == QLocalSocket::PeerClosedError;
 }
 
+bool LauncherFSM::quitMode() const
+{
+    return m_quitMode;
+}
+
 void LauncherFSM::initFSM()
 {
     QState* bindingToLocalAddress = new QState( this );
@@ -71,14 +77,23 @@ void LauncherFSM::initFSM()
 
     //from bindingToLocalAddress
     {
-        QAbstractTransition* tran = new QSignalTransition(
+        ConditionalSignalTransition* tran = new ConditionalSignalTransition(
             this,
             SIGNAL(bindSucceeded()),
-            bindingToLocalAddress );
-        tran->setTargetState( waitingForTaskQueueBecomeNonEmpty );
+            bindingToLocalAddress,
+            waitingForTaskQueueBecomeNonEmpty );
+        tran->addCondition( new ObjectPropertyEqualConditionHelper<int>::CondType(this, "quitMode", false) );
         connect( tran, SIGNAL(triggered()), this, SLOT(addTaskToTheQueue()) );
         bindingToLocalAddress->addTransition( tran );
     }
+
+    bindingToLocalAddress->addTransition(
+        new ConditionalSignalTransition(
+            this,
+            SIGNAL(bindSucceeded()),
+            bindingToLocalAddress,
+            finalState,
+            new ObjectPropertyEqualConditionHelper<int>::CondType(this, "quitMode", true) ) );
 
     bindingToLocalAddress->addTransition( this, SIGNAL(bindFailed()), addingTaskToNamedPipe );
 
@@ -145,13 +160,22 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
 
-    QString versionToLaunch;
-    QString appArgs;
-    if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
+    QByteArray serializedTask;
+    if( !m_quitMode )
     {
-        NX_LOG( QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1 );
-        emit failedToAddTaskToThePipe();
-        return;
+        QString versionToLaunch;
+        QString appArgs;
+        if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
+        {
+            NX_LOG( QString::fromLatin1("Failed to find what to launch. Will not post any task to the named pipe"), cl_logDEBUG1 );
+            emit failedToAddTaskToThePipe();
+            return;
+        }
+        serializedTask = applauncher::api::StartApplicationTask(versionToLaunch, appArgs).serialize();
+    }
+    else
+    {
+        serializedTask = applauncher::api::QuitTask().serialize();
     }
 
     //posting to the pipe 
@@ -165,7 +189,6 @@ void LauncherFSM::onAddingTaskToNamedPipeEntered()
         return;
     }
 
-    const QByteArray& serializedTask = StartApplicationTask(versionToLaunch, appArgs).serialize();
     if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
     {
         m_previousAddTaskToPipeOperationResult = sock.error();
@@ -186,7 +209,7 @@ bool LauncherFSM::addTaskToTheQueue()
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
         return false;   //TODO/IMPL
-    m_taskQueue.push( StartApplicationTask(versionToLaunch, appArgs) );
+    m_taskQueue.push( QSharedPointer<applauncher::api::BaseTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ) );
     return true;
 }
 
