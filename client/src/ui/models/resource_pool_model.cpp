@@ -89,13 +89,13 @@ public:
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
             break;
         case Qn::BastardNode:
-            m_displayName = m_name = QLatin1String("_HIDDEN_"); // this node is always hidden
+            m_displayName = m_name = QLatin1String("_HIDDEN_"); /* This node is always hidden. */
             m_bastard = true;
             break;
         case Qn::RecorderNode:
             m_displayName = m_name = name;
-            m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
-            m_bastard = true; // invisible by default until have children
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+            m_bastard = true; /* Invisible by default until has children. */
             break;
         default:
             break;
@@ -459,6 +459,12 @@ public:
         changeInternal();
     }
 
+    // TODO: #GDM
+    // This is a node construction method, so it does not really belong here.
+    // See other node construction methods, QnResourcePoolModel::node(...).
+    // 
+    // I see we already have a m_recorderNodeByResource for that, we only need
+    // a better type for it, e.g. QHash<QPair<QnResource *, QString>, Node *>.
     Node *recorder(const QString &groupId, const QString &groupName) {
         if (m_recorders.contains(groupId))
             return m_recorders[groupId];
@@ -718,16 +724,14 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
 
         Node* parent = this->node(parentResource);
 
-        QnSecurityCamResourcePtr camRes = node->resource().dynamicCast<QnSecurityCamResource>();
-        QString groupId;
-        QString groupName;
-        if (camRes) {
-            groupName = camRes->getGroupName();
-            groupId = camRes->getGroupId();
+        if (QnSecurityCamResourcePtr camera = node->resource().dynamicCast<QnSecurityCamResource>()) {
+            QString groupName = camera->getGroupName();
+            QString groupId = camera->getGroupId();
+            if(!groupId.isEmpty())
+                parent = parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
         }
-        if (groupId.isEmpty())
-            return parent;
-        return parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
+
+        return parent;
     }
 }
 
