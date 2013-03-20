@@ -917,7 +917,7 @@
 								</Directory>							
 
 								<Component Id="ClientExecutable_1_4" Guid="{5a883bac-6ae3-46d7-b0c5-ea03cf41be33}">
-									<File Id="client.exe_1_4" Name="${product.name} 1.4.exe" Source="${project.build.directory}/bin/${build.configuration}/1.4/${customization}_1_4.exe" KeyPath="yes">
+									<File Id="client.exe_1_4" Name="${product.name}.exe" Source="${project.build.directory}/bin/${build.configuration}/1.4/${customization}_1_4.exe" KeyPath="yes">
 										<fire:FirewallException Id="FirewallExceptionClient_1_4" Name="${product.name} 1.4" Scope="any" IgnoreFailure="yes"/>
 									</File>
 								</Component>
