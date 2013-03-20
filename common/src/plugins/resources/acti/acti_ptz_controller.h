@@ -35,6 +35,8 @@ private:
 
     qreal m_zoomVelocity;
     QPair<qreal, qreal> m_moveVelocity;
+    qreal m_minAngle;
+    qreal m_maxAngle;
 };
 
 

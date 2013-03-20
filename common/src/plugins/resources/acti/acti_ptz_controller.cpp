@@ -6,6 +6,8 @@
 #include "acti_resource.h"
 
 static const qreal DIGITAL_ZOOM_COEFF = 5.0;
+static const qreal ANALOG_ZOOM = 16.0;
+
 static const QString ENCODER_STR(lit("encoder"));
 
 namespace {
@@ -44,6 +46,11 @@ QnActiPtzController::~QnActiPtzController() {
     return;
 }
 
+qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)
+{
+    return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
+}
+
 void QnActiPtzController::init() 
 {
     CLHttpStatus status;
@@ -69,11 +76,43 @@ void QnActiPtzController::init()
     QnScalarSpaceMapper xMapper(minPanLogical, maxPanLogical, minPanPhysical, maxPanPhysical, Qn::PeriodicExtrapolation);
     QnScalarSpaceMapper yMapper(minTiltLogical, maxTiltLogical, minTiltPhysical, maxTiltPhysical, Qn::ConstantExtrapolation);
 
-    QnScalarSpaceMapper zMapper(minAngle, maxAngle, minAngle, maxAngle/DIGITAL_ZOOM_COEFF, Qn::ConstantExtrapolation);
-    QnScalarSpaceMapper toCameraZMapper(minAngle, maxAngle/DIGITAL_ZOOM_COEFF, 0.0, 1000.0, Qn::ConstantExtrapolation);
-    
+    qreal f35Max = maxAngle/DIGITAL_ZOOM_COEFF;
+    qreal f35Min = f35Max / ANALOG_ZOOM;
+
+    //QnScalarSpaceMapper zMapper(minAngle, maxAngle, minAngle, maxAngle/DIGITAL_ZOOM_COEFF, Qn::ConstantExtrapolation);
+
+    qreal pointsData[][2] = {
+        {0, 1.0},
+        {100, 1.2},
+        {200, 1.4},
+        {300, 1.66},
+        {400, 2.0},
+        {500, 2.6},
+        {600, 3.46},
+        {666, 4.0},
+        {700, 4.86},
+        {750, 5.3},
+        {800, 7.0},
+        {850, 8.0},
+        {875, 8.3},
+        {900, 10.6},
+        {937, 11.6},
+        {950, 12.13},
+        {1000, 16.0},
+    };
+
+    QVector<QPair<qreal, qreal> > data;
+    for (int i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
+        data << QPair<qreal, qreal>(toLogicalScale(pointsData[i][0], minAngle, maxAngle), pointsData[i][1] * f35Min);
+    QnScalarSpaceMapper zMapper(data, Qn::LinearExtrapolation);
+
+    //QnScalarSpaceMapper toCameraZMapper(minAngle, maxAngle, 0.0, 1000.0, Qn::ConstantExtrapolation);
+
+    m_minAngle = minAngle;
+    m_maxAngle = maxAngle;
+
     m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), 
-                                         QnVectorSpaceMapper(xMapper, yMapper, toCameraZMapper),
+                                         //QnVectorSpaceMapper(xMapper, yMapper, toCameraZMapper),
                                          QStringList());
 }
 
@@ -180,6 +219,8 @@ int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomV
 int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) 
 {
     QMutexLocker lock(&m_mutex);
+
+    zoomPos = (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000;
 
     CLHttpStatus status;
 
