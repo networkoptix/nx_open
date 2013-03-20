@@ -12,7 +12,6 @@ class AnimationTimer;
 class QnGridBackgroundItem : public QGraphicsObject
 {
     Q_OBJECT
-    Q_PROPERTY(QColor color READ color WRITE setColor)
     Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect)
 
 public:
@@ -21,36 +20,22 @@ public:
 
     virtual QRectF boundingRect() const override;
 
-    const QColor &color() const {
-        return m_color;
-    }
+    const QRectF &viewportRect() const;
+    void setViewportRect(const QRectF &rect);
 
-    void setColor(const QColor &color) {
-        m_color = color;
-    }
-
-    const QRectF &viewportRect() const {
-        return m_rect;
-    }
-
-    void setViewportRect(const QRectF &rect) {
-        prepareGeometryChange();
-        m_rect = rect;
-    }
-
-    const QRect &sceneRect() const {
-        return m_sceneRect;
-    }
-
-    void setSceneRect(const QRect &rect);
-
-    QnWorkbenchGridMapper *mapper() const {
-        return m_mapper.data();
-    }
-
+    QnWorkbenchGridMapper *mapper() const;
     void setMapper(QnWorkbenchGridMapper *mapper);
 
+    AnimationTimer* animationTimer() const;
     void setAnimationTimer(AnimationTimer *timer);
+
+    QImage image() const;
+    void setImage(const QImage &image);
+
+    QSize imageSize() const;
+    void setImageSize(const QSize &imageSize);
+
+    QRect sceneBoundingRect() const;
 
     void animatedShow();
     void animatedHide();
@@ -64,10 +49,11 @@ private slots:
     void at_opacityAnimator_finished();
 
 private:
-    QRect m_sceneRect;
     QRectF m_rect;
-    QColor m_color;
+    QImage m_image;
+    QSize m_imageSize;
     qreal m_targetOpacity;
+    QRect m_sceneBoundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     RectAnimator *m_geometryAnimator;
     VariantAnimator *m_opacityAnimator;

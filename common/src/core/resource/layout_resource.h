@@ -61,6 +61,12 @@ public:
 
     virtual void setUrl(const QString& value) override;
 
+    QSize backgroundSize() const;
+    void setBackgroundSize(QSize size);
+
+    QString backgroundUrl() const;
+    void setBackgroundUrl(QString url);
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -83,6 +89,8 @@ private:
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
+    QSize m_backgroundSize;
+    QString m_backgroundUrl;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

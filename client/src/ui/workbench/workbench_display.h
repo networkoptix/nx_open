@@ -158,12 +158,12 @@ public:
     /**
      * \returns                         Grid item. 
      */
-    QnGridItem *gridItem();
+    QnGridItem *gridItem() const;
 
     /**
      * \returns                         Grid background item (E-Mapping).
      */
-    QnGridBackgroundItem *gridBackgroundItem();
+    QnGridBackgroundItem *gridBackgroundItem() const;
 
     /**
      * \param item                      Item to get widget for.
@@ -326,6 +326,7 @@ protected:
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
+    void updateBackground(QnWorkbenchLayout* layout);
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();

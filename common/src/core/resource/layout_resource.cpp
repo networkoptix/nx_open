@@ -65,6 +65,26 @@ void QnLayoutResource::setUrl(const QString& value)
     }
 }
 
+QSize QnLayoutResource::backgroundSize() const {
+    QMutexLocker locker(&m_mutex);
+    return m_backgroundSize;
+}
+
+void QnLayoutResource::setBackgroundSize(QSize size) {
+    QMutexLocker locker(&m_mutex);
+    m_backgroundSize = size;
+}
+
+QString QnLayoutResource::backgroundUrl() const {
+    QMutexLocker locker(&m_mutex);
+    return m_backgroundUrl;
+}
+
+void QnLayoutResource::setBackgroundUrl(QString url) {
+    QMutexLocker locker(&m_mutex);
+    m_backgroundUrl = url;
+}
+
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
     QMutexLocker locker(&m_mutex);
 

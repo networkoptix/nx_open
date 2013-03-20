@@ -420,10 +420,8 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridBackgroundItem = new QnGridBackgroundItem();
     m_scene->addItem(gridBackgroundItem());
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
-    gridBackgroundItem()->setColor(QColor(240, 0, 0, 128));
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
-    gridBackgroundItem()->setSceneRect(QRect(QPoint(-1, -1), QPoint(1,1)));
     gridBackgroundItem()->setAnimationTimer(m_instrumentManager->animationTimer());
 
     /* Connect to context. */
@@ -450,11 +448,11 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
     m_boundingInstrument->setMovementSpeed(m_view, 4.0);
 }
 
-QnGridItem *QnWorkbenchDisplay::gridItem() {
+QnGridItem *QnWorkbenchDisplay::gridItem() const {
     return m_gridItem.data();
 }
 
-QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() {
+QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
 
@@ -635,6 +633,19 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     }
 
     emit widgetChanged(role);
+}
+
+void QnWorkbenchDisplay::updateBackground(QnWorkbenchLayout *layout) {
+    QnLayoutResourcePtr resource = layout->resource();
+    if (!resource)
+        return;
+
+    gridBackgroundItem()->setImage(QImage(resource->backgroundUrl()));
+    if (gridBackgroundItem()->image().isNull())
+        return;
+
+    gridBackgroundItem()->setImageSize(resource->backgroundSize());
+    gridBackgroundItem()->animatedShow();
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
@@ -1038,8 +1049,12 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
+    QRect backgroundBoundingRect = gridBackgroundItem()->sceneBoundingRect();
+    if(backgroundBoundingRect.isNull())
+        backgroundBoundingRect = QRect(0, 0, 1, 1);
 
-    return workbench()->mapper()->mapFromGridF(QRectF(layoutBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
+    QRect sceneBoundingRect = layoutBoundingRect.united(backgroundBoundingRect);
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1479,17 +1494,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
 
+
+    updateBackground(layout);
+
     synchronizeSceneBounds();
     fitInView(false);
-
-    if (layout->name().endsWith(QLatin1String("1"))) {
-        gridBackgroundItem()->setColor(QColor(Qt::red));
-        gridBackgroundItem()->setSceneRect(QRect(QPoint(0, 0), QPoint(1,1)));
-    } else {
-        gridBackgroundItem()->setColor(QColor(Qt::yellow));
-        gridBackgroundItem()->setSceneRect(QRect(QPoint(-1, -1), QPoint(0,0)));
-    }
-    gridBackgroundItem()->animatedShow();
 }
 
 void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
