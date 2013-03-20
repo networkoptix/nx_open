@@ -37,7 +37,7 @@ QnActiPtzController::QnActiPtzController(QnActiResource* resource):
     m_capabilities(Qn::NoCapabilities),
     m_spaceMapper(NULL),
     m_zoomVelocity(0.0),
-    m_moveVelocity(0.0, 0.0)
+    m_moveVelocity(0, 0)
 {
     init();
 }
@@ -132,7 +132,7 @@ int QnActiPtzController::stopMoveInternal()
     QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("MOVE=STOP"), status);
     int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
     if (result == 0)
-        m_moveVelocity = QPair<qreal, qreal>(0.0, 0.0);
+        m_moveVelocity = QPair<int, int>(0, 0);
     return result;
 }
 
@@ -156,12 +156,15 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
     return result;
 }
 
-int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
+int QnActiPtzController::startMoveInternal(qreal xVelocityR, qreal yVelocityR)
 {
+    stopMoveInternal();
+
+    int xVelocity = qRound(xVelocityR*5.0);
+    int yVelocity = qRound(yVelocityR*5.0);
+
     if (m_moveVelocity.first == xVelocity && m_moveVelocity.second == yVelocity)
         return 0;
-
-    stopMoveInternal();
 
     static const QString directions[3][3] =
     {
@@ -173,20 +176,17 @@ int QnActiPtzController::startMoveInternal(qreal xVelocity, qreal yVelocity)
     QString direction = directions[1-sign3(yVelocity)][sign3(xVelocity)+1];
     QString requestStr = QString(lit("MOVE=%1")).arg(direction);
 
-    int xVelocityI = qAbs(scaleValue(xVelocity, 1,5));
-    int yVelocityI = qAbs(scaleValue(yVelocity, 1,5));
-
     if (xVelocity)
-        requestStr += QString(lit(",%1")).arg(xVelocityI);
+        requestStr += QString(lit(",%1")).arg(qAbs(xVelocity));
     if (yVelocity)
-        requestStr += QString(lit(",%1")).arg(yVelocityI);
+        requestStr += QString(lit(",%1")).arg(qAbs(yVelocity));
 
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(ENCODER_STR, requestStr, status);
     int result =  (status == CL_HTTP_SUCCESS ? 0 : -1);
 
     if (result == 0)
-        m_moveVelocity = QPair<qreal, qreal>(xVelocity, yVelocity);
+        m_moveVelocity = QPair<int, int>(xVelocity, yVelocity);
 
     return result;
 }
@@ -220,7 +220,7 @@ int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     QMutexLocker lock(&m_mutex);
 
-    zoomPos = (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000;
+    zoomPos = qMax(0.0, (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
 
     CLHttpStatus status;
 

@@ -34,7 +34,7 @@ private:
     QnPtzSpaceMapper *m_spaceMapper;
 
     qreal m_zoomVelocity;
-    QPair<qreal, qreal> m_moveVelocity;
+    QPair<int, int> m_moveVelocity;
     qreal m_minAngle;
     qreal m_maxAngle;
 };
