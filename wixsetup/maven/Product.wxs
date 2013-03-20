@@ -407,7 +407,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
 		<CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_${parsedVersion.incrementalVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
 		<CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -772,12 +772,12 @@
 						<Directory Id="${installer.customization}ClientDir" Name="Client">
 							<Directory Id="${installer.customization}HelpDir" Name="help"/>							
 
-							<Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_${parsedVersion.incrementalVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
+							<Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
 
 								<Component Id="AppLauncherExecutable" Guid="{486c2632-c229-4ce5-b976-e87d0a82a2dc}">
 									<File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes">
 										<Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-											  WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_${parsedVersion.incrementalVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
+											  WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
 										</Shortcut>
 									</File>
 
@@ -801,7 +801,7 @@
 									<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
 									<Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-										  WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_${parsedVersion.incrementalVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+										  WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
 									</Shortcut>
 								</Component>							
 
