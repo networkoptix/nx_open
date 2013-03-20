@@ -99,8 +99,10 @@ void QnActiPtzController::init()
     qreal minTiltLogical = 0, maxTiltLogical = 9000; //  // todo: move to camera XML
     
     qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
-    if (!m_isFliped)
+    if (!m_isFliped) {
         qSwap(minTiltPhysical, maxTiltPhysical);
+        m_capabilities &= ~QnCommonGlobals::AbsolutePtzCapability; // acti 8111 has bug for absolute position if flip turned off
+    }
 
     QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
     m_minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
