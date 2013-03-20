@@ -10,7 +10,7 @@
     <message>
         <location filename="../src/utils/network/socket.cpp" line="372"/>
         <source>Connect failed (connect()). %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">连接失败（connect()）. %1</translation>
     </message>
 </context>
 <context>
@@ -44,7 +44,7 @@
     <message>
         <location filename="../src/qt5/network/qdnslookup.cpp" line="449"/>
         <source>Operation cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">取消操作</translation>
     </message>
 </context>
 <context>
@@ -52,27 +52,27 @@
     <message>
         <location filename="../src/qt5/network/qdnslookup.cpp" line="968"/>
         <source>Invalid domain name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无效域名</translation>
     </message>
     <message>
         <location filename="../src/qt5/network/qdnslookup_win.cpp" line="67"/>
         <source>Server could not process query</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器无法进行查询</translation>
     </message>
     <message>
         <location filename="../src/qt5/network/qdnslookup_win.cpp" line="71"/>
         <source>Server failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器故障</translation>
     </message>
     <message>
         <location filename="../src/qt5/network/qdnslookup_win.cpp" line="75"/>
         <source>Non existent domain</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不存在的域名</translation>
     </message>
     <message>
         <location filename="../src/qt5/network/qdnslookup_win.cpp" line="79"/>
         <source>Server refused to answer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器拒绝应答</translation>
     </message>
 </context>
 <context>
@@ -111,284 +111,261 @@
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="12"/>
         <source>---</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">---</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="13"/>
         <source>Camera output</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机输出</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="14"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">书签</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="15"/>
         <source>Camera recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机录像</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="16"/>
         <source>Panic recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">危机录像</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="17"/>
         <source>Send mail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送邮件</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="18"/>
         <source>Alert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">警告</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="19"/>
         <source>Show notification</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">事件提醒</translation>
     </message>
     <message>
         <location filename="../src/business/actions/abstract_business_action.cpp" line="21"/>
         <source>Unknown (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="39"/>
-        <source>%1 Event received from resource %2 (%3)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="43"/>
-        <source>%1 Event received</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="60"/>
-        <source>Event %1 caught from %2 (address %3):
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="62"/>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="63"/>
-        <source>UNKNOWN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="68"/>
-        <source>Adresates:
-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未知 (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="11"/>
         <source>User Defined (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">用户定义的 (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="19"/>
         <source>Motion on Camera</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机移动侦测</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="21"/>
         <source>Input Signal on Camera</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机输入</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="23"/>
         <source>Camera Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机离线</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="25"/>
         <source>Storage Failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储故障</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="27"/>
         <source>Network Issue</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">网络问题</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="29"/>
         <source>Camera IP Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机IP冲突</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="31"/>
         <source>Media Server Failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储服务器故障</translation>
     </message>
     <message>
         <location filename="../src/business/events/abstract_business_event.cpp" line="33"/>
         <source>Media Server Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储服务器冲突</translation>
     </message>
     <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="183"/>
-        <source>event type: %1
-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="38"/>
+        <source>User defined event</source>
+        <translation type="unfinished">用户自定义事件</translation>
     </message>
     <message>
-        <location filename="../src/business/events/abstract_business_event.cpp" line="184"/>
-        <source>timestamp: %1
-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="51"/>
+        <source>Camera %1 disconnected</source>
+        <translation type="unfinished">摄像机 %1 离线</translation>
     </message>
     <message>
-        <location filename="../src/business/events/ip_conflict_business_event.cpp" line="15"/>
-        <source> conflicting cameras:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="54"/>
+        <source>Input signal on camera %1</source>
+        <translation type="unfinished">摄像机输入 %1</translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_conflict_business_event.cpp" line="23"/>
-        <source>  several media servers are running on different EC! current EC connection %1 conflict with EC(s): </source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="57"/>
+        <source>Motion detected on camera %1</source>
+        <translation type="unfinished">摄像机 %1移动侦测</translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_failure_business_event.cpp" line="20"/>
-        <source>Media server was terminated unexpectedly</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="98"/>
+        <source>Input port: %1</source>
+        <translation type="unfinished">输入端口 %1</translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_failure_business_event.cpp" line="23"/>
-        <source>Media server is started after an unexpected shutdown</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="147"/>
+        <source>at %1</source>
+        <translation type="unfinished">在 %1</translation>
     </message>
     <message>
-        <location filename="../src/business/events/mserver_failure_business_event.cpp" line="31"/>
-        <source>. Reason: %1.
-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="149"/>
+        <source>%1 times since %2</source>
+        <translation type="unfinished">%2 开始 %1 次</translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="23"/>
-        <source>No video frame during %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="156"/>
+        <source>Adresates:</source>
+        <translation type="unfinished">Adresates:</translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="26"/>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="173"/>
+        <source>On</source>
+        <translation type="unfinished">开</translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="176"/>
+        <source>Off</source>
+        <translation type="unfinished">关</translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="195"/>
+        <source>No video frame received during last %1 seconds.</source>
+        <translation type="unfinished">在过去的 %1 秒中没有接收到视频</translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="200"/>
         <source>Connection to camera was unexpectedly closed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机连接中断</translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="33"/>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="207"/>
         <source>RTP packet loss detected. Prev seq.=%1 next seq.=%2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">侦测到RTP包丢失。之前seq.=%1，下个seq.=%2</translation>
     </message>
     <message>
-        <location filename="../src/business/events/network_issue_business_event.cpp" line="44"/>
-        <source>  reason: %1
-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="214"/>
+        <source>Server terminated.</source>
+        <translation type="unfinished">服务器终止</translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="38"/>
-        <source>IO error occured.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="218"/>
+        <source>Server started after crash.</source>
+        <translation type="unfinished">服务器终止后启动</translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="41"/>
-        <source>Not enough HDD/SSD speed for recording.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="222"/>
+        <source>I/O Error occured at %1</source>
+        <translation type="unfinished">在 %1 发生输入/输出故障</translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="49"/>
-        <source>  reason%1
-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="227"/>
+        <source>Not enough HDD/SSD speed for recording at %1.</source>
+        <translation type="unfinished">没有充足的 HDD/SSD 速度以 %1 录像</translation>
     </message>
     <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="51"/>
-        <source>  storage%1
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/events/storage_failure_business_event.cpp" line="53"/>
-        <source>  no storage for writting
-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="245"/>
+        <source>conflicted with</source>
+        <translation type="unfinished">冲突</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="9"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最低</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="11"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">低</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="13"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">普通</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="15"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="17"/>
         <source>Highest</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">最高</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="19"/>
         <source>Preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">预设位</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="23"/>
         <source>Undefined</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未定义</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
         <source>Your E-Mail address is not set.
 You cannot receive system notifications via E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">邮箱地址没有设定。
+无法通过邮件接收系统事件。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="13"/>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">没有软件许可</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="15"/>
         <source>E-Mail server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">邮件服务器没有设定</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="17"/>
         <source>Some users have not set their E-Mail addresses.
 They cannot receive system notifications via E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">一些用户没有设定邮件地址。
+他们无法通过邮件接收系统事件。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
         <source>Connection to Enterprise Controller is lost.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">与系统控制器的连接丢失</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="23"/>
         <source>Error while sending E-Mail.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发送邮件时错误</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="25"/>
         <source>Some storages are full.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">一些存储已满</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="27"/>
         <source>Storages are not configured.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储没有设定</translation>
     </message>
 </context>
 <context>
@@ -396,22 +373,22 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="120"/>
         <source>Windows Network Shared Resource</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Windows 网络共享资源</translation>
     </message>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="121"/>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">\\&lt;计算机名&gt;\&lt;文件夹&gt;</translation>
     </message>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="125"/>
         <source>Coldstore Network Storage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">NAS网络存储</translation>
     </message>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="126"/>
         <source>coldstore://&lt;Address&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">NAS://&lt;地址&gt;</translation>
     </message>
 </context>
 <context>
@@ -446,19 +423,19 @@ They cannot receive system notifications via E-Mail</source>
         <location filename="../src/rest/handlers/ext_bevent_handler.cpp" line="36"/>
         <source>Parameter &apos;res_id&apos; is absent or empty. 
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;res_id&apos;参数缺失或空白。</translation>
     </message>
     <message>
         <location filename="../src/rest/handlers/ext_bevent_handler.cpp" line="38"/>
         <source>Parameter &apos;event_type&apos; is absent or empty. 
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;event_type&apos;参数缺失或空白。</translation>
     </message>
     <message>
         <location filename="../src/rest/handlers/ext_bevent_handler.cpp" line="44"/>
         <source>Resource with id &apos;%1&apos; not found 
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID &apos;%1&apos;资源没有找到。</translation>
     </message>
 </context>
 <context>
@@ -573,7 +550,7 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="564"/>
         <source>Internal server error: invalid audio codec information</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">内部服务器错误：无效音频编码信息</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="593"/>
@@ -644,7 +621,7 @@ They cannot receive system notifications via E-Mail</source>
         <location filename="../src/transcoding/transcoder.cpp" line="162"/>
         <location filename="../src/transcoding/transcoder.cpp" line="194"/>
         <source>Unknown Transcode Method</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未知编码转换方法</translation>
     </message>
 </context>
 <context>

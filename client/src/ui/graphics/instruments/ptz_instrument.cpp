@@ -770,6 +770,12 @@ void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
 }
 
+void PtzInstrument::ptzUpdate(QnMediaResourceWidget *widget) {
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+
+    m_ptzController->updatePosition(camera);
+}
+
 void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant) {
     PtzData &data = m_dataByWidget[widget];
     data.requestedSpeed = speed;
@@ -984,7 +990,8 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     m_target = target;
     m_manipulator = manipulator;
 
-    dragProcessor()->mousePressEvent(item, event);
+    ptzUpdate(target);
+    dragProcessor()->mousePressEvent(target, event);
     
     event->accept();
     return false;
