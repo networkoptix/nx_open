@@ -47,6 +47,7 @@
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/grid/grid_background_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -312,6 +313,9 @@ void QnWorkbenchDisplay::deinitSceneView() {
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
 
+    if (!m_gridBackgroundItem.isNull())
+        delete gridBackgroundItem();
+
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
 
@@ -413,6 +417,14 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setMapper(workbench()->mapper());
     m_gridItem.data()->setAnimationTimer(m_instrumentManager->animationTimer());
 
+    m_gridBackgroundItem = new QnGridBackgroundItem();
+    m_scene->addItem(gridBackgroundItem());
+    setLayer(gridBackgroundItem(), Qn::EMappingLayer);
+    gridBackgroundItem()->setColor(QColor(240, 0, 0, 128));
+    gridBackgroundItem()->setOpacity(0.7);
+    gridBackgroundItem()->setMapper(workbench()->mapper());
+    gridBackgroundItem()->setSceneRect(QRect(QPoint(-1, -1), QPoint(1,1)));
+
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -439,6 +451,10 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 
 QnGridItem *QnWorkbenchDisplay::gridItem() {
     return m_gridItem.data();
+}
+
+QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() {
+    return m_gridBackgroundItem.data();
 }
 
 
