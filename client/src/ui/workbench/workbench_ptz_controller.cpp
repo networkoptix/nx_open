@@ -14,6 +14,15 @@
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
+//#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
+
+#ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__;
+#else
+#   define TRACE(...)
+#endif
+
+
 namespace {
     template<class Key, class T>
     void qnRemoveValues(QHash<Key, T> &hash, const T &value) {
@@ -155,6 +164,8 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
+    TRACE("SENT POSITION" << position);
+
     int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
     m_requestByHandle[handle] = position;
@@ -230,6 +241,8 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
     if(!camera)
         return; /* Already removed from the pool. */
+
+    TRACE("GOT POSITION" << position);
 
     m_cameraByHandle.remove(handle);
     
