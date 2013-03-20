@@ -484,14 +484,16 @@ class PtzOverlayWidget: public QGraphicsWidget {
 
 public:
     PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        base_type(parent, windowFlags),
-        m_manipulatorWidget(new PtzManipulatorWidget(this)),
-        m_arrowItem(new PtzArrowItem(this)),
-        m_pointerItem(new PtzPointerItem(this)),
-        m_zoomInButton(new PtzZoomButtonWidget(this)),
-        m_zoomOutButton(new PtzZoomButtonWidget(this))
+        base_type(parent, windowFlags)
     {
         setAcceptedMouseButtons(0);
+
+        /* Note that construction order is important as it defines which items are on top. */
+        m_manipulatorWidget = new PtzManipulatorWidget(this);
+        m_zoomInButton = new PtzZoomButtonWidget(this);
+        m_zoomOutButton = new PtzZoomButtonWidget(this);
+        m_arrowItem = new PtzArrowItem(this);
+        m_pointerItem = new PtzPointerItem(this);
 
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
@@ -595,10 +597,10 @@ private:
 
 private:
     PtzManipulatorWidget *m_manipulatorWidget;
-    PtzArrowItem *m_arrowItem;
-    PtzPointerItem *m_pointerItem;
     PtzZoomButtonWidget *m_zoomInButton;
     PtzZoomButtonWidget *m_zoomOutButton;
+    PtzArrowItem *m_arrowItem;
+    PtzPointerItem *m_pointerItem;
 };
 
 
