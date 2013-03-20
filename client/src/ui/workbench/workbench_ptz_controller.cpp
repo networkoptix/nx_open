@@ -112,6 +112,10 @@ void QnWorkbenchPtzController::setPhysicalPosition(const QnVirtualCameraResource
     setPosition(camera, mapper->toCamera().physicalToLogical(physicalPosition));
 }
 
+void QnWorkbenchPtzController::updatePosition(const QnVirtualCameraResourcePtr &camera) {
+    sendGetPosition(camera);
+}
+
 QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) const {
     if(!camera) {
         qnNullWarning(camera);
