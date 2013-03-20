@@ -40,8 +40,8 @@ cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
 cp -r ${project.build.directory}/bin/applauncher* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
 
 # Copy client startup script
-cp bin/client $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-cp bin/client $BINSTAGE/1.4
+#cp bin/client $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+#cp bin/client $BINSTAGE/1.4
 
 # Copy icons
 cp -P -Rf usr $STAGE
