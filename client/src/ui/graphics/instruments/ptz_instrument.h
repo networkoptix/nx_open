@@ -101,7 +101,7 @@ private:
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
     void ptzUnzoom(QnMediaResourceWidget *widget);
-
+    void ptzUpdate(QnMediaResourceWidget *widget);
     void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant = false);
 
     void processPtzClick(const QPointF &pos);

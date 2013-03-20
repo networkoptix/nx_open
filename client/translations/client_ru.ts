@@ -177,32 +177,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="440"/>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="445"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="448"/>
         <source>Manuf.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="455"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="458"/>
         <source>Address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="484"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="487"/>
         <source>&amp;Add selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="503"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="506"/>
         <source>Cl&amp;ose</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="450"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="453"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -467,6 +462,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="58"/>
+        <source>Expiry Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="43"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
@@ -474,11 +474,6 @@
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="53"/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="58"/>
-        <source>Expire Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -946,7 +941,7 @@ For easy instructions on how to install or update your video driver, follow inst
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="321"/>
+        <location filename="../src/main.cpp" line="322"/>
         <source>Using authentication parameters from command line: %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2170,27 +2165,27 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBusinessEventPopupWidget</name>
     <message>
-        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="56"/>
+        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="47"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffaa00;&quot;&gt;Warning!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="69"/>
+        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="60"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffff00;&quot;&gt;Important!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="82"/>
+        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="73"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#00aa00;&quot;&gt;Notification&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="143"/>
+        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="134"/>
         <source>Do not notify again about this</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="165"/>
+        <location filename="../src/ui/widgets/popups/business_event_popup_widget.ui" line="156"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2476,53 +2471,53 @@ for recording at
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="220"/>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="394"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="391"/>
         <source>Hide Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="220"/>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="394"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="391"/>
         <source>Show Advanced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="232"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="231"/>
         <source>Error while receiving rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="252"/>
         <source>Error while saving rule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="269"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="266"/>
         <source>Error while deleting rule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="301"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="298"/>
         <source>&amp;New...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="304"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="301"/>
         <source>&amp;Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="310"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="307"/>
         <source>&amp;Schedule...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="327"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="324"/>
         <source>Confirm save invalid rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="328"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="325"/>
         <source>Some rules are not valid. Should we disable them?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2568,69 +2563,69 @@ for recording at
 <context>
     <name>QnCameraAdditionDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="235"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="349"/>
         <source>First address in range is greater than last one</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="241"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="355"/>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="248"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="362"/>
         <source>Camera address filed must contain valid url or ip address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="307"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="421"/>
         <source>Server returned an error:
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="309"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="423"/>
         <source>This server version supports only searching by ip address.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="319"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="433"/>
         <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="319"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="433"/>
         <source>No cameras found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="347"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="461"/>
         <source>No cameras selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="347"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="461"/>
         <source>Please select at least one camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="375"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="489"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="375"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="489"/>
         <source>Camera(s) added successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="313"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="378"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="427"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="492"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="378"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="492"/>
         <source>Error while adding camera(s)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2942,12 +2937,12 @@ for recording at
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="482"/>
+        <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="484"/>
         <source>Can&apos;t find video encoder </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="490"/>
+        <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="492"/>
         <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3293,12 +3288,12 @@ Try to activate your License manually.</source>
 <context>
     <name>QnPopupCollectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/popups/popup_collection_widget.ui" line="49"/>
+        <location filename="../src/ui/widgets/popups/popup_collection_widget.ui" line="45"/>
         <source>Minimize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/popups/popup_collection_widget.ui" line="69"/>
+        <location filename="../src/ui/widgets/popups/popup_collection_widget.ui" line="65"/>
         <source>Postpone All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3696,8 +3691,8 @@ Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="299"/>
-        <source>Activate License to remove this message</source>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="298"/>
+        <source>Activate analog license to remove this message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3791,28 +3786,28 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="366"/>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="406"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="367"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="407"/>
         <source>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="381"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="382"/>
         <source>Hardware (Camera built-in)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="383"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="384"/>
         <source>Do not record motion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="554"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="555"/>
         <source>%1 digital license(s) are used out of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="565"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="566"/>
         <source>%1 analog license(s) are used out of %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3932,68 +3927,73 @@ Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="197"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="195"/>
         <source>Email is not valid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="200"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="198"/>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="235"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="233"/>
         <source>Invalid data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="235"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="233"/>
         <source>Cannot test such parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="247"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="245"/>
         <source>TLS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="249"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="247"/>
         <source>SSL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="250"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="248"/>
         <source>Unsecured</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="257"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="255"/>
         <source>In Progress...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="268"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="266"/>
         <source>Cancelled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="278"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="276"/>
         <source>Timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="286"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="284"/>
         <source>Error while testing settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="288"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="286"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="289"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="287"/>
         <source>Error: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="307"/>
+        <source>Error while receiving settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
