@@ -112,7 +112,8 @@ void QnWorkbenchPtzMapperWatcher::at_resource_statusChanged(const QnResourcePtr 
 }
 
 void QnWorkbenchPtzMapperWatcher::at_replyReceived(int status, const QnPtzSpaceMapper &mapper, int handle) {
-    Q_UNUSED(status);
+    if(status != 0)
+        return; // TODO
 
     QnVirtualCameraResourcePtr camera = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
