@@ -4,6 +4,10 @@ CONFIG(debug, debug|release) {
   CONFIG += console
 }
 
+!win32 {
+  CONFIG += console
+}
+
 include(${environment.dir}/qt-custom/qtservice/src/qtservice.pri)
 include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
 #include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
