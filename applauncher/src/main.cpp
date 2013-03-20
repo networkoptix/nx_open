@@ -90,8 +90,8 @@ int main( int argc, char* argv[] )
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
     commandLineParser.addParameter( &logFilePath, "--log-file", NULL, QString() );
-    commandLineParser.addParameter( &quitMode, "quit", NULL, false );
-    commandLineParser.addParameter( &displayHelp, "--help", NULL, false );
+    commandLineParser.addParameter( &quitMode, "quit", NULL, QString(), QVariant(true) );
+    commandLineParser.addParameter( &displayHelp, "--help", NULL, QString(), QVariant(true) );
     commandLineParser.parse( argc, argv, stderr );
 
     if( displayHelp )
