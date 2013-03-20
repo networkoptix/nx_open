@@ -296,6 +296,8 @@ bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     arguments << QLatin1String("--no-single-application");
     arguments << QLatin1String("--auth");
     arguments << QLatin1String(currentUrl().toEncoded());
+    arguments << QLatin1String("--screen");
+    arguments << QString::number(qApp->desktop()->screenNumber(this));
 
     bool result = sendCommandToLauncher(stripVersion(connectInfo->version), arguments);
     if (!result)
