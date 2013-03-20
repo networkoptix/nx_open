@@ -7,7 +7,7 @@
 #include "recording/time_period_list.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
 
-class QnVMax480ChunkReader: public  QnLongRunnable, public VMaxStreamFetcher
+class QnVMax480ChunkReader: public  QnLongRunnable, public QnVmax480DataConsumer
 {
     Q_OBJECT;
 public:
@@ -17,6 +17,7 @@ public:
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) override;
     virtual void onGotMonthInfo(const QDate& month, int monthInfo) override;
     virtual void onGotDayInfo(int dayNum, const QByteArray& data) override;
+
 signals:
     void gotChunks(int channel, QnTimePeriodList chunks);
 protected:
@@ -38,6 +39,8 @@ private:
     bool m_firstRange;
     QnTimePeriod m_archiveRange;
     QTime m_waitTimer;
+    VMaxStreamFetcher* m_streamFetcher;
+    QnResourcePtr m_res;
 };
 
 #endif // __VMAX480_CHUNK_READER_H__

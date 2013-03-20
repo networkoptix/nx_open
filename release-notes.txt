@@ -1,3 +1,37 @@
+----------------------------------------------- 1.4.4 - RC -----------------------------------------------
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - Arecont 12186 and 20365
+
+BUGS FIXED:
+
+Since 1.4
+ - If perform search and then clear all search criterias all available items were placed on scene causing freezes. Now search results are removed in this case
+ - Progress indicator was displayed incorrectly in some cases during file export. Fixed
+
+Since previous version (1.4.3)
+ - if press fix button on storage notification it didn't disappear
+ - If switch between layouts RADASS setting (if had been set manually) remained the same. Fixed: now it is reset to "Auto"
+ - If upgrade from the previous version storages are not active by default. Fixed.
+ - If licenses count is insufficient it is suggested to activate the approproate number of licenses. This number calculated incorrectly sometimes. Fixed
+ - If license name contained national characters licenses could work incorrectly. Fixed
+ - PTZ Controls were shown/hidden in the incorrect manner. Fixed
+ - Cameras that reported to have digital PTZ are discovered as non-PTZ (i.e. Vivotek and Dahua)
+ 
+IMPROVEMENTS:
+
+Since 1.4
+ - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
+ - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
+ - Health Monitoring colors can be customized
+
+Since previous version (1.4.3)
+ - E-mail signature can be specified. This signature will be attached to all outgoing E-mails that are produced by the software
+ - Recorders in Tree can be swapped between servers and put on Scene. Context Menu is introdused as well
+ - New license scheme is improved
+ - Popup notification are collapsed by default and the icon is blinking if one is received. They can be expanded and collapsed again
+ - VMAX playback is improved
+ - Custom storages (those have been added manually) can be removed
+ 
 ----------------------------------------------- 1.4.3 - Beta2 -----------------------------------------------
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - AXISP1354

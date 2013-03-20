@@ -26,6 +26,7 @@ public:
     void setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq);
 
     void setQuality(MediaQuality q);
+    void setGroupId(const QByteArray& groupId);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run();

@@ -3,47 +3,52 @@
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 
+static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
+
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     QnAbstractArchiveDelegate(),
-    VMaxStreamFetcher(res),
-    m_internalQueue(100),
+    m_maxStream(NULL),
     m_needStop(false),
-    m_sequence(0),
-    m_vmaxPaused(false),
-    m_lastMediaTime(AV_NOPTS_VALUE),
     m_reverseMode(false),
-    m_thumbnailsMode(false)
+    m_thumbnailsMode(false),
+    m_lastSeekPos(AV_NOPTS_VALUE),
+    m_isOpened(false),
+    m_ignoreNextSeek(false),
+    m_lastMediaTime(0),
+    m_noDataCounter(0)
 {
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
+    m_flags |= Flag_CanOfflineLayout;
+    //m_flags |= Flag_CanSeekImmediatly;
 }
 
 QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
 {
-    vmaxDisconnect();
-
+    close();
 }
 
 bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
 {
     Q_UNUSED(resource)
-    if (isOpened())
+
+    if (m_isOpened)
         return true;
 
-    close();
-
+    m_isOpened = true;
     m_needStop = false;
-    m_sequence = 0;
-
-    int channel = QUrl(m_res->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
-    if (channel > 0)
-        channel--;
 
     qDebug() << "before vmaxConnect";
 
-    return vmaxConnect(false, channel);
+    if (m_maxStream == 0)
+        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
+    int consumerCount = 0;
+    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode);
+    m_ignoreNextSeek = consumerCount > 1;
+    m_noDataCounter = 0;
+    return m_isOpened;
 }
 
 void QnVMax480ArchiveDelegate::beforeClose()
@@ -53,16 +58,21 @@ void QnVMax480ArchiveDelegate::beforeClose()
 
 qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-    if (!isOpened()) {
+    m_beforeSeek = false;
+    m_lastMediaTime = time;
+    if (!m_isOpened) {
         open(m_res);
-        if (!isOpened())
-            return -1;
+    }
+
+    if (m_ignoreNextSeek) {
+        m_ignoreNextSeek = false;
+        return time;
     }
 
     m_thumbnailsMode = false;
-    QnTimePeriodList chunks = m_res->getChunks();
-    if (!chunks.isEmpty())
-        time = chunks.roundTimeToPeriodUSec(time, true);
+    //QnTimePeriodList chunks = m_res->getChunks();
+    //if (!chunks.isEmpty())
+    //    time = chunks.roundTimeToPeriodUSec(time, true);
 
     return seekInternal(time, findIFrame);
 }
@@ -70,18 +80,24 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
 qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
 {
     Q_UNUSED(findIFrame)
-    m_sequence++;
-    qDebug() << "QnVMax480ArchiveDelegate::seek" << "m_sequence" << m_sequence;
+    qDebug() << "QnVMax480ArchiveDelegate::seek";
 
-    m_internalQueue.clear();
-    vmaxArchivePlay(time, m_sequence, m_reverseMode ? -1 : 1);
+    m_maxStream->vmaxArchivePlay(this, time, m_reverseMode ? -1 : 1);
+    m_lastSeekPos = time;
     return time;
 }
 
 void QnVMax480ArchiveDelegate::close()
 {
+    m_noDataCounter = 0;
     m_needStop = true;
-    vmaxDisconnect();
+    if (m_isOpened) {
+        m_maxStream->unregisterConsumer(this);
+        m_isOpened = false;
+    }
+    if (m_maxStream)
+        VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
+    m_maxStream = 0;
 }
 
 qint64 QnVMax480ArchiveDelegate::startTime()
@@ -94,20 +110,21 @@ qint64 QnVMax480ArchiveDelegate::endTime()
     return m_res->endTime();
 }
 
+void QnVMax480ArchiveDelegate::reconnect()
+{
+    close();
+    open(m_res);
+    if (!m_maxStream->isPlaying())
+        m_maxStream->vmaxArchivePlay(this, m_lastMediaTime, m_reverseMode ? -1 : 1);
+}
+
 QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
 
     
-    if (!isOpened()) {
+    if (!m_isOpened) {
         open(m_res);
-        if (!isOpened())
-            return result;
-    }
-
-    if (m_vmaxPaused && m_internalQueue.size() < m_internalQueue.maxSize()/2) {
-        vmaxArchivePlay(m_lastMediaTime, m_sequence, 1);
-        m_vmaxPaused = false;
     }
 
     if (m_thumbnailsMode) {
@@ -120,18 +137,35 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
     QTime getTimer;
     getTimer.restart();
-    while (isOpened()) {
-        QnAbstractDataPacketPtr tmp;
-        m_internalQueue.pop(tmp, 100);
+    while (m_isOpened) {
+        QnAbstractDataPacketPtr tmp = m_maxStream->getNextData(this);
         result = tmp.dynamicCast<QnAbstractMediaData>();
 
-        if (result && result->opaque == m_sequence)
+        if (result)
             break;
-        if (m_needStop || getTimer.elapsed() > MAX_FRAME_DURATION*3)
-            return QnAbstractMediaDataPtr();
+        if (!m_thumbnailsMode && m_beforeSeek) {
+            result = m_maxStream->createEmptyPacket(0); // cancel waiting
+            result->flags |= QnAbstractMediaData::MediaFlags_Skip;
+            return result;
+        }
+
+        if (m_thumbnailsMode) {
+            if (getTimer.elapsed() > MAX_FRAME_DURATION*2)
+                return result; // tell error
+        }
+        else {
+            if (getTimer.elapsed() > EMPTY_PACKET_REPEAT_INTERVAL) {
+                if (++m_noDataCounter == MAX_FRAME_DURATION*2/EMPTY_PACKET_REPEAT_INTERVAL)
+                    reconnect();
+                return m_maxStream->createEmptyPacket(m_lastMediaTime);
+            }
+        }
+
+        if (m_needStop)
+            break;
     }
     if (result) {
-        result->opaque = 0;
+        m_noDataCounter = 0;
         if (m_reverseMode) {
             result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
             result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -148,6 +182,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 
             m_ThumbnailsSeekPoints.erase(m_ThumbnailsSeekPoints.begin());
         }
+        m_lastMediaTime = result->timestamp;
     }
     else {
         close();
@@ -168,34 +203,13 @@ QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
     return &audioLayout;
 }
 
-void QnVMax480ArchiveDelegate::onGotData(QnAbstractMediaDataPtr mediaData)
-{
-    QTime waitTimer;
-    waitTimer.restart();
-
-    //qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(mediaData->timestamp/1000).toString(QLatin1String("dd.MM.yyyy hh:mm.ss"));
-
-    while (!m_needStop && m_internalQueue.size() > m_internalQueue.maxSize() && !m_vmaxPaused)
-    {
-        if (waitTimer.elapsed() > MAX_FRAME_DURATION) {
-            if (!m_vmaxPaused) {
-                vmaxArchivePlay(m_lastMediaTime, m_sequence, 0);
-                m_vmaxPaused = true;
-            }
-        }
-        else {
-            QnSleep::msleep(1);
-        }
-    }
-
-    m_internalQueue.push(mediaData);
-    m_lastMediaTime = mediaData->timestamp;
-}
-
 void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
-    m_reverseMode = value;
-    seek(displayTime, true);
+    if (m_reverseMode != value) {
+        m_reverseMode = value;
+        m_ignoreNextSeek = false;
+        seek(displayTime, true);
+    }
 }
 
 void QnVMax480ArchiveDelegate::calcSeekPoints(qint64 startTime, qint64 endTime, qint64 frameStep)
@@ -233,4 +247,25 @@ void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64
 
     //m_sequence++;
     //vmaxPlayRange(m_ThumbnailsSeekPoints.keys(), m_sequence);
+}
+
+int QnVMax480ArchiveDelegate::getChannel() const
+{
+    return m_res.dynamicCast<QnPhysicalCameraResource>()->getChannel();
+}
+
+void QnVMax480ArchiveDelegate::setGroupId(const QByteArray& data)
+{
+    m_groupId = data;
+}
+
+QnTimePeriodList QnVMax480ArchiveDelegate::chunks() 
+{ 
+    return m_res->getChunks();
+}
+
+void QnVMax480ArchiveDelegate::beforeSeek(qint64 time) 
+{ 
+    Q_UNUSED(time)
+    m_beforeSeek = true;
 }

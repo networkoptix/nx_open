@@ -1,7 +1,5 @@
 #include "notifier_win.h"
 
-#ifdef Q_OS_WIN
-
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QWidget>
@@ -139,4 +137,3 @@ bool QnWindowsNotifier::eventFilter(QObject *watched, QEvent *event) {
     }
 }
 
-#endif // Q_OS_WIN

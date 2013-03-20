@@ -7,24 +7,32 @@
 
 static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
+static const QByteArray GROUP_ID("{C30B7CCB-D64E-4f72-9417-A7F3CA133F69}");
+
 QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
     QnLongRunnable(),
-    VMaxStreamFetcher(res),
     m_waitingAnswer(false),
     m_state(State_Started),
-    m_firstRange(true)
+    m_firstRange(true),
+    m_streamFetcher(0),
+    m_res(res)
 {
-
+    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, res, false);
 }
 
 QnVMax480ChunkReader::~QnVMax480ChunkReader()
 {
     stop();
+    m_streamFetcher->freeInstance(GROUP_ID, m_res, false);
 }
 
 void QnVMax480ChunkReader::run()
 {
-    while (!m_needStop)
+    bool registered = false;
+    while (!needToStop() && !registered)
+        registered = m_streamFetcher->registerConsumer(this);
+
+    while (!needToStop())
     {
         QnResource::Status status = m_res->getStatus();
 
@@ -37,23 +45,17 @@ void QnVMax480ChunkReader::run()
             continue;
         }
 
-        if (!isOpened()) {
-            vmaxConnect(false, -1);
-            if (isOpened()) {
-                m_waitingAnswer = true;
-                m_waitTimer.restart();
-                vmaxRequestRange();
-            }
-            else {
-                msleep(10000);
-                continue;
-            }
+        /*
+        if (!m_streamFetcher->isOpened()) {
+            m_state = State_ReadTime;
+            msleep(10000);
+            continue;
         }
+        */
 
         if (m_waitingAnswer) 
         {
             if (m_waitTimer.elapsed() > 1000*30) {
-                vmaxDisconnect();
                 m_state = State_Started;
                 m_waitTimer.restart();
                 m_waitingAnswer = false;
@@ -67,12 +69,19 @@ void QnVMax480ChunkReader::run()
 
         switch (m_state)
         {
+        case State_Started:
+            if (m_streamFetcher->vmaxRequestRange())
+                m_state = State_ReadRange;
+            else
+                m_state = State_Started;
+            break;
         case State_ReadDays:
             if (!m_monthToRequest.isEmpty()) {
                 m_waitingAnswer = true;
                 m_waitTimer.restart();
                 m_updateTimer.restart();
-                vmaxRequestMonthInfo(m_monthToRequest.dequeue());
+                if (!m_streamFetcher->vmaxRequestMonthInfo(m_monthToRequest.dequeue()))
+                    m_state = State_Started;
                 break;
             }
             m_state = State_ReadTime;
@@ -80,11 +89,14 @@ void QnVMax480ChunkReader::run()
         case State_ReadTime:
             m_waitingAnswer = true;
             m_waitTimer.restart();
-            if (!m_daysToRequest.isEmpty()) {
-                vmaxRequestDayInfo(m_daysToRequest.dequeue());
+            if (!m_daysToRequest.isEmpty()) 
+            {
+                if (!m_streamFetcher->vmaxRequestDayInfo(m_daysToRequest.dequeue()))
+                    m_state = State_Started;
             }
             else {
-                vmaxRequestRange();
+                if (!m_streamFetcher->vmaxRequestRange())
+                    m_state = State_Started;
                 m_state = State_ReadRange;
             }
             break;
@@ -105,14 +117,18 @@ void QnVMax480ChunkReader::run()
                 int dayNum = date.year()*10000 + date.month()*100 + date.day();
                 m_waitingAnswer = true;
                 m_waitTimer.restart();
-                vmaxRequestDayInfo(dayNum);
-                m_state = State_ReadTime;
+                if (m_streamFetcher->vmaxRequestDayInfo(dayNum))
+                    m_state = State_ReadTime;
+                else
+                    m_state = State_Started;
             }
             break;
         }
 
         msleep(1);
     }
+
+    m_streamFetcher->unregisterConsumer(this);
 }
 
 void QnVMax480ChunkReader::updateRecordedDays(quint32 startDateTime, quint32 endDateTime)
@@ -139,7 +155,7 @@ void QnVMax480ChunkReader::updateRecordedDays(quint32 startDateTime, quint32 end
 
 void QnVMax480ChunkReader::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
 {
-    VMaxStreamFetcher::onGotArchiveRange(startDateTime, endDateTime);
+    //VMaxStreamFetcher::onGotArchiveRange(startDateTime, endDateTime);
     QMutexLocker lock(&m_mutex);
     if (m_firstRange) {
         updateRecordedDays(startDateTime, endDateTime);
@@ -177,7 +193,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     int year =  dayNum / 10000;
     int month =(dayNum % 10000)/100;
     int day =   dayNum % 100;
-    qint64 dayBase = QDateTime(QDate(year, month, day)).toMSecsSinceEpoch();
+    QDate date(year, month, day);
 
     const char* curPtr = data.data();
 
@@ -185,15 +201,21 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     {
         QnTimePeriodList dayPeriods;
 
-        for(int min = 0; min < VMAX_MAX_SLICE_DAY; ++min)
+        for (int hour = 0; hour < 25; ++hour) 
         {
-            char recordType = *curPtr & 0x0f;
-            if (recordType)
-                addChunk(dayPeriods, QnTimePeriod(dayBase + min*60*1000ll, 60*1000));
-            curPtr++;
+            for(int min = 0; min < 60; ++min)
+            {
+                char recordType = *curPtr & 0x0f;
+                // I do not know how to handle 25-th hour
+                if (recordType && hour < 24) 
+                {
+                    QTime time(hour, min, 0);
+                    QDateTime dt (date, time);
+                    addChunk(dayPeriods, QnTimePeriod(dt.toMSecsSinceEpoch(), 60*1000));
+                }
+                curPtr++;
+            }
         }
-
-        curPtr += 60; // skip reserved hour
 
         if (!dayPeriods.isEmpty()) {
             QVector<QnTimePeriodList> allPeriods;

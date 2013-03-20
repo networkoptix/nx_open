@@ -13,7 +13,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+    for (int i = 0; i < BusinessEventType::Count; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(BusinessEventType::toString(BusinessEventType::Value(i)));
         ui->businessEventsLayout->addWidget(checkbox);
@@ -39,7 +39,7 @@ void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
 
     quint64 eventsShown = settings->popupBusinessEvents();
     quint64 eventsFlag = 1;
-    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+    for (int i = 0; i < BusinessEventType::Count; i++) {
         bool checked = eventsShown & eventsFlag;
         m_businessRulesCheckBoxes[i]->setChecked(checked);
         all = all && checked;
@@ -61,7 +61,7 @@ void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
 void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
     quint64 eventsShown = settings->popupBusinessEvents();
     quint64 eventsFlag = 1;
-    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+    for (int i = 0; i < BusinessEventType::Count; i++) {
         if (m_businessRulesCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
             eventsShown |= eventsFlag;
         } else {

@@ -425,7 +425,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
-                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
+                while (!m_afterJump && !m_buffering && !needToStop() && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     qint64 newDisplayedTime = getCurrentTime();
@@ -482,6 +482,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
+    m_isLongWaiting = false;
     int channel = vd->channelNumber;
 
     if (m_singleShotMode && m_singleShotQuantProcessed)
@@ -846,15 +847,10 @@ void QnCamDisplay::processNewSpeed(float speed)
     m_executingChangeSpeed = false;
 }
 
-bool QnCamDisplay::isSyncAllowed() const
-{
-    return m_extTimeSrc && m_extTimeSrc->isEnabled();
-}
-
 bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
     //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
-    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
+    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync));
 }
 
 void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
@@ -1009,13 +1005,15 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (speed == 0)
             return true;
+
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        if (m_emptyPacketCounter >= 3)
+        bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
+        if (m_emptyPacketCounter >= 3 || playUnsync)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
+            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !playUnsync) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }

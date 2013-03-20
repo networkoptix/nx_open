@@ -342,26 +342,6 @@ qint64 QnGLRenderer::lastDisplayedTime() const
     return m_lastDisplayedTime;
 }
 
-void QnGLRenderer::blockTimeValue( qint64 timestamp )
-{
-    QMutexLocker lock(&m_mutex);
-    m_lastDisplayedTime = timestamp;
-    m_timeChangeEnabled = false;
-    //qDebug() << "QnGLRenderer::blockTimeValue ("<<m_lastDisplayedTime<<")" << QDateTime::fromMSecsSinceEpoch(m_lastDisplayedTime/1000).toString(QLatin1String("hh:mm:ss.zzz"));;
-}
-
-void QnGLRenderer::unblockTimeValue()
-{  
-    QMutexLocker lock(&m_mutex);
-    //qDebug() << "unblockTimeValue";
-    m_timeChangeEnabled = true;
-}
-
-bool QnGLRenderer::isTimeBlocked() const
-{
-    return !m_timeChangeEnabled;
-}
-
 bool QnGLRenderer::isLowQualityImage() const
 {
     return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;

@@ -38,7 +38,8 @@
 						<configuration>
 							<files>
 								<file>../build-${customization}.properties</file>
-								<file>../build-environment/${arch}/libdir.properties</file>
+								<file>../rsa-key-${license.environment}.properties</file>								
+								<file>../build_environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -93,6 +94,7 @@
 									</includes>
 								</fileset>								
 							</filesets>
+							<skip>${clean-skip}</skip>
 						</configuration>
 					</execution>
 				</executions>

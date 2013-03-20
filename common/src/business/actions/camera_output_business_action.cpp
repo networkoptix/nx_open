@@ -27,7 +27,7 @@ namespace BusinessActionParameters {
 
 
 QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(const QnBusinessParams &runtimeParams):
-    base_type(BusinessActionType::BA_CameraOutput, runtimeParams)
+    base_type(BusinessActionType::CameraOutput, runtimeParams)
 {
 }
 
@@ -45,7 +45,7 @@ QString QnCameraOutputBusinessAction::getExternalUniqKey() const
 }
 
 bool QnCameraOutputBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return camera->getCameraCapabilities() & Qn::relayOutput;
+    return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
 }
 
 bool QnCameraOutputBusinessAction::isResourcesListValid(const QnResourceList &resources) {

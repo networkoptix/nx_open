@@ -425,8 +425,8 @@ bool QnPlOnvifResource::initInternal()
     fetchRelayOutputs( &relayOutputs );
     if( !relayOutputs.empty() )
     {
-        setCameraCapability( Qn::relayOutput, true );
-        setCameraCapability( Qn::relayInput, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+        setCameraCapability( Qn::RelayOutputCapability, true );
+        setCameraCapability( Qn::RelayInputCapability, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
     }
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )

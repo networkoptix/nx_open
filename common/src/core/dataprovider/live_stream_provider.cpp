@@ -6,6 +6,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
 QnAbstractMediaStreamDataProvider(res),
 m_livemutex(QMutex::Recursive),
 m_quality(QnQualityNormal),
+m_qualityUpdatedAtLeastOnce(false),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_softMotionRole(QnResource::Role_Default),
@@ -70,13 +71,15 @@ void QnLiveStreamProvider::setQuality(QnStreamQuality q)
 {
     {
         QMutexLocker mtx(&m_livemutex);
-        if (m_quality == q)
+        if (m_quality == q && m_qualityUpdatedAtLeastOnce)
             return; // same quality
 
 
         Q_ASSERT(m_role != QnResource::Role_SecondaryLiveVideo || q == QnQualityLowest); // trying to play with quality for second stream by yourself 
 
         m_quality = q;
+
+        m_qualityUpdatedAtLeastOnce = true;
 
     }
 
@@ -150,7 +153,7 @@ float QnLiveStreamProvider::getFps() const
     QMutexLocker mtx(&m_livemutex);
 
     if (m_fps < 0) // setfps never been called
-        m_fps = m_cameraRes->getMaxFps() - 4; // 4 here is out of the blue; just somthing not maximum
+        m_fps = m_cameraRes->getMaxFps() - 2; // 2 here is out of the blue; just somthing not maximum
 
     m_fps = qMin((int)m_fps, m_cameraRes->getMaxFps());
     m_fps = qMax((int)m_fps, 1);

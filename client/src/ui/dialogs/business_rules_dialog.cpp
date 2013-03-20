@@ -228,7 +228,6 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& 
 
     bool success = (status == 0);
     if(!success) {
-        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while receiving rules"), QString::fromLatin1(errorString));
         return;
     }
@@ -250,7 +249,6 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
 
     bool success = (status == 0 && rules.size() == 1);
     if(!success) {
-        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
         return;
     }
@@ -265,7 +263,6 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
         return;
 
     if(response.status != 0) {
-        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;

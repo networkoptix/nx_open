@@ -1,6 +1,8 @@
 #include "license_manager_widget.h"
 #include "ui_license_manager_widget.h"
 
+#include "version.h"
+
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 #include <QtCore/QTextStream>
@@ -17,7 +19,34 @@
 #include <core/resource_managment/resource_pool.h>
 #include <common/customization.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
+#include <utils/license_usage_helper.h>
+
+namespace {
+
+    QString getLicenseName(QnLicensePtr license) {
+
+        if (license->key() == qnProductFeatures().freeLicenseKey.toAscii())
+            return QObject::tr("Free");
+
+        if (!license->expiration().isEmpty())
+            return QObject::tr("Trial");
+
+        if (license->xclass().toLower() == QLatin1String("analog"))
+            return QObject::tr("Analog");
+        return QObject::tr("Enterprise");
+    }
+
+    enum Columns {
+        NameColumn,
+        //ClassColumn,
+        CameraCountColumn,
+        KeyColumn,
+        ExpirationDateColumn,
+        ColumnCount
+    };
+
+}
 
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
@@ -63,10 +92,12 @@ void QnLicenseManagerWidget::updateLicenses() {
     int idx = 0;
     foreach(const QnLicensePtr &license, m_licenses.licenses()) {
         QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setData(0, Qt::DisplayRole, license->name());
-        item->setData(0, Qt::UserRole, idx++);
-        item->setData(1, Qt::DisplayRole, license->cameraCount());
-        item->setData(2, Qt::DisplayRole, license->key());
+        item->setText(NameColumn, getLicenseName(license));
+        item->setData(NameColumn, Qt::UserRole, idx++);
+        //item->setText(ClassColumn, license->xclass().toLower());
+        item->setText(CameraCountColumn, QString::number(license->cameraCount()));
+        item->setText(KeyColumn, QString::fromLatin1(license->key()));
+        item->setText(ExpirationDateColumn, license->expiration().isEmpty() ? tr("Never") : license->expiration());
         ui->gridLicenses->addTopLevelItem(item);
     }
 
@@ -74,10 +105,26 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
-        int totalCameras = m_licenses.totalCameras();
-        int usingCameras = qnResPool->activeCameras();
-        ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras. Currently using %2.")).arg(totalCameras).arg(usingCameras));
-        useRedLabel = usingCameras > totalCameras;
+        QnLicenseUsageHelper helper;
+
+        if (!helper.isValid()) {
+            useRedLabel = true;
+            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                              "Required at least %3 digital and %4 analog licenses."))
+                                   .arg(helper.totalDigital())
+                                   .arg(helper.totalAnalog())
+                                   .arg(helper.requiredDigital())
+                                   .arg(helper.requiredAnalog()));
+
+        } else {
+            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                              "Currently using %3 digital and %4 analog licenses."))
+                                   .arg(helper.totalDigital())
+                                   .arg(helper.totalAnalog())
+                                   .arg(helper.usedDigital())
+                                   .arg(helper.usedAnalog()));
+
+        }
     } else {
         if (m_licenses.hardwareId().isEmpty()) {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
@@ -93,7 +140,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     QPalette palette = this->palette();
     if(useRedLabel)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
     ui->infoLabel->setPalette(palette);
 }
 
@@ -101,9 +148,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
-//    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/vms.dev/activate.php"));
-
+    QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
     request.setUrl(url);
 
@@ -156,13 +201,13 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
 
 void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
     QString details = tr("<b>Generic:</b><br />\n"
-        "License Owner: %1<br />\n"
-        "License key: %2<br />\n"
+        "License Type: %1<br />\n"
+        "License Key: %2<br />\n"
         "Locked to Hardware ID: %3<br />\n"
         "<br />\n"
         "<b>Features:</b><br />\n"
         "Archive Streams Allowed: %4")
-        .arg(license->name())
+        .arg(getLicenseName(license))
         .arg(QLatin1String(license->key()))
         .arg(QLatin1String(m_licenses.hardwareId()))
         .arg(license->cameraCount());
@@ -219,8 +264,9 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
         QByteArray replyData = reply->readAll();
         QTextStream is(&replyData);
+        is.setCodec("UTF-8");
 
-        for (;;) {
+        while (!is.atEnd()) {
             QnLicensePtr license = readLicenseFromStream(is);
             if (!license )
                 break;
@@ -244,16 +290,16 @@ void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
 }
 
 void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int) {
-    int idx = item->data(0, Qt::UserRole).toInt();
+    int idx = item->data(NameColumn, Qt::UserRole).toInt();
     const QnLicensePtr license = m_licenses.licenses().at(idx);
     showLicenseDetails(license);
 }
 
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
-    QModelIndex model = ui->gridLicenses->selectionModel()->selectedRows().front();
-    if (model.column() > 0)
-        model = model.sibling(model.row(), 0);
-    int idx = model.data(Qt::UserRole).toInt();
+    QModelIndex index = ui->gridLicenses->selectionModel()->selectedRows().front();
+    if (index.column() > NameColumn)
+        index = index.sibling(index.row(), NameColumn);
+    int idx = index.data(Qt::UserRole).toInt();
     const QnLicensePtr license = m_licenses.licenses().at(idx);
     showLicenseDetails(license);
 }
@@ -266,7 +312,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         updateFromServer(ui->licenseWidget->serialKey().toLatin1(), QLatin1String(m_licenses.hardwareId()), QLatin1String(m_licenses.oldHardwareId()));
     } else {
         QList<QnLicensePtr> licenseList;
-        QnLicensePtr license = readLicenseFromString(ui->licenseWidget->activationKey());
+        QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
         licenseList.append(license);
         validateLicenses(license ? license->key() : "", licenseList);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);

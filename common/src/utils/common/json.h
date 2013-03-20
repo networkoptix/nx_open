@@ -79,7 +79,7 @@ namespace QJson_detail {
     }
 
     template<class T, class Map>
-    void deserialize_string_map(const QVariant &value, Map *target) {
+    bool deserialize_string_map(const QVariant &value, Map *target) {
         if(value.type() != QVariant::Map)
             return false;
 
@@ -111,7 +111,7 @@ namespace QJson_detail {
     }
 
     template<class T, class Map>
-    void deserialize_any_map(const QVariant &value, Map *target) {
+    bool deserialize_any_map(const QVariant &value, Map *target) {
         if(value.type() != QVariant::List)
             return false;
 
@@ -165,6 +165,9 @@ namespace QJson {
         QJson::serialize(value, &(*target)[QLatin1String(key)]);
     }
 
+    // TODO: #Elric this function is picked up when deserialize(const QString &, T *)
+    // is invoked, which is confusing. QVariant's conversion constructor must
+    // be forbidden for this function.
     template<class T>
     bool deserialize(const QVariant &value, T *target) {
         assert(target);
@@ -265,6 +268,10 @@ QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T
 struct QUuid;
 void serialize(const QUuid &value, QVariant *target);
 bool deserialize(const QVariant &value, QUuid *target);
+
+class QColor;
+void serialize(const QColor &value, QVariant *target);
+bool deserialize(const QVariant &value, QColor *target);
 
 
 /* Serialization can actually fail for QVariant containers because of types

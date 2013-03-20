@@ -7,7 +7,7 @@
 
 #include <core/resource/media_server_resource.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -22,23 +22,101 @@ namespace {
     };
 }
 
+QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent):
+    base_type(Qt::Horizontal, parent),
+    m_checkState(Qt::Unchecked)
+{
+    connect(this, SIGNAL(sectionClicked(int)), this, SLOT(at_sectionClicked(int)));
+}
+
+Qt::CheckState QnCheckBoxedHeaderView::checkState() const {
+    return m_checkState;
+}
+
+void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
+    if (state == m_checkState)
+        return;
+    m_checkState = state;
+    emit checkStateChanged(state);
+}
+
+void QnCheckBoxedHeaderView::paintEvent(QPaintEvent *e) {
+    base_type::paintEvent(e);
+}
+
+void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {
+    base_type::paintSection(painter, rect, logicalIndex);
+
+    if (logicalIndex == CheckBoxColumn) {
+        if (!rect.isValid())
+            return;
+        QStyleOptionButton opt;
+        opt.initFrom(this);
+
+        QStyle::State state = QStyle::State_Raised;
+        if (isEnabled())
+            state |= QStyle::State_Enabled;
+        if (window()->isActiveWindow())
+            state |= QStyle::State_Active;
+
+        switch(m_checkState) {
+        case Qt::Checked:
+            state |= QStyle::State_On;
+            break;
+        case Qt::Unchecked:
+            state |= QStyle::State_Off;
+            break;
+        default:
+            state |= QStyle::State_NoChange;
+            break;
+        }
+
+        opt.rect = rect.adjusted(4, 0, 0, 0);
+        opt.state |= state;
+        opt.text = QString();
+        style()->drawControl(QStyle::CE_CheckBox, &opt, painter, this);
+        return;
+    }
+}
+
+QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const {
+    QSize size = base_type::sectionSizeFromContents(logicalIndex);
+    if (logicalIndex != CheckBoxColumn)
+        return size;
+    size.setWidth(15);
+    return size;
+}
+
+void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
+    if (logicalIndex != CheckBoxColumn)
+        return;
+    if (m_checkState != Qt::Checked)
+        setCheckState(Qt::Checked);
+    else
+        setCheckState(Qt::Unchecked);
+}
+
 
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
     m_server(server),
     m_inIpRangeEdit(false),
-    m_subnetMode(false)
+    m_subnetMode(false),
+    m_inCheckStateChange(false)
 {
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
-    ui->camerasTable->horizontalHeader()->setVisible(true);
-    ui->camerasTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
-    ui->camerasTable->horizontalHeader()->setResizeMode(ManufColumn, QHeaderView::ResizeToContents);
-    ui->camerasTable->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::ResizeToContents);
-    ui->camerasTable->horizontalHeader()->setResizeMode(UrlColumn, QHeaderView::ResizeToContents);
+    m_header = new QnCheckBoxedHeaderView(this);
+    ui->camerasTable->setHorizontalHeader(m_header);
+    m_header->setVisible(true);
+    m_header->setResizeMode(CheckBoxColumn, QHeaderView::ResizeToContents);
+    m_header->setResizeMode(ManufColumn, QHeaderView::ResizeToContents);
+    m_header->setResizeMode(NameColumn, QHeaderView::ResizeToContents);
+    m_header->setResizeMode(UrlColumn, QHeaderView::Stretch);
+    m_header->setClickable(true);
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),    this, SLOT(at_startIPLineEdit_editingFinished()));
@@ -47,6 +125,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     connect(ui->camerasTable,       SIGNAL(cellClicked(int,int)), this, SLOT(at_camerasTable_cellClicked(int, int)));
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        this, SLOT(at_subnetCheckbox_toggled(bool)));
     connect(ui->closeButton,        SIGNAL(clicked()),            this, SLOT(accept()));
+
+    connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(at_header_checkStateChanged(Qt::CheckState)));
 
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),        ui->portSpinBox, SLOT(setDisabled(bool)));
 
@@ -62,11 +142,10 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
     connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
 
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->validateLabelSearch->setPalette(palette);
+    setWarningStyle(ui->validateLabelSearch);
 
     updateSubnetMode();
+    fillTable(QnCamerasFoundInfoList());
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -103,7 +182,7 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
     }
 }
 
-void QnCameraAdditionDialog::removeAddedCameras(){
+void QnCameraAdditionDialog::removeAddedCameras() {
     int row = ui->camerasTable->rowCount() - 1;
     while (row >= 0){
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() == Qt::Checked)
@@ -113,7 +192,7 @@ void QnCameraAdditionDialog::removeAddedCameras(){
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
 
-void QnCameraAdditionDialog::updateSubnetMode(){
+void QnCameraAdditionDialog::updateSubnetMode() {
     ui->startIPLabel->setVisible(m_subnetMode);
     ui->startIPLineEdit->setVisible(m_subnetMode);
     ui->endIPLabel->setVisible(m_subnetMode);
@@ -145,7 +224,7 @@ void QnCameraAdditionDialog::updateSubnetMode(){
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
+void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value) {
     if (m_inIpRangeEdit)
         return;
 
@@ -159,7 +238,7 @@ void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
     m_inIpRangeEdit = false;
 }
 
-void QnCameraAdditionDialog::at_startIPLineEdit_editingFinished(){
+void QnCameraAdditionDialog::at_startIPLineEdit_editingFinished() {
     QHostAddress startAddr(ui->endIPLineEdit->text());
     if (ui->subnetCheckbox->isChecked() && (startAddr.toIPv4Address() % 256 == 0)){
         QHostAddress endAddr(startAddr.toIPv4Address() + 255);
@@ -167,7 +246,7 @@ void QnCameraAdditionDialog::at_startIPLineEdit_editingFinished(){
     }
 }
 
-void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
+void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value) {
     if (m_inIpRangeEdit)
         return;
 
@@ -188,24 +267,39 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
     m_inIpRangeEdit = false;
 }
 
-void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column){
+void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column) {
     Q_UNUSED(row)
 
     if (column > CheckBoxColumn)
         return;
 
+    if (m_inCheckStateChange)
+        return;
+
+    m_inCheckStateChange = true;
+
     int rowCount = ui->camerasTable->rowCount();
     bool enabled = false;
+
+    Qt::CheckState state = Qt::Unchecked;
     for (int row = 0; row < rowCount; ++row) {
-        if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
-            continue;
-		enabled = true;
-		break;
+        QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        if (row == 0)
+            state = item->checkState();
+
+        if (item->checkState() != state)
+            state = Qt::PartiallyChecked;
+
+        if (item->checkState() == Qt::Checked)
+            enabled = true;
     }
     ui->addButton->setEnabled(enabled);
+    m_header->setCheckState(state);
+
+    m_inCheckStateChange = false;
 }
 
-void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column){
+void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
@@ -217,7 +311,25 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column){
     QDesktopServices::openUrl(url);
 }
 
-void QnCameraAdditionDialog::at_scanButton_clicked(){
+void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
+    if (state == Qt::PartiallyChecked)
+        return;
+
+    if (m_inCheckStateChange)
+        return;
+
+    m_inCheckStateChange = true;
+    int rowCount = ui->camerasTable->rowCount();
+    for (int row = 0; row < rowCount; ++row) {
+        QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        item->setCheckState(state);
+    }
+
+    ui->addButton->setEnabled(state == Qt::Checked);
+    m_inCheckStateChange = false;
+}
+
+void QnCameraAdditionDialog::at_scanButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
     int port = ui->portAutoCheckBox->isChecked()
@@ -331,7 +443,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
             ui->cameraIpLineEdit->setFocus();
 }
 
-void QnCameraAdditionDialog::at_addButton_clicked(){
+void QnCameraAdditionDialog::at_addButton_clicked() {
 
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
@@ -381,7 +493,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     }
 }
 
-void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled){
+void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled) {
     if (m_subnetMode == toggled)
         return;
 

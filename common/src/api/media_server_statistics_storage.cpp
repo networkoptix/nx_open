@@ -58,6 +58,7 @@ void QnMediaServerStatisticsStorage::update() {
 }
 
 void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsDataList &data, int handle) {
+    Q_UNUSED(handle)
     if(status != 0)
         return;
 

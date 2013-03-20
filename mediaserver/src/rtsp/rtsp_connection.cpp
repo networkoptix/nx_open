@@ -1,3 +1,4 @@
+#include <QUuid>
 #include <QSet>
 #include <QTextStream>
 #include <QHttpRequestHeader>
@@ -38,6 +39,8 @@
 class QnTcpListener;
 
 static const QByteArray ENDL("\r\n");
+
+static const int LARGE_RTSP_TIMEOUT = 1000 * 1000 * 50;
 
 // ------------- ServerTrackInfo --------------------
 
@@ -169,6 +172,7 @@ public:
     //QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
+    QByteArray clientGuid;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
@@ -853,7 +857,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-    if (camera)    
+    if (camera && d->liveMode == Mode_Live)
     {
         if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
@@ -878,11 +882,16 @@ void QnRtspConnectionProcessor::createDataProvider()
             }
         }
     }
-    if (!d->archiveDP) 
+    if (!d->archiveDP) {
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive)));
+        if (d->archiveDP)
+            d->archiveDP->setGroupId(d->clientGuid);
+    }
 
-    if (!d->thumbnailsDP) 
+    if (!d->thumbnailsDP && d->liveMode == Mode_ThumbNails) {
         d->thumbnailsDP = QSharedPointer<QnThumbnailsStreamReader>(new QnThumbnailsStreamReader(d->mediaRes));
+        d->thumbnailsDP->setGroupId(QUuid::createUuid().toString().toUtf8());
+    }
 }
 
 void QnRtspConnectionProcessor::connectToLiveDataProviders()
@@ -951,9 +960,11 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (d->requestHeaders.value("x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
+        d->clientGuid = d->requestHeaders.value("x-guid").toUtf8();
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        d->socket->setReadTimeOut(d->socketTimeout);
+        d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
+        d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
         createPredefinedTracks();
     }
 
@@ -1270,6 +1281,8 @@ void QnRtspConnectionProcessor::run()
     Q_D(QnRtspConnectionProcessor);
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
+    d->socket->setReadTimeOut(1000*1000);
+    d->socket->setWriteTimeOut(1000*1000);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();

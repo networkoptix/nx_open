@@ -40,6 +40,32 @@
     </message>
 </context>
 <context>
+    <name>ArchiveSpaceSlider</name>
+    <message>
+        <source>%1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BusinessRulesDialog</name>
+    <message>
+        <source>Alarm/Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CLAbstractDeviceSettingsDlg</name>
     <message>
         <source>Camera settings: %1</source>
@@ -129,20 +155,20 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Close</source>
+        <source>&amp;Discovery Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Discovery Port:</source>
+        <source>&amp;Camera Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
-    <message>
-        <source>...</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Get More Licenses...</source>
         <translation type="unfinished"></translation>
@@ -240,7 +266,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Apply changes before copy schedule</source>
+        <source>Apply changes before copying schedule</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -256,13 +282,17 @@
     </message>
 </context>
 <context>
-    <name>FindAppServerDialog</name>
+    <name>DatabaseManagementWidget</name>
     <message>
-        <source>Detected Enterprise Controllers</source>
+        <source>You can create a system configuration backup and restore it later if something goes wrong. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Choose one from the list below</source>
+        <source>Create Backup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore from Backup...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -322,17 +352,6 @@
     </message>
 </context>
 <context>
-    <name>HelpWidget</name>
-    <message>
-        <source>Connection Test</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do not show again</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>Language</name>
     <message>
         <source>Language Name</source>
@@ -347,10 +366,6 @@
     <name>LicenseManagerWidget</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Licensed To</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -374,7 +389,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License key</source>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expire Date</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -583,6 +606,18 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
         <source>Recording</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Licensing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use analog licenses to view selected analog cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Get More Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Node</name>
@@ -600,10 +635,6 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -719,6 +750,17 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Downmix the Audio from 5.1 to 2.1 Channels (Restart Required)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Use advanced hardware acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PtzPresetsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -740,6 +782,54 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>* Last used connection *</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts/Stops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Occurs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enterprise</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1222,19 +1312,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Change Cell Aspect Ratio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>4:3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Cell Spacing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1553,6 +1635,82 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Preview Search...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check System Health...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop current action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alarm/Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for Updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Resolution...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PTZ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current Position...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to Position...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Saved Positions...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go To Saved Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Resolution Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Cell Aspect Ratio...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Cell Spacing...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -1580,11 +1738,321 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
 </context>
 <context>
-    <name>QnCameraAdditionDialog</name>
+    <name>QnBusinessEventPopupWidget</name>
     <message>
-        <source>Camera &amp;IP:</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffaa00;&quot;&gt;Warning!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffff00;&quot;&gt;Important!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#00aa00;&quot;&gt;Notification&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not notify again about this</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 others...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 times since %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No video frame received
+during last %1 seconds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera
+was unexpectedly closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTP packet loss detected.
+Prev seq.=%1 next seq.=%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server terminated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server started after crash.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Error occured at
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough HDD/SSD speed
+for recording at
+%1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>conflicted with</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+        <source>For All Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For Administrators Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessRuleViewModel</name>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording or motion detection is disabled for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 of %2 cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>&lt;System&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Server&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Server(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>User %1 has empty email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User %1 has invalid email address: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid email address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send mail to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users, %2 additional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administrators only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is disabled for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessRuleWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>at</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Select at least one camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no more than once per</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comments:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessRulesDialog</name>
+    <message>
+        <source>Confirm exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsaved changes will be lost. Save?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while receiving rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while saving rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while deleting rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;New...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm save invalid rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some rules are not valid. Should we disable them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnBusinessRulesViewModel</name>
+    <message>
+        <source>#</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Target</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdditionDialog</name>
     <message>
         <source>First address in range is greater than last one</source>
         <translation type="unfinished"></translation>
@@ -1625,6 +2093,45 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Error while adding camera(s)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Camera address filed must contain valid url or ip address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server returned an error:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This server version supports only searching by ip address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraDisconnectedBusinessEventWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will be raised when any camera goes offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraInputBusinessEventWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;automatic&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -1646,25 +2153,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
 </context>
 <context>
-    <name>QnCameraScheduleWidget</name>
+    <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>%n license(s) are used out of %1.</source>
+        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Output ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Auto-reset in (sec):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;automatic&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraScheduleWidget</name>
     <message>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Activate %n more license(s).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%n license(s) will be used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1683,6 +2197,50 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>FPS value is too high</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 digital license(s) are used out of %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 analog license(s) are used out of %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate %1 more digital and %2 more analog licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate %1 more digital license(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate %1 more analog license(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 more digital and %2 more analog licenses will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 more digital license(s) will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 more analog license(s) will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraSettingsDialog</name>
@@ -1699,6 +2257,13 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>No cameras selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCheckableMessageBox</name>
+    <message>
+        <source>Do not ask again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1978,6 +2543,73 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
 </context>
 <context>
+    <name>QnDatabaseManagementWidget</name>
+    <message>
+        <source>Save Database Backup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Backup Files (*.db)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file &apos;%1&apos; for writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading Database Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database backup is being downloaded from the server. Please wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database was successfully backed up into file &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Database Backup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file &apos;%1&apos; for reading.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to start restoring database? All current data will be lost.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restoring Database Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database backup is being uploaded to the server. Please wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database was successfully restored from file &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occured while restoring the database from file &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -1988,7 +2620,28 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please check &apos;root media folder&apos; setting.</source>
+        <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnEmailValidDelegate</name>
+    <message>
+        <source>%1 of %2 selected users have invalid email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnEmptyBusinessEventWidget</name>
+    <message>
+        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2003,16 +2656,24 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%n license(s) will be used out of %1.</source>
+        <source>Recording cannot be enabled for some cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 digital license(s) will be used out of %2.
+%3 analog  license(s) will be used out of %4.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnInputEnabledDelegate</name>
+    <message>
+        <source>%1 of %2 selected cameras have no input ports.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message>
-        <source>The software is licensed to %1 cameras. Currently using %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Obtaining licenses from Enterprise Controller...</source>
         <translation type="unfinished"></translation>
@@ -2055,9 +2716,23 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The software is licensed to %1 digital and %2 analog cameras.
+Required at least %3 digital and %4 analog licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The software is licensed to %1 digital and %2 analog cameras.
+Currently using %3 digital and %4 analog licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
-License Owner: %1&lt;br /&gt;
-License key: %2&lt;br /&gt;
+License Type: %1&lt;br /&gt;
+License Key: %2&lt;br /&gt;
 Locked to Hardware ID: %3&lt;br /&gt;
 &lt;br /&gt;
 &lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
@@ -2099,14 +2774,6 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Zoom In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source> (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2143,7 +2810,22 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps%5%6%7</source>
+        <source> HW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> SW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnMotionEnabledDelegate</name>
+    <message>
+        <source>Recording or motion detection is disabled for %1 of %2 selected cameras.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2160,11 +2842,11 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FPS value is too high</source>
+        <source>%1 digital license(s) are used out of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
+        <source>%1 analog license(s) are used out of %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2200,6 +2882,61 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>To End</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnOutputEnabledDelegate</name>
+    <message>
+        <source>%1 of %2 selected cameras have not output relays.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+        <source>Show for Administrators only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Notification Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPopupCollectionWidget</name>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Postpone All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPopupSettingsWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show all notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Alarms/Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show System Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPortNumberValidator</name>
+    <message>
+        <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2298,10 +3035,6 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The language change will take effect after application restart.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server Time</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2318,11 +3051,86 @@ Archive Streams Allowed: %4</source>
 Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings file is read-only. Please contact your system administrator.
+All changes will be lost after program exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings cannot be saved. Please contact your system administrator.
+All changes will be lost after program exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The language change will take effect after application restart. Press OK to close application now.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzPresetsDialog</name>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PTZ presets for camera %1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnRecordingBusinessActionWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>max</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnRecordingEnabledDelegate</name>
+    <message>
+        <source>Recording is disabled for %1 of %2 selected cameras.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2357,6 +3165,17 @@ Recording Schedule is always based on Server Time.</source>
     </message>
     <message>
         <source>Live Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceSelectionDialog</name>
+    <message>
+        <source>Select cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select users...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2409,6 +3228,21 @@ Recording Schedule is always based on Server Time.</source>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Activate License to remove this message</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSendmailBusinessActionWidget</name>
+    <message>
+        <source>&amp;Additional Recipients:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Global Email Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerResourceWidget</name>
@@ -2424,48 +3258,6 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Storage path must not be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Space limit must be a non-negative integer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid storage path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t verify storage path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not enough disk space</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low space for archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage path &apos;%1&apos; is invalid or is not accessible for writing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot verify storage path &apos;%1&apos;. Cannot establish connection to the media server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage &apos;%1&apos;
-You have less storage space available than reserved free space value. Additional %2Gb are required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storage &apos;%1&apos;
-You have only %2Gb left for video archive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2474,15 +3266,23 @@ You have only %2Gb left for video archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No storages specified</source>
+        <source>Remove Storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>At least one storage must be specified.</source>
+        <source>Not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid space limit</source>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load storages from server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2520,11 +3320,154 @@ You have only %2Gb left for video archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning. FPS value is too high</source>
+        <source>%1 digital license(s) are used out of %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2</source>
+        <source>%1 analog license(s) are used out of %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSmtpSettingsWidget</name>
+    <message>
+        <source>Advanced settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;E-Mail:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP &amp;Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;User:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P&amp;ort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsecure connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure connection using TLS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure connection using SSL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Signature:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Progress:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No preset found. Use &apos;Advanced&apos; option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot test such parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsecured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Progress...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while testing settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2536,6 +3479,44 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnStorageUrlDialog</name>
+    <message>
+        <source>Invalid Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provided storage path does not define a valid external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnSystemHealthPopupWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not notify again about this</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Fix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Postpone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>( Fix... )</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2654,6 +3635,10 @@ AVAILABLE</source>
         <source>Can export video</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid email address.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnVideoCamera</name>
@@ -2680,39 +3665,29 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New layout %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New layout ?([0-9]+)?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Close Layouts</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Saving Layouts</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Please wait.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not Enable Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2755,9 +3730,12 @@ AVAILABLE</source>
         <source>Camera(s) not Saved</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Delete Files</source>
@@ -2793,9 +3771,12 @@ AVAILABLE</source>
         <source>Delete Resources</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n item(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>New Layout</source>
@@ -2811,10 +3792,6 @@ AVAILABLE</source>
     </message>
     <message>
         <source>PNG Image (*.png);;JPEG Image(*.jpg)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not save screenshot &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2844,10 +3821,6 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t overwrite file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2871,13 +3844,12 @@ Do you want to continue?</source>
         <source>Could not export layout</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Cannot export file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
@@ -2901,40 +3873,42 @@ Do you want to continue?</source>
         <source>Could not export video</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description: 
 %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Could not delete resource from Enterprise Controller. 
-
-Error description: &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description:
 %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Currently parameters can&apos;t be saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2971,15 +3945,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t create local layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current layout contains several cameras and several local files. You have to keep only cameras or only local files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3011,10 +3977,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Another export in progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Another export in progress. Please wait</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3043,10 +4005,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Software Update is Available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3060,6 +4018,110 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Preview Search for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licenses limit exceeded. Your changes will be saved, but will not take effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not apply changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No updates available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software update is available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t notify again about this update.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout with the same name already exists. Overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save a layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not overwrite file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not export file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not get position from camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.
+
+Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.
+
+The camera is probably in continuous movement mode. Please stop the camera and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter position name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not set position from camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.
+
+Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not delete resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
+
+Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3093,6 +4155,10 @@ Error description: &apos;%2&apos;</source>
         <source>Can&apos;t start recording due to the following error: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Press any key to stop tour</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchEcsHandler</name>
@@ -3100,17 +4166,26 @@ Error description: &apos;%2&apos;</source>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description: 
@@ -3123,9 +4198,12 @@ Error description: &apos;%2&apos;</source>
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Error description:
@@ -3146,28 +4224,9 @@ Error description: &apos;%2&apos;</source>
     </message>
 </context>
 <context>
-    <name>QnYouTubeSettingsWidget</name>
-    <message>
-        <source>Authentication Failed!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Authentication Succeeded</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>RecordingSettings</name>
     <message>
         <source>Video Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select screen to capture:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3235,10 +4294,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Main Media Folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Browse...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3264,6 +4319,14 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>External Device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temporary Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3320,23 +4383,34 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reserved free storage space (Gb)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Panic mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ServerSettingsWidget</name>
+    <message>
+        <source>Outgoing E-Mail Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Configuration Backup and Restore</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3465,6 +4539,37 @@ Error description: &apos;%2&apos;</source>
         <source>Ping</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Licensing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use an analog license to view this camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Get More Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StorageUrlDialog</name>
+    <message>
+        <source>Add External Storage...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Protocol:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TagsEditDialog</name>
@@ -3516,26 +4621,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Access Rights</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Access rights</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3543,132 +4628,55 @@ Error description: &apos;%2&apos;</source>
         <source>Advanced...</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>YouTubeSettings</name>
     <message>
-        <source>Video Recording</source>
+        <source>C&amp;urrent Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Authentication</source>
+        <source>&amp;Confirm Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Google Login:</source>
+        <source>&amp;Access Rights:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password:</source>
+        <source>&amp;Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Test</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>YouTubeUploadDialog</name>
-    <message>
-        <source>Dialog</source>
+        <source>&amp;Login:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>File to Upload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Browse...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name, Description and Privacy Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Title:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tags:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Category:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Privacy:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Public (Share your video with the world)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unlisted (Accessible by the direct link only)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Private</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>License:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Standard YouTube License</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creative Commons - Attribution (CC-BY - reusable)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upload File to YouTube</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Uploading to YouTube</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Uploading &quot;%1&quot;...</source>
+        <source>&amp;Email:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>YouTubeUploadProgressDialog</name>
+    <name>WeekTimeScheduleWidget</name>
     <message>
-        <source>Abort uploading?</source>
+        <source>WeekTime Schedule Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want abort uploading and close dialog?</source>
+        <source>Schedule Grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Upload failed</source>
+        <source>Note: Schedule is based on Server Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Upload failed due to error: %1 (%2)</source>
+        <source>Schedule Settings</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>YouTubeUploader</name>
     <message>
-        <source>Invalid user name or password</source>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -5,6 +5,7 @@ QnAbstractStorageResource::QnAbstractStorageResource():
     QnResource(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
+    m_usedForWriting(false),
     m_index(0)
 {
     setStatus(Offline);
@@ -70,7 +71,7 @@ quint16 QnAbstractStorageResource::getIndex() const
 float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
-	QMutexLocker lock(&m_bitrateMtx);
+    QMutexLocker lock(&m_bitrateMtx);
     foreach(const QnAbstractMediaStreamDataProvider* provider, m_providers)
         rez += provider->getBitrate();
     return rez;
@@ -78,13 +79,13 @@ float QnAbstractStorageResource::bitrate() const
 
 void QnAbstractStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-	QMutexLocker lock(&m_bitrateMtx);
+    QMutexLocker lock(&m_bitrateMtx);
     m_providers << provider;
 }
 
 void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-	QMutexLocker lock(&m_bitrateMtx);
+    QMutexLocker lock(&m_bitrateMtx);
     m_providers.remove(provider);
 }
 

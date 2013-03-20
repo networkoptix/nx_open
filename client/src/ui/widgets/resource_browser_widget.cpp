@@ -70,7 +70,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
-//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #gdm ask #Elric whether try to enable this =)
+//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #Elric why don't we enable this? looks good and useful
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
     ui->searchTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
@@ -236,8 +236,17 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        if (index.data(Qn::NodeTypeRole) == Qn::RecorderNode) {
+            for (int i = 0; i < index.model()->rowCount(index); i++) {
+                QModelIndex subIndex = index.model()->index(i, 0, index);
+                QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                if(resource && !result.contains(resource))
+                    result.append(resource);
+            }
+        }
+
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource)
+        if(resource && !result.contains(resource))
             result.append(resource);
     }
 
@@ -386,7 +395,10 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
-            model->addCriterion(QnResourceCriterionGroup(filter));
+            if (filter.isEmpty())
+                model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
+            else
+                model->addCriterion(QnResourceCriterionGroup(filter));
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
             model->addCriterion(QnResourceCriterion(QnResource::server));

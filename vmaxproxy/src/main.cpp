@@ -13,6 +13,8 @@ QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& pa
 
     if (!result->waitForConnected(1000 * 5))
     {
+        qDebug() << "can not connect to VMAX server!";
+
         result->disconnect();
         delete result;
         result = 0;
@@ -114,6 +116,14 @@ int main(int argc, char* argv[])
             case Command_OpenArchive:
                 qDebug() << "before exec Command_OpenArchive";
                 connection = openVMaxConnection(&mServerConnect, params, sequence, false);
+                break;
+            case Command_AddChannel:
+                qDebug() << "before exec Command_AddChannel";
+                connection->addChannel(params);
+                break;
+            case Command_RemoveChannel:
+                qDebug() << "before exec Command_RemoveChannel";
+                connection->removeChannel(params);
                 break;
             case Command_RecordedMonth:
                 if (connection) {

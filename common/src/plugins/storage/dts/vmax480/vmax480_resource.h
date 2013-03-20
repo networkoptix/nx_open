@@ -62,7 +62,7 @@ private:
     QnTimePeriodList m_chunks;
     
     QMutex m_mutexChunks;
-    QWaitCondition m_chunksCond;
+    //QWaitCondition m_chunksCond;
     bool m_chunksReady;
 };
 

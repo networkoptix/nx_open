@@ -12,8 +12,7 @@ QnGenericImages::~QnGenericImages() {
     return;
 }
 
-QPixmap QnGenericImages::cursorImage(Qt::CursorShape shape) const {
-    QCursor cursor(shape);
-    return cursor.pixmap();
+QCursor QnGenericImages::bitmapCursor(Qt::CursorShape shape) const {
+    return QCursor(shape);
 }
 

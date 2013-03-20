@@ -30,7 +30,10 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
     resizeSignalizer->setEventType(QEvent::Resize);
     parent->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
+    connect(resizeSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updatePosition()));
+
+    connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
+    connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -38,7 +41,7 @@ QnPopupCollectionWidget::~QnPopupCollectionWidget()
 }
 
 bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+    if (businessAction->actionType() != BusinessActionType::ShowPopup)
         return false;
 
     //TODO: #GDM check if camera is visible to us
@@ -52,10 +55,10 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
-    if (eventType >= BusinessEventType::BE_UserDefined)
+    if (eventType >= BusinessEventType::UserDefined)
         return false;
 
-    int healthMessage = eventType - BusinessEventType::BE_SystemHealthMessage;
+    int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
         QnResourceList resources;
 
@@ -82,7 +85,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         QnBusinessEventPopupWidget* pw = m_businessEventWidgets[eventType];
         pw->addBusinessAction(businessAction);
     } else {
-        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(this);
+        QnBusinessEventPopupWidget* pw = new QnBusinessEventPopupWidget(ui->verticalWidget);
         if (!pw->addBusinessAction(businessAction))
             return false;
         ui->verticalLayout->insertWidget(0, pw);
@@ -90,6 +93,8 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         connect(pw, SIGNAL(closed(BusinessEventType::Value, bool)), this, SLOT(at_businessEventWidget_closed(BusinessEventType::Value, bool)));
     }
 
+    if (!isVisible())
+        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -105,7 +110,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         QnSystemHealthPopupWidget* pw = m_systemHealthWidgets[message];
         pw->show();
     } else {
-        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(this);
+        QnSystemHealthPopupWidget* pw = new QnSystemHealthPopupWidget(ui->verticalWidget);
         if (!pw->showSystemHealthMessage(message, resources))
             return false;
         ui->verticalLayout->addWidget(pw);
@@ -113,6 +118,8 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
         connect(pw, SIGNAL(closed(QnSystemHealth::MessageType, bool)), this, SLOT(at_systemHealthWidget_closed(QnSystemHealth::MessageType, bool)));
     }
 
+    if (!isVisible())
+        action(Qn::TogglePopupsAction)->setChecked(true);
     return true;
 }
 
@@ -125,7 +132,12 @@ void QnPopupCollectionWidget::clear() {
     }
     m_businessEventWidgets.clear();
     m_systemHealthWidgets.clear();
+    action(Qn::TogglePopupsAction)->setChecked(false);
     hide();
+}
+
+bool QnPopupCollectionWidget::isEmpty() const {
+    return ui->verticalLayout->isEmpty();
 }
 
 void QnPopupCollectionWidget::showEvent(QShowEvent *event) {
@@ -139,9 +151,12 @@ void QnPopupCollectionWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void QnPopupCollectionWidget::updatePosition() {
+    //TODO: #GDM will not be used when will be placed on scene
+    const int offset = 3;
+
     QSize parentSize = parentWidget()->size();
     QSize size = this->size();
-    move(parentSize.width() - size.width(), parentSize.height() - size.height());
+    move(parentSize.width() - size.width() - offset, parentSize.height() - size.height() - offset);
 }
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {
@@ -177,3 +192,14 @@ void QnPopupCollectionWidget::at_systemHealthWidget_closed(QnSystemHealth::Messa
     if (ui->verticalLayout->count() == 0)
         hide();
 }
+
+void QnPopupCollectionWidget::at_postponeAllButton_clicked() {
+    clear();
+}
+
+void QnPopupCollectionWidget::at_minimizeButton_clicked() {
+    action(Qn::TogglePopupsAction)->setChecked(ui->verticalLayout->count() > 0);
+    hide();
+}
+
+

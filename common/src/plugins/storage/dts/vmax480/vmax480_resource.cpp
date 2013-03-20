@@ -170,12 +170,8 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
         for (int i = 1; i < VMAX_MAX_CH; ++i)
         {
             QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
-            if (otherRes) {
+            if (otherRes)
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec);
-            }
-            else {
-                break;
-            }
         }
     }
 }
@@ -215,7 +211,7 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
     QMutexLocker lock(&m_mutexChunks);
     m_chunks = chunks;
     m_chunksReady = true;
-    m_chunksCond.wakeAll();
+    //m_chunksCond.wakeAll();
 }
 
 QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
@@ -227,8 +223,8 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
     QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
     
     QMutexLocker lock(&m_mutexChunks);
-    while (!m_chunksReady)
-        m_chunksCond.wait(&m_mutexChunks);
+    //while (!m_chunksReady)
+    //    m_chunksCond.wait(&m_mutexChunks);
 
     return m_chunks.intersected(period);
 }

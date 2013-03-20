@@ -8,12 +8,14 @@ typedef QMap<QByteArray, QByteArray> VMaxParamList;
 
 enum MServerCommand {
     Command_OpenLive, 
-    Command_OpenArchive, 
-    Command_ArchivePlay, 
-    Command_PlayPoints, 
-    Command_RecordedMonth, 
-    Command_RecordedTime, 
-    Command_GetRange, 
+    Command_OpenArchive,
+    Command_ArchivePlay,
+    Command_AddChannel,
+    Command_RemoveChannel,
+    Command_PlayPoints,
+    Command_RecordedMonth,
+    Command_RecordedTime,
+    Command_GetRange,
     Command_CloseConnect
 };
 
@@ -46,7 +48,7 @@ static const char VMAX_PARAM_DELIMITER = '\\';
 
 static const int VMAX_MAX_CH = 16;
 static const int VMAX_SLICE_OF_HOUR	= 60;
-static const int VMAX_MAX_SLICE_DAY = VMAX_SLICE_OF_HOUR*24;
+static const int VMAX_MAX_SLICE_DAY = VMAX_SLICE_OF_HOUR*25;
 
 
 class QnVMax480Helper {

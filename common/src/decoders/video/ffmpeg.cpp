@@ -265,7 +265,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
 {
-    //TODO/IMPL
+    //About empty implementation see comment to QnAbstractVideoDecoder::setOutPictureSize
 }
 
 unsigned int CLFFmpegVideoDecoder::getDecoderCaps() const
@@ -275,6 +275,8 @@ unsigned int CLFFmpegVideoDecoder::getDecoderCaps() const
 
 void CLFFmpegVideoDecoder::setSpeed( float newValue )
 {
+    Q_UNUSED(newValue)
+    //ffmpeg-based decoder has nothing to do here
 }
 
 int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
@@ -526,6 +528,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
         outFrame->format = GetPixelFormat();
+        outFrame->sample_aspect_ratio = getSampleAspectRatio();
         return m_context->pix_fmt != PIX_FMT_NONE;
     }
     return false; // no picture decoded at current step
@@ -533,13 +536,14 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
 
 double CLFFmpegVideoDecoder::getSampleAspectRatio() const
 {
-    if (!m_context)
+    if (!m_context || !m_context->width || !m_context->height)
         return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);
 
-    if (qAbs(result)< 1e-7) {
-        result = m_prevSampleAspectRatio; // if sample_aspect_ratio==0 it's unknown based on ffmpeg docs. so we assume it's same as prev value
+    if (qAbs(result)< 1e-7) 
+    {
+        result = 1.0;
         if (m_context->width == 720) { // TODO: add a table!
             if (m_context->height == 480)
                 result = (4.0/3.0) / (720.0/480.0);

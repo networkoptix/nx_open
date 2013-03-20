@@ -52,6 +52,11 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
+    if (info.name.toLower().contains(QLatin1String("spartan-6"))) // arecont cameras report spartan-6 as a name
+        return;
+    
+
+
     if (camersNamesData.isManufacturerSupported(info.manufacturer) && camersNamesData.isSupported(info.name)) {
         //qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
         return;

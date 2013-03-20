@@ -31,6 +31,10 @@ static const double TIME_RESYNC_THRESHOLD = 10.0; // at seconds
 static const double LOCAL_TIME_RESYNC_THRESHOLD = 500; // at ms
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
 
+
+QByteArray RTPSession::m_guid;
+QMutex RTPSession::m_guidMutex;
+
 static QString getValueFromString(const QString& line)
 {
     int index = line.indexOf(QLatin1Char('='));
@@ -1046,6 +1050,14 @@ void RTPSession::addRangeHeader(QByteArray& request, qint64 startPos, qint64 end
 
 }
 
+QByteArray RTPSession::getGuid()
+{
+    QMutexLocker lock(&m_guidMutex);
+    if (m_guid.isEmpty())
+        m_guid = QUuid::createUuid().toString().toUtf8();
+    return m_guid;
+}
+
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
     QByteArray request;
@@ -1066,8 +1078,12 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     request += USER_AGENT_STR;
     addRangeHeader(request, startPos, endPos);
     request += QLatin1String("Scale: ") + QString::number(scale) + QLatin1String("\r\n");
-    if (m_numOfPredefinedChannels)
+    if (m_numOfPredefinedChannels) {
         request += "x-play-now: true\r\n";
+        request += "x-guid: ";
+        request += getGuid();
+        request += "\r\n";
+    }
     addAdditionAttrs(request);
     
     request += QLatin1String("\r\n");

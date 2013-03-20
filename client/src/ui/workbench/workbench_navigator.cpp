@@ -630,7 +630,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     if(m_currentWidget) {
         if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
             foreach(QnResourceWidget *widget, m_syncedWidgets)
-                updateItemDataFromSlider(widget); //TODO: #GDM may be it should be done at every selection change? ask #elrik
+                updateItemDataFromSlider(widget); //TODO: #GDM ask #elric: should it be done at every selection change?
         else
             updateItemDataFromSlider(m_currentWidget);
     } else {
@@ -800,7 +800,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             QVector<qint64> indicators;
             foreach(QnResourceWidget *widget, display()->widgets())
                 if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                    if (mediaWidget != m_currentMediaWidget)
+                    if (mediaWidget != m_currentMediaWidget && mediaWidget->resource()->hasFlags(QnResource::sync))
                         indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
             m_timeSlider->setIndicators(indicators);
         } else {

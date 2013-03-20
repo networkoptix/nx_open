@@ -38,7 +38,7 @@ QnAbstractMediaDataPtr QnNovArchiveDelegate::getNextData()
     {
         QnAbstractMediaDataPtr data = QnAviArchiveDelegate::getNextData();
 
-        if (data && m_skipFramesBeforeTime != AV_NOPTS_VALUE)
+        if (data && m_skipFramesBeforeTime != (qint64)AV_NOPTS_VALUE)
         {
             if (data->timestamp < m_skipFramesBeforeTime)
                 continue;

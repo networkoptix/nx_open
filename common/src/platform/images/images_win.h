@@ -1,11 +1,9 @@
 #ifndef QN_WINDOWS_IMAGES_H
 #define QN_WINDOWS_IMAGES_H
 
-#include <QtCore/QtGlobal>
-
-#ifdef Q_OS_WIN
-#include "platform_images.h"
 #include <QtGui/QPixmap>
+
+#include "platform_images.h"
 
 class QnWindowsImages: public QnPlatformImages {
     Q_OBJECT;
@@ -16,9 +14,7 @@ public:
     QnWindowsImages(QObject *parent = NULL);
     virtual ~QnWindowsImages();
 
-    virtual QPixmap cursorImage(Qt::CursorShape shape) const;
+    virtual QCursor bitmapCursor(Qt::CursorShape shape) const override;
 };
-
-#endif // Q_OS_WIN
 
 #endif // QN_WINDOWS_IMAGES_H

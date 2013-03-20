@@ -377,6 +377,7 @@ void parseBusinessRules(QnBusinessEventRules& businessRules, const PbBusinessRul
         businessRules.append(businessRule);
     }
 }
+} // namespace {}
 
 void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraResourcePtr& cameraPtr)
 {
@@ -445,37 +446,37 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 
 int serializeBusinessActionType(BusinessActionType::Value value) {
     switch(value) {
-        case BusinessActionType::BA_NotDefined:         return pb::NotDefinedAction;
-        case BusinessActionType::BA_CameraOutput:       return pb::CameraOutput;
-        case BusinessActionType::BA_Bookmark:           return pb::Bookmark;
-        case BusinessActionType::BA_CameraRecording:    return pb::CameraRecording;
-        case BusinessActionType::BA_PanicRecording:     return pb::PanicRecording;
-        case BusinessActionType::BA_SendMail:           return pb::SendMail;
-        case BusinessActionType::BA_Alert:              return pb::Alert;
-        case BusinessActionType::BA_ShowPopup:          return pb::ShowPopup;
+        case BusinessActionType::NotDefined:         return pb::NotDefinedAction;
+        case BusinessActionType::CameraOutput:       return pb::CameraOutput;
+        case BusinessActionType::Bookmark:           return pb::Bookmark;
+        case BusinessActionType::CameraRecording:    return pb::CameraRecording;
+        case BusinessActionType::PanicRecording:     return pb::PanicRecording;
+        case BusinessActionType::SendMail:           return pb::SendMail;
+        case BusinessActionType::Alert:              return pb::Alert;
+        case BusinessActionType::ShowPopup:          return pb::ShowPopup;
     }
     return pb::NotDefinedAction;
 }
 
 int serializeBusinessEventType(BusinessEventType::Value value) {
-    int userEvent = value - BusinessEventType::BE_UserDefined;
+    int userEvent = value - BusinessEventType::UserDefined;
     if (userEvent >= 0)
         return (pb::UserDefinedEvent + userEvent);
 
-    int healthMessage = value - BusinessEventType::BE_SystemHealthMessage;
+    int healthMessage = value - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0)
         return (pb::SystemHealthMessage + healthMessage);
 
     switch(value) {
-    case BusinessEventType::BE_NotDefined:          return pb::NotDefinedEvent;
-    case BusinessEventType::BE_Camera_Motion:       return pb::Camera_Motion;
-    case BusinessEventType::BE_Camera_Input:        return pb::Camera_Input;
-    case BusinessEventType::BE_Camera_Disconnect:   return pb::Camera_Disconnect;
-    case BusinessEventType::BE_Storage_Failure:     return pb::Storage_Failure;
-    case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
-    case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
-    case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
-    case BusinessEventType::BE_MediaServer_Conflict:return pb::MediaServer_Conflict;
+    case BusinessEventType::NotDefined:          return pb::NotDefinedEvent;
+    case BusinessEventType::Camera_Motion:       return pb::Camera_Motion;
+    case BusinessEventType::Camera_Input:        return pb::Camera_Input;
+    case BusinessEventType::Camera_Disconnect:   return pb::Camera_Disconnect;
+    case BusinessEventType::Storage_Failure:     return pb::Storage_Failure;
+    case BusinessEventType::Network_Issue:       return pb::Network_Issue;
+    case BusinessEventType::Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
+    case BusinessEventType::MediaServer_Failure: return pb::MediaServer_Failure;
+    case BusinessEventType::MediaServer_Conflict:return pb::MediaServer_Conflict;
     default:
         break;
     }
@@ -550,49 +551,53 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
 void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
 {
-    pb_license.set_name(license->name().toUtf8().constData());
-    pb_license.set_key(license->key().constData());
-    pb_license.set_cameracount(license->cameraCount());
-    pb_license.set_hwid(""); // We can't remove it, as it's required in .proto
-    pb_license.set_signature(license->signature().constData());
-}
+	// We can't remove it by now, as it's required in .proto
+    // Will remove it ocasionally.
+    pb_license.set_name("");
+    pb_license.set_hwid(""); 
+    pb_license.set_signature("");
+	/////////
+
+	pb_license.set_key(license->key().constData());
+	pb_license.set_cameracount(license->cameraCount());
+	pb_license.set_rawlicense(license->rawLicense().constData());
 }
 
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     int userEvent = pbValue - pb::UserDefinedEvent;
     if (userEvent >= 0)
-        return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
+        return BusinessEventType::Value(BusinessEventType::UserDefined + userEvent);
 
     int healthMessage = pbValue - pb::SystemHealthMessage;
     if (healthMessage >= 0)
-        return BusinessEventType::Value((BusinessEventType::BE_SystemHealthMessage + healthMessage));
+        return BusinessEventType::Value((BusinessEventType::SystemHealthMessage + healthMessage));
 
     switch(pbValue) {
-    case pb::NotDefinedEvent:       return BusinessEventType::BE_NotDefined;
-    case pb::Camera_Motion:         return BusinessEventType::BE_Camera_Motion;
-    case pb::Camera_Input:          return BusinessEventType::BE_Camera_Input;
-    case pb::Camera_Disconnect:     return BusinessEventType::BE_Camera_Disconnect;
-    case pb::Storage_Failure:       return BusinessEventType::BE_Storage_Failure;
-    case pb::Network_Issue:         return BusinessEventType::BE_Network_Issue;
-    case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
-    case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
-    case pb::MediaServer_Conflict:  return BusinessEventType::BE_MediaServer_Conflict;
+    case pb::NotDefinedEvent:       return BusinessEventType::NotDefined;
+    case pb::Camera_Motion:         return BusinessEventType::Camera_Motion;
+    case pb::Camera_Input:          return BusinessEventType::Camera_Input;
+    case pb::Camera_Disconnect:     return BusinessEventType::Camera_Disconnect;
+    case pb::Storage_Failure:       return BusinessEventType::Storage_Failure;
+    case pb::Network_Issue:         return BusinessEventType::Network_Issue;
+    case pb::Camera_Ip_Conflict:    return BusinessEventType::Camera_Ip_Conflict;
+    case pb::MediaServer_Failure:   return BusinessEventType::MediaServer_Failure;
+    case pb::MediaServer_Conflict:  return BusinessEventType::MediaServer_Conflict;
     }
-    return BusinessEventType::BE_NotDefined;
+    return BusinessEventType::NotDefined;
 }
 
 BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     switch (pbValue) {
-        case pb::NotDefinedAction:  return BusinessActionType::BA_NotDefined;
-        case pb::CameraOutput:      return BusinessActionType::BA_CameraOutput;
-        case pb::Bookmark:          return BusinessActionType::BA_Bookmark;
-        case pb::CameraRecording:   return BusinessActionType::BA_CameraRecording;
-        case pb::PanicRecording:    return BusinessActionType::BA_PanicRecording;
-        case pb::SendMail:          return BusinessActionType::BA_SendMail;
-        case pb::Alert:             return BusinessActionType::BA_Alert;
-        case pb::ShowPopup:         return BusinessActionType::BA_ShowPopup;
+        case pb::NotDefinedAction:  return BusinessActionType::NotDefined;
+        case pb::CameraOutput:      return BusinessActionType::CameraOutput;
+        case pb::Bookmark:          return BusinessActionType::Bookmark;
+        case pb::CameraRecording:   return BusinessActionType::CameraRecording;
+        case pb::PanicRecording:    return BusinessActionType::PanicRecording;
+        case pb::SendMail:          return BusinessActionType::SendMail;
+        case pb::Alert:             return BusinessActionType::Alert;
+        case pb::ShowPopup:         return BusinessActionType::ShowPopup;
     }
-    return BusinessActionType::BA_NotDefined;
+    return BusinessActionType::NotDefined;
 }
 
 
@@ -1055,17 +1060,38 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
     }
 }
 
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
+// TODO: #Ivan. Temporary code
+QByteArray combineV1LicenseBlock(const QString& name, const QString& serial, const QString& hwid, int count, const QString& signature)
 {
-    QnLicensePtr rawLicense = QnLicensePtr(new QnLicense(
-                            QString::fromUtf8(pb_license.name().c_str()),
-                            pb_license.key().c_str(),
-                            pb_license.cameracount(),
-                            pb_license.signature().c_str()
-                            ));
+	return (QString() +
+		QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
+		QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
+		QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
+        QLatin1String("COUNT=") + QString::number(count) + QLatin1String("\n") +
+		QLatin1String("SIGNATURE=") + signature).toUtf8();
+}
 
-    // TODO: #Ivan, verify that's ok to return invalid license
-    license = rawLicense; // ->isValid() ? rawLicense : QnLicensePtr();
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& hardwareId, const QByteArray& oldHardwareId)
+{
+	if (!pb_license.rawlicense().empty()) {
+		license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
+		return;
+	}
+
+	// TODO: #Ivan. Temporary code
+	QByteArray block;
+	
+	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+	if (QnLicense(block).isValid(hardwareId)) {
+		license = QnLicensePtr(new QnLicense(block));
+		return;
+	}
+
+	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+	if (QnLicense(block).isValid(oldHardwareId)) {
+		license = QnLicensePtr(new QnLicense(block));
+		return;
+	}
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
@@ -1144,7 +1170,9 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 
         QnLicensePtr license;
         // Parse license and validate its signature
-        parseLicense(license, pb_license);
+		if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
+			parseLicense(license, pb_license, licenses.hardwareId(), licenses.oldHardwareId());
+
         // Verify that license is valid and for our hardwareid
         if (license)
             licenses.append(license);

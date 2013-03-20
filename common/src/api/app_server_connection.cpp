@@ -1005,6 +1005,9 @@ int QnAppServerConnection::sendEmailAsync(const QString& addr, const QString& su
 
 int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot)
 {
+    if (message.isEmpty())
+        return -1;
+
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, EmailObject);
     QObject::connect(processor, SIGNAL(finishedSendEmail(int, const QByteArray&, bool, int)), target, slot);
 

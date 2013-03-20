@@ -11,7 +11,7 @@
 QnPlatformImages *QnPlatformImages::newInstance(QObject *parent) {
 #if defined Q_OS_WIN
     return new QnWindowsImages(parent);
-#elif defined Q_WS_X11
+#elif defined Q_OS_LINUX
     return new QnX11Images(parent);
 #else
     return new QnGenericImages(parent);

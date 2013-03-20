@@ -12,7 +12,7 @@
 #include <utils/common/email.h>
 
 #include <ui/common/read_only.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <client/client_globals.h>
@@ -64,11 +64,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
 
-    {
-        QPalette palette = ui->hintLabel->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-        ui->hintLabel->setPalette(palette);
-    }
+    setWarningStyle(ui->hintLabel);
 
     updateAll();
 }
@@ -263,7 +259,7 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
 
     QPalette palette = this->palette();
     if(!valid)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
 
     switch(element) {
     case Login:

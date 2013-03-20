@@ -1,11 +1,25 @@
 #include <QUrl>
 #include <qDebug>
+#include <QThread>
 
 #include "vmax480_reader.h"
 #include "socket.h"
 #include "acs_codec.h"
 #include "nalconstructor.h"
 
+
+class QnSleep : public QThread
+{
+public:
+
+    static void msleep ( unsigned long msecs )
+    {
+        QThread::msleep(msecs);
+    }
+};
+
+
+static const int CHANNEL_TIMEOUT = 1000 * 5;
 
 int create_vmax_sps_pps(
                    int frameWidth,
@@ -129,7 +143,7 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_spsPpsBufferLen(0),
     m_connectedInternal(false),
     m_socket(socket),
-    m_channelNum(0),
+    m_channelMask(0),
     m_reqSequence(0),
     m_curSequence(0),
     m_archivePlayProcessing(false),
@@ -173,7 +187,8 @@ void QnVMax480Provider::connect(const VMaxParamList& params, quint8 sequence, bo
     if (m_channelNum > 0)
         m_channelNum--;
     */
-    m_channelNum = params.value("channel").toInt();
+    //m_channelNum = params.value("channel").toInt();
+    m_channelMask = params.value("channel").toInt();
 
     S_CONNECT_PARAM	connectParam;
     connectParam.mUrl	=	url.host().toStdWString();
@@ -251,9 +266,8 @@ void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 
     else
         playMode = ACS_stream_source::BACKWARDPLAY;
 
-    qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
-
     if (!m_archivePlayProcessing) {
+        qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
         m_archivePlayProcessing = true;
         m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
     }
@@ -306,6 +320,45 @@ void QnVMax480Provider::playPointsInternal()
         //m_pointsPlayMode = false;
         m_ppState = PP_None;
     }
+}
+
+void QnVMax480Provider::addChannel(const VMaxParamList& params)
+{
+    if (!m_ACSStream)
+        return;
+
+    int channel = params.value("channel").toInt();
+    qDebug() << "m_ACSStream->openChannel=" << channel;
+
+
+    QMutexLocker lock(&m_channelMutex);
+    m_channelProcessed = false;
+    m_ACSStream->openChannel(channel);
+    m_channelMask |= channel;
+
+    QTime t;
+    t.restart();
+    while (!m_channelProcessed && t.elapsed() < CHANNEL_TIMEOUT)
+        m_channelCond.wait(&m_channelMutex, CHANNEL_TIMEOUT);
+}
+
+void QnVMax480Provider::removeChannel(const VMaxParamList& params)
+{
+    if (!m_ACSStream)
+        return;
+
+    int channel = params.value("channel").toInt();
+    qDebug() << "m_ACSStream->closeChannel" << channel;
+
+    QMutexLocker lock(&m_channelMutex);
+    m_channelProcessed = false;
+    m_ACSStream->closeChannel(channel);
+    m_channelMask &= ~channel;
+
+    QTime t;
+    t.restart();
+    while (!m_channelProcessed && t.elapsed() < CHANNEL_TIMEOUT)
+        m_channelCond.wait(&m_channelMutex, CHANNEL_TIMEOUT);
 }
 
 void QnVMax480Provider::requestMonthInfo(const VMaxParamList& params, quint8 sequence)
@@ -371,7 +424,7 @@ void QnVMax480Provider::receiveResultCallback(PS_ACS_RESULT _result, long long _
 void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 {
 
-    //qDebug() << "receiveVideoStream";
+    //qDebug() << "receiveVideoStream" << _stream->mCh;
     quint8 VMaxHeader[16];
     bool isIFrame = false;
     {
@@ -382,6 +435,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 
         if (m_reqSequence != m_curSequence) {
             qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
+            QnSleep::msleep(10);
             return;
         }
 
@@ -407,7 +461,9 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
         VMaxHeader[0] = m_reqSequence;
         VMaxHeader[1] = VMAXDT_GotVideoPacket;
         VMaxHeader[2] = (quint8) _stream->mSrcType;
-        VMaxHeader[3] = (quint8) isIFrame;
+        VMaxHeader[3] = _stream->mCh << 4;
+        if (isIFrame)
+            VMaxHeader[3] |= 1;
         *(quint32*)(VMaxHeader+4) = dataSize;
         //*(quint64*)(VMaxHeader+8) = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
         *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
@@ -480,14 +536,19 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
             if( _result->mResult == true )
             {
                 //m_ACSStream->requestRecordDateTime();
-                if (m_channelNum != -1) {
-                    m_ACSStream->openChannel(1 << m_channelNum);
-                    //m_ACSStream->openAudioChannel(1 << m_channelNum);
+
+                if (m_channelMask > 0) {
+                    qDebug() << "open channel onStartup=" << m_channelMask;
+                    m_ACSStream->openChannel(m_channelMask);
+                    //m_ACSStream->openAudioChannel(m_channelMask);
                 }
                 else {
                     m_connectedInternal = true;
                     m_callbackCond.wakeOne();
                 }
+
+                //m_connectedInternal = true;
+                //m_callbackCond.wakeOne();
             }
             break;
         }
@@ -512,11 +573,19 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_callbackCond.wakeOne();
                 }
             }
+            m_socket->close();
             break;
         }
     case RESULT_OPEN_VIDEO:
         m_connectedInternal = true;
-        m_callbackCond.wakeOne();
+        m_callbackCond.wakeAll();
+        
+        m_channelProcessed = true;
+        m_channelCond.wakeAll();
+        break;
+    case RESULT_CLOSE_VIDEO:
+        m_channelProcessed = true;
+        m_channelCond.wakeAll();
         break;
     case RESULT_ALIVECHK:
         {
@@ -540,6 +609,7 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
                     m_curSequence = m_reqSequence;
                 else
                     archivePlayInternal(m_newPlayCommand, m_reqSequence);
+                m_newPlayCommand.clear();
             }
             break;
         }
@@ -632,7 +702,7 @@ void QnVMax480Provider::receiveAudioStream(S_ACS_AUDIO_STREAM* _stream)
     VMaxHeader[0] = m_reqSequence;
     VMaxHeader[1] = VMAXDT_GotAudioPacket;
     VMaxHeader[2] = (quint8) _stream->mSrcType;
-    VMaxHeader[3] = 0;
+    VMaxHeader[3] = _stream->mCh << 4;
     *(quint32*)(VMaxHeader+4) = _stream->mSrcSize;
     *(quint64*)(VMaxHeader+8) = packetTimestamp.toMSecsSinceEpoch() * 1000;
     

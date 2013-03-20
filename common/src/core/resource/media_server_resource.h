@@ -1,10 +1,12 @@
 #ifndef QN_MEDIA_SERVER_RESOURCE_H
 #define QN_MEDIA_SERVER_RESOURCE_H
 
-#include "core/resource/resource.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/media_resource.h"
-#include "api/media_server_connection.h"
+#include <QtNetwork/QHostAddress>
+
+#include <api/media_server_connection.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/abstract_storage_resource.h>
 
 class QnLocalMediaServerResource : public QnResource
 {

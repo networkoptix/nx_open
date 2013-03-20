@@ -46,7 +46,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    while (!m_needStop && !result)
+    while (!needToStop() && !result)
     {
         if (!m_gotSDP) {
             msleep(10);

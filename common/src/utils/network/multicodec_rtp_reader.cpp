@@ -36,8 +36,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
-    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, int, const QString&)),
-            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, int, const QString&)));
+    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
+            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()

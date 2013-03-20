@@ -7,12 +7,19 @@ static const int UUID_LEN = 38;
 
 // ---------------------------- QnVMax480ConnectionProcessor -----------------
 
+QnVMax480Server::~QnVMax480Server()
+{
+    stop();
+}
+
+
 class QnVMax480ConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     QString tcpID;
     QnMediaContextPtr context;
     VMaxStreamFetcher* streamFetcher;
+    int openedChannels;
 };
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
@@ -20,6 +27,7 @@ QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, Qn
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
+    d->openedChannels = 0;
 }
 
 QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()
@@ -59,6 +67,39 @@ void QnVMax480ConnectionProcessor::vMaxArchivePlay(qint64 timeUsec, quint8 seque
     params["speed"] = QString::number(speed).toUtf8();
     QByteArray data = QnVMax480Helper::serializeCommand(Command_ArchivePlay, sequence, params);
     qDebug () << "before send command vMaxArchivePlay" << "time=" << timeUsec << "sequence=" << sequence << "speed=" << speed;
+    d->socket->send(data);
+}
+
+void QnVMax480ConnectionProcessor::vMaxAddChannel(int channel)
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    int newMask = d->openedChannels | channel;
+    if (newMask == d->openedChannels)
+        return;
+    d->openedChannels = newMask;
+
+    VMaxParamList params;
+    params["channel"] = QString::number(channel).toUtf8();
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_AddChannel, 0, params);
+    qDebug () << "before send command vMaxAddChannel";
+    d->socket->send(data);
+}
+
+void QnVMax480ConnectionProcessor::vMaxRemoveChannel(int channel)
+{
+    Q_D(QnVMax480ConnectionProcessor);
+
+    int newMask = d->openedChannels & ~channel;
+    if (newMask == d->openedChannels)
+        return;
+    d->openedChannels = newMask;
+
+
+    VMaxParamList params;
+    params["channel"] = QString::number(channel).toUtf8();
+    QByteArray data = QnVMax480Helper::serializeCommand(Command_RemoveChannel, 0, params);
+    qDebug () << "before send command vMaxRemoveChannel";
     d->socket->send(data);
 }
 
@@ -274,8 +315,9 @@ void QnVMax480ConnectionProcessor::run()
         if (!readBuffer((quint8*) media->data.data(), media->data.size()))
             break;
 
-        if (vMaxHeader[3])
+        if (vMaxHeader[3] & 1)
             media->flags = AV_PKT_FLAG_KEY;
+        media->channelNumber = vMaxHeader[3] >> 4;
         media->timestamp = timestamp;
         media->compressionType = codecID;
         media->opaque = sequence;

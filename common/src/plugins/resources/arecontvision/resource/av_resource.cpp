@@ -432,7 +432,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
     return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) || name.contains(QLatin1String("20365")) ||
-           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365"));
+           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365")) || name.contains(QLatin1String("12186"));
 }
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()

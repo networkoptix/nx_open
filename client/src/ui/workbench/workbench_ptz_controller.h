@@ -61,7 +61,7 @@ private slots:
     
     void at_resource_statusChanged(const QnResourcePtr &resource);
 
-    void at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
+    void at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);
     void at_ptzSetMovement_replyReceived(int status, int handle);
 
