@@ -421,9 +421,10 @@ void QnWorkbenchDisplay::initSceneView() {
     m_scene->addItem(gridBackgroundItem());
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
     gridBackgroundItem()->setColor(QColor(240, 0, 0, 128));
-    gridBackgroundItem()->setOpacity(0.7);
+    gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
     gridBackgroundItem()->setSceneRect(QRect(QPoint(-1, -1), QPoint(1,1)));
+    gridBackgroundItem()->setAnimationTimer(m_instrumentManager->animationTimer());
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -1376,6 +1377,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
+    gridBackgroundItem()->animatedHide();
+
+
     m_inChangeLayout = false;
 }
 
@@ -1477,6 +1481,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
     synchronizeSceneBounds();
     fitInView(false);
+
+    if (layout->name().endsWith(QLatin1String("1"))) {
+        gridBackgroundItem()->setColor(QColor(Qt::red));
+        gridBackgroundItem()->setSceneRect(QRect(QPoint(0, 0), QPoint(1,1)));
+    } else {
+        gridBackgroundItem()->setColor(QColor(Qt::yellow));
+        gridBackgroundItem()->setSceneRect(QRect(QPoint(-1, -1), QPoint(0,0)));
+    }
+    gridBackgroundItem()->animatedShow();
 }
 
 void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
