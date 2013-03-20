@@ -229,7 +229,7 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const
     if(!camera)
         return; /* Already removed from the pool. */
 
-    qDebug() << "GOT POSITION" << QVector3D(xPos, yPox, zoomPos);
+    //qDebug() << "GOT POSITION" << QVector3D(xPos, yPox, zoomPos);
 
     m_cameraByHandle.remove(handle);
     
