@@ -407,7 +407,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
 		<CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[${installer.customization}AppLauncherDir]applauncher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
 		<CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -415,7 +415,7 @@
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db"/>
 
 		<CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-		<CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand="-e"/>
+		<CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
 
 		<CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
 
@@ -481,10 +481,10 @@
 			<!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
 			<!--            <RemoveExistingProducts After="InstallInitialize" />-->
 			<Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
-				<![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+				<![CDATA[ NOT $(var.VmsInstalling) ]]>
 			</Custom>
-			<Custom Action="CloseAppLauncherAction" Before="RemoveFiles">
-				<![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
+			<Custom Action="CloseAppLauncherAction" Before="StopServices">
+				<![CDATA[ NOT $(var.VmsInstalling) ]]>
 			</Custom>
 
 			<Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
@@ -770,12 +770,18 @@
 						</Directory>
 
 						<Directory Id="${installer.customization}ClientDir" Name="Client">
-							<Directory Id="${installer.customization}HelpDir" Name="help"/>
+							<Directory Id="${installer.customization}HelpDir" Name="help"/>							
 
-							<Component Id="AppLauncherExecutable" Guid="{486c2632-c229-4ce5-b976-e87d0a82a2dc}">
-								<File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes" />
+							<Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
 
-								<!--<ServiceInstall Id="${installer.customization}AppLauncherService"
+								<Component Id="AppLauncherExecutable" Guid="{486c2632-c229-4ce5-b976-e87d0a82a2dc}">
+									<File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes">
+										<Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
+											  WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
+										</Shortcut>
+									</File>
+
+									<!--<ServiceInstall Id="${installer.customization}AppLauncherService"
                                                 Name="${installer.customization}AppLauncher"
                                                 DisplayName="${applauncher.name}"
                                                 Type="ownProcess"
@@ -787,22 +793,17 @@
 
 								<ServiceControl Id="Start${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Start="install" Wait="no" />
 								<ServiceControl Id="Stop${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Stop="both" Wait="yes" Remove="uninstall" />	-->
-								<Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-											  WorkingDirectory='${installer.customization}ClientDir' Target="[#applauncher.exe]" Arguments='-e' Icon="icon_menu.exe" >
-								</Shortcut>
-							</Component>
+								</Component>
 
-							<Component Id="clientShortcutDesktop" Guid="{56799FF5-5B77-442e-9A39-3F27F0FC8307}">
-								<Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
+								<Component Id="clientShortcutDesktop" Guid="{56799FF5-5B77-442e-9A39-3F27F0FC8307}">
+									<Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
-								<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
+									<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
-								<Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-										  WorkingDirectory='${installer.customization}ClientDir' Target="[#applauncher.exe]" Arguments='-e' Icon="icon_desktop.exe">
-								</Shortcut>
-							</Component>							
-
-							<Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_${parsedVersion.incrementalVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
+									<Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
+										  WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+									</Shortcut>
+								</Component>							
 
 								<Directory Id="styles" Name="styles">
 									<Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
