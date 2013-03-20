@@ -56,7 +56,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     ui(new Ui::LoginDialog),
     m_context(context),
     m_requestHandle(-1),
-    m_renderingWidget(NULL)
+    m_renderingWidget(NULL),
+    m_restartPending(false)
 {
     if(!context)
         qnNullWarning(context);
@@ -149,6 +150,10 @@ QString LoginDialog::currentName() const {
 
 QnConnectInfoPtr LoginDialog::currentInfo() const {
     return m_connectInfo;
+}
+
+bool LoginDialog::restartPending() const {
+    return m_restartPending;
 }
 
 void LoginDialog::accept() {
@@ -285,17 +290,17 @@ bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringLis
     return true;
 }
 
-void LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
+bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
 
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
     arguments << QLatin1String("--auth");
     arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
 
-    if (sendCommandToLauncher(stripVersion(connectInfo->version), arguments))
-        qApp->exit();
-    else
+    bool result = sendCommandToLauncher(stripVersion(connectInfo->version), arguments);
+    if (!result)
         QMessageBox::critical(this, tr("Launcher is not found"), tr("Launcher process is stopped."));
+    return result;
 }
 
 void LoginDialog::updateAcceptibility() {
@@ -359,6 +364,8 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 
     if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
         QString minSupportedVersion = QLatin1String("1.4");
+
+        m_restartPending = true;
         if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) {
             QMessageBox::warning(
                         this,
@@ -370,23 +377,24 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
                         .arg(QLatin1String(QN_ENGINE_VERSION))
                         .arg(connectInfo->version)
                         .arg(minSupportedVersion));
+            m_restartPending = false;
+        }
+
+        m_restartPending = m_restartPending && (QMessageBox::warning(
+                                  this,
+                                  tr("Could not connect to Enterprise Controller"),
+                                  tr("You are about to connect to Enterprise Controller which has a different version:\n"\
+                                     " - Client version: %1.\n"\
+                                     " - EC version: %2.\n"\
+                                     "Would you like to restart client in compatibility mode?")
+                                  .arg(QLatin1String(QN_ENGINE_VERSION))
+                                  .arg(connectInfo->version),
+                                  QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+                          && restartInCompatibilityMode(connectInfo);
+        if (!m_restartPending) {
             updateFocus();
             return;
         }
-
-        if (QMessageBox::warning(
-            this,
-            tr("Could not connect to Enterprise Controller"),
-            tr("You are about to connect to Enterprise Controller which has a different version:\n"\
-               " - Client version: %1.\n"\
-               " - EC version: %2.\n"\
-               "Would you like to restart client in compatibility mode?")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version),
-                    QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
-            restartInCompatibilityMode(connectInfo);
-        updateFocus();
-        return;
     }
 
     m_connectInfo = connectInfo;
