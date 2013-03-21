@@ -43,18 +43,6 @@ QnMdnsListener::ConsumerDataList QnMdnsListener::getData(long handle)
     return rez;
 }
 
-static int strEqualAmount(const char* str1, const char* str2)
-{
-    int rez = 0;
-    while (*str1 && *str1 == *str2)
-    {
-        rez++;
-        str1++;
-        str2++;
-    }
-    return rez;
-}
-
 QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
 {
     if (m_localAddressList.isEmpty())

@@ -30,11 +30,6 @@ bool QnPlVmax480Resource::isResourceAccessible()
     return true;
 }
 
-bool QnPlVmax480Resource::updateMACAddress() 
-{
-    return true;
-}
-
 QString QnPlVmax480Resource::manufacture() const 
 {
     return QLatin1String(MANUFACTURE);

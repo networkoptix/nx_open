@@ -64,6 +64,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     QString manufacturer = info.manufacturer;
     QString name = info.name;
+    QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
     //TODO:UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
@@ -103,6 +104,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             if (!response.Model.empty())
                 name = QString::fromStdString(response.Model);
 
+            if (!response.FirmwareVersion.empty())
+                firmware = QString::fromStdString(response.FirmwareVersion);
+
             if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(name).replace(manufacturer, QString()))) {
                 qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
                 return;
@@ -117,7 +121,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 
 
-    QnPlOnvifResourcePtr res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
+    QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
                                               name, mac, info.uniqId, QString::fromStdString(soapWrapper.getLogin()), QString::fromStdString(soapWrapper.getPassword()), endpoint);
     if (res)
         result << res;
@@ -146,7 +150,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
         {
-            res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
+            res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
                 name, mac, info.uniqId, QString::fromStdString(soapWrapper.getLogin()), QString::fromStdString(soapWrapper.getPassword()), endpoint);
             if (res) {
                 QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
@@ -161,7 +165,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 }
 
-QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, 
+QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, 
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
     if (uniqId.isEmpty())
@@ -183,6 +187,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setModel(name);
     resource->setName(name); 
     resource->setMAC(mac);
+    resource->setFirmware(firmware);
 
     if (!mac.size())
         resource->setPhysicalId(uniqId);

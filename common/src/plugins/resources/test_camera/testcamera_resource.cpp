@@ -18,11 +18,6 @@ bool QnTestCameraResource::isResourceAccessible()
     return true;
 }
 
-bool QnTestCameraResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnTestCameraResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
