@@ -31,7 +31,7 @@ message Layout {
     required double cellSpacingWidth  = 2;
     required double cellSpacingHeight = 3;
     repeated Item   item              = 4;
-    optional bytes  backgroundImage   = 5;
+    optional int32  backgroundImageId = 5;
     optional int32  backgroundWidth   = 6;
     optional int32  backgroundHeight  = 7;
 }
