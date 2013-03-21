@@ -12,6 +12,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Servers,                 qnSkin->icon("tree/servers.png"));
     m_cache.insert(Layout,                  qnSkin->icon("tree/layout.png"));
     m_cache.insert(Camera,                  qnSkin->icon("tree/camera.png"));
+    m_cache.insert(Recorder,                qnSkin->icon("tree/recorder.png"));
     m_cache.insert(Image,                   qnSkin->icon("tree/snapshot.png"));
     m_cache.insert(Media,                   qnSkin->icon("tree/media.png"));
     m_cache.insert(User,                    qnSkin->icon("tree/user.png"));
@@ -19,10 +20,6 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
-#if 0
-    m_cache.insert(User | Offline,          qnSkin->icon("tree/user_offline.png"));
-#endif
-
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
 
     m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
