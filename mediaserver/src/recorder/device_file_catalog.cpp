@@ -249,7 +249,7 @@ QList<QDate> DeviceFileCatalog::recordedMonthList()
     return rez;
 }
 
-void DeviceFileCatalog::addChunk(const Chunk& chunk)
+bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
     if (!m_chunks.isEmpty() && chunk.startTimeMs > m_chunks.last().startTimeMs) {
         m_chunks << chunk;
@@ -258,6 +258,13 @@ void DeviceFileCatalog::addChunk(const Chunk& chunk)
         ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
+    if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
+    {
+        // update catalog to fix bug from previous version
+        m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
+        return true;
+    }
+    return false;
 };
 
 void DeviceFileCatalog::deserializeTitleFile()
@@ -309,9 +316,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         //qint64 chunkFileSize = 0;
         if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
         {
-            ;
-            // Skip chunks for unavaileble storage
-             //addChunk(chunk, lastStartTime);
+             needRewriteCatalog |= addChunk(chunk);
         }
         else if (fileExists(chunk, checkDirOnly))
         {
@@ -342,13 +347,7 @@ void DeviceFileCatalog::deserializeTitleFile()
             else 
             */
             {
-                addChunk(chunk);
-                if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
-                {
-                    // update catalog to fix bug from previous version
-                    m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
-                    needRewriteCatalog = true;
-                }
+                needRewriteCatalog |= addChunk(chunk);
             }
         }
         else {
