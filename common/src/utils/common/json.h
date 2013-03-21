@@ -176,10 +176,10 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(const QVariantMap &map, const char *key, T *target) {
+    bool deserialize(const QVariantMap &map, const char *key, T *target, bool optional = false) {
         QVariantMap::const_iterator pos = map.find(QLatin1String(key));
         if(pos == map.end()) {
-            return false;
+            return optional;
         } else {
             return QJson::deserialize(*pos, target);
         }
