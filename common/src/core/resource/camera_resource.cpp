@@ -2,6 +2,8 @@
 #include "resource_consumer.h"
 #include "api/app_server_connection.h"
 
+static const float MAX_EPS = 0.01f;
+
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_scheduleDisabled(true),
     m_audioEnabled(false),
@@ -54,6 +56,56 @@ void QnPhysicalCameraResource::setUrl(const QString &url)
         m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
 }
 
+float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution)
+{
+    if (resolution.height() == 0)
+        return 0;
+    float result = static_cast<double>(resolution.width()) / resolution.height();
+    // SD NTCS/PAL resolutions have non standart SAR. fix it
+    if (resolution.width() == 720 && (resolution.height() == 480 || resolution.height() == 576))
+        result = float(4.0 / 3.0);
+    return result;
+}
+
+QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, float aspectRatio,
+                                              double maxResolutionSquare, const QList<QSize>& resolutionList)
+{
+    double requestSquare = resolution.width() * resolution.height();
+    if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
+
+    int bestIndex = -1;
+    double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
+
+    for (int i = 0; i < resolutionList.size(); ++i) {
+        QSize tmp;
+
+        tmp.setWidth(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].width() + 1), 8));
+        tmp.setHeight(qPower2Floor(static_cast<unsigned int>(resolutionList[i].height() - 1), 8));
+        float ar1 = getResolutionAspectRatio(tmp);
+
+        tmp.setWidth(qPower2Floor(static_cast<unsigned int>(resolutionList[i].width() - 1), 8));
+        tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
+        float ar2 = getResolutionAspectRatio(tmp);
+
+        if (aspectRatio != 0 && !qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+        {
+            continue;
+        }
+
+        double square = resolutionList[i].width() * resolutionList[i].height();
+        if (square < MAX_EPS) continue;
+
+        double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
+        if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
+            bestIndex = i;
+            bestMatchCoeff = matchCoeff;
+        }
+    }
+
+    return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
+}
+
+// --------------- QnVirtualCameraResource ----------------------
 
 void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {

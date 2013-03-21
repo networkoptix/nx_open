@@ -356,6 +356,12 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
+    else if (codecName == QLatin1String("L16")) {
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_PCM_S16BE);
+        audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
+        result = audioParser;
+    }
     
     if (result)
         connect(result, SIGNAL(packetLostDetected(quint32, quint32)), this, SLOT(at_packetLost(quint32, quint32)));

@@ -15,11 +15,6 @@ bool QnPlDriodIpWebCamResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlDriodIpWebCamResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlDriodIpWebCamResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
