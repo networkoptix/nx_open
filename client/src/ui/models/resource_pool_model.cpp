@@ -835,7 +835,6 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
                         if (child->resource() && !resources.contains(child->resource()))
                             resources.append(child->resource());
                     }
-                    pureTreeResourcesOnly = false;
                 }
 
                 if(node && node->resource() && !resources.contains(node->resource()))
