@@ -270,6 +270,7 @@ protected slots:
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_layoutSettingsAction_triggered();
+    void at_currentLayoutSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
@@ -383,6 +384,8 @@ private:
     void removeLayouts(const QnLayoutResourceList &layouts);
 
     void ensurePopupCollectionWidget();
+
+    void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

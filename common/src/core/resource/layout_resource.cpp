@@ -75,14 +75,14 @@ void QnLayoutResource::setBackgroundSize(QSize size) {
     m_backgroundSize = size;
 }
 
-QString QnLayoutResource::backgroundUrl() const {
+int QnLayoutResource::backgroundImageId() const {
     QMutexLocker locker(&m_mutex);
-    return m_backgroundUrl;
+    return m_backgroundImageId;
 }
 
-void QnLayoutResource::setBackgroundUrl(QString url) {
+void QnLayoutResource::setBackgroundImageId(int id) {
     QMutexLocker locker(&m_mutex);
-    m_backgroundUrl = url;
+    m_backgroundImageId = id;
 }
 
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {

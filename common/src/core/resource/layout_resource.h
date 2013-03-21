@@ -64,8 +64,8 @@ public:
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
-    QString backgroundUrl() const;
-    void setBackgroundUrl(QString url);
+    int backgroundImageId() const;
+    void setBackgroundImageId(int id);
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -90,7 +90,7 @@ private:
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
     QSize m_backgroundSize;
-    QString m_backgroundUrl;
+    int m_backgroundImageId;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

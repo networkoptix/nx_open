@@ -18,12 +18,19 @@ public:
     ~QnLayoutSettingsDialog();
     
     void readFromResource(const QnLayoutResourcePtr &layout);
-    void submitToResource(const QnLayoutResourcePtr &layout);
+    bool submitToResource(const QnLayoutResourcePtr &layout);
+private:
+    void updateControls();
 
-    bool hasChanges() const {return true;}
+private slots:
+    void at_viewButton_clicked();
+    void at_selectButton_clicked();
+    void at_clearButton_clicked();
 
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
+
+    int m_imageId;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

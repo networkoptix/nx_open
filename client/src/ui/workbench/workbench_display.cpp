@@ -640,7 +640,7 @@ void QnWorkbenchDisplay::updateBackground(QnWorkbenchLayout *layout) {
     if (!resource)
         return;
 
-    gridBackgroundItem()->setImage(QImage(resource->backgroundUrl()));
+    gridBackgroundItem()->setImage(QImage(/*resource->backgroundUrl()*/));
     if (gridBackgroundItem()->image().isNull())
         return;
 
