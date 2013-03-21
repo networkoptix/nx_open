@@ -60,6 +60,7 @@ void QnVMax480ChunkReader::run()
                 m_waitTimer.restart();
                 m_waitingAnswer = false;
                 m_firstRange = true;
+                m_streamFetcher->reconnect();
             }
             msleep(1);
             continue;

@@ -39,6 +39,8 @@ public:
     static void freeInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
+
+    void reconnect();
 public:
     VMaxStreamFetcher(QnResourcePtr dev, bool isLive);
     virtual ~VMaxStreamFetcher();

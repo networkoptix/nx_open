@@ -133,6 +133,12 @@ int VMaxStreamFetcher::getCurrentChannelMask() const
     return mask;
 }
 
+void VMaxStreamFetcher::reconnect()
+{
+    vmaxDisconnect();
+    vmaxConnect();
+}
+
 bool VMaxStreamFetcher::vmaxConnect()
 {
     vmaxDisconnect();
