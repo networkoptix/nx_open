@@ -486,10 +486,14 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     if (!processor->isCancelled()) {
         if (processor->isSuccess()) {
             removeAddedCameras();
-            QMessageBox::information(this, tr("Success"), tr("Camera(s) added successfully"), QMessageBox::Ok);
+            QMessageBox::information(this,
+                                     tr("Success"),
+                                     tr("%n camera(s) added successfully.\n"\
+                                        "It might take a few moments to populate them in the tree.", "", urls.size()),
+                                     QMessageBox::Ok);
         }
         else
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)"), QMessageBox::Ok);
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n camera(s)", "", urls.size()), QMessageBox::Ok);
     }
 }
 
