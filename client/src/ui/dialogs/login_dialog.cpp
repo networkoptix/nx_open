@@ -301,7 +301,11 @@ bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
 
     bool result = sendCommandToLauncher(stripVersion(connectInfo->version), arguments);
     if (!result)
-        QMessageBox::critical(this, tr("Launcher is not found"), tr("Launcher process is stopped."));
+        QMessageBox::critical(this,
+                              tr("Launcher process is not found"),
+                              tr("Cannot restart the client in compatibility mode.\n"\
+                                 "Please close the application and start it again\n"\
+                                 "using the shortcut in the start menu."));
     return result;
 }
 
