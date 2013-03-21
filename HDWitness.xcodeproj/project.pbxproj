@@ -30,6 +30,8 @@
 		C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */; };
 		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
 		C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */; };
+		C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */; };
+		C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +80,10 @@
 		C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWECSViewController.m; sourceTree = "<group>"; };
 		C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWEcsConfig.h; sourceTree = "<group>"; };
 		C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWEcsConfig.m; sourceTree = "<group>"; };
+		C7A7DD0016F923D000659CF3 /* MotionJpegImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MotionJpegImageView.h; sourceTree = "<group>"; };
+		C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MotionJpegImageView.mm; sourceTree = "<group>"; };
+		C7CAEBD216F9795100824E4B /* HDWVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWVideoViewController.h; sourceTree = "<group>"; };
+		C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWVideoViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,12 +146,16 @@
 		C71D5AFA16ADBB9600C764B5 /* HDWitness */ = {
 			isa = PBXGroup;
 			children = (
+				C7A7DD0016F923D000659CF3 /* MotionJpegImageView.h */,
+				C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */,
 				C71D5B0316ADBB9600C764B5 /* HDWAppDelegate.h */,
 				C71D5B0416ADBB9600C764B5 /* HDWAppDelegate.m */,
 				C71D5B0C16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard */,
 				C71D5B0F16ADBB9600C764B5 /* MainStoryboard_iPad.storyboard */,
 				C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */,
 				C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */,
+				C7CAEBD216F9795100824E4B /* HDWVideoViewController.h */,
+				C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */,
 				C71D5B1216ADBB9600C764B5 /* HDWMasterViewController.h */,
 				C71D5B1316ADBB9600C764B5 /* HDWMasterViewController.m */,
 				C71D5B1516ADBB9600C764B5 /* HDWDetailViewController.h */,
@@ -154,9 +164,9 @@
 				C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */,
 				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 				C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */,
+				C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */,
 				C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */,
 				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
-				C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */,
 			);
 			path = HDWitness;
 			sourceTree = "<group>";
@@ -329,6 +339,8 @@
 				C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */,
 				C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */,
 				C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */,
+				C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */,
+				C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
