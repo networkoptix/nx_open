@@ -51,7 +51,7 @@ public:
         TimerEventHandler* const taskHandler,
         const unsigned int delay );
     /*!
-        Если задача уже выполняется, то после возврата из этого метода она может всё ещё выполяться.
+        If task is already running, it can be still running after method return
         If timer handler is being executed at the moment, it can still be executed after return of this method
         \param timerID ID of timer, created by \a addTimer call. If no such timer, nothing is done
     */

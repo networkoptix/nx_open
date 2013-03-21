@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.3-SNAPSHOT</version>
+	<version>1.5.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
@@ -25,11 +25,13 @@
 		<appserver.name>Enterprise Controller</appserver.name>
 		<client.name>${company.name} ${product.name} Client</client.name>
 		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
+		<applauncher.name>${company.name} Application Launcher</applauncher.name>
 		<mediaserver.name>${company.name} Media Server</mediaserver.name>
 		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
 		<testcamera.name>${company.name} Test Camera</testcamera.name>
 		<traytool.name>${product.name} Tray Assistant</traytool.name>
 		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+		<applauncher.name>${company.name} Launcher</applauncher.name>
 		<license.environment>production</license.environment>
 
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
@@ -62,6 +64,7 @@
 		<module>build_environment</module>
 		<module>appserver</module>
 		<module>common</module>
+		<module>applauncher</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
 		<module>client</module>		

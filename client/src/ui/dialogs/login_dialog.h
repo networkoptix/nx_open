@@ -32,6 +32,7 @@ public:
     QString currentName() const;
     QnConnectInfoPtr currentInfo() const;
 
+    bool restartPending() const;
 public slots:
     virtual void accept() override;
     virtual void reject() override;
@@ -48,6 +49,14 @@ protected:
      * Reset part of connections model containing auto-found controllers.
      */
     void resetAutoFoundConnectionsModel();
+
+    /**
+     * Send the required version to the applauncher,
+     * close the current instance of the client.
+     */
+    bool restartInCompatibilityMode(QnConnectInfoPtr connectInfo);
+
+    bool sendCommandToLauncher(const QString &version, const QStringList &arguments);
 private slots:
     void updateAcceptibility();
     void updateFocus();
@@ -80,6 +89,8 @@ private:
      * @brief m_foundEcs    Hash list of automatically found Enterprise Controllers based on seed as key.
      */
     QMultiHash<QString, QUrl> m_foundEcs;
+
+    bool m_restartPending;
 };
 
 #endif // LOGINDIALOG_H

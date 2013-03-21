@@ -1,12 +1,9 @@
 #include "compatibility.h"
 
-namespace
+QString stripVersion(const QString& version)
 {
-    QString stripVersion(const QString& version)
-    {
-        QStringList versionList = version.split(QLatin1Char('.'));
-        return QString(QLatin1String("%1.%2")).arg(versionList[0]).arg(versionList[1]);
-    }
+    QStringList versionList = version.split(QLatin1Char('.'));
+    return QString(QLatin1String("%1.%2")).arg(versionList[0]).arg(versionList[1]);
 }
 
 QnCompatibilityChecker::QnCompatibilityChecker(const QList<QnCompatibilityItem> compatiblityInfo)

@@ -10,6 +10,11 @@
 #define QN_ORGANIZATION_NAME        "${company.name}"
 #define QN_APPLICATION_NAME         "${product.title}"
 #define QN_APPLICATION_VERSION      "${release.version}.${buildNumber}"
+#ifdef _WIN32
+#define QN_PRODUCT_NAME             "${product.name}"
+#else
+#define QN_PRODUCT_NAME             "${namespace.additional}"
+#endif
 #define QN_ENGINE_VERSION           "${release.version}.${buildNumber}"
 #define QN_APPLICATION_REVISION     "${changeSet}"
 #define QN_APPLICATION_PLATFORM     "${platform}"
@@ -20,7 +25,11 @@
 #define QN_BOOST_VERSION            "${boost.version}"
 #define QN_CUSTOMIZATION_NAME       "${installer.customization}"
 #define QN_MEDIA_FOLDER_NAME        "${client.mediafolder.name}"
+#ifdef _WIN32
 #define QN_CLIENT_EXECUTABLE_NAME   "${product.name}.exe"
+#else
+#define QN_CLIENT_EXECUTABLE_NAME   "client-bin"
+#endif
 #define QN_LICENSING_MAIL_ADDRESS   "${company.license.address}"
 #define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
 #define QN_FREE_LICENSE_COUNT       ${freeLicenseCount}

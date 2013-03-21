@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QSettings>
 #include "progressive_downloading_server.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
@@ -112,7 +113,29 @@ public:
     QByteArray streamingFormat;
     CodecID videoCodec;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
+    //saving address and port in case socket will not make it to the destructor
+    QString foreignAddress;
+    unsigned short foreignPort;
+    bool terminated;
+    quint64 killTimerID;
+    QMutex mutex;
+
+    QnProgressiveDownloadingConsumerPrivate()
+    :
+        videoCodec( CODEC_ID_NONE ),
+        foreignPort( 0 ),
+        terminated( false ),
+        killTimerID( 0 )
+    {
+    }
 };
+
+static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
+static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
+static int DEFAULT_MAX_CONNECTION_LIVE_TIME_MS = 30*60;    //30 minutes
+static const int MS_PER_SEC = 1000;
+
+extern QSettings qSettings;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
@@ -121,10 +144,36 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
     d->socketTimeout = CONNECTION_TIMEOUT;
     d->streamingFormat = "webm";
     d->videoCodec = CODEC_ID_VP8;
+
+    d->foreignAddress = socket->getForeignAddress();
+    d->foreignPort = socket->getForeignPort();
+
+    NX_LOG( QString::fromLatin1("Established new progressive downloading session by %1:%2. Current session count %3").
+        arg(d->foreignAddress).arg(d->foreignPort).
+        arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
+
+    d->killTimerID = TimerManager::instance()->addTimer(
+        this,
+        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME_MS ).toUInt()*MS_PER_SEC );
 }
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
+    Q_D(QnProgressiveDownloadingConsumer);
+
+    NX_LOG( QString::fromLatin1("Progressive downloading session %1:%2 disconnected. Current session count %3").
+        arg(d->foreignAddress).arg(d->foreignPort).
+        arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
+
+    quint64 killTimerID = 0;
+    {
+        QMutexLocker lk( &d->mutex );
+        killTimerID = d->killTimerID;
+        d->killTimerID = 0;
+    }
+    if( killTimerID )
+        TimerManager::instance()->joinAndDeleteTimer( killTimerID );
+
     stop();
 }
 
@@ -335,7 +384,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         //dataConsumer.sendResponse();
         dataConsumer.start();
-        while (dataConsumer.isRunning() && d->socket->isConnected())
+        while (dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated)
             readRequest(); // just reading socket to determine client connection is closed
         dataConsumer.pleaseStop();
 
@@ -347,6 +396,16 @@ void QnProgressiveDownloadingConsumer::run()
     }
 
     d->socket->close();
+}
+
+void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )
+{
+    Q_D(QnProgressiveDownloadingConsumer);
+
+    QMutexLocker lk( &d->mutex );
+    d->terminated = true;
+    d->killTimerID = 0;
+    pleaseStop();
 }
 
 int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
