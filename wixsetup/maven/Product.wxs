@@ -807,7 +807,7 @@
 
 								<Directory Id="styles" Name="styles">
 									<Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-										<File Id="bespin$(var.suffix).dll_1_4" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
+										<File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
 									</Component>
 								</Directory>
 
@@ -904,7 +904,7 @@
 
 								<Directory Id="styles_1_4" Name="styles">
 									<Component Id="bespin_1_4" Guid="{54b3dc36-52e5-4185-9f89-05e61cec5b94}">
-										<File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
+										<File Id="bespin$(var.suffix).dll_1_4" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
 									</Component>
 								</Directory>
 
@@ -917,7 +917,7 @@
 								</Directory>							
 
 								<Component Id="ClientExecutable_1_4" Guid="{5a883bac-6ae3-46d7-b0c5-ea03cf41be33}">
-									<File Id="client.exe_1_4" Name="${product.name}.exe" Source="${project.build.directory}/bin/${build.configuration}/1.4/${customization}_1_4.exe" KeyPath="yes">
+									<File Id="client.exe_1_4" Name="${product.name}.exe" Source="${project.build.directory}/1.4/bin/client.exe" KeyPath="yes">
 										<fire:FirewallException Id="FirewallExceptionClient_1_4" Name="${product.name} 1.4" Scope="any" IgnoreFailure="yes"/>
 									</File>
 								</Component>
