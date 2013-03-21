@@ -97,7 +97,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->codec_id = m_codecId;
     m_encoderCtx->width = m_resolution.width();
     m_encoderCtx->height = m_resolution.height();
-    m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
+    m_encoderCtx->pix_fmt = m_codecId == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
     if (m_bitrate == -1)

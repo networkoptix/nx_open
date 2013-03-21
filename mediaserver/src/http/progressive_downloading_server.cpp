@@ -140,6 +140,8 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
         return "video/3gp";
     else if (streamingFormat == "rtp")
         return "video/3gp";
+    else if (streamingFormat == "mpjpeg")
+        return "multipart/x-mixed-replace;boundary=--ffserver";
     else 
         return QByteArray();
 }
@@ -158,6 +160,8 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
         d->videoCodec = CODEC_ID_MPEG4;
     else if (streamingFormat == "rtp")
         d->videoCodec = CODEC_ID_MPEG4;
+    else if (streamingFormat == "mpjpeg")
+        d->videoCodec = CODEC_ID_MJPEG;
 }
 
 void QnProgressiveDownloadingConsumer::run()
