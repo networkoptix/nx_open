@@ -108,7 +108,7 @@
        <item row="3" column="0">
         <widget class="QLabel" name="simpleSignatureLabel">
          <property name="text">
-          <string>&amp;Signature</string>
+          <string>&amp;Signature:</string>
          </property>
          <property name="buddy">
           <cstring>simpleSignatureTextEdit</cstring>
@@ -456,6 +456,7 @@
  <tabstops>
   <tabstop>simpleEmailLineEdit</tabstop>
   <tabstop>simplePasswordLineEdit</tabstop>
+  <tabstop>simpleSignatureTextEdit</tabstop>
   <tabstop>serverLineEdit</tabstop>
   <tabstop>portComboBox</tabstop>
   <tabstop>userLineEdit</tabstop>
@@ -463,10 +464,11 @@
   <tabstop>tlsRadioButton</tabstop>
   <tabstop>sslRadioButton</tabstop>
   <tabstop>unsecuredRadioButton</tabstop>
-  <tabstop>okTestButton</tabstop>
-  <tabstop>cancelTestButton</tabstop>
+  <tabstop>signatureTextEdit</tabstop>
   <tabstop>advancedCheckBox</tabstop>
   <tabstop>testButton</tabstop>
+  <tabstop>okTestButton</tabstop>
+  <tabstop>cancelTestButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
