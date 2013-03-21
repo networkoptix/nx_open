@@ -201,13 +201,17 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     /* Add tree-local actions to the menu. */
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: implement with action parameters
-    
+
     if(currentItemView() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
         manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
     } else {
         manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
     }
+
+    /* Do not show 'Rename' on the recorder when it contains only one camera. */
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) == Qn::RecorderNode)
+        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
 
     if(menu->isEmpty())
         return;

@@ -722,7 +722,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
             return tr("Recording or motion detection is disabled for %1")
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
-                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
+                         : tr("%1 of %n cameras", "...for", cameras.size()).arg(invalid));
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());

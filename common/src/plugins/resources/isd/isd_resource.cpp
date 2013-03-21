@@ -48,11 +48,6 @@ bool QnPlIsdResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlIsdResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlIsdResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);

@@ -61,7 +61,14 @@ bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
-    setUrl(ip);
+    QUrl currentValue(getUrl());
+    if (currentValue.scheme().isEmpty()) {
+        setUrl(ip);
+    }
+    else {
+        currentValue.setHost(ip);
+        setUrl(currentValue.toString());
+    }
     return (domain == QnDomainMemory);
 }
 
