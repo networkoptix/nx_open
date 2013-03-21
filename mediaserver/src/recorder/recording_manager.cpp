@@ -215,8 +215,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 {
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
 
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline)
+    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline)
     {
         if (providerHi)
         {
@@ -232,7 +233,6 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         }
 
         if (providerLow) {
-            QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
