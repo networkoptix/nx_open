@@ -45,7 +45,7 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     if (m_maxStream == 0)
         m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
     int consumerCount = 0;
-    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode);
+    m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode, !m_thumbnailsMode);
     m_ignoreNextSeek = consumerCount > 1;
     m_noDataCounter = 0;
     return m_isOpened;
@@ -150,8 +150,10 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         }
 
         if (m_thumbnailsMode) {
-            if (getTimer.elapsed() > MAX_FRAME_DURATION*2)
-                return result; // tell error
+            if (getTimer.elapsed() > MAX_FRAME_DURATION*2) {
+                m_ThumbnailsSeekPoints.clear();
+                break; // tell error
+            }
         }
         else {
             if (getTimer.elapsed() > EMPTY_PACKET_REPEAT_INTERVAL) {

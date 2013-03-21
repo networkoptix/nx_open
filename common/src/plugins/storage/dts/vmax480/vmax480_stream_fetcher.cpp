@@ -273,7 +273,6 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     if (mediaData->opaque != m_sequence)
         return;
 
-    mediaData->opaque = 0;
     m_lastMediaTime = mediaData->timestamp;
     if (m_emptyPacketTime == 0)
         m_emptyPacketTime = m_lastMediaTime;
@@ -286,12 +285,6 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     QTime t;
     t.restart();
-
-    qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);
-    if (newTime != mediaData->timestamp) {
-        if (newTime != DATETIME_NOW && newTime != -1)
-            m_vmaxConnection->vMaxArchivePlay(newTime, ++m_sequence, m_lastSpeed);
-    }
 
     bool needWait = false;
     int maxQueueSize = 0;
@@ -310,6 +303,21 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     {
         QMutexLocker lock(&m_mutex);
+
+        if (mediaData->opaque != m_sequence)
+            return;
+        mediaData->opaque = 0;
+
+#if 1
+        qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);
+        if (newTime != mediaData->timestamp && newTime != DATETIME_NOW && newTime != -1) 
+        {
+            qDebug() << "outofplayback. srcTime=" << QDateTime::fromMSecsSinceEpoch(mediaData->timestamp/1000).toString(lit("dd/MM/yyyy hh:mm:ss"));
+            qDebug() << "outofplayback. roundTime=" << QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(lit("dd/MM/yyyy hh:mm:ss"));
+            m_vmaxConnection->vMaxArchivePlay(newTime, ++m_sequence, m_lastSpeed);
+            return;
+        }
+#endif
 
         qint64 ct = qnSyncTime->currentUSecsSinceEpoch();
         m_lastChannelTime[ch] = ct;
@@ -333,7 +341,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     }
 }
 
-bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count, bool openAllChannels)
+bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count, bool openAllChannels, bool checkPlaybackMask)
 {
     if (!safeOpen())
         return false;
@@ -353,7 +361,8 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         m_vmaxConnection->vMaxAddChannel(1 << channel);
         m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
     }
-    updatePlaybackMask();
+    if (checkPlaybackMask)
+        updatePlaybackMask();
     return true;
 }
 
