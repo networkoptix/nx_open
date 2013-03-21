@@ -26,7 +26,7 @@ namespace QJson {
     bool deserialize(const QVariant &value, T *target);
 
     template<class T>
-    bool deserialize(const QVariantMap &map, const char *key, T *target);
+    bool deserialize(const QVariantMap &map, const char *key, T *target, bool optional = false);
 
 } // namespace QJson
 
@@ -176,7 +176,7 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(const QVariantMap &map, const char *key, T *target, bool optional = false) {
+    bool deserialize(const QVariantMap &map, const char *key, T *target, bool optional) {
         QVariantMap::const_iterator pos = map.find(QLatin1String(key));
         if(pos == map.end()) {
             return optional;
