@@ -6,6 +6,8 @@
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
@@ -168,8 +170,8 @@ namespace QJson {
     // TODO: #Elric this function is picked up when deserialize(const QString &, T *)
     // is invoked, which is confusing. QVariant's conversion constructor must
     // be forbidden for this function.
-    template<class T>
-    bool deserialize(const QVariant &value, T *target) {
+    template<class T, class QVariant>
+    bool deserialize(const QVariant &value, T *target, typename boost::enable_if<boost::is_same<QVariant, ::QVariant> >::type * = 0) {
         assert(target);
 
         return QJson_detail::deserialize_value(value, target);
