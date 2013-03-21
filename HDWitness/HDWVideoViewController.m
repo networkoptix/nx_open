@@ -26,6 +26,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    NSURL *url = [NSURL URLWithString:@"http://admin:admin@10.0.2.133:81/videostream.cgi"];
+//    NSURL *url = [NSURL URLWithString:@"http://10.0.2.187:3451/media/00-1C-A6-01-21-97.mpjpeg"];
+    
+    self.motionJpegImageView.url = url;
+    [self.motionJpegImageView play];
 	// Do any additional setup after loading the view.
 }
 

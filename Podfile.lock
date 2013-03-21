@@ -1,11 +1,18 @@
 
-COCOAPODS: 0.16.1
+DEPENDENCIES: 
+- AFNetworking (= 1.1)
+- AZSocketIO (= 0.0.4)
 
-PODS: 
-- AFNetworking (1.0)
+COCOAPODS: 0.16.4
 
 SPEC CHECKSUMS: 
-  AFNetworking: 204f4b3d3a3ea7b38737c3fbf2646ba8c9719eea
+  SocketRocket: bca43a94bd9aac3a629df42c06843402399ee67b
+  AZSocketIO: 858a188c54067baccb264d957f70a1217f4a3369
+  AFNetworking: 761a418233d280c1e0580bcb76ff9cb4c3073d17
 
-DEPENDENCIES: 
-- AFNetworking (= 1.0)
+PODS: 
+- AFNetworking (1.1.0)
+- AZSocketIO (0.0.4): 
+  - AFNetworking
+  - SocketRocket
+- SocketRocket (0.2.0)

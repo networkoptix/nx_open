@@ -11,9 +11,9 @@
 @implementation HDWECSConfig
 + (HDWECSConfig*) initDefault {
     HDWECSConfig* instance = [[HDWECSConfig alloc] init];
-    instance.name = @"Mono";
-    instance.host = @"10.0.2.103";
-    instance.port = @"7000";
+    instance.name = @"Womac";
+    instance.host = @"10.0.2.180";
+    instance.port = @"7001";
     instance.login = @"admin";
     instance.password = @"123";
     

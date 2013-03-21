@@ -111,7 +111,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        NSDate *object = _objects[indexPath.row];
+        HDWECSConfig *object = _objects[indexPath.row];
         self.detailViewController.ecsConfig = object;
     }
 }
@@ -120,7 +120,7 @@
 {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        NSDate *object = _objects[indexPath.row];
+        HDWECSConfig *object = _objects[indexPath.row];
         [[segue destinationViewController] setEcsConfig:object];
     }
 }

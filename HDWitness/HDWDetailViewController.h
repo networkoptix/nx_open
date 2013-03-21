@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "HDWEcsConfig.h"
+#import "HDWCameraModel.h"
+#import "HDWVideoViewController.h"
 
 @interface HDWDetailViewController : UICollectionViewController <UISplitViewControllerDelegate>
 
-@property (strong, nonatomic) HDWECSConfig* ecsConfig;
-@property (strong, nonatomic) NSDictionary* servers;
-@property (strong, nonatomic) NSDictionary* cameras;
+@property (strong, nonatomic) HDWECSConfig *ecsConfig;
+@property (strong, nonatomic) HDWServersModel *servers;
 
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
+@property (strong, nonatomic) HDWVideoViewController *videoViewController;
 @end

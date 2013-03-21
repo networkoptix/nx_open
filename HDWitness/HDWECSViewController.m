@@ -51,7 +51,7 @@
             @"Property": @"host"
         },
         @{
-            @"Title" : @"Post",
+            @"Title" : @"Port",
             @"Placeholder": @"Port",
             @"Property": @"port"
         },

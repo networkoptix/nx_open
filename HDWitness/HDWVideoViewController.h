@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+#import "HDWCameraModel.h"
+#import "MotionJpegImageView.h"
+
 @interface HDWVideoViewController : UIViewController
+
+@property HDWCameraModel *camera;
+
+@property (weak, nonatomic) IBOutlet MotionJpegImageView *motionJpegImageView;
 
 @end
