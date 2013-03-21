@@ -636,7 +636,8 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
         {
             if (getName().isEmpty())
                 setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
-            setModel(QLatin1String(response.Model.c_str()));
+            if (getModel().isEmpty())
+                setModel(QLatin1String(response.Model.c_str()));
             setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
             hardwareId = QString::fromStdString(response.HardwareId);
 
