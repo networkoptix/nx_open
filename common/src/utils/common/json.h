@@ -6,6 +6,8 @@
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
@@ -14,21 +16,101 @@
 #include <QtCore/QMap>
 #include <QtCore/QHash>
 
+namespace QJson_detail {
+    void serialize_json(const QVariant &value, QByteArray *target);
+
+    bool deserialize_json(const QByteArray &value, QVariant *target);
+
+    template<class T>
+    void serialize_value(const T &value, QVariant *target);
+
+    template<class T>
+    bool deserialize_value(const QVariant &value, T *target);
+
+} // namespace QJson_detail
+
+
 namespace QJson {
+    /**
+     * Serializes the given value into intermediate JSON representation.
+     * 
+     * \param value                     Value to serialize.
+     * \param[out] target               Target intermediate JSON value, must not be NULL.
+     */
+    template<class T>
+    void serialize(const T &value, QVariant *target) {
+        assert(target);
+
+        QJson_detail::serialize_value(value, target);
+    }
 
     template<class T>
-    void serialize(const T &value, QVariant *target);
+    void serialize(const T &value, const char *key, QVariantMap *target) {
+        assert(target);
+
+        QJson::serialize(value, &(*target)[QLatin1String(key)]);
+    }
+
+    /**
+     * Serializes the given value into a JSON string.
+     * 
+     * \param value                     Value to serialize.
+     * \param[out] target               Target JSON string, must not be NULL.
+     */
+    template<class T>
+    void serialize(const T &value, QByteArray *target) {
+        assert(target);
+
+        QVariant variant;
+        QJson_detail::serialize_value(value, &variant);
+        QJson_detail::serialize_json(variant, target);
+    }
+
+    /**
+     * Deserializes the given intermediate representation of a JSON object.
+     * Note that <tt>boost::enable_if</tt> is used to prevent implicit conversions
+     * in the first argument.
+     * 
+     * \param value                     Intermediate JSON representation to deserialize.
+     * \param[out] target               Deserialization target, must not be NULL.
+     * \returns                         Whether the deserialization was successful.
+     */
+    template<class T, class QVariant>
+    bool deserialize(const QVariant &value, T *target, typename boost::enable_if<boost::is_same<QVariant, ::QVariant> >::type * = NULL) {
+        assert(target);
+
+        return QJson_detail::deserialize_value(value, target);
+    }
 
     template<class T>
-    void serialize(const T &value, const char *key, QVariantMap *target);
+    bool deserialize(const QVariantMap &map, const char *key, T *target, bool optional = false) {
+        QVariantMap::const_iterator pos = map.find(QLatin1String(key));
+        if(pos == map.end()) {
+            return optional;
+        } else {
+            return QJson::deserialize(*pos, target);
+        }
+    }
 
+    /**
+     * Deserializes a value from a JSON string.
+     * 
+     * \param value                     JSON string to deserialize.
+     * \param[out] target               Deserialization target, must not be NULL.
+     * \returns                         Whether the deserialization was successful.
+     */
     template<class T>
-    bool deserialize(const QVariant &value, T *target);
+    bool deserialize(const QByteArray &value, T *target) {
+        assert(target);
 
-    template<class T>
-    bool deserialize(const QVariantMap &map, const char *key, T *target);
+        QVariant variant;
+        if(!QJson_detail::deserialize_json(value, &variant))
+            return false;
+        return QJson_detail::deserialize_value(variant, target);
+    }
 
 } // namespace QJson
+
 
 namespace QJson_detail {
     void serialize_json(const QVariant &value, QByteArray *target);
@@ -148,63 +230,6 @@ namespace QJson_detail {
     }
 
 } // namespace QJson_detail
-
-
-namespace QJson {
-    template<class T>
-    void serialize(const T &value, QVariant *target) {
-        assert(target);
-
-        QJson_detail::serialize_value(value, target);
-    }
-
-    template<class T>
-    void serialize(const T &value, const char *key, QVariantMap *target) {
-        assert(target);
-
-        QJson::serialize(value, &(*target)[QLatin1String(key)]);
-    }
-
-    // TODO: #Elric this function is picked up when deserialize(const QString &, T *)
-    // is invoked, which is confusing. QVariant's conversion constructor must
-    // be forbidden for this function.
-    template<class T>
-    bool deserialize(const QVariant &value, T *target) {
-        assert(target);
-
-        return QJson_detail::deserialize_value(value, target);
-    }
-
-    template<class T>
-    bool deserialize(const QVariantMap &map, const char *key, T *target) {
-        QVariantMap::const_iterator pos = map.find(QLatin1String(key));
-        if(pos == map.end()) {
-            return false;
-        } else {
-            return QJson::deserialize(*pos, target);
-        }
-    }
-
-    template<class T>
-    void serialize(const T &value, QByteArray *target) {
-        assert(target);
-
-        QVariant variant;
-        QJson_detail::serialize_value(value, &variant);
-        QJson_detail::serialize_json(variant, target);
-    }
-
-    template<class T>
-    bool deserialize(const QByteArray &value, T *target) {
-        assert(target);
-
-        QVariant variant;
-        if(!QJson_detail::deserialize_json(value, &variant))
-            return false;
-        return QJson_detail::deserialize_value(variant, target);
-    }
-
-} // namespace QJson
 
 
 /* Free-standing (de)serialization functions are picked up via ADL by
