@@ -9,12 +9,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>1.4.2</version>
+        <version>1.4.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>1.4.2</version>
+    <version>1.4.3-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup</artifactId>
     <packaging>pom</packaging>
@@ -44,7 +44,7 @@
                         <configuration>
                             <files>
                                 <file>../build-${customization}.properties</file>
-                                <file>../build-environment/${arch}/libdir.properties</file>
+                                <file>../build_environment/${arch}/libdir.properties</file>
                                 <file>../appserver/setup/build/appserver-${arch}.properties</file>
                             </files>
                         </configuration>

@@ -39,11 +39,6 @@ bool QnPlAxisResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlAxisResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlAxisResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
@@ -125,6 +120,7 @@ void QnPlAxisResource::stopInputPortMonitoring()
         httpClient = m_inputPortHttpMonitor.begin()->second;
         m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
         lk.unlock();
+        httpClient->terminate();
         httpClient->scheduleForRemoval();
         lk.relock();
     }
@@ -261,6 +257,18 @@ bool QnPlAxisResource::readMotionInfo()
 bool QnPlAxisResource::initInternal()
 {
 
+    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
+    {
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
+        if (status == CL_HTTP_SUCCESS) {
+            QByteArray firmware;
+            http.readAll(firmware);
+            firmware = firmware.mid(firmware.indexOf('=')+1);
+            setFirmware(QString::fromUtf8(firmware));
+        }
+    }
+
     {
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
@@ -350,11 +358,11 @@ bool QnPlAxisResource::initInternal()
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
 
-    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
-
     initializeIOPorts( &http );
 
     initializePtz(&http);
+
+    // determin camera max resolution
 
     // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
     {
@@ -711,7 +719,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
         cl_log.log( QString::fromLatin1("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
             arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
 
@@ -728,7 +735,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
             arg(getUrl()).arg(QLatin1String(contentType)).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
 
@@ -743,7 +749,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
             arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
     if( !nx_http::ConstBufferRefType(contentType, boundaryStart-contentType.constData()).startsWith("boundary=") )
@@ -753,7 +758,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
             arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
-        httpClient->scheduleForRemoval();
         return;
     }
     boundaryStart += sizeof("boundary=")-1;
@@ -823,7 +827,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( inputPortCount > 0 )
-        setCameraCapability(Qn::relayInput, true);
+        setCameraCapability(Qn::RelayInputCapability, true);
 
     unsigned int outputPortCount = 0;
     status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
@@ -831,7 +835,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( outputPortCount > 0 )
-        setCameraCapability(Qn::relayOutput, true);
+        setCameraCapability(Qn::RelayOutputCapability, true);
 
     //reading port direction and names
     for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )
@@ -920,6 +924,7 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
     {
         if( it->second == httpClient )
         {
+            it->second->scheduleForRemoval();
             m_inputPortHttpMonitor.erase( it );
             return;
         }
@@ -937,7 +942,7 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-    m_ptzController.reset(new QnAxisPtzController(::toSharedPointer(this)));
+    m_ptzController.reset(new QnAxisPtzController(this));
     Qn::CameraCapabilities capabilities = m_ptzController->getCapabilities();
     if(capabilities == Qn::NoCapabilities)
         m_ptzController.reset();

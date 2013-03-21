@@ -9,7 +9,7 @@
 // -------------------------------------------------------------------------- //
 // QnOnvifPtzController
 // -------------------------------------------------------------------------- //
-QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
+QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource): 
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(0),
@@ -82,8 +82,23 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
-    m_capabilities = Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability; // TODO
+    m_capabilities |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability;
     m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
+
+    // TODO: #Elric make configurable
+    if(m_resource->getModel() == lit("FW3471-PS-E")) {
+        m_capabilities |= Qn::OctagonalPtzCapability;
+        m_capabilities &= ~Qn::AbsolutePtzCapability;
+    }
+    if(m_resource->getModel() == lit("FD8162")) {
+        m_capabilities = Qn::NoCapabilities;
+    }
+    if(m_resource->getModel() == lit("IPC-HDB3200C")) {
+        m_capabilities = Qn::NoCapabilities;
+    }
+    if(m_resource->getModel() == lit("DWC-MPTZ20X")) {
+        m_capabilities |= Qn::OctagonalPtzCapability;
+    }
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
@@ -121,6 +136,11 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
 
 int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity)
 {
+    QVector3D velocity = m_speedTransform * QVector3D(xVelocity, yVelocity, zoomVelocity);
+    xVelocity = velocity.x();
+    yVelocity = velocity.y();
+    zoomVelocity = velocity.z();
+
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
     _onvifPtz__ContinuousMove request;
@@ -252,5 +272,14 @@ const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper()
     return m_ptzMapper;
 }
 
+const QMatrix4x4 &QnOnvifPtzController::speedTransform() const 
+{
+    return m_speedTransform;
+}
+
+void QnOnvifPtzController::setSpeedTransform(const QMatrix4x4 &speedTransform) 
+{
+    m_speedTransform = speedTransform;
+}
 
 

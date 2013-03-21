@@ -13,15 +13,13 @@ namespace {
 QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(QnResourcePtr resource, QObject *parent):
     QnAbstractTimePeriodLoader(resource, parent),
     m_mutex(QMutex::Recursive)
-{
+{}
 
-}
-
-QnMultiCameraTimePeriodLoader* QnMultiCameraTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
+QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (resource);
     if (netRes == NULL)
-        return 0;
+        return NULL;
     return new QnMultiCameraTimePeriodLoader(netRes, parent);
 }
 
@@ -65,12 +63,12 @@ int QnMultiCameraTimePeriodLoader::loadInternal(QnNetworkResourcePtr networkReso
     if (itr != m_cache.end()) {
         loader = itr.value();
     } else {
-        loader = QnTimePeriodLoader::newInstance(networkResource);
+        loader = QnTimePeriodLoader::newInstance(networkResource, this);
         if (!loader)
             return -1;
+        
         connect(loader, SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
         connect(loader, SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
-
         m_cache.insert(networkResource, loader);
     }
     return loader->load(period, motionRegions);

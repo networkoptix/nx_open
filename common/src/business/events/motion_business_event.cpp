@@ -8,7 +8,7 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(
         ToggleState::Value toggleState,
         qint64 timeStamp,
         QnAbstractDataPacketPtr metadata):
-    base_type(BusinessEventType::BE_Camera_Motion,
+    base_type(BusinessEventType::Camera_Motion,
                             resource,
                             toggleState,
                             timeStamp),
@@ -18,7 +18,8 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(
 
 bool QnMotionBusinessEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled()
-            && camera->getMotionType() != Qn::MT_NoMotion;
+            && camera->getMotionType() != Qn::MT_NoMotion
+            && camera->supportedMotionType() != Qn::MT_NoMotion;
 
 }
 

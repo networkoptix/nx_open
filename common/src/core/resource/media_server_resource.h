@@ -1,10 +1,12 @@
 #ifndef QN_MEDIA_SERVER_RESOURCE_H
 #define QN_MEDIA_SERVER_RESOURCE_H
 
-#include "core/resource/resource.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/media_resource.h"
-#include "api/media_server_connection.h"
+#include <QtNetwork/QHostAddress>
+
+#include <api/media_server_connection.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/abstract_storage_resource.h>
 
 class QnLocalMediaServerResource : public QnResource
 {
@@ -70,6 +72,7 @@ public:
 
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
+    void determineOptimalNetIF_testProxy();
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
@@ -88,6 +91,7 @@ private:
     PanicMode m_panicMode;
     QString m_version;
     QMap<int, QString> m_runningIfRequests;
+    QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

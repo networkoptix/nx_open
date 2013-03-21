@@ -141,10 +141,19 @@ namespace Qn {
 
 
         /**
-         * Checks system health: licences, storages, email settings, etc
+         * Checks system health: licences, storages, email settings, etc.
          */
         CheckSystemHealthAction,
 
+        /**
+         * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
+         */
+        EscapeHotkeyAction,
+
+        /**
+         * Toggles visibility of popup windows.
+         */
+        TogglePopupsAction,
 
 
         /* Main menu actions. */

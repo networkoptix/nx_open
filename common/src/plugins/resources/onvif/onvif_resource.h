@@ -39,10 +39,6 @@ typedef onvifXsd__VideoSourceConfiguration VideoSource;
 class VideoOptionsLocal;
 
 //first = width, second = height
-const QSize EMPTY_RESOLUTION_PAIR(0, 0);
-const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
-
 
 class QDomElement;
 
@@ -110,7 +106,6 @@ public:
 
 
     virtual bool isResourceAccessible() override;
-    virtual bool updateMACAddress() override;
     virtual QString manufacture() const override;
 
     virtual int getMaxFps() override;
@@ -169,7 +164,7 @@ public:
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
-    const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
@@ -185,8 +180,6 @@ public:
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
-    virtual void setUrl(const QString &url) override;
-    virtual int getChannel() const override;
     int getMaxChannels() const;
 
     void updateToChannel(int value);
@@ -204,7 +197,7 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
-        QnResourcePtr resource,
+        const QnResourcePtr &resource,
         const QString& inputPortID,
         bool value,
         qint64 timestamp);
@@ -247,12 +240,8 @@ private:
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
 
-    void save();
-
     int round(float value);
     QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
-    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList);
-    static float getResolutionAspectRatio(const QSize& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
@@ -396,7 +385,6 @@ private:
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;
-    int m_channelNumer; // video/audio source number
     int m_maxChannels;
 	
     bool createPullPointSubscription();

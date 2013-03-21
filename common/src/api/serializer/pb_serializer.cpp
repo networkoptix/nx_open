@@ -55,7 +55,7 @@ QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
     return addListStrings.join(QLatin1String(";"));
 }
 
-QHostAddress stringToAddr(const QString& hostStr)
+static QHostAddress stringToAddr(const QString& hostStr)
 {
     return QHostAddress(hostStr);
 }
@@ -115,6 +115,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
 
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
+
+    camera->setGroupId(QString::fromUtf8(pb_camera.groupid().c_str()));
+    camera->setGroupName(QString::fromUtf8(pb_camera.groupname().c_str()));
 
     if (pb_camera.has_region())
     {
@@ -222,6 +225,8 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
             parameters["name"] = QString::fromUtf8(pb_storage.name().c_str());
             parameters["url"] = QString::fromUtf8(pb_storage.url().c_str());
             parameters["spaceLimit"] = QString::number(pb_storage.spacelimit());
+            if(pb_storage.has_usedforwriting())
+                parameters["usedForWriting"] = QString::number(pb_storage.usedforwriting());
 
             QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters); // TODO: #Ivan no types in pool => crash
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
@@ -372,6 +377,7 @@ void parseBusinessRules(QnBusinessEventRules& businessRules, const PbBusinessRul
         businessRules.append(businessRule);
     }
 }
+} // namespace {}
 
 void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraResourcePtr& cameraPtr)
 {
@@ -396,6 +402,8 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
     pb_camera.set_manuallyadded(cameraPtr->isManuallyAdded());
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
+    pb_camera.set_groupid(cameraPtr->getGroupId().toUtf8().constData());
+    pb_camera.set_groupname(cameraPtr->getGroupName().toUtf8().constData());
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys())
@@ -438,41 +446,46 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 
 int serializeBusinessActionType(BusinessActionType::Value value) {
     switch(value) {
-        case BusinessActionType::BA_NotDefined:         return pb::NotDefinedAction;
-        case BusinessActionType::BA_CameraOutput:       return pb::CameraOutput;
-        case BusinessActionType::BA_Bookmark:           return pb::Bookmark;
-        case BusinessActionType::BA_CameraRecording:    return pb::CameraRecording;
-        case BusinessActionType::BA_PanicRecording:     return pb::PanicRecording;
-        case BusinessActionType::BA_SendMail:           return pb::SendMail;
-        case BusinessActionType::BA_Alert:              return pb::Alert;
-        case BusinessActionType::BA_ShowPopup:          return pb::ShowPopup;
+        case BusinessActionType::NotDefined:         return pb::NotDefinedAction;
+        case BusinessActionType::CameraOutput:       return pb::CameraOutput;
+        case BusinessActionType::Bookmark:           return pb::Bookmark;
+        case BusinessActionType::CameraRecording:    return pb::CameraRecording;
+        case BusinessActionType::PanicRecording:     return pb::PanicRecording;
+        case BusinessActionType::SendMail:           return pb::SendMail;
+        case BusinessActionType::Alert:              return pb::Alert;
+        case BusinessActionType::ShowPopup:          return pb::ShowPopup;
     }
     return pb::NotDefinedAction;
 }
 
 int serializeBusinessEventType(BusinessEventType::Value value) {
-    if (int userEvent = value - BusinessEventType::BE_UserDefined >= 0)
+    int userEvent = value - BusinessEventType::UserDefined;
+    if (userEvent >= 0)
         return (pb::UserDefinedEvent + userEvent);
 
+    int healthMessage = value - BusinessEventType::SystemHealthMessage;
+    if (healthMessage >= 0)
+        return (pb::SystemHealthMessage + healthMessage);
+
     switch(value) {
-        case BusinessEventType::BE_NotDefined:          return pb::NotDefinedEvent;
-        case BusinessEventType::BE_Camera_Motion:       return pb::Camera_Motion;
-        case BusinessEventType::BE_Camera_Input:        return pb::Camera_Input;
-        case BusinessEventType::BE_Camera_Disconnect:   return pb::Camera_Disconnect;
-        case BusinessEventType::BE_Storage_Failure:     return pb::Storage_Failure;
-        case BusinessEventType::BE_Network_Issue:       return pb::Network_Issue;
-        case BusinessEventType::BE_Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
-        case BusinessEventType::BE_MediaServer_Failure: return pb::MediaServer_Failure;
-        case BusinessEventType::BE_MediaServer_Conflict:return pb::MediaServer_Conflict;
-        default:
-            break;
+    case BusinessEventType::NotDefined:          return pb::NotDefinedEvent;
+    case BusinessEventType::Camera_Motion:       return pb::Camera_Motion;
+    case BusinessEventType::Camera_Input:        return pb::Camera_Input;
+    case BusinessEventType::Camera_Disconnect:   return pb::Camera_Disconnect;
+    case BusinessEventType::Storage_Failure:     return pb::Storage_Failure;
+    case BusinessEventType::Network_Issue:       return pb::Network_Issue;
+    case BusinessEventType::Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
+    case BusinessEventType::MediaServer_Failure: return pb::MediaServer_Failure;
+    case BusinessEventType::MediaServer_Conflict:return pb::MediaServer_Conflict;
+    default:
+        break;
     }
     return pb::NotDefinedEvent;
 }
 
 void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRulePtr& businessRulePtr)
 {
-    pb_businessRule.set_id(businessRulePtr->getId().toInt());
+    pb_businessRule.set_id(businessRulePtr->id());
 
     pb_businessRule.set_eventtype((pb::BusinessEventType) serializeBusinessEventType(businessRulePtr->eventType()));
     foreach(QnResourcePtr res, businessRulePtr->eventResources())
@@ -486,7 +499,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
 
     pb_businessRule.set_aggregationperiod(businessRulePtr->aggregationPeriod());
-    pb_businessRule.set_disabled(businessRulePtr->isDisabled());
+    pb_businessRule.set_disabled(businessRulePtr->disabled());
     pb_businessRule.set_comments(businessRulePtr->comments().toUtf8());
     pb_businessRule.set_schedule(businessRulePtr->schedule().toUtf8());
 }
@@ -536,38 +549,55 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
     }
 }
 
+void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
+{
+	// We can't remove it by now, as it's required in .proto
+    // Will remove it ocasionally.
+    pb_license.set_name("");
+    pb_license.set_hwid(""); 
+    pb_license.set_signature("");
+	/////////
+
+	pb_license.set_key(license->key().constData());
+	pb_license.set_cameracount(license->cameraCount());
+	pb_license.set_rawlicense(license->rawLicense().constData());
 }
 
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
-    if (int userEvent = pbValue - pb::UserDefinedEvent >= 0)
-        return BusinessEventType::Value(BusinessEventType::BE_UserDefined + userEvent);
+    int userEvent = pbValue - pb::UserDefinedEvent;
+    if (userEvent >= 0)
+        return BusinessEventType::Value(BusinessEventType::UserDefined + userEvent);
+
+    int healthMessage = pbValue - pb::SystemHealthMessage;
+    if (healthMessage >= 0)
+        return BusinessEventType::Value((BusinessEventType::SystemHealthMessage + healthMessage));
 
     switch(pbValue) {
-        case pb::NotDefinedEvent:       return BusinessEventType::BE_NotDefined;
-        case pb::Camera_Motion:         return BusinessEventType::BE_Camera_Motion;
-        case pb::Camera_Input:          return BusinessEventType::BE_Camera_Input;
-        case pb::Camera_Disconnect:     return BusinessEventType::BE_Camera_Disconnect;
-        case pb::Storage_Failure:       return BusinessEventType::BE_Storage_Failure;
-        case pb::Network_Issue:         return BusinessEventType::BE_Network_Issue;
-        case pb::Camera_Ip_Conflict:    return BusinessEventType::BE_Camera_Ip_Conflict;
-        case pb::MediaServer_Failure:   return BusinessEventType::BE_MediaServer_Failure;
-        case pb::MediaServer_Conflict:  return BusinessEventType::BE_MediaServer_Conflict;
+    case pb::NotDefinedEvent:       return BusinessEventType::NotDefined;
+    case pb::Camera_Motion:         return BusinessEventType::Camera_Motion;
+    case pb::Camera_Input:          return BusinessEventType::Camera_Input;
+    case pb::Camera_Disconnect:     return BusinessEventType::Camera_Disconnect;
+    case pb::Storage_Failure:       return BusinessEventType::Storage_Failure;
+    case pb::Network_Issue:         return BusinessEventType::Network_Issue;
+    case pb::Camera_Ip_Conflict:    return BusinessEventType::Camera_Ip_Conflict;
+    case pb::MediaServer_Failure:   return BusinessEventType::MediaServer_Failure;
+    case pb::MediaServer_Conflict:  return BusinessEventType::MediaServer_Conflict;
     }
-    return BusinessEventType::BE_NotDefined;
+    return BusinessEventType::NotDefined;
 }
 
 BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     switch (pbValue) {
-        case pb::NotDefinedAction:  return BusinessActionType::BA_NotDefined;
-        case pb::CameraOutput:      return BusinessActionType::BA_CameraOutput;
-        case pb::Bookmark:          return BusinessActionType::BA_Bookmark;
-        case pb::CameraRecording:   return BusinessActionType::BA_CameraRecording;
-        case pb::PanicRecording:    return BusinessActionType::BA_PanicRecording;
-        case pb::SendMail:          return BusinessActionType::BA_SendMail;
-        case pb::Alert:             return BusinessActionType::BA_Alert;
-        case pb::ShowPopup:         return BusinessActionType::BA_ShowPopup;
+        case pb::NotDefinedAction:  return BusinessActionType::NotDefined;
+        case pb::CameraOutput:      return BusinessActionType::CameraOutput;
+        case pb::Bookmark:          return BusinessActionType::Bookmark;
+        case pb::CameraRecording:   return BusinessActionType::CameraRecording;
+        case pb::PanicRecording:    return BusinessActionType::PanicRecording;
+        case pb::SendMail:          return BusinessActionType::SendMail;
+        case pb::Alert:             return BusinessActionType::Alert;
+        case pb::ShowPopup:         return BusinessActionType::ShowPopup;
     }
-    return BusinessActionType::BA_NotDefined;
+    return BusinessActionType::NotDefined;
 }
 
 
@@ -665,6 +695,7 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
     }
 
     licenses.setHardwareId(pb_licenses.hwid().c_str());
+    licenses.setOldHardwareId(pb_licenses.oldhardwareid().c_str());
     parseLicenses(licenses, pb_licenses.license());
 }
 
@@ -776,11 +807,19 @@ void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray
     pb::Licenses pb_licenses;
 
     pb::License& pb_license = *(pb_licenses.add_license());
-    pb_license.set_name(license->name().toUtf8().constData());
-    pb_license.set_key(license->key().constData());
-    pb_license.set_cameracount(license->cameraCount());
-    pb_license.set_hwid(license->hardwareId().constData());
-    pb_license.set_signature(license->signature().constData());
+    serializeLicense_i(pb_license, license);
+
+    std::string str;
+    pb_licenses.SerializeToString(&str);
+    data = QByteArray(str.data(), (int) str.length());
+}
+
+void QnApiPbSerializer::serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data)
+{
+    pb::Licenses pb_licenses;
+
+    foreach(QnLicensePtr license, licenses)
+        serializeLicense_i(*pb_licenses.add_license(), license);
 
     std::string str;
     pb_licenses.SerializeToString(&str);
@@ -817,6 +856,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
             pb_storage.set_name(storagePtr->getName().toUtf8().constData());
             pb_storage.set_url(storagePtr->getUrl().toUtf8().constData());
             pb_storage.set_spacelimit(storagePtr->getSpaceLimit());
+            pb_storage.set_usedforwriting(storagePtr->isUsedForWriting());
         }
     }
 
@@ -913,9 +953,11 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &busi
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data)
 {
     pb::Emails pb_emails;
+    pb_emails.set_timeout(timeout);
+
     pb::Email& email = *(pb_emails.add_email());
 
     foreach (const QString& addr, to)
@@ -1018,17 +1060,38 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
     }
 }
 
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
+// TODO: #Ivan. Temporary code
+QByteArray combineV1LicenseBlock(const QString& name, const QString& serial, const QString& hwid, int count, const QString& signature)
 {
-    QnLicensePtr rawLicense = QnLicensePtr(new QnLicense(
-                            QString::fromUtf8(pb_license.name().c_str()),
-                            pb_license.key().c_str(),
-                            pb_license.cameracount(),
-                            pb_license.hwid().c_str(),
-                            pb_license.signature().c_str()
-                            ));
+	return (QString() +
+		QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
+		QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
+		QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
+        QLatin1String("COUNT=") + QString::number(count) + QLatin1String("\n") +
+		QLatin1String("SIGNATURE=") + signature).toUtf8();
+}
 
-    license = rawLicense->isValid() ? rawLicense : QnLicensePtr();
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& hardwareId, const QByteArray& oldHardwareId)
+{
+	if (!pb_license.rawlicense().empty()) {
+		license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
+		return;
+	}
+
+	// TODO: #Ivan. Temporary code
+	QByteArray block;
+	
+	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+	if (QnLicense(block).isValid(hardwareId)) {
+		license = QnLicensePtr(new QnLicense(block));
+		return;
+	}
+
+	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+	if (QnLicense(block).isValid(oldHardwareId)) {
+		license = QnLicensePtr(new QnLicense(block));
+		return;
+	}
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
@@ -1051,7 +1114,7 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
 
     QnResourceList eventResources;
     for (int i = 0; i < pb_businessRule.eventresource_size(); i++) {
-        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i));
+        QnResourcePtr resource = qnResPool->getResourceById(pb_businessRule.eventresource(i), QnResourcePool::rfAllResources);
         if (resource)
             eventResources << resource;
         else
@@ -1107,7 +1170,9 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 
         QnLicensePtr license;
         // Parse license and validate its signature
-        parseLicense(license, pb_license);
+		if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
+			parseLicense(license, pb_license, licenses.hardwareId(), licenses.oldHardwareId());
+
         // Verify that license is valid and for our hardwareid
         if (license)
             licenses.append(license);

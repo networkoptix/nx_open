@@ -3,24 +3,10 @@
 
 #include "instant_business_event.h"
 
-namespace QnBusiness {
-
-    enum EventReason {
-        NoReason,
-        NetworkIssueNoFrame,
-        NetworkIssueRtpPacketLoss,
-        MServerIssueTerminated,
-        MServerIssueStarted,
-        StorageIssueIoError,
-        StorageIssueNotEnoughSpeed
-    };
-
-}
-
 namespace QnBusinessEventRuntime {
 
-    int getReasonCode(const QnBusinessParams &params);
-    void setReasonCode(QnBusinessParams* params, int value);
+    QnBusiness::EventReason getReasonCode(const QnBusinessParams &params);
+    void setReasonCode(QnBusinessParams* params, QnBusiness::EventReason value);
 
     QString getReasonText(const QnBusinessParams &params);
     void setReasonText(QnBusinessParams* params, QString value);
@@ -33,12 +19,12 @@ public:
     explicit QnReasonedBusinessEvent(const BusinessEventType::Value eventType,
                                      const QnResourcePtr& resource,
                                      const qint64 timeStamp,
-                                     const int reasonCode,
+                                     const QnBusiness::EventReason reasonCode,
                                      const QString& reasonText = QString());
 
     virtual QnBusinessParams getRuntimeParams() const override;
 protected:
-    int m_reasonCode;
+    QnBusiness::EventReason m_reasonCode;
     QString m_reasonText;
 };
 

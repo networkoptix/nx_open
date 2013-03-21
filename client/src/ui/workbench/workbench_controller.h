@@ -53,7 +53,9 @@ class QnScreenRecorder;
  * This class implements default scene manipulation logic.
  */
 class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected QnGeometry {
-    Q_OBJECT;
+    Q_OBJECT
+
+    typedef QObject base_type;
 
 public:
     /**
@@ -112,6 +114,9 @@ protected:
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
 
+    void showOverlayLabel(const QString &text, int width);
+    void initOverlayLabelAnimation();
+
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -162,6 +167,7 @@ protected slots:
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
     void at_recordingAction_triggered(bool checked);
+    void at_toggleTourModeAction_triggered(bool checked);
     void at_fitInViewAction_triggered();
     void at_checkFileSignatureAction_triggered();
 
@@ -272,10 +278,10 @@ private:
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
-    QLabel *m_recordingLabel;
+    QLabel *m_overlayLabel;
 
     /** Animation for screen recording countdown. */
-    QPropertyAnimation *m_recordingAnimation;
+    QPropertyAnimation *m_overlayLabelAnimation;
 
 };
 

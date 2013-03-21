@@ -1,3 +1,6 @@
+
+#include <QMutexLocker>
+
 #include "server_archive_delegate.h"
 #include "core/resource_managment/resource_pool.h"
 #include "utils/common/util.h"
@@ -19,7 +22,8 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_afterSeek(false),
     //m_sendMotion(false),
     m_eof(false),
-    m_quality(MEDIA_Quality_High)
+    m_quality(MEDIA_Quality_High),
+    m_mutex( QMutex::Recursive )    //just to be sure no callback can occur and block
 {
     m_flags |= Flag_CanSendMotion;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
@@ -35,6 +39,8 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 
 qint64 QnServerArchiveDelegate::startTime()
 {
+    QMutexLocker lk( &m_mutex );
+
     if (m_catalogHi && m_catalogHi->minTime() != (qint64)AV_NOPTS_VALUE)
     {
         if (m_catalogLow && m_catalogLow->minTime() != (qint64)AV_NOPTS_VALUE)
@@ -52,6 +58,8 @@ qint64 QnServerArchiveDelegate::startTime()
 
 qint64 QnServerArchiveDelegate::endTime()
 {
+    QMutexLocker lk( &m_mutex );
+
     if (m_catalogHi)
     {
         if (m_catalogLow)
@@ -70,6 +78,8 @@ qint64 QnServerArchiveDelegate::endTime()
 
 bool QnServerArchiveDelegate::open(QnResourcePtr resource)
 {
+    QMutexLocker lk( &m_mutex );
+
     if (m_opened)
         return true;
     m_resource = resource;
@@ -87,6 +97,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
 
 void QnServerArchiveDelegate::close()
 {
+    QMutexLocker lk( &m_mutex );
+
     m_currentChunkCatalog.clear();
     m_aviDelegate->close();
     m_catalogHi.clear();
@@ -174,6 +186,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
 qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    QMutexLocker lk( &m_mutex );
+
     //m_tmpData.clear();
     // change time by playback mask
     m_eof = false;
@@ -195,6 +209,8 @@ DeviceFileCatalog::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr
 
 bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
 {
+    QMutexLocker lk( &m_mutex );
+
     if (m_currentChunk.durationMs == -1)
         m_currentChunkCatalog->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
     if (m_currentChunk.durationMs == -1) {
@@ -209,6 +225,8 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
 {
+    QMutexLocker lk( &m_mutex );
+
     if (m_eof)
         return QnAbstractMediaDataPtr();
 
@@ -317,27 +335,37 @@ begin_label:
 
 QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnection(int channel)
 {
+    QMutexLocker lk( &m_mutex );
+
     return QnMotionHelper::instance()->createConnection(m_resource, channel);
 }
 
 QnResourceVideoLayout* QnServerArchiveDelegate::getVideoLayout()
 {
+    QMutexLocker lk( &m_mutex );
+
     return m_aviDelegate->getVideoLayout();
 }
 
 QnResourceAudioLayout* QnServerArchiveDelegate::getAudioLayout()
 {
+    QMutexLocker lk( &m_mutex );
+
     return m_aviDelegate->getAudioLayout();
 }
 
 void QnServerArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
+    QMutexLocker lk( &m_mutex );
+
     m_reverseMode = value;
     m_aviDelegate->onReverseMode(displayTime, value);
 }
 
 AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
 {
+    QMutexLocker lk( &m_mutex );
+
     m_selectedAudioChannel = num;
     return m_aviDelegate->setAudioChannel(num);
 }
@@ -367,6 +395,8 @@ void QnServerArchiveDelegate::setSendMotion(bool value)
 
 bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
+    QMutexLocker lk( &m_mutex );
+
     return setQualityInternal(quality, fastSwitch, m_lastPacketTime/1000 + 1, true);
 }
 

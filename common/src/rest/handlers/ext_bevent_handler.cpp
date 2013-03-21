@@ -77,13 +77,12 @@ int QnExternalBusinessEventHandler::executePost(const QString& path, const QnReq
     return executeGet(path, params, result, contentType);
 }
 
-QString QnExternalBusinessEventHandler::description(TCPSocket* tcpSocket) const
+QString QnExternalBusinessEventHandler::description(TCPSocket *) const
 {
-    Q_UNUSED(tcpSocket)
-    QString rez;
-    rez += QLatin1String("Process external business event\n");
-    rez += QLatin1String("<BR>Param <b>event_type</b> - eventType. supported values: 'MServerFailure', 'UserEvent'\n");
-    rez += QLatin1String("<BR>Param <b>res_id</b> - resource (media server or camera) uniq id\n");
-    rez += QLatin1String("<BR><b>Return</b> XML with error string or 'OK' message.\n");
-    return rez;
+    return QLatin1String(
+        "Process external business event\n"
+        "<BR>Param <b>event_type</b> - eventType. supported values: 'MServerFailure', 'UserEvent'\n"
+        "<BR>Param <b>res_id</b> - resource (media server or camera) uniq id\n"
+        "<BR><b>Return</b> XML with error string or 'OK' message.\n"
+    );
 }

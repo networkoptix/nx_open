@@ -101,8 +101,12 @@ private:
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
     void ptzUnzoom(QnMediaResourceWidget *widget);
-
+    void ptzUpdate(QnMediaResourceWidget *widget);
     void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant = false);
+
+    void processPtzClick(const QPointF &pos);
+    void processPtzDrag(const QRectF &rect);
+    void processPtzDoubleClick();
 
 private:
     struct PtzData {
@@ -131,6 +135,7 @@ private:
     bool m_isClick;
     bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
+    bool m_skipNextAction;
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;

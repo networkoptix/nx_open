@@ -80,12 +80,11 @@ QFileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
         return QFileInfoList();
 }
 
-qint64 QnQtFileStorageResource::getFileSize(const QString& fillName) const
+qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 {
-    Q_UNUSED(fillName)
+    Q_UNUSED(url)
 	return 0; // not implemented
 }
-
 
 bool QnQtFileStorageResource::isStorageAvailable()
 {

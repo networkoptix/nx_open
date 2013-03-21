@@ -7,8 +7,10 @@
 #include <licensing/license.h>
 
 #include <ui/models/resource_pool_model.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <utils/license_usage_helper.h>
 
 
 QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
@@ -19,7 +21,8 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
     m_motionUsed(false),
     m_dualStreamingUsed(false),
     m_licensesOk(true),
-    m_motionOk(true)
+    m_motionOk(true),
+    m_dtsOk(true)
 {
     ui->setupUi(this);
 
@@ -28,10 +31,11 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
 
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->motionLabel->setPalette(palette);
+    setWarningStyle(ui->motionLabel);
     ui->motionLabel->setVisible(false);
+
+    setWarningStyle(ui->dtsLabel);
+    ui->dtsLabel->setVisible(false);
 
     at_resourceModel_dataChanged();
 }
@@ -86,33 +90,26 @@ void QnExportCameraSettingsDialog::keyPressEvent(QKeyEvent *event) {
 void QnExportCameraSettingsDialog::at_resourceModel_dataChanged(){
     updateLicensesStatus();
     updateMotionStatus();
+    updateDtsStatus();
 }
 
 void QnExportCameraSettingsDialog::updateLicensesStatus(){
-    int alreadyActive = 0;
 
-    QnVirtualCameraResourceList cameras = getSelectedCameras();
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras)
-        if (!camera->isScheduleDisabled())
-            alreadyActive++;
+    QnLicenseUsageHelper helper(getSelectedCameras(), m_recordingEnabled);
 
-    // how many licensed will be used if OK clicked
-    int used = qnResPool->activeCameras() - alreadyActive;
-    if (m_recordingEnabled)
-        used += cameras.size();
-
-    // how many licenses do we have
-    int total = qnLicensePool->getLicenses().totalCameras();
 
     QPalette palette = this->palette();
-    if(used > total)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    m_licensesOk = helper.isValid();
+    if(!m_licensesOk)
+        setWarningStyle(&palette);
     ui->licenseLabel->setPalette(palette);
 
-    QString usageText = tr("%n license(s) will be used out of %1.", NULL, used).arg(total);
+    QString usageText =
+            tr("%n digital license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital()) +
+            QLatin1Char('\n') +
+            tr("%n analog  license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
     ui->licenseLabel->setText(usageText);
 
-    m_licensesOk = used <= total;
     updateOkStatus();
 }
 
@@ -137,6 +134,20 @@ void QnExportCameraSettingsDialog::updateMotionStatus(){
     updateOkStatus();
 }
 
+void QnExportCameraSettingsDialog::updateDtsStatus() {
+    m_dtsOk = true;
+
+    QnVirtualCameraResourceList cameras = getSelectedCameras();
+    foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+        if (camera->isDtsBased()) {
+            m_dtsOk = false;
+            break;
+        }
+    }
+    ui->dtsLabel->setVisible(!m_dtsOk);
+    updateOkStatus();
+}
+
 void QnExportCameraSettingsDialog::updateOkStatus(){
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_licensesOk && m_motionOk);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_licensesOk && m_motionOk && m_dtsOk);
 }

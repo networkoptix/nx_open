@@ -54,7 +54,7 @@ public:
 
     Qn::RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
 
-    virtual qint64 lastDisplayedTime(int channel) const override;
+    virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;
     virtual void unblockTimeValue(int channelNumber) const  override;
     virtual bool isTimeBlocked(int channelNumber) const override;
@@ -82,17 +82,23 @@ private:
     {
         QnGLRenderer* renderer;
         DecodedPictureToOpenGLUploader* uploader;
+        bool timestampBlocked;
+        qint64 forcedTimestampValue;
+        int framesSinceJump;
 
         RenderingTools()
         :
             renderer( NULL ),
-            uploader( NULL )
+            uploader( NULL ),
+            timestampBlocked( false ),
+            forcedTimestampValue( AV_NOPTS_VALUE ),
+            framesSinceJump( 0 )
         {
         }
     };
 
     /** Renderers that are used to render the channels. */
-    std::vector<RenderingTools> m_channelRenderers;
+    mutable std::vector<RenderingTools> m_channelRenderers;
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;

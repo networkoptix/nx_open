@@ -8,6 +8,11 @@ QnDroidControlPortListener::QnDroidControlPortListener(const QHostAddress& addre
 
 }
 
+QnDroidControlPortListener::~QnDroidControlPortListener()
+{
+    stop();
+}
+
 QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnDroidControlPortProcessor(clientSocket, owner);
@@ -30,7 +35,7 @@ QnDroidControlPortProcessor::QnDroidControlPortProcessor(TCPSocket* socket, QnTc
 void QnDroidControlPortProcessor::run()
 {
     Q_D(QnDroidControlPortProcessor);
-    while (!m_needStop)
+    while (!needToStop())
     {
         quint8 recvBuffer[1024*4];
         int readed = d->socket->recv(recvBuffer, sizeof(recvBuffer));

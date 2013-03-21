@@ -1,0 +1,19 @@
+ <assembly>
+	<id>windows-x86</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${libdir}/bin/${build.configuration}</directory>
+			<outputDirectory>/bin/${build.configuration}/${project.artifactId}</outputDirectory>
+			<includes>
+				<include>${artifactId}.exe</include>
+				<include>acs_*.dll</include>
+				<include>qtcore4.dll</include>
+				<include>pid.dat</include>
+			</includes>
+		</fileSet>			
+	</fileSets>
+</assembly>

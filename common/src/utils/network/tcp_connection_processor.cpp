@@ -5,10 +5,11 @@
 #include "err.h"
 
 #ifndef Q_OS_WIN
-#include <netinet/tcp.h>
+#   include <netinet/tcp.h>
 #endif
 
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
+
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
@@ -169,7 +170,7 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     QMutexLocker lock(&d->sockMutex);
-    while (!m_needStop && size > 0 && d->socket->isConnected())
+    while (!needToStop() && size > 0 && d->socket->isConnected())
     {
         int sended;
         if (d->ssl)
@@ -311,7 +312,7 @@ bool QnTCPConnectionProcessor::readRequest()
         
     }
 
-    while (!m_needStop && d->socket->isConnected())
+    while (!needToStop() && d->socket->isConnected())
     {
         int readed;
         if (d->ssl) 

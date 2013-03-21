@@ -17,30 +17,50 @@
                 "AXIS Q6035-E"
             ],
             "fromCamera": {
-                "x" : {
+                "x": {
                     "extrapolationMode": "PeriodicExtrapolation",
                     "logical":  [-1,   1],
                     "physical": [ 0, 360]
                 },
-                "y" : {
+                "y": {
                     "extrapolationMode": "ConstantExtrapolation",
-                    "logical":  [-0.5, 0.111],
-                    "physical": [ -90,    20]
+                    "logical":  [-0.5, 0.1111111111111],
+                    "physical": [ -90,              20]
                 },
-                "z" : {
+                "z": {
                     "extrapolationMode": "ConstantExtrapolation",
-                    "logical":  [   0,     1],
+                    "logical":  [    0,     1],
                     "physical": [35.25, 711.1]
                 }
             },
             "toCamera": {
-                "x" : null,
-                "y" : {
+                "y": {
                     "extrapolationMode": "ConstantExtrapolation",
                     "logical":  [-0.5, 0.0, 1.0],
                     "physical": [ -90, 0.0,  20]
+                }
+            }
+        },
+        {
+            "models": [
+                "DWC-MPTZ20X"
+            ],
+            "fromCamera": {
+                "x": {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [-1,   1],
+                    "physical": [ 0, 360]
                 },
-                "z" : null
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [  0,    1],
+                    "physical": [  0,  -90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [0.004167, 0.083333],
+                    "physical": [   35.25,    705.0]
+                }
             }
         }
     ]

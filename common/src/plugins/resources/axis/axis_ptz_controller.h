@@ -11,7 +11,7 @@ class QnAxisParameterMap;
 class QnAxisPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
-    QnAxisPtzController(const QnPlAxisResourcePtr &resource);
+    QnAxisPtzController(QnPlAxisResource* resource);
     virtual ~QnAxisPtzController();
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
@@ -29,7 +29,7 @@ private:
     bool query(const QString &request, QnAxisParameterMap *params) const;
 
 private:
-    QnPlAxisResourcePtr m_resource;
+    QnPlAxisResource* m_resource;
     Qn::CameraCapabilities m_capabilities;
     QnPtzSpaceMapper *m_spaceMapper;
 };

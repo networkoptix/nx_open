@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.4.2</version>
+		<version>1.4.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.4.2</version>
+	<version>1.4.3-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -38,7 +38,8 @@
 						<configuration>
 							<files>
 								<file>../build-${customization}.properties</file>
-								<file>../build-environment/${arch}/libdir.properties</file>
+								<file>../rsa-key-${license.environment}.properties</file>								
+								<file>../build_environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -93,6 +94,7 @@
 									</includes>
 								</fileset>								
 							</filesets>
+							<skip>${clean-skip}</skip>
 						</configuration>
 					</execution>
 				</executions>
@@ -249,7 +251,8 @@
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
 									<exclude name="**/version.h" />
-									<exclude name="**/**_${exclude_platform}_only/**" />		
+									<exclude name="**/*_${exclude_platform}/**" />		
+									<exclude name="**/*_${exclude_platform}.*" />											
 									<exclude name="youtube/**" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
@@ -270,7 +273,8 @@
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
 									<exclude name="youtube/**" />									
-									<exclude name="**/**_${exclude_platform}_only/**" />								
+									<exclude name="**/*_${exclude_platform}/**" />	
+									<exclude name="**/*_${exclude_platform}.*" />																				
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
 									<map from="" to="SOURCES += "/>
@@ -280,7 +284,7 @@
 								<fileset id="forms_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.ui" />
 									<exclude name="youtube/**" />
-									<exclude name="**/**_${exclude_platform}_only/**" />										
+									<exclude name="**/**_${exclude_platform}/**" />										
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="forms" refid="forms_path">
 									<map from="" to="FORMS += "/>
@@ -314,7 +318,7 @@
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
-				<exclude_platform>linux</exclude_platform>
+				<exclude_platform>unix</exclude_platform>
 			</properties>
 			<build>
 				<plugins>					
@@ -359,8 +363,8 @@
 					</plugin>	
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
-						<version>1.4.1</version>
+						<artifactId>replacer</artifactId>
+						<version>1.5.2</version>
 						<executions>
 							<execution>
 								<phase>process-resources</phase>
@@ -371,12 +375,16 @@
 									<includes>
 										<include>**/${project.artifactId}-x64.vcproj</include>
 									</includes>
+									<!-- <excludes>
+										<exclude>**/vmaxproxy-x64.vcproj</exclude>
+									</excludes> -->									
 									<replacements>
 										<replacement>
 											<token>Win32</token>
 											<value>${arch}</value>
 										</replacement>         
 									</replacements>
+									<skip>${replace.skip}</skip>
 								</configuration>								
 							</execution>
 						</executions>

@@ -183,6 +183,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::ExitAction));
+    addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
@@ -202,6 +203,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::TakeScreenshotAction));
     addAction(action(Qn::TogglePanicModeAction));
     addAction(action(Qn::ToggleTourModeHotkeyAction));
+    addAction(action(Qn::TogglePopupsAction));
     addAction(action(Qn::DebugIncrementCounterAction));
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
@@ -336,9 +338,11 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         return;
 
     if(fullScreen) {
+        m_storedGeometry = geometry();
         showFullScreen();
     } else if(isFullScreen()) {
         showNormal();
+        setGeometry(m_storedGeometry);
     }
 }
 
@@ -525,7 +529,16 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
 }
 
 void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
-    m_dropResources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+
+    QnResourceList media = resources.filtered<QnMediaResource>();
+    QnResourceList layouts = resources.filtered<QnLayoutResource>();
+    QnResourceList servers = resources.filtered<QnMediaServerResource>();
+
+    m_dropResources = media;
+    m_dropResources << layouts;
+    m_dropResources << servers;
+
     if (m_dropResources.empty())
         return;
 
@@ -547,6 +560,17 @@ void QnMainWindow::dropEvent(QDropEvent *event) {
     menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_dropResources);
 
     event->acceptProposedAction();
+}
+
+void QnMainWindow::keyPressEvent(QKeyEvent *event) {
+    base_type::keyPressEvent(event);
+
+    if (!action(Qn::ToggleTourModeAction)->isChecked())
+        return;
+
+    if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
+        return;
+    menu()->trigger(Qn::ToggleTourModeAction);
 }
 
 #ifdef Q_OS_WIN

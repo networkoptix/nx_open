@@ -1,8 +1,8 @@
 #include "workbench_ptz_controller.h"
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 
 #include <api/media_server_connection.h>
 
@@ -13,6 +13,15 @@
 #include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
+
+//#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
+
+#ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__;
+#else
+#   define TRACE(...)
+#endif
+
 
 namespace {
     template<class Key, class T>
@@ -112,6 +121,10 @@ void QnWorkbenchPtzController::setPhysicalPosition(const QnVirtualCameraResource
     setPosition(camera, mapper->toCamera().physicalToLogical(physicalPosition));
 }
 
+void QnWorkbenchPtzController::updatePosition(const QnVirtualCameraResourcePtr &camera) {
+    sendGetPosition(camera);
+}
+
 QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) const {
     if(!camera) {
         qnNullWarning(camera);
@@ -139,7 +152,7 @@ void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
-    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, qreal, qreal, qreal, int)));
+    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
     m_cameraByHandle[handle] = camera;
 
     PtzData &data = m_dataByCamera[camera];
@@ -150,6 +163,8 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if(!server)
         return; // TODO. This really does happen
+
+    TRACE("SENT POSITION" << position);
 
     int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
@@ -222,10 +237,12 @@ void QnWorkbenchPtzController::at_resource_statusChanged(const QnResourcePtr &re
         tryInitialize(camera);
 }
 
-void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle) {
+void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle) {
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
     if(!camera)
         return; /* Already removed from the pool. */
+
+    TRACE("GOT POSITION" << position);
 
     m_cameraByHandle.remove(handle);
     
@@ -233,7 +250,6 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
     if(status == 0) {
         bool positionChanged = false;
         if(qFuzzyIsNull(data.movement)) {
-            QVector3D position(xPos, yPox, zoomPos);
             positionChanged = !qFuzzyCompare(position, data.position);
             data.position = position;
             if(const QnPtzSpaceMapper *mapper = m_mapperWatcher->mapper(camera))

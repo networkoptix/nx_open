@@ -27,4 +27,3 @@ QnPlatformAbstraction::~QnPlatformAbstraction() {
     if(s_instance == this)
         s_instance = NULL;
 }
-

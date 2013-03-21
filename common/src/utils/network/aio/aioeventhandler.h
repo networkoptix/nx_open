@@ -19,7 +19,7 @@ namespace aio
     public:
         virtual ~AIOEventHandler() {}
 
-        virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) = 0;
+        virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) throw() = 0;
     };
 }
 

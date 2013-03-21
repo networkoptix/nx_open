@@ -13,7 +13,8 @@ QnNetworkResource::QnNetworkResource():
     m_networkTimeout(5000),
     m_probablyNeedToUpdateStatus(false)
 {
-    addFlags(network | motion);
+    //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support
+    addFlags(network);
 }
 
 QnNetworkResource::~QnNetworkResource()
@@ -60,7 +61,14 @@ bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
-    setUrl(ip);
+    QUrl currentValue(getUrl());
+    if (currentValue.scheme().isEmpty()) {
+        setUrl(ip);
+    }
+    else {
+        currentValue.setHost(ip);
+        setUrl(currentValue.toString());
+    }
     return (domain == QnDomainMemory);
 }
 
@@ -189,6 +197,7 @@ void QnNetworkResource::updateInner(QnResourcePtr other)
     if (other_casted)
     {
         m_auth = other_casted->m_auth;
+        m_macAddress = other_casted->m_macAddress;
     }
 }
 

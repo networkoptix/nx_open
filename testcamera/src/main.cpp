@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         qDebug() << "count=N";
         qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
         qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-        qDebug() << "[offline=0.100] (optional, default value 0 - no offline)";
+        qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
         qDebug() << "";
         qDebug() << "example:";
         QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20");

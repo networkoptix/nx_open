@@ -5,6 +5,7 @@
 #include <QtCore/QWeakPointer>
 
 #include <QtGui/QDialogButtonBox>
+#include <QtGui/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
@@ -27,6 +28,7 @@ class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
+class QnCameraAdditionDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
 
@@ -154,7 +156,7 @@ public:
 protected:
     QnAppServerConnectionPtr connection() const;
 
-    QString newLayoutName(const QnUserResourcePtr &user) const;
+    QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;
@@ -185,7 +187,7 @@ protected:
 
     void rotateItems(int degrees);
 
-    void setItemsResolutionMode(Qn::ResolutionMode resolutionMode);
+    void setResolutionMode(Qn::ResolutionMode resolutionMode);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
@@ -199,6 +201,10 @@ protected:
         return m_popupCollectionWidget.data();
     }
 
+    QnCameraAdditionDialog *cameraAdditionDialog() const {
+        return m_cameraAdditionDialog.data();
+    }
+
 protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
@@ -210,6 +216,7 @@ protected slots:
     void at_workbench_layoutsChanged();
     void at_workbench_cellAspectRatioChanged();
     void at_workbench_cellSpacingChanged();
+    void at_workbench_currentLayoutChanged();
 
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();
@@ -322,6 +329,7 @@ protected slots:
     void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
+    void at_toggleTourModeHotkeyAction_triggered();
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
@@ -335,7 +343,13 @@ protected slots:
 
     void at_whatsThisAction_triggered();
 
+    void at_escapeHotkeyAction_triggered();
+
     void at_checkSystemHealthAction_triggered();
+
+    void at_togglePopupsAction_toggled(bool checked);
+
+    void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
@@ -348,6 +362,26 @@ private:
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
 
+    /**
+     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
+     * @param name                      Suggested new name.
+     * @param user                      User that will own the layout.
+     * @param layout                    Layout that we want to rename (if any).
+     * @return                          List of existing layouts with same name.
+     */
+    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
+
+    /**
+     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
+     * @param buttons               Messagebox buttons.
+     * @param defaultButton         Default button.
+     * @return                      Selected button.
+     */
+    QMessageBox::StandardButton askOverrideLayout(QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton);
+
+    void removeLayouts(const QnLayoutResourceList &layouts);
+
+    void ensurePopupCollectionWidget();
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -358,6 +392,7 @@ private:
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QWeakPointer<QnPopupCollectionWidget> m_popupCollectionWidget;
+    QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
 
     /** Whether the set of selected resources was changed and settings
      * dialog is waiting to be updated. */
@@ -382,7 +417,7 @@ private:
     QnMediaResourcePtr m_exportedMediaRes;
     //QString m_layoutExportMessage;
     LayoutExportMode m_layoutExportMode;
-
+    int m_healthRequestHandle;
 
     QTimer *m_tourTimer;
 };

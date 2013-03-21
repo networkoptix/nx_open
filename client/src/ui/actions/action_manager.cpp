@@ -406,6 +406,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Check System Health..."));
 
+    factory(Qn::TogglePopupsAction).
+        flags(Qn::NoTarget).
+        checkable().
+        icon(qnSkin->icon("popup.png")).
+        text(tr("Show notifications"));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -550,6 +556,11 @@ QnActionManager::QnActionManager(QObject *parent):
             rotationSpeed(180.0);
     }
 
+    factory(Qn::EscapeHotkeyAction).
+        flags(Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Esc")).
+        text(tr("Stop current action"));
+
     factory(Qn::FullscreenAction).
         flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
@@ -560,7 +571,6 @@ QnActionManager::QnActionManager(QObject *parent):
 #else
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
-        shortcut(tr("Esc")).
 #endif
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
@@ -759,24 +769,27 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnDisplayInfoActionCondition(this));
 
     factory().
-        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Resolution..."));
 
     factory.beginSubMenu(); {
+        factory.beginGroup();
         factory(Qn::RadassAutoAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            flags(Qn::Scene | Qn::NoTarget ).
             text(tr("Auto")).
-            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+            checkable().
+            checked();
 
         factory(Qn::RadassLowAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            flags(Qn::Scene | Qn::NoTarget ).
             text(tr("Low")).
-            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+            checkable();
 
         factory(Qn::RadassHighAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            flags(Qn::Scene | Qn::NoTarget ).
             text(tr("High")).
-            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+            checkable();
+        factory.endGroup();
     } factory.endSubMenu();
 
     factory().

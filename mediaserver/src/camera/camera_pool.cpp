@@ -5,10 +5,6 @@
 
 QMutex QnVideoCameraPool::m_staticMtx;
 
-QnVideoCameraPool::QnVideoCameraPool()
-{
-}
-
 void QnVideoCameraPool::stop()
 {
     foreach(QnVideoCamera* camera, m_cameras.values())
@@ -24,11 +20,19 @@ QnVideoCameraPool::~QnVideoCameraPool()
     stop();
 }
 
+static QnVideoCameraPool* globalInstance = NULL;
+
+void QnVideoCameraPool::initStaticInstance( QnVideoCameraPool* inst )
+{
+    globalInstance = inst;
+}
+
 QnVideoCameraPool* QnVideoCameraPool::instance()
 {
-    QMutexLocker lock(&m_staticMtx);
-    static QnVideoCameraPool inst;
-    return &inst;
+    return globalInstance;
+    //QMutexLocker lock(&m_staticMtx);
+    //static QnVideoCameraPool inst;
+    //return &inst;
 }
 
 QnVideoCamera* QnVideoCameraPool::getVideoCamera(QnResourcePtr res)

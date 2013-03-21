@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 #include <utils/common/email.h>
 
@@ -54,10 +54,7 @@ QnCheckResourceAndWarnDelegate<ResourceType>::~QnCheckResourceAndWarnDelegate() 
 template<class ResourceType>
 void QnCheckResourceAndWarnDelegate<ResourceType>::init(QWidget* parent) {
     m_warningLabel = new QLabel(parent);
-    QPalette palette = parent->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    m_warningLabel->setPalette(palette);
-
+    setWarningStyle(m_warningLabel);
     parent->layout()->addWidget(m_warningLabel);
 }
 
@@ -77,10 +74,10 @@ bool QnCheckResourceAndWarnDelegate<ResourceType>::validate(const QnResourceList
     return true;
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnMotionEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnMotionEnabledDelegate::QnMotionEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -96,10 +93,10 @@ QString QnMotionEnabledDelegate::getText(int invalid, int total) const {
     return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnRecordingEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnRecordingEnabledDelegate::QnRecordingEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -114,10 +111,10 @@ QString QnRecordingEnabledDelegate::getText(int invalid, int total) const {
     return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnInputEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnInputEnabledDelegate::QnInputEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -132,10 +129,10 @@ QString QnInputEnabledDelegate::getText(int invalid, int total) const {
     return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnOutputEnabledDelegate
 // -------------------------------------------------------------------------- //
-
 QnOutputEnabledDelegate::QnOutputEnabledDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -150,10 +147,10 @@ QString QnOutputEnabledDelegate::getText(int invalid, int total) const {
     return tr("%1 of %2 selected cameras have not output relays.").arg(invalid).arg(total);
 }
 
+
 // -------------------------------------------------------------------------- //
 // QnEmailValidDelegate
 // -------------------------------------------------------------------------- //
-
 QnEmailValidDelegate::QnEmailValidDelegate(QWidget *parent):
     base_type(parent) {
 }
@@ -162,7 +159,7 @@ QnEmailValidDelegate::~QnEmailValidDelegate() {
 }
 
 bool QnEmailValidDelegate::isResourceValid(const QnUserResourcePtr &user) const {
-    return isEmailValid(user->getEmail());
+    return QnEmail::isValid(user->getEmail());
 }
 QString QnEmailValidDelegate::getText(int invalid, int total) const {
     return tr("%1 of %2 selected users have invalid email.").arg(invalid).arg(total);

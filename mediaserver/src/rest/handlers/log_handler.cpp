@@ -84,11 +84,9 @@ int QnRestLogHandler::executePost(const QString& path, const QnRequestParamList&
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestLogHandler::description(TCPSocket* tcpSocket) const
+QString QnRestLogHandler::description(TCPSocket *) const
 {
-    Q_UNUSED(tcpSocket)
-    QString rez;
-    rez += "Returns tail of the server log file";
-    rez += "<BR>Param <b>lines</b> - Optional. Display last N log lines.";
-    return rez;
+    return 
+        "Returns tail of the server log file"
+        "<BR>Param <b>lines</b> - Optional. Display last N log lines.";
 }

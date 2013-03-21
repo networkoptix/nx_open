@@ -35,6 +35,8 @@ public:
     */
 
     virtual QString getGuid() const { return QString(); }
+
+    bool showPopup(QnPopupBusinessActionPtr action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
@@ -50,15 +52,18 @@ public slots:
 
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
+    static void fini();
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
-    void at_businessRuleDeleted(QnId id);
+    void at_businessRuleDeleted(int id);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
+    void at_sendPopupFinished(QnHTTPRawResponse response, int handle);
+    void at_sendEmailFinished(int status, const QByteArray& errorString, bool result, int handle);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
 
@@ -76,15 +81,13 @@ protected:
     QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 
     void terminateRunningRule(QnBusinessEventRulePtr rule);
+
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
     bool sendMail( const QnSendMailBusinessActionPtr& action );
-
-    bool showPopup(QnPopupBusinessActionPtr action);
-
 
     QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);

@@ -7,8 +7,11 @@ class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 {
 public:
     QnMServerResourceDiscoveryManager();
+    virtual ~QnMServerResourceDiscoveryManager();
+
 protected:
     virtual bool processDiscoveredResources(QnResourceList& resources) override;
+
 private:
 
     void check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState);
@@ -23,8 +26,6 @@ private:
 
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(QnResourcePtr res);
-
-    bool hasRunningLiveProvider(QnNetworkResourcePtr netRes) const;
 private:
     bool m_foundSmth; // minor just to minimize lof output
     QMap<QString, int> m_resourceDiscoveryCounter;

@@ -10,5 +10,6 @@ message Email {
 }
 
 message Emails {
-    repeated Email email = 1;
+    repeated Email email   = 1;
+    optional int32 timeout = 2;
 }

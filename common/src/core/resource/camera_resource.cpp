@@ -1,5 +1,8 @@
 #include "camera_resource.h"
 #include "resource_consumer.h"
+#include "api/app_server_connection.h"
+
+static const float MAX_EPS = 0.01f;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_scheduleDisabled(true),
@@ -9,7 +12,9 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0)
 {}
 
-QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
+QnPhysicalCameraResource::QnPhysicalCameraResource(): 
+    QnVirtualCameraResource(),
+    m_channelNumer(0)
 {
     setFlags(local_live_cam);
 }
@@ -34,6 +39,74 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
     return qMax(128,result);
 }
 
+int QnPhysicalCameraResource::getChannel() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_channelNumer;
+}
+
+void QnPhysicalCameraResource::setUrl(const QString &url)
+{
+    QUrl u(url);
+
+    QMutexLocker lock(&m_mutex);
+    QnVirtualCameraResource::setUrl(url);
+    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
+    if (m_channelNumer > 0)
+        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+}
+
+float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution)
+{
+    if (resolution.height() == 0)
+        return 0;
+    float result = static_cast<double>(resolution.width()) / resolution.height();
+    // SD NTCS/PAL resolutions have non standart SAR. fix it
+    if (resolution.width() == 720 && (resolution.height() == 480 || resolution.height() == 576))
+        result = float(4.0 / 3.0);
+    return result;
+}
+
+QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, float aspectRatio,
+                                              double maxResolutionSquare, const QList<QSize>& resolutionList)
+{
+    double requestSquare = resolution.width() * resolution.height();
+    if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
+
+    int bestIndex = -1;
+    double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
+
+    for (int i = 0; i < resolutionList.size(); ++i) {
+        QSize tmp;
+
+        tmp.setWidth(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].width() + 1), 8));
+        tmp.setHeight(qPower2Floor(static_cast<unsigned int>(resolutionList[i].height() - 1), 8));
+        float ar1 = getResolutionAspectRatio(tmp);
+
+        tmp.setWidth(qPower2Floor(static_cast<unsigned int>(resolutionList[i].width() - 1), 8));
+        tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
+        float ar2 = getResolutionAspectRatio(tmp);
+
+        if (aspectRatio != 0 && !qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+        {
+            continue;
+        }
+
+        double square = resolutionList[i].width() * resolutionList[i].height();
+        if (square < MAX_EPS) continue;
+
+        double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
+        if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
+            bestIndex = i;
+            bestMatchCoeff = matchCoeff;
+        }
+    }
+
+    return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
+}
+
+// --------------- QnVirtualCameraResource ----------------------
+
 void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 {
     QnNetworkResource::updateInner(other);
@@ -45,6 +118,8 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
         m_scheduleDisabled = camera->isScheduleDisabled();
         m_audioEnabled = camera->isAudioEnabled();
         m_manuallyAdded = camera->isManuallyAdded();
+        m_model = camera->m_model;
+        m_firmware = camera->m_firmware;
     }
 }
 
@@ -148,3 +223,20 @@ QString QnVirtualCameraResource::getUniqueId() const
 		return getPhysicalId();
 
 }
+
+void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters) {
+    QnNetworkResource::deserialize(parameters);
+
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        addFlags(motion);
+}
+
+void QnVirtualCameraResource::save()
+{
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
+        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
+            << getPhysicalId() << ". Description: " << conn->getLastError();
+    }
+}
+

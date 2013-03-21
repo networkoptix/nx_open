@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -112,7 +112,8 @@ void QnWorkbenchPtzMapperWatcher::at_resource_statusChanged(const QnResourcePtr 
 }
 
 void QnWorkbenchPtzMapperWatcher::at_replyReceived(int status, const QnPtzSpaceMapper &mapper, int handle) {
-    Q_UNUSED(status);
+    if(status != 0)
+        return; // TODO
 
     QnVirtualCameraResourcePtr camera = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);

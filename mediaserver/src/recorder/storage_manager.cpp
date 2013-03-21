@@ -7,6 +7,7 @@
 #include "recording_manager.h"
 #include "serverutil.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
+#include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 
@@ -20,7 +21,10 @@ QnStorageManager::QnStorageManager():
     m_mutexCatalog(QMutex::Recursive),
     m_storageFileReaded(false),
     m_storagesStatisticsReady(false),
-    m_catalogLoaded(false)
+    m_catalogLoaded(false),
+    m_warnSended(false),
+    m_isWritableStorageAvail(false),
+    m_bigStorageExists(false)
 {
 }
 
@@ -72,7 +76,7 @@ bool QnStorageManager::deserializeStorageFile()
         QStringList params = line.split(';');
         if (params.size() >= 2) {
             QString path = toCanonicalPath(params[0]);
-            for (int i = 0; i < params.size(); ++i) {
+            for (int i = 1; i < params.size(); ++i) {
                 int index = params[i].toInt();
                 m_storageIndexes[path].insert(index);
             }
@@ -257,27 +261,45 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
-    QVector<QnTimePeriodList> cameras;
+    QVector<QnTimePeriodList> periods;
     for (int i = 0; i < resList.size(); ++i)
     {
-        QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
+        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resList[i]);
         if (camera) {
-            QString physicalId = camera->getPhysicalId();
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
+            if (camera->isDtsBased())
+            {
+                periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
+            }
+            else {
+                QString physicalId = camera->getPhysicalId();
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
+            }
         }
     }
 
-    return QnTimePeriod::mergeTimePeriods(cameras);
+    return QnTimePeriod::mergeTimePeriods(periods);
 }
 
 void QnStorageManager::clearSpace()
 {
     if (!m_catalogLoaded)
         return;
-    const StorageMap storages = getAllStorages();
+    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
     foreach(QnStorageResourcePtr storage, storages)
         clearSpace(storage);
+}
+
+QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
+{ 
+    QMutexLocker lock(&m_mutexStorages); 
+    return m_storageRoots; 
+} 
+
+QnStorageResourceList QnStorageManager::getStorages() const 
+{
+    QMutexLocker lock(&m_mutexStorages);
+    return m_storageRoots.values().toSet().toList(); // remove storage duplicates. Duplicates are allowed in sake for v1.4 compatibility
 }
 
 void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
@@ -353,31 +375,57 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
-void QnStorageManager::updateStorageStatistics()
+qint64 QnStorageManager::minSpaceForWritting() const
 {
-    double totalSpace = 0;
+    return m_bigStorageExists ? BIG_STORAGE_THRESHOLD : 0;
+}
+
+QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
+{
+    QSet<QnStorageResourcePtr> result;
+
     for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
-        if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
-            continue; // do not use offline storages for writting
-
-        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
-        qint64 storageSpace = fileStorage->getSpaceLimit();
-        totalSpace += storageSpace;
+        if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
+        {
+            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+            if (available > minSpaceForWritting())
+                result << fileStorage;
+        }
     }
 
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
-    {
-        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
-        if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
-            continue; // do not use offline storages for writting
+    return result;
+}
 
-        //qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
-        qint64 storageSpace = fileStorage->getSpaceLimit();
+void QnStorageManager::updateStorageStatistics()
+{
+    QMutexLocker lock(&m_mutexStorages);
+    if (m_storagesStatisticsReady) 
+        return;
+
+    double totalSpace = 0;
+    QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    m_isWritableStorageAvail = !storages.isEmpty();
+    m_bigStorageExists = false;
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
+        totalSpace += storageSpace;
+        m_bigStorageExists |= storageSpace > BIG_STORAGE_THRESHOLD;
+    }
+
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+
+        qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
+    m_storagesStatisticsReady = true;
+    m_warnSended = false;
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
@@ -385,28 +433,20 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
 
-    {
-        QMutexLocker lock(&m_mutexStorages);
-        if (!m_storagesStatisticsReady) {
-            updateStorageStatistics();
-            m_storagesStatisticsReady = true;
-        }
-    }
+    updateStorageStatistics();
 
     QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
     QVector<QnStorageResourcePtr> candidates;
 
     // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
-    const StorageMap storages = getAllStorages();
-    for (StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
+    const QSet<QnStorageResourcePtr> storages = getWritableStorages();
+    for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-		QnStorageResourcePtr storage = itr.value();
-        if (storage->getStatus() != QnResource::Offline) {
-            qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
-            float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
-            minBitrate = qMin(minBitrate, bitrate);
-            bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
-        }
+		QnStorageResourcePtr storage = *itr;
+        qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
+        float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
+        minBitrate = qMin(minBitrate, bitrate);
+        bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
     }
     for (int i = 0; i < bitrateInfo.size(); ++i)
     {
@@ -426,10 +466,16 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         }
     }
 
-	if (result)
+    if (result) {
 		qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
-	else
+    }
+    else {
 		qDebug() << "No storage available for recording";
+        if (!m_warnSended) {
+            emit noStoragesAvailable();
+            m_warnSended = true;
+        }
+    }
 
     return result;
 }
@@ -509,6 +555,12 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
 
 QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
+    // 1.4 to 1.5 compatibility notes:
+    // 1.5 prevent duplicates path to same physical storage (aka c:/test and c:/test/)
+    // for compatibility with 1.4 I keep all such patches as difference keys to same storage
+	// In other case we are going to lose archive from 1.4 because of storage_index is different for same physical folder
+    // If several storage keys are exists, function return minimal storage index
+
     storageIndex = -1;
     const StorageMap storages = getAllStorages();
     for(StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -571,4 +623,10 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         return false;
     catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
     return true;
+}
+
+qint64 QnStorageManager::isBigStorageExists() const 
+{
+    QMutexLocker lock(&m_mutexStorages);
+    return m_bigStorageExists; 
 }

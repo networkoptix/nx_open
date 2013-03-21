@@ -228,17 +228,15 @@ int QnImageHandler::executePost(const QString& path, const QnRequestParamList& p
     return executeGet(path, params, result, contentType);
 }
 
-QString QnImageHandler::description(TCPSocket* tcpSocket) const
+QString QnImageHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
-        QString rez;
-    rez += "Return image from camera <BR>";
-    rez += "<BR>Param <b>physicalId</b> - camera physicalId.";
-    rez += "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected. Also, special values allowed: 'NOW' - live position (no frame is returned if camera is offline). 'LATEST' - last frame from camera (return live position or last frame from archive if camera is offline)";
-    rez += "<BR>Param <b>format</b> - Optional. image format. Allowed values: 'jpeg', 'png', 'bmp', 'tiff'. Default value 'jpeg";
-    rez += "<BR>Param <b>precise</b> - Optional. Allowed values: 'true' or 'false'. If parameter is 'false' server returns nearest I-frame instead of exact frame. Default value 'false'. Parameter not used for Motion jpeg video codec";
-    rez += "<BR>Param <b>height</b> - Optional. Required image height.";
-    rez += "<BR>Param <b>width</b> - Optional. Required image width. If only width or height is specified other parameter is auto detected. Video aspect ratio is not changed";
-    rez += "<BR>Returns image";
-    return rez;
+    return 
+        "Return image from camera <BR>"
+        "<BR>Param <b>physicalId</b> - camera physicalId."
+        "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected. Also, special values allowed: 'NOW' - live position (no frame is returned if camera is offline). 'LATEST' - last frame from camera (return live position or last frame from archive if camera is offline)"
+        "<BR>Param <b>format</b> - Optional. image format. Allowed values: 'jpeg', 'png', 'bmp', 'tiff'. Default value 'jpeg"
+        "<BR>Param <b>precise</b> - Optional. Allowed values: 'true' or 'false'. If parameter is 'false' server returns nearest I-frame instead of exact frame. Default value 'false'. Parameter not used for Motion jpeg video codec"
+        "<BR>Param <b>height</b> - Optional. Required image height."
+        "<BR>Param <b>width</b> - Optional. Required image width. If only width or height is specified other parameter is auto detected. Video aspect ratio is not changed"
+        "<BR>Returns image";
 }

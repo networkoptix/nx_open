@@ -24,7 +24,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_videoParser(0),
     m_audioParser(0),
     m_timeHelper(res->getUniqueId()),
-    m_pleaseStop(false)
+    m_pleaseStop(false),
+    m_gotSomeFrame(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -35,8 +36,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
-    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, int, const QString&)),
-            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, int, const QString&)));
+    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
+            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -194,6 +195,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         result = m_lastVideoData;
 		m_lastVideoData.clear();
         m_demuxedData[channelNum]->clear();
+        m_gotSomeFrame = true;
         return result;
     }
     if (!m_lastAudioData.isEmpty())
@@ -203,14 +205,19 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         m_demuxedData[channelNum]->clear();
         result->channelNumber += m_numberOfVideoChannels;
 
+        m_gotSomeFrame = true;
         return result;
     }
-    if (m_RtpSession.isOpened() && !m_pleaseStop) {
+    if (m_RtpSession.isOpened() && !m_pleaseStop && m_gotSomeFrame) 
+    {
         qWarning() << "RTP read timeout for camera " << getResource()->getUniqueId() << ". Reopen stream";
+
+        int elapsed = dataTimer.elapsed();
+        QnBusiness::EventReason reason = elapsed > MAX_FRAME_DURATION*2 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueConnectionClosed;
         emit networkIssue(getResource(),
                           qnSyncTime->currentUSecsSinceEpoch(),
-                          QnBusiness::NetworkIssueNoFrame,
-                          QString::number((qlonglong) MAX_FRAME_DURATION*2/1000));
+                          reason,
+                          QString::number((qlonglong) elapsed/1000));
     }
     return result;
 }
@@ -349,6 +356,12 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }
+    else if (codecName == QLatin1String("L16")) {
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_PCM_S16BE);
+        audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
+        result = audioParser;
+    }
     
     if (result)
         connect(result, SIGNAL(packetLostDetected(quint32, quint32)), this, SLOT(at_packetLost(quint32, quint32)));
@@ -384,7 +397,7 @@ void QnMulticodecRtpReader::openStream()
     if (isStreamOpened())
         return;
     //m_timeHelper.reset();
-
+    m_gotSomeFrame = false;
     QString transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
     if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
         transport = QLatin1String("AUTO");

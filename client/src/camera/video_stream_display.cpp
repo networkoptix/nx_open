@@ -332,7 +332,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         if (m_bufferedFrameDisplayer) 
         {
             m_bufferedFrameDisplayer->waitForFramesDisplayed();
-            //setLastDisplayedTime(m_bufferedFrameDisplayer->getLastDisplayedTime());
+            //overrideTimestampOfNextFrameToRender(m_bufferedFrameDisplayer->getTimestampOfNextFrameToRender());
             //QMutexLocker lock(&m_timeMutex);
             delete m_bufferedFrameDisplayer;
             m_bufferedFrameDisplayer = 0;
@@ -611,7 +611,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
 {
     Q_UNUSED(reverseMode)
     //if (quint64(outFrame->pkt_dts) != AV_NOPTS_VALUE)
-    //    setLastDisplayedTime(outFrame->pkt_dts);
+    //    overrideTimestampOfNextFrameToRender(outFrame->pkt_dts);
 
     //qDebug() << "got decoded frame=" << QDateTime::fromMSecsSinceEpoch(outFrame->pkt_dts/1000).toString(QLatin1String("hh:mm:ss.zzz"));
 
@@ -743,7 +743,7 @@ void QnVideoStreamDisplay::setSpeed(float value)
 }
 
 /*
-qint64 QnVideoStreamDisplay::getLastDisplayedTime() const 
+qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const 
 { 
     QMutexLocker lock(&m_timeMutex);
     if (m_drawer && m_timeChangeEnabled)
@@ -753,7 +753,7 @@ qint64 QnVideoStreamDisplay::getLastDisplayedTime() const
 }
 */
 
-void QnVideoStreamDisplay::setLastDisplayedTime(qint64 value)
+void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
 { 
     m_drawer->blockTimeValue(m_channelNumber, value);
     if (m_bufferedFrameDisplayer)
@@ -762,9 +762,9 @@ void QnVideoStreamDisplay::setLastDisplayedTime(qint64 value)
     m_drawer->unblockTimeValue(m_channelNumber);
 }
 
-qint64 QnVideoStreamDisplay::getLastDisplayedTime() const 
+qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const 
 {
-    return m_drawer->lastDisplayedTime(m_channelNumber);
+    return m_drawer->getTimestampOfNextFrameToRender(m_channelNumber);
 }
 
 void QnVideoStreamDisplay::blockTimeValue(qint64 time)
@@ -774,7 +774,7 @@ void QnVideoStreamDisplay::blockTimeValue(qint64 time)
     QMutexLocker lock(&m_timeMutex);
     m_lastDisplayedTime = time;
     if (m_bufferedFrameDisplayer)
-        m_bufferedFrameDisplayer->setLastDisplayedTime(time);
+        m_bufferedFrameDisplayer->overrideTimestampOfNextFrameToRender(time);
     m_timeChangeEnabled = false;
     */
 }
@@ -789,7 +789,7 @@ void QnVideoStreamDisplay::unblockTimeValue()
     /*
     QMutexLocker lock(&m_timeMutex);
     if (m_bufferedFrameDisplayer)
-        m_bufferedFrameDisplayer->setLastDisplayedTime(m_lastDisplayedTime);
+        m_bufferedFrameDisplayer->overrideTimestampOfNextFrameToRender(m_lastDisplayedTime);
     m_timeChangeEnabled = true;
     */
     m_drawer->unblockTimeValue(m_channelNumber);

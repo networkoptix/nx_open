@@ -28,11 +28,11 @@ struct QnHTTPRawResponse
     {
     }
 
-    QnHTTPRawResponse(int status_, const QnReplyHeaderList& headers_, const QByteArray& data_, QByteArray errorString_)
-        : status(status_),
-          headers(headers_),
-          data(data_),
-          errorString(errorString_)
+    QnHTTPRawResponse(int status, const QnReplyHeaderList& headers, const QByteArray& data, QByteArray errorString)
+        : status(status),
+          headers(headers),
+          data(data),
+          errorString(errorString)
     {
     }
 

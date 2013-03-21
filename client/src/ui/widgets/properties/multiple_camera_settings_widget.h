@@ -25,8 +25,8 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    int activeCameraCount() const;
-    void setCamerasActive(bool active);
+    void setScheduleEnabled(bool enabled);
+    bool isScheduleEnabled() const;
 
     void updateFromResources();
     void submitToResources();
@@ -65,11 +65,15 @@ private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
-    void at_cameraScheduleWidget_scheduleEnabledChanged();
+    void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_cameraScheduleWidget_controlsChangesApplied();
+
     void at_enableAudioCheckBox_clicked();
+    void at_analogViewCheckBox_clicked();
+
     void updateMaxFPS();
+    void updateLicenseText();
 private:
     void setHasDbChanges(bool hasChanges);
 

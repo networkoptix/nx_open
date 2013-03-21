@@ -1,7 +1,7 @@
 #include "axis_ptz_controller.h"
 
-#include <utils/common/math.h>
-#include <utils/common/space_mapper.h>
+#include <utils/math/math.h>
+#include <utils/math/space_mapper.h>
 #include <utils/network/simple_http_client.h>
 
 #include "axis_resource.h"
@@ -66,7 +66,7 @@ private:
 };
 
 
-QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
+QnAxisPtzController::QnAxisPtzController(QnPlAxisResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),

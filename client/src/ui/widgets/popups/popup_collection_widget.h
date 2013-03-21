@@ -28,9 +28,11 @@ public:
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     bool addSystemHealthEvent(QnSystemHealth::MessageType message);
+    bool addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources);
+
+    bool isEmpty() const;
 
     void clear();
-
 protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
@@ -40,6 +42,9 @@ private slots:
 
     void at_businessEventWidget_closed(BusinessEventType::Value actionType, bool ignore);
     void at_systemHealthWidget_closed(QnSystemHealth::MessageType message, bool ignore);
+
+    void at_postponeAllButton_clicked();
+    void at_minimizeButton_clicked();
 private:
     QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 

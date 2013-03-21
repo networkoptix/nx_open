@@ -7,6 +7,7 @@
 #include "utils/common/synctime.h"
 
 #include <QDateTime>
+#include <QFileInfo>
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
@@ -107,6 +108,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_emptyPacketCounter(0),
     m_isStillImage(false),
     m_isLongWaiting(false),
+    m_skippingFramesStarted(false),
     m_executingChangeSpeed(false),
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
@@ -118,13 +120,22 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
-    m_doNotChangeDisplayTime(false),
-    m_skippingFramesStarted(false)
+    m_doNotChangeDisplayTime(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
+
+    if (resource && resource->hasFlags(QnResource::still_image)) {
+        m_isStillImage = true;
+
+        QFileInfo fileInfo(resource->getUrl());
+        if (fileInfo.isReadable())
+            resource->setStatus(QnResource::Online);
+        else
+            resource->setStatus(QnResource::Offline);
+    }
 
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -235,7 +246,6 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 			{
 				QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
                 qnRedAssController->onSlowStream(reader);
-				//reader->setQuality(MEDIA_Quality_Low, true);
 			}
 		}
 	}
@@ -415,10 +425,15 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
-                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
+                while (!m_afterJump && !m_buffering && !needToStop() && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
-                    displayedTime = getCurrentTime(); // new VideoStreamDisplay update time async! So, currentTime possible may be changed during waiting (it is was not possible before v1.5)
+                    qint64 newDisplayedTime = getCurrentTime();
+                    if (newDisplayedTime != displayedTime) {
+                        // new VideoStreamDisplay update time async! So, currentTime possible may be changed during waiting (it is was not possible before v1.5)
+                        displayedTime = newDisplayedTime;
+                        firstWait = true;
+                    }
                     if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
                     {
                         if (firstWait)
@@ -467,6 +482,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
+    m_isLongWaiting = false;
     int channel = vd->channelNumber;
 
     if (m_singleShotMode && m_singleShotQuantProcessed)
@@ -831,15 +847,10 @@ void QnCamDisplay::processNewSpeed(float speed)
     m_executingChangeSpeed = false;
 }
 
-bool QnCamDisplay::isSyncAllowed() const
-{
-    return m_extTimeSrc && m_extTimeSrc->isEnabled();
-}
-
 bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
     //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
-    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
+    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync));
 }
 
 void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
@@ -994,13 +1005,15 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (speed == 0)
             return true;
+
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
-        if (m_emptyPacketCounter >= 3)
+        bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
+        if (m_emptyPacketCounter >= 3 || playUnsync)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
-            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
+            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !playUnsync) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }
@@ -1010,12 +1023,12 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             // move current time position to the edge to prevent other cameras blocking
             m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
+                m_display[i]->overrideTimestampOfNextFrameToRender(m_lastDecodedTime);
             }
             */
 
             //performing before locking m_timeMutex. Otherwise we could get dead-lock between this thread and a setSpeed, called from main thread.
-                //E.g. setLastDisplayedTime waits for frames rendered, setSpeed (main thread) waits for m_timeMutex
+                //E.g. overrideTimestampOfNextFrameToRender waits for frames rendered, setSpeed (main thread) waits for m_timeMutex
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
                 m_display[i]->flushFramesToRenderer();
 
@@ -1023,7 +1036,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
                 if( m_display[i] )
-                    m_display[i]->setLastDisplayedTime(emptyData->timestamp);
+                    m_display[i]->overrideTimestampOfNextFrameToRender(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
 
@@ -1406,17 +1419,17 @@ qint64 QnCamDisplay::getDisplayedMax() const
     qint64 rez = AV_NOPTS_VALUE;
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
-        rez = qMax(rez, m_display[i]->getLastDisplayedTime());
+        rez = qMax(rez, m_display[i]->getTimestampOfNextFrameToRender());
     }
     return rez;
 }
 
 qint64 QnCamDisplay::getDisplayedMin() const
 {
-    qint64 rez = m_display[0]->getLastDisplayedTime();
+    qint64 rez = m_display[0]->getTimestampOfNextFrameToRender();
     for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
-        qint64 val = m_display[i]->getLastDisplayedTime();
+        qint64 val = m_display[i]->getTimestampOfNextFrameToRender();
         if ((quint64)val != AV_NOPTS_VALUE) {
             rez = qMin(rez, val);
         }
@@ -1427,7 +1440,7 @@ qint64 QnCamDisplay::getDisplayedMin() const
 qint64 QnCamDisplay::getCurrentTime() const 
 {
     if (m_display[0] && m_display[0]->isTimeBlocked())
-        return m_display[0]->getLastDisplayedTime();
+        return m_display[0]->getTimestampOfNextFrameToRender();
     else if (m_speed >= 0)
         return getDisplayedMax();
     else
@@ -1449,12 +1462,12 @@ qint64 QnCamDisplay::getNextTime() const
 {
     if( m_display[0] && m_display[0]->isTimeBlocked() )
     {
-        return m_display[0]->getLastDisplayedTime();
+        return m_display[0]->getTimestampOfNextFrameToRender();
     }
     else
     {
         qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
-        qint64 lastTime = m_display[0]->getLastDisplayedTime();
+        qint64 lastTime = m_display[0]->getTimestampOfNextFrameToRender();
 
         if ((quint64)rez != AV_NOPTS_VALUE)
             return m_speed < 0 ? qMin(rez, lastTime) : qMax(rez, lastTime);
@@ -1464,7 +1477,7 @@ qint64 QnCamDisplay::getNextTime() const
         /*
         return m_display[0] == NULL || (quint64)rez != AV_NOPTS_VALUE
             ? rez
-            : m_display[0]->getLastDisplayedTime();
+            : m_display[0]->getTimestampOfNextFrameToRender();
         */
     }
 }

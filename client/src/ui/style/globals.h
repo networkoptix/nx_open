@@ -5,10 +5,9 @@
 #include <QVariant>
 #include <QSizeF>
 
-#include <utils/common/property_storage.h>
+#include <ui/style/statistics_colors.h>
 
-typedef QVector<QColor> QnColorVector;
-Q_DECLARE_METATYPE(QnColorVector)
+#include <utils/common/property_storage.h>
 
 /**
  * Global style settings.
@@ -57,8 +56,12 @@ public:
 
         BACKGROUD_GRADIENT_COLOR,
 
-        SYSTEM_HEALTH_COLOR_GRID,
-        SYSTEM_HEALTH_COLORS,
+        STATISTICS_COLORS,
+
+        POPUP_FRAME_SYSTEM,
+        POPUP_FRAME_NOTIFICATION,
+        POPUP_FRAME_IMPORTANT,
+        POPUP_FRAME_WARNING,
 
         VARIABLE_COUNT
     };
@@ -71,10 +74,7 @@ public:
 
 protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-
 private:
-    QnColorVector initSystemHealthColors();
-
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_R_PROPERTY(QFont,    settingsFont,                   SETTINGS_FONT,                          QFont())
         QN_DECLARE_R_PROPERTY(QColor,   shadowColor,                    SHADOW_COLOR,                           QColor(0, 0, 0, 128))
@@ -102,8 +102,12 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0))
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50))
 
-        QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorGrid,          SYSTEM_HEALTH_COLOR_GRID,               QColor(66, 140, 237, 100))
-        QN_DECLARE_R_PROPERTY(QnColorVector,   systemHealthColors,      SYSTEM_HEALTH_COLORS,                   initSystemHealthColors())
+        QN_DECLARE_R_PROPERTY(QnStatisticsColors,   statisticsColors,   STATISTICS_COLORS,                      QnStatisticsColors())
+
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameSystem,               POPUP_FRAME_SYSTEM,                     QColor(255, 0, 0, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameNotification,         POPUP_FRAME_NOTIFICATION,               QColor(64, 130, 180, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameImportant,            POPUP_FRAME_IMPORTANT,                  QColor(255, 128, 0, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   popupFrameWarning,              POPUP_FRAME_WARNING,                    QColor(255, 0, 0, 128))
     QN_END_PROPERTY_STORAGE()
 };
 

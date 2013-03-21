@@ -11,7 +11,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     QnClientMetaTypes::initialize();
 
-    new QnCommonModule(argc, argv, this);
+    m_common = new QnCommonModule(argc, argv, this);
 }
 
 QnClientModule::~QnClientModule() {

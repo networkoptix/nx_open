@@ -4,7 +4,7 @@
 
 #include "digital_watchdog_resource.h"
 
-QnDwZoomPtzController::QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource):
+QnDwZoomPtzController::QnDwZoomPtzController(QnPlWatchDogResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource)
 {}

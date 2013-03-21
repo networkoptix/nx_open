@@ -28,7 +28,10 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent),
+    base_type(parent,
+              Qt::WindowMinMaxButtonsHint |
+              Qt::WindowCloseButtonHint |
+              Qt::WindowSystemMenuHint ),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -81,8 +84,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 
     connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
-            this, SLOT(at_message_ruleDeleted(QnId)));
+    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
+            this, SLOT(at_message_ruleDeleted(int)));
 
     at_context_userChanged();
     updateControlButtons();
@@ -183,14 +186,9 @@ void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr 
     //TODO: ask user
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
     m_rulesViewModel->deleteRule(id);
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        if (rule->getId() == id) {
-            m_pendingDeleteRules.removeOne(rule);
-            return;
-        }
-    }
+    m_pendingDeleteRules.removeOne(id);
     //TODO: ask user
 }
 
@@ -230,7 +228,6 @@ void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& 
 
     bool success = (status == 0);
     if(!success) {
-        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while receiving rules"), QString::fromLatin1(errorString));
         return;
     }
@@ -252,7 +249,6 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
 
     bool success = (status == 0 && rules.size() == 1);
     if(!success) {
-        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
         return;
     }
@@ -267,7 +263,6 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
         return;
 
     if(response.status != 0) {
-        //TODO: #GDM remove password from error message
         QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
@@ -348,9 +343,10 @@ bool QnBusinessRulesDialog::saveAll() {
     foreach (QModelIndex idx, modified) {
         saveRule(m_rulesViewModel->getRuleModel(idx.row()));
     }
-    foreach (QnBusinessEventRulePtr rule, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection()->deleteAsync(rule, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
-        m_deleting[handle] = rule;
+    foreach (int id, m_pendingDeleteRules) {
+        int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
+                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+        m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();
     return true;
@@ -367,9 +363,8 @@ void QnBusinessRulesDialog::saveRule(QnBusinessRuleViewModel* ruleModel) {
 }
 
 void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
-    if (ruleModel->id()) {
-        m_pendingDeleteRules.append(ruleModel->createRule());
-    }
+    if (ruleModel->id() > 0)
+        m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);
     updateControlButtons();
 }

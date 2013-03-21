@@ -90,6 +90,11 @@ void QnRecordingManager::stop()
         deleteRecorder(recorders);
     }
     m_recordMap.clear();
+    m_onlineCameras.clear();
+    m_scheduleWatchingTimer.stop();
+
+    onTimer();
+    m_delayedStop.clear();
 }
 
 Recorders QnRecordingManager::findRecorders(QnResourcePtr res) const
@@ -210,8 +215,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 {
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
 
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline)
+    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline)
     {
         if (providerHi)
         {
@@ -227,7 +233,6 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         }
 
         if (providerLow) {
-            QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
@@ -387,8 +392,10 @@ void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
         m_onlineCameras.insert(camera);
     }
 
-    if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) {
-        emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
+    if((status == QnResource::Offline || status == QnResource::Unauthorized) && m_onlineCameras.contains(camera)) 
+    {
+        if (QnLiveStreamProvider::hasRunningLiveProvider(resource.dynamicCast<QnNetworkResource>()))
+            emit cameraDisconnected(camera, qnSyncTime->currentUSecsSinceEpoch());
         m_onlineCameras.remove(camera);
     }
 }
@@ -492,10 +499,18 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
+//Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
+static QnRecordingManager* staticInstance = NULL;
+
+void QnRecordingManager::initStaticInstance( QnRecordingManager* recordingManager )
+{
+    staticInstance = recordingManager;
+}
+
 QnRecordingManager* QnRecordingManager::instance()
 {
-    return qn_recordingManager_instance();
+    //return qn_recordingManager_instance();
+    return staticInstance;
 }
 
 // --------------------- QnServerDataProviderFactory -------------------

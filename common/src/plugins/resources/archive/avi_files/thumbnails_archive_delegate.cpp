@@ -102,3 +102,8 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
         m_currentPos = DATETIME_NOW;
     return result;
 }
+
+void QnThumbnailsArchiveDelegate::setGroupId(const QByteArray& groupId)
+{
+    m_baseDelegate->setGroupId(groupId);
+}

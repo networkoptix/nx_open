@@ -6,6 +6,9 @@
 #include "aiothread.h"
 
 #include <deque>
+#include <memory>
+
+#include <QAtomicInt>
 
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
@@ -42,6 +45,32 @@ namespace aio
         }
     };
 
+    class AIOEventHandlingData
+    {
+    public:
+        QAtomicInt beingProcessed;
+        QAtomicInt markedForRemoval;
+        AIOEventHandler* eventHandler;
+
+        AIOEventHandlingData( AIOEventHandler* _eventHandler )
+        :
+            eventHandler( _eventHandler )
+        {
+        }
+    };
+
+    class AIOEventHandlingDataHolder
+    {
+    public:
+        QSharedPointer<AIOEventHandlingData> data;
+
+        AIOEventHandlingDataHolder( AIOEventHandler* _eventHandler )
+        :
+            data( new AIOEventHandlingData(_eventHandler) )
+        {
+        }
+    };
+
     class AIOThreadImpl
     {
     public:
@@ -66,6 +95,7 @@ namespace aio
                 return;
 
             QMutexLocker lk( mutex );
+
             for( std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
                 it != pollSetModificationQueue.end();
@@ -80,8 +110,11 @@ namespace aio
 
                 if( task.type == SocketAddRemoveTask::tAdding )
                 {
-                    if( !pollSet.add( task.socket.data(), task.eventType, task.eventHandler ) )
+                    std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( task.eventHandler ) );
+                    if( !pollSet.add( task.socket.data(), task.eventType, handlingData.get() ) )
                         cl_log.log( QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
+                    else
+                        handlingData.release();
                     if( task.eventType == PollSet::etRead )
                         --newReadMonitorTaskCount;
                     else if( task.eventType == PollSet::etWrite )
@@ -91,7 +124,9 @@ namespace aio
                 }
                 else    //task.type == SocketAddRemoveTask::tRemoving
                 {
-                    pollSet.remove( task.socket.data(), task.eventType );
+                    void* userData = pollSet.remove( task.socket.data(), task.eventType );
+                    if( userData )
+                        delete static_cast<AIOEventHandlingDataHolder*>(userData);
                 }
                 it = pollSetModificationQueue.erase( it );
             }
@@ -118,6 +153,13 @@ namespace aio
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
                     //TODO/IMPL if we changing socket handler MUST not remove task
+                    if( it->type == SocketAddRemoveTask::tRemoving )
+                    {
+                        //cancelling remove task
+                        void* userData = pollSet.getUserData( sock.data(), eventType );
+                        Q_ASSERT( userData );
+                        static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval = 0;
+                    }
                     pollSetModificationQueue.erase( it );
                     return true;
                 }
@@ -177,21 +219,40 @@ namespace aio
         return true;
     }
 
-    //!Do not monitor \a sock for event \a eventType
-    /*!
-        Garantees that no \a eventTriggered will be called after return of this method
-    */
-    void AIOThread::removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType )
+    bool AIOThread::removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType )
     {
+        //NOTE m_impl->mutex locked up the stack
+
         //checking queue for reverse task for \a sock
         if( m_impl->removeReverseTask(sock, eventType, SocketAddRemoveTask::tRemoving, NULL) )
-            return;    //ignoring task
+            return true;    //ignoring task
 
-        //QMutexLocker lk( &m_impl->processEventsMutex );
-
+        void* userData = m_impl->pollSet.getUserData( sock.data(), eventType );
+        if( userData == NULL )
+            return false;   //assert ???
+        QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(userData)->data;
+        if( handlingData->markedForRemoval > 0 )
+            return false; //socket already marked for removal
+        handlingData->markedForRemoval.ref();
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventType, NULL, SocketAddRemoveTask::tRemoving) );
-        m_impl->pollSet.interrupt();
-        //TODO/IMPL
+        if( QThread::currentThread() != this )
+        {
+            m_impl->pollSet.interrupt();
+
+            if( handlingData->beingProcessed > 0 )
+            {
+                m_impl->mutex->unlock();
+                //waiting for event handler to return
+                while( handlingData->beingProcessed > 0 )
+                {
+                    m_impl->processEventsMutex.lock();
+                    m_impl->processEventsMutex.unlock();
+                }
+                m_impl->mutex->lock();
+            }
+        }
+
+        return true;
     }
 
     //!Returns number of sockets monitored for \a eventToWatch event
@@ -231,14 +292,22 @@ namespace aio
 
             m_impl->removeSocketsFromPollSet();
 
-            //QMutexLocker lk( &m_impl->processEventsMutex );
-
             for( PollSet::const_iterator
                 it = m_impl->pollSet.begin();
                 it != m_impl->pollSet.end();
                 ++it )
             {
-                static_cast<AIOEventHandler*>(it.userData())->eventTriggered( it.socket(), it.eventType() );
+                //no need to lock mutex, since data is removed in this thread only
+                QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(it.userData())->data;
+                QMutexLocker lk( &m_impl->processEventsMutex );
+                handlingData->beingProcessed.ref();
+                if( handlingData->markedForRemoval > 0 ) //socket has been removed from watch
+                {
+                    handlingData->beingProcessed.deref();
+                    continue;
+                }
+                handlingData->eventHandler->eventTriggered( it.socket(), it.eventType() );
+                handlingData->beingProcessed.deref();
             }
         }
 

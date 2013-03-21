@@ -83,6 +83,9 @@ private:
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;
 
+    /** Mapping for recorder nodes, by resource. */
+    QHash<QnResource *, QHash<int, Node *> > m_recorderNodeByResource;
+
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, Node *> m_itemNodeByUuid;
 

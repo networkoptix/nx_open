@@ -19,6 +19,7 @@ public:
     virtual QnResourceAudioLayout* getAudioLayout() override;
 
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep);
+    virtual void setGroupId(const QByteArray& groupId) override;
 private:
     qint64 m_currentPos;
     qint64 m_rangeStart;

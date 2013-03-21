@@ -14,16 +14,12 @@ int QnVersionHandler::executeGet(const QString& path, const QnRequestParamList& 
     return CODE_OK;
 }
 
-int QnVersionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnVersionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnVersionHandler::description(TCPSocket* tcpSocket) const
+QString QnVersionHandler::description(TCPSocket *) const
 {
-    Q_UNUSED(tcpSocket)
-    QString rez;
-    rez += "Returns server version";
-    return rez;
+    return "Returns server version";
 }

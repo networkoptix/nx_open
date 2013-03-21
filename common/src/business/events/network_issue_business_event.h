@@ -9,10 +9,8 @@ class QnNetworkIssueBusinessEvent: public QnReasonedBusinessEvent
 public:
     QnNetworkIssueBusinessEvent(const QnResourcePtr& resource,
                           qint64 timeStamp,
-                          int reasonCode,
+                          QnBusiness::EventReason reasonCode,
                           const QString &reasonText);
-
-    virtual QString toString() const override;
 };
 
 typedef QSharedPointer<QnNetworkIssueBusinessEvent> QnNetworkIssueBusinessEventPtr;

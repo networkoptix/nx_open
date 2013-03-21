@@ -8,10 +8,10 @@
 
 #include <ui/widgets/dwm.h>
 #include <ui/style/skin.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 #ifdef Q_OS_WIN
-#   include "device_plugins/desktop_win_only/win_audio_helper.h"
+#   include "device_plugins/desktop_win/win_audio_helper.h"
 #endif
 
 namespace {
@@ -61,8 +61,8 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateDisableAeroCheckbox()));
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
-    setDefaultSoundIcon(ui->label_primaryDeviceIcon);
-    setDefaultSoundIcon(ui->label_secondaryDeviceIcon);
+    setDefaultSoundIcon(ui->primaryDeviceIconLabel);
+    setDefaultSoundIcon(ui->secondaryDeviceIconLabel);
 
     foreach (const QString& deviceName, QnVideoRecorderSettings::availableDeviceNames(QAudio::AudioInput)) {
         ui->primaryAudioDeviceComboBox->addItem(deviceName);
@@ -86,14 +86,11 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
         );
     }
 
-    {
-        QPalette palette = ui->recordingWarningLabel->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-        ui->recordingWarningLabel->setPalette(palette);
-    }
+    setWarningStyle(ui->recordingWarningLabel);
 
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
     connect(ui->resolutionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
+    connect(ui->fullscreenButton, SIGNAL(toggled(bool)), ui->screenComboBox, SLOT(setEnabled(bool)));
 
     updateDisableAeroCheckbox();
 }
@@ -130,7 +127,7 @@ Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
     if (ui->fullscreenButton->isChecked() && !ui->disableAeroCheckBox->isChecked())
         return Qn::FullScreenMode;
     else if (ui->fullscreenButton->isChecked() && ui->disableAeroCheckBox->isChecked())
-        return Qn::FullScreenNoeroMode;
+        return Qn::FullScreenNoAeroMode;
     else
         return Qn::WindowMode;
 }
@@ -142,7 +139,7 @@ void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
         ui->fullscreenButton->setChecked(true);
         ui->disableAeroCheckBox->setChecked(false);
         break;
-    case Qn::FullScreenNoeroMode:
+    case Qn::FullScreenNoAeroMode:
         ui->fullscreenButton->setChecked(true);
         ui->disableAeroCheckBox->setChecked(true);
         break;
@@ -236,17 +233,17 @@ void QnRecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
 
 void QnRecordingSettingsWidget::additionalAdjustSize()
 {
-    ui->label_primaryDeviceText->adjustSize();
-    ui->label_secondaryDeviceText->adjustSize();
+    ui->primaryDeviceTextLabel->adjustSize();
+    ui->secondaryDeviceTextLabel->adjustSize();
 
-    int maxWidth = qMax(ui->label_primaryDeviceText->width(), ui->label_secondaryDeviceText->width());
-    QSize s = ui->label_primaryDeviceText->minimumSize();
+    int maxWidth = qMax(ui->primaryDeviceTextLabel->width(), ui->secondaryDeviceTextLabel->width());
+    QSize s = ui->primaryDeviceTextLabel->minimumSize();
     s.setWidth(maxWidth);
-    ui->label_primaryDeviceText->setMinimumSize(s);
-    ui->label_secondaryDeviceText->setMinimumSize(s);
+    ui->primaryDeviceTextLabel->setMinimumSize(s);
+    ui->secondaryDeviceTextLabel->setMinimumSize(s);
 
-    ui->label_primaryDeviceText->adjustSize();
-    ui->label_secondaryDeviceText->adjustSize();
+    ui->primaryDeviceTextLabel->adjustSize();
+    ui->secondaryDeviceTextLabel->adjustSize();
 }
 
 void QnRecordingSettingsWidget::updateRecordingWarning() {
@@ -310,7 +307,7 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 #ifdef Q_OS_WIN
     QComboBox* c = (QComboBox*) sender();
     WinAudioExtendInfo info(c->itemText(index));
-    QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->label_primaryDeviceIcon : ui->label_secondaryDeviceIcon;
+    QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->primaryDeviceIconLabel : ui->secondaryDeviceIconLabel;
     QPixmap icon = info.deviceIcon();
     if (!icon.isNull())
         l->setPixmap(icon.scaled(ICON_SIZE, ICON_SIZE));

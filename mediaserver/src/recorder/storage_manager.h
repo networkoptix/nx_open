@@ -30,7 +30,6 @@ public:
     void removeAbsentStorages(QnAbstractStorageResourceList newStorages);
     void addStorage(QnStorageResourcePtr storage);
 
-
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
     bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
@@ -57,8 +56,17 @@ public:
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
-    const StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
+    QnStorageResourceList getStorages() const;
     void clearSpace();
+
+    bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
+
+    qint64 minSpaceForWritting() const;
+    qint64 isBigStorageExists() const;
+
+    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+signals:
+    void noStoragesAvailable();
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -76,6 +84,8 @@ private:
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
     QString toCanonicalPath(const QString& path);
+    StorageMap getAllStorages() const;
+    QSet<QnStorageResourcePtr> getWritableStorages() const;
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -93,6 +103,9 @@ private:
     FileNumCache m_fileNumCache;
     QMutex m_cacheMutex;
     bool m_catalogLoaded;
+    bool m_warnSended;
+    bool m_isWritableStorageAvail;
+    bool m_bigStorageExists;
 };
 
 #define qnStorageMan QnStorageManager::instance()

@@ -41,7 +41,8 @@ public:
     QnResourcePool();
     ~QnResourcePool();
 
-    static QnResourcePool *instance();
+    static void initStaticInstance( QnResourcePool* inst );
+    static QnResourcePool* instance();
 
     // this function will add or update existing resources
     // keeps database ID ( if possible )
@@ -82,13 +83,26 @@ public:
     QnResourceList getResourcesWithParentId(QnId id) const;
     QnResourceList getResourcesWithTypeId(QnId id) const;
 
+    QnUserResourcePtr getAdministrator() const;
+
     QStringList allTags() const;
 
-    int activeCameras() const;
+    int activeCamerasByClass(bool analog) const;
+
+    int activeDigital() const {
+        return activeCamerasByClass(false);
+    }
+
+    int activeAnalog() const {
+        return activeCamerasByClass(true);
+    }
 
     // TODO #gdm: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
+
+    //!Empties all internal dictionaries. Needed for correct destruction order at application stop
+    void clear();
 
 signals:
     void resourceAdded(const QnResourcePtr &resource);

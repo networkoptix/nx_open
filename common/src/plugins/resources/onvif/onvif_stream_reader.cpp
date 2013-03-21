@@ -120,6 +120,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary)
     //}
     QString result = fetchStreamUrl(soapWrapper, info.profileToken, isPrimary);
     qDebug() << "got stream URL for camera" << m_resource->getUrl() << "for profile" << info.profileToken;
+    qDebug() << "rtsp=" << result;
     return result;
 }
 
@@ -436,6 +437,8 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
 
     qSort(availableProfiles);
     int profileIndex = isPrimary ? 0 : 1;
+    profileIndex += m_onvifRes->getChannel()* (m_onvifRes->hasDualStreaming() ? 2 : 1);
+
     if (availableProfiles.size() <= profileIndex)
         return 0; // no existing profile matched
 

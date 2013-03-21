@@ -5,7 +5,7 @@
 #include <QtCore/QHash>
 #include <QtGui/QVector3D>
 
-#include <utils/common/space_mapper.h>
+#include <utils/math/space_mapper.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -37,6 +37,9 @@ public:
 
     void setPhysicalPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &physicalPosition);
 
+    // TODO: #Elric remove?
+    void updatePosition(const QnVirtualCameraResourcePtr &camera);
+
     /**
      * \param camera                    Camera to get current PTZ continuous movement speed for.
      * \returns                         Current PTZ continuous movement speed for the given
@@ -61,7 +64,7 @@ private slots:
     
     void at_resource_statusChanged(const QnResourcePtr &resource);
 
-    void at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
+    void at_ptzGetPosition_replyReceived(int status, const QVector3D &position, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);
     void at_ptzSetMovement_replyReceived(int status, int handle);
 

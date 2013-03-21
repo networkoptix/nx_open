@@ -9,13 +9,13 @@
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(BusinessActionType::Value actionType, QWidget *parent,
                                                                             QnWorkbenchContext *context) {
     switch (actionType) {
-        case BusinessActionType::BA_CameraOutput:
+        case BusinessActionType::CameraOutput:
             return new QnCameraOutputBusinessActionWidget(parent);
-        case BusinessActionType::BA_CameraRecording:
+        case BusinessActionType::CameraRecording:
             return new QnRecordingBusinessActionWidget(parent);
-        case BusinessActionType::BA_SendMail:
+        case BusinessActionType::SendMail:
             return new QnSendmailBusinessActionWidget(parent, context);
-        case BusinessActionType::BA_ShowPopup:
+        case BusinessActionType::ShowPopup:
             return new QnPopupBusinessActionWidget(parent, context);
         default:
             return new QnEmptyBusinessActionWidget(parent);

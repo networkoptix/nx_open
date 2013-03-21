@@ -3,100 +3,69 @@
 
 #include "config.h" 
 
-#include <cassert>
-#include <typeinfo>
-
 #include <QtCore/QThread>
 #include <QtCore/QSemaphore>
+#include <QtCore/QSharedPointer>
 
-#include "warnings.h"
+#include "singleton.h"
+
+class QnLongRunnablePoolPrivate;
+
 
 class QN_EXPORT QnLongRunnable: public QThread {
     Q_OBJECT
 public:
-    QnLongRunnable(): 
-        m_needStop(false),
-        m_onPause(false)
-    {
-        DEBUG_CODE(m_type = NULL);
-    }
+    QnLongRunnable();
+    virtual ~QnLongRunnable();
 
-    virtual ~QnLongRunnable() {
-        if(isRunning())
-            qnCritical("Runnable instance was destroyed without a call to stop().");
-    }
+    bool needToStop() const;
 
-    virtual bool needToStop() const {
-        return m_needStop;
-    }
+    virtual void pause();
+    virtual void resume();
+    bool isPaused() const;
+    void pauseDelay();
 
-    virtual void pause() {
-        m_semaphore.tryAcquire(m_semaphore.available());
-        m_onPause = true;
-    }
-
-    virtual void resume() {
-        m_onPause = false;
-        m_semaphore.release();
-    }
-
-    void pauseDelay() {
-        while(m_onPause && !needToStop())
-            m_semaphore.tryAcquire(1, 50);
-    }
-
-    void smartSleep(int ms) {
-        int n = ms / 100;
-
-        for (int i = 0; i < n; ++i)
-            if (!needToStop())
-                msleep(100);
-
-        if (!needToStop())
-            msleep(ms % 100);
-    }
-
-    bool isPaused() const { return m_onPause; }
+    void smartSleep(int ms);
 
 public slots:
-    void start(Priority priority = InheritPriority) {
-        if (isRunning()) // already runing;
-            return;
+    virtual void start(Priority priority = InheritPriority);
+    virtual void pleaseStop();
+    virtual void stop();
 
-        DEBUG_CODE(m_type = &typeid(*this));
-
-        m_needStop = false;
-        QThread::start(priority);
-        assert(isRunning());
-    }
-
-    virtual void pleaseStop() {
-        m_needStop = true;
-        if (m_onPause)
-            resume();
-    }
-
-    virtual void stop() {
-        DEBUG_CODE(
-            if(m_type) {
-                const std::type_info *type = &typeid(*this);
-                assert(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
-
-                m_type = NULL; /* So that we don't check it again. */
-            }
-        );
-
-        pleaseStop();
-        wait();
-    }
+private slots:
+    void at_started();
+    void at_finished();
 
 protected:
     volatile bool m_needStop;
     volatile bool m_onPause;
-
     QSemaphore m_semaphore;
-
+    QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     DEBUG_CODE(const std::type_info *m_type;)
+};
+
+
+class QnLongRunnablePool: public QObject, public QnSingleton<QnLongRunnablePool> {
+    Q_OBJECT
+public:
+    QnLongRunnablePool(QObject *parent = NULL);
+    virtual ~QnLongRunnablePool();
+
+    /**
+     * Sends stop request to all threads previously registered with this pool
+     * and waits until they are stopped.
+     */
+    void stopAll();
+
+    /**
+     * Blocks current thread until all threads previously registered with this
+     * pool are stopped.
+     */
+    void waitAll();
+
+private:
+    friend class QnLongRunnable;
+    QSharedPointer<QnLongRunnablePoolPrivate> d;
 };
 
 
@@ -104,10 +73,8 @@ protected:
  * Helper cleanup class to use QnLongRunnable inside Qt smart pointers in a 
  * non-blocking fashion.
  */
-struct QnRunnableCleanup
-{
-    static inline void cleanup(QnLongRunnable *runnable)
-    {
+struct QnRunnableCleanup {
+    static inline void cleanup(QnLongRunnable *runnable) {
         if(!runnable)
             return;
 

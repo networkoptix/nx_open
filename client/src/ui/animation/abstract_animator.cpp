@@ -27,7 +27,7 @@ AbstractAnimator::~AbstractAnimator() {
 
 void AbstractAnimator::setTimeLimit(int timeLimitMSec) {
     if(isRunning()) {
-        qnWarning("Cannot change time limit of a running animation.");
+        qnWarning("Cannot set time limit of a running animation.");
         return;
     }
 

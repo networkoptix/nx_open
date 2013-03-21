@@ -12,7 +12,7 @@
 #include <utils/common/email.h>
 
 #include <ui/common/read_only.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <client/client_globals.h>
@@ -37,7 +37,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
         qnNullWarning(context);
 
     foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
-        m_userByLogin[user->getName()] = user;
+        m_userByLogin[user->getName().toLower()] = user;
 
     for(int i = 0; i < ElementCount; i++) {
         m_valid[i] = true;
@@ -64,11 +64,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
 
-    {
-        QPalette palette = ui->hintLabel->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-        ui->hintLabel->setPalette(palette);
-    }
+    setWarningStyle(ui->hintLabel);
 
     updateAll();
 }
@@ -148,6 +144,11 @@ void QnUserSettingsDialog::setEditorPermissions(quint64 rights) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
+}
+
+void QnUserSettingsDialog::setFocusedElement(QString element) {
+    if (element == QLatin1String("email"))
+        ui->emailEdit->setFocus();
 }
 
 QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element element) const {
@@ -258,7 +259,7 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
 
     QPalette palette = this->palette();
     if(!valid)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
 
     switch(element) {
     case Login:
@@ -295,7 +296,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Login cannot be empty.");
             valid = false;
         }
-        if(m_userByLogin.contains(ui->loginEdit->text()) && m_userByLogin.value(ui->loginEdit->text()) != m_user) {
+        if(m_userByLogin.contains(ui->loginEdit->text().toLower()) && m_userByLogin.value(ui->loginEdit->text().toLower()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
         }
@@ -338,7 +339,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         }
         break;
     case Email:
-        if(!ui->emailEdit->text().isEmpty() && !isEmailValid(ui->emailEdit->text())) {
+        if(!ui->emailEdit->text().trimmed().isEmpty() && !QnEmail::isValid(ui->emailEdit->text())) {
             hint = tr("Invalid email address.");
             valid = false;
         }

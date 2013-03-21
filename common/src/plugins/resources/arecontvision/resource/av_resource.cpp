@@ -267,6 +267,10 @@ bool QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
+    const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
+    setFirmware(firmware);
+    save();
+
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
 
@@ -428,7 +432,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
     return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) || name.contains(QLatin1String("20365")) ||
-           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365"));
+           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365")) || name.contains(QLatin1String("12186"));
 }
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()

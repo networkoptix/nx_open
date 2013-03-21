@@ -12,13 +12,29 @@
 
 #include "core/resource/resource.h"
 #include <core/resource_managment/resource_pool.h>
+#include "health/system_health.h"
+#include "actions/system_health_business_action.h"
 
 
-Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
+static QnBusinessEventConnector* _instance = NULL;
+
+QnBusinessEventConnector::QnBusinessEventConnector()
+{
+}
+
+QnBusinessEventConnector::~QnBusinessEventConnector()
+{
+}
+
+void QnBusinessEventConnector::initStaticInstance( QnBusinessEventConnector* inst )
+{
+    _instance = inst;
+}
 
 QnBusinessEventConnector* QnBusinessEventConnector::instance()
 {
-    return static_instance();
+    //return static_instance();
+    return _instance;
 }
 
 void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata)
@@ -39,7 +55,7 @@ void QnBusinessEventConnector::at_cameraDisconnected(const QnResourcePtr &resour
     qnBusinessRuleProcessor->processBusinessEvent(cameraEvent);
 }
 
-void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, int reasonCode, const QnResourcePtr &storageRes)
+void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QnResourcePtr &storageRes)
 {
     QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(
         mServerRes,
@@ -50,7 +66,7 @@ void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
-void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode)
+void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode)
 {
     QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(
         resource,
@@ -69,7 +85,7 @@ void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource
     qnBusinessRuleProcessor->processBusinessEvent(ipConflictEvent);
 }
 
-void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode, const QString &reasonText)
+void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonText)
 {
     QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
         resource,
@@ -100,4 +116,10 @@ void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resou
         timeStamp,
         otherServers));
     qnBusinessRuleProcessor->processBusinessEvent(conflictEvent);
+}
+
+void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
+{
+    QnPopupBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured, resource->getId()));
+    qnBusinessRuleProcessor->showPopup(action);
 }

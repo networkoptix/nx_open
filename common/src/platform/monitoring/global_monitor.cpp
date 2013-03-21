@@ -6,6 +6,21 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
+#include <utils/common/delete_later.h>
+
+// -------------------------------------------------------------------------- //
+// QnStubMonitor
+// -------------------------------------------------------------------------- //
+class QnStubMonitor: public QnPlatformMonitor {
+public:
+    QnStubMonitor(QObject *parent = NULL): QnPlatformMonitor(parent) {}
+
+    virtual qreal totalCpuUsage() override { return 0.0; }
+    virtual qreal totalRamUsage() override { return 0.0; }
+    virtual QList<HddLoad> totalHddLoad() override { return QList<HddLoad>(); }
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return QList<PartitionSpace>(); }
+    virtual QString partitionByPath(const QString &) override { return QString(); }
+};
 
 
 // -------------------------------------------------------------------------- //
@@ -60,21 +75,22 @@ private:
 // QnGlobalMonitor
 // -------------------------------------------------------------------------- //
 QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
+    base_type(parent),
     d_ptr(new QnGlobalMonitorPrivate())
 {
-    Q_UNUSED(parent)
     Q_D(QnGlobalMonitor);
 
     d_ptr->q_ptr = this;
 
     if(!base) {
         qnNullWarning(base);
-        base = new QnPlatformMonitor();
+        base = new QnStubMonitor();
     }
 
     if(base->thread() != thread()) {
         qnWarning("Cannot use a base monitor that lives in another thread.");
-        base = new QnPlatformMonitor();
+        qnDeleteLater(base); /* Claim ownership. */
+        base = new QnStubMonitor();
     }
 
     base->setParent(this); /* Claim ownership. */
@@ -133,6 +149,20 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     d->requestCount++;
     d->stopped = false;
     return d->totalHddLoad;
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo() {
+    Q_D(QnGlobalMonitor);
+    QMutexLocker locker(&d->mutex);
+
+    return d_func()->base->totalPartitionSpaceInfo();
+}
+
+QString QnGlobalMonitor::partitionByPath(const QString &path) {
+    Q_D(QnGlobalMonitor);
+    QMutexLocker locker(&d->mutex);
+
+    return d_func()->base->partitionByPath(path);
 }
 
 void QnGlobalMonitor::timerEvent(QTimerEvent *event) {

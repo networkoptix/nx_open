@@ -26,16 +26,18 @@ public:
     void setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq);
 
     void setQuality(MediaQuality q);
+    void setGroupId(const QByteArray& groupId);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run();
+    virtual void afterRun() override;
 private:
     QnAbstractMediaDataPtr createEmptyPacket();
 private:
     QnAbstractArchiveDelegate* m_delegate;
     qint64 m_currentPos;
     int m_cseq;
-    QnServerArchiveDelegatePtr m_archiveDelegate;
+    QnAbstractArchiveDelegate* m_archiveDelegate;
 };
 
 #endif //THUMBNAILS_STREAM_READER_H__

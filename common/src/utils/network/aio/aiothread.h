@@ -37,6 +37,7 @@ namespace aio
         //!Monitor socket \a sock for event \a eventToWatch occurence and trigger \a eventHandler on event
         /*!
             \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
+            \note MUST be called with \a mutex locked
         */
         bool watchSocket(
             const QSharedPointer<Socket>& sock,
@@ -44,9 +45,13 @@ namespace aio
             AIOEventHandler* const eventHandler );
         //!Do not monitor \a sock for event \a eventType
         /*!
-            Garantees that no \a eventTriggered will be called after return of this method
+            Garantees that no \a eventTriggered will be called after return of this method.
+            If \a eventTriggered is running and \a removeFromWatch called not from \a eventTriggered, method blocks till \a eventTriggered had returned
+            \return true if removed socket. false if failed to remove
+            \note Calling this method with same parameters simultaneously from multiple threads can cause undefined behavour
+            \note MUST be called with \a mutex locked
         */
-        void removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType );
+        bool removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType );
         //!Returns number of sockets monitored for \a eventToWatch event
         size_t size( PollSet::EventType eventToWatch ) const;
         //!Returns true, if can monitor one more socket for \a eventToWatch

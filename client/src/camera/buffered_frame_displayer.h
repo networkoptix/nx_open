@@ -29,9 +29,9 @@ public:
 
     void clear();
 
-    qint64 getLastDisplayedTime();
+    qint64 getTimestampOfNextFrameToRender();
 
-    void setLastDisplayedTime(qint64 value);
+    void overrideTimestampOfNextFrameToRender(qint64 value);
 
 protected:
     virtual void run() override;

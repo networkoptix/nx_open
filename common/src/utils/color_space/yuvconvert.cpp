@@ -5,7 +5,7 @@
 
 #include <QtCore/QtGlobal>
 
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);

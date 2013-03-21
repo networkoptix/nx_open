@@ -4,6 +4,8 @@
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/synctime.h"
 
+#include <client/client_globals.h>
+
 class QnCamDisplay;
 class QnArchiveStreamReader;
 
@@ -18,6 +20,9 @@ public:
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
     int counsumerCount() const;
+
+    void setMode(Qn::ResolutionMode mode);
+    Qn::ResolutionMode getMode() const;
 
 public slots:
     /* Inform controller that not enough data or CPU for stream */
@@ -61,6 +66,7 @@ private:
     int m_hiQualityRetryCounter;
     int m_timerTicks;    // onTimer ticks count
     qint64 m_lastLqTime; // latest HQ->LQ switch time
+    Qn::ResolutionMode m_mode;
 private:
     QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason, double speed = INT_MAX);

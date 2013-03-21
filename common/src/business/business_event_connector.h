@@ -1,8 +1,10 @@
 #ifndef __BUSINESS_EVENT_CONNECTOR_H__
 #define __BUSINESS_EVENT_CONNECTOR_H__
 
-#include "core/resource/resource_fwd.h"
-#include "core/datapacket/abstract_data_packet.h"
+#include <core/resource/resource_fwd.h>
+#include <core/datapacket/abstract_data_packet.h>
+
+#include <business/business_logic_common.h>
 
 /*
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor
@@ -11,7 +13,12 @@
 class QnBusinessEventConnector: public QObject
 {
     Q_OBJECT
+
 public:
+    QnBusinessEventConnector();
+    ~QnBusinessEventConnector();
+
+    static void initStaticInstance( QnBusinessEventConnector* );
     static QnBusinessEventConnector* instance();
 
 public slots:
@@ -27,11 +34,11 @@ public slots:
 
     /*! Some problem with storage
     */
-    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, int reasonCode, const QnResourcePtr &storageRes);
+    void at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QnResourcePtr &storageRes);
 
     /*! Some problem with network
     */
-    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode, const QString &reasonText);
+    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonText);
 
     /*!
         \param inputPortID device-specific ID of input port
@@ -39,11 +46,13 @@ public slots:
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
 
-    void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, int reasonCode);
+    void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode);
 
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList, qint64 timeStamp);
 
     void at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QList<QByteArray>& otherServers);
+
+    void at_NoStorages(const QnResourcePtr& resource);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

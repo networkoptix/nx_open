@@ -39,6 +39,8 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         for (int i = 0; i < numChannels; ++i) 
             setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
+        m_groupId = other_casted->m_groupId;
+        m_groupName = other_casted->m_groupName;
     }
 }
 
@@ -119,6 +121,18 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         return result;
 
     }
+    else if (role == QnResource::Role_Archive) {
+        
+        QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+        if (archiveDelegate) {
+            QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+            archiveReader->setArchiveDelegate(archiveDelegate);
+            if (hasFlags(still_image) || hasFlags(utc))
+                archiveReader->setCycleMode(false);
+            return archiveReader;
+        }
+    }
+
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
@@ -244,6 +258,28 @@ bool QnSecurityCamResource::hasDualStreaming() const
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
     this_casted->getParam(lit("hasDualStreaming"), val, QnDomainMemory);
+    return val.toInt();
+}
+
+bool QnSecurityCamResource::isDtsBased() const
+{
+    if (!hasParam(lit("dts")))
+        return false;
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam(lit("dts"), val, QnDomainMemory);
+    return val.toInt();
+}
+
+bool QnSecurityCamResource::isAnalog() const
+{
+    if (!hasParam(lit("analog")))
+        return false;
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam(lit("analog"), val, QnDomainMemory);
     return val.toInt();
 }
 
@@ -447,6 +483,11 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
     return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
 }
 
+bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const
+{
+    return getCameraCapabilities() & capabilities;
+}
+
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
     setParam(lit("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
 }
@@ -475,4 +516,28 @@ void QnSecurityCamResource::recordingEventAttached()
 void QnSecurityCamResource::recordingEventDetached()
 {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
+}
+
+QString QnSecurityCamResource::getGroupName() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_groupName;
+}
+
+void QnSecurityCamResource::setGroupName(const QString& value)
+{
+    QMutexLocker lk( &m_mutex );
+    m_groupName = value;
+}
+
+QString QnSecurityCamResource::getGroupId() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_groupId;
+}
+
+void QnSecurityCamResource::setGroupId(const QString& value)
+{
+    QMutexLocker lk( &m_mutex );
+    m_groupId = value;
 }

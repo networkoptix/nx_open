@@ -11,10 +11,11 @@ message Server {
     }
 
     message Storage {
-        optional int32        id           = 1;
-        required string       name         = 2;
-        required string       url          = 3;
-        required int64        spaceLimit   = 4;
+        optional int32        id             = 1;
+        required string       name           = 2;
+        required string       url            = 3;
+        required int64        spaceLimit     = 4;
+        optional bool         usedForWriting = 5;
     }
 
     required string       apiUrl       = 1;

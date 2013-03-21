@@ -24,6 +24,9 @@ public:
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;
 
+    void setUsedForWriting(bool isUsedForWriting);
+    bool isUsedForWriting() const;
+
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }
 
@@ -43,6 +46,17 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
+
+    // TODO: #Elric move out?
+    struct ProtocolDescription {
+        QString protocol;
+        QString name;
+        QString urlTemplate;
+        QString urlPattern;
+    };
+
+    static ProtocolDescription protocolDescription(const QString &protocol);
+
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -53,7 +67,8 @@ signals:
 
 private:
     qint64 m_spaceLimit;
-    int m_maxStoreTime; // at seconds
+    int m_maxStoreTime; // in seconds
+    bool m_usedForWriting;
     quint16 m_index;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;

@@ -7,10 +7,11 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ui/common/resource_name.h>
+#include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
-#include <utils/settings.h>
 
 namespace {
 
@@ -23,35 +24,12 @@ namespace {
         ConflictsRole
 
     };
-
-
-    QString extractHost(const QString &url) {
-        /* Try it as a host address first. */
-        QHostAddress hostAddress(url);
-        if(!hostAddress.isNull())
-            return hostAddress.toString();
-
-        /* Then go default QUrl route. */
-        return QUrl(url).host();
-    }
-
-    QString getResourceName(const QnResourcePtr& resource) {
-        QnResource::Flags flags = resource->flags();
-        if (qnSettings->isIpShownInTree()) {
-            if((flags & QnResource::network) || (flags & QnResource::server && flags & QnResource::remote)) {
-                QString host = extractHost(resource->getUrl());
-                if(!host.isEmpty())
-                    return QString(QLatin1String("%1 (%2)")).arg(resource->getName()).arg(host);
-            }
-        }
-        return resource->getName();
-    }
 }
 
 QnBusinessEventPopupWidget::QnBusinessEventPopupWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnBusinessEventPopupWidget),
-    m_eventType(BusinessEventType::BE_NotDefined),
+    m_eventType(BusinessEventType::NotDefined),
     m_showAllItem(NULL),
     m_showAll(false)
 {
@@ -76,6 +54,7 @@ QnBusinessEventPopupWidget::~QnBusinessEventPopupWidget()
 
 void QnBusinessEventPopupWidget::at_okButton_clicked() {
     emit closed(m_eventType, ui->ignoreCheckBox->isChecked());
+    hide();
 }
 
 void QnBusinessEventPopupWidget::at_eventsTreeView_clicked(const QModelIndex &index) {
@@ -128,7 +107,7 @@ void QnBusinessEventPopupWidget::updateTreeSize() {
 }
 
 bool QnBusinessEventPopupWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    if (m_eventType == BusinessEventType::BE_NotDefined) //not initialized
+    if (m_eventType == BusinessEventType::NotDefined) //not initialized
         initWidget(QnBusinessEventRuntime::getEventType(businessAction->getRuntimeParams()));
     if (!updateTreeModel(businessAction))
         return false;
@@ -177,27 +156,30 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
 
     m_eventType = eventType;
     switch (m_eventType) {
-        case BusinessEventType::BE_NotDefined:
-            return;
+    case BusinessEventType::NotDefined:
+        return;
 
-        case BusinessEventType::BE_Camera_Input:
-        case BusinessEventType::BE_Camera_Disconnect:
-            ui->importantLabel->setVisible(true);
-            break;
+    case BusinessEventType::Camera_Input:
+    case BusinessEventType::Camera_Disconnect:
+        setBorderColor(qnGlobals->popupFrameImportant());
+        ui->importantLabel->setVisible(true);
+        break;
 
-        case BusinessEventType::BE_Storage_Failure:
-        case BusinessEventType::BE_Network_Issue:
-        case BusinessEventType::BE_Camera_Ip_Conflict:
-        case BusinessEventType::BE_MediaServer_Failure:
-        case BusinessEventType::BE_MediaServer_Conflict:
-            ui->warningLabel->setVisible(true);
-            break;
+    case BusinessEventType::Storage_Failure:
+    case BusinessEventType::Network_Issue:
+    case BusinessEventType::Camera_Ip_Conflict:
+    case BusinessEventType::MediaServer_Failure:
+    case BusinessEventType::MediaServer_Conflict:
+        setBorderColor(qnGlobals->popupFrameWarning());
+        ui->warningLabel->setVisible(true);
+        break;
 
-        //case BusinessEventType::BE_Camera_Motion:
-        //case BusinessEventType::BE_UserDefined:
-        default:
-            ui->notificationLabel->setVisible(true);
-            break;
+        //case BusinessEventType::Camera_Motion:
+        //case BusinessEventType::UserDefined:
+    default:
+        setBorderColor(qnGlobals->popupFrameNotification());
+        ui->notificationLabel->setVisible(true);
+        break;
     }
     ui->eventLabel->setText(BusinessEventType::toString(eventType));
 }
@@ -205,18 +187,18 @@ void QnBusinessEventPopupWidget::initWidget(BusinessEventType::Value eventType) 
 bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionPtr &businessAction) {
     QStandardItem* item;
     switch (m_eventType) {
-        case BusinessEventType::BE_Camera_Disconnect:
-        case BusinessEventType::BE_Camera_Input:
-        case BusinessEventType::BE_Camera_Motion:
+        case BusinessEventType::Camera_Disconnect:
+        case BusinessEventType::Camera_Input:
+        case BusinessEventType::Camera_Motion:
             item = updateSimpleTree(businessAction->getRuntimeParams());
             break;
-        case BusinessEventType::BE_Storage_Failure:
-        case BusinessEventType::BE_Network_Issue:
-        case BusinessEventType::BE_MediaServer_Failure:
+        case BusinessEventType::Storage_Failure:
+        case BusinessEventType::Network_Issue:
+        case BusinessEventType::MediaServer_Failure:
             item = updateReasonTree(businessAction->getRuntimeParams());
             break;
-        case BusinessEventType::BE_Camera_Ip_Conflict:
-        case BusinessEventType::BE_MediaServer_Conflict:
+        case BusinessEventType::Camera_Ip_Conflict:
+        case BusinessEventType::MediaServer_Conflict:
             item = updateConflictTree(businessAction->getRuntimeParams());
             break;
         default:
@@ -297,12 +279,16 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessPara
 
     switch (reasonCode) {
         case QnBusiness::NetworkIssueNoFrame:
-            if (m_eventType == BusinessEventType::BE_Network_Issue)
+            if (m_eventType == BusinessEventType::Network_Issue)
                 item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
                                                   .arg(reasonText)));
             break;
+        case QnBusiness::NetworkIssueConnectionClosed:
+            if (m_eventType == BusinessEventType::Network_Issue)
+                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
+            break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
-            if (m_eventType == BusinessEventType::BE_Network_Issue) {
+            if (m_eventType == BusinessEventType::Network_Issue) {
                 QStringList seqs = reasonText.split(QLatin1Char(';'));
                 if (seqs.size() != 2)
                     break;
@@ -313,20 +299,20 @@ QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessPara
             }
             break;
         case QnBusiness::MServerIssueTerminated:
-            if (m_eventType == BusinessEventType::BE_MediaServer_Failure)
+            if (m_eventType == BusinessEventType::MediaServer_Failure)
                 item->appendRow(new QStandardItem(tr("Server terminated.")));
             break;
         case QnBusiness::MServerIssueStarted:
-            if (m_eventType == BusinessEventType::BE_MediaServer_Failure)
+            if (m_eventType == BusinessEventType::MediaServer_Failure)
                 item->appendRow(new QStandardItem(tr("Server started after crash.")));
             break;
         case QnBusiness::StorageIssueIoError:
-            if (m_eventType == BusinessEventType::BE_Storage_Failure)
+            if (m_eventType == BusinessEventType::Storage_Failure)
                 item->appendRow(new QStandardItem(tr("I/O Error occured at\n%1")
                                                   .arg(reasonText)));
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:
-            if (m_eventType == BusinessEventType::BE_Storage_Failure)
+            if (m_eventType == BusinessEventType::Storage_Failure)
                 item->appendRow(new QStandardItem(tr("Not enough HDD/SSD speed\nfor recording at\n%1.")
                                                   .arg(reasonText)));
             break;

@@ -59,7 +59,9 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_pausedStart(false),
     m_sendMotion(false),
     m_prevSendMotion(false),
-    m_outOfPlaybackMask(false)
+    m_outOfPlaybackMask(false),
+    m_latPacketTime(DATETIME_NOW),
+    m_stopCond(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -190,13 +192,15 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
 
 const QnResourceVideoLayout* QnArchiveStreamReader::getDPVideoLayout() const
 {
-    m_delegate->open(m_resource);
+    if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
+    	m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
 const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 {
-    m_delegate->open(m_resource);
+	if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
+    	m_delegate->open(m_resource);
     return m_delegate->getAudioLayout();
 }
 
@@ -208,7 +212,8 @@ bool QnArchiveStreamReader::init()
     qint64 requiredJumpTime = m_requiredJumpTime;
 	MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode)
+    bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
+    if (imSeek && (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode))
     {
         // It is optimization: open and jump at same time
         while (1)
@@ -244,6 +249,11 @@ bool QnArchiveStreamReader::init()
         emit slowSourceHint();
 
     return true;
+}
+
+bool QnArchiveStreamReader::offlineRangeSupported() const
+{
+    return m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineRange;
 }
 
 qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
@@ -323,18 +333,28 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
 
+    if (m_stopCond) {
+        QMutexLocker lock(&m_stopMutex);
+        m_delegate->close();
+        while (m_stopCond && !needToStop())
+            m_stopWaitCond.wait(&m_stopMutex);
+        if (needToStop())
+            return QnAbstractMediaDataPtr();
+        m_delegate->seek(m_latPacketTime, true);
+    }
+
     if (m_pausedStart)
     {
         m_pausedStart = false;
         QMutexLocker mutex(&m_jumpMtx);
-        while (m_singleShot && m_singleQuantProcessed && !m_needStop)
+        while (m_singleShot && m_singleQuantProcessed && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
     //=================
     {
         QMutexLocker mutex(&m_jumpMtx);
-        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !m_needStop)
+        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
         //QnLongRunnable::pause();
     }
@@ -342,7 +362,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     bool singleShotMode = m_singleShot;
 
 begin_label:
-    if (m_needStop)
+    if (needToStop())
         return QnAbstractMediaDataPtr();
 
     if (mFirstTime)
@@ -383,6 +403,8 @@ begin_label:
         m_oldQuality = quality;
         m_oldQualityFastSwitch = qualityFastSwitch;
     }
+
+    m_dataMarker = m_newDataMarker;
 
     m_jumpMtx.unlock();
 
@@ -479,7 +501,6 @@ begin_label:
         if (jumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(displayTime);
     }
-    m_dataMarker = m_newDataMarker;
 
     if (m_outOfPlaybackMask)
         return createEmptyPacket(reverseMode); // EOF reached
@@ -519,6 +540,9 @@ begin_label:
 
     if (m_currentData == 0)
         return m_currentData;
+
+    if (m_currentData->flags & QnAbstractMediaData::MediaFlags_Skip)
+        goto begin_label;
 
     videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
 
@@ -670,7 +694,7 @@ begin_label:
                     m_nextData.clear();
                     if (tmp && tmp->dataType == QnAbstractMediaData::EMPTY_DATA)
                     {
-                        return createEmptyPacket(reverseMode); // EOF/BOF reached
+                        return tmp; //createEmptyPacket(reverseMode); // EOF/BOF reached
                     }
                 }
             }
@@ -723,7 +747,7 @@ begin_label:
     }
 
     // ensure Pos At playback mask
-    if (!m_needStop && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (!needToStop() && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
@@ -785,7 +809,8 @@ begin_label:
             }
         }
     }
-
+    if (m_currentData) 
+        m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : qMin(qnSyncTime->currentUSecsSinceEpoch(), m_currentData->timestamp);
     return m_currentData;
 }
 
@@ -819,12 +844,12 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
 {
     QnAbstractMediaDataPtr result;
-    while (!m_needStop)
+    while (!needToStop())
     {
 
         result = m_delegate->getNextData();
 
-        if (result == 0 && !m_needStop)
+        if (result == 0 && !needToStop())
         {
             if (m_cycleMode)
             {
@@ -905,6 +930,7 @@ void QnArchiveStreamReader::pleaseStop()
     if (m_delegate)
         m_delegate->beforeClose();
     m_singleShowWaitCond.wakeAll();
+    m_stopWaitCond.wakeAll();
 }
 
 void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast)
@@ -946,6 +972,7 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
     channeljumpToUnsync(mksec, 0, mksec);
 }
 
+/*
 void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int marker)
 {
     bool useMutex = !m_externalLocked;
@@ -958,6 +985,7 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, bool findIFrame, int ma
     if (useMutex)
         m_jumpMtx.unlock();
 }
+*/
 
 void QnArchiveStreamReader::setMarker(int marker)
 {
@@ -998,17 +1026,25 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         skipTime = 0;
 
 
-    m_jumpMtx.lock();
+    bool useMutex = !m_externalLocked;
+    if (useMutex)
+        m_jumpMtx.lock();
+
     bool needJump = newTime != m_lastJumpTime || m_lastSkipTime != skipTime;
     m_lastJumpTime = newTime;
     m_lastSkipTime = skipTime;
-    m_jumpMtx.unlock();
+
+    if(useMutex)
+        m_jumpMtx.unlock();
 
     if (needJump)
     {
-        QMutexLocker mutex(&m_jumpMtx);
+        if (useMutex)
+            m_jumpMtx.lock();
         beforeJumpInternal(newTime);
         channeljumpToUnsync(newTime, 0, skipTime);
+        if (useMutex)
+            m_jumpMtx.unlock();
     }
 
     //start(QThread::HighPriority);
@@ -1149,4 +1185,40 @@ qint64 QnArchiveStreamReader::endTime() const
         return m_delegate->endTime();
     else
         return p.endTimeMs()*1000;
+}
+
+void QnArchiveStreamReader::afterRun()
+{
+    if (m_delegate)
+        m_delegate->close();
+}
+
+void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
+{
+    if (m_delegate)
+        m_delegate->setGroupId(guid);
+}
+
+void QnArchiveStreamReader::pause() 
+{
+    if (getResource()->hasParam(lit("groupplay"))) {
+        QMutexLocker lock(&m_stopMutex);
+        m_delegate->beforeClose();
+        m_stopCond = true; // for VMAX
+    }
+    else {
+        QnAbstractArchiveReader::pause();
+    }
+}
+
+void QnArchiveStreamReader::resume() 
+{
+    if (getResource()->hasParam(lit("groupplay"))) {
+        QMutexLocker lock(&m_stopMutex);
+        m_stopCond = false; // for VMAX
+        m_stopWaitCond.wakeAll();
+    }
+    else {
+        QnAbstractArchiveReader::resume();
+    }
 }

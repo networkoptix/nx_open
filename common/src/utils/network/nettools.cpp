@@ -12,15 +12,16 @@
 #include <unistd.h>
 #endif
 
-bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port)
+bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
 {
     int res;
 
 #ifdef Q_OS_LINUX
+    Q_UNUSED(mode)
     sock.bind(port);
     res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
 #else
-    res = !sock.bind(iface.address, port);
+    res = !sock.bind(iface.address, port, mode);
 #endif
 
     if (res)
@@ -140,10 +141,8 @@ QString MACToString (const unsigned char* mac)
     return result;
 }
 
-unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
+unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep)
 {
-
-    const char cSep = '-';
     QByteArray arr = macs.toLatin1();
     const char *pszMACAddress = arr.data();
 
@@ -558,4 +557,23 @@ QHostAddress resolveAddress(const QString& addr)
         return hi.addresses()[0];
     else
         return QHostAddress();
+}
+
+int strEqualAmount(const char* str1, const char* str2)
+{
+    int rez = 0;
+    while (*str1 && *str1 == *str2)
+    {
+        rez++;
+        str1++;
+        str2++;
+    }
+    return rez;
+}
+
+bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
+{
+    int eq1 = strEqualAmount(host.toLocal8Bit().constData(), newAddress.toLocal8Bit().constData());
+    int eq2 = strEqualAmount(host.toLocal8Bit().constData(), oldAddress.toLocal8Bit().constData());
+    return eq1 > eq2;
 }

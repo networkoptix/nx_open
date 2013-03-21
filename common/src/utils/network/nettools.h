@@ -25,7 +25,7 @@ struct QnInterfaceAndAddr
 
 QN_EXPORT QString MACToString (const unsigned char* mac);
 
-QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress);
+QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
 // returns list of interfaces which has at least one IPv4 addresse on current machine
@@ -48,9 +48,12 @@ QN_EXPORT QString getMacByIP(const QHostAddress& ip, bool net = true);
 // returns all pingable hosts in the range
 QN_EXPORT QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
 
-QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0);
+QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0, QUdpSocket::BindMode mode = QUdpSocket::DefaultForPlatform);
 
 QN_EXPORT bool isIpv4Address(const QString& addr);
 QN_EXPORT QHostAddress resolveAddress(const QString& addr);
+
+QN_EXPORT int strEqualAmount(const char* str1, const char* str2);
+QN_EXPORT bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 
 #endif //cl_net_tools_1232

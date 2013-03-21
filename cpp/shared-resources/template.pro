@@ -1,7 +1,7 @@
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
-VERSION = ${project.version}
+VERSION = ${release.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat app_bundle
@@ -18,10 +18,10 @@ isEmpty(BUILDLIB) {
 
 CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ../../build-environment/${arch}/bin/debug
+	DESTDIR = ../../build_environment/${arch}/bin/debug
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
 	} else {
-    DESTDIR = ../../build-environment/${arch}/build/bin/debug
+    DESTDIR = ../../build_environment/${arch}/build/bin/debug
   }  
   OBJECTS_DIR = ../${arch}/build/debug
   MOC_DIR = ../${arch}/build/debug/generated
@@ -32,10 +32,10 @@ CONFIG(debug, debug|release) {
 
 CONFIG(release, debug|release) {
   isEmpty(BUILDLIB) {
-	DESTDIR = ../../build-environment/${arch}/bin/release
+	DESTDIR = ../../build_environment/${arch}/bin/release
 #	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
   } else {
-    DESTDIR = ../../build-environment/${arch}/build/bin/release
+    DESTDIR = ../../build_environment/${arch}/build/bin/release
   }  
   OBJECTS_DIR  = ../${arch}/build/release
   MOC_DIR = ../${arch}/build/release/generated
@@ -44,7 +44,7 @@ CONFIG(release, debug|release) {
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
-!contains(TARGET,common) {
+!contains(TARGET,common){
   LIBS += -lcommon	
 }
 
@@ -53,8 +53,8 @@ DEFINES += ${global.defines}
 
 QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-include(${environment.dir}/qt/custom/QtCore/private/qtcore.pri)
-INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt/custom ${environment.dir}/qt/custom/QtCore
+include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
+INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h

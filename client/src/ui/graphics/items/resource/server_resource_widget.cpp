@@ -2,7 +2,8 @@
 
 #include <iterator> /* For std::advance. */
 
-#include <utils/common/math.h> /* For M_PI. */
+#include <utils/math/math.h> /* For M_PI. */
+#include <utils/math/color_transformations.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -20,6 +21,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
+#include <ui/style/statistics_colors.h>
 #include <ui/workbench/workbench_context.h>
 
 /** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
@@ -33,45 +35,13 @@ namespace {
 
     /** Get corresponding color from config */
     QColor getColorByKey(const QString &key) {
-        int id;
-        // TODO: #gdm
-        // It seems that qHash is not needed and is actually harmful here.
-        // Why don't we just use plain numbering?
-        // CPU -> 0
-        // RAM -> 1
-        // C: -> 2
-        // D: -> 3
-        // E: -> 4
-        // ...
-        // 
-        // And for linux:
-        // hda -> 2
-        // hdb -> 3
-        // ...
-        // 
-        // This way we won't have collisions for sure.
-
-        // some hacks to align hashes for keys like 'C:' and 'sda'
-        // strongly depends on size of systemHealthColors
-        QLatin1String salt = QLatin1String("2");
+        QnStatisticsColors colors = qnGlobals->statisticsColors();
         if (key == QLatin1String("CPU"))
-            id = 7;
-        else if (key == QLatin1String("RAM"))
-            id = 8;
-        else
-        if (key.contains(QLatin1Char(':'))) {
-            // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
-            QString key2 = key.at(0);
-            id = qHash(salt + key2);
-        }
-        else
-            // linux hdd keys
-            id = qHash(salt + key);
-        QnColorVector colors = qnGlobals->systemHealthColors();
-        return colors[id % colors.size()];
+            return colors.cpu;
+        if (key == QLatin1String("RAM"))
+            return colors.ram;
+        return colors.hddByKey(key);
     }
-
-
 
     /** Create path for the chart */
     QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
@@ -315,7 +285,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     /** Draw grid */
     {
         QPen grid;
-        grid.setColor(qnGlobals->systemHealthColorGrid());
+        grid.setColor(qnGlobals->statisticsColors().grid);
         grid.setWidthF(pen_width);
 
         QPainterPath grid_path;
@@ -363,7 +333,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         Q_UNUSED(penRollback)
 
         QPen main_pen;
-        main_pen.setColor(getColorByKey(QLatin1String("CPU")));
+        main_pen.setColor(qnGlobals->statisticsColors().frame);
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::MiterJoin);
 

@@ -65,17 +65,39 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 bool QnPlWatchDogResource::initInternal() 
 {
     bool unauth = false;
-
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
         return false;
     }
-    else 
-    {
-        return QnPlOnvifResource::initInternal();
+        
+    bool result = QnPlOnvifResource::initInternal();
+
+    // TODO: #Elric this code is totally evil. Better write it properly as soon as possible.
+    CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
+    http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
+    QByteArray data;
+    http.readAll(data);
+
+    qreal speedX = 1.0, speedY = 1.0;
+    if(getModel() == QLatin1String("DWC-MPTZ20X"))
+        speedX *= -1.0;
+    if(data.contains("flipmode1: 1")) {
+        speedX *= -1.0;
+        speedY *= -1.0;
     }
+    if(data.contains("mirrormode1: 1"))
+        speedX *= -1.0;
+    if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) 
+    {
+        QMatrix4x4 transform;
+        transform(0, 0) = speedX;
+        transform(1, 1) = speedY;
+        ptzController->setSpeedTransform(transform);
+    }
+
+    return result;
 }
 
 
@@ -86,8 +108,7 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     QByteArray request;
     request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
     request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
-    CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
-    Q_UNUSED(status);
+    http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
 
     setStatus(Offline);
     // camera rebooting ....
@@ -135,7 +156,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
         if(hasFocus) {
             setCameraCapability(Qn::ContinuousZoomCapability, true);
-            m_ptzController.reset(new QnDwZoomPtzController(::toSharedPointer(this)));
+            m_ptzController.reset(new QnDwZoomPtzController(this));
         }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];

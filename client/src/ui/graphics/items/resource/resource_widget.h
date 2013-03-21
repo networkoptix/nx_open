@@ -65,6 +65,13 @@ public:
     };
     Q_DECLARE_FLAGS(Buttons, Button)
 
+    // TODO: Refactoring needed.
+    enum OverlayVisibility {
+        Invisible,
+        UserVisible,
+        AutoVisible,
+    };
+
     /**
      * Constructor.
      *
@@ -233,9 +240,6 @@ public:
      */
     void setInfoTextFormat(const QString &infoTextFormat);
 
-    bool isDecorationsVisible() const;
-    Q_SLOT void setDecorationsVisible(bool visible = true, bool animate = true);
-
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
 
@@ -247,10 +251,15 @@ public:
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
-    using base_type::mapRectToScene;
+    bool isOverlayVisible() const;
+    Q_SLOT void setOverlayVisible(bool visible = true, bool animate = true);
 
-    void addOverlayWidget(QGraphicsWidget *widget, bool autoRotate = false, bool bindToViewport = false);
+    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false);
     void removeOverlayWidget(QGraphicsWidget *widget);
+    OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
+    void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
+
+    using base_type::mapRectToScene;
 
 signals:
     void aspectRatioChanged();
@@ -266,7 +275,8 @@ protected:
         LoadingOverlay,
         NoDataOverlay,
         OfflineOverlay,
-        UnauthorizedOverlay
+        UnauthorizedOverlay,
+        AnalogWithoutLicenseOverlay
     };
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
@@ -308,6 +318,7 @@ protected:
     Q_SLOT void updateInfoText();
 
     void updateOverlayWidgetsGeometry();
+    void updateOverlayWidgetsVisibility(bool animate = true);
 
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
@@ -358,6 +369,7 @@ private:
     };
 
     struct OverlayWidget {
+        OverlayVisibility visibility;
         QGraphicsWidget *widget;
         QnViewportBoundWidget *boundWidget;
         QnFixedRotationTransform *rotationTransform;
@@ -405,6 +417,7 @@ private:
 
     /** List of overlay widgets. */
     QList<OverlayWidget> m_overlayWidgets;
+    bool m_overlayVisible;
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
@@ -431,6 +444,7 @@ private:
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
     QStaticText m_loadingStaticText;
+    QStaticText m_analogLicenseStaticText;
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
