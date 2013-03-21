@@ -125,9 +125,9 @@ bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
     
     QnScalarSpaceMapper xMapper, yMapper, zMapper;
     if(
-        !QJson::deserialize(map, "x", &xMapper) || 
-        !QJson::deserialize(map, "y", &yMapper) ||
-        !QJson::deserialize(map, "z", &zMapper)
+        !QJson::deserialize(map, "x", &xMapper, true) || 
+        !QJson::deserialize(map, "y", &yMapper, true) ||
+        !QJson::deserialize(map, "z", &zMapper, true)
     ) {
         return false;
     }
@@ -163,19 +163,24 @@ bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
     QnVectorSpaceMapper toCamera, fromCamera;
     if(
         !QJson::deserialize(map, "models", &models) || 
-        !QJson::deserialize(map, "fromCamera", &fromCamera) ||
-        !QJson::deserialize(map, "toCamera", &toCamera)
+        !QJson::deserialize(map, "fromCamera", &fromCamera, true) ||
+        !QJson::deserialize(map, "toCamera", &toCamera, true)
     ) {
         return false;
     }
 
     /* Null means "take this one from the other mapper". */
+    if(toCamera.isNull() && fromCamera.isNull())
+        return false;
     if(fromCamera.isNull())
         fromCamera = toCamera;
     if(toCamera.isNull())
         toCamera = fromCamera;
     for(int i = 0; i < QnVectorSpaceMapper::CoordinateCount; i++) {
         QnVectorSpaceMapper::Coordinate coordinate = static_cast<QnVectorSpaceMapper::Coordinate>(i);
+
+        if(fromCamera.mapper(coordinate).isNull() && toCamera.mapper(coordinate).isNull())
+            return false;
         if(fromCamera.mapper(coordinate).isNull())
             fromCamera.setMapper(coordinate, toCamera.mapper(coordinate));
         if(toCamera.mapper(coordinate).isNull())
