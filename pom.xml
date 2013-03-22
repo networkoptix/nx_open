@@ -25,7 +25,7 @@
 		<appserver.name>Enterprise Controller</appserver.name>
 		<client.name>${company.name} ${product.name} Client</client.name>
 		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
-		<applauncher.name>${company.name} Application Launcher</applauncher.name>
+		<applauncher.name>${company.name} Launcher</applauncher.name>
 		<mediaserver.name>${company.name} Media Server</mediaserver.name>
 		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
 		<testcamera.name>${company.name} Test Camera</testcamera.name>

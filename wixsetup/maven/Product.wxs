@@ -789,12 +789,24 @@
                                                 ErrorControl="normal"
                                                 Description="${applauncher.name}">
 									<util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
-								</ServiceInstall>
-
+								</ServiceInstall>								
+								
 								<ServiceControl Id="Start${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Start="install" Wait="no" />
 								<ServiceControl Id="Stop${installer.customization}AppLauncherService" Name="${installer.customization}AppLauncherServer" Stop="both" Wait="yes" Remove="uninstall" />	-->
 								</Component>
 
+								<Component Id="AppLauncherConfiguration" Guid="{f84029ca-94fe-4d78-b193-174fadd07638}" Permanent="yes">
+									<!--<Condition>
+										NOT PREVIOUSVERSIONSINSTALLED
+									</Condition> -->
+
+									<RegistryKey Root="HKCU"
+												 Key="Software\[Manufacturer]\${applauncher.name}"
+												 Action="create">
+										<RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
+									</RegistryKey>
+								</Component>								
+								
 								<Component Id="clientShortcutDesktop" Guid="{56799FF5-5B77-442e-9A39-3F27F0FC8307}">
 									<Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
@@ -1065,6 +1077,7 @@
 			<ComponentRef Id="NovFileAssociation"/>
 
 			<ComponentRef Id="AppLauncherExecutable" />
+			<ComponentRef Id="AppLauncherConfiguration" />			
 			<ComponentRef Id="ClientExecutable" />
 			<ComponentRef Id="clientShortcutDesktop"/>
 			<ComponentGroupRef Id="ClientHelpComponent"/>
