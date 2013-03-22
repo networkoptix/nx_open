@@ -15,6 +15,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
+    connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
 
     updateControls();
 }
@@ -27,16 +28,16 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     m_imageId = layout->backgroundImageId();
     ui->widthSpinBox->setValue(layout->backgroundSize().width());
     ui->heightSpinBox->setValue(layout->backgroundSize().height());
+    ui->lockedCheckBox->setChecked(layout->locked());
     updateControls();
 }
 
 bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout) {
-    if (layout->backgroundImageId() == 0 && m_imageId == 0)
+    if (!hasChanges(layout))
         return false;
-
-    QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
-    if (m_imageId == layout->backgroundImageId() && newSize == layout->backgroundSize())
-        return false;
+    layout->setLocked(ui->lockedCheckBox->isChecked());
+    layout->setBackgroundImageId(m_imageId);
+    layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
 
     // TODO: progress dialog uploading image?
     // TODO: remove unused image if any
@@ -44,13 +45,26 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     return true;
 }
 
+bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
+    if (ui->lockedCheckBox->isChecked() != layout->locked())
+        return true;
+
+    if (layout->backgroundImageId() == 0 && m_imageId == 0)
+        return false;
+
+    QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
+    return (m_imageId != layout->backgroundImageId() || newSize != layout->backgroundSize());
+}
+
 void QnLayoutSettingsDialog::updateControls() {
     bool imagePresent = m_imageId > 0;
+    bool locked = ui->lockedCheckBox->isChecked();
 
-    ui->widthSpinBox->setEnabled(imagePresent);
-    ui->heightSpinBox->setEnabled(imagePresent);
+    ui->widthSpinBox->setEnabled(imagePresent && !locked);
+    ui->heightSpinBox->setEnabled(imagePresent && !locked);
     ui->viewButton->setEnabled(imagePresent);
-    ui->clearButton->setEnabled(imagePresent);
+    ui->clearButton->setEnabled(imagePresent && !locked);
+    ui->selectButton->setEnabled(!locked);
 }
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {

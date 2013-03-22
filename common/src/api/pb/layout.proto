@@ -31,4 +31,5 @@ message Layout {
     required double cellSpacingWidth  = 2;
     required double cellSpacingHeight = 3;
     repeated Item   item              = 4;
+    optional bool   locked            = 8;
 }
