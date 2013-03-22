@@ -25,7 +25,7 @@ public:
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;
 
 protected:
-    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) override;
+    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result) override;
 
 private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);

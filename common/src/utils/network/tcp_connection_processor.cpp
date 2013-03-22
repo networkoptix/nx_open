@@ -166,13 +166,13 @@ void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
     sendData(sendBuffer.data(), sendBuffer.size());
 }
 
-void QnTCPConnectionProcessor::sendData(const char* data, int size)
+bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     QMutexLocker lock(&d->sockMutex);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        int sended;
+        int sended = 0;
         if (d->ssl)
             sended = SSL_write(d->ssl, data, size);
         else
@@ -184,7 +184,13 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
             data += sended;
             size -= sended;
         }
+        else
+        {
+            return false;
+        }
     }
+
+    return true;
 }
 
 
@@ -283,6 +289,18 @@ void QnTCPConnectionProcessor::pleaseStop()
     if (d->socket)
         d->socket->close();
     QnLongRunnable::pleaseStop();
+}
+
+void* QnTCPConnectionProcessor::ssl() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->ssl;
+}
+
+TCPSocket* QnTCPConnectionProcessor::socket() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->socket;
 }
 
 int QnTCPConnectionProcessor::getSocketTimeout()
