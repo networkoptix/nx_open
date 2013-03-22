@@ -403,8 +403,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         }
     } else {
         QUrl url = QUrl::fromUserInput(ui->cameraIpLineEdit->text());
-        if (url.isEmpty()) { // TODO: #gdm maybe isValid() ?
-            ui->validateLabelSearch->setText(tr("Camera address filed must contain valid url or ip address"));
+        if (!url.isValid()) {
+            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url or ip address"));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
