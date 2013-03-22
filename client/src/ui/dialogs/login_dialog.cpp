@@ -352,7 +352,9 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         QMessageBox::warning(
             this, 
             tr("Could not connect to Enterprise Controller"), 
-            tr("Connection to the Enterprise Controller could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
+            tr("Connection to the Enterprise Controller could not be established.\n"\
+               "Connection details that you have entered are incorrect, please try again.\n\n"\
+               "If this error persists, please contact your VMS administrator.")
         );
         updateFocus();
         return;
