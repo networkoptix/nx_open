@@ -262,7 +262,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
     return 0;
 }
 
-int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
+int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result)
 {
     Q_UNUSED(result)
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
@@ -297,7 +297,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         if (transcoder)
         {
             // transcode media
-            int errCode = transcoder->transcodePacket(media, transcodedData);
+            int errCode = transcoder->transcodePacket(media, result ? &transcodedData : NULL);
             if (errCode != 0)
                 return errCode;
             if (transcodedData) {

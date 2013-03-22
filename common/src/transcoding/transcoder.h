@@ -42,10 +42,10 @@ public:
         Transcoder is allowed to return NULL coded picture for non-NULL input and return coded output pictures with some delay from input.
         To empty transcoder'a coded picture buffer one should provide NULL as input until receiving NULL at output.
         \param media Coded picture of the input stream. May be NULL
-        \param result Coded picture of the output stream. May be NULL
+        \param result Coded picture of the output stream. If NULL, only decoding is done
         \return return Return error code or 0 if no error
     */
-    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
+    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
 
 protected:
@@ -131,10 +131,10 @@ public:
 
     /*
     * Transcode media data and write it to specified QnByteArray
-    * @param transcoded data block
+    * @param result transcoded data block. If NULL, only decoding is done
     * @return Returns 0 if no error or error code
     */
-    int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result);
+    int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result);
 
     /*
     * Return description of the last error code
@@ -154,7 +154,7 @@ protected:
     */
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) = 0;
 
-    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) = 0;
+    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result) = 0;
 
     QnVideoTranscoderPtr m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
