@@ -11,7 +11,7 @@
 #include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnResource base_type;
 
@@ -61,12 +61,17 @@ public:
 
     virtual void setUrl(const QString& value) override;
 
+    /** Size of background image - in cells */
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
+    /** Id of background image on EC */
     int backgroundImageId() const;
     void setBackgroundImageId(int id);
 
+    /** Locked state - locked layout cannot be modified in any way */
+    bool locked() const;
+    void setLocked(bool value);
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -75,6 +80,9 @@ signals:
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
+    void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
+    void backgroundImageChanged(const QnLayoutResourcePtr &resource);
+    void lockedChanged(const QnLayoutResourcePtr &resource);
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
@@ -91,6 +99,7 @@ private:
     QnTimePeriod m_localRange;
     QSize m_backgroundSize;
     int m_backgroundImageId;
+    bool m_locked;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);
