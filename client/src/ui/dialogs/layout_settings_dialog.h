@@ -19,13 +19,14 @@ public:
     
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
-private:
-    void updateControls();
-
 private slots:
     void at_viewButton_clicked();
     void at_selectButton_clicked();
     void at_clearButton_clicked();
+
+    void updateControls();
+private:
+    bool hasChanges(const QnLayoutResourcePtr &layout);
 
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;

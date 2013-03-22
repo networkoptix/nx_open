@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>434</width>
-    <height>442</height>
+    <width>422</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,6 +166,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="lockedCheckBox">
+     <property name="text">
+      <string>Layout is locked</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -178,6 +185,7 @@
   </layout>
   <zorder>buttonBox</zorder>
   <zorder>groupBox</zorder>
+  <zorder>lockedCheckBox</zorder>
  </widget>
  <tabstops>
   <tabstop>viewButton</tabstop>

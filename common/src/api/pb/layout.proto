@@ -34,4 +34,5 @@ message Layout {
     optional int32  backgroundImageId = 5;
     optional int32  backgroundWidth   = 6;
     optional int32  backgroundHeight  = 7;
+    optional bool   locked            = 8;
 }
