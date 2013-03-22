@@ -1,3 +1,6 @@
+
+#include <memory>
+
 #include <QFileInfo>
 #include <QSettings>
 #include "progressive_downloading_server.h"
