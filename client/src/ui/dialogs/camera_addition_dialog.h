@@ -137,7 +137,7 @@ private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
     void updateSubnetMode();
-
+    bool ensureServerOnline();
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();
@@ -145,11 +145,11 @@ private slots:
     void at_camerasTable_cellChanged(int row, int column);
     void at_camerasTable_cellClicked(int row, int column);
     void at_header_checkStateChanged(Qt::CheckState state);
-
     void at_scanButton_clicked();
     void at_addButton_clicked();
     void at_subnetCheckbox_toggled(bool toggled);
-
+    void at_resPool_resourceChanged(const QnResourcePtr &resource);
+    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 

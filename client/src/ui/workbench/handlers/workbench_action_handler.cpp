@@ -859,6 +859,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
     ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
+    if (cameraAdditionDialog())
+        cameraAdditionDialog()->hide();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {

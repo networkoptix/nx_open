@@ -460,6 +460,13 @@
    <item>
     <layout class="QHBoxLayout" name="buttonsLayout">
      <item>
+      <widget class="QLabel" name="serverOfflineLabel">
+       <property name="text">
+        <string>Server is offline</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
