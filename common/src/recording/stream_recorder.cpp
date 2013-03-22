@@ -343,7 +343,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     {
         QnAbstractMediaDataPtr result;
         do {
-            m_audioTranscoder->transcodePacket(md, result);
+            m_audioTranscoder->transcodePacket(md, &result);
             if (result && result->data.size() > 0)
                 writeData(result, streamIndex);
             md.clear();
@@ -352,7 +352,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
     {
         QnAbstractMediaDataPtr result;
-        m_videoTranscoder->transcodePacket(md, result);
+        m_videoTranscoder->transcodePacket(md, &result);
         if (result && result->data.size() > 0)
             writeData(result, streamIndex);
     }
