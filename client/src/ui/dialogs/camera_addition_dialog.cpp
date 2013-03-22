@@ -97,10 +97,10 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
 }
 
 
-QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
+QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
-    m_server(server),
+    m_server(NULL),
     m_inIpRangeEdit(false),
     m_subnetMode(false),
     m_inCheckStateChange(false)
@@ -145,14 +145,31 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     setWarningStyle(ui->validateLabelSearch);
 
     updateSubnetMode();
-    fillTable(QnCamerasFoundInfoList());
+    clearTable();
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
 
-void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
+    if (m_server == server)
+        return;
 
+    clearTable();
+    m_server = server;
+    if (server)
+        setWindowTitle(tr("Add cameras to %1").arg(server->getName()));
+
+    emit serverChanged();
+}
+
+
+void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setRowCount(0);
+    ui->camerasTable->setEnabled(false);
+}
+
+void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+    clearTable();
 
     foreach(QnCamerasFoundInfo info, cameras){
         int row = ui->camerasTable->rowCount();
@@ -180,6 +197,7 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, NameColumn, nameItem);
         ui->camerasTable->setItem(row, UrlColumn, urlItem);
     }
+    ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
 
 void QnCameraAdditionDialog::removeAddedCameras() {
@@ -325,7 +343,7 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
         item->setCheckState(state);
     }
 
-    ui->addButton->setEnabled(state == Qt::Checked);
+    ui->addButton->setEnabled(rowCount > 0 && state == Qt::Checked);
     m_inCheckStateChange = false;
 }
 
@@ -367,6 +385,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         endAddrStr = QString();
     }
 
+    clearTable();
     ui->scanButton->setEnabled(false);
 
     ui->startIPLineEdit->setEnabled(false);
@@ -384,23 +403,17 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->stopScanButton->setVisible(true);
     ui->stopScanButton->setFocus();
 
-    QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
-
     QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
-    connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
-    connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(ui->closeButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-
+    connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
 
     QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncManualCameraSearch(startAddrStr, endAddrStr, username, password, port,
                                                  processor.data(),
                                                  SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
                                                  SLOT(processSearchError(int, const QString &)));
-
-    eventLoop->exec();
+    processor->start();
 
     ui->scanButton->setEnabled(true);
     ui->startIPLineEdit->setEnabled(true);
@@ -415,32 +428,43 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->stopScanButton->setVisible(false);
     ui->scanProgressBar->setVisible(false);
 
-    if (!processor->isCancelled()) {
-        if (!processor->isSuccess()) {
-            QString processor_error = processor->getLastError();
+    switch (processor->state()) {
+    case detail::Init:
+    case detail::Progress:
+        qWarning() << "Incorrect reply processor state";
+        //fall-through
+    case detail::Cancelled:
+        break;
+    case detail::Success:
+        {
+            if (processor->camerasFound().count() > 0) {
+                fillTable(processor->camerasFound());
+                ui->addButton->setFocus();
+            } else
+                QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
+        }
+        break;
+    case detail::Error:
+        {
+            QString processorError = processor->getLastError();
             QString error = tr("Server returned an error:\n%1");
-            if (processor_error.length() == 0){
+            if (processorError.length() == 0){
                 error = error.arg(tr("This server version supports only searching by ip address."));
             } else {
-                error = error.arg(processor_error);
+                error = error.arg(processorError);
             }
             QMessageBox::critical(this, tr("Error"), error, QMessageBox::Ok);
-        } else if (processor->camerasFound().count() > 0) {
-            fillTable(processor->camerasFound());
-            ui->camerasTable->setEnabled(true);
-            ui->addButton->setFocus();
-        } else {
-            QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
-            if (m_subnetMode)
-                ui->startIPLineEdit->setFocus();
-            else
-                ui->cameraIpLineEdit->setFocus();
         }
-    } else
-        if (m_subnetMode)
-            ui->startIPLineEdit->setFocus();
-        else
-            ui->cameraIpLineEdit->setFocus();
+        break;
+    default:
+        break;
+    }
+
+    ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
+    if (m_subnetMode)
+        ui->startIPLineEdit->setFocus();
+    else
+        ui->cameraIpLineEdit->setFocus();
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked() {
@@ -466,25 +490,29 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     ui->scanButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
 
-    QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
-
     QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
-    connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
-    connect(ui->closeButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
+
     connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
+    connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
 
     QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncManualCameraAdd(urls, manufacturers, username, password,
                                               processor.data(), SLOT(processAddReply(int)));
-
-    eventLoop->exec();
+    processor->start();
 
     ui->addButton->setEnabled(true);
     ui->scanButton->setEnabled(true);
-    ui->camerasTable->setEnabled(true);
+    ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 
-    if (!processor->isCancelled()) {
-        if (processor->isSuccess()) {
+    switch (processor->state()) {
+    case detail::Init:
+    case detail::Progress:
+        qWarning() << "Incorrect reply processor state";
+        //fall-through
+    case detail::Cancelled:
+        break;
+    case detail::Success:
+        {
             removeAddedCameras();
             QMessageBox::information(this,
                                      tr("Success"),
@@ -492,8 +520,14 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                                         "It might take a few moments to populate them in the tree.", "", urls.size()),
                                      QMessageBox::Ok);
         }
-        else
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n camera(s)", "", urls.size()), QMessageBox::Ok);
+        break;
+    case detail::Error:
+        {
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)", "", urls.size()), QMessageBox::Ok);
+        }
+        break;
+    default:
+        break;
     }
 }
 

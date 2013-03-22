@@ -109,8 +109,6 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
 
-
-
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
 // -------------------------------------------------------------------------- //
@@ -1857,10 +1855,11 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     bool newlyCreated = false;
     if(!cameraAdditionDialog()) {
-        m_cameraAdditionDialog = new QnCameraAdditionDialog(resources[0], widget());
+        m_cameraAdditionDialog = new QnCameraAdditionDialog(widget());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraAdditionDialog()->geometry();
+    cameraAdditionDialog()->setServer(resources[0]);
     cameraAdditionDialog()->show();
     if(!newlyCreated)
         cameraAdditionDialog()->setGeometry(oldGeometry);
