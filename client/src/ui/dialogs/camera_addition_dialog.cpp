@@ -220,10 +220,10 @@ void QnCameraAdditionDialog::updateSubnetMode() {
         ui->cameraIpLineEdit->setFocus();
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
 void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value) {
     if (m_inIpRangeEdit)
         return;
@@ -358,7 +358,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         }
     } else {
         QUrl url = QUrl::fromUserInput(ui->cameraIpLineEdit->text());
-        if (url == QUrl()){
+        if (url.isEmpty()) { // TODO: #gdm maybe isValid() ?
             ui->validateLabelSearch->setText(tr("Camera address filed must contain valid url or ip address"));
             ui->validateLabelSearch->setVisible(true);
             return;
