@@ -1158,6 +1158,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
                 result = false;
                 vd = QnCompressedVideoDataPtr();
             }
+            QnCompressedVideoDataPtr incoming = vd;
             vd = nextInOutVideodata(vd, channel);
             if (!vd)
                 return result; // impossible? incoming vd!=0
@@ -1165,8 +1166,10 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
 
-            if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
+            if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed)) {
+                restoreVideoQueue(incoming, vd, vd->channelNumber);
                 return false; // keep frame
+            }
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                 m_singleShotQuantProcessed = true;
             return result;
@@ -1196,7 +1199,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             vd = nextInOutVideodata(incoming, channel);
 
-            incoming = QnCompressedVideoDataPtr();
             if (vd) {
                 // New av sync algorithm required MT decoding
                 if (!m_useMtDecoding && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE))
@@ -1213,7 +1215,10 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
                         m_display[channel]->setCurrentTime(currentAudioTime);
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
                 }                
-                display(vd, !ignoreVideo, speed);
+                if (!display(vd, !ignoreVideo, speed)) {
+                    restoreVideoQueue(incoming, vd, vd->channelNumber);
+                    return false;  // keep frame
+                }
                 if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                     m_singleShotQuantProcessed = true;
             }
@@ -1300,6 +1305,17 @@ QnCompressedVideoDataPtr QnCamDisplay::nextInOutVideodata(QnCompressedVideoDataP
     // queue is not empty
     return dequeueVideo(channel);
 }
+
+void QnCamDisplay::restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel)
+{
+    if (!vd || vd == incoming)
+        return;
+    if (vd)
+        m_videoQueue[channel].insert(0, vd);
+    if (incoming)
+        m_videoQueue->removeAt(m_videoQueue->size()-1);
+}
+
 
 quint64 QnCamDisplay::nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const
 {
