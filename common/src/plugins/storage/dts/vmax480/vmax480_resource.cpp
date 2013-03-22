@@ -41,11 +41,6 @@ void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-QString QnPlVmax480Resource::getHostAddress() const 
-{
-    return QString();
-}
-
 bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain) 
 {
     Q_UNUSED(domain)

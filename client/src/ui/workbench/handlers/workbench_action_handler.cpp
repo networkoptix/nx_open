@@ -1500,7 +1500,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     //updateStoredConnections(connectionData);
 
-    menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
+    else
+        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {

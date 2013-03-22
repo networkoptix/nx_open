@@ -76,7 +76,7 @@ public:
 
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
-    void addChunk(const Chunk& chunk);
+    bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 private:

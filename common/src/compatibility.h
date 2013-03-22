@@ -8,6 +8,8 @@
 // that component of ver1 is compatible (or has compatibility mode)
 // with EVERY component of ver2
 
+QString stripVersion(const QString& version);
+
 struct QnCompatibilityItem
 {
     QnCompatibilityItem(QString v1, QString c1, QString v2)

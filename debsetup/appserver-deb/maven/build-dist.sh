@@ -93,4 +93,4 @@ install -m 644 debian/conffiles $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)

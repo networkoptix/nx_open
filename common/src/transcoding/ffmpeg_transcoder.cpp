@@ -49,6 +49,8 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
     return ffmpegIOContext;
 }
 
+static QAtomicInt QnFfmpegTranscoder_count = 0;
+
 QnFfmpegTranscoder::QnFfmpegTranscoder():
 QnTranscoder(),
 m_videoEncoderCodecCtx(0),
@@ -58,10 +60,14 @@ m_formatCtx(0),
 m_ioContext(0),
 m_baseTime(AV_NOPTS_VALUE)
 {
+    NX_LOG( QString::fromLatin1("Created new ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
 {
+    NX_LOG( QString::fromLatin1("Destroying ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
     closeFfmpegContext();
 }
 
