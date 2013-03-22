@@ -26,7 +26,7 @@ QnHelpHandler::QnHelpHandler(QObject *parent):
     QObject(parent),
     m_topic(Qn::Empty_Help)
 {
-    m_helpRoot = qApp->applicationDirPath() + QLatin1String("help");
+    m_helpRoot = qApp->applicationDirPath() + QLatin1String("../help");
 }
 
 QnHelpHandler::~QnHelpHandler() {
