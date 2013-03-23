@@ -10,8 +10,9 @@
 #import "HDWEcsConfig.h"
 #import "HDWCameraModel.h"
 #import "HDWVideoViewController.h"
+#import "SRWebSocket.h"
 
-@interface HDWDetailViewController : UICollectionViewController <UISplitViewControllerDelegate>
+@interface HDWDetailViewController : UICollectionViewController <UISplitViewControllerDelegate, SRWebSocketDelegate>
 
 @property (strong, nonatomic) HDWECSConfig *ecsConfig;
 @property (strong, nonatomic) HDWServersModel *servers;

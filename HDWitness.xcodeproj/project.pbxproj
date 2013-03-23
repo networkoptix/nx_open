@@ -162,11 +162,11 @@
 				C71D5B1616ADBB9600C764B5 /* HDWDetailViewController.m */,
 				C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */,
 				C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */,
-				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 				C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */,
 				C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */,
 				C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */,
 				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
+				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 			);
 			path = HDWitness;
 			sourceTree = "<group>";

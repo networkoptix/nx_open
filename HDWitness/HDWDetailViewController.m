@@ -10,7 +10,9 @@
 #import "HDWCollectionViewCell.h"
 
 #import "AFJSONRequestOperation.h"
-#import "AZSocketIO.h"
+#import "AFHTTPClient.h"
+
+// #import "AZSocketIO.h"
 
 @interface HDWDetailViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
@@ -30,6 +32,21 @@
 @end
 
 @implementation HDWDetailViewController
+
+- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)rawMessage
+{
+    NSString *messageString = (NSString*)rawMessage;
+    NSData *messageData = [messageString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    NSError* error;
+    NSDictionary *message = [NSJSONSerialization JSONObjectWithData:messageData options:kNilOptions error:&error];
+    
+    if (message[@"type"] == 0)
+    {
+    }
+    
+    NSLog(@"Pens: %@", message);
+}
 
 #pragma mark - Managing the detail item
 
@@ -75,6 +92,10 @@
         camera.physicalId = jsonCamera[@"physical_id"];
         
         HDWServerModel *server = [serversDict objectForKey: camera.serverId];
+        
+        camera.videoUrl = [NSURL URLWithString:[NSString stringWithFormat:@"/media/%@.mpjpeg", camera.physicalId] relativeToURL:server.streamingUrl];
+        camera.thumbnailUrl = [NSURL URLWithString:[NSString stringWithFormat:@"/api/image?physicalId=%@&time=now", camera.physicalId] relativeToURL:server.streamingUrl];
+        
         [server.cameras addObject: camera];
     }
     
@@ -89,29 +110,91 @@
     NSString* urlString = [NSString stringWithFormat:@"https://%@:%@@%@:%@/", _ecsConfig.login, _ecsConfig.password, _ecsConfig.host, _ecsConfig.port];
     NSURL *baseUrl = [NSURL URLWithString:urlString];
     
-    NSURL *resourceUrl = [NSURL URLWithString:@"api/resource" relativeToURL:baseUrl];
-    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl];
+//    NSURL *resourceUrl = [NSURL URLWithString:@"api/resource/" relativeToURL:baseUrl];
+//    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl];
     
-    AFJSONRequestOperation *resourceOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        [self requestFinished: JSON];
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-        NSLog(@"Error: %@", error);
-    }];
-    [resourceOperation start];
+//    AFJSONRequestOperation *resourceOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+//        [self requestFinished: JSON];
+//    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+//        NSLog(@"Error: %@", error);
+//    }];
+//    [resourceOperation start];
     
-    NSURL *messageUrl = [NSURL URLWithString:@"events/" relativeToURL:baseUrl];
-    NSURLRequest *messageRequest = [NSURLRequest requestWithURL:messageUrl];
     
-    AZSocketIO *socket = [[AZSocketIO alloc] initWithRequest:messageRequest];
+    NSURL *messageUrl = [NSURL URLWithString:@"/events/" relativeToURL:baseUrl];
+    NSMutableURLRequest *messageRequest = [NSMutableURLRequest requestWithURL:messageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:0];
     
-    [socket setEventRecievedBlock:^(NSString *eventName, id data) {
-        NSLog(@"%@ : %@", eventName, data);
-    }];
-    [socket connectWithSuccess:^{
-        [socket emit:@"Send Me Data" args:@"cows" error:nil];
-    } andFailure:^(NSError *error) {
-        NSLog(@"Boo: %@", error);
-    }];
+    NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
+    [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", AFBase64EncodedStringFromString(basicAuthCredentials)] forHTTPHeaderField: @"Authorization"];
+    
+    SRWebSocket* socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
+    [socket setDelegate:self];
+    [socket open];
+    
+//    AFHTTPRequestOperation *messageOperation = [[AFHTTPRequestOperation alloc]initWithRequest:messageRequest];
+//    messageOperation.outputStream = [NSOutputStream outputStreamToMemory];
+//    [messageOperation.outputStream setDelegate: self ];
+//    [messageOperation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
+//        NSLog(@"%d", bytesRead);
+//    }];
+//    
+//    [messageOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+//        NSLog(@"Response %@", operation.responseString);
+//    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+//        NSLog(@"Error: %@", error);
+//    }];
+//    
+//    [messageOperation start];
+    
+//    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:messageUrl];
+//    [httpClient setAuthorizationHeaderWithUsername:messageUrl.user password:messageUrl.password];
+//    
+//    AFHTTPRequestOperation *messageOperation = [[AFHTTPRequestOperation alloc] initWithRequest:messageRequest];
+//    
+//    [messageOperation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
+//         if (challenge.previousFailureCount == 0)
+//         {
+//            NSURLCredential *creds = [NSURLCredential credentialWithUser:messageUrl.user
+//                                                                password:messageUrl.password
+//                                                                persistence:NSURLCredentialPersistenceForSession];
+//    
+//            [[challenge sender] useCredential:creds forAuthenticationChallenge:challenge];
+//         }
+//         else
+//         {
+//             NSLog(@"Previous auth challenge failed. Are username and password correct?");
+//         }
+//     }];
+//    
+//    messageOperation.outputStream = [NSOutputStream outputStreamToMemory];
+//    [messageOperation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
+//        NSLog(@"%d", bytesRead);
+//    }];
+//    [httpClient enqueueHTTPRequestOperation:messageOperation];
+    
+
+//    AFHTTPRequestOperation *messageOperation = [httpClient HTTPRequestOperationWithRequest:messageRequest success:^(AFHTTPRequestOperation *operation, id responseObject) {
+//        NSLog(@"%@", @"Success");
+//    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+//        NSLog(@"%@", @"Error");
+//    }];
+    
+    
+//    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:messageRequest];
+//    operation.outputStream = [NSOutputStream outputStreamToMemory];
+//    [operation start];
+    
+//    AZSocketIO *socket = [[AZSocketIO alloc] initWithRequest:messageRequest];
+//    
+//    [socket setEventRecievedBlock:^(NSString *eventName, id data) {
+//        NSLog(@"%@ : %@", eventName, data);
+//    }];
+//    
+//    [socket connectWithSuccess:^{
+//        [socket emit:@"Send Me Data" args:@"cows" error:nil];
+//    } andFailure:^(NSError *error) {
+//        NSLog(@"Boo: %@", error);
+//    }];
     
 //    AFHTTPRequestOperation *messagesOperation = [[AFHTTPRequestOperation alloc] initWithRequest:messagesRequest];
 //    messagesOperation.outputStream = [NSOutputStream outputStreamToMemory];
@@ -159,13 +242,7 @@
     HDWServerModel *server = [_servers getServerAtIndex: indexPath.section];
     HDWCameraModel *camera = [server.cameras objectAtIndex:indexPath.row];
     
-    NSURL *streamingUrl = server.streamingUrl;
-    
-    NSString* urlString = [NSString stringWithFormat:@"http://%@:%@/api/image?physicalId=%@&time=now",
-                           streamingUrl.host, streamingUrl.port, camera.physicalId];
-    
-    NSURL *url= [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSData *data = [NSData dataWithContentsOfURL:camera.thumbnailUrl];
     
     cell.imageView.image = [UIImage imageWithData:data];
     cell.labelView.text = camera.name;
@@ -191,7 +268,6 @@
     if ([[segue identifier] isEqualToString:@"showVideo"]) {
         NSArray* selectedItems = [self.collectionView indexPathsForSelectedItems];
         NSIndexPath *indexPath = [selectedItems objectAtIndex:0];
-        NSLog(@"%@", selectedItems);
         
         HDWCameraModel *camera = [_servers getCameraForIndexPath: indexPath];
         [[segue destinationViewController] setCamera:camera];

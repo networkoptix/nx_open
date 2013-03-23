@@ -30,6 +30,11 @@
 @property NSNumber *serverId;
 @property NSString *name;
 @property NSString *physicalId;
+
+@property NSURL *videoUrl;
+@property NSURL *thumbnailUrl;
+
+
 @end
 
 /**
