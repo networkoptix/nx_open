@@ -54,7 +54,7 @@ namespace BusinessActionParameters {
 }
 
 QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessParams &runtimeParams):
-    base_type(BusinessActionType::BA_CameraRecording, runtimeParams)
+    base_type(BusinessActionType::CameraRecording, runtimeParams)
 {
 }
 

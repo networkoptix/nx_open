@@ -22,6 +22,7 @@ public:
         Servers,
         Layout,
         Camera,
+        Recorder,
         Image,
         Media,
         User,

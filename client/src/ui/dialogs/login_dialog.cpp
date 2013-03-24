@@ -7,12 +7,16 @@
 #include <QtGui/QInputDialog>
 #include <QtGui/QStandardItemModel>
 
+#include <QtNetwork/QLocalSocket>
+
 #include <client/client_connection_data.h>
 
 #include <core/resource/resource.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
+#include <api/ipc_pipe_names.h>
+#include <api/start_application_task.h>
 
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>
@@ -52,7 +56,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     ui(new Ui::LoginDialog),
     m_context(context),
     m_requestHandle(-1),
-    m_renderingWidget(NULL)
+    m_renderingWidget(NULL),
+    m_restartPending(false)
 {
     if(!context)
         qnNullWarning(context);
@@ -145,6 +150,10 @@ QString LoginDialog::currentName() const {
 
 QnConnectInfoPtr LoginDialog::currentInfo() const {
     return m_connectInfo;
+}
+
+bool LoginDialog::restartPending() const {
+    return m_restartPending;
 }
 
 void LoginDialog::accept() {
@@ -256,6 +265,50 @@ void LoginDialog::resetAutoFoundConnectionsModel() {
 
 }
 
+bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
+    QLocalSocket sock;
+    sock.connectToServer( launcherPipeName );
+    if( !sock.waitForConnected( -1 ) )
+    {
+        qDebug()<<QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
+        return false;
+    }
+
+    const QByteArray& serializedTask = applauncher::api::StartApplicationTask(version, arguments).serialize();
+    if( sock.write( serializedTask.data(), serializedTask.size() ) != serializedTask.size() )
+    {
+        qDebug()<<QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(sock.errorString());
+        return false;
+    }
+
+    sock.waitForReadyRead(-1);
+//    QByteArray result =
+            sock.readAll();
+//    if (result != "ok")
+//        return false;
+
+    return true;
+}
+
+bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
+
+    QStringList arguments;
+    arguments << QLatin1String("--no-single-application");
+    arguments << QLatin1String("--auth");
+    arguments << QLatin1String(currentUrl().toEncoded());
+    arguments << QLatin1String("--screen");
+    arguments << QString::number(qApp->desktop()->screenNumber(this));
+
+    bool result = sendCommandToLauncher(stripVersion(connectInfo->version), arguments);
+    if (!result)
+        QMessageBox::critical(this,
+                              tr("Launcher process is not found"),
+                              tr("Cannot restart the client in compatibility mode.\n"\
+                                 "Please close the application and start it again\n"\
+                                 "using the shortcut in the start menu."));
+    return result;
+}
+
 void LoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
@@ -299,7 +352,9 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         QMessageBox::warning(
             this, 
             tr("Could not connect to Enterprise Controller"), 
-            tr("Connection to the Enterprise Controller could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
+            tr("Connection to the Enterprise Controller could not be established.\n"\
+               "Connection details that you have entered are incorrect, please try again.\n\n"\
+               "If this error persists, please contact your VMS administrator.")
         );
         updateFocus();
         return;
@@ -316,13 +371,38 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
     }
 
     if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
-        QMessageBox::warning(
-            this,
-            tr("Could not connect to Enterprise Controller"),
-            tr("Connection could not be established.\nThe Enterprise Controller is incompatible with this client. Please upgrade your client or contact your VMS administrator.")
-        );
-        updateFocus();
-        return;
+        QString minSupportedVersion = QLatin1String("1.4");
+
+        m_restartPending = true;
+        if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) {
+            QMessageBox::warning(
+                        this,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("You are about to connect to Enterprise Controller which has a different version:\n"\
+                           " - Client version: %1.\n"\
+                           " - EC version: %2.\n"\
+                           "Compatibility mode for versions lower than %3 is not supported.")
+                        .arg(QLatin1String(QN_ENGINE_VERSION))
+                        .arg(connectInfo->version)
+                        .arg(minSupportedVersion));
+            m_restartPending = false;
+        }
+
+        m_restartPending = m_restartPending && (QMessageBox::warning(
+                                  this,
+                                  tr("Could not connect to Enterprise Controller"),
+                                  tr("You are about to connect to Enterprise Controller which has a different version:\n"\
+                                     " - Client version: %1.\n"\
+                                     " - EC version: %2.\n"\
+                                     "Would you like to restart client in compatibility mode?")
+                                  .arg(QLatin1String(QN_ENGINE_VERSION))
+                                  .arg(connectInfo->version),
+                                  QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Ok)
+                          && restartInCompatibilityMode(connectInfo);
+        if (!m_restartPending) {
+            updateFocus();
+            return;
+        }
     }
 
     m_connectInfo = connectInfo;

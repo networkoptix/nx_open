@@ -109,8 +109,6 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
 
-
-
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
 // -------------------------------------------------------------------------- //
@@ -861,6 +859,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
     ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
+    if (cameraAdditionDialog())
+        cameraAdditionDialog()->hide();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -871,7 +871,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+    if (businessAction->actionType() != BusinessActionType::ShowPopup)
         return;
 
     ensurePopupCollectionWidget();
@@ -1166,7 +1166,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         if(!sourceCamera)
             continue;
 
-                QString physicalId = sourceCamera->getPhysicalId();
+        QString physicalId = sourceCamera->getPhysicalId();
 
         QnVirtualCameraResourcePtr replacedCamera;
         foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
@@ -1475,7 +1475,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     //updateStoredConnections(connectionData);
 
-    menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
+    if (dialog->restartPending())
+        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
+    else
+        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
@@ -1854,10 +1857,11 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     bool newlyCreated = false;
     if(!cameraAdditionDialog()) {
-        m_cameraAdditionDialog = new QnCameraAdditionDialog(resources[0], widget());
+        m_cameraAdditionDialog = new QnCameraAdditionDialog(widget());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraAdditionDialog()->geometry();
+    cameraAdditionDialog()->setServer(resources[0]);
     cameraAdditionDialog()->show();
     if(!newlyCreated)
         cameraAdditionDialog()->setGeometry(oldGeometry);

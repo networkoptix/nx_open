@@ -83,7 +83,7 @@ public:
     // and no broad cast and multi cast is accessible. so you can not get MAC of device with standard methods
     // the only way is to request it from device through http or so
     // we need to get mac anyway to differentiate one device from another
-    virtual bool updateMACAddress() = 0;
+    virtual bool updateMACAddress() { return true; }
 
     virtual void updateInner(QnResourcePtr other) override;
 

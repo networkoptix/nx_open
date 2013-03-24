@@ -23,7 +23,7 @@ namespace Qn {
         /** Node that contains hidden resources. */
         BastardNode,
 
-        /** Node that represents a recorder (VMAX, etc) */
+        /** Node that represents a recorder (VMAX, etc). */
         RecorderNode,
 
         NodeTypeCount

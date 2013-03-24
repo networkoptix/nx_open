@@ -30,11 +30,6 @@ bool QnPlVmax480Resource::isResourceAccessible()
     return true;
 }
 
-bool QnPlVmax480Resource::updateMACAddress() 
-{
-    return true;
-}
-
 QString QnPlVmax480Resource::manufacture() const 
 {
     return QLatin1String(MANUFACTURE);
@@ -44,11 +39,6 @@ void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
 {
     Q_UNUSED(frames)
     Q_UNUSED(timems)
-}
-
-QString QnPlVmax480Resource::getHostAddress() const 
-{
-    return QString();
 }
 
 bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain) 

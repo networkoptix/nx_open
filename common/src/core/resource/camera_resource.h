@@ -89,6 +89,9 @@ private:
     QnAbstractDTSFactory* m_dtsFactory;
 };
 
+const QSize EMPTY_RESOLUTION_PAIR(0, 0);
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(1280, 720);
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource
 {
@@ -103,6 +106,9 @@ public:
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
+protected:
+    static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
+    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
 private:
     int m_channelNumer; // video/audio source number
 };

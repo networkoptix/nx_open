@@ -26,10 +26,12 @@ public:
     //!Convert action to human-readable string (for inserting into email body)
     QString getMessageBody() const;
 private:
-    BusinessEventType::Value m_eventType;
-    QString m_eventResourceName;
-    QString m_eventResourceUrl;
-    QString m_eventDescription;
+    QString resourceString(bool useUrl) const;
+    QString timestampString() const;
+    QString adresatesString() const;
+    QString stateString() const;
+    QString reasonString() const;
+    QString conflictString() const;
 };
 
 typedef QSharedPointer<QnSendMailBusinessAction> QnSendMailBusinessActionPtr;

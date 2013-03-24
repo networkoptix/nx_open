@@ -37,6 +37,9 @@ public:
 
     void setPhysicalPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &physicalPosition);
 
+    // TODO: #Elric remove?
+    void updatePosition(const QnVirtualCameraResourcePtr &camera);
+
     /**
      * \param camera                    Camera to get current PTZ continuous movement speed for.
      * \returns                         Current PTZ continuous movement speed for the given

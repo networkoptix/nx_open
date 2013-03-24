@@ -36,8 +36,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
-    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, int, const QString&)),
-            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, int, const QString&)));
+    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
+            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -353,6 +353,12 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
         audioParser->setCodecId(CODEC_ID_ADPCM_G726);
         audioParser->setBitsPerSample(bitsPerSample.toInt()/8);
+        audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
+        result = audioParser;
+    }
+    else if (codecName == QLatin1String("L16")) {
+        QnSimpleAudioRtpParser* audioParser = new QnSimpleAudioRtpParser;
+        audioParser->setCodecId(CODEC_ID_PCM_S16BE);
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
     }

@@ -114,11 +114,6 @@ bool QnPlDlinkResource::isResourceAccessible()
     return true;
 }
 
-bool QnPlDlinkResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlDlinkResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);

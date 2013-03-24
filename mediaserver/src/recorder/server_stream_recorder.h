@@ -9,6 +9,8 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "dualstreaming_helper.h"
 
+#include <business/business_logic_common.h>
+
 class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
@@ -40,7 +42,7 @@ signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnAbstractDataPacketPtr motion);
 
-    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, int reasonCode, QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 

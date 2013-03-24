@@ -41,8 +41,8 @@ public:
     enum CameraCapability { 
         NoCapabilities                      = 0x000, 
         PrimaryStreamSoftMotionCapability   = 0x004,
-        relayInput                          = 0x008, // TODO: #AK please name enums properly (see how other enums are named)
-        relayOutput                         = 0x010, // TODO: #AK same here
+        RelayInputCapability                = 0x008,
+        RelayOutputCapability               = 0x010,
         AbsolutePtzCapability               = 0x020,
         ContinuousPanTiltCapability         = 0x040,
         ContinuousZoomCapability            = 0x080,

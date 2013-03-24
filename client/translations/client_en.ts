@@ -103,29 +103,29 @@
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Could not save the following layout to Enterprise Controller.</numerusform>
+            <numerusform>Could not save the following %n layouts to Enterprise Controller.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Do you want to restore this layout?</numerusform>
+            <numerusform>Do you want to restore these %n layouts?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Could not save the following item to Enterprise Controller.</numerusform>
+            <numerusform>Could not save the following %n items to Enterprise Controller.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Could not save changes made to the following resource.</numerusform>
+            <numerusform>Could not save changes made to the following %n resources.</numerusform>
         </translation>
     </message>
 </context>

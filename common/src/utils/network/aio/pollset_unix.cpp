@@ -236,6 +236,7 @@ PollSet::EventType PollSet::const_iterator::eventType() const
 
 void* PollSet::const_iterator::userData() const
 {
+    //TODO: #AK gcc warning: invalid conversion from 'const void*' to 'void*' [-fpermissive]
     return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( eventType() );
 }
 

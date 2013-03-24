@@ -6,49 +6,48 @@
 #include "core/resource/resource_fwd.h"
 #include <business/business_logic_common.h>
 
-// TODO: #Elric have BE_ prefix => namespace not needed
 namespace BusinessEventType
 {
     enum Value
     {
         /** Motion has occured on a camera. */
-        BE_Camera_Motion,
+        Camera_Motion,
 
         /** Camera was disconnected. */
-        BE_Camera_Disconnect,
+        Camera_Disconnect,
 
         /** Storage read error has occured. */
-        BE_Storage_Failure,
+        Storage_Failure,
 
         /** Network issue: packet lost, RTP timeout, etc. */
-        BE_Network_Issue,
+        Network_Issue,
 
         /** Found some cameras with same IP address. */
-        BE_Camera_Ip_Conflict,
+        Camera_Ip_Conflict,
 
         /** Camera input signal is received. */
-        BE_Camera_Input,
+        Camera_Input,
 
         /** Connection to mediaserver lost. */
-        BE_MediaServer_Failure,
+        MediaServer_Failure,
 
         /** Two or more mediaservers are running. */
-        BE_MediaServer_Conflict,
+        MediaServer_Conflict,
 
         /** Event type is not defined. Used in rules. */
-        BE_NotDefined,
+        NotDefined,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        BE_Count = BE_NotDefined,
+        Count = NotDefined,
 
         /** System health message. */
-        BE_SystemHealthMessage = 500,
+        SystemHealthMessage = 500,
 
         /** Base index for the user defined events. */
-        BE_UserDefined = 1000
+        UserDefined = 1000
 
     };
 
@@ -72,9 +71,6 @@ namespace QnBusinessEventRuntime {
 
     int getEventResourceId(const QnBusinessParams &params);
     void setEventResourceId(QnBusinessParams* params, int value);
-
-    QString getEventDescription(const QnBusinessParams &params);
-    void setEventDescription(QnBusinessParams* params, QString value);
 
 }
 
@@ -100,12 +96,6 @@ protected:
 
 public:
     virtual ~QnAbstractBusinessEvent();
-
-    /**
-     * @brief toString          Convert event to human-readable string in debug purposes and as sendMail text.
-     * @return                  Printable string with all event data in human-readable form.
-     */
-    virtual QString toString() const;
 
     /**
      * @brief getResource       Get resource that provided this event.
