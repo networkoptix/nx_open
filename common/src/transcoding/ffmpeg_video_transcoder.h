@@ -13,7 +13,7 @@ public:
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
-    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
+    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(QnCompressedVideoDataPtr video) override;
     AVCodecContext* getCodecContext();
 

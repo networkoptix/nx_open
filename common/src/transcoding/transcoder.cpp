@@ -197,7 +197,7 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
     return m_lastErrMessage.isEmpty();
 }
 
-int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
+int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result)
 {
     m_internalBuffer.clear();
     m_outputPacketSize.clear();
@@ -233,7 +233,8 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
             return rez;
         m_initialized = true;
     }
-    result.clear();
+    if( result )
+        result->clear();
     int errCode = 0;
     while (!m_delayedVideoQueue.isEmpty()) {
         errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue(), result);
@@ -251,7 +252,8 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
             return errCode;
     }
     
-    result.write(m_internalBuffer.data(), m_internalBuffer.size());
+    if( result )
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
     
     return 0;
 }
