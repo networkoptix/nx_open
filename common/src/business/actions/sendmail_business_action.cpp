@@ -131,7 +131,7 @@ QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
             result = res->getName();
     }
 
-    if (!result.isEmpty())
+    if (!result.isEmpty() && useUrl)
         result += QLatin1Char('\n');
     return result;
 }

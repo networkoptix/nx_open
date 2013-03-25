@@ -300,6 +300,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_totalLineStretch(0.0),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
+    m_thumbnailsAspectRatio(-1.0),
     m_lastThumbnailsUpdateTime(0),
     m_lastHoverThumbnail(-1),
     m_thumbnailsVisible(false),
@@ -680,7 +681,7 @@ QnThumbnailsLoader *QnTimeSlider::thumbnailsLoader() const {
     return m_thumbnailsLoader.data();
 }
 
-void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
+void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader, qreal aspectRatio) {
     if(m_thumbnailsLoader.data() == loader)
         return;
 
@@ -692,15 +693,16 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
         disconnect(m_thumbnailsLoader.data(), NULL, this, NULL);
 
     m_thumbnailsLoader = loader;
+    m_thumbnailsAspectRatio = aspectRatio;
 
     if(m_thumbnailsLoader) {
-        connect(m_thumbnailsLoader.data(), SIGNAL(sourceSizeChanged()), this, SLOT(updateThumbnailsStepSizeForced()));
+        //connect(m_thumbnailsLoader.data(), SIGNAL(sourceSizeChanged()), this, SLOT(updateThumbnailsStepSizeForced())); // TODO: #Elric
         connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailsInvalidated()), this, SLOT(clearThumbnails()));
         connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
     }
 
     updateThumbnailsPeriod();
-    updateThumbnailsStepSize(true);
+    updateThumbnailsStepSize(true); // TODO: #Elric
 
     if(m_thumbnailsLoader)
         foreach(const QnThumbnail &thumbnail, loader->thumbnails())
@@ -1196,12 +1198,18 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     bool boundingSizeChanged = thumbnailsLoader()->boundingSize() != boundingSize;
 
     /* Calculate actual thumbnail size. */
+#if 0
     QSize size = thumbnailsLoader()->thumbnailSize();
     if(size.isEmpty()) {
         size = QSize(boundingHeigth * 4 / 3, boundingHeigth); /* For uninitialized loader, assume 4:3 aspect ratio. */
     } else if(size.height() != boundingHeigth) { // TODO: evil hack, should work on signals.
         size = QSize(boundingHeigth * size.width() / size.height() , boundingHeigth);
     }
+#else
+    QSize size;
+    if(m_thumbnailsAspectRatio > 0)
+        size = QSize(boundingHeigth * m_thumbnailsAspectRatio, boundingHeigth);
+#endif
     if(size.isEmpty())
         return;
 

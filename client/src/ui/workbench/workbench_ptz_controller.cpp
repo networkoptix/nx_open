@@ -202,6 +202,8 @@ void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &c
         return;
 
     data.initialized = true;
+    data.sequenceId = QUuid::createUuid();
+    data.sequenceNumber = 0;
     sendGetPosition(camera);
     sendSetMovement(camera, QVector3D());
 }

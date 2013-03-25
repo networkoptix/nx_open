@@ -152,7 +152,7 @@ public:
     void setRulerHeight(qreal rulerHeight);
 
     QnThumbnailsLoader *thumbnailsLoader() const;
-    void setThumbnailsLoader(QnThumbnailsLoader *value);
+    void setThumbnailsLoader(QnThumbnailsLoader *value, qreal aspectRatio); // TODO: remove aspectRatio
 
     const QVector<qint64> &indicators() const;
     void setIndicators(const QVector<qint64> &indicators);
@@ -337,6 +337,7 @@ private:
     QVector<QVector<QPointF> > m_tickmarkLines;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    qreal m_thumbnailsAspectRatio;
     QTimer *m_thumbnailsUpdateTimer;
     qint64 m_lastThumbnailsUpdateTime;
     QPixmap m_noThumbnailsPixmap;

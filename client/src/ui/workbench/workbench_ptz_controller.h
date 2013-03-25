@@ -88,6 +88,8 @@ private:
     struct PtzData {
         PtzData();
 
+        QUuid sequenceId;
+        int sequenceNumber;
         bool initialized;
         QVector3D position, physicalPosition;
         QVector3D movement;
