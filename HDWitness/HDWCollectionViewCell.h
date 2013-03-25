@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UICollectionViewCell.h>
+#import "FXImageView.h"
 
 @interface HDWCollectionViewCell : UICollectionViewCell
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+
+@property (weak, nonatomic) IBOutlet FXImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *labelView;
 
 @end

@@ -17,6 +17,7 @@
 @property (strong, nonatomic) HDWECSConfig *ecsConfig;
 @property (strong, nonatomic) HDWServersModel *servers;
 
+@property (strong, nonatomic) SRWebSocket* socket;
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
 @property (strong, nonatomic) HDWVideoViewController *videoViewController;
 @end

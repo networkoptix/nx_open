@@ -12,8 +12,6 @@
 #import "AFJSONRequestOperation.h"
 #import "AFHTTPClient.h"
 
-// #import "AZSocketIO.h"
-
 @interface HDWDetailViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 - (void)configureView;
@@ -41,17 +39,47 @@
     NSError* error;
     NSDictionary *message = [NSJSONSerialization JSONObjectWithData:messageData options:kNilOptions error:&error];
     
-    if (message[@"type"] == 0)
-    {
+    NSNumber *messageType = message[@"type"];
+    NSString *objectName = message[@"objectName"];
+    
+    NSMutableArray *changedCameras = [[NSMutableArray alloc] init];
+    
+    if ([messageType intValue] == 2) {
+        NSDictionary *resource = message[@"resource"];
+        
+        // resource changed
+        if ([objectName isEqual: @"Server"]) {
+            HDWServerModel* server = [HDWServerModel alloc];
+            server.serverId = resource[@"id"];
+            server.name = resource[@"name"];
+            server.streamingUrl = resource[@"streamingUrl"];
+            
+            [_servers updateServer:server];
+        } else if ([objectName isEqual: @"Camera"]) {
+            HDWCameraModel* camera = [HDWCameraModel alloc];
+            camera.cameraId = resource[@"id"];
+            camera.serverId = resource[@"parentId"];
+            camera.name = resource[@"name"];
+            camera.physicalId = resource[@"physicalId"];
+            camera.status = resource[@"status"];
+            
+            [_servers updateCamera:camera];
+            
+            [changedCameras addObject:[_servers getIndexPathOfCameraWithId:camera.cameraId andServerId:camera.serverId]];
+        }
     }
+    
+
+    [self.collectionView performBatchUpdates:^{
+        [self.collectionView reloadItemsAtIndexPaths:changedCameras];
+    } completion:nil];
     
     NSLog(@"Pens: %@", message);
 }
 
 #pragma mark - Managing the detail item
 
-- (void)setEcsConfig:(id)newEcsConfig
-{
+- (void)setEcsConfig:(id)newEcsConfig {
     if (_ecsConfig != newEcsConfig) {
         _ecsConfig = newEcsConfig;
         
@@ -65,8 +93,7 @@
     }        
 }
 
-- (void) onGotResultsFromEcs
-{
+- (void) onGotResultsFromEcs {
     [self.collectionView reloadData];
 }
 
@@ -110,15 +137,15 @@
     NSString* urlString = [NSString stringWithFormat:@"https://%@:%@@%@:%@/", _ecsConfig.login, _ecsConfig.password, _ecsConfig.host, _ecsConfig.port];
     NSURL *baseUrl = [NSURL URLWithString:urlString];
     
-//    NSURL *resourceUrl = [NSURL URLWithString:@"api/resource/" relativeToURL:baseUrl];
-//    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl];
+    NSURL *resourceUrl = [NSURL URLWithString:@"api/resource/" relativeToURL:baseUrl];
+    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl];
     
-//    AFJSONRequestOperation *resourceOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-//        [self requestFinished: JSON];
-//    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-//        NSLog(@"Error: %@", error);
-//    }];
-//    [resourceOperation start];
+    AFJSONRequestOperation *resourceOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        [self requestFinished: JSON];
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        NSLog(@"Error: %@", error);
+    }];
+    [resourceOperation start];
     
     
     NSURL *messageUrl = [NSURL URLWithString:@"/events/" relativeToURL:baseUrl];
@@ -127,81 +154,9 @@
     NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
     [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", AFBase64EncodedStringFromString(basicAuthCredentials)] forHTTPHeaderField: @"Authorization"];
     
-    SRWebSocket* socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
-    [socket setDelegate:self];
-    [socket open];
-    
-//    AFHTTPRequestOperation *messageOperation = [[AFHTTPRequestOperation alloc]initWithRequest:messageRequest];
-//    messageOperation.outputStream = [NSOutputStream outputStreamToMemory];
-//    [messageOperation.outputStream setDelegate: self ];
-//    [messageOperation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
-//        NSLog(@"%d", bytesRead);
-//    }];
-//    
-//    [messageOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-//        NSLog(@"Response %@", operation.responseString);
-//    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-//        NSLog(@"Error: %@", error);
-//    }];
-//    
-//    [messageOperation start];
-    
-//    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:messageUrl];
-//    [httpClient setAuthorizationHeaderWithUsername:messageUrl.user password:messageUrl.password];
-//    
-//    AFHTTPRequestOperation *messageOperation = [[AFHTTPRequestOperation alloc] initWithRequest:messageRequest];
-//    
-//    [messageOperation setAuthenticationChallengeBlock:^(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge) {
-//         if (challenge.previousFailureCount == 0)
-//         {
-//            NSURLCredential *creds = [NSURLCredential credentialWithUser:messageUrl.user
-//                                                                password:messageUrl.password
-//                                                                persistence:NSURLCredentialPersistenceForSession];
-//    
-//            [[challenge sender] useCredential:creds forAuthenticationChallenge:challenge];
-//         }
-//         else
-//         {
-//             NSLog(@"Previous auth challenge failed. Are username and password correct?");
-//         }
-//     }];
-//    
-//    messageOperation.outputStream = [NSOutputStream outputStreamToMemory];
-//    [messageOperation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
-//        NSLog(@"%d", bytesRead);
-//    }];
-//    [httpClient enqueueHTTPRequestOperation:messageOperation];
-    
-
-//    AFHTTPRequestOperation *messageOperation = [httpClient HTTPRequestOperationWithRequest:messageRequest success:^(AFHTTPRequestOperation *operation, id responseObject) {
-//        NSLog(@"%@", @"Success");
-//    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-//        NSLog(@"%@", @"Error");
-//    }];
-    
-    
-//    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:messageRequest];
-//    operation.outputStream = [NSOutputStream outputStreamToMemory];
-//    [operation start];
-    
-//    AZSocketIO *socket = [[AZSocketIO alloc] initWithRequest:messageRequest];
-//    
-//    [socket setEventRecievedBlock:^(NSString *eventName, id data) {
-//        NSLog(@"%@ : %@", eventName, data);
-//    }];
-//    
-//    [socket connectWithSuccess:^{
-//        [socket emit:@"Send Me Data" args:@"cows" error:nil];
-//    } andFailure:^(NSError *error) {
-//        NSLog(@"Boo: %@", error);
-//    }];
-    
-//    AFHTTPRequestOperation *messagesOperation = [[AFHTTPRequestOperation alloc] initWithRequest:messagesRequest];
-//    messagesOperation.outputStream = [NSOutputStream outputStreamToMemory];
-//    [messagesOperation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
-//        NSLog(@"%d bytes read", bytesRead);
-//    }];
-//    [messagesOperation start];
+    _socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
+    [_socket setDelegate:self];
+    [_socket open];
     
     if (self.ecsConfig) {
         self.detailDescriptionLabel.text = [self.ecsConfig description];
@@ -211,10 +166,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
     
     self.videoViewController = (HDWVideoViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+}
+
+- (void)willMoveToParentViewController:(UIViewController *)parent {
+    [_socket close];
+    NSLog(@"willMoveToParentViewController");
 }
 
 - (void)didReceiveMemoryWarning
@@ -238,13 +199,18 @@
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     HDWCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MyCell" forIndexPath:indexPath];
-    
+
+    cell.imageView.reflectionScale = 0.5f;
+    cell.imageView.reflectionAlpha = 0.25f;
+    cell.imageView.reflectionGap = 10.0f;
+    cell.imageView.shadowOffset = CGSizeMake(0.0f, 2.0f);
+    cell.imageView.shadowBlur = 5.0f;
+    cell.imageView.cornerRadius = 10.0f;
+
     HDWServerModel *server = [_servers getServerAtIndex: indexPath.section];
     HDWCameraModel *camera = [server.cameras objectAtIndex:indexPath.row];
-    
-    NSData *data = [NSData dataWithContentsOfURL:camera.thumbnailUrl];
-    
-    cell.imageView.image = [UIImage imageWithData:data];
+   
+    [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
     cell.labelView.text = camera.name;
     
     return cell;

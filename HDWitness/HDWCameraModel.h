@@ -30,6 +30,7 @@
 @property NSNumber *serverId;
 @property NSString *name;
 @property NSString *physicalId;
+@property NSNumber *status;
 
 @property NSURL *videoUrl;
 @property NSURL *thumbnailUrl;
@@ -46,9 +47,16 @@
 
 -(void) addServers: (NSArray*) servers;
 -(void) addServer: (HDWServerModel*) server;
+
+-(void) updateServer: (HDWServerModel*) server;
+-(void) updateCamera: (HDWCameraModel*) camera;
+
 -(HDWServerModel*) findServerById: (NSNumber*) id;
+-(HDWCameraModel*) findCameraById: (NSNumber*) id atServer: (NSNumber*) serverId;
+
 -(HDWServerModel*) getServerAtIndex: (NSInteger) index;
 -(HDWCameraModel*) getCameraForIndexPath: (NSIndexPath*) indexPath;
+-(NSIndexPath*) getIndexPathOfCameraWithId: (NSNumber*) cameraId andServerId: (NSNumber*) serverId;
 -(int) count;
 
 @end

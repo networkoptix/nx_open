@@ -27,6 +27,7 @@
 		C71D5B2916ADBB9600C764B5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B2716ADBB9600C764B5 /* InfoPlist.strings */; };
 		C71D5B2C16ADBB9600C764B5 /* HDWitnessTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */; };
 		C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */; };
+		C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EA170090E900AC48C4 /* camera_offline.png */; };
 		C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */; };
 		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
 		C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */; };
@@ -74,6 +75,7 @@
 		C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HDWitnessTests.m; sourceTree = "<group>"; };
 		C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCameraModel.h; sourceTree = "<group>"; };
 		C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCameraModel.m; sourceTree = "<group>"; };
+		C744D1EA170090E900AC48C4 /* camera_offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = camera_offline.png; path = ../camera_offline.png; sourceTree = "<group>"; };
 		C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCollectionViewCell.h; sourceTree = "<group>"; };
 		C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCollectionViewCell.m; sourceTree = "<group>"; };
 		C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWECSViewController.h; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 		C71D5AFB16ADBB9600C764B5 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C744D1EA170090E900AC48C4 /* camera_offline.png */,
 				C71D5AFC16ADBB9600C764B5 /* HDWitness-Info.plist */,
 				C71D5AFD16ADBB9600C764B5 /* InfoPlist.strings */,
 				C71D5B0016ADBB9600C764B5 /* main.m */,
@@ -283,6 +286,7 @@
 				C71D5B0B16ADBB9600C764B5 /* Default-568h@2x.png in Resources */,
 				C71D5B0E16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard in Resources */,
 				C71D5B1116ADBB9600C764B5 /* MainStoryboard_iPad.storyboard in Resources */,
+				C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

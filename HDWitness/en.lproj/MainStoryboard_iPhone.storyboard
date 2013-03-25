@@ -235,7 +235,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="155" height="95"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l0Y-MM-cFB">
+                                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="camera_offline.png" translatesAutoresizingMaskIntoConstraints="NO" id="l0Y-MM-cFB" customClass="FXImageView">
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="135" id="F6j-i9-WNf"/>
                                                 <constraint firstAttribute="height" constant="67" id="qpR-TX-Dj2"/>
@@ -327,7 +327,13 @@
             <point key="canvasLocation" x="1790" y="-73"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="camera_offline.png" width="128" height="128"/>
+    </resources>
     <classes>
+        <class className="FXImageView" superclassName="UIImageView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/FXImageView.h"/>
+        </class>
         <class className="HDWCollectionViewCell" superclassName="UICollectionViewCell">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWCollectionViewCell.h"/>
             <relationships>
