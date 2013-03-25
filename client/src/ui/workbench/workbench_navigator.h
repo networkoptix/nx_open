@@ -143,7 +143,7 @@ protected slots:
 
     void updateLocalOffset();
    
-    void updateThumbnailsLoader();
+    Q_SLOT void updateThumbnailsLoader();
     
     void updateCurrentWidgetFlags();
 

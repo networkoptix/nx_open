@@ -95,21 +95,17 @@ protected:
         }
 
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
-        QnByteArray* resultPtr = m_dataOutput->packetsInQueue() > 1 ? NULL : &result;
+        QnByteArray* const resultPtr = m_dataOutput->packetsInQueue() > 1 ? NULL : &result;
         if( !resultPtr )
         {
             NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1:%2. Skipping frame...").
                 arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()), cl_logDEBUG2 );
         }
-        else
-        {
-            int x = 0;
-        }
         int errCode = m_owner->getTranscoder()->transcodePacket(
             media,
             resultPtr );   //if previous frame dispatch not even started, skipping current frame
         if (errCode == 0) {
-            if (result.size() > 0) {
+            if (resultPtr && result.size() > 0) {
                 //if (!m_owner->sendChunk(result))
                 //    m_needStop = true;
                 m_dataOutput->postPacket(toHttpChunk(result.data(), result.size()));
