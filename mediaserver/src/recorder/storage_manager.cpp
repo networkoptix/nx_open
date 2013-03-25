@@ -10,6 +10,7 @@
 #include "core/resource/camera_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -26,6 +27,7 @@ QnStorageManager::QnStorageManager():
     m_isWritableStorageAvail(false),
     m_bigStorageExists(false)
 {
+    m_lastTestTime.restart();
 }
 
 void QnStorageManager::loadFullFileCatalog()
@@ -398,6 +400,27 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
+void QnStorageManager::testOfflineStorages()
+{
+    QMutexLocker lock(&m_mutexStorages);
+
+    if (m_lastTestTime.elapsed() < OFFLINE_STORAGES_TEST_INTERVAL)
+        return;
+
+    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
+        QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
+        if (fileStorage->getStatus() != status) 
+        {
+            fileStorage->setStatus(status);
+            m_storagesStatisticsReady = false;
+        }
+    }
+
+    m_lastTestTime.restart();
+}
+
 void QnStorageManager::updateStorageStatistics()
 {
     QMutexLocker lock(&m_mutexStorages);
@@ -433,6 +456,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     QnStorageResourcePtr result;
     float minBitrate = (float) INT_MAX;
 
+    testOfflineStorages();
     updateStorageStatistics();
 
     QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;

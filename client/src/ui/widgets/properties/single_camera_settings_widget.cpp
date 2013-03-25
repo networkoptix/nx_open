@@ -333,6 +333,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     if(!m_camera) {
         ui->nameEdit->setText(QString());
         ui->modelEdit->setText(QString());
+        ui->firmwareEdit->setText(QString());
         ui->enableAudioCheckBox->setChecked(false);
         ui->macAddressEdit->setText(QString());
         ui->ipAddressEdit->setText(QString());
@@ -360,6 +361,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
+        ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
@@ -550,11 +552,9 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
 
     QnLicenseUsageHelper helper(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
 
-    //TODO: refactor duplicated code
+    //TODO: #GDM refactor duplicated code
     { // digital licenses
-        QString usageText = tr("%1 digital license(s) are used out of %2.")
-                .arg(helper.usedDigital())
-                .arg(helper.totalDigital());
+        QString usageText = tr("%n digital license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
         ui->digitalLicensesLabel->setText(usageText);
         QPalette palette = this->palette();
         if (!helper.isValid() && helper.requiredDigital() > 0)
@@ -563,9 +563,7 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
     }
 
     { // analog licenses
-        QString usageText = tr("%1 analog license(s) are used out of %2.")
-                .arg(helper.usedAnalog())
-                .arg(helper.totalAnalog());
+        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
         ui->analogLicensesLabel->setText(usageText);
         QPalette palette = this->palette();
         if (!helper.isValid() && helper.requiredAnalog() > 0)

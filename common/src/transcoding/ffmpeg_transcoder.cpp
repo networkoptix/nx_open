@@ -49,6 +49,8 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
     return ffmpegIOContext;
 }
 
+static QAtomicInt QnFfmpegTranscoder_count = 0;
+
 QnFfmpegTranscoder::QnFfmpegTranscoder():
 QnTranscoder(),
 m_videoEncoderCodecCtx(0),
@@ -58,10 +60,14 @@ m_formatCtx(0),
 m_ioContext(0),
 m_baseTime(AV_NOPTS_VALUE)
 {
+    NX_LOG( QString::fromLatin1("Created new ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
 {
+    NX_LOG( QString::fromLatin1("Destroying ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
     closeFfmpegContext();
 }
 
@@ -136,7 +142,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(0);
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
-        m_videoEncoderCodecCtx->pix_fmt = PIX_FMT_YUV420P;
+        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
 
         if (m_vTranscoder)
         {
@@ -256,7 +262,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
     return 0;
 }
 
-int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
+int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result)
 {
     Q_UNUSED(result)
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
@@ -291,7 +297,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         if (transcoder)
         {
             // transcode media
-            int errCode = transcoder->transcodePacket(media, transcodedData);
+            int errCode = transcoder->transcodePacket(media, result ? &transcodedData : NULL);
             if (errCode != 0)
                 return errCode;
             if (transcodedData) {

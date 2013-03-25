@@ -75,26 +75,28 @@ bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
         return false;
     QVariantMap map = value.toMap();
 
-    QString extrapolationModeName = map.value(lit("extrapolationMode")).toString();
-    QVariantList logical = map.value(lit("logical")).toList();
-    QVariantList physical = map.value(lit("physical")).toList();
-    
-    if(map.isEmpty() || extrapolationModeName.isEmpty() || logical.size() != physical.size())
+    QString extrapolationModeName;
+    QList<qreal> logical, physical;
+    qreal logicalMultiplier = 1.0, physicalMultiplier = 1.0;
+    if(
+        !QJson::deserialize(map, "extrapolationMode", &extrapolationModeName) || 
+        !QJson::deserialize(map, "logical", &logical) ||
+        !QJson::deserialize(map, "physical", &physical) ||
+        !QJson::deserialize(map, "logicalMultiplier", &logicalMultiplier, true) ||
+        !QJson::deserialize(map, "physicalMultiplier", &physicalMultiplier, true)
+    ) {
+        return false;
+    }
+    if(logical.size() != physical.size())
         return false;
 
-    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName);
+    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName, -1);
     if(extrapolationMode == -1)
         return false;
 
     QVector<QPair<qreal, qreal> > logicalToPhysical;
-    for(int i = 0; i < logical.size(); i++) {
-        bool success = true;
-        qreal x = logical[i].toReal(&success);
-        qreal y = physical[i].toReal(&success);
-        if(!success)
-            return false;
-        logicalToPhysical.push_back(qMakePair(x, y));
-    }
+    for(int i = 0; i < logical.size(); i++)
+        logicalToPhysical.push_back(qMakePair(logical[i] * logicalMultiplier, physical[i] * physicalMultiplier));
 
     *target = QnScalarSpaceMapper(logicalToPhysical, static_cast<Qn::ExtrapolationMode>(extrapolationMode));
     return true;
@@ -125,9 +127,9 @@ bool deserialize(const QVariant &value, QnVectorSpaceMapper *target) {
     
     QnScalarSpaceMapper xMapper, yMapper, zMapper;
     if(
-        !QJson::deserialize(map, "x", &xMapper) || 
-        !QJson::deserialize(map, "y", &yMapper) ||
-        !QJson::deserialize(map, "z", &zMapper)
+        !QJson::deserialize(map, "x", &xMapper, true) || 
+        !QJson::deserialize(map, "y", &yMapper, true) ||
+        !QJson::deserialize(map, "z", &zMapper, true)
     ) {
         return false;
     }
@@ -163,19 +165,24 @@ bool deserialize(const QVariant &value, QnPtzSpaceMapper *target) {
     QnVectorSpaceMapper toCamera, fromCamera;
     if(
         !QJson::deserialize(map, "models", &models) || 
-        !QJson::deserialize(map, "fromCamera", &fromCamera) ||
-        !QJson::deserialize(map, "toCamera", &toCamera)
+        !QJson::deserialize(map, "fromCamera", &fromCamera, true) ||
+        !QJson::deserialize(map, "toCamera", &toCamera, true)
     ) {
         return false;
     }
 
     /* Null means "take this one from the other mapper". */
+    if(toCamera.isNull() && fromCamera.isNull())
+        return false;
     if(fromCamera.isNull())
         fromCamera = toCamera;
     if(toCamera.isNull())
         toCamera = fromCamera;
     for(int i = 0; i < QnVectorSpaceMapper::CoordinateCount; i++) {
         QnVectorSpaceMapper::Coordinate coordinate = static_cast<QnVectorSpaceMapper::Coordinate>(i);
+
+        if(fromCamera.mapper(coordinate).isNull() && toCamera.mapper(coordinate).isNull())
+            return false;
         if(fromCamera.mapper(coordinate).isNull())
             fromCamera.setMapper(coordinate, toCamera.mapper(coordinate));
         if(toCamera.mapper(coordinate).isNull())

@@ -34,7 +34,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == BusinessActionType::BA_SendMail || action->actionType() == BusinessActionType::BA_Alert)
+    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Alert)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
@@ -100,13 +100,13 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-        case BusinessActionType::BA_SendMail:
+        case BusinessActionType::SendMail:
             return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
-        case BusinessActionType::BA_Alert:
+        case BusinessActionType::Alert:
             break;
 
-        case BusinessActionType::BA_ShowPopup:
+        case BusinessActionType::ShowPopup:
             return showPopup( action.dynamicCast<QnPopupBusinessAction>() );
 
         default:
@@ -503,7 +503,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
 {
     //notifying resources to start input monitoring
     {
-        if( businessRule->eventType() == BusinessEventType::BE_Camera_Input)
+        if( businessRule->eventType() == BusinessEventType::Camera_Input)
         {
             QnResourceList resList = businessRule->eventResources();
             if (resList.isEmpty())
@@ -525,7 +525,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
     //notifying resources about recording action
     {
         const QnResourceList& resList = businessRule->actionResources();
-        if( businessRule->actionType() == BusinessActionType::BA_CameraRecording)
+        if( businessRule->actionType() == BusinessActionType::CameraRecording)
         {
             for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
             {

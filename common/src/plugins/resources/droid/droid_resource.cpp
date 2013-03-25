@@ -18,11 +18,6 @@ bool QnDroidResource::isResourceAccessible()
     return true;
 }
 
-bool QnDroidResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnDroidResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);

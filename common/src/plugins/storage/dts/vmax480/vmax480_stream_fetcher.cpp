@@ -79,7 +79,8 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
         return false;
 
 
-    int ch = consumer->getChannel();
+    //TODO: #vasilenko what was it for?
+    //int ch = consumer->getChannel();
 
     QMutexLocker  lock(&m_mutex);
 
@@ -105,6 +106,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
 
 bool VMaxStreamFetcher::vmaxPlayRange(QnVmax480DataConsumer* consumer, const QList<qint64>& pointsUsec)
 {
+    Q_UNUSED(consumer)
     if (!safeOpen())
         return false;
 
@@ -129,6 +131,12 @@ int VMaxStreamFetcher::getCurrentChannelMask() const
             mask |= 1 << consumer->getChannel();
     }
     return mask;
+}
+
+void VMaxStreamFetcher::reconnect()
+{
+    vmaxDisconnect();
+    vmaxConnect();
 }
 
 bool VMaxStreamFetcher::vmaxConnect()
@@ -254,7 +262,7 @@ int VMaxStreamFetcher::getMaxQueueSize() const
     QMutexLocker lock(&m_mutex);
     for (ConsumersMap::const_iterator itr = m_dataConsumers.constBegin(); itr != m_dataConsumers.constEnd(); ++itr)
     {
-        QnVmax480DataConsumer* consumer = itr.key();
+        //QnVmax480DataConsumer* consumer = itr.key();
         CLDataQueue* queue = itr.value();
         maxQueueSize = qMax(queue->size(), maxQueueSize);
     }
@@ -271,7 +279,6 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     if (mediaData->opaque != m_sequence)
         return;
 
-    mediaData->opaque = 0;
     m_lastMediaTime = mediaData->timestamp;
     if (m_emptyPacketTime == 0)
         m_emptyPacketTime = m_lastMediaTime;
@@ -284,12 +291,6 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     QTime t;
     t.restart();
-
-    qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);
-    if (newTime != mediaData->timestamp) {
-        if (newTime != DATETIME_NOW && newTime != -1)
-            m_vmaxConnection->vMaxArchivePlay(newTime, ++m_sequence, m_lastSpeed);
-    }
 
     bool needWait = false;
     int maxQueueSize = 0;
@@ -308,6 +309,21 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     {
         QMutexLocker lock(&m_mutex);
+
+        if (mediaData->opaque != m_sequence)
+            return;
+        mediaData->opaque = 0;
+
+#if 1
+        qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);
+        if (newTime != mediaData->timestamp && newTime != DATETIME_NOW && newTime != -1) 
+        {
+            qDebug() << "outofplayback. srcTime=" << QDateTime::fromMSecsSinceEpoch(mediaData->timestamp/1000).toString(lit("dd/MM/yyyy hh:mm:ss"));
+            qDebug() << "outofplayback. roundTime=" << QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(lit("dd/MM/yyyy hh:mm:ss"));
+            m_vmaxConnection->vMaxArchivePlay(newTime, ++m_sequence, m_lastSpeed);
+            return;
+        }
+#endif
 
         qint64 ct = qnSyncTime->currentUSecsSinceEpoch();
         m_lastChannelTime[ch] = ct;
@@ -331,7 +347,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
     }
 }
 
-bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count, bool openAllChannels)
+bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* count, bool openAllChannels, bool checkPlaybackMask)
 {
     if (!safeOpen())
         return false;
@@ -351,7 +367,8 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         m_vmaxConnection->vMaxAddChannel(1 << channel);
         m_lastChannelTime[channel] = qnSyncTime->currentUSecsSinceEpoch();
     }
-    updatePlaybackMask();
+    if (checkPlaybackMask)
+        updatePlaybackMask();
     return true;
 }
 
@@ -391,7 +408,7 @@ void VMaxStreamFetcher::unregisterConsumer(QnVmax480DataConsumer* consumer)
 
     updatePlaybackMask();
 
-    if (!m_dataConsumers.isEmpty() && !m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
+    if (!m_dataConsumers.isEmpty() && !m_isLive && m_lastMediaTime != (qint64)AV_NOPTS_VALUE)
     {
         bool dataFound = false;
         qint64 time = findRoundTime(m_lastMediaTime, &dataFound);
@@ -465,7 +482,7 @@ bool VMaxStreamFetcher::safeOpen()
             QnSleep::msleep(1000);
             return false; // prevent reconnect flood
         }
-        if (!m_isLive && m_lastMediaTime != AV_NOPTS_VALUE)
+        if (!m_isLive && m_lastMediaTime != (qint64)AV_NOPTS_VALUE)
             m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
     }
 
@@ -503,5 +520,5 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
 bool VMaxStreamFetcher::isPlaying() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_lastSeekPos != AV_NOPTS_VALUE;
+    return m_lastSeekPos != (qint64)AV_NOPTS_VALUE;
 }

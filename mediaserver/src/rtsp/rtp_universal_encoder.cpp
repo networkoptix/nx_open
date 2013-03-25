@@ -631,7 +631,7 @@ void QnUniversalRtpEncoder::setDataPacket(QnAbstractMediaDataPtr media)
     m_outputBuffer.clear();
     m_outputPos = 0;
     packetIndex = 0;
-    m_transcoder.transcodePacket(media, m_outputBuffer);
+    m_transcoder.transcodePacket(media, &m_outputBuffer);
 }
 
 bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)

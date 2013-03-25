@@ -36,7 +36,7 @@ private:
      *
      * \param success - Status of the connection test
      */
-    void updateUi(bool success);
+    void updateUi(bool success, const QString &details);
 
 private:
     Q_DISABLE_COPY(QnConnectionTestingDialog)

@@ -39,11 +39,6 @@ bool QnPlAxisResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-bool QnPlAxisResource::updateMACAddress()
-{
-    return true;
-}
-
 QString QnPlAxisResource::manufacture() const
 {
     return QLatin1String(MANUFACTURE);
@@ -262,6 +257,18 @@ bool QnPlAxisResource::readMotionInfo()
 bool QnPlAxisResource::initInternal()
 {
 
+    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
+    {
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
+        if (status == CL_HTTP_SUCCESS) {
+            QByteArray firmware;
+            http.readAll(firmware);
+            firmware = firmware.mid(firmware.indexOf('=')+1);
+            setFirmware(QString::fromUtf8(firmware));
+        }
+    }
+
     {
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
@@ -351,11 +358,11 @@ bool QnPlAxisResource::initInternal()
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
 
-    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
-
     initializeIOPorts( &http );
 
     initializePtz(&http);
+
+    // determin camera max resolution
 
     // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
     {
@@ -820,7 +827,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( inputPortCount > 0 )
-        setCameraCapability(Qn::relayInput, true);
+        setCameraCapability(Qn::RelayInputCapability, true);
 
     unsigned int outputPortCount = 0;
     status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
@@ -828,7 +835,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     else if( outputPortCount > 0 )
-        setCameraCapability(Qn::relayOutput, true);
+        setCameraCapability(Qn::RelayOutputCapability, true);
 
     //reading port direction and names
     for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )

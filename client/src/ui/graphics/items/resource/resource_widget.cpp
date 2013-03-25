@@ -295,7 +295,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_analogLicenseStaticText.setText(tr("Activate License to remove this message"));
+    m_analogLicenseStaticText.setText(tr("Activate analog license to remove this message"));
     m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
 

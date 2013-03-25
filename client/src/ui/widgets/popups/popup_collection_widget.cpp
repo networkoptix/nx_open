@@ -41,7 +41,7 @@ QnPopupCollectionWidget::~QnPopupCollectionWidget()
 }
 
 bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::BA_ShowPopup)
+    if (businessAction->actionType() != BusinessActionType::ShowPopup)
         return false;
 
     //TODO: #GDM check if camera is visible to us
@@ -55,10 +55,10 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
     QnBusinessParams params = businessAction->getRuntimeParams();
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
 
-    if (eventType >= BusinessEventType::BE_UserDefined)
+    if (eventType >= BusinessEventType::UserDefined)
         return false;
 
-    int healthMessage = eventType - BusinessEventType::BE_SystemHealthMessage;
+    int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
         QnResourceList resources;
 

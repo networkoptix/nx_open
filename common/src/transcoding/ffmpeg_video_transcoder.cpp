@@ -97,7 +97,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->codec_id = m_codecId;
     m_encoderCtx->width = m_resolution.width();
     m_encoderCtx->height = m_resolution.height();
-    m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
+    m_encoderCtx->pix_fmt = m_codecId == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
     if (m_bitrate == -1)
@@ -195,9 +195,10 @@ void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
         m_timeImg->width(), m_timeImg->height(), false);
 }
 
-int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
+int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
 {
-    result.clear();
+    if( result )
+        result->clear();
     if (!media)
         return 0;
 
@@ -222,6 +223,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
 
+        if( !result )
+            return 0;
+
         //TODO: #vasilenko avoid using deprecated methods
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
 
@@ -229,15 +233,16 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         {
             return -3;
         }
-        result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded));
-        result->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
+        *result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded));
+        (*result)->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
         if(m_encoderCtx->coded_frame->key_frame)
-            result->flags |= AV_PKT_FLAG_KEY;
-        result->data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+            (*result)->flags |= AV_PKT_FLAG_KEY;
+        (*result)->data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         return 0;
     }
     else {
-        result = QnCompressedVideoDataPtr();
+        if( result )
+            *result = QnCompressedVideoDataPtr();
         return 0; // ignore decode error
     }
 }

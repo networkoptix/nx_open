@@ -80,6 +80,7 @@ private:
     void getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
     void updateStorageStatistics();
+    void testOfflineStorages();
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
@@ -106,6 +107,7 @@ private:
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     bool m_bigStorageExists;
+    QTime m_lastTestTime;
 };
 
 #define qnStorageMan QnStorageManager::instance()

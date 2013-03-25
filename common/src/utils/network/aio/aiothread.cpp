@@ -153,7 +153,7 @@ namespace aio
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
                     //TODO/IMPL if we changing socket handler MUST not remove task
-                    if( it->eventType == SocketAddRemoveTask::tRemoving )
+                    if( it->type == SocketAddRemoveTask::tRemoving )
                     {
                         //cancelling remove task
                         void* userData = pollSet.getUserData( sock.data(), eventType );

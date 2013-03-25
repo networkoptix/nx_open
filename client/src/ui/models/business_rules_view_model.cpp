@@ -71,16 +71,16 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
     m_id(0),
     m_modified(false),
-    m_eventType(BusinessEventType::BE_Camera_Disconnect),
+    m_eventType(BusinessEventType::Camera_Disconnect),
     m_eventState(ToggleState::NotDefined),
-    m_actionType(BusinessActionType::BA_ShowPopup),
+    m_actionType(BusinessActionType::ShowPopup),
     m_aggregationPeriod(60),
     m_disabled(false),
     m_eventTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
 {
-    for (int i = 0; i < BusinessEventType::BE_Count; i++) {
+    for (int i = 0; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
         QStandardItem *item = new QStandardItem(BusinessEventType::toString(val));
@@ -102,7 +102,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventStatesModel->appendRow(row);
     }
 
-    for (int i = 0; i < BusinessActionType::BA_Count; i++) {
+    for (int i = 0; i < BusinessActionType::Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
 
         QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
@@ -160,9 +160,9 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             else if (column == QnBusiness::ActionColumn)
                 return m_actionType;
             else if (column == QnBusiness::TargetColumn) {
-                if (m_actionType == BusinessActionType::BA_SendMail)
+                if (m_actionType == BusinessActionType::SendMail)
                     return BusinessActionParameters::getEmailAddress(m_actionParams);
-                if (m_actionType == BusinessActionType::BA_ShowPopup)
+                if (m_actionType == BusinessActionType::ShowPopup)
                     return BusinessActionParameters::getUserGroup(m_actionParams);
             }
             break;
@@ -229,11 +229,11 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             setEventResources(value.value<QnResourceList>());
             return true;
         case QnBusiness::TargetColumn:
-            /*if (m_actionType == BusinessActionType::BA_SendMail) {
+            /*if (m_actionType == BusinessActionType::SendMail) {
                 QnBusinessParams params = m_actionParams;
                 BusinessActionParameters::setEmailAddress(&params, value.toString());
                 setActionParams(params);
-            } else */if (m_actionType == BusinessActionType::BA_ShowPopup) {
+            } else */if (m_actionType == BusinessActionType::ShowPopup) {
                 QnBusinessParams params = m_actionParams;
                 BusinessActionParameters::setUserGroup(&params, value.toInt());
                 setActionParams(params);
@@ -359,7 +359,7 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
     }
 
     if (actionTypeShouldBeInstant() && BusinessActionType::hasToggleState(m_actionType)) {
-        m_actionType = BusinessActionType::BA_ShowPopup;
+        m_actionType = BusinessActionType::ShowPopup;
         fields |= QnBusiness::ActionTypeField;
     }
 
@@ -421,7 +421,7 @@ void QnBusinessRuleViewModel::setEventState(ToggleState::Value state) {
     QnBusiness::Fields fields = QnBusiness::EventStateField | QnBusiness::ModifiedField;
 
     if (actionTypeShouldBeInstant() && BusinessActionType::hasToggleState(m_actionType)) {
-        m_actionType = BusinessActionType::BA_ShowPopup;
+        m_actionType = BusinessActionType::ShowPopup;
         fields |= QnBusiness::ActionTypeField;
     }
     updateActionTypesModel();
@@ -440,7 +440,7 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
     bool cameraRequired = BusinessActionType::requiresCameraResource(m_actionType);
     bool userRequired = BusinessActionType::requiresUserResource(m_actionType);
 
-    bool wasEmailAction = m_actionType == BusinessActionType::BA_SendMail;
+    bool wasEmailAction = m_actionType == BusinessActionType::SendMail;
 
     m_actionType = value;
     m_modified = true;
@@ -454,7 +454,7 @@ void QnBusinessRuleViewModel::setActionType(const BusinessActionType::Value valu
      *  If action is "send e-mail" default units for aggregation period should be hours, not minutes.
      *  Works only if aggregation period was not changed from default value.
      */
-    if (value == BusinessActionType::BA_SendMail && m_aggregationPeriod == 60) {
+    if (value == BusinessActionType::SendMail && m_aggregationPeriod == 60) {
         m_aggregationPeriod = 60*60;
         fields |= QnBusiness::AggregationField;
     } else if (wasEmailAction && m_aggregationPeriod == 60*60) {
@@ -617,12 +617,12 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
             }
         case QnBusiness::TargetColumn:
             {
-                if (m_actionType == BusinessActionType::BA_SendMail) {
+                if (m_actionType == BusinessActionType::SendMail) {
                     if (!isValid(QnBusiness::TargetColumn))
                         return qnResIconCache->icon(QnResourceIconCache::Offline, true);
                     return qnResIconCache->icon(QnResourceIconCache::Users);
 
-                } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
+                } else if (m_actionType == BusinessActionType::ShowPopup) {
                     if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else
@@ -656,9 +656,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         case QnBusiness::SourceColumn:
             {
                 switch (m_eventType) {
-                    case BusinessEventType::BE_Camera_Motion:
+                    case BusinessEventType::Camera_Motion:
                         return QnMotionBusinessEvent::isResourcesListValid(m_eventResources);
-                    case BusinessEventType::BE_Camera_Input:
+                    case BusinessEventType::Camera_Input:
                         return QnCameraInputEvent::isResourcesListValid(m_eventResources);
                     default:
                         return true;
@@ -666,7 +666,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             }
         case QnBusiness::TargetColumn:
             {
-                if (m_actionType == BusinessActionType::BA_SendMail) {
+                if (m_actionType == BusinessActionType::SendMail) {
                     bool any = false;
                     foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
                         QString email = user->getEmail();
@@ -684,7 +684,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                         any = true;
                     }
                     return any;
-                } else if (m_actionType == BusinessActionType::BA_CameraRecording) {
+                } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 }
 
@@ -712,7 +712,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel() {
 }
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
-    if (m_eventType == BusinessEventType::BE_Camera_Motion) {
+    if (m_eventType == BusinessEventType::Camera_Motion) {
         QnVirtualCameraResourceList cameras = m_eventResources.filtered<QnVirtualCameraResource>();
         if (cameras.isEmpty())
             return tr("<Any Camera>");
@@ -722,7 +722,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
             return tr("Recording or motion detection is disabled for %1")
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
-                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
+                         : tr("%1 of %n cameras", "...for", cameras.size()).arg(invalid));
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());
@@ -748,7 +748,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
 }
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
-    if (m_actionType == BusinessActionType::BA_SendMail) {
+    if (m_actionType == BusinessActionType::SendMail) {
 
         QStringList receivers;
         QnUserResourceList users =  m_actionResources.filtered<QnUserResource>();
@@ -780,12 +780,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
         return tr("%1 users").arg(users.size());
 
-    } else if (m_actionType == BusinessActionType::BA_ShowPopup) {
+    } else if (m_actionType == BusinessActionType::ShowPopup) {
         if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
             return tr("Administrators only");
         else
             return tr("All users");
-    } else if (m_actionType == BusinessActionType::BA_CameraRecording) {
+    } else if (m_actionType == BusinessActionType::CameraRecording) {
         QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
         if (cameras.isEmpty())
             return tr("Select at least one camera");
@@ -918,7 +918,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                 BusinessActionType::Value actionType = m_rules[index.row()]->actionType();
                 if (BusinessActionType::requiresCameraResource(actionType)
                         || BusinessActionType::requiresUserResource(actionType)
-                        || actionType == BusinessActionType::BA_ShowPopup)
+                        || actionType == BusinessActionType::ShowPopup)
                     flags |= Qt::ItemIsEditable;
             }
             break;

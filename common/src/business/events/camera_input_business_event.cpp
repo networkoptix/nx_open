@@ -30,22 +30,12 @@ QnCameraInputEvent::QnCameraInputEvent(
     const QString& inputPortID)
 :
     base_type(
-        BusinessEventType::BE_Camera_Input,
+        BusinessEventType::Camera_Input,
         resource,
         toggleState,
         timeStamp),
     m_inputPortID( inputPortID )
 {
-}
-
-QString QnCameraInputEvent::toString() const
-{
-    QString text = QnAbstractBusinessEvent::toString();
-    text += QString::fromLatin1("  input port %1, state %2\n").arg(m_inputPortID)
-            .arg(getToggleState() == ToggleState::On
-                 ? QLatin1String("On")
-                 : QLatin1String("Off"));
-    return text;
 }
 
 const QString& QnCameraInputEvent::inputPortID() const
@@ -62,7 +52,7 @@ bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusine
 }
 
 bool QnCameraInputEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return (camera->getCameraCapabilities() & Qn::relayInput);
+    return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
 }
 
 bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {
