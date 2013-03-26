@@ -7,6 +7,7 @@ BUGS FIXED:
 Since 1.4
  - If perform search and then clear all search criterias all available items were placed on scene causing freezes. Now search results are removed in this case
  - Progress indicator was displayed incorrectly in some cases during file export. Fixed
+ - Arecont SPARTAN-6 issues is resolved. Also fps jumping for arecont is resolved.
 
 Since previous version (1.4.3)
  - if press fix button on storage notification it didn't disappear
