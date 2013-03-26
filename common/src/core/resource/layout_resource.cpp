@@ -110,22 +110,6 @@ void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData 
     updateItemUnderLock(itemUuid, item);
 }
 
-}
-
-bool QnLayoutResource::userCanEdit() const {
-    QMutexLocker locker(&m_mutex);
-    return m_userCanEdit;
-}
-
-void QnLayoutResource::setUserCanEdit(bool value) {
-    {
-        QMutexLocker locker(&m_mutex);
-        if(m_userCanEdit == value)
-            return;
-        m_userCanEdit = value;
-    }
-
-    emit userCanEditChanged(::toSharedPointer(this));
 void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
     if(m_itemByUuid.contains(item.uuid)) {
         qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
@@ -249,6 +233,24 @@ void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
 void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
     setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
 }
+
+/********* User Can Edit property **********/
+bool QnLayoutResource::userCanEdit() const {
+    QMutexLocker locker(&m_mutex);
+    return m_userCanEdit;
+}
+
+void QnLayoutResource::setUserCanEdit(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_userCanEdit == value)
+            return;
+        m_userCanEdit = value;
+    }
+
+    emit userCanEditChanged(::toSharedPointer(this));
+}
+
 
 
 /********* Background size property **********/
