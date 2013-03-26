@@ -45,14 +45,9 @@ public:
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
-
 private:
     int msInQueue() const;
 
-    static QnCodecAudioFormat downmix(QnByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat float2int16(QnByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat float2int32(QnByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat int32Toint16(QnByteArray& audio, QnCodecAudioFormat format);
     bool initFormatConvertRule(QnAudioFormat format);
 
 private:
