@@ -145,9 +145,6 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
                     m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType());
-        ui->eventStatesComboBox->setVisible(prolonged);
-
         bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
         ui->eventResourcesFrame->setVisible(isResourceRequired);
 
@@ -178,6 +175,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->actionAggregationFrame->setVisible(actionIsInstant);
 
         initActionParameters();
+    }
+
+    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField)) {
+        bool prolonged = BusinessEventType::hasToggleState(m_model->eventType()) && !BusinessActionType::hasToggleState(m_model->actionType());
+        ui->eventStatesComboBox->setVisible(prolonged);
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
@@ -320,6 +322,10 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
 
 void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index) {
     if (!m_model || m_updating)
+        return;
+
+    bool prolonged = BusinessEventType::hasToggleState(m_model->eventType()) && !BusinessActionType::hasToggleState(m_model->actionType());
+    if (!prolonged)
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
