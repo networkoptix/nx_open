@@ -76,7 +76,7 @@ QString QnSendMailBusinessAction::getSubject() const {
 QString QnSendMailBusinessAction::getMessageBody() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
 
-    QString messageBody = tr("%1 Server detected %2")
+    QString messageBody = QObject::tr("%1 Server detected %2")
             .arg(QLatin1String(VER_COMPANYNAME_STR))
             .arg(BusinessEventType::toString(eventType));
 
