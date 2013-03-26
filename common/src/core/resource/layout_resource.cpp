@@ -8,7 +8,8 @@
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
     m_cellAspectRatio(-1.0),
-    m_cellSpacing(-1.0, -1.0)
+    m_cellSpacing(-1.0, -1.0),
+    m_userCanEdit(false)
 {
     setStatus(Online, true);
     addFlags(QnResource::layout);
@@ -146,6 +147,22 @@ void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
 
 void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
     setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
+}
+
+bool QnLayoutResource::userCanEdit() const {
+    QMutexLocker locker(&m_mutex);
+    return m_userCanEdit;
+}
+
+void QnLayoutResource::setUserCanEdit(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_userCanEdit == value)
+            return;
+        m_userCanEdit = value;
+    }
+
+    emit userCanEditChanged(::toSharedPointer(this));
 }
 
 void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {

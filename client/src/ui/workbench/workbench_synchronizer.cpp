@@ -60,8 +60,10 @@ void QnWorkbenchSynchronizer::submit() {
             synchronizer->setAutoDeleting(true);
             synchronizer->submit();
 
-            if(context()->user())
+            if(context()->user()) {
                 resource->setParentId(context()->user()->getId());
+                resource->setUserCanEdit(true);
+            }
 
             resourcePool()->addResource(resource);
         }

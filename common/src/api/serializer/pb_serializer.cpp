@@ -269,6 +269,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
     layout->setName(QString::fromUtf8(pb_layoutResource.name().c_str()));
     layout->setCellAspectRatio(pb_layout.cellaspectratio());
     layout->setCellSpacing(QSizeF(pb_layout.cellspacingwidth(), pb_layout.cellspacingheight()));
+    layout->setUserCanEdit(pb_layout.usercanedit());
 
     if (pb_layout.item_size() > 0)
     {
@@ -529,6 +530,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
     pb_layout.set_cellaspectratio(layoutIn->cellAspectRatio());
     pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
     pb_layout.set_cellspacingheight(layoutIn->cellSpacing().height());
+    pb_layout.set_usercanedit(layoutIn->userCanEdit());
 
     if (!layoutIn->getItems().isEmpty()) {
         foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {

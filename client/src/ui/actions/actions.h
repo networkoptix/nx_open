@@ -414,6 +414,11 @@ namespace Qn {
         CurrentLayoutSettingsAction,
 
         /**
+         * Opens layout settings dialog.
+         */
+        LayoutSettingsAction,
+
+        /**
          * Opens provided resources in an existing camera settings dialog.
          */
         OpenInCameraSettingsDialogAction,

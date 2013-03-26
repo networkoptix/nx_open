@@ -64,6 +64,8 @@
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/ptz_presets_dialog.h>
+#include <ui/dialogs/layout_settings_dialog.h>
+
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -235,6 +237,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CloseAllButThisLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::ClearCameraSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_clearCameraSettingsAction_triggered()));
@@ -1085,6 +1088,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
+    newLayout->setUserCanEdit(context()->user() == user);
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
@@ -1374,8 +1378,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!layout)
         return;
 
-    Qn::Permissions permissions = accessController()->permissions(layout);
-    if(!(permissions & Qn::ReadWriteSavePermission))
+    if (!(accessController()->globalPermissions() & Qn::GlobalEditLayoutsPermission))
         return;
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(widget()));
@@ -2117,6 +2120,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
+    layout->setUserCanEdit(context()->user() == user);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     resourcePool()->addResource(layout);
 
