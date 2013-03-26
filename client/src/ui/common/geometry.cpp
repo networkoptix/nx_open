@@ -344,3 +344,11 @@ QRectF QnGeometry::movedInto(const QRectF &rect, const QRectF &target) {
 
     return rect.translated(dx, dy);
 }
+
+QRectF QnGeometry::transformed(const QRectF &transform, const QRectF &rect) {
+    return QRectF(
+        transform.topLeft() + cwiseMul(rect.topLeft(), transform.size()),
+        cwiseMul(rect.size(), transform.size())
+    );
+}
+

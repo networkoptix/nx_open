@@ -35,7 +35,7 @@ public:
     */
     void beforeDestroy();
     
-    Qn::RenderStatus paint(const QRectF &r);
+    Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
 
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 

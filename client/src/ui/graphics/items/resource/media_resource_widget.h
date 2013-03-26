@@ -45,6 +45,9 @@ public:
         return m_renderer;
     }
 
+    const QRectF &zoomWindow() const;
+    void setZoomWindow(const QRectF &zoomWindow);
+
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
      * \returns                         Coordinates of the motion cell that the given point belongs to.
@@ -176,6 +179,7 @@ private:
 
     QStaticText m_sensStaticText[10];
 
+    QRectF m_zoomWindow;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

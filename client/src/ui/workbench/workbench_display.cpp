@@ -1087,6 +1087,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
     }
 
     synchronizeGeometry(widget, animate);
+    synchronizeZoomWindow(widget);
     synchronizeLayer(widget);
 }
 
@@ -1146,6 +1147,19 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
+}
+
+void QnWorkbenchDisplay::synchronizeZoomWindow(QnWorkbenchItem *item) {
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the given item. */
+
+    synchronizeZoomWindow(widget);
+}
+
+void QnWorkbenchDisplay::synchronizeZoomWindow(QnResourceWidget *widget) {
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        mediaWidget->setZoomWindow(widget->item()->zoomWindow());
 }
 
 void QnWorkbenchDisplay::synchronizeAllGeometries(bool animate) {
@@ -1509,6 +1523,10 @@ void QnWorkbenchDisplay::at_item_geometryChanged() {
 
 void QnWorkbenchDisplay::at_item_geometryDeltaChanged() {
     synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), true);
+}
+
+void QnWorkbenchDisplay::at_item_zoomWindowChanged() {
+    synchronizeZoomWindow(static_cast<QnWorkbenchItem *>(sender()));
 }
 
 void QnWorkbenchDisplay::at_item_rotationChanged() {

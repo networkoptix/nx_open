@@ -52,7 +52,7 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    Qn::RenderStatus paint(int channel, const QRectF &rect, qreal opacity);
+    Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
 
     virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
     virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;

@@ -56,7 +56,7 @@ public:
         QPainter painter(this);
         painter.beginNativePainting();
         if (m_renderer)
-            m_renderer->paint(0, m_videoRect, 1.0);
+            m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         painter.endNativePainting();
     }
     
