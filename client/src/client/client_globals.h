@@ -62,6 +62,7 @@ namespace Qn {
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
+        ItemZoomWindowRole,                         /**< Role for item's zoom window. Value of type QRectF. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
 
