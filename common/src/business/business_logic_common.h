@@ -35,6 +35,18 @@ namespace QnBusiness {
 
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 
+namespace QnBusinessEventRuntime {
+    static QLatin1String paramsKeyStr("paramsKey");
+
+    inline QString getParamsKey(const QnBusinessParams &params) {
+        return params[paramsKeyStr].toString();
+    }
+
+    inline void setParamsKey(QnBusinessParams* params, QString value) {
+        (*params)[paramsKeyStr] = value;
+    }
+}
+
 
 inline QByteArray serializeBusinessParams(const QnBusinessParams& value) {
     QByteArray result;
@@ -47,5 +59,7 @@ inline QnBusinessParams deserializeBusinessParams(const QByteArray& value) {
     QJson::deserialize(value, &result);
     return result; /* Returns empty map in case of deserialization error. */
 }
+
+
 
 #endif // QN_BUSINESS_LOGIC_COMMON_H

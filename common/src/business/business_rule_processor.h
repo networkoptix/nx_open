@@ -10,16 +10,81 @@
 #include "business_message_bus.h"
 #include "business_event_rule.h"
 
+#include <business/business_aggregation_info.h>
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/camera_output_business_action.h>
 #include <business/actions/popup_business_action.h>
 
+
+class QnProcessorAggregationInfo {
+public:
+    QnProcessorAggregationInfo():
+        m_timestamp(0),
+        m_initialized(false)
+    {}
+
+    /** Timestamp when the action should be executed. */
+    qint64 estimatedEnd() {
+        if (!m_initialized)
+            return 0;
+        qint64 period = m_rule->aggregationPeriod()*1000ll*1000ll;
+        return m_timestamp + period;
+    }
+
+    void init(const QnAbstractBusinessEventPtr& event, const QnBusinessEventRulePtr& rule, qint64 timestamp) {
+        m_event = event;
+        m_rule = rule;
+        m_timestamp = timestamp;
+        m_initialized = true;
+    }
+
+    /** Restores the initial state. */
+    void reset(qint64 timestamp){
+        m_timestamp = timestamp;
+        m_info.clear();
+    }
+
+    void append(const QnBusinessParams& runtimeParams) {
+        m_info.append(runtimeParams);
+    }
+
+
+    bool initialized() const {
+        return m_initialized;
+    }
+
+    int totalCount() const {
+        return m_info.totalCount();
+    }
+
+    QnAbstractBusinessEventPtr event() const {
+        return m_event;
+    }
+
+    QnBusinessEventRulePtr rule() const {
+        return m_rule;
+    }
+
+    const QnBusinessAggregationInfo& info() const {
+        return m_info;
+    }
+private:
+    QnAbstractBusinessEventPtr m_event;
+    QnBusinessEventRulePtr m_rule;
+    QnBusinessAggregationInfo m_info;
+
+    /** Timestamp of the first event. */
+    qint64 m_timestamp;
+
+    /** Flag that event and rule are set. */
+    bool m_initialized;
+};
+
 /*
 * This class route business event and generate business action
 */
-
 class QnBusinessRuleProcessor: public QThread
 {
     Q_OBJECT
@@ -112,16 +177,7 @@ private:
      */
     bool checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
 
-    struct QAggregationInfo 
-    {
-        QAggregationInfo(): timeStamp(0), count(0) {}
-        QAggregationInfo(qint64 _timeStamp, qint64 _count): timeStamp(_timeStamp), count(_count) {}
-        qint64 timeStamp;
-        int count;
-        QnAbstractBusinessEventPtr bEvent;
-        QnBusinessEventRulePtr bRule;
-    };
-    QMap<QString, QAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
+    QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
     mutable QMutex m_mutex;
     QTimer m_timer;

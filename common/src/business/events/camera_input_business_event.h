@@ -10,7 +10,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-namespace BusinessEventParameters
+namespace QnBusinessEventRuntime
 {
     QString getInputPortId(const QnBusinessParams &params);
     void setInputPortId(QnBusinessParams* params, const QString &value);
@@ -32,6 +32,8 @@ public:
 
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static bool isResourcesListValid(const QnResourceList &resources);
+
+    virtual QnBusinessParams getRuntimeParams() const override;
 private:
     const QString m_inputPortID;
 };

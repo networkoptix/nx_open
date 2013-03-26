@@ -13,6 +13,8 @@
 #include <business/events/conflict_business_event.h>
 #include <business/events/camera_input_business_event.h>
 
+#include "version.h"
+
 namespace BusinessActionParameters {
     static QLatin1String emailAddress("emailAddress");
 
@@ -74,15 +76,37 @@ QString QnSendMailBusinessAction::getSubject() const {
 QString QnSendMailBusinessAction::getMessageBody() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
 
-    QString messageBody = BusinessEventType::toString(eventType);
-    messageBody += QLatin1Char('\n');
+    QString messageBody = tr("%1 Server detected %2")
+            .arg(QLatin1String(VER_COMPANYNAME_STR))
+            .arg(BusinessEventType::toString(eventType));
 
     if (eventType >= BusinessEventType::UserDefined)
         return messageBody;
 
     if (BusinessEventType::isResourceRequired(eventType))
         messageBody += resourceString(true);
+    messageBody += QLatin1Char('\n');
 
+    if (m_aggregationInfo.totalCount() == 0) {
+        messageBody += eventTextString(eventType, m_runtimeParams);
+        messageBody += timestampString(m_runtimeParams, getAggregationCount());
+    }
+    else
+        foreach (QnInfoDetail detail, m_aggregationInfo.toList()) {
+            messageBody += eventTextString(eventType, detail.runtimeParams);
+            messageBody += timestampString(detail.runtimeParams, detail.count);
+        }
+
+    messageBody += recipientsString();
+    return messageBody;
+}
+
+void QnSendMailBusinessAction::setAggregationInfo(const QnBusinessAggregationInfo &info) {
+    m_aggregationInfo = info;
+}
+
+QString QnSendMailBusinessAction::eventTextString(BusinessEventType::Value eventType, const QnBusinessParams &params) const {
+    QString result;
     switch (eventType) {
     case BusinessEventType::NotDefined:
         qWarning() << "Undefined event has occured";
@@ -91,33 +115,27 @@ QString QnSendMailBusinessAction::getMessageBody() const {
     case BusinessEventType::Camera_Disconnect:
         break;
     case BusinessEventType::Camera_Motion:
-        messageBody += stateString();
         break;
     case BusinessEventType::Camera_Input:
         {
-            messageBody += QObject::tr("Input port: %1")
-                    .arg(BusinessEventParameters::getInputPortId(m_runtimeParams));
-            messageBody += QLatin1Char('\n');
-            messageBody += stateString();
+            result += QObject::tr("Input port: %1")
+                    .arg(QnBusinessEventRuntime::getInputPortId(params));
+            result += QLatin1Char('\n');
         }
         break;
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure:
-        messageBody += reasonString();
+        result += reasonString(params);
         break;
     case BusinessEventType::Camera_Ip_Conflict:
     case BusinessEventType::MediaServer_Conflict:
-        messageBody += conflictString();
+        result += conflictString();
         break;
     default:
         return QString();
     }
-    messageBody += QLatin1Char('\n');
-
-    messageBody += timestampString();
-    messageBody += adresatesString();
-    return messageBody;
+    return result;
 }
 
 QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
@@ -126,7 +144,7 @@ QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
     QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
     if (res) {
         if (useUrl)
-            result = QString(QLatin1String("%1 (%2)")).arg(res->getName()).arg(res->getUrl());
+            result = QString(QLatin1String("at %1 (%2)")).arg(res->getName()).arg(res->getUrl());
         else
             result = res->getName();
     }
@@ -137,12 +155,12 @@ QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
 }
 
 
-QString QnSendMailBusinessAction::timestampString() const {
-    quint64 ts = QnBusinessEventRuntime::getEventTimestamp(m_runtimeParams);
+QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params, int aggregationCount) const {
+    quint64 ts = QnBusinessEventRuntime::getEventTimestamp(params);
     QString timeStamp = QDateTime::fromMSecsSinceEpoch(ts/1000).toString(Qt::SystemLocaleShortDate);
 
     QString result;
-    int count = qMax(getAggregationCount(), 1);
+    int count = qMax(aggregationCount, 1);
     if (count == 1)
         result = QObject::tr("at %1").arg(timeStamp);
     else
@@ -152,8 +170,8 @@ QString QnSendMailBusinessAction::timestampString() const {
 }
 
 
-QString QnSendMailBusinessAction::adresatesString() const {
-    QString result = QObject::tr("Adresates:");
+QString QnSendMailBusinessAction::recipientsString() const {
+    QString result = QObject::tr("Recipients:");
     result += QLatin1Char('\n');
     QnResourceList resources = getResources();
     foreach (const QnUserResourcePtr &user, resources.filtered<QnUserResource>())
@@ -166,27 +184,10 @@ QString QnSendMailBusinessAction::adresatesString() const {
     return result;
 }
 
-QString QnSendMailBusinessAction::stateString() const {
-    QString result;
-    switch (m_toggleState) {
-    case ToggleState::On:
-        result = QObject::tr("On");
-        break;
-    case ToggleState::Off:
-        result += QObject::tr("Off");
-        break;
-    default:
-        break;
-    }
-    if (!result.isEmpty())
-        result += QLatin1Char('\n');
-    return result;
-}
-
-QString QnSendMailBusinessAction::reasonString() const {
-    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
-    QnBusiness::EventReason reasonCode = QnBusinessEventRuntime::getReasonCode(m_runtimeParams);
-    QString reasonText = QnBusinessEventRuntime::getReasonText(m_runtimeParams);
+QString QnSendMailBusinessAction::reasonString(const QnBusinessParams &params) const {
+    BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(params);
+    QnBusiness::EventReason reasonCode = QnBusinessEventRuntime::getReasonCode(params);
+    QString reasonText = QnBusinessEventRuntime::getReasonText(params);
 
     QString result;
     switch (reasonCode) {
@@ -219,7 +220,7 @@ QString QnSendMailBusinessAction::reasonString() const {
             break;
         case QnBusiness::StorageIssueIoError:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QObject::tr("I/O Error occured at %1")
+                result = QObject::tr("There are no available storages for writing at %1")
                                                   .arg(reasonText);
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:
