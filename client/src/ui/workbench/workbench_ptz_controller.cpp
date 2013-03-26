@@ -152,11 +152,11 @@ void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
-    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
-    m_cameraByHandle[handle] = camera;
-
     PtzData &data = m_dataByCamera[camera];
     data.attemptCount[GetPositionRequest]++;
+
+    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, const QVector3D &, int)));
+    m_cameraByHandle[handle] = camera;
 }
 
 void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
@@ -166,12 +166,13 @@ void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr 
 
     TRACE("SENT POSITION" << position);
 
-    int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
+    PtzData &data = m_dataByCamera[camera];
+    data.sequenceNumber++;
+    data.attemptCount[SetPositionRequest]++;
+
+    int handle = server->apiConnection()->asyncPtzMoveTo(camera, position, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetPosition_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
     m_requestByHandle[handle] = position;
-
-    PtzData &data = m_dataByCamera[camera];
-    data.attemptCount[SetPositionRequest]++;
 }
 
 void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement) {
@@ -179,17 +180,18 @@ void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr 
     if(!server)
         return; // TODO. This really does happen
 
+    PtzData &data = m_dataByCamera[camera];
+    data.sequenceNumber++;
+    data.attemptCount[SetMovementRequest]++;
+
     int handle;
     if(qFuzzyIsNull(movement)) {
-        handle = server->apiConnection()->asyncPtzStop(camera, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
+        handle = server->apiConnection()->asyncPtzStop(camera, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
     } else {
-        handle = server->apiConnection()->asyncPtzMove(camera, movement.x(), movement.y(), movement.z(), this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
+        handle = server->apiConnection()->asyncPtzMove(camera, movement, data.sequenceId, data.sequenceNumber, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
     }
     m_cameraByHandle[handle] = camera;
     m_requestByHandle[handle] = movement;
-
-    PtzData &data = m_dataByCamera[camera];
-    data.attemptCount[SetMovementRequest]++;
 }
 
 void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &camera) {

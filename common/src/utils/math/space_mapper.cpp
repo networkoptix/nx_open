@@ -47,6 +47,24 @@ void QnScalarSpaceMapper::init(const QVector<QPair<qreal, qreal> > &logicalToPhy
     m_physicalMaximum = qMax(physicalA, physicalB);
 }
 
+QnScalarSpaceMapper QnScalarSpaceMapper::flipped(bool flipLogical, bool flipPhysical, qreal logicalCenter, qreal physicalCenter) const {
+    if(!flipLogical && !flipPhysical)
+        return *this;
+
+    QVector<QPair<qreal, qreal> > logicalToPhysical = m_logicalToPhysical.points();
+    qreal logicalFlipValue = logicalCenter * 2.0;
+    qreal physicalFlipValue = physicalCenter * 2.0;
+
+    for(int i = 0; i < logicalToPhysical.size(); i++) {
+        if(flipLogical)
+            logicalToPhysical[i].first = logicalFlipValue - logicalToPhysical[i].first;
+        if(flipPhysical)
+            logicalToPhysical[i].second = physicalFlipValue - logicalToPhysical[i].second;
+    }
+
+    return QnScalarSpaceMapper(logicalToPhysical, m_logicalToPhysical.extrapolationMode());
+}
+
 void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
     QString extrapolationMode = qn_extrapolationMode_enumNameMapper()->name(value.logicalToPhysical().extrapolationMode());
 

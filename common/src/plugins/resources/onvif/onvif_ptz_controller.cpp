@@ -13,7 +13,9 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(0),
-    m_ptzMapper(NULL)
+    m_ptzMapper(NULL),
+    m_verticalFlipped(false),
+    m_horizontalFlipped(false)
 {
     m_xNativeVelocityCoeff.first = 1.0;
     m_yNativeVelocityCoeff.first = 1.0;
@@ -136,10 +138,10 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
 
 int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity)
 {
-    QVector3D velocity = m_speedTransform * QVector3D(xVelocity, yVelocity, zoomVelocity);
-    xVelocity = velocity.x();
-    yVelocity = velocity.y();
-    zoomVelocity = velocity.z();
+    if(m_horizontalFlipped)
+        xVelocity = -xVelocity;
+    if(m_verticalFlipped)
+        yVelocity = -yVelocity;
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
@@ -272,14 +274,18 @@ const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper()
     return m_ptzMapper;
 }
 
-const QMatrix4x4 &QnOnvifPtzController::speedTransform() const 
+void QnOnvifPtzController::setFlipped(bool horizontal, bool vertical) 
 {
-    return m_speedTransform;
+    m_horizontalFlipped = horizontal;
+    m_verticalFlipped = vertical;
 }
 
-void QnOnvifPtzController::setSpeedTransform(const QMatrix4x4 &speedTransform) 
+void QnOnvifPtzController::getFlipped(bool *horizontal, bool *vertical) 
 {
-    m_speedTransform = speedTransform;
+    if(horizontal)
+        *horizontal = m_horizontalFlipped;
+    if(vertical)
+        *vertical = m_verticalFlipped;
 }
 
 
