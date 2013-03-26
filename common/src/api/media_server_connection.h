@@ -250,9 +250,9 @@ public:
     int asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
                                 QObject *target, const char *slot);
 
-    int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
-    int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
-    int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, qreal xPos, qreal yPos, qreal zoomPos, QObject *target, const char *slot);
+    int asyncPtzMove(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int asyncPtzStop(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
     int asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
