@@ -47,6 +47,24 @@ void QnScalarSpaceMapper::init(const QVector<QPair<qreal, qreal> > &logicalToPhy
     m_physicalMaximum = qMax(physicalA, physicalB);
 }
 
+QnScalarSpaceMapper QnScalarSpaceMapper::flipped(bool flipLogical, bool flipPhysical, qreal logicalCenter, qreal physicalCenter) const {
+    if(!flipLogical && !flipPhysical)
+        return *this;
+
+    QVector<QPair<qreal, qreal> > logicalToPhysical = m_logicalToPhysical.points();
+    qreal logicalFlipValue = logicalCenter * 2.0;
+    qreal physicalFlipValue = physicalCenter * 2.0;
+
+    for(int i = 0; i < logicalToPhysical.size(); i++) {
+        if(flipLogical)
+            logicalToPhysical[i].first = logicalFlipValue - logicalToPhysical[i].first;
+        if(flipPhysical)
+            logicalToPhysical[i].second = physicalFlipValue - logicalToPhysical[i].second;
+    }
+
+    return QnScalarSpaceMapper(logicalToPhysical, m_logicalToPhysical.extrapolationMode());
+}
+
 void serialize(const QnScalarSpaceMapper &value, QVariant *target) {
     QString extrapolationMode = qn_extrapolationMode_enumNameMapper()->name(value.logicalToPhysical().extrapolationMode());
 
@@ -75,26 +93,28 @@ bool deserialize(const QVariant &value, QnScalarSpaceMapper *target) {
         return false;
     QVariantMap map = value.toMap();
 
-    QString extrapolationModeName = map.value(lit("extrapolationMode")).toString();
-    QVariantList logical = map.value(lit("logical")).toList();
-    QVariantList physical = map.value(lit("physical")).toList();
-    
-    if(map.isEmpty() || extrapolationModeName.isEmpty() || logical.size() != physical.size())
+    QString extrapolationModeName;
+    QList<qreal> logical, physical;
+    qreal logicalMultiplier = 1.0, physicalMultiplier = 1.0;
+    if(
+        !QJson::deserialize(map, "extrapolationMode", &extrapolationModeName) || 
+        !QJson::deserialize(map, "logical", &logical) ||
+        !QJson::deserialize(map, "physical", &physical) ||
+        !QJson::deserialize(map, "logicalMultiplier", &logicalMultiplier, true) ||
+        !QJson::deserialize(map, "physicalMultiplier", &physicalMultiplier, true)
+    ) {
+        return false;
+    }
+    if(logical.size() != physical.size())
         return false;
 
-    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName);
+    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName, -1);
     if(extrapolationMode == -1)
         return false;
 
     QVector<QPair<qreal, qreal> > logicalToPhysical;
-    for(int i = 0; i < logical.size(); i++) {
-        bool success = true;
-        qreal x = logical[i].toReal(&success);
-        qreal y = physical[i].toReal(&success);
-        if(!success)
-            return false;
-        logicalToPhysical.push_back(qMakePair(x, y));
-    }
+    for(int i = 0; i < logical.size(); i++)
+        logicalToPhysical.push_back(qMakePair(logical[i] * logicalMultiplier, physical[i] * physicalMultiplier));
 
     *target = QnScalarSpaceMapper(logicalToPhysical, static_cast<Qn::ExtrapolationMode>(extrapolationMode));
     return true;

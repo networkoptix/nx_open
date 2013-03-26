@@ -175,6 +175,7 @@ QnBusinessParams QnAbstractBusinessEvent::getRuntimeParams() const {
     QnBusinessEventRuntime::setEventType(&params, m_eventType);
     QnBusinessEventRuntime::setEventTimestamp(&params, m_timeStamp);
     QnBusinessEventRuntime::setEventResourceId(&params, m_resource ? m_resource->getId().toInt() : 0);
+    QnBusinessEventRuntime::setParamsKey(&params, QString::number(m_eventType)); //default value, will be overwritten in required cases
 
     return params;
 }

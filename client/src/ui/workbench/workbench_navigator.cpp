@@ -1022,8 +1022,10 @@ void QnWorkbenchNavigator::updateSpeedRange() {
 
 void QnWorkbenchNavigator::updateThumbnailsLoader() {
     QnResourcePtr resource;
+    qreal aspectRatio = -1;
 
     if (m_centralWidget) {
+        aspectRatio = m_centralWidget->aspectRatio();
         if(QnCachingTimePeriodLoader *loader = this->loader(m_centralWidget)) {
             if(!loader->periods(Qn::RecordingRole).isEmpty())
                 resource = m_centralWidget->resource();
@@ -1032,10 +1034,10 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
         }
     }
 
-    if(!resource) {
-        m_timeSlider->setThumbnailsLoader(NULL);
+    if(!resource || aspectRatio < 0) {
+        m_timeSlider->setThumbnailsLoader(NULL, -1);
     } else if(!m_timeSlider->thumbnailsLoader() || m_timeSlider->thumbnailsLoader()->resource() != resource) {
-        m_timeSlider->setThumbnailsLoader(thumbnailLoader(resource));
+        m_timeSlider->setThumbnailsLoader(thumbnailLoader(resource), aspectRatio);
     }
 }
 
@@ -1228,12 +1230,14 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->resource()->flags() & QnResource::sync)
+    if(widget->resource()->flags() & QnResource::sync) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)){
             addSyncedWidget(mediaWidget);
             connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
         }
+    }
 
+    connect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateThumbnailsLoader()));
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
     connect(widget->resource().data(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 }

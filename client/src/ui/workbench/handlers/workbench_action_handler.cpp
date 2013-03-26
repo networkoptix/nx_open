@@ -57,7 +57,6 @@
 #include <ui/dialogs/camera_settings_dialog.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/user_settings_dialog.h>
-#include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
@@ -65,6 +64,8 @@
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/ptz_presets_dialog.h>
+#include <ui/dialogs/layout_settings_dialog.h>
+
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -109,8 +110,6 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
-
-
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -864,6 +863,8 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
     ensurePopupCollectionWidget();
     popupCollectionWidget()->addSystemHealthEvent(QnSystemHealth::ConnectionLost);
+    if (cameraAdditionDialog())
+        cameraAdditionDialog()->hide();
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
@@ -1087,6 +1088,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
+    newLayout->setUserCanEdit(context()->user() == user);
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
@@ -1376,8 +1378,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!layout)
         return;
 
-    Qn::Permissions permissions = accessController()->permissions(layout);
-    if(!(permissions & Qn::ReadWriteSavePermission))
+    if (!(accessController()->globalPermissions() & Qn::GlobalEditLayoutsPermission))
         return;
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(widget()));
@@ -1882,10 +1883,11 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     bool newlyCreated = false;
     if(!cameraAdditionDialog()) {
-        m_cameraAdditionDialog = new QnCameraAdditionDialog(resources[0], widget());
+        m_cameraAdditionDialog = new QnCameraAdditionDialog(widget());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraAdditionDialog()->geometry();
+    cameraAdditionDialog()->setServer(resources[0]);
     cameraAdditionDialog()->show();
     if(!newlyCreated)
         cameraAdditionDialog()->setGeometry(oldGeometry);
@@ -2118,6 +2120,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
+    layout->setUserCanEdit(context()->user() == user);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     resourcePool()->addResource(layout);
 

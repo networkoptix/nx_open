@@ -14,12 +14,18 @@
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="backgroundGroupBox">
      <property name="title">
       <string>Background</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetFixedSize</enum>
+      </property>
       <item>
        <widget class="QLabel" name="imageLabel">
         <property name="text">
@@ -173,6 +179,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="userCanEditCheckBox">
+     <property name="text">
+      <string>User can edit layout</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -184,8 +197,9 @@
    </item>
   </layout>
   <zorder>buttonBox</zorder>
-  <zorder>groupBox</zorder>
+  <zorder>backgroundGroupBox</zorder>
   <zorder>lockedCheckBox</zorder>
+  <zorder>userCanEditCheckBox</zorder>
  </widget>
  <tabstops>
   <tabstop>viewButton</tabstop>

@@ -74,7 +74,6 @@ public:
     bool setData(const int column, const QVariant &value, int role);
 
     void loadFromRule(QnBusinessEventRulePtr businessRule);
-    bool actionTypeShouldBeInstant() const;
     QnBusinessEventRulePtr createRule() const;
 
     QVariant getText(const int column, const bool detailed = true) const;

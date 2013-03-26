@@ -137,6 +137,7 @@ private:
 
     std::auto_ptr<QTimer> m_timer;
     State m_state;
+    QSet<QString> m_recentlyDeleted;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

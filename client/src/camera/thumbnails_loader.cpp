@@ -278,11 +278,11 @@ void QnThumbnailsLoader::updateProcessingLocked() {
     /* Trim at live. */
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if(processingEnd > currentTime)
-        processingEnd = currentTime + defaultUpdateInterval;
+        processingEnd = qCeil(currentTime + defaultUpdateInterval, m_timeStep);
 
     /* Adjust for the chunks near live that could not be loaded at the last request. */
     if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingEnd > m_maxLoadedTime) {
-        processingStart = qMin(processingStart, m_maxLoadedTime + m_timeStep);
+        processingStart = qMin(processingStart, qFloor(m_maxLoadedTime, m_timeStep) + m_timeStep);
         m_processingEnd = m_maxLoadedTime;
     }
 
@@ -314,6 +314,10 @@ void QnThumbnailsLoader::updateProcessingLocked() {
 
 void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
     m_processingStack.push(QnTimePeriod(startTime, endTime - startTime));
+
+#ifdef QN_THUMBNAILS_LOADER_DEBUG
+    qDebug() << "QnThumbnailsLoader::enqueueForProcessingLocked [" << startTime << "," << endTime << ") STEP" << m_timeStep;
+#endif
 
     while(m_processingStack.size() > maxStackSize)
         m_processingStack.pop();

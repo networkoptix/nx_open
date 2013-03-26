@@ -7,6 +7,43 @@
 #include <business/actions/popup_business_action.h>
 #include <business/actions/common_business_action.h>
 
+QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule,
+                                                                       const QnAbstractBusinessEventPtr &event,
+                                                                       ToggleState::Value state) {
+    if (BusinessActionType::requiresCameraResource(rule->actionType()) && rule->actionResources().isEmpty())
+        return QnAbstractBusinessActionPtr(); //camera is not exists anymore
+    //TODO: #GDM check resource type?
+
+    QnBusinessParams runtimeParams = event->getRuntimeParams();
+
+    QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
+
+    if (!rule->actionParams().isEmpty())
+        result->setParams(rule->actionParams());
+    result->setResources(rule->actionResources());
+
+    if (BusinessEventType::hasToggleState(event->getEventType()) && BusinessActionType::hasToggleState(rule->actionType())) {
+        ToggleState::Value value = state != ToggleState::NotDefined ? state : event->getToggleState();
+        result->setToggleState(value);
+    }
+    result->setBusinessRuleId(rule->id());
+
+    return result;
+}
+
+QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule,
+                                                                       const QnAbstractBusinessEventPtr &event,
+                                                                       const QnBusinessAggregationInfo &aggregationInfo) {
+    QnAbstractBusinessActionPtr result = instantiateAction(rule, event);
+    result->setAggregationCount(aggregationInfo.totalCount());
+
+    if (QnSendMailBusinessActionPtr sendMailAction = result.dynamicCast<QnSendMailBusinessAction>()) {
+        sendMailAction->setAggregationInfo(aggregationInfo);
+    }
+
+    return result;
+}
+
 QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const BusinessActionType::Value actionType, const QnBusinessParams &runtimeParams) {
     switch(actionType)
     {
@@ -21,4 +58,3 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const Business
     }
     return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 }
-

@@ -3,7 +3,7 @@
 
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
-#include "business_logic_common.h"
+#include <business/business_logic_common.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -19,9 +19,6 @@ public:
     ~QnBusinessEventRule();
 
     QString getUniqueId() const;
-
-    // TODO: move to some factory
-    QnAbstractBusinessActionPtr instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined) const;
 
     int id() const;
     void setId(int value);

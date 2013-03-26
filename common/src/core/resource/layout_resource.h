@@ -61,6 +61,9 @@ public:
 
     virtual void setUrl(const QString& value) override;
 
+    bool userCanEdit() const;
+
+    void setUserCanEdit(bool value);
     /** Size of background image - in cells */
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
@@ -78,6 +81,7 @@ signals:
     void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
+    void userCanEditChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
@@ -97,6 +101,7 @@ private:
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
+    bool m_userCanEdit;
     QSize m_backgroundSize;
     int m_backgroundImageId;
     bool m_locked;

@@ -134,7 +134,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
-        if(snapshotManager()->isLocal(layout)) {
+        if(snapshotManager()->isLocal(layout) || layout->userCanEdit()) {
             return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
         } else {
             return Qn::ReadPermission | Qn::WritePermission;

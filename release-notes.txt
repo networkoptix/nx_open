@@ -92,7 +92,7 @@ Since previous Beta (1.4.2)
 ----------------------------------------------- 1.4.2 - Beta -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
- - Digital Waychdog VMAX 480 Encoders
+ - Digital Watchdog VMAX 480 Encoders
  - Axis Encoders (incl. PTZ)
  - Flex Watch Encoders (incl. PTZ)
  - Vivotek Encoders 

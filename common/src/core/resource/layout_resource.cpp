@@ -9,6 +9,7 @@ QnLayoutResource::QnLayoutResource():
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
+    m_userCanEdit(false),
     m_backgroundSize(1, 1),
     m_backgroundImageId(0),
     m_locked(false)
@@ -109,6 +110,22 @@ void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData 
     updateItemUnderLock(itemUuid, item);
 }
 
+}
+
+bool QnLayoutResource::userCanEdit() const {
+    QMutexLocker locker(&m_mutex);
+    return m_userCanEdit;
+}
+
+void QnLayoutResource::setUserCanEdit(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_userCanEdit == value)
+            return;
+        m_userCanEdit = value;
+    }
+
+    emit userCanEditChanged(::toSharedPointer(this));
 void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
     if(m_itemByUuid.contains(item.uuid)) {
         qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());

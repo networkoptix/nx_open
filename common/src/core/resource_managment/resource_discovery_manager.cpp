@@ -282,6 +282,17 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 
     appendManualDiscoveredResources(resources);
+
+    {
+        QMutexLocker lock(&m_searchersListMutex);
+        for (int i = resources.size()-1; i >= 0; --i)
+        {
+            if (m_recentlyDeleted.contains(resources[i]->getUniqueId()))
+                resources.removeAt(i);
+        }
+        m_recentlyDeleted.clear();
+    }
+
     if (processDiscoveredResources(resources)) 
     {
         dtsAssignment();
@@ -482,6 +493,7 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
     QnManualCamerasMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
     if (itr != m_manualCameraMap.end() && itr.value().resType->getId() == resource->getTypeId())
         m_manualCameraMap.erase(itr);
+    m_recentlyDeleted << resource->getUniqueId();
 }
 
 bool QnResourceDiscoveryManager::containManualCamera(const QString& uniqId)

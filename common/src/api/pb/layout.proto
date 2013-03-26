@@ -31,8 +31,9 @@ message Layout {
     required double cellSpacingWidth  = 2;
     required double cellSpacingHeight = 3;
     repeated Item   item              = 4;
-    optional int32  backgroundImageId = 5;
-    optional int32  backgroundWidth   = 6;
-    optional int32  backgroundHeight  = 7;
-    optional bool   locked            = 8;
+    optional bool   userCanEdit       = 5;    
+    optional int32  backgroundImageId = 6;
+    optional int32  backgroundWidth   = 7;
+    optional int32  backgroundHeight  = 8;
+    optional bool   locked            = 9;
 }
