@@ -39,20 +39,14 @@ QString QnSendMailBusinessAction::getSubject() const {
     if (eventType >= BusinessEventType::UserDefined)
         return BusinessEventType::toString(eventType);
 
-    QString name;
-    if (BusinessEventType::isResourceRequired(eventType))
-        name = resourceString(false);
-
+    QString name = resourceString(false);
     return BusinessEventType::toString(eventType, name);
 }
 
 QString QnSendMailBusinessAction::getMessageBody() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
 
-    QString resourceName;
-    if (BusinessEventType::isResourceRequired(eventType))
-        resourceName = resourceString(true);
-
+    QString resourceName = resourceString(true);
     QString messageBody = QObject::tr("%1 Server detected %2\n")
             .arg(QLatin1String(VER_COMPANYNAME_STR))
             .arg(BusinessEventType::toString(eventType, resourceName));
