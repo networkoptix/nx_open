@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 
 
-namespace BusinessEventParameters {
+namespace QnBusinessEventRuntime {
 
     static QLatin1String inputPortId( "inputPortId" );
 
@@ -47,7 +47,7 @@ bool QnCameraInputEvent::checkCondition(ToggleState::Value state, const QnBusine
     if (!base_type::checkCondition(state, params))
         return false;
 
-    QString inputPort = BusinessEventParameters::getInputPortId(params);
+    QString inputPort = QnBusinessEventRuntime::getInputPortId(params);
     return inputPort.isEmpty() || inputPort == m_inputPortID;
 }
 
@@ -66,3 +66,11 @@ bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {
     }
     return true;
 }
+
+QnBusinessParams QnCameraInputEvent::getRuntimeParams() const {
+    QnBusinessParams params = base_type::getRuntimeParams();
+    QnBusinessEventRuntime::setInputPortId(&params, m_inputPortID);
+    QnBusinessEventRuntime::setParamsKey(&params, m_inputPortID);
+    return params;
+}
+

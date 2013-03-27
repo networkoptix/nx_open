@@ -34,8 +34,14 @@ QnReasonedBusinessEvent::QnReasonedBusinessEvent(const BusinessEventType::Value 
 }
 
 QnBusinessParams QnReasonedBusinessEvent::getRuntimeParams() const {
+    QString paramKey = QString::number(m_reasonCode);
+    if (m_reasonCode == QnBusiness::StorageIssueIoError ||
+            m_reasonCode == QnBusiness::StorageIssueNotEnoughSpeed)
+        paramKey += QLatin1String("_") + m_reasonText;
+
     QnBusinessParams params = base_type::getRuntimeParams();
     QnBusinessEventRuntime::setReasonCode(&params, m_reasonCode);
     QnBusinessEventRuntime::setReasonText(&params, m_reasonText);
+    QnBusinessEventRuntime::setParamsKey(&params, paramKey);
     return params;
 }
