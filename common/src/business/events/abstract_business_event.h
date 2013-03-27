@@ -52,7 +52,6 @@ namespace BusinessEventType
     };
 
     QString toString( Value val );
-    QString toString( Value val, const QString &resourceName);
 
     bool isResourceRequired(Value val);
 
