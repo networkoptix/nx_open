@@ -362,15 +362,18 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 {
     Q_ASSERT( action );
 
+    QStringList log;
     QStringList recipients;
     foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
         QString email = user->getEmail();
+        log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmail::isValid(email))
             recipients << email;
     }
 
     QStringList additional = BusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
+        log << email;
         QString trimmed = email.trimmed();
         if (trimmed.isEmpty())
             continue;
@@ -381,6 +384,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
     if( recipients.isEmpty() )
     {
         cl_log.log( QString::fromLatin1("Action SendMail missing valid recipients. Ignoring..."), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
         return false;
     }
 

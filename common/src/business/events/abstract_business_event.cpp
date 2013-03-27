@@ -37,6 +37,33 @@ namespace BusinessEventType
         //return QObject::tr("Unknown Event");
     }
 
+    QString toString( Value val, const QString &resourceName) {
+        switch (val) {
+        case BusinessEventType::NotDefined:
+            qWarning() << "Undefined event has occured";
+            return QString();
+
+        case BusinessEventType::Camera_Disconnect:
+            return QObject::tr("Camera %1 disconnected").arg(resourceName);
+
+        case BusinessEventType::Camera_Input:
+            return QObject::tr("Input signal on camera %1").arg(resourceName);
+
+        case BusinessEventType::Camera_Motion:
+            return QObject::tr("Motion on camera %1").arg(resourceName);
+
+        case BusinessEventType::Storage_Failure:
+        case BusinessEventType::Network_Issue:
+        case BusinessEventType::MediaServer_Failure:
+        case BusinessEventType::Camera_Ip_Conflict:
+        case BusinessEventType::MediaServer_Conflict:
+            return BusinessEventType::toString(val);
+        default:
+            break;
+        }
+        return QString();
+    }
+
     bool isResourceRequired(Value val) {
         return requiresCameraResource(val) || requiresServerResource(val);
     }
