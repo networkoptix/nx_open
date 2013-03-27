@@ -713,7 +713,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_totalFrames = 0;
     m_fczFrames = 0;
     m_iFrames = 0;
-    if (!m_afterJump) // if not more (not handled yet) jumps expected
+    if (!m_afterJump && !m_skippingFramesStarted) // if not more (not handled yet) jumps expected
     {
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
             if (media && !(media->flags & QnAbstractMediaData::MediaFlags_Ignore)) {

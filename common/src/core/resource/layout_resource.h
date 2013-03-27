@@ -61,12 +61,17 @@ public:
 
     virtual void setUrl(const QString& value) override;
 
+    bool userCanEdit() const;
+
+    void setUserCanEdit(bool value);
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
+    void userCanEditChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
 protected:
@@ -83,6 +88,7 @@ private:
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
+    bool m_userCanEdit;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

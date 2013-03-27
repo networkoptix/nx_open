@@ -1,14 +1,19 @@
+#include "business_rule_processor.h"
 
 #include <QList>
-#include "business_rule_processor.h"
-#include "core/resource/resource.h"
-#include "core/resource/media_server_resource.h"
+
+#include <api/app_server_connection.h>
+
+#include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
 #include <business/actions/system_health_business_action.h>
-#include "api/app_server_connection.h"
+
+#include <core/resource/resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
+
 #include "utils/common/synctime.h"
 #include <utils/common/email.h>
-#include "core/resource_managment/resource_pool.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -202,12 +207,12 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
         // if toggled action is used and condition is no longer valid - stop action
         // Or toggle event goes to 'off'. stop action
         if (!condOK || bEvent->getToggleState() == ToggleState::Off)
-            action = rule->instantiateAction(bEvent, ToggleState::Off); 
+            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, ToggleState::Off);
         else
             return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
-        action = rule->instantiateAction(bEvent);
+        action = QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
     bool isActionRunning = action && action->getToggleState() == ToggleState::On;
     if (isActionRunning)
@@ -246,26 +251,28 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
 
 
     if (rule->aggregationPeriod() == 0)
-        return rule->instantiateAction(bEvent);
+        return QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
     QString eventKey = rule->getUniqueId();
     if (bEvent->getResource())
         eventKey += bEvent->getResource()->getUniqueId();
 
-    QAggregationInfo& aggInfo = m_aggregateActions[eventKey];
-    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    aggInfo.count++;
-    aggInfo.bEvent = bEvent;
-    aggInfo.bRule = rule;
 
-    qint64 period = aggInfo.bRule->aggregationPeriod()*1000ll*1000ll;
-    if (aggInfo.timeStamp + period < currentTime)
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+
+    QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
+    if (!aggInfo.initialized())
+        aggInfo.init(bEvent, rule, currentTime);
+
+    aggInfo.append(bEvent->getRuntimeParams());
+
+    if (currentTime > aggInfo.estimatedEnd())
     {
-        QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
-        action->setAggregationCount(aggInfo.count);
-        executeAction(action);
-        aggInfo.count = 0;
-        aggInfo.timeStamp = currentTime;
+        QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
+                                                                                        aggInfo.event(),
+                                                                                        aggInfo.info());
+        aggInfo.reset(currentTime);
+        return result;
     }
 
     return QnAbstractBusinessActionPtr();
@@ -275,18 +282,16 @@ void QnBusinessRuleProcessor::at_timer()
 {
     QMutexLocker lock(&m_mutex);
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    QMap<QString, QAggregationInfo>::iterator itr = m_aggregateActions.begin();
+    QMap<QString, QnProcessorAggregationInfo>::iterator itr = m_aggregateActions.begin();
     while (itr != m_aggregateActions.end())
     {
-        QAggregationInfo& aggInfo = itr.value();
-        qint64 period = aggInfo.bRule->aggregationPeriod()*1000ll*1000ll;
-        if (aggInfo.count > 0 && aggInfo.timeStamp + period < currentTime)
+        QnProcessorAggregationInfo& aggInfo = itr.value();
+        if (aggInfo.totalCount() > 0 && currentTime > aggInfo.estimatedEnd())
         {
-            QnAbstractBusinessActionPtr action = aggInfo.bRule->instantiateAction(aggInfo.bEvent);
-            action->setAggregationCount(aggInfo.count);
-            executeAction(action);
-            aggInfo.count = 0;
-            aggInfo.timeStamp = currentTime;
+            executeAction(QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
+                                                                     aggInfo.event(),
+                                                                     aggInfo.info()));
+            aggInfo.reset(currentTime);
         }
         ++itr;
     }
@@ -465,7 +470,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
             if (bEvent) {
-                QnAbstractBusinessActionPtr action = rule->instantiateAction(bEvent, ToggleState::Off);
+                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, ToggleState::Off);
                 if (action)
                     executeAction(action);
             }
@@ -474,7 +479,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     m_rulesInProgress.remove(ruleId);
 
     QString aggKey = rule->getUniqueId();
-    QMap<QString, QAggregationInfo>::iterator itr = m_aggregateActions.lowerBound(aggKey);
+    QMap<QString, QnProcessorAggregationInfo>::iterator itr = m_aggregateActions.lowerBound(aggKey);
     while (itr != m_aggregateActions.end())
     {
         itr = m_aggregateActions.erase(itr);

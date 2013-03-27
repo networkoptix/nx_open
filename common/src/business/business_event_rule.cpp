@@ -19,28 +19,6 @@ QnBusinessEventRule::~QnBusinessEventRule() {
 
 }
 
-QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState) const {
-    if (BusinessActionType::requiresCameraResource(m_actionType) && m_actionResources.isEmpty())
-        return QnAbstractBusinessActionPtr(); //camera is not exists anymore
-    //TODO: #GDM check resource type?
-
-    QnBusinessParams runtimeParams = bEvent->getRuntimeParams();
-
-    QnAbstractBusinessActionPtr result = QnBusinessActionFactory::createAction(m_actionType, runtimeParams);
-
-    if (!m_actionParams.isEmpty())
-        result->setParams(m_actionParams);
-    result->setResources(m_actionResources);
-
-    if (BusinessEventType::hasToggleState(bEvent->getEventType()) && BusinessActionType::hasToggleState(m_actionType)) {
-        ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
-        result->setToggleState(value);
-    }
-    result->setBusinessRuleId(m_id);
-
-    return result;
-}
-
 int QnBusinessEventRule::id() const {
     return m_id;
 }
@@ -145,7 +123,7 @@ void QnBusinessEventRule::setSchedule(const QString value) {
 
 QString QnBusinessEventRule::getUniqueId() const
 {
-    return QString(QLatin1String("QnBusinessEventRule_")) + QString::number(m_id);
+    return QString(QLatin1String("QnBusinessEventRule_%1_")).arg(QString::number(m_id));
 }
 
 bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const

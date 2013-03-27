@@ -64,6 +64,8 @@
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/ptz_presets_dialog.h>
+#include <ui/dialogs/layout_settings_dialog.h>
+
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -235,6 +237,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CloseAllButThisLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
+    connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::ClearCameraSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_clearCameraSettingsAction_triggered()));
     connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
@@ -1084,6 +1088,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
+    newLayout->setUserCanEdit(context()->user() == user);
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
@@ -1367,6 +1372,27 @@ void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts
 void QnWorkbenchActionHandler::ensurePopupCollectionWidget() {
     if (!popupCollectionWidget())
         m_popupCollectionWidget = new QnPopupCollectionWidget(widget());
+}
+
+void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
+    if(!layout)
+        return;
+
+    if (!(accessController()->globalPermissions() & Qn::GlobalEditLayoutsPermission))
+        return;
+
+    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setWindowTitle(tr("Layout Settings"));
+    dialog->readFromResource(layout);
+    //TODO: #Elric Who should add help topics? - asked GDM
+//    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
+
+    if(!dialog->exec() || !dialog->submitToResource(layout))
+        return;
+
+    //TODO: #GDM make sure slot code should be executed this time
+    connection()->saveAsync(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -2094,6 +2120,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
+    layout->setUserCanEdit(context()->user() == user);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     resourcePool()->addResource(layout);
 
@@ -2282,6 +2309,15 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
             QnAppServerConnectionFactory::setDefaultUrl(data.url);
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
+    QnActionParameters params = menu()->currentParameters(sender());
+    openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
+}
+
+void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
+    openLayoutSettingsDialog(workbench()->currentLayout()->resource());
 }
 
 void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()

@@ -1099,11 +1099,8 @@ void PtzInstrument::finishDrag(DragInfo *info) {
             QSizeF targetSize = target()->size();
 
             qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
-            if(relativeSize < minPtzZoomRectSize) {
-                processPtzClick(selectionRect.center());
-            } else {
+            if(relativeSize >= minPtzZoomRectSize)
                 processPtzDrag(selectionRect);
-            }
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();

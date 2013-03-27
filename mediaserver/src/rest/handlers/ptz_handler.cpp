@@ -9,9 +9,42 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
 
+static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
+
+QMap<QString, QnPtzHandler::SequenceInfo> QnPtzHandler::m_sequencedRequests;
+QMutex QnPtzHandler::m_sequenceMutex;
+
+
 QnPtzHandler::QnPtzHandler()
 {
 
+}
+
+void QnPtzHandler::cleanupOldSequence()
+{
+    QMap<QString, SequenceInfo>::iterator itr = m_sequencedRequests.begin();
+    while ( itr != m_sequencedRequests.end())
+    {
+        SequenceInfo& info = itr.value();
+        if (info.m_timer.elapsed() > OLD_SEQUENCE_THRESHOLD)
+            itr = m_sequencedRequests.erase(itr);
+        else
+            ++itr;
+    }
+}
+
+bool QnPtzHandler::checkSequence(const QString& id, int sequence)
+{
+    QMutexLocker lock(&m_sequenceMutex);
+    cleanupOldSequence();
+    if (id.isEmpty())
+        return true; // do not check if empty
+
+    if (m_sequencedRequests[id].sequence > sequence)
+        return false;
+
+    m_sequencedRequests[id] = SequenceInfo(sequence);
+    return true;
 }
 
 int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
@@ -34,6 +67,8 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
     qreal xPos = INT_MAX;
     qreal yPos = INT_MAX;
     qreal zoomPos = INT_MAX;
+    QString seqId;
+    int seqNum = 0;
     
     bool resParamFound = false;
 
@@ -72,6 +107,10 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
             yPos = params[i].second.toDouble();
         else if (params[i].first == "zoomPos")
             zoomPos = params[i].second.toDouble();
+        else if (params[i].first == "seqId")
+            seqId = params[i].second;
+        else if (params[i].first == "seqNum")
+            seqNum = params[i].second.toInt();
     }
     if (!resParamFound)
         errStr = QLatin1String("parameter 'res_id' is absent");
@@ -118,18 +157,23 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         return CODE_INVALID_PARAMETER;
     }
 
+
     if (action == "move")
     {
-        if (ptz->startMove(xSpeed, ySpeed, zoomSpeed) != 0)
-            errStr = "Error executing PTZ command";
+        if (checkSequence(seqId, seqNum)) {
+            if (ptz->startMove(xSpeed, ySpeed, zoomSpeed) != 0)
+                errStr = "Error executing PTZ command";
+        }
     }
     else if (action == "moveTo")
     {
         if (xPos == INT_MAX || yPos == INT_MAX) {
             errStr = "Paremeters 'xPos', 'yPos' MUST be provided\n";
         }
-        else if (ptz->moveTo(xPos, yPos, zoomPos) != 0)
-            errStr = "Error executing PTZ command";
+        else if (checkSequence(seqId, seqNum)) {
+            if (ptz->moveTo(xPos, yPos, zoomPos) != 0)
+                errStr = "Error executing PTZ command";
+        }
     }
     else if (action == "getPosition")
     {
@@ -149,8 +193,10 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
     }
     else if (action == "stop")
     {
-        if (ptz->stopMove() != 0)
-            errStr = "Error executing PTZ command";
+        if (checkSequence(seqId, seqNum)) {
+            if (ptz->stopMove() != 0)
+                errStr = "Error executing PTZ command";
+        }
     }
     else if (action == "getSpaceMapper")
     {

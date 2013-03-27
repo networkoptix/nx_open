@@ -919,6 +919,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F2")).
         autoRepeat(false);
 
+    factory().
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        separator();
+
     factory(Qn::YouTubeUploadAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Upload to YouTube...")).
@@ -949,6 +953,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Camera Settings...")).
         requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+
+    factory(Qn::LayoutSettingsAction).
+       flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+       text(tr("Layout Settings...")).
+       requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
+       condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1042,6 +1052,15 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        separator();
+
+    factory(Qn::CurrentLayoutSettingsAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
+        text(tr("Layout Settings..."));
 
     factory(Qn::ToggleTourModeHotkeyAction).
         flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).
