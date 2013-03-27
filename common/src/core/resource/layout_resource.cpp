@@ -85,6 +85,7 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
         setItems(localOther->getItems());
         setCellAspectRatio(localOther->cellAspectRatio());
         setCellSpacing(localOther->cellSpacing());
+        setUserCanEdit(localOther->userCanEdit());
     }
 }
 
