@@ -122,7 +122,7 @@ QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params
     if (count == 1)
         result = QObject::tr("at %1").arg(timeStamp);
     else
-        result = QObject::tr("%1 times since %2").arg(count).arg(timeStamp);
+        result = QObject::tr("%n times since %1", "", count).arg(timeStamp);
     result += QLatin1Char('\n');
     return result;
 }
