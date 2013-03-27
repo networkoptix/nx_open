@@ -39,20 +39,14 @@ QString QnSendMailBusinessAction::getSubject() const {
     if (eventType >= BusinessEventType::UserDefined)
         return BusinessEventType::toString(eventType);
 
-    QString name;
-    if (BusinessEventType::isResourceRequired(eventType))
-        name = resourceString(false);
-
+    QString name = resourceString(false);
     return BusinessEventType::toString(eventType, name);
 }
 
 QString QnSendMailBusinessAction::getMessageBody() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
 
-    QString resourceName;
-    if (BusinessEventType::isResourceRequired(eventType))
-        resourceName = resourceString(true);
-
+    QString resourceName = resourceString(true);
     QString messageBody = QObject::tr("%1 Server detected %2\n")
             .arg(QLatin1String(VER_COMPANYNAME_STR))
             .arg(BusinessEventType::toString(eventType, resourceName));
@@ -128,7 +122,7 @@ QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params
     if (count == 1)
         result = QObject::tr("at %1").arg(timeStamp);
     else
-        result = QObject::tr("%1 times since %2").arg(count).arg(timeStamp);
+        result = QObject::tr("%n times since %1", "", count).arg(timeStamp);
     result += QLatin1Char('\n');
     return result;
 }
@@ -169,7 +163,7 @@ QString QnSendMailBusinessAction::reasonString(const QnBusinessParams &params) c
             break;
         case QnBusiness::StorageIssueIoError:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QObject::tr("There are no available storages for writing at %1")
+                result = QObject::tr("Error while writing to %1")
                                                   .arg(reasonText);
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:

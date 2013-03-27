@@ -53,15 +53,24 @@ namespace BusinessEventType
             return QObject::tr("Motion on camera %1").arg(resourceName);
 
         case BusinessEventType::Storage_Failure:
+            return QObject::tr("Storage Failure at %1").arg(resourceName);
+
         case BusinessEventType::Network_Issue:
+            return QObject::tr("Network Issue at %1").arg(resourceName);
+
         case BusinessEventType::MediaServer_Failure:
+            return QObject::tr("Media Server %1 Failure").arg(resourceName);
+
         case BusinessEventType::Camera_Ip_Conflict:
+            return QObject::tr("Camera IP Conflict at %1").arg(resourceName);
+
         case BusinessEventType::MediaServer_Conflict:
-            return BusinessEventType::toString(val);
+            return QObject::tr("Media Server %1 Conflict").arg(resourceName);
+
         default:
             break;
         }
-        return QString();
+        return BusinessEventType::toString(val);
     }
 
     bool isResourceRequired(Value val) {
