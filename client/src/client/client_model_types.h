@@ -24,6 +24,9 @@ public:
 
 QN_DEFINE_STRUCT_FUNCTIONS(QnWorkbenchState, (qdatastream), (currentLayoutIndex)(layoutUuids), inline);
 
+/**
+ * Mapping from user name to workbench state.
+ */
 typedef QHash<QString, QnWorkbenchState> QnWorkbenchStateHash;
 
 Q_DECLARE_METATYPE(QnWorkbenchState);
@@ -47,6 +50,28 @@ typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
 
 Q_DECLARE_METATYPE(QnServerStorageKey);
 Q_DECLARE_METATYPE(QnServerStorageStateHash);
+
+
+// -------------------------------------------------------------------------- //
+// QnLicenseWarningState
+// -------------------------------------------------------------------------- //
+struct QnLicenseWarningState {
+    QnLicenseWarningState(): ignore(false) {}
+    QnLicenseWarningState(const QDateTime &lastWarningTime, bool ignore): lastWarningTime(lastWarningTime), ignore(ignore) {}
+
+    QDateTime lastWarningTime;
+    bool ignore;
+};
+
+QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (qdatastream), (lastWarningTime)(ignore), inline);
+
+/**
+ * Mapping from license key to license warning state.
+ */
+typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
+
+Q_DECLARE_METATYPE(QnLicenseWarningState);
+Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
 
 
 #endif // QN_CLIENT_MODEL_TYPES_H

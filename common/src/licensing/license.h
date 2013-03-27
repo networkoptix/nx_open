@@ -1,6 +1,7 @@
 #ifndef QN_LICENSING_LICENSE
 #define QN_LICENSING_LICENSE
 
+#include <QCoreApplication>
 #include <QSharedPointer>
 #include <QString>
 #include <QList>
@@ -8,18 +9,26 @@
 #include <QSet>
 #include <QTextStream>
 
-class QnLicense
-{
+class QnLicense {
+    Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
+    enum Type {
+        FreeLicense,
+        TrialLicense,
+        AnalogLicense,
+        EnterpriseLicense,
+        TypeCount
+    };
+
     QnLicense(const QByteArray& licenseBlock);
 
     /**
-      * Check if signature matches other fields
-      */
+     * Check if signature matches other fields
+     */
     bool isValid(const QByteArray& hardwareId) const;
 
     /**
-     * @return True if license is for analog cameras
+     * @returns                         Whether this license is for analog cameras.
      */
     bool isAnalog() const;
 
@@ -32,11 +41,16 @@ public:
     const QString &xclass() const;
     const QString &version() const;
     const QString &brand() const;
-    const QString &expiration() const;
+    const QString &expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
 
 	const QByteArray& rawLicense() const;
 
-    QByteArray toString() const;
+    QByteArray toString() const; 
+
+    QDateTime expirationDate() const;
+    Type type() const;
+    QString typeName() const;
+
 
 private:
     QByteArray m_rawLicense;
@@ -64,6 +78,7 @@ typedef QSharedPointer<QnLicense> QnLicensePtr;
 
 QnLicensePtr readLicenseFromStream(QTextStream& stream);
 
+// TODO: #Elric make it an STL list. Naming a non-list a list is BAD.
 class QnLicenseList
 {
 public:
@@ -81,14 +96,14 @@ public:
     void clear();
 
     /**
-     * Count total number of digital cameras allowed.
+     * \returns                         Total number of digital cameras allowed.
      */
     int totalDigital() const {
         return totalCamerasByClass(false);
     }
 
     /**
-     * Count total number of analog cameras allowed.
+     * \returns                         Total number of analog cameras allowed.
      */
     int totalAnalog() const {
         return totalCamerasByClass(true);
@@ -106,9 +121,8 @@ private:
 };
 
 /**
-  * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
-  *
-  */
+ * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
+ */
 class QnLicensePool : public QObject
 {
     Q_OBJECT
@@ -117,9 +131,9 @@ public:
     static QnLicensePool* instance();
 
     const QnLicenseList &getLicenses() const;
+    void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
-    void addLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;

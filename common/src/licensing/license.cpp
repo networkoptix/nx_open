@@ -1,17 +1,20 @@
 #include "license.h"
 
+#include <cassert>
+#include <numeric> // TODO: #Elric where does this header come from?
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
 #include <QtCore/QUuid>
 #include <QtCore/QStringList>
 
-#include <numeric>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
 #include "version.h"
+#include "common/customization.h"
 
 QT_STATIC_CONST char networkOptixRSAPublicKey[] = QN_RSA_PUBLIC_KEY;
 
@@ -177,6 +180,38 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
+QDateTime QnLicense::expirationDate() const {
+    if(m_expiration.isEmpty())
+        return QDateTime();
+
+    return QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
+}
+
+QnLicense::Type QnLicense::type() const {
+    if (key() == qnProductFeatures().freeLicenseKey.toAscii())
+        return FreeLicense;
+
+    if (!expiration().isEmpty())
+        return TrialLicense;
+
+    if (xclass().toLower() == QLatin1String("analog"))
+        return AnalogLicense;
+
+    return EnterpriseLicense;
+}
+
+QString QnLicense::typeName() const {
+    switch(type()) {
+    case FreeLicense:       return tr("Free");
+    case TrialLicense:      return tr("Trial");
+    case AnalogLicense:     return tr("Analog");
+    case EnterpriseLicense: return tr("Enterprise");
+    default:
+        assert(false);
+        return QString();
+    }
+}
+
 QnLicensePtr readLicenseFromStream(QTextStream& stream)
 {
     QByteArray licenseBlock;
@@ -210,6 +245,17 @@ const QnLicenseList &QnLicensePool::getLicenses() const
     return m_licenses;
 }
 
+void QnLicensePool::addLicense(const QnLicensePtr &license)
+{
+    QMutexLocker locker(&m_mutex);
+
+    if (license) {
+        m_licenses.append(license);
+
+        emit licensesChanged();
+    }
+}
+
 void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
     QMutexLocker locker(&m_mutex);
@@ -230,17 +276,6 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
         m_licenses.append(license);
 
     emit licensesChanged();
-}
-
-void QnLicensePool::addLicense(const QnLicensePtr &license)
-{
-    QMutexLocker locker(&m_mutex);
-
-    if (license) {
-        m_licenses.append(license);
-
-        emit licensesChanged();
-    }
 }
 
 void QnLicensePool::reset()
