@@ -2,6 +2,9 @@
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - Arecont 12186 and 20365
 
+NEW FEATURES (since 1.4):  
+- client of any version can talk to any server version.
+
 BUGS FIXED:
 
 Since 1.4
@@ -24,6 +27,7 @@ Since 1.4
  - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
  - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
  - Health Monitoring colors can be customized
+ - Now non Admin users can create own layouts. It means that some cameras can be assigned to users.
 
 Since previous version (1.4.3)
  - E-mail signature can be specified. This signature will be attached to all outgoing E-mails that are produced by the software
