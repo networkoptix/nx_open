@@ -577,7 +577,7 @@ template <class T>
 void QnCamDisplay::markIgnoreBefore(const T& queue, qint64 time)
 {
     for (int i = 0; i < queue.size(); ++i) {
-        QnAbstractMediaDataPtr media = queue.at(i).dynamicCast<QnAbstractMediaData>();
+        QnAbstractMediaDataPtr media = queue.at(i).template dynamicCast<QnAbstractMediaData>();
         if (media) {
             if (m_speed >= 0 && media->timestamp < time)
                 media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
