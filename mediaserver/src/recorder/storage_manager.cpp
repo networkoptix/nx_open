@@ -411,10 +411,12 @@ void QnStorageManager::testOfflineStorages()
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
         QnResource::Status status = fileStorage->isStorageAvailable() ? QnResource::Online : QnResource::Offline;
-        if (fileStorage->getStatus() != status) 
+        if (fileStorage->getStatus() != status)
         {
             fileStorage->setStatus(status);
             m_storagesStatisticsReady = false;
+            if (status == QnResource::Offline)
+                emit storageFailure(fileStorage);
         }
     }
 

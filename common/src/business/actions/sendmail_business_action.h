@@ -35,7 +35,6 @@ private:
 
     QString resourceString(bool useUrl) const;
     QString timestampString(const QnBusinessParams &params, int aggregationCount) const;
-    QString recipientsString() const;
     QString reasonString(const QnBusinessParams &params) const;
     QString conflictString() const;
 

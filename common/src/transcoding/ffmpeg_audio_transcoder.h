@@ -24,6 +24,9 @@ private:
     int m_decodedBufferSize;
     qint64 m_lastTimestamp;
     QnMediaContextPtr m_context;
+    
+    bool m_downmixAudio;
+    int m_frameNum;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;

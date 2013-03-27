@@ -754,7 +754,8 @@ begin_label:
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
 
-        if (newTime == DATETIME_NOW || newTime == -1) {
+        qint64 maxTime = m_delegate->endTime();
+        if (newTime == DATETIME_NOW || newTime == -1 || (maxTime != AV_NOPTS_VALUE && newTime > maxTime)) {
             //internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
