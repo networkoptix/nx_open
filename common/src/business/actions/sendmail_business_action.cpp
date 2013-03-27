@@ -163,7 +163,7 @@ QString QnSendMailBusinessAction::reasonString(const QnBusinessParams &params) c
             break;
         case QnBusiness::StorageIssueIoError:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QObject::tr("There are no available storages for writing at %1")
+                result = QObject::tr("Error while writing to %1")
                                                   .arg(reasonText);
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:
