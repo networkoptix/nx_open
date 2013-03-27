@@ -145,6 +145,7 @@ private:
     void unblockTimeValue();
     void waitForFramesDisplayed();
     void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
+    template <class T> void markIgnoreBefore(const T& queue, qint64 time);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
