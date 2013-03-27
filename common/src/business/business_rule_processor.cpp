@@ -383,7 +383,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
 
     if( recipients.isEmpty() )
     {
-        cl_log.log( QString::fromLatin1("Action SendMail missing valid recipients. Ignoring..."), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId()), cl_logWARNING );
         cl_log.log( QString::fromLatin1("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
         return false;
     }
