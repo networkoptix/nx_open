@@ -1,39 +1,7 @@
 #include "statistics_colors.h"
 
 #include <utils/common/json.h>
-
-/*
-inline void serialize(const QnStatisticsColors &value, QVariant *target) {
-    QVariantMap result;
-    QJson::serialize(value.grid(), "grid", &result);
-    QJson::serialize(value.frame(), "frame", &result);
-    QJson::serialize(value.cpu(), "cpu", &result);
-    QJson::serialize(value.ram(), "ram", &result);
-    *target = result;
-}
-
-inline bool deserialize(const QVariant &value, QnStatisticsColors *target) {
-
-    QVariantMap map;
-    if(value.type() == QVariant::Map) {
-        map = value.toMap();
-    } else
-        return false;
-
-    *target = QnStatisticsColors();
-
-    QColor grid, frame, cpu, ram;
-    if (QJson::deserialize(map, "grid", &grid))
-        target->setGrid(grid);
-    if (QJson::deserialize(map, "frame", &frame))
-        target->setFrame(grid);
-    if (QJson::deserialize(map, "cpu", &cpu))
-        target->setCpu(grid);
-    if (QJson::deserialize(map, "ram", &ram))
-        target->setRam(grid);
-    return true;
-}
-*/
+#include <utils/math/math.h>
 
 QnStatisticsColors::QnStatisticsColors():
     grid(QColor(66, 140, 237, 100)),
@@ -58,17 +26,27 @@ QnStatisticsColors::~QnStatisticsColors() {
 
 }
 
+int asciisum(const QString &value) {
+    int result = 0;
+    foreach (QChar c, value)
+        result += c.toAscii();
+    return result;
+}
+
 QColor QnStatisticsColors::hddByKey(const QString &key) const {
+    static int sda = asciisum(QLatin1String("sda"));
+    static int hda = asciisum(QLatin1String("hda"));
+
     int id = 0;
     if (key.contains(QLatin1Char(':'))) {
         // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
         id = key.at(0).toAscii() - 'C';
     }
     else if (key.startsWith(QLatin1String("sd")))
-        id = key.compare(QLatin1String("sda"));
+        id = asciisum(key) - sda;
     else if (key.startsWith(QLatin1String("hd")))
-        id = key.compare(QLatin1String("hda"));
-    return hdds[id % hdds.size()];
+        id = asciisum(key) - hda;
+    return hdds[qMod(id, hdds.size())];
 }
 
 
