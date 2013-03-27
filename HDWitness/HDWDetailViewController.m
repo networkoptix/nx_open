@@ -12,6 +12,24 @@
 #import "AFJSONRequestOperation.h"
 #import "AFHTTPClient.h"
 
+enum MessageType {
+    Initial                 = 0,
+    Ping                    = 1,
+    
+    ResourceChange          = 2,
+    ResourceDelete          = 3,
+    ResourceStatusChange    = 4,
+    ResourceDisabledChange  = 5,
+    
+    License                 = 6,
+    CameraServerItem        = 7,
+    
+    BusinessRuleChange      = 8,
+    BusinessRuleDelete      = 9,
+    
+    BroadcastBusinessAction = 10
+};
+
 @interface HDWDetailViewController ()
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 - (void)configureView;
@@ -39,12 +57,16 @@
     NSError* error;
     NSDictionary *message = [NSJSONSerialization JSONObjectWithData:messageData options:kNilOptions error:&error];
     
-    NSNumber *messageType = message[@"type"];
+    int messageType = [message[@"type"] intValue];
     NSString *objectName = message[@"objectName"];
+
+    NSMutableArray *newServers = [[NSMutableArray alloc] init];
+    NSMutableArray *newCameras = [[NSMutableArray alloc] init];
     
-    NSMutableArray *changedCameras = [[NSMutableArray alloc] init];
-    
-    if ([messageType intValue] == 2) {
+    NSMutableArray *removedIndexPaths = [NSMutableArray array];
+    NSMutableIndexSet *removedSections = [NSMutableIndexSet indexSet];
+
+    if (messageType == ResourceChange) {
         NSDictionary *resource = message[@"resource"];
         
         // resource changed
@@ -54,27 +76,63 @@
             server.name = resource[@"name"];
             server.streamingUrl = resource[@"streamingUrl"];
             
-            [_servers updateServer:server];
+            if ([_servers findServerById:server.serverId] == nil)
+                [newServers addObject:server];
+            
+            [_servers addOrUpdateServer:server];
         } else if ([objectName isEqual: @"Camera"]) {
             HDWCameraModel* camera = [HDWCameraModel alloc];
             camera.cameraId = resource[@"id"];
-            camera.serverId = resource[@"parentId"];
+            camera.server = [_servers findServerById:resource[@"parentId"]];
             camera.name = resource[@"name"];
-            camera.physicalId = resource[@"physicalId"];
             camera.status = resource[@"status"];
+            camera.physicalId = resource[@"physicalId"];
             
-            [_servers updateCamera:camera];
+            if ([_servers findCameraById:camera.cameraId atServer:camera.server.serverId] == nil)
+                [newCameras addObject:camera];
             
-            [changedCameras addObject:[_servers getIndexPathOfCameraWithId:camera.cameraId andServerId:camera.serverId]];
+            [_servers addOrUpdateCamera:camera];
+        }
+    } else if (messageType == ResourceDelete) {
+        NSNumber *resourceId = message[@"resourceId"];
+        NSNumber *parentId = message[@"parentId"];
+        
+        if ([_servers findServerById:resourceId]) {
+            NSUInteger serverIndex = [_servers getIndexOfServerWithId:resourceId];
+            [removedSections addIndex:serverIndex];
+            
+            [_servers removeServerById:resourceId];
+        } else if ([_servers findCameraById:resourceId atServer:parentId]) {
+            NSIndexPath *indexPath = [_servers getIndexPathOfCameraWithId:resourceId andServerId:parentId];
+            [removedIndexPaths addObject:indexPath];
+            
+            [_servers removeCameraById:resourceId];
         }
     }
-    
 
     [self.collectionView performBatchUpdates:^{
-        [self.collectionView reloadItemsAtIndexPaths:changedCameras];
+        NSMutableArray *indexPaths = [NSMutableArray array];
+        NSMutableIndexSet *sections = [NSMutableIndexSet indexSet];
+        
+        for (HDWServerModel* server in newServers) {
+            NSUInteger serverIndex = [_servers getIndexOfServerWithId:server.serverId];
+            [sections addIndex:serverIndex];
+        }
+        
+        for (HDWCameraModel* camera in newCameras) {
+            NSIndexPath *indexPath = [_servers getIndexPathOfCameraWithId:camera.cameraId andServerId:camera.server.serverId];
+            [indexPaths addObject:indexPath];
+        }
+        
+        [self.collectionView deleteItemsAtIndexPaths:removedIndexPaths];
+        [self.collectionView deleteSections:removedSections];
+        
+        [self.collectionView insertSections:sections];
+        [self.collectionView insertItemsAtIndexPaths:indexPaths];
+
+//        [self.collectionView reloadItemsAtIndexPaths:indexPaths];
+//        [self.collectionView reloadData];
     } completion:nil];
-    
-    NSLog(@"Pens: %@", message);
 }
 
 #pragma mark - Managing the detail item
@@ -114,14 +172,11 @@
     for (NSDictionary *jsonCamera in jsonCameras) {
         HDWCameraModel *camera = [[HDWCameraModel alloc] init];
         camera.cameraId = jsonCamera[@"id"];
-        camera.serverId = jsonCamera[@"parent_id"];
         camera.name = jsonCamera[@"name"];
         camera.physicalId = jsonCamera[@"physical_id"];
         
-        HDWServerModel *server = [serversDict objectForKey: camera.serverId];
-        
-        camera.videoUrl = [NSURL URLWithString:[NSString stringWithFormat:@"/media/%@.mpjpeg", camera.physicalId] relativeToURL:server.streamingUrl];
-        camera.thumbnailUrl = [NSURL URLWithString:[NSString stringWithFormat:@"/api/image?physicalId=%@&time=now", camera.physicalId] relativeToURL:server.streamingUrl];
+        HDWServerModel *server = [serversDict objectForKey: jsonCamera[@"parent_id"]];
+        camera.server = server;
         
         [server.cameras addObject: camera];
     }
@@ -148,7 +203,7 @@
     [resourceOperation start];
     
     
-    NSURL *messageUrl = [NSURL URLWithString:@"/events/" relativeToURL:baseUrl];
+    NSURL *messageUrl = [NSURL URLWithString:@"/websocket/" relativeToURL:baseUrl];
     NSMutableURLRequest *messageRequest = [NSMutableURLRequest requestWithURL:messageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:0];
     
     NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
@@ -174,6 +229,7 @@
 }
 
 - (void)willMoveToParentViewController:(UIViewController *)parent {
+    [_socket setDelegate:nil];
     [_socket close];
     NSLog(@"willMoveToParentViewController");
 }

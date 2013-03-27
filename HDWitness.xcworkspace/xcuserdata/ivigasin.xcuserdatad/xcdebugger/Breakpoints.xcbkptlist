@@ -164,11 +164,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "81"
-         endingLineNumber = "81"
+         startingLineNumber = "139"
+         endingLineNumber = "139"
          landmarkName = "@implementation HDWDetailViewController"
          landmarkType = "3">
       </FileBreakpoint>
@@ -190,11 +190,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "253"
-         endingLineNumber = "253"
+         startingLineNumber = "309"
+         endingLineNumber = "309"
          landmarkName = "-splitViewController:willShowViewController:invalidatingBarButtonItem:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -203,11 +203,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "127"
-         endingLineNumber = "127"
+         startingLineNumber = "182"
+         endingLineNumber = "182"
          landmarkName = "-requestFinished:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -216,22 +216,22 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "260"
-         endingLineNumber = "260">
+         startingLineNumber = "316"
+         endingLineNumber = "316">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "97"
-         endingLineNumber = "97"
+         startingLineNumber = "155"
+         endingLineNumber = "155"
          landmarkName = "-onGotResultsFromEcs"
          landmarkType = "5">
       </FileBreakpoint>
@@ -240,11 +240,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "291"
-         endingLineNumber = "291">
+         startingLineNumber = "347"
+         endingLineNumber = "347">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -340,11 +340,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "122"
-         endingLineNumber = "122"
+         startingLineNumber = "179"
+         endingLineNumber = "179"
          landmarkName = "-requestFinished:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -392,11 +392,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922944.098397"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "52"
-         endingLineNumber = "52"
+         startingLineNumber = "74"
+         endingLineNumber = "74"
          landmarkName = "-webSocket:didReceiveMessage:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -405,11 +405,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922979.284097"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "47"
-         endingLineNumber = "47"
+         startingLineNumber = "69"
+         endingLineNumber = "69"
          landmarkName = "-webSocket:didReceiveMessage:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -418,11 +418,37 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385922985.095945"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "48"
-         endingLineNumber = "48"
+         startingLineNumber = "70"
+         endingLineNumber = "70"
+         landmarkName = "-webSocket:didReceiveMessage:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "HDWitness/HDWDetailViewController.m"
+         timestampString = "386100824.216338"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "114"
+         endingLineNumber = "114"
+         landmarkName = "-webSocket:didReceiveMessage:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "HDWitness/HDWDetailViewController.m"
+         timestampString = "386100824.216338"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "84"
+         endingLineNumber = "84"
          landmarkName = "-webSocket:didReceiveMessage:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -431,12 +457,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWCameraModel.m"
-         timestampString = "385923481.815386"
+         timestampString = "386099713.451081"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "91"
-         endingLineNumber = "91"
-         landmarkName = "-getIndexPathOfCameraWithId:andServerId:"
+         startingLineNumber = "127"
+         endingLineNumber = "127"
+         landmarkName = "-findCameraById:atServer:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -444,12 +470,25 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWCameraModel.m"
-         timestampString = "385923587.193031"
+         timestampString = "386095765.33508"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "113"
-         endingLineNumber = "113"
-         landmarkName = "-getIndexPathOfCameraWithId:andServerId:"
+         startingLineNumber = "37"
+         endingLineNumber = "37"
+         landmarkName = "-findCameraById:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "HDWitness/HDWCameraModel.m"
+         timestampString = "386095765.33508"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "40"
+         endingLineNumber = "40"
+         landmarkName = "-findCameraById:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -457,11 +496,37 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "385923614.943164"
+         timestampString = "386100824.216338"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "73"
-         endingLineNumber = "73"
+         startingLineNumber = "257"
+         endingLineNumber = "257"
+         landmarkName = "-collectionView:cellForItemAtIndexPath:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "HDWitness/HDWDetailViewController.m"
+         timestampString = "386100824.216338"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "111"
+         endingLineNumber = "111"
+         landmarkName = "-webSocket:didReceiveMessage:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "HDWitness/HDWDetailViewController.m"
+         timestampString = "386100953.221233"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "97"
+         endingLineNumber = "97"
          landmarkName = "-webSocket:didReceiveMessage:"
          landmarkType = "5">
       </FileBreakpoint>
