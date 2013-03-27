@@ -89,6 +89,9 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
         setCellAspectRatio(localOther->cellAspectRatio());
         setCellSpacing(localOther->cellSpacing());
         setUserCanEdit(localOther->userCanEdit());
+        setBackgroundImageId(localOther->backgroundImageId());
+        setBackgroundSize(localOther->backgroundSize());
+        setLocked(localOther->locked());
     }
 }
 

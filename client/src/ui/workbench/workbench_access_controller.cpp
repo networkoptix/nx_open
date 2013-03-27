@@ -127,9 +127,11 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
-    } if(QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
+    } else if (layout->locked()) {
+        return Qn::ReadPermission;
+    } else if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
-    } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
+    } else if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
@@ -220,6 +222,7 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         connect(layout.data(), SIGNAL(userCanEditChanged(const QnLayoutResourcePtr &)), this, SLOT(updatePermissions(const QnLayoutResourcePtr &)));
+        connect(layout.data(), SIGNAL(lockedChanged(const QnLayoutResourcePtr &)), this, SLOT(updatePermissions(const QnLayoutResourcePtr &)));
     }
     
     updatePermissions(resource);
