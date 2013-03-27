@@ -104,6 +104,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
     if (user == m_user) {
         result |= m_userPermissions; /* Add global permissions for current user. */
         result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
+        result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) /* Layout-admin can create layouts. */
@@ -134,8 +135,11 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
-        if(snapshotManager()->isLocal(layout) || layout->userCanEdit()) {
+        if(snapshotManager()->isLocal(layout)) {
             return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
+        }
+        else if (layout->userCanEdit()) {
+            return Qn::ReadWriteSavePermission| Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify layout with this flag. */
         } else {
             return Qn::ReadPermission | Qn::WritePermission;
         }

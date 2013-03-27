@@ -37,67 +37,29 @@ QString QnSendMailBusinessAction::getSubject() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
 
     if (eventType >= BusinessEventType::UserDefined)
-        return QObject::tr("User defined event");
+        return BusinessEventType::toString(eventType);
 
-    QString name;
-    if (BusinessEventType::isResourceRequired(eventType)) {
-        name = resourceString(false);
-    }
-
-    switch (eventType) {
-    case BusinessEventType::NotDefined:
-        qWarning() << "Undefined event has occured";
-        return QString();
-
-    case BusinessEventType::Camera_Disconnect:
-        return QObject::tr("Camera %1 disconnected").arg(name);
-
-    case BusinessEventType::Camera_Input:
-        return QObject::tr("Input signal on camera %1").arg(name);
-
-    case BusinessEventType::Camera_Motion:
-        return QObject::tr("Motion detected on camera %1").arg(name);
-
-    case BusinessEventType::Storage_Failure:
-    case BusinessEventType::Network_Issue:
-    case BusinessEventType::MediaServer_Failure:
-
-        break;
-    case BusinessEventType::Camera_Ip_Conflict:
-    case BusinessEventType::MediaServer_Conflict:
-
-        break;
-    default:
-        break;
-    }
-    return QString();
+    QString name = resourceString(false);
+    return BusinessEventType::toString(eventType, name);
 }
 
 QString QnSendMailBusinessAction::getMessageBody() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
 
-    QString messageBody = QObject::tr("%1 Server detected %2")
+    QString resourceName = resourceString(true);
+    QString messageBody = QObject::tr("%1 Server detected %2\n")
             .arg(QLatin1String(VER_COMPANYNAME_STR))
-            .arg(BusinessEventType::toString(eventType));
-
-    if (eventType >= BusinessEventType::UserDefined)
-        return messageBody;
-
-    if (BusinessEventType::isResourceRequired(eventType))
-        messageBody += resourceString(true);
-    messageBody += QLatin1Char('\n');
+            .arg(BusinessEventType::toString(eventType, resourceName));
 
     if (m_aggregationInfo.totalCount() == 0) {
         messageBody += eventTextString(eventType, m_runtimeParams);
         messageBody += timestampString(m_runtimeParams, getAggregationCount());
     }
-    else
-        foreach (QnInfoDetail detail, m_aggregationInfo.toList()) {
-            messageBody += eventTextString(eventType, detail.runtimeParams);
-            messageBody += timestampString(detail.runtimeParams, detail.count);
-        }
+    foreach (QnInfoDetail detail, m_aggregationInfo.toList()) {
+        messageBody += eventTextString(eventType, detail.runtimeParams);
+        messageBody += timestampString(detail.runtimeParams, detail.count);
+    }
 
-    messageBody += recipientsString();
     return messageBody;
 }
 
@@ -133,7 +95,7 @@ QString QnSendMailBusinessAction::eventTextString(BusinessEventType::Value event
         result += conflictString();
         break;
     default:
-        return QString();
+        break;
     }
     return result;
 }
@@ -144,16 +106,12 @@ QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
     QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
     if (res) {
         if (useUrl)
-            result = QString(QLatin1String("at %1 (%2)")).arg(res->getName()).arg(res->getUrl());
+            result = QString(QLatin1String("%1 (%2)")).arg(res->getName()).arg(res->getUrl());
         else
             result = res->getName();
     }
-
-    if (!result.isEmpty() && useUrl)
-        result += QLatin1Char('\n');
     return result;
 }
-
 
 QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params, int aggregationCount) const {
     quint64 ts = QnBusinessEventRuntime::getEventTimestamp(params);
@@ -166,21 +124,6 @@ QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params
     else
         result = QObject::tr("%1 times since %2").arg(count).arg(timeStamp);
     result += QLatin1Char('\n');
-    return result;
-}
-
-
-QString QnSendMailBusinessAction::recipientsString() const {
-    QString result = QObject::tr("Recipients:");
-    result += QLatin1Char('\n');
-    QnResourceList resources = getResources();
-    foreach (const QnUserResourcePtr &user, resources.filtered<QnUserResource>())
-        result += user->getName() + QLatin1Char('\n');
-
-    QString additional = BusinessActionParameters::getEmailAddress(getParams());
-    QStringList receivers = additional.split(QLatin1Char(';'), QString::SkipEmptyParts);
-    foreach (const QString &receiver, receivers)
-        result += receiver.trimmed() + QLatin1Char('\n');
     return result;
 }
 
