@@ -137,15 +137,15 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
                 {
                     QVector<QnTimePeriodList> allPeriods;
                     if (!timePeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1) 
-                    {
-                        if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs)
+                        if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs) // TODO: #Elric should be timePeriods.last().startTimeMs?
                             m_loadedData.last().durationMs = 0;
-                    }
                     allPeriods << m_loadedData << timePeriods;
                     m_loadedData = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
 
                     QnTimePeriod loadedPeriod = m_loading[i].period;
-                    loadedPeriod.durationMs = qMax(0ll, loadedPeriod.durationMs - 60 * 1000); /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
+                    loadedPeriod.durationMs -= 60 * 1000; /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
+                    if(!m_loadedData.isEmpty())
+                        loadedPeriod.durationMs = qMin(loadedPeriod.durationMs, m_loadedData.back().endTimeMs() - loadedPeriod.startTimeMs);
                     if(loadedPeriod.durationMs > 0) {
                         QnTimePeriodList loadedPeriods;
                         loadedPeriods.push_back(loadedPeriod);
