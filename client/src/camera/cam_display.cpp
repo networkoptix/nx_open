@@ -573,14 +573,11 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     return doProcessPacket;
 }
 
-void QnCamDisplay::onSkippingFrames(qint64 time)
+template <class T>
+void QnCamDisplay::markIgnoreBefore(const T& queue, qint64 time)
 {
-    if (m_extTimeSrc)
-        m_extTimeSrc->onBufferingStarted(this, time);
-
-    m_dataQueue.lock();
-    for (int i = 0; i < m_dataQueue.size(); ++i) {
-        QnAbstractMediaDataPtr media = m_dataQueue.at(i).dynamicCast<QnAbstractMediaData>();
+    for (int i = 0; i < queue.size(); ++i) {
+        QnAbstractMediaDataPtr media = queue.at(i).dynamicCast<QnAbstractMediaData>();
         if (media) {
             if (m_speed >= 0 && media->timestamp < time)
                 media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
@@ -588,7 +585,18 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
                 media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
         }
     }
+}
+
+void QnCamDisplay::onSkippingFrames(qint64 time)
+{
+    if (m_extTimeSrc)
+        m_extTimeSrc->onBufferingStarted(this, time);
+
+    m_dataQueue.lock();
+    markIgnoreBefore(m_dataQueue, time);
     m_dataQueue.unlock();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        markIgnoreBefore(m_videoQueue[i], time);
 
     QMutexLocker lock(&m_timeMutex);
     m_singleShotQuantProcessed = false;

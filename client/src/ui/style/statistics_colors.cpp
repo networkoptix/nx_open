@@ -68,7 +68,7 @@ QColor QnStatisticsColors::hddByKey(const QString &key) const {
         id = key.compare(QLatin1String("sda"));
     else if (key.startsWith(QLatin1String("hd")))
         id = key.compare(QLatin1String("hda"));
-    return hdds[id & hdds.size()];
+    return hdds[id % hdds.size()];
 }
 
 
