@@ -8,6 +8,8 @@
 
 class QNetworkAccessManager;
 
+class QnLicenseListModel;
+
 namespace Ui {
     class LicenseManagerWidget;
 }
@@ -28,7 +30,7 @@ private slots:
 
     void at_licenseDetailsButton_clicked();
     void at_gridLicenses_currentChanged();
-    void at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int);
+    void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
 
 private:
@@ -40,6 +42,7 @@ private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
+    QnLicenseListModel *m_model;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
 	QMap<QNetworkReply*, QByteArray> m_replyKeyMap;

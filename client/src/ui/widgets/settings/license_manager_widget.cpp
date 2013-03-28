@@ -20,34 +20,8 @@
 #include <common/customization.h>
 
 #include <ui/style/warning_style.h>
+#include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
-
-namespace {
-
-    QString getLicenseName(QnLicensePtr license) {
-
-        if (license->key() == qnProductFeatures().freeLicenseKey.toAscii())
-            return QObject::tr("Free");
-
-        if (!license->expiration().isEmpty())
-            return QObject::tr("Trial");
-
-        if (license->xclass().toLower() == QLatin1String("analog"))
-            return QObject::tr("Analog");
-        return QObject::tr("Enterprise");
-    }
-
-    enum Columns {
-        NameColumn,
-        //ClassColumn,
-        CameraCountColumn,
-        KeyColumn,
-        ExpirationDateColumn,
-        ColumnCount
-    };
-
-}
-
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -56,13 +30,20 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QList<QnLicenseListModel::Column> columns;
+    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn;
+
+    m_model = new QnLicenseListModel(this);
+    m_model->setColumns(columns);
+    ui->gridLicenses->setModel(m_model);
+
     ui->detailsButton->setEnabled(false);
     ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
     connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(at_gridLicenses_currentChanged()));
-    connect(ui->gridLicenses,                   SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),                  this,   SLOT(at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *, int)));
+    connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
 
     updateLicenses();
@@ -87,19 +68,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(qnProductFeatures().freeLicenseKey.toAscii()) && (qnProductFeatures().freeLicenseCount > 0));
 
     /* Update grid. */
-    ui->gridLicenses->clear();
-
-    int idx = 0;
-    foreach(const QnLicensePtr &license, m_licenses.licenses()) {
-        QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setText(NameColumn, getLicenseName(license));
-        item->setData(NameColumn, Qt::UserRole, idx++);
-        //item->setText(ClassColumn, license->xclass().toLower());
-        item->setText(CameraCountColumn, QString::number(license->cameraCount()));
-        item->setText(KeyColumn, QString::fromLatin1(license->key()));
-        item->setText(ExpirationDateColumn, license->expiration().isEmpty() ? tr("Never") : license->expiration());
-        ui->gridLicenses->addTopLevelItem(item);
-    }
+    m_model->setLicenses(m_licenses.licenses());
 
     /* Update info label. */
     bool useRedLabel = false;
@@ -207,7 +176,7 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
         "<br />\n"
         "<b>Features:</b><br />\n"
         "Archive Streams Allowed: %4")
-        .arg(getLicenseName(license))
+        .arg(license->typeName())
         .arg(QLatin1String(license->key()))
         .arg(QLatin1String(m_licenses.hardwareId()))
         .arg(license->cameraCount());
@@ -289,19 +258,13 @@ void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
     ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
 }
 
-void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int) {
-    int idx = item->data(NameColumn, Qt::UserRole).toInt();
-    const QnLicensePtr license = m_licenses.licenses().at(idx);
-    showLicenseDetails(license);
+void QnLicenseManagerWidget::at_gridLicenses_doubleClicked(const QModelIndex &index) {
+    showLicenseDetails(m_model->license(index));
 }
 
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
     QModelIndex index = ui->gridLicenses->selectionModel()->selectedRows().front();
-    if (index.column() > NameColumn)
-        index = index.sibling(index.row(), NameColumn);
-    int idx = index.data(Qt::UserRole).toInt();
-    const QnLicensePtr license = m_licenses.licenses().at(idx);
-    showLicenseDetails(license);
+    showLicenseDetails(m_model->license(index));
 }
 
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
