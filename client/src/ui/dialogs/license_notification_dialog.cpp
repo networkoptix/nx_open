@@ -42,4 +42,7 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
     } else {
         ui->label->setText(tr("Some of your licenses will soon expire."));
     }
+
+    for(int c = 0; c < ui->treeView->model()->columnCount(); c++)
+        ui->treeView->resizeColumnToContents(c);
 }
