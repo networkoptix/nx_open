@@ -86,6 +86,7 @@
 #include "rest/handlers/favico_handler.h"
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
+#include "plugins/resources/stardot/stardot_resource_searcher.h"
 
 
 #define USE_SINGLE_STREAMING_PORT
@@ -998,6 +999,7 @@ void QnMain::run()
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
