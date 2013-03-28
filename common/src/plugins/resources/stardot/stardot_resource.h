@@ -36,6 +36,8 @@ public:
     QString getRtspUrl() const;
 
     QByteArray makeStardotRequest(const QString& request, CLHttpStatus& status) const;
+    QByteArray makeStardotPostRequest(const QString& request, const QString& body, CLHttpStatus& status) const;
+
     QSize getResolution() const;
 
     bool isAudioSupported() const;

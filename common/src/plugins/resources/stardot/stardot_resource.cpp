@@ -89,6 +89,18 @@ QByteArray QnStardotResource::makeStardotRequest(const QString& request, CLHttpS
     return result;
 }
 
+QByteArray QnStardotResource::makeStardotPostRequest(const QString& request, const QString& body, CLHttpStatus& status) const
+{
+    QByteArray result;
+
+    QUrl url(getUrl());
+    CLSimpleHTTPClient client(getHostAddress(), 80, TCP_TIMEOUT, getAuth());
+    status = client.doPOST(request, body);
+    if (status == CL_HTTP_SUCCESS)
+        client.readAll(result);
+    return result;
+}
+
 void QnStardotResource::detectMaxResolutionAndFps(const QByteArray& resList)
 {
     m_resolutionNum = -1;
@@ -204,6 +216,8 @@ bool QnStardotResource::hasDualStreaming() const
     return false;
 }
 
+static const QString motionData();
+
 void QnStardotResource::setMotionMaskPhysical(int channel)
 {
     if (channel != 0)
@@ -216,8 +230,16 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
         if (!region.getRegionBySens(sens).isEmpty())
         {
             CLHttpStatus status;
-            makeStardotRequest(QString(lit("admin.cgi?motion&motion_sensitivity=%1")).arg(sens), status); // sensitivity in range 1..15, 1 is min sens
-            makeStardotRequest(QString(lit("admin.cgi?motion&motion_noise=%1")).arg(16 - sens), status);  // additional motion filter in range 1..15, 15 - maximum filtering
+            QString body(lit("motion_noise=%1&motion_sensitivity=%2&motion_time=4"));
+            body = body.arg(16-sens).arg(sens);
+            for (int y = 0; y < 16; ++y)
+            {
+                for (int x = 0; x < 16; ++x) {
+                    body += QString(lit("&motion_grid_%1%2=on")).arg(y, 0, 16).arg(x, 0, 16);
+                }
+            }
+
+            makeStardotPostRequest(lit("admin.cgi?motion"), body, status);
             break; // only 1 sensitivity for all frame is supported
         }
     }
