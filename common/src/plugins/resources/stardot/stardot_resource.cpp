@@ -23,6 +23,10 @@ namespace
     {
         return size.width() * size.height();
     }
+    QString formatCellStr(int val) {
+        return QString::number(val, 16).toUpper();
+    }
+
 };
 
 QnStardotResource::QnStardotResource():
@@ -235,7 +239,7 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
             for (int y = 0; y < 16; ++y)
             {
                 for (int x = 0; x < 16; ++x) {
-                    body += QString(lit("&motion_grid_%1%2=on")).arg(y, 0, 16).arg(x, 0, 16);
+                    body += QString(lit("&motion_grid_%1%2=on")).arg(formatCellStr(y)).arg(formatCellStr(x));
                 }
             }
 
