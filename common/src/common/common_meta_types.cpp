@@ -30,6 +30,7 @@
 #include <core/misc/schedule_task.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
+#include "business/business_logic_common.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -54,6 +55,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
+    qRegisterMetaType<QnBusiness::EventReason>();
     
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
