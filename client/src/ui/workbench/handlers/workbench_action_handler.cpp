@@ -1064,7 +1064,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
             if (!canRemoveLayouts(existing)) {
                 QMessageBox::warning(widget(),
                                      tr("Layout already exists"),
-                                     tr("Layout with the same name already exists and you are not allowed to overwrite it."));
+                                     tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
                 return;
             }
 
@@ -1082,7 +1082,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         if (!canRemoveLayouts(existing)) {
             QMessageBox::warning(widget(),
                                  tr("Layout already exists"),
-                                 tr("Layout with the same name already exists and you are not allowed to overwrite it."));
+                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
             return;
         }
 
@@ -2034,7 +2034,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         if (!canRemoveLayouts(existing)) {
             QMessageBox::warning(widget(),
                                  tr("Layout already exists"),
-                                 tr("Layout with the same name already exists and you are not allowed to overwrite it."));
+                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
             return;
         }
 
@@ -2142,7 +2142,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
         if (!canRemoveLayouts(existing)) {
             QMessageBox::warning(widget(),
                                  tr("Layout already exists"),
-                                 tr("Layout with the same name already exists and you are not allowed to overwrite it."));
+                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
             return;
         }
 
