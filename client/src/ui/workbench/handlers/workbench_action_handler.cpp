@@ -1061,6 +1061,13 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
             button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+            if (!canRemoveLayouts(existing)) {
+                QMessageBox::warning(widget(),
+                                     tr("Layout already exists"),
+                                     tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+                return;
+            }
+
             if (!existing.isEmpty()) {
                 button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
                 if (button == QMessageBox::Cancel)
@@ -1072,6 +1079,13 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         } while (button != QMessageBox::Yes);
     } else {
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        if (!canRemoveLayouts(existing)) {
+            QMessageBox::warning(widget(),
+                                 tr("Layout already exists"),
+                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+            return;
+        }
+
         if (!existing.isEmpty()) {
             if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
                 return;
@@ -1360,7 +1374,18 @@ QMessageBox::StandardButton QnWorkbenchActionHandler::askOverrideLayout(QMessage
                                 defaultButton);
 }
 
+bool QnWorkbenchActionHandler::canRemoveLayouts(const QnLayoutResourceList &layouts) {
+    foreach(const QnLayoutResourcePtr &layout, layouts) {
+        if (!(accessController()->permissions(layout) & Qn::RemovePermission))
+            return false;
+    }
+    return true;
+}
+
 void QnWorkbenchActionHandler::removeLayouts(const QnLayoutResourceList &layouts) {
+    if (!canRemoveLayouts(layouts))
+        return;
+
     foreach(const QnLayoutResourcePtr &layout, layouts) {
         if(snapshotManager()->isLocal(layout))
             resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
@@ -2006,6 +2031,13 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnUserResourcePtr user = qnResPool->getResourceById(layout->getParentId()).dynamicCast<QnUserResource>();
 
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        if (!canRemoveLayouts(existing)) {
+            QMessageBox::warning(widget(),
+                                 tr("Layout already exists"),
+                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+            return;
+        }
+
         if (!existing.isEmpty()) {
             if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
                 return;
@@ -2106,6 +2138,14 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 
         button = QMessageBox::Yes;
         QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
+
+        if (!canRemoveLayouts(existing)) {
+            QMessageBox::warning(widget(),
+                                 tr("Layout already exists"),
+                                 tr("Layout with the same name already exists\nand you do not have the rights to overwrite it."));
+            return;
+        }
+
         if (!existing.isEmpty()) {
             button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
             if (button == QMessageBox::Cancel)

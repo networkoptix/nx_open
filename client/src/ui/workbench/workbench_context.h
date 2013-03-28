@@ -87,7 +87,7 @@ signals:
      * 
      * \param user                      New user that was logged in. May be null.
      */
-    void userChanged(const QnUserResourcePtr &user);
+    void userChanged(const QnUserResourcePtr &user); // TODO: #Elric remove user parameter
 
     /**
      * This signal is emitted when this workbench context is about to be destroyed,
