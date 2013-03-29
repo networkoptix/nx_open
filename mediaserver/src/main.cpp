@@ -1073,10 +1073,11 @@ void QnMain::run()
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
 
+    QnResourceDiscoveryManager::instance()->stop();
+    QThreadPool::globalInstance()->waitForDone();
+
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
-
-    QThreadPool::globalInstance()->waitForDone();
 
     connectorThread->quit();
     connectorThread->wait();
