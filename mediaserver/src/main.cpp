@@ -99,7 +99,6 @@ static const char COMPONENT_NAME[] = "MediaServer";
 static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
 
 class QnMain;
-static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -496,8 +495,6 @@ int serverMain(int argc, char *argv[])
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
-    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
-
     return 0;
 }
 
@@ -552,7 +549,6 @@ QnMain::QnMain(int argc, char* argv[])
     m_progressiveDownloadingServer(0),
     m_universalTcpListener(0)
 {
-    serviceMainInstance = this;
 }
 
 QnMain::~QnMain()
@@ -826,6 +822,8 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
+    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -859,8 +857,8 @@ void QnMain::run()
             break;
 
         cl_log.log("Can't connect to Enterprise Controller: ", appServerConnection->getLastError(), cl_logWARNING);
-
-        QnSleep::msleep(1000);
+        if (!needToStop())
+            QnSleep::msleep(1000);
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
 
@@ -1065,11 +1063,20 @@ void QnMain::run()
 
     exec();
 
+    QnResource::onStopApplication();
+
+    stopObjects();
+
+    QnResource::stopCommandProc();
+
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
 
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
+
+    QnResourceDiscoveryManager::instance()->stop();
+    QThreadPool::globalInstance()->waitForDone();
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
@@ -1081,6 +1088,8 @@ void QnMain::run()
     delete QnBusinessEventConnector::instance();
     QnBusinessEventConnector::initStaticInstance( NULL );
 
+    QnBusinessRuleProcessor::fini();
+
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
@@ -1089,8 +1098,13 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
+
+    av_lockmgr_register(NULL);
+
+    qSettings.setValue("lastRunningTime", 0);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
@@ -1112,11 +1126,7 @@ protected:
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
-
-        //providing garanteed single tone destruction order, when needed. 
-            //TODO Explicit instanciation/destruction (avoid using Q_GLOBAL_STATIC) of all single-tone objects would be a good fix
-            //to avoid destruction order - related problems in future
-        destroySingleToneObjects();
+        //QnBusinessRuleProcessor::fini();
 
         return result;
     }
@@ -1146,6 +1156,7 @@ protected:
 
     virtual void stop() override
     {
+        m_main.pleaseStop();
         m_main.exit();
         m_main.wait();
         stopServer(0);
@@ -1156,30 +1167,12 @@ private:
     int m_argc;
     char **m_argv;
 
-    void destroySingleToneObjects()
-    {
-        QThreadPool::globalInstance()->waitForDone();
-
-        QnBusinessRuleProcessor::fini();
-    }
 };
 
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
-
-    QnResource::stopCommandProc();
-    //QnResourceDiscoveryManager::instance()->stop();
-    //QnRecordingManager::instance()->stop();
-    if (serviceMainInstance)
-    {
-        serviceMainInstance->stopObjects();
-        serviceMainInstance = 0;
-    }
-    //QnVideoCameraPool::instance()->stop();
-    av_lockmgr_register(NULL);
     qApp->quit();
-    qSettings.setValue("lastRunningTime", 0);
 }
 
 int main(int argc, char* argv[])

@@ -60,20 +60,21 @@ qint64 QnServerArchiveDelegate::endTime()
 {
     QMutexLocker lk( &m_mutex );
 
-    if (m_catalogHi)
-    {
-        if (m_catalogLow)
-            return qMax(m_catalogHi->maxTime(), m_catalogLow->maxTime())*1000;
-        else
-            return m_catalogHi->maxTime()*1000;
-    }
-    else if (m_catalogLow)
-    {
-        return m_catalogLow->maxTime()*1000;
-    }
-    else {
-        return 0;
-    }
+    qint64 timeHi = m_catalogHi ? m_catalogHi->maxTime() : AV_NOPTS_VALUE;
+    qint64 timeLow = m_catalogLow ? m_catalogLow->maxTime() : AV_NOPTS_VALUE;
+
+    qint64 rez;
+    if (timeHi != AV_NOPTS_VALUE && timeLow != AV_NOPTS_VALUE)
+        rez = qMax(timeHi, timeLow);
+    else if (timeHi != AV_NOPTS_VALUE)
+        rez = timeHi;
+    else
+        rez = timeLow;
+
+    if (rez != AV_NOPTS_VALUE && rez != DATETIME_NOW)
+        rez *= 1000;
+    
+    return rez;
 }
 
 bool QnServerArchiveDelegate::open(QnResourcePtr resource)

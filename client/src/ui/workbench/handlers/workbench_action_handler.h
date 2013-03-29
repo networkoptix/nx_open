@@ -381,6 +381,8 @@ private:
      */
     QMessageBox::StandardButton askOverrideLayout(QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton);
 
+    bool canRemoveLayouts(const QnLayoutResourceList &layouts);
+
     void removeLayouts(const QnLayoutResourceList &layouts);
 
     void ensurePopupCollectionWidget();

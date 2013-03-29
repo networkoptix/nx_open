@@ -20,6 +20,8 @@
 
 #include "utils/common/synctime.h"
 
+bool QnResource::m_appStopping = false;
+
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
@@ -32,6 +34,12 @@ QnResource::QnResource():
 {
     connect(this, SIGNAL(parameterValueChangedQueued(const QnResourcePtr &, const QnParam &)), this, SIGNAL(parameterValueChanged(const QnResourcePtr &, const QnParam &)), Qt::QueuedConnection);
 }
+
+void QnResource::onStopApplication()
+{
+    m_appStopping = true;
+}
+
 
 QnResource::~QnResource()
 {

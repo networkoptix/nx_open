@@ -75,14 +75,14 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         item->setText(QString::fromLatin1(license->key()));
         break;
     case ExpirationDateColumn:
-        item->setText(license->expirationDate().isNull() ? tr("Never") : license->expirationDate().toString());
+        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());
         break;
     case ExpiresInColumn: {
-        QDateTime now = qnSyncTime->currentDateTime();
-        QDateTime expiration = license->expirationDate();
+        qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+        qint64 expirationTime = license->expirationTime();
 
         qint64 day = 1000ll * 60ll * 60ll * 24ll;
-        qint64 timeLeft = now.msecsTo(expiration);
+        qint64 timeLeft = expirationTime - currentTime;
         if(timeLeft < 0) {
             item->setText(tr("Expired"));
             item->setData(QBrush(Qt::red), Qt::ForegroundRole);
@@ -90,7 +90,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
             if(timeLeft < 5 * day)
                 item->setData(QBrush(Qt::yellow), Qt::ForegroundRole);
 
-            int daysLeft = now.date().daysTo(expiration.date());
+            int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
             if(daysLeft == 0) {
                 item->setText(tr("Today"));
             } else if(daysLeft == 1) {

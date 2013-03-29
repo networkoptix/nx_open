@@ -31,10 +31,10 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
     m_model->setLicenses(licenses);
 
     // TODO: #Elric this code does not belong here.
-    QDateTime now = qnSyncTime->currentDateTime();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     int expiredCount = 0;
     foreach(const QnLicensePtr &license, licenses)
-        if(license->expirationDate() < now)
+        if(license->expirationTime() < currentTime)
             expiredCount++;
 
     if(expiredCount > 0) {
@@ -42,4 +42,7 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
     } else {
         ui->label->setText(tr("Some of your licenses will soon expire."));
     }
+
+    for(int c = 0; c < ui->treeView->model()->columnCount(); c++)
+        ui->treeView->resizeColumnToContents(c);
 }
