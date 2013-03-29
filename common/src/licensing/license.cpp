@@ -308,12 +308,14 @@ void QnLicenseList::clear()
 
 int QnLicenseList::totalCamerasByClass(bool analog) const
 {
-    int n = 0;
-    foreach (QnLicensePtr license, m_licenses.values())
-        if (license->isAnalog() == analog)
-            n += license->cameraCount();
+    int result = 0;
 
-    return n;
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    foreach (QnLicensePtr license, m_licenses.values())
+        if (license->isAnalog() == analog && currentTime < license->expirationTime())
+            result += license->cameraCount();
+
+    return result;
 }
 
 bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
