@@ -122,6 +122,9 @@ public:
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
+    /*!
+        Actual request is performed asynchronously. This method only posts task to the queue
+    */
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,
@@ -341,6 +344,32 @@ private:
         std::stack<State> m_parseStateStack;
     };
 
+    class TriggerOutputTask
+    {
+    public:
+        QString outputID;
+        bool active;
+        unsigned int autoResetTimeoutMS;
+
+        TriggerOutputTask()
+        :
+            active( false ),
+            autoResetTimeoutMS( 0 )
+        {
+        }
+
+        TriggerOutputTask(
+            const QString _outputID,
+            const bool _active,
+            const unsigned int _autoResetTimeoutMS )
+        :
+            outputID( _outputID ),
+            active( _active ),
+            autoResetTimeoutMS( _autoResetTimeoutMS )
+        {
+        }
+    };
+
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
     static const int DEFAULT_IFRAME_DISTANCE;
@@ -386,6 +415,7 @@ private:
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
+    std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
 	
     bool createPullPointSubscription();
     bool pullMessages();
@@ -397,6 +427,10 @@ private:
     bool fetchRelayInputInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
+    bool setRelayOutputStateNonSafe(
+        const QString& outputID,
+        bool active,
+        unsigned int autoResetTimeoutMS );
 };
 
 #endif //onvif_resource_h
