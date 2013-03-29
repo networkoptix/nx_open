@@ -1063,6 +1063,8 @@ void QnMain::run()
 
     exec();
 
+    QnVirtualCameraResource::onStopApplication();
+
     stopObjects();
 
     QnResource::stopCommandProc();

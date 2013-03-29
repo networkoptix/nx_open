@@ -50,6 +50,8 @@ public:
 	virtual QString getUniqueId() const override;
 
     void deserialize(const QnResourceParameters& parameters);
+
+    static void onStopApplication(); // do not save camera to EC because of application is stopping
 protected:
     void save();
 // -------------------------------------------------------------------------- //
@@ -87,6 +89,9 @@ private:
     QString m_firmware;
 
     QnAbstractDTSFactory* m_dtsFactory;
+
+    static QReadWriteLock m_stopAppLock;
+    static bool m_pleaseStop;
 };
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
@@ -106,6 +111,7 @@ public:
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
+
 protected:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
