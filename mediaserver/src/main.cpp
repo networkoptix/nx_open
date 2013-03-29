@@ -495,8 +495,6 @@ int serverMain(int argc, char *argv[])
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
-    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
-
     return 0;
 }
 
@@ -824,6 +822,8 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
+    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -1088,6 +1088,8 @@ void QnMain::run()
     delete QnBusinessEventConnector::instance();
     QnBusinessEventConnector::initStaticInstance( NULL );
 
+    QnBusinessRuleProcessor::fini();
+
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
@@ -1096,10 +1098,9 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
-
-    //QnBusinessRuleProcessor::fini();
 
     av_lockmgr_register(NULL);
 
@@ -1125,7 +1126,7 @@ protected:
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
-        QnBusinessRuleProcessor::fini();
+        //QnBusinessRuleProcessor::fini();
 
         return result;
     }
