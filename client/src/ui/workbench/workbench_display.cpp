@@ -47,6 +47,7 @@
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/grid/grid_background_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -312,6 +313,9 @@ void QnWorkbenchDisplay::deinitSceneView() {
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
 
+    if (!m_gridBackgroundItem.isNull())
+        delete gridBackgroundItem();
+
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
 
@@ -413,6 +417,13 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setMapper(workbench()->mapper());
     m_gridItem.data()->setAnimationTimer(m_instrumentManager->animationTimer());
 
+    m_gridBackgroundItem = new QnGridBackgroundItem();
+    m_scene->addItem(gridBackgroundItem());
+    setLayer(gridBackgroundItem(), Qn::EMappingLayer);
+    gridBackgroundItem()->setOpacity(0.0);
+    gridBackgroundItem()->setMapper(workbench()->mapper());
+    gridBackgroundItem()->setAnimationTimer(m_instrumentManager->animationTimer());
+
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -437,8 +448,12 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
     m_boundingInstrument->setMovementSpeed(m_view, 4.0);
 }
 
-QnGridItem *QnWorkbenchDisplay::gridItem() {
+QnGridItem *QnWorkbenchDisplay::gridItem() const {
     return m_gridItem.data();
+}
+
+QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
+    return m_gridBackgroundItem.data();
 }
 
 
@@ -618,6 +633,19 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     }
 
     emit widgetChanged(role);
+}
+
+void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
+    if (!layout)
+        return;
+
+    if (layout->backgroundImageId() == 0)
+        return;
+
+    gridBackgroundItem()->setImageSize(layout->backgroundSize());
+    gridBackgroundItem()->setImageId(layout->backgroundImageId());
+    gridBackgroundItem()->showWhenReady();
+    synchronizeSceneBounds();
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
@@ -1021,8 +1049,12 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
+    QRect backgroundBoundingRect = gridBackgroundItem()->sceneBoundingRect();
+    if(backgroundBoundingRect.isNull())
+        backgroundBoundingRect = QRect(0, 0, 1, 1);
 
-    return workbench()->mapper()->mapFromGridF(QRectF(layoutBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
+    QRect sceneBoundingRect = layoutBoundingRect.united(backgroundBoundingRect);
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1360,6 +1392,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
+    gridBackgroundItem()->animatedHide();
+
+
     m_inChangeLayout = false;
 }
 
@@ -1458,7 +1493,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
-
+    if (layout->resource()) {
+        connect(layout->resource().data(), SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+        connect(layout->resource().data(), SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+    }
+    updateBackground(layout->resource());
     synchronizeSceneBounds();
     fitInView(false);
 }
