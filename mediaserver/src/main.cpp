@@ -1146,6 +1146,7 @@ protected:
 
     virtual void stop() override
     {
+        m_main.pleaseStop();
         m_main.exit();
         m_main.wait();
         stopServer(0);
