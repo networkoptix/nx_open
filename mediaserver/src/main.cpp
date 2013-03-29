@@ -99,7 +99,6 @@ static const char COMPONENT_NAME[] = "MediaServer";
 static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
 
 class QnMain;
-static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -552,7 +551,6 @@ QnMain::QnMain(int argc, char* argv[])
     m_progressiveDownloadingServer(0),
     m_universalTcpListener(0)
 {
-    serviceMainInstance = this;
 }
 
 QnMain::~QnMain()
@@ -1065,6 +1063,10 @@ void QnMain::run()
 
     exec();
 
+    stopObjects();
+
+    QnResource::stopCommandProc();
+
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
 
@@ -1091,6 +1093,10 @@ void QnMain::run()
     QnResourcePool::initStaticInstance( NULL );
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
+
+    av_lockmgr_register(NULL);
+
+    qSettings.setValue("lastRunningTime", 0);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
@@ -1168,19 +1174,7 @@ private:
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
-
-    QnResource::stopCommandProc();
-    //QnResourceDiscoveryManager::instance()->stop();
-    //QnRecordingManager::instance()->stop();
-    if (serviceMainInstance)
-    {
-        serviceMainInstance->stopObjects();
-        serviceMainInstance = 0;
-    }
-    //QnVideoCameraPool::instance()->stop();
-    av_lockmgr_register(NULL);
     qApp->quit();
-    qSettings.setValue("lastRunningTime", 0);
 }
 
 int main(int argc, char* argv[])
