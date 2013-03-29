@@ -1097,7 +1097,7 @@ void QnMain::run()
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
 
-    QnBusinessRuleProcessor::fini();
+    //QnBusinessRuleProcessor::fini();
 
     av_lockmgr_register(NULL);
 
@@ -1123,6 +1123,7 @@ protected:
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
+        QnBusinessRuleProcessor::fini();
 
         return result;
     }
