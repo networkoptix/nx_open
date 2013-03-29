@@ -11,8 +11,14 @@ public:
     QnWorkbenchLicenseNotifier(QObject *parent = NULL);
     virtual ~QnWorkbenchLicenseNotifier();
 
+    void checkLicenses();
+
 private slots:
     void at_licensePool_licensesChanged();
+    void at_context_userChanged();
+
+private:
+    bool m_checked;
 };
 
 #endif // QN_WORKBENCH_LICENSE_NOTIFIER_H

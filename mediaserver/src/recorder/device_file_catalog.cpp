@@ -508,15 +508,17 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 		}
 	}
 
-	if (!delFileName.isEmpty())
-	{
-        if (deletedSize == 0)
-            deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
-		//storage->addWritedSpace(-deletedSize);
-		storage->removeFile(delFileName);
-	}
-	if (!motionDirName.isEmpty())
-		storage->removeDir(motionDirName);
+    if (storage) {
+	    if (!delFileName.isEmpty())
+	    {
+            if (deletedSize == 0)
+                deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
+		    //storage->addWritedSpace(-deletedSize);
+		    storage->removeFile(delFileName);
+	    }
+	    if (!motionDirName.isEmpty())
+		    storage->removeDir(motionDirName);
+    }
 
     return deletedSize;
 }

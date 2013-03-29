@@ -31,10 +31,10 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
     m_model->setLicenses(licenses);
 
     // TODO: #Elric this code does not belong here.
-    QDateTime now = qnSyncTime->currentDateTime();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     int expiredCount = 0;
     foreach(const QnLicensePtr &license, licenses)
-        if(license->expirationDate() < now)
+        if(license->expirationTime() < currentTime)
             expiredCount++;
 
     if(expiredCount > 0) {
