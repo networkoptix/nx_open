@@ -12,6 +12,8 @@ namespace std { typedef __int32 intptr_t; }
 #   include <cstdint> /* For std::intptr_t. */
 #endif
 
+#include <sstream>
+
 #include <boost/preprocessor/stringize.hpp>
 
 #include <QtCore/QString>
@@ -71,19 +73,18 @@ namespace detail {
         }
 
         template<class T>
-        inline QString textstream_operator_lshift(const QString &s, const T &arg) {
-            QString text;
-            QTextStream stream(&text, QIODevice::WriteOnly);
+        inline QString stringstream_operator_lshift(const QString &s, const T &arg) {
+            std::wstringstream stream; /* Not using QTextStream as it's more heavyweight than the one from std. */
             stream << arg;
-            return s.arg(text);
+            return s.arg(QString::fromWCharArray(stream.str().c_str()));
         }
 
         inline QString operator<<(const QString &s, void *arg) {
-            return textstream_operator_lshift(s, arg);
+            return stringstream_operator_lshift(s, arg);
         }
 
         inline QString operator<<(const QString &s, const void *arg) {
-            return textstream_operator_lshift(s, arg);
+            return stringstream_operator_lshift(s, arg);
         }
 
         template<class T>

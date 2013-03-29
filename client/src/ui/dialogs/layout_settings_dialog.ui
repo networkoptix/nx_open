@@ -14,18 +14,12 @@
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
-   </property>
    <item>
     <widget class="QGroupBox" name="backgroundGroupBox">
      <property name="title">
       <string>Background</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
-      </property>
       <item>
        <widget class="QLabel" name="imageLabel">
         <property name="text">
