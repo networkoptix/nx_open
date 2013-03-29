@@ -9,6 +9,10 @@
 #include <QSet>
 #include <QTextStream>
 
+class QnLicense;
+typedef QSharedPointer<QnLicense> QnLicensePtr;
+
+
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
@@ -51,6 +55,7 @@ public:
     Type type() const;
     QString typeName() const;
 
+    static QnLicensePtr readFromStream(QTextStream &stream);
 
 private:
     QByteArray m_rawLicense;
@@ -74,9 +79,6 @@ private:
     bool m_isValid2;
 };
 
-typedef QSharedPointer<QnLicense> QnLicensePtr;
-
-QnLicensePtr readLicenseFromStream(QTextStream& stream);
 
 // TODO: #Elric make it an STL list. Naming a non-list a list is BAD.
 class QnLicenseList
@@ -119,6 +121,7 @@ private:
     QByteArray m_hardwareId;
 	QByteArray m_oldHardwareId;
 };
+
 
 /**
  * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).

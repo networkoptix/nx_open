@@ -236,7 +236,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         is.setCodec("UTF-8");
 
         while (!is.atEnd()) {
-            QnLicensePtr license = readLicenseFromStream(is);
+            QnLicensePtr license = QnLicense::readFromStream(is);
             if (!license )
                 break;
 
