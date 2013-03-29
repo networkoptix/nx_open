@@ -30,6 +30,11 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
 
     m_imageId = layout->backgroundImageId();
+    if (m_imageId > 0) {
+        QImage img = m_cache->getImage(m_imageId);
+        at_image_loaded(m_imageId, img);
+    }
+
     ui->widthSpinBox->setValue(layout->backgroundSize().width());
     ui->heightSpinBox->setValue(layout->backgroundSize().height());
     ui->lockedCheckBox->setChecked(layout->locked());
@@ -81,6 +86,26 @@ void QnLayoutSettingsDialog::updateControls() {
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {
 
+    QImage img = m_cache->getImage(m_imageId);
+    if (img.isNull())
+        return; //show message?
+
+    QDialog d(this);
+
+    QVBoxLayout *layout = new QVBoxLayout(&d);
+
+    QLabel* l = new QLabel(&d);
+    l->setPixmap(QPixmap::fromImage(img));
+    layout->addWidget(l);
+
+    QPushButton* b = new QPushButton(&d);
+    b->setText(tr("Close"));
+    connect(b, SIGNAL(clicked()), &d, SLOT(close()));
+    layout->addWidget(b);
+
+    d.setLayout(layout);
+    d.setModal(true);
+    d.exec();
 }
 
 void QnLayoutSettingsDialog::at_selectButton_clicked() {

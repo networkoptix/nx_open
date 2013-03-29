@@ -13,6 +13,9 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 
 
 QImage QnAppServerFileCache::getImage(int id) {
+    if (id <= 0)
+        return QImage();
+
     QString fullPath = getPath(id);
     QImage img(fullPath);
     if (img.isNull()) {
