@@ -1,9 +1,11 @@
 #include "workbench_license_notifier.h"
 
+#include <core/resource/user_resource.h>
 #include <licensing/license.h>
 #include <utils/settings.h>
 #include <utils/common/synctime.h>
 
+#include <ui/workbench/workbench_context.h>
 #include <ui/dialogs/license_notification_dialog.h>
 
 namespace {
@@ -24,16 +26,18 @@ namespace {
 
 QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_checked(false)
 {
     connect(qnLicensePool, SIGNAL(licensesChanged()), this, SLOT(at_licensePool_licensesChanged()));
+    connect(context(), SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
 }
 
 QnWorkbenchLicenseNotifier::~QnWorkbenchLicenseNotifier() {
     return;
 }
 
-void QnWorkbenchLicenseNotifier::at_licensePool_licensesChanged() {
+void QnWorkbenchLicenseNotifier::checkLicenses() {
     QnLicenseWarningStateHash licenseWarningStates = qnSettings->licenseWarningStates();
 
     QDateTime now = qnSyncTime->currentDateTime();
@@ -76,3 +80,18 @@ void QnWorkbenchLicenseNotifier::at_licensePool_licensesChanged() {
     }
 }
 
+void QnWorkbenchLicenseNotifier::at_licensePool_licensesChanged() {
+    if(!m_checked) {
+        m_checked = true;
+        checkLicenses();
+    }
+}
+
+void QnWorkbenchLicenseNotifier::at_context_userChanged() {
+    if(context()->user())
+        m_checked = false;
+    if(!qnLicensePool->getLicenses().isEmpty() && !m_checked) {
+        m_checked = true;
+        checkLicenses();
+    }
+}
