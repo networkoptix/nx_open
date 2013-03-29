@@ -30,8 +30,8 @@ namespace QnBusiness {
         StorageIssueIoError,
         StorageIssueNotEnoughSpeed
     };
-
 }
+Q_DECLARE_METATYPE(QnBusiness::EventReason);
 
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 

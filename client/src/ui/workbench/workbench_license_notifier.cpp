@@ -10,7 +10,6 @@ namespace {
     const qint64 day = 1000ll * 60ll * 60ll * 24ll;
 
     const qint64 warningTimes[] = {
-        day * 30,
         day * 15,
         day * 10,
         day * 5,

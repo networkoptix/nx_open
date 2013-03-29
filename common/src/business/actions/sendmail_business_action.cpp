@@ -46,10 +46,10 @@ QString QnSendMailBusinessAction::getSubject() const {
         break;
 
     case BusinessEventType::Camera_Disconnect:
-        return QObject::tr("Camera %1 has disconnected").arg(resourceName);
+        return QObject::tr("Camera %1 was disconnected").arg(resourceName);
 
     case BusinessEventType::Camera_Input:
-        return QObject::tr("Input signal caught on camera %1").arg(resourceName);
+        return QObject::tr("Input signal was caught on camera %1").arg(resourceName);
 
     case BusinessEventType::Camera_Motion:
         return QObject::tr("Motion was detected on camera %1").arg(resourceName);
@@ -79,63 +79,65 @@ QString QnSendMailBusinessAction::getMessageBody() const {
     BusinessEventType::Value eventType = QnBusinessEventRuntime::getEventType(m_runtimeParams);
     QString resourceName = resourceString(true);
     QString serverName = QObject::tr("%1 Server").arg(QLatin1String(VER_COMPANYNAME_STR));
+    int issueCount = qMax(m_aggregationInfo.totalCount(), 1);
 
     QString messageBody;
-    if (eventType >= BusinessEventType::UserDefined)
-        messageBody = QObject::tr("User Defined Event (%1) has occured on %2")
-                .arg((int)eventType - (int)BusinessEventType::UserDefined)
-                .arg(serverName);
 
     switch (eventType) {
     case BusinessEventType::NotDefined:
-        qWarning() << "Undefined event has occured" << m_runtimeParams;
+        messageBody = QObject::tr("Undefined event has occured");
         break;
 
     case BusinessEventType::Camera_Disconnect:
-        return QObject::tr("%1 has detected that camera %2 was disconnected")
+        messageBody = QObject::tr("%1 has detected that camera %2 was disconnected")
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::Camera_Input:
-        return QObject::tr("%1 has detected input signal on camera %2")
+        return QObject::tr("%1 has caught an input signal on camera %2")
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::Camera_Motion:
-        return QObject::tr("%1 has detected motion on camera %2")
+        messageBody = QObject::tr("%1 has detected motion on camera %2")
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::Storage_Failure:
-        return QObject::tr("%1 %2 has detected storage failure")
+        return QObject::tr("%1 %2 has detected %n storage issues", "", issueCount)
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::Network_Issue:
-        return QObject::tr("%1 %2 has experienced a network issue")
+        return QObject::tr("%1 has experienced %n network issues with camera %2", "", issueCount)
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::MediaServer_Failure:
-        return QObject::tr("%1 %2 failure was detected")
+        messageBody = QObject::tr("%1 %2 failure was detected")
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::Camera_Ip_Conflict:
-        return QObject::tr("%1 %2 has detected camera IP conflict")
+        messageBody = QObject::tr("%1 %2 has detected camera IP conflict")
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     case BusinessEventType::MediaServer_Conflict:
-        return QObject::tr("%1 %2 is conflicting with other server")
+        messageBody = QObject::tr("%1 %2 is conflicting with other server")
                 .arg(serverName)
                 .arg(resourceName);
-
+        break;
     default:
+        if (eventType >= BusinessEventType::UserDefined)
+            messageBody = QObject::tr("User Defined Event (%1) has occured on %2")
+                    .arg((int)eventType - (int)BusinessEventType::UserDefined)
+                    .arg(serverName);
+        else
+            messageBody = QObject::tr("Unknown Event has occured on").arg(serverName);
         break;
     }
-    return QObject::tr("Unknown Event has occured on").arg(serverName);
-
+    messageBody += QLatin1Char('\n');
 
     if (m_aggregationInfo.totalCount() == 0) {
         messageBody += eventTextString(eventType, m_runtimeParams);
@@ -201,14 +203,19 @@ QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
 
 QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params, int aggregationCount) const {
     quint64 ts = QnBusinessEventRuntime::getEventTimestamp(params);
-    QString timeStamp = QDateTime::fromMSecsSinceEpoch(ts/1000).toString(Qt::SystemLocaleShortDate);
+
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
     QString result;
     int count = qMax(aggregationCount, 1);
     if (count == 1)
-        result = QObject::tr("at %1").arg(timeStamp);
+        result = QObject::tr("at %1 on %2", "%1 means time, %2 means date")
+                .arg(time.time().toString())
+                .arg(time.date().toString());
     else
-        result = QObject::tr("%n times since %1", "", count).arg(timeStamp);
+        result = QObject::tr("%n times since %1 %2", "%1 means time, %2 means date", count)
+                .arg(time.time().toString())
+                .arg(time.date().toString());
     result += QLatin1Char('\n');
     return result;
 }
@@ -222,26 +229,21 @@ QString QnSendMailBusinessAction::reasonString(const QnBusinessParams &params) c
     switch (reasonCode) {
         case QnBusiness::NetworkIssueNoFrame:
             if (eventType == BusinessEventType::Network_Issue)
-                result = QObject::tr("No video frame received during last %1 seconds")
+                result = QObject::tr("No video frames were received during the last %1 seconds")
                                                   .arg(reasonText);
             break;
         case QnBusiness::NetworkIssueConnectionClosed:
             if (eventType == BusinessEventType::Network_Issue)
-                result = QObject::tr("Connection to camera was unexpectedly closed");
+                result = QObject::tr("Connection to camera was closed unexpectedly");
             break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
             if (eventType == BusinessEventType::Network_Issue) {
-                QStringList seqs = reasonText.split(QLatin1Char(';'));
-                if (seqs.size() != 2)
-                    break;
-                result = QObject::tr("RTP packet loss detected. Prev seq.=%1 next seq.=%2")
-                        .arg(seqs[0])
-                        .arg(seqs[1]);
+                result = QObject::tr("RTP packet was loss detected");
             }
             break;
         case QnBusiness::MServerIssueTerminated:
             if (eventType == BusinessEventType::MediaServer_Failure)
-                result = QObject::tr("Server terminated");
+                result = QObject::tr("Server has been terminated");
             break;
         case QnBusiness::MServerIssueStarted:
             if (eventType == BusinessEventType::MediaServer_Failure)
@@ -249,12 +251,12 @@ QString QnSendMailBusinessAction::reasonString(const QnBusinessParams &params) c
             break;
         case QnBusiness::StorageIssueIoError:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QObject::tr("Error while writing to %1")
+                result = QObject::tr("An error has occured while writing to %1")
                                                   .arg(reasonText);
             break;
         case QnBusiness::StorageIssueNotEnoughSpeed:
             if (eventType == BusinessEventType::Storage_Failure)
-                result = QObject::tr("Not enough HDD/SSD speed for recording at %1")
+                result = QObject::tr("Writing speed of HDD/SSD at %1 was found to be insufficient to sustain continuous recording")
                                                   .arg(reasonText);
             break;
         default:
