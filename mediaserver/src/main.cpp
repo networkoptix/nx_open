@@ -859,8 +859,8 @@ void QnMain::run()
             break;
 
         cl_log.log("Can't connect to Enterprise Controller: ", appServerConnection->getLastError(), cl_logWARNING);
-
-        QnSleep::msleep(1000);
+        if (!needToStop())
+            QnSleep::msleep(1000);
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
 
