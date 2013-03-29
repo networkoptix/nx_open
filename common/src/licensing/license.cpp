@@ -313,7 +313,7 @@ int QnLicenseList::totalCamerasByClass(bool analog) const
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     foreach (QnLicensePtr license, m_licenses.values())
-        if (license->isAnalog() == analog && currentTime < license->expirationTime())
+        if (license->isAnalog() == analog && (license->expirationTime() < 0 || currentTime < license->expirationTime())) // TODO: #Elric make NEVER an INT64_MAX
             result += license->cameraCount();
 
     return result;
