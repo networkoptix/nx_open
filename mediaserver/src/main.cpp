@@ -1063,8 +1063,6 @@ void QnMain::run()
 
     exec();
 
-    QnVirtualCameraResource::onStopApplication();
-
     stopObjects();
 
     QnResource::stopCommandProc();
@@ -1077,6 +1075,8 @@ void QnMain::run()
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+
+    QThreadPool::globalInstance()->waitForDone();
 
     connectorThread->quit();
     connectorThread->wait();
@@ -1095,6 +1095,8 @@ void QnMain::run()
     QnResourcePool::initStaticInstance( NULL );
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
+
+    QnBusinessRuleProcessor::fini();
 
     av_lockmgr_register(NULL);
 
@@ -1120,11 +1122,6 @@ protected:
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
-
-        //providing garanteed single tone destruction order, when needed. 
-            //TODO Explicit instanciation/destruction (avoid using Q_GLOBAL_STATIC) of all single-tone objects would be a good fix
-            //to avoid destruction order - related problems in future
-        destroySingleToneObjects();
 
         return result;
     }
@@ -1165,12 +1162,6 @@ private:
     int m_argc;
     char **m_argv;
 
-    void destroySingleToneObjects()
-    {
-        QThreadPool::globalInstance()->waitForDone();
-
-        QnBusinessRuleProcessor::fini();
-    }
 };
 
 void stopServer(int signal)

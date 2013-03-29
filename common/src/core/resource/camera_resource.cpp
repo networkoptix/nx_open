@@ -4,9 +4,6 @@
 
 static const float MAX_EPS = 0.01f;
 
-QReadWriteLock QnVirtualCameraResource::m_stopAppLock;
-bool QnVirtualCameraResource::m_pleaseStop = false;
-
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_scheduleDisabled(true),
     m_audioEnabled(false),
@@ -234,18 +231,8 @@ void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters
         addFlags(motion);
 }
 
-void QnVirtualCameraResource::onStopApplication()
-{
-    QWriteLocker lock(&m_stopAppLock);
-    m_pleaseStop = true;
-}
-
 void QnVirtualCameraResource::save()
 {
-    QReadLocker lock(&m_stopAppLock);
-    if (m_pleaseStop)
-        return;
-
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
     if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
