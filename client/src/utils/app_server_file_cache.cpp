@@ -1,6 +1,7 @@
 #include "app_server_file_cache.h"
 
 #include <QDesktopServices>
+#include <QFileInfo>
 
 #include <api/app_server_connection.h>
 
@@ -26,6 +27,14 @@ QImage QnAppServerFileCache::getImage(int id) {
         m_loading.insert(handle, id);
     }
     return img;
+}
+
+int QnAppServerFileCache::appendDebug(QString path) {
+    int i = 1;
+    while (QFileInfo(getPath(i)).exists())
+        i++;
+    QImage(path).save(getPath(i));
+    return i;
 }
 
 QString QnAppServerFileCache::getPath(int id) const {

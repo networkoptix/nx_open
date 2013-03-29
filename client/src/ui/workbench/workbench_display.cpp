@@ -645,6 +645,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
     gridBackgroundItem()->setImageId(layout->backgroundImageId());
     gridBackgroundItem()->showWhenReady();
+    synchronizeSceneBounds();
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
@@ -1497,7 +1498,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         connect(layout->resource().data(), SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
     }
     updateBackground(layout->resource());
-
     synchronizeSceneBounds();
     fitInView(false);
 }

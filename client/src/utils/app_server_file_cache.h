@@ -12,6 +12,9 @@ public:
     ~QnAppServerFileCache();
 
     QImage getImage(int id);
+
+    int appendDebug(QString path);
+
 signals:
     void imageLoaded(int id, const QImage& image);
 private slots:

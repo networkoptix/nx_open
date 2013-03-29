@@ -8,6 +8,7 @@
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
+    m_cache(new QnAppServerFileCache(this)),
     m_imageId(0)
 {
     ui->setupUi(this);
@@ -16,6 +17,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
+
+    connect(m_cache, SIGNAL(imageLoaded(int,QImage)), this, SLOT(at_image_loaded(int, const QImage &)));
 
     updateControls();
 }
@@ -104,8 +107,8 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
         ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
     }
 
-    m_imageId = 1;
-
+    //TODO: #GDM replace with uploading
+    m_imageId = m_cache->appendDebug(files[0]);
     updateControls();
 }
 
@@ -116,3 +119,16 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 
     updateControls();
 }
+
+void QnLayoutSettingsDialog::at_image_loaded(int id, const QImage &image) {
+    if (id != m_imageId)
+        return;
+    QPixmap pixmap;
+    if (!pixmap.convertFromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio)))
+        qWarning() << "Could not convert image";
+    ui->imageLabel->setPixmap(pixmap);
+}
+
+
+
+
