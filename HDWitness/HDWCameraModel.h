@@ -16,15 +16,17 @@
 @interface HDWCameraModel : NSObject {
 }
 
-@property NSNumber *cameraId;
-@property HDWServerModel *server;
-@property NSString *name;
-@property NSString *physicalId;
-@property NSNumber *status;
+@property(readonly) NSNumber *cameraId;
+@property(readonly) NSString *name;
+@property(readonly) NSString *physicalId;
+@property(readonly) NSNumber *status;
+@property(readonly) BOOL disabled;
 
+@property(readonly) HDWServerModel *server;
 @property(readonly) NSURL *videoUrl;
 @property(readonly) NSURL *thumbnailUrl;
 
+-(HDWCameraModel*) initWithDict: (NSDictionary*) dict andServer: (HDWServerModel*) server;
 
 @end
 
@@ -32,17 +34,23 @@
  * Model representing Server object. Cameras are inside.
  */
 @interface HDWServerModel : NSObject {
+    NSMutableDictionary *cameras;
 }
 
-@property NSNumber *serverId;
-@property NSString *name;
-@property NSURL *streamingUrl;
-@property NSMutableArray *cameras;
+@property(readonly) NSUInteger cameraCount;
+@property(readonly) NSNumber *serverId;
+@property(readonly) NSString *name;
+@property(readonly) NSURL *streamingUrl;
 
--(void) addOrUpdateCamera: (HDWCameraModel*) camera;
+-(HDWServerModel*) initWithDict: (NSDictionary*) dict;
 
+-(HDWCameraModel*) cameraAtIndex:(NSUInteger)index;
 -(HDWCameraModel*) findCameraById: (NSNumber*) cameraId;
+-(void) addOrReplaceCamera: (HDWCameraModel*) camera;
 -(void) removeCameraById: (NSNumber*) cameraId;
+-(NSUInteger) indexOfCameraWithId: (NSNumber*) serverId;
+-(NSArray*) enabledCamerasIds;
+-(NSArray*) enabledCameras;
 
 @end
 
@@ -50,27 +58,29 @@
  * Model representing list of servers.
  */
 @interface HDWServersModel : NSObject {
-    NSMutableArray *servers;
+    NSMutableDictionary *servers;
 }
+
+-(id)init;
 
 -(void) addServers: (NSArray*) servers;
 -(void) addServer: (HDWServerModel*) server;
--(void) addOrUpdateServer: (HDWServerModel*) server;
+-(NSUInteger) addOrUpdateServer: (HDWServerModel*) server;
 
 -(void) updateServer: (HDWServerModel*) server;
--(void) addOrUpdateCamera: (HDWCameraModel*) camera;
+-(NSIndexPath*) addOrReplaceCamera: (HDWCameraModel*) camera;
 
 -(HDWServerModel*) findServerById: (NSNumber*) id;
 -(HDWCameraModel*) findCameraById: (NSNumber*) id atServer: (NSNumber*) serverId;
 
--(HDWServerModel*) getServerAtIndex: (NSInteger) index;
--(NSUInteger) getIndexOfServerWithId: (NSNumber*) serverId;
+-(HDWServerModel*) serverAtIndex: (NSInteger) index;
+-(NSUInteger) indexOfServerWithId: (NSNumber*) serverId;
 
--(HDWCameraModel*) getCameraForIndexPath: (NSIndexPath*) indexPath;
--(NSIndexPath*) getIndexPathOfCameraWithId: (NSNumber*) cameraId andServerId: (NSNumber*) serverId;
+-(HDWCameraModel*) cameraAtIndexPath: (NSIndexPath*) indexPath;
+-(NSIndexPath*) indexPathOfCameraWithId: (NSNumber*) cameraId andServerId: (NSNumber*) serverId;
 
 -(void) removeServerById: (NSNumber*) serverId;
--(void) removeCameraById: (NSNumber*) cameraId;
+-(void) removeCameraById: (NSNumber*) cameraId andServerId: (NSNumber*) serverId;
 
 -(int) count;
 

@@ -10,57 +10,106 @@
 
 @implementation HDWCameraModel
 
+-(HDWCameraModel*) initWithDict: (NSDictionary*) dict andServer: (HDWServerModel*) server {
+    self = [super init];
+    
+    if (self) {
+        _cameraId = dict[@"id"];
+        _name = dict[@"name"];
+        _status = dict[@"status"];
+        _disabled = ((NSNumber*)dict[@"disabled"]).intValue == 1;
+        _physicalId = dict[@"physicalId"];
+        _server = server;
+    }
+    
+    return self;
+}
+
 -(NSURL*) videoUrl {
-    return [NSURL URLWithString:[NSString stringWithFormat:@"/media/%@.mpjpeg", _physicalId] relativeToURL:_server.streamingUrl];
+    return [NSURL URLWithString:[NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=720p", _physicalId] relativeToURL:_server.streamingUrl];
 }
 
 -(NSURL*) thumbnailUrl {
-    return [NSURL URLWithString:[NSString stringWithFormat:@"/api/image?physicalId=%@&time=now", _physicalId] relativeToURL:_server.streamingUrl];
+    return [NSURL URLWithString:[NSString stringWithFormat:@"/api/image?physicalId=%@&time=now&width=20", _physicalId] relativeToURL:_server.streamingUrl];
 }
 
 @end
 
 @implementation HDWServerModel
 
--(id)init {
+-(HDWServerModel*) initWithDict: (NSDictionary*) dict {
     self = [super init];
+    
     if (self) {
-        _cameras = [[NSMutableArray alloc] init];
+        _serverId = dict[@"id"];
+        _name = dict[@"name"];
+        _streamingUrl = [NSURL URLWithString:dict[@"streamingUrl"]];
+        
+        cameras = [[NSMutableDictionary alloc] init];
     }
     
     return self;
 }
 
+-(HDWCameraModel*) cameraAtIndex:(NSUInteger)index {
+    return [[self enabledCameras] objectAtIndex:index];
+}
+
+-(void) update: (HDWServerModel*) server {
+    _name = server.name;
+    _streamingUrl = server.streamingUrl;
+}
+
 -(HDWCameraModel*) findCameraById: (NSNumber*) cameraId {
-    for (HDWCameraModel* camera in _cameras) {
-        if ([camera.cameraId isEqualToNumber:cameraId])
-            return camera;
-    }
-    
-    return nil;
+    return [cameras objectForKey:cameraId];
 }
 
 -(void) removeCameraById: (NSNumber*) cameraId {
-    HDWCameraModel *camera = [self findCameraById:cameraId];
-    [_cameras removeObject:camera];
+    [cameras removeObjectForKey:cameraId];
 }
 
--(void) addOrUpdateCamera: (HDWCameraModel*) newCamera {
-    NSIndexSet *camerasIndexes = [_cameras indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
-        HDWCameraModel *camera = (HDWCameraModel*) obj;
-        if (camera.cameraId == newCamera.cameraId) {
-            *stop = YES;
-            return YES;
-        } else {
-            return NO;
-        }
+-(void) addOrReplaceCamera: (HDWCameraModel*) camera {
+    [cameras setObject:camera forKey:camera.cameraId];
+}
+
+-(NSUInteger) cameraCount {
+    return [self enabledCamerasIdSet].count;
+}
+
+-(NSUInteger) indexOfCameraWithId: (NSNumber*) cameraId {
+    return [[self enabledCamerasIds] indexOfObject:cameraId];
+}
+
+-(NSSet*) enabledCamerasIdSet {
+    return [cameras keysOfEntriesPassingTest:^BOOL(id key, id obj, BOOL *stop) {
+        return ((HDWCameraModel*)obj).disabled == NO;
     }];
+}
+
+-(NSArray*) enabledCamerasIds {
+    NSSet* keySet = [self enabledCamerasIdSet];
     
-    if (camerasIndexes.count == 1) {
-        [_cameras replaceObjectAtIndex:camerasIndexes.firstIndex withObject:newCamera];
-    } else {
-        [_cameras addObject:newCamera];
+    NSMutableArray* keyArray = [NSMutableArray array];
+    for (id key in cameras.allKeys) {
+        if ([keySet containsObject:key]) {
+            [keyArray addObject:key];
+        }
     }
+    
+    return keyArray;
+}
+
+-(NSArray*) enabledCameras {
+    NSSet* keySet = [self enabledCamerasIdSet];
+    
+    NSMutableArray* valueArray = [NSMutableArray array];
+    for (HDWCameraModel* camera in cameras.allValues) {
+        if ([keySet containsObject:camera.cameraId]) {
+            [valueArray addObject:camera];
+        }
+    }
+    
+    return valueArray;
 }
 
 @end
@@ -70,7 +119,7 @@
 -(id)init {
     self = [super init];
     if (self) {
-        servers = [[NSMutableArray alloc] init];
+        servers = [[NSMutableDictionary alloc] init];
     }
     
     return self;
@@ -83,44 +132,39 @@
 }
 
 -(void) addServer: (HDWServerModel*) server {
-    [servers addObject:server];
+    [servers setObject:server forKey:server.serverId];
+}
+
+-(NSUInteger) addOrUpdateServer: (HDWServerModel*) newServer {
+    HDWServerModel *server = [servers objectForKey:newServer.serverId];
+    if (server) {
+        [server update:newServer];
+        return NSNotFound;
+    } else {
+        [servers setObject:newServer forKey:newServer.serverId];
+        return [self indexOfServerWithId:newServer.serverId];
+    }
 }
 
 -(void) updateServer: (HDWServerModel*) server {
     HDWServerModel *existingServer = [self findServerById:server.serverId];
-    existingServer.name = server.name;
-    existingServer.streamingUrl = server.streamingUrl;
+    [existingServer update:server];
 }
 
--(void) addOrUpdateServer: (HDWServerModel*) newServer {
-    NSIndexSet *serverIndexes = [servers indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
-        HDWServerModel *server = (HDWServerModel*) obj;
-        if (server.serverId == newServer.serverId) {
-            *stop = YES;
-            return YES;
-        } else {
-            return NO;
-        }
-    }];
+-(NSIndexPath*) addOrReplaceCamera: (HDWCameraModel*) camera {
+    BOOL insert = NO;
     
-    if (serverIndexes.count == 1) {
-        [servers replaceObjectAtIndex:serverIndexes.firstIndex withObject:newServer];
-    } else {
-        [servers addObject:newServer];
-    }
-}
-
--(void) addOrUpdateCamera: (HDWCameraModel*) camera {
-    [camera.server addOrUpdateCamera:camera];
-}
-
--(HDWServerModel*) findServerById: (NSNumber*) id {
-    for (HDWServerModel* server in servers) {
-        if ([server.serverId isEqualToNumber:id])
-            return server;
+    if ([self findCameraById:camera.cameraId atServer:camera.server.serverId] == nil) {
+        insert = YES;
     }
     
-    return nil;
+    [camera.server addOrReplaceCamera:camera];
+    
+    return insert ? [self indexPathOfCameraWithId:camera.cameraId andServerId:camera.server.serverId] : nil;
+}
+
+-(HDWServerModel*) findServerById: (NSNumber*) serverId {
+    return [servers objectForKey:serverId];
 }
 
 -(HDWCameraModel*) findCameraById: (NSNumber*) cameraId atServer: (NSNumber*) serverId {
@@ -131,69 +175,30 @@
     return [server findCameraById:cameraId];
 }
 
--(HDWServerModel*) getServerAtIndex: (NSInteger) index {
-    return [servers objectAtIndex: index];
+-(HDWServerModel*) serverAtIndex: (NSInteger) index {
+    return [servers.allValues objectAtIndex: index];
 }
 
--(HDWCameraModel*) getCameraForIndexPath: (NSIndexPath*) indexPath {
-    HDWServerModel *server = [servers objectAtIndex: indexPath.section];
-    return [server.cameras objectAtIndex: indexPath.row];
+-(NSUInteger) indexOfServerWithId: (NSNumber*) serverId {
+    return [servers.allKeys indexOfObject:serverId];
 }
 
--(NSUInteger) getIndexOfServerWithId: (NSNumber*) serverId {
-    NSUInteger n = 0;
-    for (HDWServerModel* server in servers) {
-        if ([server.serverId isEqualToNumber:serverId])
-            return n;
-        
-        n++;
-    }
-    
-    return nil;
+-(HDWCameraModel*) cameraAtIndexPath: (NSIndexPath*) indexPath {
+    HDWServerModel *server = [self serverAtIndex:indexPath.section];
+    return [server cameraAtIndex:indexPath.row];
 }
 
--(NSIndexPath*) getIndexPathOfServerWithId: (NSNumber*) serverId {
-    NSInteger section = -1;
+-(NSIndexPath*) indexPathOfCameraWithId: (NSNumber*) cameraId andServerId: (NSNumber*) serverId {
+    HDWServerModel *server = [self findServerById:serverId];
     
-    NSInteger n = 0;
-    for (HDWServerModel* server in servers) {
-        if ([server.serverId isEqualToNumber:serverId]) {
-            section = n;
-            break;
-        }
-    }
-    
-    return [NSIndexPath indexPathWithIndex:section];
-}
-
--(NSIndexPath*) getIndexPathOfCameraWithId: (NSNumber*) cameraId andServerId: (NSNumber*) serverId {
-    NSInteger section = -1;
-    NSInteger row = -1;
-    
-    NSInteger n = 0;
-    for (HDWServerModel* server in servers) {
-        if ([server.serverId isEqualToNumber:serverId]) {
-            section = n;
-
-            NSInteger m = 0;
-            for (HDWCameraModel* camera in server.cameras) {
-                if ([camera.cameraId isEqualToNumber:cameraId]) {
-                    row = m;
-                    break;
-                }
-                
-                m++;
-            }
-        }
-        
-        n++;
-    }
+    NSInteger section = [self indexOfServerWithId:serverId];
+    NSInteger row = [server indexOfCameraWithId:cameraId];
     
     return [NSIndexPath indexPathForRow:row inSection:section];
 }
 
 -(void) removeServerById: (NSNumber*) serverId {
-    [servers removeObject:serverId];
+    [servers removeObjectForKey:serverId];
 }
 
 -(void) removeCameraById: (NSNumber*) cameraId andServerId: (NSNumber*) serverId {

@@ -12,6 +12,13 @@
 #import "AFJSONRequestOperation.h"
 #import "AFHTTPClient.h"
 
+enum CameraStatus {
+    Offline,
+    Unauthorized,
+    Online,
+    Recording
+};
+
 enum MessageType {
     Initial                 = 0,
     Ping                    = 1,
@@ -37,12 +44,14 @@ enum MessageType {
 
 @interface Header : UICollectionReusableView
 @property (weak, nonatomic) IBOutlet UILabel *label;
+@property (weak, nonatomic) IBOutlet UILabel *summaryLabel;
 @end
 
 @implementation Header
 
-- (void)setText:(NSString*)text {
+- (void)setText:(NSString*)text andSummary:(NSString*)summary {
     self.label.text = text;
+    self.summaryLabel.text = summary;
 }
 
 @end
@@ -60,75 +69,57 @@ enum MessageType {
     int messageType = [message[@"type"] intValue];
     NSString *objectName = message[@"objectName"];
 
-    NSMutableArray *newServers = [[NSMutableArray alloc] init];
-    NSMutableArray *newCameras = [[NSMutableArray alloc] init];
+    NSMutableIndexSet *newServers = [NSMutableIndexSet indexSet];
+    NSMutableArray *newCameras = [NSMutableArray array];
     
-    NSMutableArray *removedIndexPaths = [NSMutableArray array];
-    NSMutableIndexSet *removedSections = [NSMutableIndexSet indexSet];
+    NSMutableArray *removedCameras = [NSMutableArray array];
+    NSMutableIndexSet *removedServers = [NSMutableIndexSet indexSet];
 
     if (messageType == ResourceChange) {
         NSDictionary *resource = message[@"resource"];
         
         // resource changed
         if ([objectName isEqual: @"Server"]) {
-            HDWServerModel* server = [HDWServerModel alloc];
-            server.serverId = resource[@"id"];
-            server.name = resource[@"name"];
-            server.streamingUrl = resource[@"streamingUrl"];
+            HDWServerModel* server = [[HDWServerModel alloc] initWithDict:resource];
             
-            if ([_servers findServerById:server.serverId] == nil)
-                [newServers addObject:server];
-            
-            [_servers addOrUpdateServer:server];
+            NSUInteger index = [_servers addOrUpdateServer:server];
+            if (index != NSNotFound) {
+                [newServers addIndex:index];
+            }
         } else if ([objectName isEqual: @"Camera"]) {
-            HDWCameraModel* camera = [HDWCameraModel alloc];
-            camera.cameraId = resource[@"id"];
-            camera.server = [_servers findServerById:resource[@"parentId"]];
-            camera.name = resource[@"name"];
-            camera.status = resource[@"status"];
-            camera.physicalId = resource[@"physicalId"];
+            HDWCameraModel* camera = [[HDWCameraModel alloc] initWithDict:resource andServer:[_servers findServerById:resource[@"parentId"]]];
             
-            if ([_servers findCameraById:camera.cameraId atServer:camera.server.serverId] == nil)
-                [newCameras addObject:camera];
-            
-            [_servers addOrUpdateCamera:camera];
+            NSIndexPath* indexPath = [_servers addOrReplaceCamera:camera];
+            if (indexPath) {
+                [newCameras addObject:indexPath];
+            }
         }
     } else if (messageType == ResourceDelete) {
         NSNumber *resourceId = message[@"resourceId"];
         NSNumber *parentId = message[@"parentId"];
         
         if ([_servers findServerById:resourceId]) {
-            NSUInteger serverIndex = [_servers getIndexOfServerWithId:resourceId];
-            [removedSections addIndex:serverIndex];
+            NSUInteger serverIndex = [_servers indexOfServerWithId:resourceId];
             
-            [_servers removeServerById:resourceId];
+            if (serverIndex != NSNotFound) {
+                [removedServers addIndex:serverIndex];
+                [_servers removeServerById:resourceId];
+            }
         } else if ([_servers findCameraById:resourceId atServer:parentId]) {
-            NSIndexPath *indexPath = [_servers getIndexPathOfCameraWithId:resourceId andServerId:parentId];
-            [removedIndexPaths addObject:indexPath];
-            
-            [_servers removeCameraById:resourceId];
+            NSIndexPath *indexPath = [_servers indexPathOfCameraWithId:resourceId andServerId:parentId];
+            if (indexPath) {
+                [removedCameras addObject:indexPath];
+                [_servers removeCameraById:resourceId andServerId:parentId];
+            }
         }
     }
 
     [self.collectionView performBatchUpdates:^{
-        NSMutableArray *indexPaths = [NSMutableArray array];
-        NSMutableIndexSet *sections = [NSMutableIndexSet indexSet];
+        [self.collectionView deleteItemsAtIndexPaths:removedCameras];
+        [self.collectionView deleteSections:removedServers];
         
-        for (HDWServerModel* server in newServers) {
-            NSUInteger serverIndex = [_servers getIndexOfServerWithId:server.serverId];
-            [sections addIndex:serverIndex];
-        }
-        
-        for (HDWCameraModel* camera in newCameras) {
-            NSIndexPath *indexPath = [_servers getIndexPathOfCameraWithId:camera.cameraId andServerId:camera.server.serverId];
-            [indexPaths addObject:indexPath];
-        }
-        
-        [self.collectionView deleteItemsAtIndexPaths:removedIndexPaths];
-        [self.collectionView deleteSections:removedSections];
-        
-        [self.collectionView insertSections:sections];
-        [self.collectionView insertItemsAtIndexPaths:indexPaths];
+        [self.collectionView insertSections:newServers];
+        [self.collectionView insertItemsAtIndexPaths:newCameras];
 
 //        [self.collectionView reloadItemsAtIndexPaths:indexPaths];
 //        [self.collectionView reloadData];
@@ -160,25 +151,17 @@ enum MessageType {
     
     NSArray *jsonServers = JSON[@"servers"];
     for (NSDictionary *jsonServer in jsonServers) {
-        HDWServerModel *server = [[HDWServerModel alloc] init];
-        server.serverId = jsonServer[@"id"];
-        server.name = jsonServer[@"name"];
-        server.streamingUrl = [NSURL URLWithString: jsonServer[@"streaming_url"]];
+        HDWServerModel *server = [[HDWServerModel alloc] initWithDict:jsonServer];
         
         [serversDict setObject:server forKey:server.serverId];
     }
 
     NSArray *jsonCameras = JSON[@"cameras"];
     for (NSDictionary *jsonCamera in jsonCameras) {
-        HDWCameraModel *camera = [[HDWCameraModel alloc] init];
-        camera.cameraId = jsonCamera[@"id"];
-        camera.name = jsonCamera[@"name"];
-        camera.physicalId = jsonCamera[@"physical_id"];
+        HDWServerModel *server = [serversDict objectForKey: jsonCamera[@"parentId"]];
+        HDWCameraModel *camera = [[HDWCameraModel alloc] initWithDict:jsonCamera andServer:server];
         
-        HDWServerModel *server = [serversDict objectForKey: jsonCamera[@"parent_id"]];
-        camera.server = server;
-        
-        [server.cameras addObject: camera];
+        [server addOrReplaceCamera:camera];
     }
     
     [_servers addServers: [serversDict allValues]];
@@ -247,15 +230,16 @@ enum MessageType {
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    HDWServerModel* server = [_servers getServerAtIndex: section];
+    HDWServerModel* server = [_servers serverAtIndex: section];
     
-    return server.cameras.count;
+    return server.cameraCount;
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     HDWCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MyCell" forIndexPath:indexPath];
 
+    cell.imageView.asynchronous = NO;
     cell.imageView.reflectionScale = 0.5f;
     cell.imageView.reflectionAlpha = 0.25f;
     cell.imageView.reflectionGap = 10.0f;
@@ -263,10 +247,30 @@ enum MessageType {
     cell.imageView.shadowBlur = 5.0f;
     cell.imageView.cornerRadius = 10.0f;
 
-    HDWServerModel *server = [_servers getServerAtIndex: indexPath.section];
-    HDWCameraModel *camera = [server.cameras objectAtIndex:indexPath.row];
-   
-    [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
+    HDWCameraModel *camera = [_servers cameraAtIndexPath:indexPath];
+
+    switch (camera.status.intValue) {
+        case Offline: {
+            [cell.imageView setImageWithContentsOfFile:@"camera_offline.png"];
+            break;
+        }
+            
+        case Unauthorized: {
+            [cell.imageView setImageWithContentsOfFile:@"camera_unauthorized.png"];
+            break;
+        }
+            
+        case Online: {
+            [cell.imageView setImageWithContentsOfFile:@"camera.png"];
+            break;
+        }
+            
+        case Recording: {
+            break;
+        }
+            
+    }
+//    [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
     cell.labelView.text = camera.name;
     
     return cell;
@@ -276,8 +280,9 @@ enum MessageType {
     if(kind == UICollectionElementKindSectionHeader)
     {
         Header *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerTitle" forIndexPath:indexPath];
-        HDWServerModel *server = [_servers getServerAtIndex:indexPath.section];
-        [header setText: server.name];
+        HDWServerModel *server = [_servers serverAtIndex:indexPath.section];
+        NSString *summary = [NSString stringWithFormat:@"Address: %@", server.streamingUrl.host];
+        [header setText: server.name andSummary:summary];
         
         //modify your header
         return header;
@@ -291,7 +296,7 @@ enum MessageType {
         NSArray* selectedItems = [self.collectionView indexPathsForSelectedItems];
         NSIndexPath *indexPath = [selectedItems objectAtIndex:0];
         
-        HDWCameraModel *camera = [_servers getCameraForIndexPath: indexPath];
+        HDWCameraModel *camera = [_servers cameraAtIndexPath: indexPath];
         [[segue destinationViewController] setCamera:camera];
     }
 }

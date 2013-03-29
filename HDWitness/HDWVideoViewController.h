@@ -15,6 +15,7 @@
 
 @property HDWCameraModel *camera;
 
-@property (weak, nonatomic) IBOutlet MotionJpegImageView *motionJpegImageView;
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet MotionJpegImageView *imageView;
 
 @end

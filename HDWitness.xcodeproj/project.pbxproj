@@ -16,7 +16,6 @@
 		C71D5B0516ADBB9600C764B5 /* HDWAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B0416ADBB9600C764B5 /* HDWAppDelegate.m */; };
 		C71D5B0716ADBB9600C764B5 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B0616ADBB9600C764B5 /* Default.png */; };
 		C71D5B0916ADBB9600C764B5 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B0816ADBB9600C764B5 /* Default@2x.png */; };
-		C71D5B0B16ADBB9600C764B5 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B0A16ADBB9600C764B5 /* Default-568h@2x.png */; };
 		C71D5B0E16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B0C16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard */; };
 		C71D5B1116ADBB9600C764B5 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B0F16ADBB9600C764B5 /* MainStoryboard_iPad.storyboard */; };
 		C71D5B1416ADBB9600C764B5 /* HDWMasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B1316ADBB9600C764B5 /* HDWMasterViewController.m */; };
@@ -26,13 +25,24 @@
 		C71D5B2116ADBB9600C764B5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C71D5AF616ADBB9600C764B5 /* Foundation.framework */; };
 		C71D5B2916ADBB9600C764B5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C71D5B2716ADBB9600C764B5 /* InfoPlist.strings */; };
 		C71D5B2C16ADBB9600C764B5 /* HDWitnessTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */; };
+		C734CB301705F70B003450BF /* server.png in Resources */ = {isa = PBXBuildFile; fileRef = C734CB2F1705F70B003450BF /* server.png */; };
+		C734CB321705F714003450BF /* server_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C734CB311705F714003450BF /* server_offline.png */; };
 		C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */; };
 		C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EA170090E900AC48C4 /* camera_offline.png */; };
+		C744D1ED1704B4B100AC48C4 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EC1704B4B100AC48C4 /* Default.png */; };
+		C744D1EF1704B4B400AC48C4 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EE1704B4B400AC48C4 /* Default@2x.png */; };
+		C744D1F11704B4B700AC48C4 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F01704B4B700AC48C4 /* Default-568h@2x.png */; };
+		C744D1F31704B50A00AC48C4 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F21704B50A00AC48C4 /* Default-Portrait~ipad.png */; };
+		C744D1F71704B51800AC48C4 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F61704B51800AC48C4 /* Default-Landscape~ipad.png */; };
+		C744D1F81704B51F00AC48C4 /* Default-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F41704B50D00AC48C4 /* Default-Portrait@2x~ipad.png */; };
+		C744D1FA1704B52300AC48C4 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F91704B52300AC48C4 /* Default-Landscape@2x~ipad.png */; };
 		C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */; };
 		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
 		C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */; };
 		C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */; };
 		C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */; };
+		C7CCD4421705E16600BA30DF /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = C7CCD4411705E16600BA30DF /* camera.png */; };
+		C7CCD4441705E3EA00BA30DF /* camera_unauthorized.png in Resources */ = {isa = PBXBuildFile; fileRef = C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,9 +83,18 @@
 		C71D5B2816ADBB9600C764B5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C71D5B2A16ADBB9600C764B5 /* HDWitnessTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDWitnessTests.h; sourceTree = "<group>"; };
 		C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HDWitnessTests.m; sourceTree = "<group>"; };
+		C734CB2F1705F70B003450BF /* server.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = server.png; sourceTree = "<group>"; };
+		C734CB311705F714003450BF /* server_offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = server_offline.png; sourceTree = "<group>"; };
 		C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCameraModel.h; sourceTree = "<group>"; };
 		C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCameraModel.m; sourceTree = "<group>"; };
 		C744D1EA170090E900AC48C4 /* camera_offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = camera_offline.png; path = ../camera_offline.png; sourceTree = "<group>"; };
+		C744D1EC1704B4B100AC48C4 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		C744D1EE1704B4B400AC48C4 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		C744D1F01704B4B700AC48C4 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		C744D1F21704B50A00AC48C4 /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait~ipad.png"; sourceTree = "<group>"; };
+		C744D1F41704B50D00AC48C4 /* Default-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
+		C744D1F61704B51800AC48C4 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
+		C744D1F91704B52300AC48C4 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCollectionViewCell.h; sourceTree = "<group>"; };
 		C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCollectionViewCell.m; sourceTree = "<group>"; };
 		C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWECSViewController.h; sourceTree = "<group>"; };
@@ -86,6 +105,8 @@
 		C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MotionJpegImageView.mm; sourceTree = "<group>"; };
 		C7CAEBD216F9795100824E4B /* HDWVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWVideoViewController.h; sourceTree = "<group>"; };
 		C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWVideoViewController.m; sourceTree = "<group>"; };
+		C7CCD4411705E16600BA30DF /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
+		C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera_unauthorized.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +137,13 @@
 		C71D5AE516ADBB9600C764B5 = {
 			isa = PBXGroup;
 			children = (
+				C744D1F91704B52300AC48C4 /* Default-Landscape@2x~ipad.png */,
+				C744D1F61704B51800AC48C4 /* Default-Landscape~ipad.png */,
+				C744D1F41704B50D00AC48C4 /* Default-Portrait@2x~ipad.png */,
+				C744D1F21704B50A00AC48C4 /* Default-Portrait~ipad.png */,
+				C744D1F01704B4B700AC48C4 /* Default-568h@2x.png */,
+				C744D1EE1704B4B400AC48C4 /* Default@2x.png */,
+				C744D1EC1704B4B100AC48C4 /* Default.png */,
 				C71D5AFA16ADBB9600C764B5 /* HDWitness */,
 				C71D5B2416ADBB9600C764B5 /* HDWitnessTests */,
 				C71D5AF316ADBB9600C764B5 /* Frameworks */,
@@ -176,6 +204,10 @@
 		C71D5AFB16ADBB9600C764B5 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C734CB2F1705F70B003450BF /* server.png */,
+				C734CB311705F714003450BF /* server_offline.png */,
+				C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */,
+				C7CCD4411705E16600BA30DF /* camera.png */,
 				C744D1EA170090E900AC48C4 /* camera_offline.png */,
 				C71D5AFC16ADBB9600C764B5 /* HDWitness-Info.plist */,
 				C71D5AFD16ADBB9600C764B5 /* InfoPlist.strings */,
@@ -283,10 +315,20 @@
 				C71D5AFF16ADBB9600C764B5 /* InfoPlist.strings in Resources */,
 				C71D5B0716ADBB9600C764B5 /* Default.png in Resources */,
 				C71D5B0916ADBB9600C764B5 /* Default@2x.png in Resources */,
-				C71D5B0B16ADBB9600C764B5 /* Default-568h@2x.png in Resources */,
 				C71D5B0E16ADBB9600C764B5 /* MainStoryboard_iPhone.storyboard in Resources */,
 				C71D5B1116ADBB9600C764B5 /* MainStoryboard_iPad.storyboard in Resources */,
 				C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */,
+				C744D1ED1704B4B100AC48C4 /* Default.png in Resources */,
+				C744D1EF1704B4B400AC48C4 /* Default@2x.png in Resources */,
+				C744D1F11704B4B700AC48C4 /* Default-568h@2x.png in Resources */,
+				C744D1F31704B50A00AC48C4 /* Default-Portrait~ipad.png in Resources */,
+				C744D1F71704B51800AC48C4 /* Default-Landscape~ipad.png in Resources */,
+				C744D1F81704B51F00AC48C4 /* Default-Portrait@2x~ipad.png in Resources */,
+				C744D1FA1704B52300AC48C4 /* Default-Landscape@2x~ipad.png in Resources */,
+				C7CCD4421705E16600BA30DF /* camera.png in Resources */,
+				C7CCD4441705E3EA00BA30DF /* camera_unauthorized.png in Resources */,
+				C734CB301705F70B003450BF /* server.png in Resources */,
+				C734CB321705F714003450BF /* server_offline.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -450,6 +492,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -465,6 +508,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HDWitness/HDWitness-Prefix.pch";
 				INFOPLIST_FILE = "HDWitness/HDWitness-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -477,6 +521,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HDWitness/HDWitness-Prefix.pch";
 				INFOPLIST_FILE = "HDWitness/HDWitness-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
