@@ -202,13 +202,13 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
-QDateTime QnLicense::expirationDate() const {
+qint64 QnLicense::expirationTime() const {
     if(m_expiration.isEmpty())
-        return QDateTime();
+        return -1;
 
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
     result.setTimeSpec(Qt::UTC); /* Expiration is stored as UTC date-time. */
-    return result.toLocalTime();
+    return result.toMSecsSinceEpoch();
 }
 
 QnLicense::Type QnLicense::type() const {
@@ -308,12 +308,14 @@ void QnLicenseList::clear()
 
 int QnLicenseList::totalCamerasByClass(bool analog) const
 {
-    int n = 0;
-    foreach (QnLicensePtr license, m_licenses.values())
-        if (license->isAnalog() == analog)
-            n += license->cameraCount();
+    int result = 0;
 
-    return n;
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    foreach (QnLicensePtr license, m_licenses.values())
+        if (license->isAnalog() == analog && currentTime < license->expirationTime())
+            result += license->cameraCount();
+
+    return result;
 }
 
 bool QnLicenseList::haveLicenseKey(const QByteArray &key) const
