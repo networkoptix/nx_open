@@ -202,13 +202,13 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
-QDateTime QnLicense::expirationDate() const {
+qint64 QnLicense::expirationTime() const {
     if(m_expiration.isEmpty())
-        return QDateTime();
+        return -1;
 
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
     result.setTimeSpec(Qt::UTC); /* Expiration is stored as UTC date-time. */
-    return result.toLocalTime();
+    return result.toMSecsSinceEpoch();
 }
 
 QnLicense::Type QnLicense::type() const {

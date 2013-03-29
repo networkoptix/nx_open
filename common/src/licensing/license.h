@@ -51,7 +51,11 @@ public:
 
     QByteArray toString() const; 
 
-    QDateTime expirationDate() const;
+    /**
+     * \returns                         Expiration time of this license, in milliseconds since epoch, 
+     *                                  or -1 if this license never expires.
+     */
+    qint64 expirationTime() const;
     Type type() const;
     QString typeName() const;
 
