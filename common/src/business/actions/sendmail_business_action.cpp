@@ -203,14 +203,19 @@ QString QnSendMailBusinessAction::resourceString(bool useUrl) const {
 
 QString QnSendMailBusinessAction::timestampString(const QnBusinessParams &params, int aggregationCount) const {
     quint64 ts = QnBusinessEventRuntime::getEventTimestamp(params);
-    QString timeStamp = QDateTime::fromMSecsSinceEpoch(ts/1000).toString(Qt::SystemLocaleShortDate);
+
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
 
     QString result;
     int count = qMax(aggregationCount, 1);
     if (count == 1)
-        result = QObject::tr("at %1").arg(timeStamp);
+        result = QObject::tr("at %1 on %2", "%1 means time, %2 means date")
+                .arg(time.time().toString())
+                .arg(time.date().toString());
     else
-        result = QObject::tr("%n times since %1", "", count).arg(timeStamp);
+        result = QObject::tr("%n times since %1 %2", "%1 means time, %2 means date", count)
+                .arg(time.time().toString())
+                .arg(time.date().toString());
     result += QLatin1Char('\n');
     return result;
 }
