@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QGraphicsObject>
 
+#include <utils/app_server_file_cache.h>
+
 class QnWorkbenchGridMapper;
 class RectAnimator;
 class VariantAnimator;
@@ -29,34 +31,38 @@ public:
     AnimationTimer* animationTimer() const;
     void setAnimationTimer(AnimationTimer *timer);
 
-    QImage image() const;
-    void setImage(const QImage &image);
+    int imageId() const;
+    void setImageId(int imageId);
 
     QSize imageSize() const;
     void setImageSize(const QSize &imageSize);
 
     QRect sceneBoundingRect() const;
 
-    void animatedShow();
+    void showWhenReady();
     void animatedHide();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private slots:
+    void animatedShow();
     void updateGeometry();
 
     void at_opacityAnimator_finished();
+    void at_image_loaded(int id, const QImage& image);
 
 private:
     QRectF m_rect;
     QImage m_image;
+    int m_imageId;
     QSize m_imageSize;
     qreal m_targetOpacity;
     QRect m_sceneBoundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     RectAnimator *m_geometryAnimator;
     VariantAnimator *m_opacityAnimator;
+    QnAppServerFileCache *m_cache;
 };
 
 

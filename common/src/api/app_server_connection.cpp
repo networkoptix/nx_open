@@ -1017,6 +1017,11 @@ int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& 
     return addObjectAsync(EmailObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
+int QnAppServerConnection::requestStoredFileAsync(int id, QObject *target, const char *slot) {
+    //TODO: #GDM implement
+    return 1;
+}
+
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
 {
     QnRequestHeaderList requestHeaders(m_requestHeaders);

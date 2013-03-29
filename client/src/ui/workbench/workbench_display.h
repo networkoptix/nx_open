@@ -325,14 +325,13 @@ protected:
     void setWidgetsFrameOpacity(qreal opacity);
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
-
-    void updateBackground(QnWorkbenchLayout* layout);
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
     void updateFrameWidths();
 
     void updateCurtainedCursor();
+    void updateBackground(const QnLayoutResourcePtr &layout);
 
     void at_scene_destroyed();
     void at_scene_selectionChanged();

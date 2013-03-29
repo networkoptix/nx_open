@@ -11,11 +11,16 @@
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
+    m_imageId(0),
+    m_imageSize(1, 1),
+    m_targetOpacity(0),
     m_geometryAnimator(NULL),
-    m_opacityAnimator(NULL)
+    m_opacityAnimator(NULL),
+    m_cache(new QnAppServerFileCache(this))
 {
     setAcceptedMouseButtons(0);
 
+    connect(m_cache, SIGNAL(imageLoaded(int,QImage)), this, SLOT(at_image_loaded(int, const QImage &)));
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
@@ -26,6 +31,14 @@ QRectF QnGridBackgroundItem::boundingRect() const {
 
 QnGridBackgroundItem::~QnGridBackgroundItem() {
     return;
+}
+
+void QnGridBackgroundItem::showWhenReady() {
+    if (m_imageId == 0)
+        return;
+    m_image = m_cache->getImage(m_imageId);
+    if (!m_image.isNull())
+        animatedShow();
 }
 
 void QnGridBackgroundItem::animatedHide() {
@@ -90,12 +103,12 @@ void QnGridBackgroundItem::setAnimationTimer(AnimationTimer *timer) {
     m_geometryAnimator->setTimer(timer);
 }
 
-QImage QnGridBackgroundItem::image() const {
-    return m_image;
+int QnGridBackgroundItem::imageId() const {
+    return m_imageId;
 }
 
-void QnGridBackgroundItem::setImage(const QImage &image) {
-    m_image = image;
+void QnGridBackgroundItem::setImageId(int imageId) {
+    m_imageId = imageId;
 }
 
 QSize QnGridBackgroundItem::imageSize() const {
@@ -134,6 +147,13 @@ void QnGridBackgroundItem::updateGeometry() {
 void QnGridBackgroundItem::at_opacityAnimator_finished() {
     if (!qFuzzyCompare(this->opacity(), m_targetOpacity))
          m_opacityAnimator->animateTo(m_targetOpacity);
+}
+
+void QnGridBackgroundItem::at_image_loaded(int id, const QImage &image) {
+    if (id != m_imageId)
+        return;
+    m_image = image;
+    animatedShow();
 }
 
 void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
