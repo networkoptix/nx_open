@@ -391,6 +391,9 @@ bool QnPlOnvifResource::initInternal()
 
     calcTimeDrift();
 
+    if (m_appStopping)
+        return false;
+
     if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
     {
         if (!fetchAndSetDeviceInformation(false) && getMediaUrl().isEmpty())
@@ -402,9 +405,19 @@ bool QnPlOnvifResource::initInternal()
             m_needUpdateOnvifUrl = false;
     }
 
+    if (m_appStopping)
+        return false;
+
     if (!fetchAndSetVideoSource())
         return false;
+
+    if (m_appStopping)
+        return false;
+
     fetchAndSetAudioSource();
+
+    if (m_appStopping)
+        return false;
 
     if (!fetchAndSetResourceOptions()) 
     {
@@ -412,11 +425,17 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
+    if (m_appStopping)
+        return false;
+
     //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
     //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
 
     //Additional camera settings
     fetchAndSetCameraSettings();
+
+    if (m_appStopping)
+        return false;
 
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
     if (m_ptzController)
@@ -438,7 +457,15 @@ bool QnPlOnvifResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
         setCameraCapability( Qn::RelayInputCapability, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
     }
+
+    if (m_appStopping)
+        return false;
+
     fetchRelayInputInfo();
+
+    if (m_appStopping)
+        return false;
+
     //if( !m_relayInputs.empty() )
     //    setCameraCapability( Qn::relayInput, true );
 
@@ -1752,6 +1779,9 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
     if (!fetchVideoSourceToken())
         return false;
 
+    if (m_appStopping)
+        return false;
+
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
 
@@ -1768,6 +1798,9 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
         return false;
 
     }
+
+    if (m_appStopping)
+        return false;
 
     std::string srcToken = m_videoSourceToken.toStdString();
     for (uint i = 0; i < response.Configurations.size(); ++i)
@@ -1792,6 +1825,9 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
         else {
             return true;
         }
+
+        if (m_appStopping)
+            return false;
     }
 
     return false;
@@ -1945,6 +1981,9 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
         settings->makeGetRequest();
     }
 
+    if (m_appStopping)
+        return;
+
     OnvifCameraSettingReader reader(*settings);
 
     reader.read() && reader.proceed();
@@ -1954,6 +1993,8 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     for (; it != onvifSettings.end(); ++it) {
         setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
+        if (m_appStopping)
+            return;
     }
 
 

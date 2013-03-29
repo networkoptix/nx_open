@@ -1063,6 +1063,8 @@ void QnMain::run()
 
     exec();
 
+    QnResource::onStopApplication();
+
     stopObjects();
 
     QnResource::stopCommandProc();

@@ -220,6 +220,8 @@ public:
 
     virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
+    static void onStopApplication();
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -319,6 +321,7 @@ protected:
 
     mutable QnParamList m_resourceParamList;
 
+    static bool m_appStopping;
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
