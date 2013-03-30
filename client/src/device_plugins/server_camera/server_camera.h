@@ -3,15 +3,11 @@
 
 #include "core/resource/camera_resource.h"
 
-class QnServerCameraProcessor : public QObject, public QnResourceProcessor
+class QnLocalFileProcessor : public QObject, public QnResourceProcessor
 {
     Q_OBJECT
 public:
     void processResources(const QnResourceList &resources);
-private:
-    void determineOptimalIF(QnMediaServerResource* mediaServer);
-private slots:
-    void at_serverIfFound(const QString &);
 };
 
 class QnServerCamera: public QnVirtualCameraResource
@@ -25,8 +21,8 @@ public:
     virtual QString manufacture() const;
     virtual void setIframeDistance(int frames, int timems);
 
-    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
 protected:
     virtual QString getUniqueId() const override;
     virtual void setCropingPhysical(QRect croping);

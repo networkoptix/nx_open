@@ -17,8 +17,8 @@
 #include <utils/common/util.h>
 
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/linear_combination.h>
-#include <ui/common/color_transformations.h>
+#include <utils/math/linear_combination.h>
+#include <utils/math/color_transformations.h>
 #include <ui/common/geometry.h>
 
 #include <ui/widgets/palette_widget.h>
@@ -539,9 +539,12 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
     if(!widget)
         return false;
 
+    if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
+        return true; /* Draw nothing. */
+
     qreal itemOpacity = qvariant_cast<qreal>(widget->property(Qn::ItemViewItemBackgroundOpacity), 1.0);
     if(qFuzzyCompare(itemOpacity, 1.0))
-        return false;
+        return false; /* Let the default implementation handle it. */
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * itemOpacity);

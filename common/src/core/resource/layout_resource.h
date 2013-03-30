@@ -52,7 +52,7 @@ public:
 
     QHash<int, QVariant> data() const;
 
-    void requestStore() { emit storeRequested(); } // TODO: hack
+    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: hack
 
     QnTimePeriod getLocalRange() const;
     void setLocalRange(const QnTimePeriod& value);
@@ -61,13 +61,18 @@ public:
 
     virtual void setUrl(const QString& value) override;
 
+    bool userCanEdit() const;
+
+    void setUserCanEdit(bool value);
+
 signals:
-    void itemAdded(const QnLayoutItemData &item);
-    void itemRemoved(const QnLayoutItemData &item);
-    void itemChanged(const QnLayoutItemData &item);
-    void cellAspectRatioChanged();
-    void cellSpacingChanged();
-    void storeRequested();
+    void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+    void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+    void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+    void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
+    void cellSpacingChanged(const QnLayoutResourcePtr &resource);
+    void userCanEditChanged(const QnLayoutResourcePtr &resource);
+    void storeRequested(const QnLayoutResourcePtr &resource);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
@@ -83,6 +88,7 @@ private:
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
+    bool m_userCanEdit;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

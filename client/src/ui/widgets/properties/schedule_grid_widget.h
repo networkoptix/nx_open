@@ -2,6 +2,7 @@
 #define QN_SCHEDULE_GRID_WIDGET_H
 
 #include <QtGui/QWidget>
+#include <core/misc/schedule_recording_type.h>
 
 static const int SEL_CELL_CLR_DELTA = 40;
 static const int TEXT_SPACING = 4;
@@ -18,7 +19,13 @@ public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
     virtual ~QnScheduleGridWidget();
 
-    enum ParamType { FirstParam, SecondParam, ColorParam, ColorInsideParam, ParamType_Count };
+    enum ParamType {
+        FirstParam,
+        SecondParam,
+        RecordTypeParam,
+        DiffersFlagParam,
+
+        ParamType_Count };
 
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);
@@ -31,6 +38,9 @@ public:
     void setCellValue(const QPoint &cell, ParamType paramType, const QVariant &value);
     void resetCellValues();
 
+    Qn::RecordingType cellRecordingType(const QPoint &cell) const;
+    void setCellRecordingType(const QPoint &cell, const Qn::RecordingType &value);
+
     virtual QSize minimumSizeHint() const;
 
     void setEnabled(bool val);
@@ -39,19 +49,12 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMaxFps(int maxFps);
-    int getMaxFps();
+    void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
+    int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
 
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
-
-    /**
-     * @brief cellValueNotChanged       This signal is emitted when there was a try to change cell value
-     *                                  but real value was the same.
-     */
-    void cellValueNotChanged(const QPoint &cell);
-
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -92,6 +95,9 @@ private:
     bool m_mousePressed;
     QFont m_labelsFont;
     QFont m_gridFont;
+
+    QColor m_colors[Qn::RecordingType_Count];
+    QColor m_insideColors[Qn::RecordingType_Count];
 
     bool m_enabled;
     bool m_readOnly;

@@ -2,7 +2,7 @@
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/scoped_painter_rollback.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 extern "C" {
 #ifdef WIN32
@@ -634,7 +634,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
             goto error_label;
         }
 
-        // TODO: use avcodec_encode_video2 instead
+        // TODO: #vasilenko avoid using deprecated methods
         out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
         if (out_size == 0)
             out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer

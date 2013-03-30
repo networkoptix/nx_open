@@ -3,6 +3,26 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 
+QString QnStreamQualityToString(QnStreamQuality value) {
+    switch(value) {
+        case QnQualityLowest:
+            return QObject::tr("Lowest");
+        case QnQualityLow:
+            return QObject::tr("Low");
+        case QnQualityNormal:
+            return QObject::tr("Normal");
+        case QnQualityHigh:
+            return QObject::tr("High");
+        case QnQualityHighest:
+            return QObject::tr("Highest");
+        case QnQualityPreSet:
+            return QObject::tr("Preset");
+    default:
+        break;
+    }
+    return QObject::tr("Undefined");
+}
+
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
 QnMediaResource::QnMediaResource():
@@ -23,7 +43,7 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, QnStreamQu
 }
 
 static QnDefaultResourceVideoLayout defaultVideoLayout;
-const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
     getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
@@ -44,7 +64,7 @@ const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractMed
 }
 
 static QnEmptyResourceAudioLayout audioLayout;
-const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
+const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return &audioLayout;
 }

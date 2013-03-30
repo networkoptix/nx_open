@@ -143,7 +143,7 @@ protected slots:
 
     void updateLocalOffset();
    
-    void updateThumbnailsLoader();
+    Q_SLOT void updateThumbnailsLoader();
     
     void updateCurrentWidgetFlags();
 
@@ -157,7 +157,6 @@ protected slots:
     void at_widget_optionsChanged(QnResourceWidget *widget);
     void at_widget_optionsChanged();
 
-    void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
     void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodRole type);

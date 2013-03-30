@@ -6,6 +6,7 @@
 #include "core/datapacket/media_data_packet.h"
 
 class QnArchiveStreamReader;
+class QnAviArchiveDelegate;
 
 class QnAviResource : public QnAbstractArchiveResource
 {
@@ -20,8 +21,8 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
     virtual QString toString() const;
 
-    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
 
     void setStorage(QnStorageResourcePtr);
     QnStorageResourcePtr getStorage() const;
@@ -34,7 +35,7 @@ public:
 
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
-
+    QnAviArchiveDelegate* createArchiveDelegate() const;
 protected:
 
 private:

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>762</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -377,6 +377,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="isHardwareDecodingCheckBox">
+            <property name="text">
+             <string>Use advanced hardware acceleration</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -407,6 +414,13 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="readOnlyWarningLabel">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
    <item>

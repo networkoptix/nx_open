@@ -83,7 +83,7 @@ int nullGsoapFdisconnect(struct soap*)
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
     QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
-    qSocket.writeDatagram(QByteArray(s, n), WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
+    qSocket.writeDatagram(QByteArray(s, (int) n), WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -111,7 +111,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 //Socket send through QUdpSocket
 int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 {
-    QString recvData = QString::fromLatin1(QByteArray(s, n).data());
+    QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data());
     //avoiding sending numerous data
     if (!recvData.startsWith(QString::fromLatin1("<?xml"))) {
         return SOAP_OK;
@@ -132,7 +132,7 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 
 int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
 {
-    QString recvData = QString::fromLatin1(QByteArray(s, n).data());
+    QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data());
     //avoiding sending numerous data
     if (!recvData.startsWith(QString::fromLatin1("<?xml"))) {
         return SOAP_OK;
@@ -440,6 +440,8 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
     }
 
     QString scopes = QLatin1String(source->Scopes->__item);
+
+
     int posStart = scopes.indexOf(QLatin1String(SCOPES_HARDWARE_PREFIX));
     if (posStart == -1) {
         return QString();
@@ -573,11 +575,14 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
 
     QUdpSocket qSocket;
 
-    if (iface) {
+    if (iface) 
+    {
         if (!bindToInterface(qSocket, *iface))
             return;
-    } else {
-        qSocket.bind(QHostAddress(QString::fromLatin1("192.168.0.111")), 0);
+    } 
+    else 
+    {
+        return;
     }
 
     QStringList addrPrefixes = getAddrPrefixes(iface ? iface->address.toString() : camAddr->toString());

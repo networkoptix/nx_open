@@ -9,9 +9,10 @@
 #include <core/resource_managment/resource_pool.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
+#include <utils/common/email.h>
 
 #include <ui/common/read_only.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <client/client_globals.h>
@@ -36,10 +37,10 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
         qnNullWarning(context);
 
     foreach(const QnResourcePtr &user, context->resourcePool()->getResourcesWithFlag(QnResource::user))
-        m_userByLogin[user->getName()] = user;
+        m_userByLogin[user->getName().toLower()] = user;
 
     for(int i = 0; i < ElementCount; i++) {
-        m_valid[i] = false;
+        m_valid[i] = true;
         m_flags[i] = Editable | Visible;
     }
 
@@ -48,26 +49,22 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     ui->accessRightsGroupbox->hide();
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateLogin()));
-    connect(ui->currentPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
+    connect(ui->currentPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
-    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
     connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
-    connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
+    connect(ui->emailEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateEmail()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(updateAccessRights()));
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
     connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
+    connect(ui->emailEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(setHasChanges()));
 
     //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
 
-    {
-        QPalette palette = ui->hintLabel->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-        ui->hintLabel->setPalette(palette);
-    }
+    setWarningStyle(ui->hintLabel);
 
     updateAll();
 }
@@ -129,6 +126,11 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         setReadOnly(ui->accessRightsGroupbox, !editable);
         // TODO: #gdm if readonly then do not save anyway
         break;
+    case Email:
+        ui->emailEdit->setVisible(visible);
+        ui->emailLabel->setVisible(visible);
+        ui->emailEdit->setReadOnly(!editable);
+        break;
     default:
         break;
     }
@@ -142,6 +144,11 @@ void QnUserSettingsDialog::setEditorPermissions(quint64 rights) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
+}
+
+void QnUserSettingsDialog::setFocusedElement(QString element) {
+    if (element == QLatin1String("email"))
+        ui->emailEdit->setFocus();
 }
 
 QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element element) const {
@@ -181,14 +188,19 @@ void QnUserSettingsDialog::setCurrentPassword(const QString &currentPassword) {
 }
 
 void QnUserSettingsDialog::updateFromResource() {
-    if(!m_user) {
+    if(!m_user)
+        return;
+
+    if(m_user->getId() == 0) {
         ui->loginEdit->clear();
         ui->currentPasswordEdit->clear();
         ui->passwordEdit->clear();
         ui->passwordEdit->setPlaceholderText(QString());
         ui->confirmPasswordEdit->clear();
         ui->confirmPasswordEdit->setPlaceholderText(QString());
-        ui->accessRightsComboBox->setCurrentIndex(-1);
+        ui->emailEdit->clear();
+
+        loadAccessRightsToUi(Qn::GlobalLiveViewerPermissions);
     } else {
         QString placeholder(6, QLatin1Char('*'));
 
@@ -198,6 +210,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->passwordEdit->clear();
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
         ui->confirmPasswordEdit->clear();
+        ui->emailEdit->setText(m_user->getEmail());
 
         loadAccessRightsToUi(context()->accessController()->globalPermissions(m_user));
         updatePassword();
@@ -210,14 +223,15 @@ void QnUserSettingsDialog::submitToResource() {
         return;
 
     m_user->setName(ui->loginEdit->text());
-    if(!ui->passwordEdit->text().isEmpty())
-        m_user->setPassword(ui->passwordEdit->text());
+//    if(!ui->passwordEdit->text().isEmpty())
+    m_user->setPassword(ui->passwordEdit->text()); //empty text means 'no change'
 
     quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
     if (rights == CUSTOM_RIGHTS)
         rights = readAccessRightsAdvanced();
 
     m_user->setPermissions(rights);
+    m_user->setEmail(ui->emailEdit->text());
 
     setHasChanges(false);
 }
@@ -245,7 +259,7 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
 
     QPalette palette = this->palette();
     if(!valid)
-        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        setWarningStyle(&palette);
 
     switch(element) {
     case Login:
@@ -261,11 +275,14 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
     case AccessRights:
         ui->accessRightsLabel->setPalette(palette);
         break;
+    case Email:
+        ui->emailLabel->setPalette(palette);
+        break;
     default:
         break;
     }
 
-    bool allValid = m_valid[Login] && m_valid[Password] && m_valid[AccessRights];
+    bool allValid = m_valid[Login] && m_valid[Password] && m_valid[AccessRights] && m_valid[Email];
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(allValid);
 }
 
@@ -279,13 +296,15 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Login cannot be empty.");
             valid = false;
         }
-        if(m_userByLogin.contains(ui->loginEdit->text()) && m_userByLogin.value(ui->loginEdit->text()) != m_user) {
+        if(m_userByLogin.contains(ui->loginEdit->text().toLower()) && m_userByLogin.value(ui->loginEdit->text().toLower()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
         }
         break;
     case CurrentPassword:
-        if((!ui->passwordEdit->text().isEmpty() || !ui->confirmPasswordEdit->text().isEmpty()) && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
+        if((!ui->passwordEdit->text().isEmpty() ||
+            !ui->confirmPasswordEdit->text().isEmpty())
+                && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
             if(ui->currentPasswordEdit->text().isEmpty()) {
                 hint = tr("To change your password, please\n enter your current password.");
                 valid = false;
@@ -296,11 +315,14 @@ void QnUserSettingsDialog::updateElement(Element element) {
         }
         break;
     case Password:
-        if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty() && ui->passwordEdit->placeholderText().isEmpty()) {
-            hint = tr("Password cannot be empty.");
-            valid = false;
-        } else if(ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
+        if (ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
             hint = tr("Passwords do not match.");
+            valid = false;
+        } else if ( (ui->passwordEdit->text().isEmpty() || ui->confirmPasswordEdit->text().isEmpty())
+                    && ui->passwordEdit->placeholderText().isEmpty() // creating new user
+                  )
+        {
+            hint = tr("Password cannot be empty.");
             valid = false;
         }
         break;
@@ -314,6 +336,12 @@ void QnUserSettingsDialog::updateElement(Element element) {
                 ui->advancedButton->setChecked(true);
             else
                 fillAccessRightsAdvanced(rights);
+        }
+        break;
+    case Email:
+        if(!ui->emailEdit->text().trimmed().isEmpty() && !QnEmail::isValid(ui->emailEdit->text())) {
+            hint = tr("Invalid email address.");
+            valid = false;
         }
         break;
     default:
@@ -335,6 +363,7 @@ void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights) {
 }
 
 void QnUserSettingsDialog::updateAll() {
+    updateElement(Email);
     updateElement(AccessRights);
     updateElement(Password);
     updateElement(CurrentPassword);

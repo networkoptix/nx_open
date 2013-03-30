@@ -130,7 +130,7 @@ void NetworkOptixModuleRevealer::run()
             it != m_pollSet.end();
             ++it )
         {
-            if( !(it.revents() & PollSet::etRead) )
+            if( !(it.eventType() & PollSet::etRead) )
                 continue;
 
             UDPSocket* udpSocket = static_cast<UDPSocket*>(it.socket());

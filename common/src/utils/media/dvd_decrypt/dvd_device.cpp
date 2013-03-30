@@ -883,7 +883,7 @@ static int libc_readv ( dvdcss_t dvdcss, struct iovec *p_iovec, int i_blocks )
          i_index;
          i_index--, p_iovec++ )
     {
-        i_len  = p_iovec->iov_len;
+        i_len  = (int) p_iovec->iov_len;
         p_base = (unsigned char*) p_iovec->iov_base;
 
         if( i_len <= 0 )
@@ -969,7 +969,7 @@ static int win_readv ( dvdcss_t dvdcss, struct iovec *p_iovec, int i_blocks )
 
     for( i_index = i_blocks; i_index; i_index-- )
     {
-        i_blocks_total += p_iovec[i_index-1].iov_len;
+        i_blocks_total += (int) p_iovec[i_index-1].iov_len;
     }
 
     if( i_blocks_total <= 0 ) return 0;
@@ -1015,7 +1015,7 @@ static int win_readv ( dvdcss_t dvdcss, struct iovec *p_iovec, int i_blocks )
         /* if we read less blocks than asked, we'll just end up copying
          * garbage, this isn't an issue as we return the number of
          * blocks actually read */
-        i_blocks_total -= ( p_iovec[i_index].iov_len / DVDCSS_BLOCK_SIZE );
+        i_blocks_total -= int( p_iovec[i_index].iov_len / DVDCSS_BLOCK_SIZE );
     }
 
     dvdcss->i_pos += i_blocks_read;

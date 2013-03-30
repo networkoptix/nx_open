@@ -49,8 +49,9 @@ QString QnPlISDResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
 
     QString host = url.host();
     int port = url.port();
@@ -64,7 +65,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
         port = 80;
 
     CLHttpStatus status;
-    QString name = QString(QLatin1String(downloadFile(status, QLatin1String("api/param.cgi?req=General.Brand.ModelName"), QHostAddress(host), port, timeout, auth)));
+    QString name = QString(QLatin1String(downloadFile(status, QLatin1String("api/param.cgi?req=General.Brand.ModelName"), host, port, timeout, auth)));
 
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     //name.replace(QLatin1Char('-'), QString()); // remove spaces
@@ -74,7 +75,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
 
     if (name.length()==0)
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
 
     name = getValueFromString(name).trimmed();
@@ -85,7 +86,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
         name.chop(1);
 
 
-    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("/api/param.cgi?req=Network.1.MacAddress"), QHostAddress(host), port, timeout, auth)));
+    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("/api/param.cgi?req=Network.1.MacAddress"), host, port, timeout, auth)));
 
     mac.replace(QLatin1Char(' '), QString()); // remove spaces
     mac.replace(QLatin1Char('\r'), QString()); // remove spaces
@@ -94,12 +95,12 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
 
     if (mac.isEmpty() || name.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
 
     mac = getValueFromString(mac).trimmed();
 
-    int n = mac.length();
+    //int n = mac.length();
 
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);
@@ -110,7 +111,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
@@ -118,12 +119,13 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(mac);
-    resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
-
-    return resource;
+    QList<QnResourcePtr> result;
+    result << resource;
+    return result;
 }
 
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
@@ -192,7 +194,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
             return local_result; // already found;
         }

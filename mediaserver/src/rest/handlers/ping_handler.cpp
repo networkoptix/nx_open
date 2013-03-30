@@ -11,6 +11,10 @@ QnRestPingHandler::QnRestPingHandler()
 
 int QnRestPingHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    Q_UNUSED(contentType)
+
     result.append(QString("<pong>%1</pong>\n").arg(serverGuid()).toUtf8());
     return CODE_OK;
 }
@@ -21,10 +25,7 @@ int QnRestPingHandler::executePost(const QString& path, const QnRequestParamList
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestPingHandler::description(TCPSocket* tcpSocket) const
+QString QnRestPingHandler::description() const
 {
-    Q_UNUSED(tcpSocket)
-    QString rez;
-    rez += "Returns server ping message";
-    return rez;
+    return "Returns server ping message";
 }

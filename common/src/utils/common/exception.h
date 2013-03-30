@@ -6,6 +6,7 @@
 #include <QString>
 #include <QByteArray>
 
+// TODO: #Elric use this class for Ivan's custom exceptions
 class QnException: virtual public std::exception {
 public:
     QnException(const QString &message = QString()): m_message(message) {}

@@ -18,11 +18,11 @@ class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     // TODO: #gdm parent is always the last parameter in constructor. This is a Qt convention.
-    explicit QnResourcePoolModel(QObject *parent = 0, Qn::NodeType rootNodeType = Qn::RootNode);
+    explicit QnResourcePoolModel(QObject *parent = 0, Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -69,25 +69,22 @@ private slots:
     void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
-    void at_resource_parentIdChanged();
     void at_resource_resourceChanged(const QnResourcePtr &resource);
-    void at_resource_resourceChanged();
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-    void at_resource_itemAdded(const QnLayoutItemData &item);
     void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-    void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
-    /** Root node. */
-    Node *m_rootNode;
+    /** Root nodes array */
+    Node *m_rootNodes[Qn::NodeTypeCount];
 
-    /** Bastard node for hidden resources. */
-    Node *m_bastardNode;
-
-    Node *m_serversNode, *m_localNode, *m_usersNode;
+    /** Set of top-level node types */
+    QList<Qn::NodeType> m_rootNodeTypes;
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;
+
+    /** Mapping for recorder nodes, by resource. */
+    QHash<QnResource *, QHash<int, Node *> > m_recorderNodeByResource;
 
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, Node *> m_itemNodeByUuid;
@@ -100,6 +97,9 @@ private:
 
     /** Type of root node - for the models with narrowed scopes */
     Qn::NodeType m_rootNodeType;
+
+    /** If set to true only top-level resources should be displayed */
+    bool m_flat;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

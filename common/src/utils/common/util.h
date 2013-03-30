@@ -5,7 +5,7 @@
 
 #include <QtCore/QString>
 
-#include "math.h" /* For INT64_MAX. */
+#include <utils/math/math.h> /* For INT64_MAX. */
 
 template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
@@ -46,7 +46,7 @@ QN_EXPORT int digitsInNumber(unsigned num);
  * \param total                         Total duration in seconds. 
  *                                      Pass zero to convert position only.
  */
-QN_EXPORT QString formatDuration(unsigned position, unsigned total = 0);
+QN_EXPORT QString formatDuration(unsigned position, unsigned total = 0); // TODO: #Elric move to string.h
 
 /**
  * Gets param from string;   for example str= {param1="param_val" sdhksjh}
@@ -59,6 +59,8 @@ QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
 QN_EXPORT QString closeDirPath(const QString& value);
 
 QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
+
+QN_EXPORT qint64 getDiskTotalSpace(const QString& root);
 
 #define DATETIME_NOW INT64_MAX 
 
@@ -82,6 +84,7 @@ QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
 
 quint64 QN_EXPORT getUsecTimer();
 
+// TODO: #Elric move to separate header
 template <typename T, std::size_t N = CL_MEDIA_ALIGNMENT>
 class AlignmentAllocator {
 public:
@@ -160,7 +163,7 @@ public:
 /*
 * Returns current time zone offset in seconds
 */
-int currentTimeZone();
+int currentTimeZone(); // TODO: #Elric move to time.h
 
 
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;

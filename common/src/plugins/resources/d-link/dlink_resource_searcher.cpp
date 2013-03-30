@@ -144,7 +144,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(smac);
-            resource->setHostAddress(sender, QnDomainMemory);
+            resource->setHostAddress(sender.toString(), QnDomainMemory);
 
             resource->setDiscoveryAddr(iface.address);
 
@@ -163,8 +163,9 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(doMultichannelCheck)
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())
@@ -177,10 +178,10 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
         port = 80;
 
     CLHttpStatus status;
-    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("common/info.cgi"), QHostAddress(host), port, timeout, auth)));
+    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("common/info.cgi"), host, port, timeout, auth)));
 
     if (response.length()==0)
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
     QStringList lines = response.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
 
@@ -203,12 +204,12 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
     }
 
     if (mac.isEmpty() || name.isEmpty())
-        return QnResourcePtr(0);
+        return QList<QnResourcePtr>();
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
-        return QnResourcePtr(0);;
+        return QList<QnResourcePtr>();
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
 
@@ -216,11 +217,12 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
     resource->setName(name);
     resource->setMAC(mac);
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
-    resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
-
-    return resource;
+    QList<QnResourcePtr> result;
+    result << resource;
+    return result;
 }
 

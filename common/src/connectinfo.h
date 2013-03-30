@@ -11,6 +11,7 @@ struct QnConnectInfo
     QString version;
     QList<QnCompatibilityItem> compatibilityItems;
     int proxyPort;
+    QString ecsGuid;
 };
 
 typedef QSharedPointer<QnConnectInfo> QnConnectInfoPtr;

@@ -32,14 +32,14 @@ qint64 QnBufferedFrameDisplayer::bufferedDuration() {
         return m_lastQueuedTime - m_queue.front()->pkt_dts;
 }
 
-bool QnBufferedFrameDisplayer::addFrame(CLVideoDecoderOutput* outFrame) 
+bool QnBufferedFrameDisplayer::addFrame(const QSharedPointer<CLVideoDecoderOutput>& outFrame) 
 {
     bool wasWaiting = false;
     bool needWait;
     do {
         m_sync.lock();
         m_lastQueuedTime = outFrame->pkt_dts;
-        needWait = !m_needStop && (m_queue.size() == m_queue.maxSize() 
+        needWait = !needToStop() && (m_queue.size() == m_queue.maxSize() 
                     || (m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME));
         m_sync.unlock();
         if (needWait) {
@@ -63,13 +63,13 @@ void QnBufferedFrameDisplayer::clear() {
     start();
 }
 
-qint64 QnBufferedFrameDisplayer::getLastDisplayedTime() 
+qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() 
 {
     QMutexLocker lock(&m_sync);
     return m_lastDisplayedTime;
 }
 
-void QnBufferedFrameDisplayer::setLastDisplayedTime(qint64 value)
+void QnBufferedFrameDisplayer::overrideTimestampOfNextFrameToRender(qint64 value)
 {
     QMutexLocker lock(&m_sync);
     m_lastDisplayedTime = value;
@@ -77,8 +77,8 @@ void QnBufferedFrameDisplayer::setLastDisplayedTime(qint64 value)
 
 void QnBufferedFrameDisplayer::run() 
 {
-    CLVideoDecoderOutput* frame;
-    while (!m_needStop)
+    QSharedPointer<CLVideoDecoderOutput> frame;
+    while (!needToStop())
     {
         if (m_queue.size() > 0)
         {

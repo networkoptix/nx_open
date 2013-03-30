@@ -3,7 +3,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
-#include "ui/common/color_transformations.h"
+#include "utils/math/color_transformations.h"
 
 QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) 
 {

@@ -1,11 +1,9 @@
 #include "av_client_pull.h"
 
 #include "../resource/av_resource.h"
-#include "utils/common/rand.h"
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
     QnClientPullMediaStreamProvider(res),
-    QnLiveStreamProvider(res),
     m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
 {
     QnSecurityCamResourcePtr ceqResource = getResource().dynamicCast<QnSecurityCamResource>();
@@ -25,7 +23,7 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
     m_streamParam.insert("image_top", 0);
     m_streamParam.insert("image_bottom", maxResolution.height());
 
-    m_streamParam.insert("streamID", (int)cl_get_random_val(1, 32000));
+    m_streamParam.insert("streamID", 1 + static_cast<qint64>(qrand()) * (32000 - 1) / RAND_MAX);
 
     m_streamParam.insert("resolution", QLatin1String("full"));
     m_streamParam.insert("Quality", QLatin1String("11"));

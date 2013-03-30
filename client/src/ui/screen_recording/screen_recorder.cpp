@@ -12,8 +12,8 @@
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
-#   include <device_plugins/desktop/screen_grabber.h>
-#   include <device_plugins/desktop/desktop_file_encoder.h>
+#   include <device_plugins/desktop_win/screen_grabber.h>
+#   include <device_plugins/desktop_win/desktop_file_encoder.h>
 #endif
 
 namespace {
@@ -74,7 +74,7 @@ namespace {
         switch(captureMode) {
         case Qn::WindowMode:             return QnScreenGrabber::CaptureMode_Application;
         case Qn::FullScreenMode:         return QnScreenGrabber::CaptureMode_DesktopWithAero;
-        case Qn::FullScreenNoeroMode:    return QnScreenGrabber::CaptureMode_DesktopWithoutAero;
+        case Qn::FullScreenNoAeroMode:    return QnScreenGrabber::CaptureMode_DesktopWithoutAero;
         default:
             qnWarning("Invalid capture mode value '%1', treating as window mode.", static_cast<int>(captureMode));
             return QnScreenGrabber::CaptureMode_Application;

@@ -379,6 +379,14 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
 
+    factory(Qn::OpenServerSettingsAction).
+        flags(Qn::NoTarget).
+        text(tr("Settings..."));
+
+    factory(Qn::OpenPopupSettingsAction).
+        flags(Qn::NoTarget).
+        text(tr("Settings..."));
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
@@ -394,6 +402,15 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
+    factory(Qn::CheckSystemHealthAction).
+        flags(Qn::NoTarget).
+        text(tr("Check System Health..."));
+
+    factory(Qn::TogglePopupsAction).
+        flags(Qn::NoTarget).
+        checkable().
+        icon(qnSkin->icon("popup.png")).
+        text(tr("Show notifications"));
 
     /* Context menu actions. */
 
@@ -476,7 +493,7 @@ QnActionManager::QnActionManager(QObject *parent):
     } factory.endSubMenu();
 
     factory(Qn::OpenCurrentUserLayoutMenu).
-        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::RequiresChildren).
+        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
         text(tr("Open Layout...")).
         childFactory(new QnOpenCurrentUserLayoutActionFactory(this)).
         icon(qnSkin->icon("titlebar/dropdown.png"));
@@ -539,8 +556,13 @@ QnActionManager::QnActionManager(QObject *parent):
             rotationSpeed(180.0);
     }
 
+    factory(Qn::EscapeHotkeyAction).
+        flags(Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Esc")).
+        text(tr("Stop current action"));
+
     factory(Qn::FullscreenAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
         autoRepeat(false).
@@ -549,7 +571,6 @@ QnActionManager::QnActionManager(QObject *parent):
 #else
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
-        shortcut(tr("Esc")).
 #endif
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
@@ -560,12 +581,21 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Minimize")).
         icon(qnSkin->icon("titlebar/minimize.png"));
 
+
     factory(Qn::MaximizeAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
+
+
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Rules...")).
+        shortcut(tr("Ctrl+E")).
+        autoRepeat(false);
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
@@ -578,6 +608,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
     
+    factory(Qn::CheckForUpdatesAction).
+        flags(Qn::Main).
+        text(tr("Check for Updates..."));
+
     factory(Qn::AboutAction).
         flags(Qn::Main).
         text(tr("About...")).
@@ -734,6 +768,65 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+I")).
         condition(new QnDisplayInfoActionCondition(this));
 
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Change Resolution..."));
+
+    factory.beginSubMenu(); {
+        factory.beginGroup();
+        factory(Qn::RadassAutoAction).
+            flags(Qn::Scene | Qn::NoTarget ).
+            text(tr("Auto")).
+            checkable().
+            checked();
+
+        factory(Qn::RadassLowAction).
+            flags(Qn::Scene | Qn::NoTarget ).
+            text(tr("Low")).
+            checkable();
+
+        factory(Qn::RadassHighAction).
+            flags(Qn::Scene | Qn::NoTarget ).
+            text(tr("High")).
+            checkable();
+        factory.endGroup();
+    } factory.endSubMenu();
+
+    factory().
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("PTZ..."));
+
+    factory.beginSubMenu(); {
+        factory(Qn::PtzSavePresetAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Save Current Position...")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzGoToPresetMenu).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Go to Position...")).
+            childFactory(new QnPtzGoToPresetActionFactory(this)).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzManagePresetsAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Manage Saved Positions...")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+
+        factory(Qn::PtzGoToPresetAction).
+            flags(Qn::SingleTarget | Qn::ResourceTarget).
+            text(tr("Go To Saved Position")).
+            condition(hasCapabilities(Qn::AbsolutePtzCapability));
+    } factory.endSubMenu();
+
+#if 0
+    factory(Qn::ToggleRadassAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Resolution Mode")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(this));
+#endif
+
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion/Smart Search")).
@@ -826,6 +919,10 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F2")).
         autoRepeat(false);
 
+    factory().
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        separator();
+
     factory(Qn::YouTubeUploadAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Upload to YouTube...")).
@@ -857,6 +954,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
+    factory(Qn::LayoutSettingsAction).
+       flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+       text(tr("Layout Settings...")).
+       requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
+       condition(hasFlags(QnResource::layout));
+
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in Camera Settings Dialog"));
@@ -878,7 +981,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Aspect Ratio"));
+        text(tr("Change Cell Aspect Ratio..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -902,7 +1005,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Spacing"));
+        text(tr("Change Cell Spacing..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -949,6 +1052,15 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        separator();
+
+    factory(Qn::CurrentLayoutSettingsAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
+        text(tr("Layout Settings..."));
 
     factory(Qn::ToggleTourModeHotkeyAction).
         flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).
@@ -1301,7 +1413,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
         return result;
     } else if(parent->childFactory()) {
-        QList<QAction *> actions = parent->childFactory()->newActions(NULL);
+        QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
             QMenu *result = new QMenu();

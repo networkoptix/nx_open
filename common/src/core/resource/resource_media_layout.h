@@ -4,7 +4,7 @@
 #define CL_MAX_CHANNELS 4 // TODO: get rid of this definition
 #include <QVector>
 #include <QStringList>
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/abstract_data_packet.h"
 
 class QN_EXPORT QnResourceLayout
 {
@@ -19,9 +19,9 @@ public:
     struct AudioTrack
     {
         AudioTrack() {} 
-        AudioTrack(QnMediaContextPtr ctx, const QString& descr): codecContext(ctx), description(descr) {}
+        AudioTrack(QnAbstractMediaContextPtr ctx, const QString& descr): codecContext(ctx), description(descr) {}
 
-        QnMediaContextPtr codecContext;
+        QnAbstractMediaContextPtr codecContext;
         QString description;
     };
 
@@ -42,6 +42,7 @@ public:
     
 
     QnResourceCustomAudioLayout(): QnResourceAudioLayout() {}
+    virtual ~QnResourceCustomAudioLayout() {}
 
     void addAudioTrack(const AudioTrack& audioTrack) {m_audioTracks << audioTrack; }
     void setNumberOfChannels(int value) { m_audioTracks.resize(value); }

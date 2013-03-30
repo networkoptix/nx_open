@@ -99,16 +99,13 @@ signals:
 
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
+    void updatePermissions(const QnLayoutResourcePtr &layout);
     void updatePermissions(const QnResourceList &resources);
-    void updateSenderPermissions();
 
     void at_context_userChanged(const QnUserResourcePtr &user);
     
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-
-    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout);
-
 private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 

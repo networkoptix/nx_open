@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
+#include "workbench_license_notifier.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -41,6 +42,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_menu.reset(new QnActionManager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
+
+    instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -48,8 +51,13 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
-    qDeleteAll(m_instanceByTypeName);
-    m_instanceByTypeName.clear();
+    /* Destroy typed subobjects in reverse order to how they were constructed. */
+    while(!m_instances.empty()) {
+        QObject *instance = m_instances.back();
+        m_instances.pop_back();
+        m_instanceByTypeName.remove(typeid(*instance).name());
+        delete instance;
+    }
     m_userWatcher = NULL;
 
     /* Destruction order of these objects is important. */

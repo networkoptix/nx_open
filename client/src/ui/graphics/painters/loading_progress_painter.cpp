@@ -5,15 +5,24 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/shaders/color_shader_program.h>
-#include <ui/common/linear_combination.h>
+#include <utils/math/linear_combination.h>
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
     QnGlFunctions(context),
+    m_initialized(false),
     m_sectorCount(sectorCount),
     m_shader(QnColorShaderProgram::instance(context))
 {
-    if(context != QGLContext::currentContext())
+    if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
+        return;
+    }
+
+    if(!(features() & OpenGL2_0)) {
+        qnWarning("OpenGL version 2.0 is required.");
+        return;
+    }
+
 
     QByteArray data;
 
@@ -26,12 +35,11 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         qreal r0 = innerRadius;
         qreal r1 = 1;
 
-
         vertexStream 
-            << polar<QVector2D>(a0, r0)
-            << polar<QVector2D>(a1, r0)
-            << polar<QVector2D>(a1, r1)
-            << polar<QVector2D>(a0, r1);
+            << polarToCartesian<QVector2D>(r0, a0)
+            << polarToCartesian<QVector2D>(r0, a1)
+            << polarToCartesian<QVector2D>(r1, a1)
+            << polarToCartesian<QVector2D>(r1, a0);
     }
     m_vertexCount = sectorCount * 4;
 
@@ -49,10 +57,13 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_initialized = true;
 }
 
 QnLoadingProgressPainter::~QnLoadingProgressPainter() {
-    glDeleteBuffers(1, &m_buffer);
+    if(m_initialized)
+        glDeleteBuffers(1, &m_buffer);
 }
 
 void QnLoadingProgressPainter::paint() {
@@ -60,6 +71,9 @@ void QnLoadingProgressPainter::paint() {
 }
 
 void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
+    if(!m_initialized)
+        return;
+
     glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
 
@@ -68,7 +82,8 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableVertexAttribArray(m_shader->colorLocation());
-
+    
+    // TODO: #1.5 if buffers are not supported, this code will crash
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glVertexPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid *>(m_vertexOffset));
     glVertexAttribPointer(m_shader->colorLocation(), 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid *>(m_colorOffset));

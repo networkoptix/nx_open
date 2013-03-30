@@ -7,6 +7,7 @@
 #include <QtGui/QItemSelectionModel>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_managment/resource_criterion.h>
 
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
@@ -15,6 +16,23 @@ class QnResourceTreeSortProxyModel;
 
 namespace Ui {
     class QnResourceTreeWidget;
+}
+
+namespace Qn {
+    /**
+     * Flags describing graphics tweaks usable in resource tree wigdet.
+     */
+    enum GraphicsTweaksFlag {
+        /** Last row is hidden if there is not enough space to fully show it. */
+        HideLastRow = 0x1,
+
+        /** Set background opacity to items. */
+        BackgroundOpacity = 0x2,
+
+        /** Set Qt::BypassGraphicsProxyWidget flag to items. */
+        BypassGraphicsProxy = 0x4
+    };
+    Q_DECLARE_FLAGS(GraphicsTweaksFlags, GraphicsTweaksFlag)
 }
 
 class QnResourceTreeWidget : public QWidget {
@@ -30,6 +48,9 @@ public:
     void setModel(QAbstractItemModel *model);
 
     QItemSelectionModel *selectionModel();
+
+    const QnResourceCriterion &criterion() const;
+    void setCriterion(const QnResourceCriterion &criterion);
 
     void setWorkbench(QnWorkbench *workbench);
 
@@ -53,9 +74,17 @@ public:
      */
     bool isCheckboxesVisible() const;
 
-    //TODO: #gdm flags?
-    // TODO: #gdm setter starts with set, e.g. setGraphicsTweaksEnabled. And add a getter.
-    void enableGraphicsTweaks(bool enableTweaks = true);
+    /**
+     * @brief setGraphicsTweaks         Set various graphics tweaks for widget displaying.
+     * @param flags                     Set of flags describing tweaks.
+     */
+    void setGraphicsTweaks(Qn::GraphicsTweaksFlags flags);
+
+    /**
+     * @brief getGraphicsTweaks         Which graphics tweaks are enabled for this widget.
+     * @return                          Set of flags describing used tweaks.
+     */
+    Qn::GraphicsTweaksFlags getGraphicsTweaks();
 
     /**
      * @brief setFilterVisible          Show/hide resource tree filter widget.
@@ -80,17 +109,20 @@ public:
      * @return                          True if editing is allowed.
      */
     bool isEditingEnabled() const;
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;
 
     void updateCheckboxesVisibility();
+
 signals:
     void activated(const QnResourcePtr &resource);
     void viewportSizeChanged();
 
 private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
+    void at_treeView_spacePressed(const QModelIndex &index);
     void at_treeView_doubleClicked(const QModelIndex &index);
 
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
@@ -98,8 +130,11 @@ private slots:
 
     void updateColumnsSize();
     void updateFilter();
+
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
+
+    QnResourceCriterion m_criterion;
 
     QnResourceTreeItemDelegate *m_itemDelegate;
 
@@ -111,9 +146,16 @@ private:
     bool m_checkboxesVisible;
 
     /**
+     * @brief m_graphicsTweaksFlags     This property holds which graphics tweaks are used for widget displaying.
+     */
+    Qn::GraphicsTweaksFlags m_graphicsTweaksFlags;
+
+    /**
      * @brief m_editingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
      */
     bool m_editingEnabled;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::GraphicsTweaksFlags)
 
 #endif // RESOURCE_TREE_WIDGET_H

@@ -5,6 +5,7 @@
 #include <QtNetwork/QHostAddress>
 #include "utils/network/mac_address.h"
 #include "resource.h"
+#include "recording/time_period_list.h"
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
@@ -27,8 +28,8 @@ public:
 
     virtual QString getUniqueId() const;
 
-    virtual QHostAddress getHostAddress() const;
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
+    virtual QString getHostAddress() const;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
@@ -82,18 +83,25 @@ public:
     // and no broad cast and multi cast is accessible. so you can not get MAC of device with standard methods
     // the only way is to request it from device through http or so
     // we need to get mac anyway to differentiate one device from another
-    virtual bool updateMACAddress() = 0;
+    virtual bool updateMACAddress() { return true; }
 
     virtual void updateInner(QnResourcePtr other) override;
-
-    bool hasRunningLiveProvider() const;
 
     virtual bool shoudResolveConflicts() const;
 
     // in some cases I just want to update couple of field from just discovered resource
-    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source);
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
 
+    virtual int getChannel() const;
 
+    /*
+    * Return time periods from resource based archive (direct to storage)
+    */
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
+        Q_UNUSED(startTimeMs)
+        Q_UNUSED(endTimeMs)
+        Q_UNUSED(detailLevel)
+        return QnTimePeriodList(); }
 private:
     QAuthenticator m_auth;
     bool m_authenticated;

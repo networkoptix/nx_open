@@ -3,7 +3,7 @@
 #include <QtCore/QRectF>
 
 #include <utils/common/warnings.h>
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 
 Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections sections) {
     if(sections == 0) { /* Filter out the most common case first. */

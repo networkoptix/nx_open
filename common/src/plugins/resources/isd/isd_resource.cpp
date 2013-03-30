@@ -1,6 +1,6 @@
 #include "isd_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 #include "api/app_server_connection.h"
 #include "isd_stream_reader.h"
 
@@ -46,11 +46,6 @@ QnPlIsdResource::QnPlIsdResource()
 bool QnPlIsdResource::isResourceAccessible()
 {
     return updateMACAddress();
-}
-
-bool QnPlIsdResource::updateMACAddress()
-{
-    return true;
 }
 
 QString QnPlIsdResource::manufacture() const
@@ -219,7 +214,7 @@ void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
 {
 }
 
-const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnRtpStreamReader* rtspReader = dynamic_cast<const QnRtpStreamReader*>(dataProvider);
@@ -254,10 +249,9 @@ int QnPlIsdResource::getMaxFps()
 
 void QnPlIsdResource::save()
 {
-    QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << errorStr;
+            << getPhysicalId() << ". Description: " << conn->getLastError();
     }
 }

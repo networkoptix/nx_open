@@ -2,12 +2,13 @@
 
 #include <cassert>
 
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+#include <utils/math/color_transformations.h>
+
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/common/color_to_vector_converter.h>
-
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
 
 #include "variant_animator.h"
 

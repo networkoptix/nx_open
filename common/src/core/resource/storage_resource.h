@@ -5,65 +5,7 @@
 #include "resource.h"
 #include <QFileInfoList>
 #include <QIODevice>
-
-class QnAbstractMediaStreamDataProvider;
-
-class QnAbstractStorageResource : public QnResource
-{
-    Q_OBJECT
-
-    Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
-    Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
-
-public:
-    QnAbstractStorageResource();
-    virtual ~QnAbstractStorageResource();
-
-    virtual QString getUniqueId() const;
-
-    void setSpaceLimit(qint64 value);
-    qint64 getSpaceLimit() const;
-
-    void setMaxStoreTime(int timeInSeconds);
-    int getMaxStoreTime() const;
-
-    virtual float bitrate() const;
-    virtual float getStorageBitrateCoeff() const { return 1.0; }
-
-    void addBitrate(QnAbstractMediaStreamDataProvider* provider);
-    void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
-
-    /*
-     * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
-     */
-    void setIndex(quint16 value);
-    quint16 getIndex() const;
-
-    void deserialize(const QnResourceParameters& parameters);
-
-    /*
-     * Returns storage usage in range [0..1]
-     */
-    virtual float getAvarageWritingUsage() const;
-
-signals:
-    /*
-     * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
-     * @param newStartTime - new archive start time point
-     * @param newEndTime - Not used now, reserved for future use
-     */
-    void archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
-
-protected:
-
-private:
-    qint64 m_spaceLimit;
-    int m_maxStoreTime; // at seconds
-    quint16 m_index;
-    QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
-};
-
+#include "abstract_storage_resource.h"
 
 class QnStorageResource : public QnAbstractStorageResource
 {
@@ -73,106 +15,131 @@ public:
     QnStorageResource();
     virtual ~QnStorageResource();
 
-    AVIOContext* createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE = 32768);
-    static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE = 32768);
-    void closeFfmpegIOContext(AVIOContext* ioContext);
-    qint64 getFileSizeByIOContext(AVIOContext* ioContext);
-
 public:
-    //virtual void registerFfmpegProtocol() const = 0;
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) = 0;
+    static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
 
+    virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 
+    /**
+     * TODO: #VASILENKO doxydocs!
+     */
     virtual int getChunkLen() const = 0;
 
-    /*
-    *   If function returns true, auto delete old files
-    */
+    /**
+     * \returns                         Whether the storage automatically deletes old files.
+     */
     virtual bool isNeedControlFreeSpace() = 0;
 
-    /*
-    *   Return storage free space. if isNeedControlFreeSpace returns false, this function is not used
-    */
+    /**
+     * \returns                         Storage free space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
+     */
     virtual qint64 getFreeSpace() = 0;
 
-    /*
-    *   Returns true if storage physically acccesible right now (ready only check)
-    */
+    /**
+     * \returns                         Storage total space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
+     */
+    virtual qint64 getTotalSpace() = 0;
+
+    /**
+     * \returns                         Whether the storage is physically accessible.
+     */
     virtual bool isStorageAvailable() = 0;
 
-    /*
-    *   Returns true if storage physically acccesible and ready for writing
-    */
+    /**
+     * \returns                         Whether the storage is physically accessible and ready for writing
+     */
     virtual bool isStorageAvailableForWriting() = 0;
 
 
-    /*
-    *   Remove file from storage
-    */
+    /**
+     * \param url                       Url of the file to delete.
+     * \returns                         Whether the file was successfully removed.
+     */
     virtual bool removeFile(const QString& url) = 0;
 
-    /*
-    *   Remove dir from storage
-    */
+    /**
+     * \param url                       Url of the folder to remove.
+     * \returns                         Whether the folder was successfully removed.
+     */
     virtual bool removeDir(const QString& url) = 0;
 
-    /*
-    *   This function is used when server restarts. Unfinished files re-readed, writed again (under a new name), then renamed.
-    */
+    /**
+     * This function is used when server restarts. Unfinished files re-readed, writed again (under a new name), then renamed.
+     *
+     * \param oldName
+     * \param newName
+     * \returns                         Whether the file was successfully renamed.
+     */
     virtual bool renameFile(const QString& oldName, const QString& newName) = 0;
 
-    /*
-    *   Returns file list in current directory, only files (but not subdirs) requires.
-    *   QFileInfo structure MUST contains valid fields for full file name and file size.
-    */
+    /**
+     * \param dirName                   Url of the folder to list.
+     * \returns                         List of files in given directory, excluding subdirectories.
+     * 
+     * \note QFileInfo structure MUST contains valid fields for full file name and file size.
+     */
     virtual QFileInfoList getFileList(const QString& dirName) = 0;
 
-    /*
-    *   Returns true if file exists
-    */
+    /**
+     * \param url                       Url of a file to check.
+     * \returns                         Whether a file with the given url exists.
+     */
     virtual bool isFileExists(const QString& url) = 0;
 
-    /*
-    *   Returns true if dir exists
-    */
+    /**
+     * \param url                       Url of a folder to check.
+     * \returns                         Whether a folder with the given name exists.
+     */
     virtual bool isDirExists(const QString& url) = 0;
 
-    /*
-    *   Returns true if storage support catalog functions: isFileExists, isDirExists, getFileList. 
-    *   If function returns false, server doesn't check file catalog on startup
-    */
+    /**
+     * \returns                         Whether storage supports catalog functions: 
+     *                                  <tt>isFileExists</tt>, <tt>isDirExists</tt>, <tt>getFileList</tt>. 
+     *                                  If function returns false, server doesn't check file catalog on startup.
+     */
     virtual bool isCatalogAccessible() = 0;
 
-    virtual bool isRealFiles() const{return true;};
+    /**
+     * TODO: #VASILENKO doxydocs!
+     */
+    virtual bool isRealFiles() const{return true;}
 
-    qint64 getWritedSpace() const;
-    void addWritedSpace(qint64 value);
+    //qint64 getWritedSpace() const;
+    //void addWritedSpace(qint64 value);
 
-    virtual qint64 getFileSize(const QString& fillName) const = 0;
+    /**
+     * \param url                       Url of the file to get size of.
+     * \returns                         Size of the file, or 0 if the file does not exist.
+     */
+    virtual qint64 getFileSize(const QString& url) const = 0;
+
 public:
     virtual void setUrl(const QString& value);
+
 protected:
-    qint64 m_writedSpace;
+    //qint64 m_writedSpace;
+
 private:
     mutable QMutex m_writedSpaceMtx;
 };
 
-typedef QnStorageResource* (*StorageTypeInstance)();
 
 class QnStoragePluginFactory
 {
 public:
+    typedef QnStorageResource *(*StorageResourceFactory)();
+
     QnStoragePluginFactory();
     virtual ~QnStoragePluginFactory();
-    static QnStoragePluginFactory* instance();
+    static QnStoragePluginFactory *instance();
 
-    void registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol = false);
-    QnStorageResource* createStorage(const QString& storageType, bool useDefaultForUnknownPrefix = true);
+    void registerStoragePlugin(const QString &protocol, const StorageResourceFactory &factory, bool isDefaultProtocol = false);
+    QnStorageResource *createStorage(const QString &url, bool useDefaultForUnknownPrefix = true);
 
 private:
-    QMap<QString, StorageTypeInstance> m_storageTypes;
-    StorageTypeInstance m_defaultStoragePlugin;
-    QMutex m_mutex;
+    QHash<QString, StorageResourceFactory> m_factoryByProtocol;
+    StorageResourceFactory m_defaultFactory;
+    QMutex m_mutex; // TODO: #VASILENKO this mutex is not used, is it intentional?
 };
 
 #endif // QN_STORAGE_RESOURCE_H

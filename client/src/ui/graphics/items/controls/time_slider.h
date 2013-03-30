@@ -1,10 +1,11 @@
 #ifndef QN_TIME_SLIDER_H
 #define QN_TIME_SLIDER_H
 
+#include <utils/math/functors.h>
+
 #include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
 
-#include <ui/common/functors.h>
 #include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
@@ -151,7 +152,7 @@ public:
     void setRulerHeight(qreal rulerHeight);
 
     QnThumbnailsLoader *thumbnailsLoader() const;
-    void setThumbnailsLoader(QnThumbnailsLoader *value);
+    void setThumbnailsLoader(QnThumbnailsLoader *value, qreal aspectRatio); // TODO: remove aspectRatio
 
     const QVector<qint64> &indicators() const;
     void setIndicators(const QVector<qint64> &indicators);
@@ -336,6 +337,7 @@ private:
     QVector<QVector<QPointF> > m_tickmarkLines;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    qreal m_thumbnailsAspectRatio;
     QTimer *m_thumbnailsUpdateTimer;
     qint64 m_lastThumbnailsUpdateTime;
     QPixmap m_noThumbnailsPixmap;

@@ -4,9 +4,8 @@
 
 #include <camera/thumbnail.h>
 
-#include <ui/workbench/workbench_state.h>
-
 #include "client_globals.h"
+#include "client_model_types.h"
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -29,6 +28,14 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchStateHash>();
+    qRegisterMetaType<QnLicenseWarningState>();
+    qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();
+    qRegisterMetaType<QnLicenseWarningStateHash>();
+    qRegisterMetaTypeStreamOperators<QnLicenseWarningStateHash>();
+    qRegisterMetaType<QnServerStorageKey>();
+    qRegisterMetaTypeStreamOperators<QnServerStorageKey>();
+    qRegisterMetaType<QnServerStorageStateHash>();
+    qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
 

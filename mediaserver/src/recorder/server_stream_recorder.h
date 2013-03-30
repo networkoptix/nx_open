@@ -9,6 +9,8 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "dualstreaming_helper.h"
 
+#include <business/business_logic_common.h>
+
 class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
@@ -21,6 +23,26 @@ public:
     void updateScheduleInfo(qint64 timeMs);
 
     void setDualStreamingHelper(QnDualStreamingHelperPtr helper);
+
+    /*
+    * Ignore current schedule task param and start (or restart) recording with specified params. 
+    * Both primary and secondary streams are recorded.
+    * Panic mode recording has higher priority (fps may be increased if panic mode activated)
+    */
+    void startForcedRecording(QnStreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+
+    /*
+    * Switch from forced recording mode to normal recording mode specified by schedule task
+    * Panic mode recording has higher priority
+    */
+    void stopForcedRecording();
+
+    int getFRAfterThreshold() const;
+signals:
+    void fpsChanged(QnServerStreamRecorder* recorder, float value);
+    void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnAbstractDataPacketPtr motion);
+
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
@@ -35,10 +57,18 @@ protected:
     virtual void putData(QnAbstractDataPacketPtr data) override;
 
     virtual void endOfRun() override;
+    virtual bool saveData(QnAbstractMediaDataPtr md) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
-    bool isMotionRec(QnScheduleTask::RecordingType recType) const;
+    bool isMotionRec(Qn::RecordingType recType) const;
+    void updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData);
+    void setSpecialRecordingMode(QnScheduleTask& task);
+    int getFpsForValue(int fps);
+    void writeRecentlyMotion(qint64 writeAfterTime);
+    void keepRecentlyMotion(QnAbstractMediaDataPtr md);
+private slots:
+    void at_recordingFailed(QString msg);
 private:
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
@@ -53,10 +83,15 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;
-    QnScheduleTask m_panicSchedileRecord;
+    QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
+    QnScheduleTask m_forcedSchedileRecord;  // special recording mode (recording action). Priority higher than regular schedule
     bool m_usedPanicMode;
+    bool m_usedSpecialRecordingMode;
+    bool m_lastMotionState; // true if motion in progress
     qint64 m_queuedSize;
     QMutex m_queueSizeMutex;
+    qint64 m_lastMediaTime;
+    QQueue<QnAbstractMediaDataPtr> m_recentlyMotion;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

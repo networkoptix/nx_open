@@ -1,15 +1,144 @@
 #ifndef frame_info_1730
 #define frame_info_1730
 
+#ifdef _WIN32
+#include <D3D9.h>
+#endif
+#include <QAtomicInt>
+
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/media_data_packet.h"
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
 
+
+//!base class for differently-stored pictures
+/*!
+    Usage of synchronization context is not required
+*/
+class QnAbstractPictureDataRef
+{
+public:
+    //!Used for synchronizing access to surface between decoder and renderer
+    class SynchronizationContext
+    {
+    public:
+        /*!
+            QnAbstractPictureDataRef implementation MUST increment this value at object instanciation and decrement at object destruction
+        */
+        QAtomicInt externalRefCounter;
+        //!Sequence counter incremented by the decoder to invalidate references to the picture
+        /*!
+            QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved 
+            value this one to check, whether its reference is still valid
+        */
+        QAtomicInt sequence;
+        //!MUST be incremented for accessing picture data
+        QAtomicInt usageCounter;
+    };
+
+    enum PicStorageType
+    {
+        //!Picture data is stored in memory
+        pstSysMemPic,
+        //!Picture is stored as OpenGL texture
+        pstOpenGL,
+        //!Picture is presented as \a IDirect3DSurface*
+        pstD3DSurface
+    };
+
+    QnAbstractPictureDataRef( SynchronizationContext* const syncCtx )
+    :
+        m_syncCtx( syncCtx ),
+        m_initialSequence( syncCtx->sequence )
+    {
+    }
+    virtual ~QnAbstractPictureDataRef() {}
+
+    //!Returns pic type
+    virtual PicStorageType type() const = 0;
+    //!Returns rect, that contains actual data
+    virtual QRect cropRect() const = 0;
+
+    /*!
+        Instances of \a QnAbstractPictureDataRef MUST share \a SynchronizationContext instance of single picture
+        \return Can be NULL
+    */
+    SynchronizationContext* syncCtx() const
+    {
+        return m_syncCtx;
+    }
+    //!If return value is \a false, access to picture data can lead to undefined behavour
+    bool isValid() const
+    {
+        return m_syncCtx->sequence == m_initialSequence;
+    }
+
+private:
+    SynchronizationContext* const m_syncCtx;
+    int m_initialSequence;
+};
+
+//!Picture data stored in system memory
+class QnSysMemPictureData
+:
+    public QnAbstractPictureDataRef
+{
+public:
+    //TODO/IMPL
+
+    virtual QnAbstractPictureDataRef::PicStorageType type() const { return QnAbstractPictureDataRef::pstSysMemPic; }
+};
+
+#ifdef _WIN32
+//!Holds picture as DXVA surface
+class D3DPictureData
+:
+    public QnAbstractPictureDataRef
+{
+public:
+    D3DPictureData( SynchronizationContext* const syncCtx )
+    :
+        QnAbstractPictureDataRef( syncCtx )
+    {
+    }
+
+    //!Implementation of QnAbstractPictureDataRef
+    virtual PicStorageType type() const { return QnAbstractPictureDataRef::pstD3DSurface; };
+    virtual IDirect3DSurface9* getSurface() const = 0;
+};
+#endif
+
+//!OpenGL texture (type \a pstOpenGL)
+class QnOpenGLPictureData
+:
+    public QnAbstractPictureDataRef
+{
+public:
+    QnOpenGLPictureData(
+        SynchronizationContext* const syncCtx,
+//  		GLXContext _glContext,
+   		unsigned int _glTexture );
+
+    virtual QnAbstractPictureDataRef::PicStorageType type() const { return QnAbstractPictureDataRef::pstOpenGL; }
+
+    //!Returns OGL texture name
+    virtual unsigned int glTexture() const;
+
+private:
+//    GLXContext m_glContext;
+    unsigned int m_glTexture;
+};
+
+
+//!Decoded frame, ready to be rendered
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
+	//!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
+	QSharedPointer<QnAbstractPictureDataRef> picData;
+
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
 
@@ -44,6 +173,9 @@ private:
 private:
     bool m_useExternalData; // pointers only copied to this frame
     bool m_displaying;
+
+    CLVideoDecoderOutput( const CLVideoDecoderOutput& );
+    const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 };
 
 /*

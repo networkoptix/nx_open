@@ -10,6 +10,38 @@ static const int MAX_LINE_LENGTH = 1024*16;
 
 using namespace std;
 
+QString toString( CLHttpStatus status )
+{
+    switch( status )
+    {
+        case CL_HTTP_SUCCESS:
+            return QString::fromLatin1("%1 (OK)").arg(status);
+        case CL_HTTP_REDIRECT:
+            return QString::fromLatin1("%1 (REDIRECT)").arg(status);
+        case CL_HTTP_BAD_REQUEST:
+            return QString::fromLatin1("%1 (BAD REQUEST)").arg(status);
+        case CL_HTTP_AUTH_REQUIRED:
+            return QString::fromLatin1("%1 (AUTH REQUIRED)").arg(status);
+        case CL_HTTP_NOT_FOUND:
+            return QString::fromLatin1("%1 (NOT FOUND)").arg(status);
+        default:
+            return QString::fromLatin1("%1 (UNKNOWN)").arg(status);
+    }
+}
+
+
+CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_port(port),
+    m_connected(false),
+    m_timeout(timeout),
+    m_auth(auth),
+    m_dataRestPtr(0),
+    m_dataRestLen(0)
+{
+    m_host = resolveAddress(host);
+    initSocket();
+}
+
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_host(host),
     m_port(port),
@@ -39,6 +71,11 @@ QHostAddress CLSimpleHTTPClient::getLocalHost() const
     return QHostAddress(m_sock->getLocalAddress());
 }
 
+void CLSimpleHTTPClient::addHeader(const QByteArray& key, const QByteArray& value)
+{
+    m_additionHeaders[key] = value;
+}
+
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
 {
     return doPOST(requestStr.toUtf8(), body);
@@ -65,6 +102,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         request.append("\r\n");
         request.append("User-Agent: Simple HTTP Client 1.0\r\n");
         request.append("Accept: */*\r\n");
+
+        addExtraHeaders(request);
+
         request.append("Content-Type: application/x-www-form-urlencoded\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
@@ -187,6 +227,11 @@ int CLSimpleHTTPClient::readHeaders()
     return CL_HTTP_SUCCESS;
 }
 
+QByteArray CLSimpleHTTPClient::getHeaderValue(const QByteArray& key)
+{
+    return m_header.value(key);
+}
+
 CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive)
 {
     return doGET(requestStr.toUtf8(), recursive);
@@ -206,12 +251,16 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
 
         QByteArray request;
 
-        request.append("GET /");
+        request.append("GET ");
+        if( !requestStr.startsWith('/') )
+            request.append('/');
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
         request.append(m_host.toString().toUtf8());
         request.append("\r\n");
+
+        addExtraHeaders(request);
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
@@ -235,7 +284,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
 
         m_responseLine = m_responseLine.toLower();
 
-        if (!m_responseLine.contains("200 ok"))// not ok
+        if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
         {
             close();
 
@@ -406,8 +455,18 @@ QString CLSimpleHTTPClient::digestAccess(const QString& request) const
     return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QLatin1Char('/') + request);
 }
 
+void CLSimpleHTTPClient::addExtraHeaders(QByteArray& request)
+{
+    for (QMap<QByteArray,QByteArray>::iterator itr = m_additionHeaders.begin(); itr != m_additionHeaders.end(); ++itr)
+    {
+        request.append(itr.key());
+        request.append(": ");
+        request.append(itr.value());
+        request.append("\r\n");
+    }
+}
 
-QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
+QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
 {
     CLSimpleHTTPClient http (host, port, timeout, auth);
     status = http.doGET(fileName);

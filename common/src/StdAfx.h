@@ -40,11 +40,15 @@ extern "C" {
 
 #include "utils/media/sse_helper.h"
 
-// stl headers
+/* STL headers. */
 #include <algorithm>
 #include <functional>
 
-// QT headers
+/* Boost headers. */
+#include <boost/foreach.hpp>
+#include <boost/array.hpp>
+
+/* QT headers. */
 #include <QAction>
 
 #ifdef Q_OS_WIN

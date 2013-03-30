@@ -116,7 +116,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     if(!mediaWidget)
         return;
 
-    connect(mediaWidget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
+    connect(mediaWidget->resource().data(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 
     if(!mediaWidget->resource()->hasFlags(QnResource::sync)) {
         m_queuedWidgets.insert(mediaWidget);
@@ -177,13 +177,6 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnAbstrac
 void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
     QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
     m_syncPlay->setLiveModeEnabled(period.isEmpty());
-}
-
-void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged() {
-    if(!sender())
-        return;
-
-    at_resource_flagsChanged(checked_cast<QnResource *>(sender())->toSharedPointer());
 }
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {

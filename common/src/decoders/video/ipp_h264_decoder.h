@@ -2,7 +2,9 @@
 #define ipp_decoder_h149
 
 #ifdef Q_OS_WIN
+
 #include "abstractdecoder.h"
+
 
 class IPPH264Decoder : public QnAbstractVideoDecoder
 {
@@ -10,12 +12,18 @@ public:
     IPPH264Decoder();
     ~IPPH264Decoder();
 
-    virtual bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame);
-    virtual void resetDecoder( QnCompressedVideoDataPtr data );
-    virtual void setOutPictureSize( const QSize& outSize );
-
-
+    virtual bool decode(const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame) override;
+    //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
+    virtual QSize getOriginalPictureSize() const override;
+    virtual void resetDecoder( QnCompressedVideoDataPtr data ) override;
+    virtual void setOutPictureSize( const QSize& outSize ) override;
     void setLightCpuMode(DecodeMode) {}
+
+    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const override { return QnAbstractPictureDataRef::pstSysMemPic; }
+    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
+    virtual unsigned int getDecoderCaps() const override;
+    //!Implementation of QnAbstractVideoDecoder::setSpeed
+    virtual void setSpeed( float newValue ) override;
 
 private:
     unsigned long m_decoder;

@@ -104,6 +104,7 @@ public:
     virtual double getSpeed() const = 0;
 
     virtual void startPaused() = 0;
+    virtual void setGroupId(const QByteArray& groupId)  = 0;
 signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);

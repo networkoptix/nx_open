@@ -28,7 +28,8 @@
 #include "dvdread_internal.h"
 
 #ifdef _MSC_VER
-#    pragma warning(push, disable: 4018) /* C4018: '?' : signed/unsigned mismatch */
+#    pragma warning(push)
+#    pragma warning(disable: 4018) /* C4018: '?' : signed/unsigned mismatch */
 #endif
 
 void navRead_PCI(pci_t *pci, unsigned char *buffer) {
@@ -206,3 +207,6 @@ void navRead_DSI(dsi_t *dsi, unsigned char *buffer) {
   CHECK_VALUE(dsi->dsi_gi.zero1 == 0);
 }
 
+#ifdef _MSC_VER
+#    pragma warning(pop)
+#endif

@@ -1,6 +1,7 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
+#include <QMutex>
 #include <QRegion>
 
 #include "plugins/resources/archive/abstract_archive_delegate.h"
@@ -79,6 +80,8 @@ private:
     bool m_eof;
     MediaQuality m_quality;
     QnDialQualityHelper m_dialQualityHelper;
+
+    mutable QMutex m_mutex;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

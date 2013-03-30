@@ -7,9 +7,12 @@ class QnDroidControlPortListener: public QnTcpListener
 {
 public:
     QnDroidControlPortListener(const QHostAddress& address, int port);
+    virtual ~QnDroidControlPortListener();
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) override;
 };
+
+class QnDroidControlPortProcessorPrivate;
 
 class QnDroidControlPortProcessor: public QnTCPConnectionProcessor
 {
@@ -18,5 +21,5 @@ public:
 protected:
     virtual void run() override;
 
-    QN_DECLARE_PRIVATE_DERIVED(QnDroidControlPortProcessor);
+    Q_DECLARE_PRIVATE(QnDroidControlPortProcessor);
 };

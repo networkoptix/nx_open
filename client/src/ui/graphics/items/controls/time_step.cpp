@@ -3,7 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include <utils/common/warnings.h>
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/time.h>
 
 
@@ -172,6 +172,8 @@ QString toLongString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) {
         return QString();
     } else {
+        if (step.format == lit("h")) // TODO: #Elric I don't think this is necessary. 
+            msecs++; // avoid daylight bug like: 1h, 3h, 3h, 5h (3h twice, valid values are 1,3,4,5)
         return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.longFormat);
     }
 }

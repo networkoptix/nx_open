@@ -5,18 +5,16 @@
 #include <QList>
 #include <QTextStream>
 
-#include "core/resource/media_resource.h"
 #include "utils/common/qnid.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "schedule_recording_type.h"
 
 class QnScheduleTask
 {
 public:
-    enum RecordingType { RecordingType_Run, RecordingType_MotionOnly, RecordingType_Never, RecordingType_MotionPlusLQ };
-
     struct Data
     {
-        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, RecordingType recordType = RecordingType_Never,
+        Data(int dayOfWeek = 1, int startTime = 0, int endTime = 0, Qn::RecordingType recordType = Qn::RecordingType_Never,
              int beforeThreshold = 0, int afterThreshold = 0, QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
             : m_dayOfWeek(dayOfWeek),
               m_startTime(startTime),
@@ -39,7 +37,7 @@ public:
         /** End time offset, in seconds. */
         int m_endTime;
 
-        RecordingType m_recordType;
+        Qn::RecordingType m_recordType;
 
         int m_beforeThreshold;
 
@@ -59,11 +57,13 @@ public:
     }
 
     QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
-                   RecordingType recordType =  RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
+                   Qn::RecordingType recordType =  Qn::RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
                    QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
         : m_id(id), m_resourceId(resourceId),
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
+
+    bool isEmpty() const {return m_data.m_startTime == 0 && m_data.m_endTime == 0; }
 
     const Data& getData() const { return m_data; }
     void setData(const Data& data) { m_data = data; }
@@ -76,14 +76,20 @@ public:
     int getMinute() const;
     int getSecond() const;
     int getEndTime() const { return m_data.m_endTime; }
-    RecordingType getRecordingType() const { return m_data.m_recordType; }
+    void setEndTime(int value) { m_data.m_endTime = value; }
+
+    Qn::RecordingType getRecordingType() const { return m_data.m_recordType; }
     int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
+    void setBeforeThreshold(int value)  { m_data.m_beforeThreshold = value; }
     int getAfterThreshold() const { return m_data.m_afterThreshold; }
+    void setAfterThreshold(int value) { m_data.m_afterThreshold= value; }
     QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
+    void setStreamQuality(QnStreamQuality value) { m_data.m_streamQuality = value; }
+    
     int getFps() const { return m_data.m_fps; }
+    void setFps(int value) { m_data.m_fps = value; }
     bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
-    void setFps(int value) { m_data.m_fps = value; }
 
     /*
     * Duration at ms
@@ -136,16 +142,16 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
 {
     QString recordingTypeString;
     switch(data.getRecordingType()) {
-    case QnScheduleTask::RecordingType_Run:
+    case Qn::RecordingType_Run:
         recordingTypeString = QLatin1String("Always");
         break;
-    case QnScheduleTask::RecordingType_MotionOnly:
+    case Qn::RecordingType_MotionOnly:
         recordingTypeString = QLatin1String("Motion");
         break;
-    case QnScheduleTask::RecordingType_Never:
+    case Qn::RecordingType_Never:
         recordingTypeString = QLatin1String("Never");
         break;
-    case QnScheduleTask::RecordingType_MotionPlusLQ:
+    case Qn::RecordingType_MotionPlusLQ:
         recordingTypeString = QLatin1String("MotionAndLQ");
         break;
     default:
@@ -175,7 +181,7 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
     }
 
     stream << "type=" << recordingTypeString << " fps=" << data.getFps() << " quality=" << qualityString;
-    if (data.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
+    if (data.getRecordingType() == Qn::RecordingType_MotionOnly)
         stream << " pre-motion=" << data.getBeforeThreshold() << "post-motion=" << data.getAfterThreshold();
     return stream;
 }

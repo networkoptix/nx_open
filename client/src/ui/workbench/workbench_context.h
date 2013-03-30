@@ -74,8 +74,10 @@ public:
     T *instance() {
         QByteArray key(typeid(T).name());
         QObject *&result = m_instanceByTypeName[key];
-        if(!result)
+        if(!result) {
             result = new T(this);
+            m_instances.push_back(result);
+        }
         return static_cast<T *>(result);
     }
 
@@ -85,7 +87,7 @@ signals:
      * 
      * \param user                      New user that was logged in. May be null.
      */
-    void userChanged(const QnUserResourcePtr &user);
+    void userChanged(const QnUserResourcePtr &user); // TODO: #Elric remove user parameter
 
     /**
      * This signal is emitted when this workbench context is about to be destroyed,
@@ -107,7 +109,8 @@ private:
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
 
     QnWorkbenchUserWatcher *m_userWatcher;
-    QHash<QByteArray, QObject *> m_instanceByTypeName;
+    QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: use std::type_index
+    QList<QObject *> m_instances;
 };
 
 

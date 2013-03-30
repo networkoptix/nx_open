@@ -1,14 +1,15 @@
 #include "dwm.h"
 
+#include <boost/type_traits/remove_pointer.hpp>
+
 #include <QtCore/QLibrary>
 #include <QtGui/QWidget>
 
 #include <utils/common/warnings.h>
-#include <utils/common/mpl.h>
 
 #include <utils/common/invocation_event.h>
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
 #include <QtGui/private/qwidget_p.h>
 #include <qt_windows.h>
 #define NOMINMAX
@@ -61,7 +62,7 @@ typedef enum _DWMNCRENDERINGPOLICY {
     DWMNCRP_LAST 
 } DWMNCRENDERINGPOLICY;
 
-typedef remove_pointer<LRESULT>::type RESULT;
+typedef boost::remove_pointer<LRESULT>::type RESULT;
 
 typedef HRESULT (WINAPI *PtrDwmIsCompositionEnabled)(BOOL* pfEnabled);
 typedef HRESULT (WINAPI *PtrDwmExtendFrameIntoClientArea)(HWND hWnd, const _MARGINS *pMarInset);
@@ -69,7 +70,7 @@ typedef HRESULT (WINAPI *PtrDwmEnableBlurBehindWindow)(HWND hWnd, const _DWM_BLU
 typedef HRESULT (WINAPI *PtrDwmGetColorizationColor)(DWORD *pcrColorization, BOOL *pfOpaqueBlend);
 typedef BOOL (WINAPI *PtrDwmDefWindowProc)(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT *plResult);
 typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute, LPCVOID pvAttribute, DWORD cbAttribute);
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 
 enum QnDwmInvocation {
     AdjustPositionInvocation = 0x7591
@@ -83,14 +84,14 @@ public:
 
     void init(QWidget *widget);
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     void updateFrameStrut();
     bool calcSizeEvent(MSG *message, long *result);
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
     bool ncPaintEvent(MSG *message, long *result);
     bool getMinMaxInfoEvent(MSG *message, long *result);
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 
     static bool isSupported();
 
@@ -104,7 +105,7 @@ public:
     /** Whether this api instance is functional. */
     bool hasApi;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     /** Whether DWM is available. */
     bool hasDwm;
 
@@ -120,33 +121,31 @@ public:
     QMargins userFrameMargins;
 
     bool overrideFrameMargins;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 };
 
 bool QnDwmPrivate::isSupported() {
     bool result;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     /* We're using private Qt functions, so we have to check that the right runtime is used. */
     result = !qstrcmp(qVersion(), QT_VERSION_STR);
     if(!result)
         qnWarning("Compile-time and run-time Qt versions differ (%1 != %2), DWM will be disabled.", qVersion(), QT_VERSION_STR);
 #else
     result = false;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 
     return result;
 }
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_dwm_isSupported, {
-    *x = QnDwmPrivate::isSupported();
-});
+Q_GLOBAL_STATIC_WITH_ARGS(bool, qn_dwm_isSupported, (QnDwmPrivate::isSupported()));
 
 void QnDwmPrivate::init(QWidget *widget) {
     this->widget = widget;
     hasApi = widget != NULL && qn_dwm_isSupported();
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     QLibrary dwmLib(QString::fromAscii("dwmapi"));
     dwmIsCompositionEnabled         = (PtrDwmIsCompositionEnabled)      dwmLib.resolve("DwmIsCompositionEnabled");
     dwmExtendFrameIntoClientArea    = (PtrDwmExtendFrameIntoClientArea) dwmLib.resolve("DwmExtendFrameIntoClientArea");
@@ -165,10 +164,10 @@ void QnDwmPrivate::init(QWidget *widget) {
         dwmSetWindowAttribute != NULL;
 
     overrideFrameMargins = false;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
 void QnDwmPrivate::updateFrameStrut() {
     QWidgetPrivate *wd = qt_widget_private(widget);
     QTLWExtra *tlwExtra = wd->maybeTopData();
@@ -188,7 +187,7 @@ void QnDwmPrivate::updateFrameStrut() {
         qt_qwidget_data(widget)->fstrut_dirty = false;
     }
 }
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 
 QnDwm::QnDwm(QWidget *widget):
     QObject(widget),
@@ -213,7 +212,7 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     if(!d->hasDwm)
         return false;
 
@@ -229,14 +228,14 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
 #else
     Q_UNUSED(enable)
     return false;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 bool QnDwm::isCompositionEnabled() const {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     if (!d->hasDwm)
         return false;
 
@@ -252,14 +251,14 @@ bool QnDwm::isCompositionEnabled() const {
     }
 #else
     return false;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     if(!d->hasDwm)
         return false;
 
@@ -290,14 +289,14 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
 #else
     Q_UNUSED(margins)
     return false;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 QMargins QnDwm::themeFrameMargins() const {
     if(!d->hasApi)
         return QMargins(-1, -1, -1, -1);
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     int frameX, frameY;
     if(d->widget->windowFlags() & Qt::FramelessWindowHint) {
         frameX = 0;
@@ -313,14 +312,14 @@ QMargins QnDwm::themeFrameMargins() const {
     return QMargins(frameX, frameY, frameX, frameY);
 #else
     return QMargins(-1, -1, -1, -1);
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 int QnDwm::themeTitleBarHeight() const {
     if(!d->hasApi)
         return -1;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     if((d->widget->windowFlags() & Qt::FramelessWindowHint) || (d->widget->windowFlags() & Qt::X11BypassWindowManagerHint)) {
         return 0;
     } else if(d->widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
@@ -330,7 +329,7 @@ int QnDwm::themeTitleBarHeight() const {
     }
 #else
     return -1;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 QMargins QnDwm::currentFrameMargins() const {
@@ -339,7 +338,7 @@ QMargins QnDwm::currentFrameMargins() const {
     if(!d->hasApi)
         return errorValue;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     HWND hwnd = d->widget->winId();
     BOOL status = S_OK;
 
@@ -366,14 +365,14 @@ QMargins QnDwm::currentFrameMargins() const {
     );
 #else
     return QMargins(-1, -1, -1, -1);
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     HWND hwnd = d->widget->winId();
     BOOL status = S_OK;
 
@@ -391,7 +390,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
 #else
     Q_UNUSED(margins)
     return false;
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 }
 
 bool QnDwm::widgetEvent(QEvent *event) {
@@ -400,7 +399,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
     if(!d->hasApi)
         return false;
 
-#ifdef Q_OS_WIN
+#ifdef QN_HAS_DWM
     if(d->overrideFrameMargins) {
         /* Qt calculates frame margins based on window's style, 
          * not on actual margins specified by WM_NCCALCSIZE. We fix that. */
@@ -421,13 +420,14 @@ bool QnDwm::widgetEvent(QEvent *event) {
         if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
             d->widget->move(d->widget->pos()); 
     }
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 
     return false;
 }
 
 #ifdef Q_OS_WIN
 bool QnDwm::widgetWinEvent(MSG *message, long *result) {
+#ifdef QN_HAS_DWM
     if(d->widget == NULL)
         return false;
 
@@ -448,8 +448,13 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     case WM_GETMINMAXINFO:          return d->getMinMaxInfoEvent(message, result);
     default:                        return false;
     }
+#else
+    return false;
+#endif // QN_HAS_DWM
 }
+#endif // Q_OS_WIN
 
+#ifdef QN_HAS_DWM
 bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     if(!overrideFrameMargins)
         return false;
@@ -601,6 +606,6 @@ bool QnDwmPrivate::getMinMaxInfoEvent(MSG *message, long *result) {
     return false;
 }
 
-#endif // Q_OS_WIN
+#endif // QN_HAS_DWM
 
 

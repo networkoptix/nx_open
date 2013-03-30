@@ -10,7 +10,12 @@
 #define QN_ORGANIZATION_NAME        "${company.name}"
 #define QN_APPLICATION_NAME         "${product.title}"
 #define QN_APPLICATION_VERSION      "${release.version}.${buildNumber}"
-#define QN_ENGINE_VERSION           "${project.version}.${buildNumber}"
+#ifdef _WIN32
+#define QN_PRODUCT_NAME             "${product.name}"
+#else
+#define QN_PRODUCT_NAME             "${namespace.additional}"
+#endif
+#define QN_ENGINE_VERSION           "${release.version}.${buildNumber}"
 #define QN_APPLICATION_REVISION     "${changeSet}"
 #define QN_APPLICATION_PLATFORM     "${platform}"
 #define QN_APPLICATION_ARCH         "${arch}"
@@ -19,11 +24,19 @@
 #define QN_SIGAR_VERSION            "${sigar.version}"
 #define QN_BOOST_VERSION            "${boost.version}"
 #define QN_CUSTOMIZATION_NAME       "${installer.customization}"
-#define QN_CUSTOMIZED_FILENAME      "${product.name}.exe"
+#define QN_MEDIA_FOLDER_NAME        "${client.mediafolder.name}"
+#ifdef _WIN32
+#define QN_CLIENT_EXECUTABLE_NAME   "${product.name}.exe"
+#else
+#define QN_CLIENT_EXECUTABLE_NAME   "client-bin"
+#endif
 #define QN_LICENSING_MAIL_ADDRESS   "${company.license.address}"
 #define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
 #define QN_FREE_LICENSE_COUNT       ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY         "${freeLicenseKey}"
+#define QN_FREE_LICENSE_IS_TRIAL    ${freeLicenseIsTrial}
+#define QN_LICENSE_URL              "${license.url}"
+#define QN_RSA_PUBLIC_KEY           ${rsa.public.key}
 
 /* 
  * These constans are here for windows resouce file.
@@ -33,9 +46,9 @@
  */
 #define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}" // TODO: move up
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
-#define VER_FILEVERSION_STR         "${project.version}.${buildNumber}"
+#define VER_FILEVERSION_STR         "${release.version}.${buildNumber}"
 #define VER_PRODUCTVERSION          ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
-#define VER_PRODUCTVERSION_STR      "${project.version}.${buildNumber}"
+#define VER_PRODUCTVERSION_STR      "${release.version}.${buildNumber}"
 #define VER_COMPANYNAME_STR         "${company.name}"
 #define VER_FILEDESCRIPTION_STR     "${product.title}"
 #define VER_INTERNALNAME_STR        "${product.title}"
@@ -45,6 +58,6 @@
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
-/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. */
+/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
 
 #endif // ${artifactId}_VERSION_H

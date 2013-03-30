@@ -63,18 +63,7 @@ void QnConnectionTestingDialog::timeout()
     }
 
     m_timeoutTimer.stop();
-    updateUi(false);
-}
-
-void QnConnectionTestingDialog::oldHttpTestResults(const QnHTTPRawResponse& response, int handle)
-{
-    Q_UNUSED(handle)
-
-    if (response.status == 204 && m_timeoutTimer.isActive())
-    {
-        m_timeoutTimer.stop();
-        updateUi(false);
-    }
+    updateUi(false, tr("Request timed out."));
 }
 
 void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
@@ -97,25 +86,50 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
         compatibilityChecker = &localChecker;
 
     ui->progressBar->setValue(ui->progressBar->maximum());
-    updateUi(!status && compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version));
+
+    bool success = true;
+    QString detail;
+
+    if (status != 0) {
+        success = false;
+        detail = tr("Connection to the Enterprise Controller could not be established.\n"\
+                    "Connection details that you have entered are incorrect, please try again.\n\n"\
+                    "If this error persists, please contact your VMS administrator.");
+    } else
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+        QString minSupportedVersion = QLatin1String("1.4");
+
+        if (stripVersion(connectInfo->version).compare(minSupportedVersion) < 0) {
+            detail = tr("Enterprise Controller has a different version:\n"\
+                        " - Client version: %1.\n"\
+                        " - EC version: %2.\n"\
+                        "Compatibility mode for versions lower than %3 is not supported.")
+                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(connectInfo->version)
+                    .arg(minSupportedVersion);
+            success = false;
+        } else {
+            detail = tr("Enterprise Controller has a different version:\n"\
+                        " - Client version: %1.\n"\
+                        " - EC version: %2.\n"\
+                        "You will be asked to restart the client in compatibility mode.")
+                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(connectInfo->version);
+        }
+    }
+
+    updateUi(success, detail);
 }
 
 void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
     m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
-
-    QUrl httpUrl;
-    httpUrl.setHost(m_url.host());
-    httpUrl.setPort(m_url.port());
-    httpUrl.setScheme(QLatin1String("http"));
-    httpUrl.setUserName(QString());
-    httpUrl.setPassword(QString());
-    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(const QnHTTPRawResponse& response, int)));
 }
 
-void QnConnectionTestingDialog::updateUi(bool success){
+void QnConnectionTestingDialog::updateUi(bool success, const QString &details){
     ui->statusLabel->setText(success ? tr("Success") : tr("Failed"));
+    ui->descriptionLabel->setText(details);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(false);

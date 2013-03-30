@@ -255,9 +255,10 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = removeProtocolPrefix(storage->getUrl());
-        storage->setUrl(newName); // update binary offsetvalue
-        if (storageUrl == removeProtocolPrefix(newName))
+        if (storageUrl == removeProtocolPrefix(newName)) {
+            storage->setUrl(newName); // update binary offsetvalue
             storage->restoreOpenedFiles();
+        }
         else if (storageUrl == removeProtocolPrefix(oldName)) {
             storage->setUrl(newName);
             storage->restoreOpenedFiles();
@@ -298,6 +299,11 @@ qint64 QnLayoutFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
 }
 
+qint64 QnLayoutFileStorageResource::getTotalSpace()
+{
+    return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
+}
+
 QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
@@ -305,9 +311,9 @@ QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
     return dir.entryInfoList(QDir::Files);
 }
 
-qint64 QnLayoutFileStorageResource::getFileSize(const QString& fillName) const
+qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 {
-    Q_UNUSED(fillName)
+    Q_UNUSED(url)
     return 0; // not implemented
 }
 
@@ -361,7 +367,7 @@ bool QnLayoutFileStorageResource::readIndexHeader()
     
     file.seek(m_novFileOffset);
     file.read((char*) &m_index, sizeof(m_index));
-    if (m_index.magic != MAGIC_STATIC) {
+    if ((quint64)m_index.magic != MAGIC_STATIC) {
         qWarning() << "Invalid Nov index detected! Disk write error or antivirus activty. Ignoring";
         m_index = QnLayoutFileIndex();
         return false;
@@ -478,4 +484,20 @@ void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
 
     const quint64 magic = FileTypeSupport::NOV_EXE_MAGIC;
     file.write((char*) &magic, sizeof(qint64));
+}
+
+QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
+{
+    QString url = res->getUrl();
+    url = url.mid(url.lastIndexOf(L'?')+1);
+    QFileInfo fi(url);
+    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
+    if (!chunkData)
+        return QnTimePeriodList();
+    QnTimePeriodList chunks;
+    QByteArray chunkDataArray(chunkData->readAll());
+    chunks.decode(chunkDataArray);
+    delete chunkData;
+
+    return chunks;
 }

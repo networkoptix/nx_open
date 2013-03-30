@@ -1,9 +1,11 @@
 #include "log.h"
+#include <sstream>
 #include <QTextStream>
 #include <QThread>
 #include <QDateTime>
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
+const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
     QString str = value.toUpper().trimmed();
@@ -39,7 +41,10 @@ public:
 
         m_file.setFileName(currFileName());
 
-        return m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+        if (rez)
+            m_file.write(UTF8_BOM);
+        return rez;
     }
 
     void setLogLevel(QnLogLevel logLevel) 
@@ -57,20 +62,25 @@ public:
         if (logLevel > m_logLevel)
             return;
 
-        QByteArray th;
-        QTextStream textStream(&th);
-        textStream << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz"))
-            << QLatin1String(" Thread ") << QString::number((qint64)QThread::currentThread()->currentThreadId(), 16)
-            << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
-        textStream.flush();
+        std::ostringstream ostr;
+        ostr << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
+            << " Thread " << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).data()
+            << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
+        ostr.flush();
 
         QMutexLocker mutx(&m_mutex);
         if (!m_file.isOpen())
             return;
-        m_file.write(th);
+        m_file.write(ostr.str().c_str());
         m_file.flush();
         if (m_file.size() >= m_maxFileSize)
             openNextFile();
+    }
+
+    QString syncCurrFileName() const
+    {
+        QMutexLocker lock(&m_mutex);
+        return m_baseName + QLatin1String(".log");
     }
 
 private:
@@ -101,7 +111,8 @@ private:
         }
 
         m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-
+        if (m_file.size() == 0)
+            m_file.write(UTF8_BOM);
     }
 
     QString currFileName() const
@@ -135,7 +146,7 @@ private:
 
     QFile m_file;
 
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
 };
 
 Q_GLOBAL_STATIC(QnLogPrivate, qn_logPrivateInstance);
@@ -144,10 +155,25 @@ Q_GLOBAL_STATIC(QnLogPrivate, qn_logPrivateInstance);
 // -------------------------------------------------------------------------- //
 // QnLog
 // -------------------------------------------------------------------------- //
+static QAtomicPointer<QnLog> qnLogInstance;
+//static QGlobalStatic<QnLog> qnLogInstance = { Q_BASIC_ATOMIC_INITIALIZER(0), false };
+//Q_GLOBAL_STATIC_WITH_ARGS( QnLog, qnLogInstance, qn_logPrivateInstance() );
+
 QnLog::QnLog(QnLogPrivate *d): d(d) {}
 
-QnLog QnLog::instance() {
-    return QnLog(qn_logPrivateInstance());
+QnLog* QnLog::instance()
+{
+    //return QnLog(qn_logPrivateInstance());
+
+    if( !qnLogInstance )
+    {
+        QnLog* newInstance = new QnLog( qn_logPrivateInstance() );
+        if( !qnLogInstance.testAndSetOrdered( NULL, newInstance ) )
+            delete newInstance;
+        //else
+        //    static QGlobalStaticDeleter<QnLog> cleanup(qnLogInstance);
+    }
+    return qnLogInstance;
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
@@ -222,6 +248,10 @@ void qnLogMsgHandler(QtMsgType type, const char *msg) {
     cl_log.log(QString::fromLocal8Bit(msg), logLevel);
 }
 
+QString QnLog::logFileName()
+{
+    return instance()->d->syncCurrFileName();
+}
 
 void QnLog::initLog(const QString& logLevelStr) {
     bool needWarnLogLevel = false;
@@ -244,4 +274,10 @@ void QnLog::initLog(const QString& logLevelStr) {
         if (needWarnLogLevel) 
             cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
     }
+}
+
+void QnLog::initLog( QnLog* externalInstance )
+{
+    //Q_ASSERT( !qnLogInstance );
+    qnLogInstance = externalInstance;
 }

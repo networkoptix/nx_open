@@ -1,10 +1,12 @@
 #ifndef QN_MEDIA_SERVER_RESOURCE_H
 #define QN_MEDIA_SERVER_RESOURCE_H
 
-#include "core/resource/resource.h"
-#include "core/resource/storage_resource.h"
-#include "core/resource/media_resource.h"
-#include "api/media_server_connection.h"
+#include <QtNetwork/QHostAddress>
+
+#include <api/media_server_connection.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/abstract_storage_resource.h>
 
 class QnLocalMediaServerResource : public QnResource
 {
@@ -27,6 +29,8 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
+    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
+
     QnMediaServerResource();
     virtual ~QnMediaServerResource();
 
@@ -55,10 +59,10 @@ public:
     void setReserve(bool reserve = true);
     bool getReserve() const;
 
-    bool isPanicMode() const;
-    void setPanicMode(bool panicMode);
+    PanicMode getPanicMode() const;
+    void setPanicMode(PanicMode panicMode);
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     QString getProxyHost() const;
     int getProxyPort() const;
@@ -66,11 +70,13 @@ public:
     QString getVersion() const;
     void setVersion(const QString& version);
 
-signals:
-    void serverIFFound(const QString &);
-    void panicModeChanged(const QnMediaServerResourcePtr &resource);
+private slots:
+    void at_pingResponse(QnHTTPRawResponse, int);
+    void determineOptimalNetIF_testProxy();
 
-protected:
+signals:
+    void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
+    void panicModeChanged(const QnMediaServerResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;
@@ -82,8 +88,10 @@ private:
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     bool m_reserve;
-    bool m_panicMode;
+    PanicMode m_panicMode;
     QString m_version;
+    QMap<int, QString> m_runningIfRequests;
+    QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

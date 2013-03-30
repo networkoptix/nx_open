@@ -18,8 +18,8 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 
 class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
     typedef QWidget base_type;
 
@@ -33,8 +33,8 @@ public:
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 
-    bool isCameraActive() const;
-    void setCameraActive(bool active);
+    void setScheduleEnabled(bool enabled);
+    bool isScheduleEnabled() const;
 
     bool hasCameraChanges() const {
         return m_hasCameraChanges;
@@ -91,14 +91,17 @@ private slots:
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_cameraScheduleWidget_controlsChangesApplied();
+    void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
     void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
     void at_pingButton_clicked();
+    void at_analogViewCheckBox_clicked();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
+    void updateLicenseText();
 
 private:
     void setHasCameraChanges(bool hasChanges);

@@ -7,6 +7,8 @@
 #include <QtGui/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
+#include <decoders/abstractvideodecoderplugin.h>
+#include <plugins/pluginmanager.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
@@ -20,9 +22,14 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/warning_style.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
+#include <ui/widgets/settings/popup_settings_widget.h>
+#include <ui/widgets/settings/server_settings_widget.h>
+
 #include <youtube/youtubesettingswidget.h>
+
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
@@ -30,9 +37,13 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui(new Ui::PreferencesDialog()),
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
+    m_popupSettingsWidget(NULL),
     m_licenseManagerWidget(NULL),
+    m_serverSettingsWidget(NULL),
     m_settings(qnSettings),
-    m_licenseTabIndex(0)
+    m_licenseTabIndex(0),
+    m_serverSettingsTabIndex(0),
+    m_popupSettingsTabIndex(0)
 {
     ui->setupUi(this);
 
@@ -57,6 +68,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
+    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
+    m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
+
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
     tabWidget->addTab(youTubeSettingsWidget, tr("YouTube"));
@@ -66,6 +80,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
+
+    m_serverSettingsWidget = new QnServerSettingsWidget(this);
+    m_serverSettingsTabIndex = ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
 
     resize(1, 1); // set widget size to minimal possible
 
@@ -80,6 +97,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     if(m_licenseManagerWidget)
         setHelpTopic(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
 
+    at_onDecoderPluginsListChanged();
+
+    connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
+    connect( PluginManager::instance(), SIGNAL(pluginUnloaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
@@ -95,6 +116,22 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     initLanguages();
     updateFromSettings();
     at_context_userChanged();
+
+    if (m_settings->isWritable()) {
+        ui->readOnlyWarningLabel->hide();
+    }
+    else {
+        setWarningStyle(ui->readOnlyWarningLabel);
+        ui->readOnlyWarningLabel->setText(
+                     #ifdef Q_OS_LINUX
+                             tr("Settings file is read-only. Please contact your system administrator.\n" \
+                                "All changes will be lost after program exit.")
+                     #else
+                             tr("Settings cannot be saved. Please contact your system administrator.\n" \
+                                "All changes will be lost after program exit.")
+                     #endif
+                             );
+    }
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {
@@ -135,8 +172,13 @@ void QnPreferencesDialog::initLanguages() {
 void QnPreferencesDialog::accept() {
     QString oldLanguage = m_settings->translationPath();
     submitToSettings();
-    if (oldLanguage != m_settings->translationPath())
-        QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
+    if (oldLanguage != m_settings->translationPath()) {
+        QMessageBox::StandardButton button =
+            QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart. Press OK to close application now."),
+                                     QMessageBox::Ok, QMessageBox::Cancel);
+        if (button == QMessageBox::Ok)
+            qApp->exit();
+    }
     //m_youTubeSettingsWidget->accept();
     base_type::accept();
 }
@@ -149,6 +191,7 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
+    m_settings->setUseHardwareDecoding(ui->isHardwareDecodingCheckBox->isChecked());
     m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
@@ -156,14 +199,18 @@ void QnPreferencesDialog::submitToSettings() {
         extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
     m_settings->setExtraMediaFolders(extraMediaFolders);
 
-    if (m_recordingSettingsWidget)
-        m_recordingSettingsWidget->submitToSettings();
-
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
 
     m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
+
+    if (m_recordingSettingsWidget)
+        m_recordingSettingsWidget->submitToSettings();
+    if (m_serverSettingsWidget)
+        m_serverSettingsWidget->submit();
+    if (m_popupSettingsWidget)
+        m_popupSettingsWidget->submitToSettings(m_settings);
 
     m_settings->save();
 }
@@ -176,6 +223,7 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
+    ui->isHardwareDecodingCheckBox->setChecked( m_settings->isHardwareDecodingUsed() );
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
 
     ui->extraMediaFoldersList->clear();
@@ -189,6 +237,9 @@ void QnPreferencesDialog::updateFromSettings() {
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
 
+    if (m_popupSettingsWidget)
+        m_popupSettingsWidget->updateFromSettings(m_settings);
+
     int id = ui->languageComboBox->findData(m_settings->translationPath());
     if (id >= 0)
         ui->languageComboBox->setCurrentIndex(id);
@@ -196,6 +247,15 @@ void QnPreferencesDialog::updateFromSettings() {
 
 void QnPreferencesDialog::openLicensesPage() {
     ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
+}
+
+void QnPreferencesDialog::openServerSettingsPage() {
+    ui->tabWidget->setCurrentIndex(m_serverSettingsTabIndex);
+    m_serverSettingsWidget->updateFocusedElement();
+}
+
+void QnPreferencesDialog::openPopupSettingsPage() {
+    ui->tabWidget->setCurrentIndex(m_popupSettingsTabIndex);
 }
 
 
@@ -259,11 +319,33 @@ void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &co
 }
 
 void QnPreferencesDialog::at_context_userChanged() {
-    ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+    bool isAdmin = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+
+    ui->tabWidget->setTabEnabled(m_licenseTabIndex, isAdmin);
+    ui->tabWidget->setTabEnabled(m_serverSettingsTabIndex, isAdmin);
+    if (isAdmin) {
+        m_serverSettingsWidget->update();
+    }
 }
 
 void QnPreferencesDialog::at_timeModeComboBox_activated() {
     if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
         QMessageBox::warning(this, tr("Warning"), tr("This settings will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
     }
+}
+
+void QnPreferencesDialog::at_onDecoderPluginsListChanged()
+{
+    //checking, whether hardware decoding plugin present
+    const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
+    foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
+    {
+        if( plugin->isHardwareAccelerated() )
+        {
+            ui->isHardwareDecodingCheckBox->show();
+            return;
+        }
+    }
+
+    ui->isHardwareDecodingCheckBox->hide();
 }

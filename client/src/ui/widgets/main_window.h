@@ -53,6 +53,7 @@ public slots:
 
 protected:
     virtual bool event(QEvent *event) override;
+    virtual void closeEvent(QCloseEvent* event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void dragEnterEvent(QDragEnterEvent *event) override;
@@ -61,6 +62,7 @@ protected:
     virtual void dropEvent(QDropEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
@@ -111,6 +113,9 @@ private:
     QMargins m_frameMargins;
 
     bool m_changeOpacity;
+
+    /** This field is used to restore geometry after switching to fullscreen and back */
+    QRect m_storedGeometry;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

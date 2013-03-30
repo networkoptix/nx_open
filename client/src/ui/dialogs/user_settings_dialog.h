@@ -23,6 +23,7 @@ public:
         CurrentPassword,
         Password,
         AccessRights,
+        Email,
         ElementCount
     };
 
@@ -44,6 +45,8 @@ public:
     void setElementFlags(Element element, ElementFlags flags);
     ElementFlags elementFlags(Element element) const;
 
+    void setFocusedElement(QString element);
+
     void setEditorPermissions(quint64 rights);
 
     bool hasChanges() const {
@@ -63,9 +66,9 @@ protected:
 protected slots:
     void updateElement(Element element);
     void updateLogin() { updateElement(Login); }
-    void updateCurrentPassword() { updateElement(CurrentPassword); }
-    void updatePassword() { updateElement(Password); }
+    void updatePassword() { updateElement(CurrentPassword); updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
+    void updateEmail() { updateElement(Email); }
     void loadAccessRightsToUi(quint64 rights);
 
     void updateDependantPermissions();

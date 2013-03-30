@@ -7,10 +7,9 @@
 #include <QtCore/QTimer>
 #include <QtGui/QImage>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
-#include <client/client_meta_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
@@ -27,6 +26,7 @@
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
@@ -60,8 +60,6 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource, bool decode):
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
-    QnClientMetaTypes::initialize();
-
     connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
 
     start();
@@ -280,11 +278,11 @@ void QnThumbnailsLoader::updateProcessingLocked() {
     /* Trim at live. */
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if(processingEnd > currentTime)
-        processingEnd = currentTime + defaultUpdateInterval;
+        processingEnd = qCeil(currentTime + defaultUpdateInterval, m_timeStep);
 
     /* Adjust for the chunks near live that could not be loaded at the last request. */
     if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingEnd > m_maxLoadedTime) {
-        processingStart = qMin(processingStart, m_maxLoadedTime + m_timeStep);
+        processingStart = qMin(processingStart, qFloor(m_maxLoadedTime, m_timeStep) + m_timeStep);
         m_processingEnd = m_maxLoadedTime;
     }
 
@@ -316,6 +314,10 @@ void QnThumbnailsLoader::updateProcessingLocked() {
 
 void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
     m_processingStack.push(QnTimePeriod(startTime, endTime - startTime));
+
+#ifdef QN_THUMBNAILS_LOADER_DEBUG
+    qDebug() << "QnThumbnailsLoader::enqueueForProcessingLocked [" << startTime << "," << endTime << ") STEP" << m_timeStep;
+#endif
 
     while(m_processingStack.size() > maxStackSize)
         m_processingStack.pop();
@@ -384,7 +386,14 @@ void QnThumbnailsLoader::process() {
         }
     }
     else {
-        QnAviArchiveDelegatePtr aviDelegate(new QnAviArchiveDelegate());
+        QnAviArchiveDelegatePtr aviDelegate;
+
+        QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
+        if (aviFile)
+            aviDelegate = QnAviArchiveDelegatePtr(aviFile->createArchiveDelegate());
+        else
+            aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate);
+
         QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(aviDelegate));
         if (thumbnailDelegate->open(m_resource))
             delegates << thumbnailDelegate;
@@ -408,11 +417,11 @@ void QnThumbnailsLoader::process() {
         if (frame)
         {
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
-            CLVideoDecoderOutput outFrame;
-            outFrame.setUseExternalData(false);
+            QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
+            outFrame->setUseExternalData(false);
 
             while (frame) {
-                if (!camera)
+                if (!m_resource->hasFlags(QnResource::utc))
                     frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
 
                 timingsQueue << frame->timestamp;
@@ -421,8 +430,8 @@ void QnThumbnailsLoader::process() {
                 if(m_decode) {
                     if (decoder.decode(frame, &outFrame)) 
                     {
-                        outFrame.pkt_dts = timingsQueue.dequeue();
-                        thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                        outFrame->pkt_dts = timingsQueue.dequeue();
+                        thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
                         time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                     }
                 } else {
@@ -454,8 +463,8 @@ void QnThumbnailsLoader::process() {
                         break;
                     }
 
-                    outFrame.pkt_dts = timingsQueue.dequeue();
-                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                    outFrame->pkt_dts = timingsQueue.dequeue();
+                    thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
             }
@@ -538,7 +547,7 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
     QSize scaleTargetSize;
     {
         QMutexLocker locker(&m_mutex);
-        ensureScaleContextLocked(outFrame.linesize[0], QSize(outFrame.width, outFrame.height), boundingSize, (PixelFormat) outFrame.format);
+        ensureScaleContextLocked(outFrame.linesize[0], QSize(outFrame.width*outFrame.sample_aspect_ratio, outFrame.height), boundingSize, (PixelFormat) outFrame.format);
         scaleTargetSize = m_scaleTargetSize;
     }
 

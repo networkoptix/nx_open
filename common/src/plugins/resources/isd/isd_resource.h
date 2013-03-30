@@ -18,8 +18,6 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual bool updateMACAddress();
-
     virtual int getMaxFps() override;
 
     QSize getPrimaryResolution() const;
@@ -32,7 +30,7 @@ public:
     //bool hasDualStreaming() const {return false;}
 
 
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 protected:
     bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();

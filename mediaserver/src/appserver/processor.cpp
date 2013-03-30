@@ -8,6 +8,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
     m_appServer = QnAppServerConnectionFactory::createConnection();
+    connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
@@ -39,17 +40,21 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // but now (new version) camera NOT in resource pool!
         resource->setStatus(QnResource::Online, true); // set status in silence mode. Do not send any signals e.t.c
 
-        QByteArray errorString;
         QnVirtualCameraResourceList cameras;
         QString password = cameraResource->getAuth().password();
 
 
-        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance().containManualCamera(cameraResource->getUrl()))
+        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
 
-        if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
+        if (m_appServer->addCamera(cameraResource, cameras) != 0)
         {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
+            continue;
+        }
+        if (cameras.isEmpty())
+        {
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
             continue;
         }
 
@@ -88,8 +93,10 @@ bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &re
     return false;
 }
 
-void QnAppserverResourceProcessor::onResourceStatusChanged(const QnResourcePtr &resource)
+void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
 {
+    Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
     else

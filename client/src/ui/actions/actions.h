@@ -40,6 +40,17 @@ namespace Qn {
          */
         GetMoreLicensesAction,
 
+
+        /**
+         * Opens server settings preferences tab.
+         */
+        OpenServerSettingsAction,
+
+        /**
+         * Opens popup settings preferences tab.
+         */
+        OpenPopupSettingsAction,
+
         /**
          * Reconnects to the Enterprise Controller using the last used URL
          * set in <tt>QnSettings</tt>.
@@ -129,6 +140,20 @@ namespace Qn {
         WhatsThisAction,
 
 
+        /**
+         * Checks system health: licences, storages, email settings, etc.
+         */
+        CheckSystemHealthAction,
+
+        /**
+         * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
+         */
+        EscapeHotkeyAction,
+
+        /**
+         * Toggles visibility of popup windows.
+         */
+        TogglePopupsAction,
 
 
         /* Main menu actions. */
@@ -213,9 +238,19 @@ namespace Qn {
         SystemSettingsAction,
 
         /**
+         * Opens business events editing dialog.
+         */
+        BusinessEventsAction,
+
+        /**
          * Opens about dialog.
          */
         AboutAction,
+
+        /**
+         * Checks for updates.
+         */
+        CheckForUpdatesAction,
 
         /**
          * Closes the client.
@@ -374,6 +409,16 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
+         * Opens current layout settings dialog.
+         */
+        CurrentLayoutSettingsAction,
+
+        /**
+         * Opens layout settings dialog.
+         */
+        LayoutSettingsAction,
+
+        /**
          * Opens provided resources in an existing camera settings dialog.
          */
         OpenInCameraSettingsDialogAction,
@@ -442,6 +487,51 @@ namespace Qn {
          * Hides info widget if it is visible on all items, otherwise displays on all items
          */
         ToggleInfoAction,
+
+        /**
+         * Changes RADASS mode to auto.
+         */
+        RadassAutoAction,
+
+        /**
+         * Changes RADASS mode to high resolution.
+         */
+        RadassHighAction,
+
+        /**
+         * Changes RADASS mode to low resolution.
+         */
+        RadassLowAction,
+
+        /**
+         * Toggles next RADASS state.
+         */
+        ToggleRadassAction,
+
+        /**
+         * Opens preset name editing dialog and saves current position as a new PTZ preset.
+         */
+        PtzSavePresetAction,
+
+        /**
+         * Menu containing all PTZ presets.
+         */
+        PtzGoToPresetMenu,
+
+        /**
+         * Moves camera to the given PTZ preset.
+         * 
+         * Parameters:
+         * <tt>QString NameParameter</tt> --- name of the PTZ preset.
+         */
+        PtzGoToPresetAction,
+
+        /**
+         * Opens PTZ preset management dialog.
+         */
+        PtzManagePresetsAction,
+
+
 
         /* Layout actions. */
 

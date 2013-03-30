@@ -1,3 +1,4 @@
+#include <QHostInfo>
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
@@ -11,15 +12,16 @@
 #include <unistd.h>
 #endif
 
-bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port)
+bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
 {
     int res;
 
 #ifdef Q_OS_LINUX
+    Q_UNUSED(mode)
     sock.bind(port);
     res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
 #else
-    res = !sock.bind(iface.address, port);
+    res = !sock.bind(iface.address, port, mode);
 #endif
 
     if (res)
@@ -139,10 +141,8 @@ QString MACToString (const unsigned char* mac)
     return result;
 }
 
-unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
+unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep)
 {
-
-    const char cSep = '-';
     QByteArray arr = macs.toLatin1();
     const char *pszMACAddress = arr.data();
 
@@ -535,3 +535,45 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 
 #endif
 
+QString getMacByIP(const QString& host, bool net)
+{
+    return getMacByIP(resolveAddress(host), net);
+}
+
+bool isIpv4Address(const QString& addr)
+{
+    int ip4Addr = inet_addr(addr.toAscii().data());
+    return ip4Addr != 0 && ip4Addr != -1;
+}
+
+QHostAddress resolveAddress(const QString& addr)
+{
+    int ip4Addr = inet_addr(addr.toAscii().data());
+    if (ip4Addr != 0 && ip4Addr != -1)
+        return QHostAddress(ntohl(ip4Addr));
+
+    QHostInfo hi = QHostInfo::fromName(addr);
+    if (!hi.addresses().isEmpty())
+        return hi.addresses()[0];
+    else
+        return QHostAddress();
+}
+
+int strEqualAmount(const char* str1, const char* str2)
+{
+    int rez = 0;
+    while (*str1 && *str1 == *str2)
+    {
+        rez++;
+        str1++;
+        str2++;
+    }
+    return rez;
+}
+
+bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
+{
+    int eq1 = strEqualAmount(host.toLocal8Bit().constData(), newAddress.toLocal8Bit().constData());
+    int eq2 = strEqualAmount(host.toLocal8Bit().constData(), oldAddress.toLocal8Bit().constData());
+    return eq1 > eq2;
+}

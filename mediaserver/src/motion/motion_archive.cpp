@@ -59,7 +59,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
         }
     }
 
-    if (m_lastTimeMs != AV_NOPTS_VALUE && timeMs > m_lastTimeMs)
+    if (m_lastTimeMs != (qint64)AV_NOPTS_VALUE && timeMs > m_lastTimeMs)
         m_indexItr = qUpperBound(m_indexItr, m_index.end(), timeMs - m_indexHeader.startTime);
     else 
         m_indexItr = qUpperBound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
@@ -169,7 +169,7 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
 
 QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
-    if (minTime() != AV_NOPTS_VALUE)
+    if (minTime() != (qint64)AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
     msEndTime = qMin(msEndTime, m_maxMotionTime);
 
@@ -231,7 +231,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                         break;
                     }
 
-                    if (!rez.isEmpty() && fullStartTime < rez.last().startTimeMs + rez.last().durationMs + (detailLevel-1))
+                    if (!rez.isEmpty() && fullStartTime <= rez.last().startTimeMs + rez.last().durationMs + detailLevel)
                         rez.last().durationMs = qMax(rez.last().durationMs, i->duration + fullStartTime - rez.last().startTimeMs);
                     else
                         rez.push_back(QnTimePeriod(fullStartTime, i->duration));
@@ -353,7 +353,6 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
         else {
             loadIndexFile(m_index, m_indexHeader, m_detailedIndexFile);
             if (m_index.size() > 0) {
-                m_minMotionTime = m_index.first().start + m_indexHeader.startTime;
                 m_lastRecordedTime = m_maxMotionTime = m_index.last().start + m_indexHeader.startTime;
             }
         }
@@ -380,7 +379,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
-    quint32 duration = int(data->m_duration/1000);
+    quint32 duration = int((data->timestamp+data->m_duration)/1000 - timestamp);
     if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
@@ -400,7 +399,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
 
     m_lastRecordedTime = timestamp;
     m_maxMotionTime = qMax(m_maxMotionTime, timestamp);
-    if (m_minMotionTime == AV_NOPTS_VALUE)
+    if (m_minMotionTime == (qint64)AV_NOPTS_VALUE)
         m_minMotionTime = m_maxMotionTime;
     m_middleRecordNum++;
     return true;
@@ -410,7 +409,7 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
 {
     bool rez = true;
 
-    if (m_lastTimestamp == AV_NOPTS_VALUE) {
+    if (m_lastTimestamp == (qint64)AV_NOPTS_VALUE) {
         m_lastDetailedData->m_duration = 0;
         m_lastDetailedData->timestamp = data->timestamp;
     }

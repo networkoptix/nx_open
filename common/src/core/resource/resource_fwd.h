@@ -76,6 +76,11 @@ class QnPlAxisResource;
 typedef QnSharedResourcePointer<QnPlAxisResource> QnPlAxisResourcePtr;
 typedef QnSharedResourcePointerList<QnPlAxisResource> QnPlAxisResourceList;
 
+class QnActiResource;
+typedef QnSharedResourcePointer<QnActiResource> QnActiResourcePtr;
+typedef QnSharedResourcePointerList<QnActiResource> QnActiResourceList;
+
+
 class QnPlOnvifResource;
 typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 typedef QnSharedResourcePointerList<QnPlOnvifResource> QnPlOnvifResourceList;
@@ -86,8 +91,14 @@ typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
 
 class QnPlPulseResource;
 typedef QSharedPointer<QnPlPulseResource> QnPlPulseResourcePtr;
+typedef QnSharedResourcePointerList<QnPlPulseResource> QnPlPulseResourceList;
 
 class QnPlIqResource;
 typedef QSharedPointer<QnPlIqResource> QnPlIqResourcePtr;
+typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
+
+class QnPlWatchDogResource;
+typedef QSharedPointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
+typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
 
 #endif // QN_RESOURCE_FWD_H

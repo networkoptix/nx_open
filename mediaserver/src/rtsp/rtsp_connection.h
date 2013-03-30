@@ -41,6 +41,8 @@ struct RtspServerTrackInfo
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
+class QnRtspConnectionProcessorPrivate;
+
 class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
@@ -64,13 +66,16 @@ public:
     //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
     int getTracksCount() const;
+
 protected:
     virtual void run();
     void addResponseRangeHeader();
     QString getRangeStr();
+
 private slots:
-    void at_cameraDisabledChanged(bool oldValue, bool newValue);
-    void at_cameraUpdated();
+    void at_camera_disabledChanged();
+    void at_camera_resourceChanged();
+
 private:
     void checkQuality();
     void processRequest();
@@ -101,8 +106,9 @@ private:
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks();
+
 private:
-    QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
+    Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;
 };
 

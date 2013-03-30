@@ -1,13 +1,16 @@
 #include "ffmpeg_audio_transcoder.h"
+#include "utils/media/audio_processor.h"
 
 static const int MAX_AUDIO_JITTER = 1000 * 200;
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
-QnAudioTranscoder(codecId),
-m_encoderCtx(0),
-m_decoderContext(0),
-m_firstEncodedPts(AV_NOPTS_VALUE),
-m_lastTimestamp(AV_NOPTS_VALUE)
+    QnAudioTranscoder(codecId),
+    m_encoderCtx(0),
+    m_decoderContext(0),
+    m_firstEncodedPts(AV_NOPTS_VALUE),
+    m_lastTimestamp(AV_NOPTS_VALUE),
+    m_downmixAudio(false),
+    m_frameNum(0)
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE, 32);
@@ -62,6 +65,11 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     else
         m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_S16; //avCodec->sample_fmts[0];
     m_encoderCtx->channels = codecCtx->ctx()->channels;
+    if (m_encoderCtx->channels > 2 && (m_codecId == CODEC_ID_MP3 || m_codecId == CODEC_ID_MP2))
+    {
+        m_downmixAudio = true;
+        m_encoderCtx->channels = 2;
+    }
     m_encoderCtx->sample_rate = codecCtx->ctx()->sample_rate;
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
@@ -87,20 +95,22 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
         return false;
     }
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
+    m_frameNum = 0;
     return true;
 }
 
-int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
+int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
 {
-    result.clear();
+    if( result )
+        result->clear();
 
     if (!m_lastErrMessage.isEmpty())
         return -3;
 
     if (media) {
-        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER || m_lastTimestamp == AV_NOPTS_VALUE)
+        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER || (quint64)m_lastTimestamp == AV_NOPTS_VALUE)
         {
-            m_encoderCtx->frame_number = 0;
+            m_frameNum = 0;
             m_firstEncodedPts = media->timestamp;
         }
 
@@ -112,18 +122,26 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         avpkt.size = media->data.size();
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(m_decoderContext, (short *)(m_decodedBuffer + m_decodedBufferSize), &out_size, &avpkt);
         if (len < 0)
             return -3;
-        if (out_size > 0)
+        if (out_size > 0) {
+            if (m_downmixAudio)
+                out_size = QnAudioProcessor::downmix(m_decodedBuffer + m_decodedBufferSize, out_size, audio->context->ctx());
             m_decodedBufferSize += out_size;
+        }
         Q_ASSERT(m_decodedBufferSize < AVCODEC_MAX_AUDIO_FRAME_SIZE);
     }
+
+    if( !result )
+        return 0;
 
     int encoderFrameSize = m_encoderCtx->frame_size*sizeof(short)*m_encoderCtx->channels;
     if (m_decodedBufferSize < encoderFrameSize)
         return 0;
 
+    // TODO: #vasilenko avoid using deprecated methods
     int encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
     if (encoded < 0)
         return -3;
@@ -135,13 +153,15 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         return 0;
 
 
-    result = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context));
-    result->compressionType = m_codecId;
+    *result = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context));
+    (*result)->compressionType = m_codecId;
     static AVRational r = {1, 1000000};
     //result->timestamp  = m_lastTimestamp;
-    qint64 audioPts = m_encoderCtx->frame_number*m_encoderCtx->frame_size;
-    result->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
-    result->data.write((const char*) m_audioEncodingBuffer, encoded);
+    qint64 audioPts = m_frameNum++ * m_encoderCtx->frame_size;
+    (*result)->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
+    (*result)->data.write((const char*) m_audioEncodingBuffer, encoded);
+
+    return 0;
 }
 
 AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()

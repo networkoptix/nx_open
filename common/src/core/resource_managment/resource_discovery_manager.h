@@ -1,8 +1,10 @@
 #ifndef QN_RESOURCE_DISCOVERY_MANAGER_H
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
+#include <memory> // for auto_ptr
 #include <QtCore/QThread>
 #include <QAuthenticator>
+#include <QTimer>
 #include "utils/common/long_runnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
@@ -14,7 +16,7 @@ class QnAbstractDTSSearcher;
 struct QnManualCameraInfo
 {
     QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType);
-    QnResourcePtr checkHostAddr() const;
+    QList<QnResourcePtr> checkHostAddr() const;
 
     QUrl url;
     QnResourceTypePtr resType;
@@ -24,6 +26,27 @@ struct QnManualCameraInfo
 typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
 
 class QnAbstractResourceSearcher;
+
+class QnResourceDiscoveryManager;
+/*!
+    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread, 
+    since we cannot move QnResourceDiscoveryManager object to QnResourceDiscoveryManager thread (weird...)
+*/
+class QnResourceDiscoveryManagerTimeoutDelegate
+:
+    public QObject
+{
+    Q_OBJECT
+
+public:
+    QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager );
+
+public slots:
+    void onTimeout();
+
+private:
+    QnResourceDiscoveryManager* m_discoveryManager;
+};
 
 // this class just searches for new resources
 // it uses others plugins
@@ -36,12 +59,10 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
+    QnResourceDiscoveryManager();
     ~QnResourceDiscoveryManager();
 
-    static QnResourceDiscoveryManager& instance();
-
-    void setServer(bool serv);
-    bool isServer() const;
+    static QnResourceDiscoveryManager* instance();
 
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
@@ -55,63 +76,68 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth, int port);
+    QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
     bool registerManualCameras(const QnManualCamerasMap& cameras);
-    QnResourceList processManualAddedResources();
+    //QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
+
+    //!This method MUST be called from non-GUI thread, since it can block for some time
+    void doResourceDiscoverIteration();
+
+    static void init(QnResourceDiscoveryManager* instance);
+
+public slots:
+    virtual void start( Priority priority = InheritPriority ) override;
+
 protected:
-    QnResourceDiscoveryManager();
+    QMutex m_discoveryMutex;
+    unsigned int m_runNumber;
 
     virtual void run();
+    virtual bool processDiscoveredResources(QnResourceList& resources);
 
 signals:
     void localInterfacesChanged();
+    void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
+
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
+
 private:
+    enum State
+    {
+        initialSearch,
+        periodicSearch
+    };
+
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
     QnResourceList findNewResources();
 
-    void check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState);
-
-    void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished, CLNetState& netState);
-
-    
-    void markOfflineIfNeeded(QSet<QString>& discoveredResources);
-
-    void updateResourceStatus(QnResourcePtr res, QSet<QString>& discoveredResources);
-
-
-    // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
-    void pingResources(QnResourcePtr res);
     void appendManualDiscoveredResources(QnResourceList& resources);
-    bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
     void dtsAssignment();
-private:
+
     QMutex m_searchersListMutex;
-    QMutex m_discoveryMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCamerasMap m_manualCameraMap;
 
     bool m_server;
-    bool m_foundSmth; // minor just to minimize lof output
     volatile bool m_ready;
-
-    unsigned int m_runNumber;
 
     QList<QHostAddress> m_allLocalAddresses;
 
 
-    QMap<QString, int> m_resourceDiscoveryCounter;
     QVector<QnAbstractDTSSearcher*> m_dstList;
-	CLNetState netState;
-    QTime netStateTime;
     QSet<QString> m_disabledVendorsForAutoSearch;
+    static QnResourceDiscoveryManager* m_instance;
+
+    std::auto_ptr<QTimer> m_timer;
+    State m_state;
+    QSet<QString> m_recentlyDeleted;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

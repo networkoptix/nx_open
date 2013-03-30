@@ -1,5 +1,7 @@
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "dw_zoom_ptz_controller.h"
+#include "utils/math/space_mapper.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -64,17 +66,48 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 bool QnPlWatchDogResource::initInternal() 
 {
     bool unauth = false;
-
     if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
         // The camera most likely is going to reset after enabling dual streaming
         enableOnvifSecondStream();
         return false;
     }
-    else 
-    {
-        return QnPlOnvifResource::initInternal();
+        
+    bool result = QnPlOnvifResource::initInternal();
+
+    // TODO: #Elric this code is totally evil. Better write it properly as soon as possible.
+    CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
+    http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
+    QByteArray data;
+    http.readAll(data);
+
+    bool flipVertical = false, flipHorizontal = false;
+    if(data.contains("flipmode1: 1")) {
+        flipHorizontal = !flipHorizontal;
+        flipVertical = !flipVertical;
     }
+    if(data.contains("mirrormode1: 1"))
+        flipHorizontal = !flipHorizontal;
+
+    // TODO: #Elric evil hacks here =(
+    if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) {
+        ptzController->setFlipped(flipHorizontal, flipVertical);
+
+        if(QnPtzSpaceMapper *mapper = const_cast<QnPtzSpaceMapper *>(ptzController->getSpaceMapper())) {
+            QnVectorSpaceMapper &fromCamera = const_cast<QnVectorSpaceMapper &>(mapper->fromCamera());
+            QnVectorSpaceMapper &toCamera = const_cast<QnVectorSpaceMapper &>(mapper->toCamera());
+            if(flipHorizontal) {
+                fromCamera.setMapper(QnVectorSpaceMapper::X, fromCamera.mapper(QnVectorSpaceMapper::X).flipped(false, true, 0.0, 0.0));
+                toCamera.setMapper(QnVectorSpaceMapper::X, toCamera.mapper(QnVectorSpaceMapper::X).flipped(false, true, 0.0, 0.0));
+            }
+            if(flipVertical) {
+                fromCamera.setMapper(QnVectorSpaceMapper::Y, fromCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
+                toCamera.setMapper(QnVectorSpaceMapper::Y, toCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
+            }
+        }
+    }
+
+    return result;
 }
 
 
@@ -85,8 +118,7 @@ void QnPlWatchDogResource::enableOnvifSecondStream()
     QByteArray request;
     request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
     request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
-    CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
-    Q_UNUSED(status);
+    http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
 
     setStatus(Offline);
     // camera rebooting ....
@@ -104,12 +136,19 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     resolutionFactor = pow(resolutionFactor, (float)0.5);
 
     float frameRateFactor = fps/30.0;
-    frameRateFactor = pow(resolutionFactor, (float)0.4);
+    frameRateFactor = pow(frameRateFactor, (float)0.4);
 
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(1024,result);
+}
+
+QnAbstractPtzController *QnPlWatchDogResource::getPtzController() {
+    QnAbstractPtzController *result = base_type::getPtzController();
+    if(result)
+        return result; /* Use PTZ controller from ONVIF if one is present. */
+    return m_ptzController.data();
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
@@ -124,11 +163,11 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
-
-        if (suffix.endsWith(QLatin1String("-FOCUS")))
-            addCameraCapabilities(HasZoom);
-        else
-            removeCameraCapabilities(HasZoom);
+        bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
+        if(hasFocus) {
+            setCameraCapability(Qn::ContinuousZoomCapability, true);
+            m_ptzController.reset(new QnDwZoomPtzController(this));
+        }
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;
@@ -224,7 +263,7 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
 // class QnPlWatchDogResourceAdditionalSettings
 //
 
-QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host,
+QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(const QString& host,
         int port, unsigned int timeout, const QAuthenticator& auth, const QString& cameraSettingId) :
     m_cameraProxy(new DWCameraProxy(host, port, timeout, auth)),
     m_settings()

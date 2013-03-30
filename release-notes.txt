@@ -1,3 +1,108 @@
+----------------------------------------------- 1.5 -----------------------------------------------
+
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - Digital Watchdog VMAX 480 Encoders
+ - Axis Encoders (incl. PTZ)
+ - Flex Watch Encoders (incl. PTZ)
+ - Vivotek Encoders 
+ - Arecont 12186 and 20365
+ - AXISP1354
+ - ACTI product line
+ - Canon product line 
+
+NEW FEATURES:  
+ - New license type is introduced. It will be used for analog cameras. Analog cameras are divided into 2 types:
+   - DTS Based (i.e. VMAX Channels). For those cameras analog license is required for view live stream and archive (set on camera settings on the "General" tab). Recording is performed on DTS so the software only acruires recorded data from it.
+   - Encoder channels (i.e. Flex Watch channels). Those cameras require a license for recording and may be viewed live without one. Recording is configured as usual. Such cameras are recorded directly by Media server.
+ - License form is redesigned. Now the following data is displayed:
+   - Licensed To - License Name and the provider the license has been obtained from
+   - Type (analog/digital)
+   - Expiration Date - specified only for trial licenses, "never" for permanent-ones
+ - Windows 8 is supported
+ - E-Mails are introduced for Users. Each user is advised to have an e-mail. These e-mails will be used for notifications (see below)
+ - Intuitive Mail Server settings. It is necessary to specify e-mail address and password of the account that is intended to be used for mail notifications. The system will do the rest. Additional parameters are available as well
+ - client of any version can talk to any EC version
+ - Events and Actions:
+   - Events: 
+     - Motion (camera(s) must be specified). Camera(s) must have Recording enabled
+     - Camera Disconnected (specific camera(s) may be specified). If not, any camera will trigger the event
+     - Storage Failure (in case Media Server is unable to write a file on a storage)
+     - Network Issue (RTP timeout or RTP packet loss)
+     - Camera IP Conflict (if several cameras or servers have the same IP address)
+     - Input Signal on Camera (if supported - ONVIF and Axis only)
+     - Media Server Failure (in case Media Server goes down or reboots itself)
+     - Media Servers Conflict (if another Media Server that connected to another EC is pulling video from the same camera(s))
+	 - EC Connection Lost (results in notifications only)
+	 - Licenses are not configured (results in notifications only for Admin)
+	 - E-mail is not set (results in notifications only). Admin gets notifications about all users that have not emails specified
+	 - Storages are not configure properly (results in notifications only for Admin)
+   - Actions: 
+     - Camera Recording (camera(s) must be specified). Camera(s) must have Recording enabled
+     - Panic Recording
+     - Send Mail (user(s) and additional recipient(s) must be specified). Mail Server settings should be configured in Global Settings
+     - Show Notification (User roles may be specified). Notification parameters should be configured in Global Settings
+     - Camera Output(if supported - ONVIF and Axis only)     
+   - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has standard and advanced parameters
+ - Hardware acceleration of video decoding (Intel Quick Sync only). The flag in System Settings will be available only if Intel HD graphics is enabled
+ - PTZ is greatly improved:
+   - PTZ is now more intuitive and precise
+   - PTZ now works correctly for rotated/flipped Axis cameras
+   - PTZ positions can be saved/restored (if a camera supports positioning)
+   - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
+ 
+IMPROVEMENTS:
+ - Storage Dialog is significantly redesigned. Now it is not necessary to specify the folder for the recording data, it is necessary to select the disks the recording will be performed to and the amount of free space to preserve. The software will do the last.
+ - CTRL can be used in Calendar Search to select multiple dates
+ - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
+ - Domain names are allowed for the "Manual camera addition" form
+ - The "Do not show again" checkbox is added to the upgrade form. To re-enable it use "Check For Upgrade" Main Menu item
+ - It is possible to view EC and Mediaserver logs via Web Interface. Use https://<EC IP>:<EC Port>/web/servers URL (i.e. https://127.0.0.1:7001/web/servers)
+ - Auto storage selection is improved. While installing a media server, every available partition in the system must be added (if the partition has >100 GB free)
+ - Manual RADASS Switch is added to the interface but not implemented in the code. We will think about it and maybe remove it
+ - If max fps has been reduced for motion+low, it will be reduced for all record modes in schedule (Arecont cameras only)
+ - Now it is not necessary to select an item before export. Last selected item will be exported
+ - Screen Recording form was redesigned
+ - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
+ - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
+ - Health Monitoring colors can be customized
+ - Now non-admin users (viewers) can create own layouts based on cameras that have been assigned to them 
+ - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
+ - Manual Camera Addition Dialog is improved:
+   - Last entered data is filled automatically
+   - It is possible to perform other actions while manual camera addition is in progress 
+ 
+BUGS FIXED:
+ - If several cameras had different recording parameters it was not possible to set "Do not record" to them simultaneously
+ - Identically named items were sorted randomly in Tree each time Client was started. Fixed
+ - If the password for admin was changed, no changes were applied toEC until system restart. Fixed
+ - If a distance between recorded fragments were small (2-3sec), then "Next chunk" button resulted in jump over these chunks. Fixed
+ - "Open in a new window" didn't work for items of Multi-Video exported files. Now it works
+ - The selection of items was not saved correctly after closing and re-opening the layout. Fixed
+ - If two cameras were playing video near the live position (last minute) and one of them was closed, than another didn't jump up to live and could stuck. Fixed
+ - If open several Multi-Videos then change and save one of them, then another was corrupted. Fixed
+ - "Close All but This" menu item didn't ask to save layouts. Fixed
+ - If a layout had been modified via drag'n'drop is was not suggested to save it if try to close the client. Fixed
+ - If open camera from another user's Layout in a new tab (using Resource Tree) it was removed from layout in resource tree. Fixed
+ - If two cameras had the same password, it was displayed if select them both and open their properties. Now asterisks are displayed
+ - If Screen Recording was performed with the mouse cursor, the cursor position displayed incorrectly. Fixed
+ - Arecont. If choose Motion + Lo-Res Recording and choose Max FPS, then click Cancel then warning message was appeared severel times. Fixed
+ - If save a layout as... and specify the existing name, this layout was saved as new. Fixed
+ - Thumbnails are drawn on top of chunks holes in multi-video exported file. Fixed
+ - If restart screen recording quickly, it is not started. Fixed
+ - If click ESC many times, main window was getting bigger
+ - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed
+ - If physically delete a file that was containing in a saved layout it was displayed incorrectly (Loading... was drawn). Fixed
+ - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously 
+ 
+----------------------------------------------- 1.4 Patch -----------------------------------------------
+
+BUGS FIXED:
+ - If a panoramic camera had been renamed it didn't display video streams. Fixed
+ - x86 EC contained unusual library, that affected web-client. Fixed
+ - Motion was gone for archive older than 1 month. Fixed
+ 
+----------------------------------------------- 1.4 -----------------------------------------------
+
 NEW CAMERAS AND RECORDERS SUPPORTED:
  - D-Link cameras are able to do dual-streaming. This results in software motion detection support and RADASS capabilities on these cameras
  - Camera models that can be added manually are extended. Now Arecont, D-Link and ISD cameras can be added manually
@@ -208,7 +313,7 @@ Improvements:
  - If rewind back up to the end of archive circles were moving instead of NO DATA. Fixed.
  - If run Media Server after client then client was trying to connect via Media Proxy. Fixed.
  - Fixed incorrect tab behavior in login dialog. 
- - If hold Right mouse Bbutton on Timeline	current selection cleared. Now not.
+ - If hold Right mouse Bbutton on Timeline    current selection cleared. Now not.
  - Incorrect total # of licenses displayed in recording schedule form right after a license registration. Fixed.
  - Screen recording were saved as *.av. Now *.avi.
  - If switch off a server and try to seek on the recorded position camera could hang for a long time instead of NO DATA. Fixed.

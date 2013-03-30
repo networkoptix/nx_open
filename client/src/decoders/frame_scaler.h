@@ -21,7 +21,7 @@ public:
     };
 
     static void downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, DownscaleFactor factor);
-private:
+
 private:
     static void downscalePlate_factor2(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);
     static void downscalePlate_factor4(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);

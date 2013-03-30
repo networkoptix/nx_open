@@ -15,14 +15,13 @@ public:
 
     static QnStorageResource* instance();
 
-    //void registerFfmpegProtocol() const override;
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getChunkLen() const override;
     virtual bool isStorageAvailable() override;
     virtual bool isStorageAvailableForWriting() override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
-    qint64 getFileSize(const QString& fillName) const override;
+    qint64 getFileSize(const QString& url) const override;
     virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
@@ -31,6 +30,7 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
+    virtual qint64 getTotalSpace() override;
 
 protected:
 private:

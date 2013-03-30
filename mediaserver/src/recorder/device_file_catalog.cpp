@@ -57,10 +57,10 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
 }
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
+    m_mutex(QMutex::Recursive),
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
-    m_mutex(QMutex::Recursive),
-    m_duplicateName(false),
+    //m_duplicateName(false),
     m_role(role),
     m_lastAddIndex(-1)
 {
@@ -92,14 +92,24 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     }
 }
 
+/*
 bool DeviceFileCatalog::lastFileDuplicateName() const
 {
     return m_duplicateName;
 }
+*/
 
-bool DeviceFileCatalog::fileExists(const Chunk& chunk, qint64& fileSize)
+QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
-    fileSize = 0;
+    QString result = prefix;
+    for (int j = 0; j <= i; ++j)
+        result += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
+    return result;
+}
+
+bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
+{
+    //fileSize = 0;
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return false;
@@ -141,25 +151,26 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, qint64& fileSize)
         {
             sameDir = false;
             // new folder. check it
-            for (int j = 0; j < i; ++j)
-                prefix += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
 
-            bool exist = true;
-            for (int j = i; j < 4; ++j)
-            {
-                prefix += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
-                if (exist)
-                    exist &= storage->isDirExists(prefix);
+            for (int j = i; j < 4; ++j) {
                 prevParts[j].first = currentParts[j];
-                prevParts[j].second = exist;
+                prevParts[j].second = true;
             }
+            for (int j = 3; j >= i && !storage->isDirExists(getDirName(prefix, currentParts, j)); --j)
+                prevParts[j].second = false;
+
             break;
         }
     }
     if (!prevParts[3].second)
         return false;
+
+    // do not check files. just check dirs
+    if (checkDirOnly)
+        return true;
+
     if (!sameDir) {
-        itr.value().entryList = storage->getFileList(prefix);
+        itr.value().entryList = storage->getFileList(getDirName(prefix, currentParts, 3));
     }
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
 
@@ -169,7 +180,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, qint64& fileSize)
         if (info.fileName() == fName)
         {
             found = true;
-            fileSize = info.size();
+            qint64 fileSize = info.size();
             if (fileSize < 1024) 
             {
                 // file is absent or empty media file
@@ -179,14 +190,8 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, qint64& fileSize)
             break;
         }
     }
-    if (!found)
-        return false;
-    //if (!m_existFileList.contains(fName))
-    //    return false;
-
-    m_duplicateName = (fName == m_prevFileNames[chunk.storageIndex]) && sameDir;
-    m_prevFileNames[chunk.storageIndex] = fName;
-    return true;
+    //m_prevFileNames[chunk.storageIndex] = fName;
+    return found;
 }
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage)
@@ -216,12 +221,12 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     recorder.close();
     delete reader;
 
-    qint64 oldSize = storage->getFileSize(fileName);
-    qint64 newSize = storage->getFileSize(fileName + ".new.mkv");
+    //qint64 oldSize = storage->getFileSize(fileName);
+    //qint64 newSize = storage->getFileSize(fileName + ".new.mkv");
 
     if (storage->removeFile(fileName)) {
         storage->renameFile(fileName+".new.mkv", fileName);
-        storage->addWritedSpace(newSize - oldSize);
+        //storage->addWritedSpace(newSize - oldSize);
     }
     return rez;
 }
@@ -244,7 +249,7 @@ QList<QDate> DeviceFileCatalog::recordedMonthList()
     return rez;
 }
 
-void DeviceFileCatalog::addChunk(const Chunk& chunk)
+bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
     if (!m_chunks.isEmpty() && chunk.startTimeMs > m_chunks.last().startTimeMs) {
         m_chunks << chunk;
@@ -253,10 +258,20 @@ void DeviceFileCatalog::addChunk(const Chunk& chunk)
         ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
+    if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
+    {
+        // update catalog to fix bug from previous version
+        m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
+        return true;
+    }
+    return false;
 };
 
 void DeviceFileCatalog::deserializeTitleFile()
 {
+    QTime t;
+    t.restart();
+
     QMutexLocker lock(&m_mutex);
     bool needRewriteCatalog = false;
     QFile newFile(m_file.fileName() + QString(".tmp"));
@@ -266,6 +281,7 @@ void DeviceFileCatalog::deserializeTitleFile()
     if (headerLine.contains("timezone"))
         timeZoneExist = 1;
     QByteArray line;
+    bool checkDirOnly = false;
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
@@ -288,23 +304,26 @@ void DeviceFileCatalog::deserializeTitleFile()
             if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
             {
                 needRewriteCatalog = true;
-                chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
+                //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
+                storage->removeFile(fullFileName(chunk));
+                continue;
             }
             else {
                 chunk.durationMs = 0;
             }
         }
 
-        qint64 chunkFileSize = 0;
+        //qint64 chunkFileSize = 0;
         if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
         {
-            ;
-            // Skip chunks for unavaileble storage
-             //addChunk(chunk, lastStartTime);
+             needRewriteCatalog |= addChunk(chunk);
         }
-        else if (fileExists(chunk, chunkFileSize))
+        else if (fileExists(chunk, checkDirOnly))
         {
-            chunk.setFileSize(chunkFileSize);
+            //chunk.setFileSize(chunkFileSize);
+
+            // optimization. Since we have got first file, check dirs only. It is required to check files at begin to determine archive start point
+            checkDirOnly = true; 
 
             if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
             {
@@ -315,8 +334,9 @@ void DeviceFileCatalog::deserializeTitleFile()
                 needRewriteCatalog = true;
                 continue;
             }
-			storage->addWritedSpace(chunkFileSize);
+			//storage->addWritedSpace(chunkFileSize);
 
+            /*
             if (lastFileDuplicateName()) {
                 if (m_chunks.isEmpty())
                     m_chunks << chunk;
@@ -325,14 +345,9 @@ void DeviceFileCatalog::deserializeTitleFile()
                 needRewriteCatalog = true;
             }       
             else 
+            */
             {
-                addChunk(chunk);
-                if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
-                {
-                    // update catalog to fix bug from previous version
-                    m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
-                    needRewriteCatalog = true;
-                }
+                needRewriteCatalog |= addChunk(chunk);
             }
         }
         else {
@@ -364,6 +379,8 @@ void DeviceFileCatalog::deserializeTitleFile()
         m_file.open(QFile::ReadWrite);
         m_file.seek(m_file.size());
     }
+
+    qWarning() << QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed());
 }
 
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
@@ -457,7 +474,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 	{
 		QMutexLocker lock(&m_mutex);
 		if (m_chunks.isEmpty())
-			return deletedSize;
+			return -1;
 
 		static const int DELETE_COEFF = 1000;
 
@@ -491,15 +508,17 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
 		}
 	}
 
-	if (!delFileName.isEmpty())
-	{
-        if (deletedSize == 0)
-            deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
-		storage->addWritedSpace(-deletedSize);
-		storage->removeFile(delFileName);
-	}
-	if (!motionDirName.isEmpty())
-		storage->removeDir(motionDirName);
+    if (storage) {
+	    if (!delFileName.isEmpty())
+	    {
+            if (deletedSize == 0)
+                deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
+		    //storage->addWritedSpace(-deletedSize);
+		    storage->removeFile(delFileName);
+	    }
+	    if (!motionDirName.isEmpty())
+		    storage->removeDir(motionDirName);
+    }
 
     return deletedSize;
 }

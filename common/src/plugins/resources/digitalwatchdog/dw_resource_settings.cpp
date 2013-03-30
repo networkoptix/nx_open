@@ -7,7 +7,7 @@
 QRegExp DW_RES_SETTINGS_FILTER(QString::fromLatin1("[{},']"));
 
 
-DWCameraProxy::DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
+DWCameraProxy::DWCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_host(host),
     m_port(port),
     m_timeout(timeout),

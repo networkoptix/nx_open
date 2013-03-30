@@ -50,7 +50,7 @@ namespace {
 
 QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
     m_filterTimerId(0)
@@ -68,12 +68,12 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_resourceModel = new QnResourcePoolModel(this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
-    ui->resourceTreeWidget->enableGraphicsTweaks();
+    ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
-//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #gdm ask #Elrik whether try to enable this =)
+//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #Elric why don't we enable this? looks good and useful
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
-    ui->searchTreeWidget->enableGraphicsTweaks();
+    ui->searchTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
 
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
@@ -81,9 +81,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_renameAction = new QAction(this);
 
     setHelpTopic(this,                              Qn::MainWindow_Tree_Help);
-    setHelpTopic(ui->resourceTreeWidget->model(),   Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab,                     Qn::MainWindow_Tree_Search_Help);
-    setHelpTopic(ui->searchTreeWidget->model(),     Qn::MainWindow_Tree_Search_Help);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
@@ -117,7 +115,7 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget() {
 
     at_workbench_currentLayoutAboutToBeChanged();
 
-    ui->searchTreeWidget->setWorkbench(NULL);\
+    ui->searchTreeWidget->setWorkbench(NULL);
     ui->resourceTreeWidget->setWorkbench(NULL);
 }
 
@@ -203,13 +201,17 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     /* Add tree-local actions to the menu. */
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: implement with action parameters
-    
+
     if(currentItemView() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
         manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
     } else {
         manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
     }
+
+    /* Do not show 'Rename' on the recorder when it contains only one camera. */
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) == Qn::RecorderNode)
+        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
 
     if(menu->isEmpty())
         return;
@@ -238,8 +240,17 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        if (index.data(Qn::NodeTypeRole) == Qn::RecorderNode) {
+            for (int i = 0; i < index.model()->rowCount(index); i++) {
+                QModelIndex subIndex = index.model()->index(i, 0, index);
+                QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                if(resource && !result.contains(resource))
+                    result.append(resource);
+            }
+        }
+
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource)
+        if(resource && !result.contains(resource))
             result.append(resource);
     }
 
@@ -388,10 +399,15 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
-            model->addCriterion(QnResourceCriterionGroup(filter));
+            if (filter.isEmpty())
+                model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
+            else
+                model->addCriterion(QnResourceCriterionGroup(filter));
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
             model->addCriterion(QnResourceCriterion(QnResource::server));
+            model->addCriterion(QnResourceCriterion(QnResource::user));
+            model->addCriterion(QnResourceCriterion(QnResource::layout));
         }
     }
 

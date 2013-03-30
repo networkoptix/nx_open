@@ -7,7 +7,7 @@
 
 #include "ui/style/globals.h"
 #include "utils/settings.h"
-#include "ui/common/color_transformations.h"
+#include "utils/math/color_transformations.h"
 
 namespace {
 
@@ -26,9 +26,16 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_readOnly = false;
     m_defaultParams[FirstParam] = 10;
     m_defaultParams[SecondParam] = QLatin1String("Me");
-    m_defaultParams[ColorInsideParam] = m_defaultParams[ColorParam] = qnGlobals->recordAlwaysColor().rgba();
-    resetCellValues();
+    m_defaultParams[RecordTypeParam] = Qn::RecordingType_Run;
 
+    m_insideColors[Qn::RecordingType_Never] = m_colors[Qn::RecordingType_Never] = qnGlobals->noRecordColor();
+    m_insideColors[Qn::RecordingType_MotionOnly] = m_colors[Qn::RecordingType_MotionOnly] = qnGlobals->recordMotionColor();
+    m_insideColors[Qn::RecordingType_Run] = m_colors[Qn::RecordingType_Run] = qnGlobals->recordAlwaysColor();
+
+    m_colors[Qn::RecordingType_MotionPlusLQ] = shiftColor(qnGlobals->recordMotionColor(),0,1,0);
+    m_insideColors[Qn::RecordingType_MotionPlusLQ] = qnGlobals->recordAlwaysColor();
+
+    resetCellValues();
 
     QDate date(2010,1,1);
     date = date.addDays(1 - date.dayOfWeek());
@@ -157,8 +164,9 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
-            QColor color(m_gridParams[x][y][ColorParam].toUInt());
-            QColor colorInside(m_gridParams[x][y][ColorInsideParam].toUInt());
+            uint recordTypeIdx(m_gridParams[x][y][RecordTypeParam].toUInt());
+            QColor color(m_colors[recordTypeIdx]);
+            QColor colorInside(m_insideColors[recordTypeIdx]);
             if (!m_mousePressed) {
                 if ((y == m_mouseMoveCell.y()  && x == m_mouseMoveCell.x()) ||
                     (m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x()) ||
@@ -260,12 +268,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
 
     // draw selection
-    penClr = subColor(QColor(m_defaultParams[ColorParam].toUInt()), qnGlobals->selectionBorderDelta());
+    QColor defColor = m_colors[m_defaultParams[RecordTypeParam].toUInt()];
+    penClr = subColor(defColor, qnGlobals->selectionBorderDelta());
     if (!m_enabled)
         penClr = toGrayscale(penClr);
 
     p.setPen(penClr);
-    QColor brushClr = subColor(QColor(m_defaultParams[ColorParam].toUInt()), qnGlobals->selectionOpacityDelta());
+    QColor brushClr = subColor(defColor, qnGlobals->selectionOpacityDelta());
     if (!m_enabled)
         brushClr = toGrayscale(brushClr);
 
@@ -428,6 +437,17 @@ void QnScheduleGridWidget::setCellValue(const QPoint &cell, ParamType paramType,
     update();
 }
 
+Qn::RecordingType QnScheduleGridWidget::cellRecordingType(const QPoint &cell) const {
+    QVariant value = cellValue(cell, RecordTypeParam);
+    if (value.isValid())
+        return Qn::RecordingType(value.toUInt());
+    return Qn::RecordingType_Run;
+}
+
+void QnScheduleGridWidget::setCellRecordingType(const QPoint &cell, const Qn::RecordingType &value) {
+    setCellValue(cell, RecordTypeParam, value);
+}
+
 void QnScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
 {
     assert(isValidCell(cell));
@@ -442,7 +462,6 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellPa
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
     if(qEqual(value, &value[ParamType_Count], localValue)) {
-        emit cellValueNotChanged(cell);
         return;
     }
 
@@ -470,7 +489,7 @@ void QnScheduleGridWidget::resetCellValues()
     CellParams emptyParams;
     emptyParams[FirstParam] = QLatin1String("-");
     emptyParams[SecondParam] = QLatin1String("-");
-    emptyParams[ColorInsideParam] = emptyParams[ColorParam] = qnGlobals->noRecordColor().rgba();
+    emptyParams[RecordTypeParam] = Qn::RecordingType_Never;
 
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
@@ -512,26 +531,34 @@ bool QnScheduleGridWidget::isValidColumn(int column) const {
     return column >= 0 && column < columnCount();
 }
 
-void QnScheduleGridWidget::setMaxFps(int maxFps)
+void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
 {
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
             int fps = m_gridParams[x][y][FirstParam].toInt();
-            if(fps > maxFps) 
-                setCellValueInternal(QPoint(x, y), FirstParam, maxFps);
+            int value = maxFps;
+            if (m_gridParams[x][y][RecordTypeParam] == Qn::RecordingType_MotionPlusLQ)
+                value = maxDualStreamFps;
+            if(fps > value)
+                setCellValueInternal(QPoint(x, y), FirstParam, value);
         }
     }
 }
 
-int QnScheduleGridWidget::getMaxFps()
+int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
 {
     int fps = 0;
-    for (int x = 0; x < columnCount(); ++x)
+    for (int x = 0; x < columnCount(); ++x) {
         for (int y = 0; y < rowCount(); ++y) {
-            if (m_gridParams[x][y][ColorParam] != qnGlobals->noRecordColor().rgba())
-                fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+            Qn::RecordingType rt = static_cast<Qn::RecordingType>(m_gridParams[x][y][RecordTypeParam].toUInt());
+            if (motionPlusLqOnly && rt != Qn::RecordingType_MotionPlusLQ)
+                continue;
+            if (rt == Qn::RecordingType_Never)
+                continue;
+            fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
         }
+    }
     return fps;
 }

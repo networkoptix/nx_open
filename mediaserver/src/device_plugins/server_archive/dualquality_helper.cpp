@@ -16,10 +16,10 @@ void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
     m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 }
 
-void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod)
+void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod, bool preciseFind)
 {
     //qDebug() << "find data for time=" << QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("hh:mm:ss.zzz"));
-    bool altChunkWasSelected = m_alreadyOnAltChunk;
+    bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
     m_alreadyOnAltChunk = false;
 
     catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi);
@@ -41,8 +41,8 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
             timeDistanceAlt = INT_MAX; // actually chunk not found
 
-        int findEps = m_quality == MEDIA_Quality_High ? SECOND_STREAM_FIND_EPS : FIRST_STREAM_FIND_EPS;
-        if (timeDistance - timeDistanceAlt > findEps || (timeDistance > 0 && altChunkWasSelected))
+        int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : SECOND_STREAM_FIND_EPS;
+        if (timeDistance - timeDistanceAlt > findEps || (timeDistance > timeDistanceAlt && usePreciseFind))
         {
             if (timeDistanceAlt == 0)
             {
@@ -51,16 +51,15 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
                 if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs()-time < findEps)
                 {
                     DeviceFileCatalog::Chunk nextAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.endTimeMs(), findMethod));
-                    //if (nextAltChunk.startTimeMs != altChunk.endTimeMs())
-                    if (nextAltChunk.startTimeMs > chunk.startTimeMs - findEps && chunk.startTimeMs > time)
-                        return;
+                    //if (nextAltChunk.startTimeMs > chunk.startTimeMs - findEps && chunk.startTimeMs > time)
+                    if (nextAltChunk.startTimeMs > altChunk.endTimeMs() + findEps && chunk.startTimeMs > time && !usePreciseFind)
+                        return; // It is data hole, but altChunk cover very right edge before hole. Ignore it.
                     if (nextAltChunk.startTimeMs == altChunk.startTimeMs)
                         return; // EOF reached
                 }
                 else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && time - altChunk.startTimeMs < findEps)
                 {
                     DeviceFileCatalog::Chunk prevAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.startTimeMs-1, findMethod));
-                    //if (prevAltChunk.endTimeMs() != altChunk.startTimeMs)
                     if (prevAltChunk.endTimeMs() < chunk.endTimeMs() + findEps && chunk.endTimeMs() < time)
                         return;
                 }

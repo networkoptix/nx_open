@@ -40,9 +40,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="licensesLabel">
+      <widget class="QLabel" name="requiredLicensesLabel">
        <property name="text">
-        <string>...</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -54,6 +54,20 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="digitalLicensesLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="analogLicensesLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
@@ -584,7 +598,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Apply changes before copy schedule</string>
+          <string>Apply changes before copying schedule</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

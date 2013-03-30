@@ -179,6 +179,8 @@ public:
 
     QList<QnResourceWidget *> widgets() const;
 
+    QnResourceWidget* activeWidget() const;
+
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
     QnVideoCamera *camera(QnWorkbenchItem *item) const;
@@ -282,6 +284,9 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
+    void resourceAdded(const QnResourcePtr &resource);
+    void resourceAboutToBeRemoved(const QnResourcePtr &resource);
+
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 
@@ -305,8 +310,8 @@ protected:
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
-    void deinitSceneContext();
-    void initSceneContext();
+    void deinitSceneView();
+    void initSceneView();
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
@@ -355,7 +360,6 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_resource_disabledChanged();
     void at_resource_disabledChanged(const QnResourcePtr &resource);
 
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);

@@ -1,13 +1,26 @@
 #ifndef QN_WARNINGS_H
 #define QN_WARNINGS_H
 
+#if defined(_MSC_VER) && _MSC_VER<1600 
+// TODO: msvc2008, remove this hell after transition to msvc2010
+#   ifdef _WIN64
+namespace std { typedef __int64 intptr_t; }
+#   else
+namespace std { typedef __int32 intptr_t; }
+#   endif
+#else
+#   include <cstdint> /* For std::intptr_t. */
+#endif
+
+#include <sstream>
+
+#include <boost/preprocessor/stringize.hpp>
+
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
-
-#include "preprocessor.h"
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -60,15 +73,18 @@ namespace detail {
         }
 
         template<class T>
-        inline QString textstream_operator_lshift(const QString &s, const T &arg) {
-            QString text;
-            QTextStream stream(&text, QIODevice::WriteOnly);
+        inline QString stringstream_operator_lshift(const QString &s, const T &arg) {
+            std::wstringstream stream; /* Not using QTextStream as it's more heavyweight than the one from std. */
             stream << arg;
-            return s.arg(text);
+            return s.arg(QString::fromWCharArray(stream.str().c_str()));
+        }
+
+        inline QString operator<<(const QString &s, void *arg) {
+            return stringstream_operator_lshift(s, arg);
         }
 
         inline QString operator<<(const QString &s, const void *arg) {
-            return textstream_operator_lshift(s, arg);
+            return stringstream_operator_lshift(s, arg);
         }
 
         template<class T>
@@ -169,7 +185,7 @@ namespace detail {
 
 #define QN_NULL_PARAMETER_I(MACRO, PARAMETER) {                                 \
     (void) (PARAMETER); /* Show compilation error if parameter name is mistyped. */ \
-    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), QN_STRINGIZE(PARAMETER)); \
+    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), BOOST_PP_STRINGIZE(PARAMETER)); \
 }
 
 /**

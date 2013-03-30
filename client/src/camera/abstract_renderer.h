@@ -2,6 +2,8 @@
 #define QN_ABSTRACT_RENDERER_H
 
 #include "utils/media/frame_info.h"
+#include "utils/common/stoppable.h"
+
 
 class CLVideoDecoderOutput;
 
@@ -14,6 +16,8 @@ class CLVideoDecoderOutput;
  * Note that it is owned by the rendering thread.
  */
 class QnAbstractRenderer
+:
+    public QnStoppable
 {
 public:
     QnAbstractRenderer(): m_displayCounter(0) {}
@@ -27,6 +31,21 @@ public:
      * \param channel                   Channel number.
      */
     virtual void waitForFrameDisplayed(int channel) = 0;
+
+    /**
+     * Upon return there is no frames to display and renderer has finished displaying current frame
+    */
+    virtual void discardAllFramesPostedToDisplay(int channel) = 0;
+
+    /**
+     * Blocks until all frames passed to \a draw are surely displayed on screen.
+     * Difference from \a waitForFrameDisplayed is that waitForFrameDisplayed may not wait for frames displayed, but only ensure, 
+     * they will be displayed sometimes. This is required to take advantage of async frame uploading and for effective usage of hardware decoder: 
+     * it should spend as much time as possible in \a decode method, but not waiting for frame to be rendered.
+     *
+     * \todo refactoring (some renaming?) is required when it all works as expected
+     */
+    virtual void finishPostedFramesRender(int channel) = 0;
 
     /**
      * This function is supposed to be called from <i>rendering</i> thread.
@@ -66,7 +85,7 @@ public:
      * 
      * \param image                     New video frame.
      */
-    virtual void draw(CLVideoDecoderOutput *image) = 0;
+    virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image) = 0;
 
     /**
      * \returns                         Value of this renderer's display counter.
@@ -82,11 +101,11 @@ public:
      */
     virtual void onNoVideo() {}
 
-    /**
-     * Returns last displayed time
-     */
-    virtual qint64 lastDisplayedTime() const { return AV_NOPTS_VALUE; }
-
+    //!Returns timestamp of frame that will be rendered next. It can be already displayed frame (if no new frames available)
+    virtual qint64 getTimestampOfNextFrameToRender(int channelNumber) const  = 0;
+    virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const = 0;
+    virtual void unblockTimeValue(int channelNumber) const = 0;
+    virtual bool isTimeBlocked(int channelNumber) const  = 0;
 
 protected:
     virtual void doFrameDisplayed() {} // Not used for now.

@@ -61,7 +61,7 @@ public:
 
     qint64 minTime() const;
     qint64 maxTime() const;
-    bool lastFileDuplicateName() const;
+    //bool lastFileDuplicateName() const;
     qint64 firstTime() const;
     QnResource::ConnectionRole getRole() const { return m_role; }
 
@@ -75,8 +75,8 @@ public:
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
 private:
-    bool fileExists(const Chunk& chunk, qint64& fileSize);
-    void addChunk(const Chunk& chunk);
+    bool fileExists(const Chunk& chunk, bool checkDirOnly);
+    bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 private:
@@ -98,8 +98,8 @@ private:
     typedef QMap<int, IOCacheEntry > IOCacheMap;
     IOCacheMap m_prevPartsMap[4];
 
-    bool m_duplicateName;
-    QMap<int,QString> m_prevFileNames;
+    //bool m_duplicateName;
+    //QMap<int,QString> m_prevFileNames;
     QnResource::ConnectionRole m_role;
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;

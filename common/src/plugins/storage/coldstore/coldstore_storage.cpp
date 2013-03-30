@@ -300,9 +300,9 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
 
 }
 
-qint64 QnPlColdStoreStorage::getFileSize(const QString& fillName) const
+qint64 QnPlColdStoreStorage::getFileSize(const QString& url) const
 {
-    Q_UNUSED(fillName)
+    Q_UNUSED(url)
 	return 0;
 }
 
@@ -350,8 +350,14 @@ bool QnPlColdStoreStorage::isCatalogAccessible()
 
 qint64 QnPlColdStoreStorage::getFreeSpace() 
 {
-    return 10*1024*1024*1024ll;
+    return UnknownSize;
 }
+
+qint64 QnPlColdStoreStorage::getTotalSpace() 
+{
+    return UnknownSize;
+}
+
 
 QnCSFileInfo QnPlColdStoreStorage::getFileInfo(const QString& fn)
 {
@@ -435,7 +441,7 @@ void QnPlColdStoreStorage::checkIfRangeNeedsToBeUpdated()
         m_lastRangeUpdate.restart();
         qint64 t0 = getOldestFileTime();
         qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-        emit archiveRangeChanged(t0, t1);
+        emit archiveRangeChanged(::toSharedPointer(this), t0, t1);
     }
 }
 

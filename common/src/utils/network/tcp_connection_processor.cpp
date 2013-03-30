@@ -5,10 +5,11 @@
 #include "err.h"
 
 #ifndef Q_OS_WIN
-#include <netinet/tcp.h>
+#   include <netinet/tcp.h>
 #endif
 
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
+
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
@@ -165,13 +166,13 @@ void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
     sendData(sendBuffer.data(), sendBuffer.size());
 }
 
-void QnTCPConnectionProcessor::sendData(const char* data, int size)
+bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     QMutexLocker lock(&d->sockMutex);
-    while (!m_needStop && size > 0 && d->socket->isConnected())
+    while (!needToStop() && size > 0 && d->socket->isConnected())
     {
-        int sended;
+        int sended = 0;
         if (d->ssl)
             sended = SSL_write(d->ssl, data, size);
         else
@@ -183,7 +184,13 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
             data += sended;
             size -= sended;
         }
+        else
+        {
+            return false;
+        }
     }
+
+    return true;
 }
 
 
@@ -204,7 +211,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, bool displayDebug)
+void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
@@ -213,13 +220,13 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         d->responseHeaders.setValue(QLatin1String("Transfer-Encoding"), QLatin1String("chunked"));
         d->responseHeaders.setContentType(QLatin1String(contentType));
     }
-    if (!d->responseBody.isEmpty())
-    {
-        //d->responseHeaders.setContentLength(d->responseBody.length());
-        //d->responseHeaders.setContentType(QLatin1String(contentType));
+
+    if (!contentEncoding.isEmpty())
+        d->responseHeaders.setValue(QLatin1String("Content-Encoding"), QLatin1String(contentEncoding));
+    if (!contentType.isEmpty())
         d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
+    if (!d->chunkedMode)
         d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
-    }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
     response.replace(0,4,transport);
@@ -284,6 +291,18 @@ void QnTCPConnectionProcessor::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
+void* QnTCPConnectionProcessor::ssl() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->ssl;
+}
+
+TCPSocket* QnTCPConnectionProcessor::socket() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->socket;
+}
+
 int QnTCPConnectionProcessor::getSocketTimeout()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -311,7 +330,7 @@ bool QnTCPConnectionProcessor::readRequest()
         
     }
 
-    while (!m_needStop && d->socket->isConnected())
+    while (!needToStop() && d->socket->isConnected())
     {
         int readed;
         if (d->ssl) 

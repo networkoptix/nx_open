@@ -5,6 +5,7 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource_managment/resource_criterion.h>
 
@@ -20,7 +21,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)),     this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(resourcePool(),     SIGNAL(resourceAdded(const QnResourcePtr &)),       this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(resourcePool(),     SIGNAL(resourceRemoved(const QnResourcePtr &)),     this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this,   SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
+    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this,   SLOT(updatePermissions(const QnLayoutResourcePtr &)));
 
     at_context_userChanged(context()->user());
 }
@@ -51,20 +52,11 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
         return result;
 
     result = static_cast<Qn::Permissions>(user->getPermissions());
+    
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;
 
-    if(result & Qn::DeprecatedEditCamerasPermission) {
-        result &= ~Qn::DeprecatedEditCamerasPermission;
-        result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
-    }
-
-    if(result & Qn::DeprecatedViewExportArchivePermission) {
-        result &= ~Qn::DeprecatedViewExportArchivePermission;
-        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
-    }
-
-    return result;
+    return Qn::undeprecate(result);
 }
 
 bool QnWorkbenchAccessController::hasGlobalPermissions(Qn::Permissions requiredPermissions) const {
@@ -113,6 +105,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
     if (user == m_user) {
         result |= m_userPermissions; /* Add global permissions for current user. */
         result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
+        result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
     if (m_userPermissions & Qn::GlobalEditLayoutsPermission) /* Layout-admin can create layouts. */
@@ -143,9 +136,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
-        if(snapshotManager()->isLocal(layout)) {
+        if (layout->userCanEdit()) {
+            return Qn::ReadWriteSavePermission| Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify layout with this flag. */
+        } else if(snapshotManager()->isLocal(layout)) {
             return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
-        } else {
+        }
+        else {
             return Qn::ReadPermission | Qn::WritePermission;
         }
     }
@@ -184,17 +180,13 @@ void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr &resourc
     setPermissionsInternal(resource, calculatePermissions(resource));
 }
 
+void QnWorkbenchAccessController::updatePermissions(const QnLayoutResourcePtr &layout) {
+    updatePermissions(static_cast<QnResourcePtr>(layout));
+}
+
 void QnWorkbenchAccessController::updatePermissions(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources)
         updatePermissions(resource);
-}
-
-void QnWorkbenchAccessController::updateSenderPermissions() {
-    QObject *sender = this->sender();
-    if(!sender)
-        return; /* Already disconnected from this sender. */
-
-    updatePermissions(toSharedPointer(checked_cast<QnResource *>(sender)));
 }
 
 void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions) {
@@ -222,9 +214,13 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    connect(resource.data(), SIGNAL(parentIdChanged()), this, SLOT(updateSenderPermissions()));
-    connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateSenderPermissions()));
-    connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(updateSenderPermissions()));
+    connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SLOT(updatePermissions(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
+
+    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        connect(layout.data(), SIGNAL(userCanEditChanged(const QnLayoutResourcePtr &)), this, SLOT(updatePermissions(const QnLayoutResourcePtr &)));
+    }
     
     updatePermissions(resource);
 }
@@ -235,8 +231,3 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
     setPermissionsInternal(resource, 0); /* So that the signal is emitted. */
     m_dataByResource.remove(resource);
 }
-
-void QnWorkbenchAccessController::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout) {
-    updatePermissions(layout);
-}
-

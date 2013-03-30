@@ -66,6 +66,11 @@ qint64 QnQtFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
 }
 
+qint64 QnQtFileStorageResource::getTotalSpace()
+{
+    return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
+}
+
 QFileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
@@ -75,12 +80,11 @@ QFileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
         return QFileInfoList();
 }
 
-qint64 QnQtFileStorageResource::getFileSize(const QString& fillName) const
+qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 {
-    Q_UNUSED(fillName)
+    Q_UNUSED(url)
 	return 0; // not implemented
 }
-
 
 bool QnQtFileStorageResource::isStorageAvailable()
 {

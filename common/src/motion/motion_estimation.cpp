@@ -9,7 +9,7 @@
 #include <QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 
 static const unsigned char BitReverseTable256[] = 
 {
@@ -580,8 +580,8 @@ QnMotionEstimation::QnMotionEstimation()
     m_decoder = 0;
     //m_outFrame.setUseExternalData(false);
     //m_prevFrame.setUseExternalData(false);
-    m_frames[0] = new CLVideoDecoderOutput();
-    m_frames[1] = new CLVideoDecoderOutput();
+    m_frames[0] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
+    m_frames[1] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
     m_frames[0]->setUseExternalData(false);
     m_frames[1]->setUseExternalData(false);
 
@@ -626,8 +626,6 @@ QnMotionEstimation::~QnMotionEstimation()
     qFreeAligned(m_motionSensMask);
     qFreeAligned(m_linkedNums);
     delete [] m_resultMotion;
-    delete m_frames[0];
-    delete m_frames[1];
 }
 
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
@@ -856,7 +854,6 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         }
     }
 #endif
-
     // 6. remove motion if motion square is not enough and write result to bitarray
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
     {
@@ -886,7 +883,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     int idx = m_totalFrames % FRAMES_BUFFER_SIZE;
     int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
 
-    if (!m_decoder->decode(videoData, m_frames[idx]))
+    if (!m_decoder->decode(videoData, &m_frames[idx]))
         return;
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
@@ -917,11 +914,11 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     {
         // calculate difference between frames
         if (m_xStep == 8)
-            getFrame_avgY_array_8_x (m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx]);
+            getFrame_avgY_array_8_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
         else if (m_xStep == 16)
-            getFrame_avgY_array_16_x(m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx]);
+            getFrame_avgY_array_16_x(m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
         else
-            getFrame_avgY_array_x_x (m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx], m_xStep);
+            getFrame_avgY_array_x_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
 
 
         analizeMotionAmount(m_frameBuffer[idx]);
@@ -1016,7 +1013,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     QnMetaDataV1Ptr rez(new QnMetaDataV1());
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
     //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
-    rez->timestamp = m_lastFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
+    rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
 
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)
@@ -1035,8 +1032,9 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         int iLineNum = (scaledLineNum+32768) >> 16;
         if (iLineNum > prevILineNum) 
         {
-            for (int i = 0; i < iLineNum - prevILineNum; ++i)
-                dst[y] = m_resultMotion[iLineNum+i];
+            dst[y] = m_resultMotion[iLineNum];
+            for (int i = 1; i < iLineNum - prevILineNum; ++i)
+                dst[y] |= m_resultMotion[iLineNum+i];
         }
         else {
             dst[y] |= m_resultMotion[iLineNum];
@@ -1055,7 +1053,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 bool QnMotionEstimation::existsMetadata() const
 {
-    return m_lastFrameTime - m_firstFrameTime >= 300 * 1000; // 30 ms agg period
+    return m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD; // 30 ms agg period
 }
 
 void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)

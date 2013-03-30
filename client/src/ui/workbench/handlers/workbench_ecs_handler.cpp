@@ -42,8 +42,8 @@ void QnWorkbenchEcsHandler::at_resources_saved(int status, const QByteArray &err
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to Enterprise Controller.", NULL, reopeningLayoutResources.size()),
-            tr("Do you want to restore these %n layout(s)?", NULL, reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Enterprise Controller.", "", reopeningLayoutResources.size()),
+            tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         if(button == QMessageBox::Yes) {
@@ -59,7 +59,7 @@ void QnWorkbenchEcsHandler::at_resources_saved(int status, const QByteArray &err
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n items to Enterprise Controller.", NULL, resources.size()),
+            tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
             tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
             QDialogButtonBox::Ok
         );
@@ -84,7 +84,7 @@ void QnWorkbenchEcsHandler::at_resources_statusSaved(int status, const QByteArra
         widget(),
         resources,
         tr("Error"),
-        tr("Could not save changes made to the following %n resource(s).", NULL, resources.size()),
+        tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
         tr("Error description:\n%1").arg(QLatin1String(errorString.constData())),
         QDialogButtonBox::Ok
     );

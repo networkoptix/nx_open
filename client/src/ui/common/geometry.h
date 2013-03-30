@@ -5,9 +5,8 @@
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 
-#include <utils/common/math.h>
+#include <utils/math/math.h>
 
-#include "color_transformations.h"
 #include "margins.h"
 
 class QRect;
@@ -160,6 +159,7 @@ public:
      */
     static qreal scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mode);
 
+    static QPointF bounded(const QPointF &pos, const QRectF &bounds);
     static QPoint bounded(const QPoint &pos, const QRect &bounds);
 
     /**
@@ -300,6 +300,8 @@ public:
      * \returns                         Whether the reference size contains the given size.
      */
     static bool contains(const QSize &size, const QSize &otherSize);
+
+    static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
 };
 

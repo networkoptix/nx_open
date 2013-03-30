@@ -3,7 +3,6 @@
 
 #include <QtCore/QVariant>
 
-#include <utils/common/mpl.h>
 #include <core/resource/resource_fwd.h>
 
 #include "action_fwd.h"
@@ -68,6 +67,10 @@ public:
     QnResourceWidget *widget(const QString &key = QString()) const;
 
     QnResourceWidgetList widgets(const QString &key = QString()) const;
+
+    void setFocusElement(QString element);
+
+    QString focusElement() const;
 
     const QVariantMap &arguments() const {
         return m_arguments;

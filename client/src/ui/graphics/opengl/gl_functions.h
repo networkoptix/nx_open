@@ -5,8 +5,6 @@
 
 #include <QtOpenGL/QGLContext>
 
-class QGLContext;
-
 class QnGlFunctionsPrivate;
 
 #ifndef GL_ARB_vertex_buffer_object
@@ -18,17 +16,23 @@ typedef std::ptrdiff_t GLsizeiptrARB;
 typedef char GLchar;
 #endif
 
+typedef struct __GLsync *GLsync;
+typedef uint64_t GLuint64;
+
 
 class QnGlFunctions {
 public:
     enum Feature {
-        ArbPrograms = 0x1,              /**< Supports ARB shader programs. */
-        OpenGL1_3 = 0x2,                /**< Implements OpenGL1.3 spec. */
-        OpenGL1_5 = 0x4,                /**< Implements OpenGL1.5 spec. */
-        OpenGL2_0 = 0x8,                /**< Implements OpenGL2.0 spec. */
-        
-        ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
-        NoOpenGLFullScreen = 0x0002000  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
+        OpenGL1_3           = 0x00000001,   /**< Implements OpenGL1.3 spec. */
+        OpenGL1_5           = 0x00000002,   /**< Implements OpenGL1.5 spec. */
+        OpenGL2_0           = 0x00000004,   /**< Implements OpenGL2.0 spec. */
+        OpenGL3_2           = 0x00000008,   /**< Implements OpenGL3.2 spec. */
+
+        ArbPrograms         = 0x00010000,   /**< Supports ARB shader programs. */
+        ArbSync             = 0x00020000,   /**< Supports ARB sync primitives. */
+
+        ShadersBroken       = 0x10000000,   /**< Vendor has messed something up, and shaders are not supported. */
+        NoOpenGLFullScreen  = 0x20000000,   /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -47,7 +51,7 @@ public:
     /**
      * \returns                         OpenGL context that this functions instance works with.
      */
-    QGLContext *context() const;
+    const QGLContext *context() const;
 
     /**
      * \returns                         Set of features supported by the current OpenGL context.
@@ -94,12 +98,22 @@ public:
     void glBindBuffer(GLenum target, GLuint buffer);
     void glDeleteBuffers(GLsizei n, const GLuint *buffers);
     void glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
+    void glBufferSubData(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data);
+    GLvoid *glMapBuffer(GLenum target, GLenum access);
+    GLboolean glUnmapBuffer(GLenum target);
 
     /* OpenGL2_0 group. */
     
     void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
     void glEnableVertexAttribArray(GLuint index);
     void glDisableVertexAttribArray(GLuint index);
+
+    /* OpenGL3_2 group. */
+
+    GLsync glFenceSync(GLenum condition, GLbitfield flags);
+    void glDeleteSync(GLsync sync);
+    void glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
+    GLenum glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;

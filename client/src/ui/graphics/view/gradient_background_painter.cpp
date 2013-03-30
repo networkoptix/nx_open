@@ -5,7 +5,7 @@
 #include <QtCore/QRect>
 #include <QtGui/QRadialGradient>
 
-#include <ui/common/linear_combination.h>
+#include <utils/math/linear_combination.h>
 #include <ui/common/color_to_vector_converter.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -44,7 +44,7 @@ VariantAnimator *QnGradientBackgroundPainter::backgroundColorAnimator() {
     if(!view() || !view()->scene())
         return NULL;
 
-    AnimationTimer *animationTimer = InstrumentManager::animationTimerOf(view()->scene());
+    AnimationTimer *animationTimer = InstrumentManager::animationTimer(view()->scene());
     if(!animationTimer)
         return NULL;
 

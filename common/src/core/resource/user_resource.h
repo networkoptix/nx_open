@@ -24,6 +24,8 @@ public:
     bool isAdmin() const;
     void setAdmin(bool isAdmin);
 
+    QString getEmail() const;
+    void setEmail(const QString &email);
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
@@ -31,6 +33,7 @@ private:
     QString m_password;
     quint64 m_permissions;
     bool m_isAdmin;
+    QString m_email;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)

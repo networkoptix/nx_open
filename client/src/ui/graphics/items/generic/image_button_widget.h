@@ -39,7 +39,7 @@ public:
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
-    QnImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     virtual ~QnImageButtonWidget();
 
@@ -86,7 +86,6 @@ public slots:
 signals:
     void clicked(bool checked = false);
     void toggled(bool checked);
-    void enabled();
     void pressed();
     void released();
 

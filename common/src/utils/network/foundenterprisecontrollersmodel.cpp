@@ -122,7 +122,7 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
     if( index.column() != 0 || index.internalId() == 0 )
         return QModelIndex();
 
-    const size_t foundModuleIndex = index.internalId() & 0x00ffffff;
+    const int foundModuleIndex = index.internalId() & 0x00ffffff;
     if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) )
         return QModelIndex();
 
@@ -131,6 +131,7 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
 
 int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
 {
+    Q_UNUSED(index)
     return 1;
 }
 
@@ -138,7 +139,7 @@ int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) con
 int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
 {
     if( !parent.isValid() )
-        return m_foundModules.size();
+        return (int) m_foundModules.size();
 
     if( parent.internalId() != 0 || //element with ip address
         parent.column() != 0 ||
@@ -149,7 +150,7 @@ int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
     }
 
     //returning number of IPs of enterprise controller
-    return m_foundModules[parent.row()].ipAddresses.size();
+    return (int) m_foundModules[parent.row()].ipAddresses.size();
 }
 
 void FoundEnterpriseControllersModel::remoteModuleFound(
@@ -163,7 +164,7 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
 {
     QMutexLocker lk( &m_mutex );
 
-    if( moduleID != QString::fromAscii(NX_ENTERPISE_CONTROLLER_ID) )
+    if( moduleID != nxEntControllerId )
         return;
     if( !moduleParameters.contains(QString::fromAscii("port")) )
         return;
@@ -211,9 +212,10 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     bool isLocal,
     const QString& seed )
 {
+    Q_UNUSED(isLocal)
     QMutexLocker lk( &m_mutex );
 
-    if( moduleID != QString::fromAscii(NX_ENTERPISE_CONTROLLER_ID) )
+    if( moduleID != nxEntControllerId )
         return;
 
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );

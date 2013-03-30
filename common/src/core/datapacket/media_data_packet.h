@@ -14,15 +14,20 @@
 #   include <QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
-#include "utils/common/math.h"
+#include "utils/math/math.h"
 #include "utils/network/socket.h"
 #include "utils/common/util.h"
 
 struct AVCodecContext;
 
-enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_None};
+enum MediaQuality { MEDIA_Quality_High,  // high quality
+                    MEDIA_Quality_Low,   // low quality
+                    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
+                    // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
+                    MEDIA_Quality_ForceHigh,
+                    MEDIA_Quality_None};
 
-class QnMediaContext {
+class QnMediaContext: public QnAbstractMediaContext {
 public:
 
     QnMediaContext(AVCodecContext* ctx);
@@ -38,8 +43,8 @@ public:
 private:
     AVCodecContext* m_ctx;
 };
-
 typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
+
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
@@ -61,7 +66,11 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_NewServer = 1024, // swith archive to a new media server
         MediaFlags_DecodeTwice = 2048,
         MediaFlags_FCZ = 4096, // fast channel zapping flag
-        MediaFlags_AfterDrop = 1024*8 // some data were dropped before current data
+        MediaFlags_AfterDrop = 1024*8, // some data were dropped before current data
+
+        MediaFlags_HWDecodingUsed = 1024*16, //hardware decoding used
+        MediaFlags_PlayUnsync = 1024*32, // ignore syncplay mode
+        MediaFlags_Skip = 1024*64 // ignore packet at all
     };
 
     enum DataType {
@@ -130,6 +139,8 @@ typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
 
 struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
+Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
+
 
 
 struct QnCompressedVideoData : public QnAbstractMediaData
@@ -357,18 +368,5 @@ private:
     void assign(QnCompressedAudioData* other);
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
-
-
-class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
-{
-public:
-    CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
-
-
-    qint64 mediaLength() const;
-private:
-    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
-};
-
 
 #endif //abstract_media_data_h_112

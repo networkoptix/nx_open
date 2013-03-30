@@ -2,6 +2,7 @@
 #define __SIMPLE_HTTP_CLIENT__
 
 #include <QtCore/QHash>
+#include <QString>
 
 #include "socket.h"
 
@@ -16,12 +17,15 @@ enum CLHttpStatus
     CL_TRANSPORT_ERROR = -1
 };
 
+QString toString( CLHttpStatus status );
+
 class CLSimpleHTTPClient
 {
     enum { Basic, Digestaccess };
 
 public:
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
     ~CLSimpleHTTPClient();
 
     CLHttpStatus doGET(const QString& request, bool recursive = true);
@@ -29,6 +33,8 @@ public:
 
     CLHttpStatus doGET(const QByteArray& request, bool recursive = true);
     CLHttpStatus doPOST(const QByteArray& request, const QString& body);
+
+    void addHeader(const QByteArray& key, const QByteArray& value);
 
     QHostAddress getLocalHost() const;
 
@@ -52,6 +58,8 @@ public:
 
     static QByteArray basicAuth(const QAuthenticator& auth);
     static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url);
+    QByteArray getHeaderValue(const QByteArray& key);
+
 
     QString mRealm;
     QString mNonce;
@@ -67,7 +75,7 @@ private:
     QString digestAccess(const QString&) const;
 
     int readHeaders();
-
+    void addExtraHeaders(QByteArray& request);
 private:
 
     QHostAddress m_host;
@@ -88,9 +96,10 @@ private:
     QByteArray m_responseLine;
     char* m_dataRestPtr;
     int m_dataRestLen;
+    QMap<QByteArray,QByteArray> m_additionHeaders;
 };
 
-QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
+QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
 
 bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 

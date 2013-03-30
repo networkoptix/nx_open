@@ -4,12 +4,10 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
-#include "common/common_meta_types.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -17,14 +15,10 @@
 #   define TRACE(...)
 #endif
 
-Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
-
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
 {
-    QnCommonMetaTypes::initilize();
-
     localServer = QnResourcePtr(new QnLocalMediaServerResource);
     addResource(localServer);
 }
@@ -32,16 +26,26 @@ QnResourcePool::QnResourcePool() : QObject(),
 QnResourcePool::~QnResourcePool()
 {
     bool signalsBlocked = blockSignals(false);
-    emit aboutToBeDestroyed();
+    //emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
     QMutexLocker locker(&m_resourcesMtx);
     m_resources.clear();
 }
 
-QnResourcePool *QnResourcePool::instance()
+//Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
+
+static QnResourcePool* resourcePool = NULL;
+
+void QnResourcePool::initStaticInstance( QnResourcePool* inst )
 {
-    return globalResourcePool();
+    resourcePool = inst;
+}
+
+QnResourcePool* QnResourcePool::instance()
+{
+    //return globalResourcePool();
+    return resourcePool;
 }
 
 bool QnResourcePool::isLayoutsUpdated() const {
@@ -96,6 +100,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 
         /* Fix up items that are stored in layout. */
+        /*
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             foreach(QnLayoutItemData data, layout->getItems()) {
                 if(!data.resource.id.isValid()) {
@@ -124,6 +129,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 }
             }
         }
+        */
 
         resource->setResourcePool(this);
     }
@@ -132,19 +138,11 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        const QnId resId = resource->getId();
-        QString uniqueId = resource->getUniqueId();
-
-        if (m_resources.contains(uniqueId))
+        if( insertOrUpdateResource(
+                resource,
+                resource->hasFlags(QnResource::foreigner) ? &m_foreignResources : &m_resources ) )
         {
-            // if we already have such resource in the pool
-            m_resources[uniqueId]->update(resource);
-        }
-        else
-        {
-            // new resource
-            m_resources[uniqueId] = resource;
-            newResources.insert(resId, resource);
+            newResources.insert(resource->getId(), resource);
         }
     }
 
@@ -152,17 +150,41 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, newResources.values())
     {
-        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
 
-        if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
-            resource->init();
+        if (!resource->hasFlags(QnResource::foreigner))
+        {
+            if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
+                resource->init();
+        }
 
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
+}
+
+namespace
+{
+    class MatchResourceByID
+    {
+    public:
+        MatchResourceByID( const QnId& _idToFind )
+        :
+            idToFind( _idToFind )
+        {
+        }
+
+        bool operator()( const QnResourcePtr& res ) const
+        {
+            return res->getId() == idToFind;
+        }
+
+    private:
+        QnId idToFind;
+    };
 }
 
 void QnResourcePool::removeResources(const QnResourceList &resources)
@@ -182,11 +204,26 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         if(resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
 
-        QString uniqueId = resource->getUniqueId();
-
-        if (m_resources.remove(uniqueId) != 0)
+        //const QString& uniqueId = resource->getUniqueId();
+        //if( m_resources.remove(uniqueId) != 0 )
+        //    removedResources.append(resource);
+        
+        //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
+        QHash<QString, QnResourcePtr>::iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(resource->getId()) );
+        if( resIter != m_resources.end() )
         {
+            m_resources.erase( resIter );
             removedResources.append(resource);
+        }
+        else
+        {
+            //may be foreign resource?
+            resIter = std::find_if( m_foreignResources.begin(), m_foreignResources.end(), MatchResourceByID(resource->getId()) );
+            if( resIter != m_foreignResources.end() )
+            {
+                m_foreignResources.erase( resIter );
+                removedResources.append(resource);
+            }
         }
 
         resource->setResourcePool(NULL);
@@ -208,42 +245,29 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     }
 }
 
-void QnResourcePool::handleStatusChange()
-{
-    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
-
-    if (!resource)
-        return;
-
-    emit statusChanged(resource);
-}
-
-void QnResourcePool::handleResourceChange()
-{
-    const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
-
-    if (!resource)
-        return;
-
-    emit resourceChanged(resource);
-}
-
 QnResourceList QnResourcePool::getResources() const
 {
     QMutexLocker locker(&m_resourcesMtx);
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id) const
+QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    foreach(const QnResourcePtr& res, m_resources)
-    {
-        if (res->getId() == id)
-            return res;
-    }
 
-    return QnResourcePtr(0);
+    QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
+    if( resIter != m_resources.end() )
+        return resIter.value();
+
+    if( searchFilter == rfOnlyFriends )
+        return QnResourcePtr(NULL);
+
+    //looking through foreign resources
+    resIter = std::find_if( m_foreignResources.begin(), m_foreignResources.end(), MatchResourceByID(id) );
+    if( resIter != m_foreignResources.end() )
+        return resIter.value();
+
+    return QnResourcePtr(NULL);
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
@@ -282,6 +306,19 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
+QnResourceList QnResourcePool::getAllEnabledCameras() const
+{
+    QnResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+            result << camResource;
+    }
+
+    return result;
+}
+
 QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
 {
     QnNetworkResourceList result;
@@ -289,6 +326,24 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QStrin
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
         if (netResource != 0 && netResource->getPhysicalId() == physicalId)
+            result << netResource;
+    }
+
+    return result;
+}
+
+QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const
+{
+    return getAllNetResourceByHostAddress(hostAddress.toString());
+}
+
+QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QString &hostAddress) const
+{
+    QnNetworkResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
+        if (netResource != 0 && netResource->getHostAddress() == hostAddress)
             result << netResource;
     }
 
@@ -331,7 +386,7 @@ void QnResourcePool::updateUniqId(QnResourcePtr res, const QString &newUniqId)
     m_resources.insert(newUniqId, res);
 }
 
-bool QnResourcePool::hasSuchResouce(const QString &uniqid) const
+bool QnResourcePool::hasSuchResource(const QString &uniqid) const
 {
     return !getResourceByUniqId(uniqid).isNull();
 }
@@ -374,6 +429,17 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnId id) const
     return result;
 }
 
+QnUserResourcePtr QnResourcePool::getAdministrator() const {
+    QMutexLocker locker(&m_resourcesMtx);
+
+    foreach(const QnResourcePtr &resource, m_resources) {
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        if (user && user->isAdmin())
+            return user;
+    }
+    return QnUserResourcePtr();
+}
+
 QStringList QnResourcePool::allTags() const
 {
     QStringList result;
@@ -396,20 +462,43 @@ QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
     return QnNetworkResourcePtr(0);
 }
 
-int QnResourcePool::activeCameras() const
+int QnResourcePool::activeCamerasByClass(bool analog) const
 {
     int count = 0;
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
+        if (!camera || camera->isDisabled() || camera->isScheduleDisabled() || camera->isAnalog() != analog)
             continue;
-
-        if (!camera->isDisabled() && !camera->isScheduleDisabled())
-            count++;
+        count++;
     }
-
     return count;
 }
 
+void QnResourcePool::clear()
+{
+    QMutexLocker lk( &m_resourcesMtx );
+
+    localServer.clear();
+    m_resources.clear();
+    m_foreignResources.clear();
+}
+
+bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )
+{
+    const QString& uniqueId = resource->getUniqueId();
+
+    if (resourcePool->contains(uniqueId))
+    {
+        // if we already have such resource in the pool
+        (*resourcePool)[uniqueId]->update(resource);
+        return false;
+    }
+    else
+    {
+        // new resource
+        (*resourcePool)[uniqueId] = resource;
+        return true;
+    }
+}

@@ -11,7 +11,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
 
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
 
 namespace {

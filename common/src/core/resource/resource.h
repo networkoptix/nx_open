@@ -8,6 +8,7 @@
 #include <QSet>
 #include <QStringList>
 #include <QReadWriteLock>
+#include <QThreadPool>
 #include "utils/common/qnid.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "resource_fwd.h"
@@ -52,17 +53,23 @@ class QN_EXPORT QnResource : public QObject
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
-    enum Status { Offline, Unauthorized, Online, Recording };
+    enum Status {
+        Offline,
+        Unauthorized,
+        Online,
+        Recording };
 
     enum Flag {
         network = 0x01,         /**< Has ip and mac. */
         url = 0x02,             /**< Has url, e.g. file name. */
         streamprovider = 0x04,
         media = 0x08,
+
         playback = 0x10,        /**< Something playable (not real time and not a single shot). */
         video = 0x20,
         audio = 0x40,
         live = 0x80,
+
         still_image = 0x100,    /**< Still image device. */
 
         local = 0x200,          /**< Local client resource. */
@@ -74,8 +81,11 @@ public:
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
         periods = 0x8000,       /**< Resource has recorded periods. */
+
         motion = 0x10000,       /**< Resource has motion */
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
+
+        foreigner = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -152,6 +162,11 @@ public:
 
 
     QnResourcePtr toSharedPointer() const;
+    
+    template<class Resource>
+    static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
+
+    QnResourcePtr getParentResource() const;
 
     // ==================================================
 
@@ -204,17 +219,18 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController();
+    virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
+    static void stopAsyncTasks();
 signals:
-    void parameterValueChanged(const QnParam &param);
-    void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-    void disabledChanged(bool oldValue, bool newValue);
-    void nameChanged();
-    void parentIdChanged();
-    void idChanged(const QnId &oldId, const QnId &newId);
-    void flagsChanged();
-    void urlChanged();
+    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
+    void statusChanged(const QnResourcePtr &resource);
+    void disabledChanged(const QnResourcePtr &resource);
+    void nameChanged(const QnResourcePtr &resource);
+    void parentIdChanged(const QnResourcePtr &resource);
+    void flagsChanged(const QnResourcePtr &resource);
+    void urlChanged(const QnResourcePtr &resource);
+    void resourceChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -230,8 +246,9 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void resourceChanged();
-    void initAsyncFinished(QnResourcePtr resource, bool initialized);
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
+
+    void parameterValueChangedQueued(const QnResourcePtr &resource, const QnParam &param);
 
 public:
     // this is thread to process commands like setparam
@@ -240,8 +257,12 @@ public:
     static void addCommandToProc(QnAbstractDataPacketPtr data);
     static int commandProcQueueSize();
 
-    void update(QnResourcePtr other);
+    void update(QnResourcePtr other, bool silenceMode = false);
 
+    // Need use lock/unlock consumers before this call!
+    QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
+    void lockConsumers() { m_consumersMtx.lock(); }
+    void unlockConsumers() { m_consumersMtx.unlock(); }
 protected:
     virtual void updateInner(QnResourcePtr other);
 
@@ -254,6 +275,11 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     virtual bool initInternal() {return true;};
+    //!Called just after successful \a initInternal()
+    /*!
+        Inherited class implementation MUST call base class method first
+    */
+    virtual void initializationDone();
 
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
@@ -295,6 +321,7 @@ protected:
 
     mutable QnParamList m_resourceParamList;
 
+    static bool m_appStopping;
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -336,6 +363,8 @@ private:
 
     bool m_initialized;    
     QMutex m_initMutex;
+
+    static QThreadPool m_initAsyncPool;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
@@ -349,6 +378,11 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     }
 }
 
+template<class Resource>
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource) {
+    using ::toSharedPointer; /* Let ADL kick in. */
+    return toSharedPointer(resource);
+}
 
 
 class QnResourceFactory

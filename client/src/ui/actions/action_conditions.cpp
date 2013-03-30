@@ -67,8 +67,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        bool isCamera = widget->resource()->flags() & QnResource::network;
-        if(!isCamera)
+        if (!widget->resource()->hasFlags(QnResource::motion))
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
@@ -87,7 +86,7 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!widget->isInfoButtonVisible())
+        if (!(widget->visibleButtons() & QnResourceWidget::InfoButton))
             continue;
 
         if(m_hasRequiredDisplayInfoValue) {

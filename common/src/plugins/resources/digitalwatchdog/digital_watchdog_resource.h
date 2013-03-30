@@ -13,11 +13,17 @@ typedef QSharedPointer<QnPlWatchDogResourceAdditionalSettings> QnPlWatchDogResou
 
 class QnPlWatchDogResource : public QnPlOnvifResource
 {
+    Q_OBJECT
+
+    typedef QnPlOnvifResource base_type;
+
 public:
     QnPlWatchDogResource();
     ~QnPlWatchDogResource();
 
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+
+    virtual QnAbstractPtzController *getPtzController() override;
 
 protected:
     bool initInternal() override;
@@ -31,6 +37,9 @@ private:
     QString fetchCameraModel();
 
 private:
+    friend class QnWatchDogPtzController; // TODO: remove
+
+    QScopedPointer<QnAbstractPtzController> m_ptzController;
 
     //The List contains hierarchy of DW models from child to parent "DIGITALWATCHDOG" (see in camera_settings.xml)
     //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method
@@ -38,7 +47,6 @@ private:
     AdditionalSettings m_additionalSettings;
 };
 
-typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
 
 class QnPlWatchDogResourceAdditionalSettings
 {
@@ -46,7 +54,7 @@ class QnPlWatchDogResourceAdditionalSettings
 
 public:
     
-    QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host, int port, unsigned int timeout,
+    QnPlWatchDogResourceAdditionalSettings(const QString& host, int port, unsigned int timeout,
         const QAuthenticator& auth, const QString& cameraSettingId);
     ~QnPlWatchDogResourceAdditionalSettings();
 

@@ -22,6 +22,7 @@ public:
         Servers,
         Layout,
         Camera,
+        Recorder,
         Image,
         Media,
         User,
@@ -41,7 +42,13 @@ public:
 
     QIcon icon(QnResource::Flags flags, QnResource::Status status);
 
-    QIcon icon(Key key);
+    /**
+     * @brief icon
+     * @param key
+     * @param unchecked         Do not check against TypeMask
+     * @return
+     */
+    QIcon icon(Key key, bool unchecked = false);
 
     static Key key(QnResource::Flags flags, QnResource::Status status);
 

@@ -1,6 +1,9 @@
 #include "server_resource_widget.h"
 
-#include <utils/common/math.h> /* For M_PI. */
+#include <iterator> /* For std::advance. */
+
+#include <utils/math/math.h> /* For M_PI. */
+#include <utils/math/color_transformations.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -18,6 +21,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
+#include <ui/style/statistics_colors.h>
 #include <ui/workbench/workbench_context.h>
 
 /** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
@@ -31,45 +35,13 @@ namespace {
 
     /** Get corresponding color from config */
     QColor getColorByKey(const QString &key) {
-        int id;
-        // TODO: #gdm
-        // It seems that qHash is not needed here and actually harmful here.
-        // Why don't we just use plain numbering?
-        // CPU -> 0
-        // RAM -> 1
-        // C: -> 2
-        // D: -> 3
-        // E: -> 4
-        // ...
-        // 
-        // And for linux:
-        // hda -> 2
-        // hdb -> 3
-        // ...
-        // 
-        // This way we won't have collisions for sure.
-
-        // some hacks to align hashes for keys like 'C:' and 'sda'
-        // strongly depends on size of systemHealthColors
-        QLatin1String salt = QLatin1String("2");
+        QnStatisticsColors colors = qnGlobals->statisticsColors();
         if (key == QLatin1String("CPU"))
-            id = 7;
-        else if (key == QLatin1String("RAM"))
-            id = 8;
-        else
-        if (key.contains(QLatin1Char(':'))) {
-            // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
-            QString key2 = key.at(0);
-            id = qHash(salt + key2);
-        }
-        else
-            // linux hdd keys
-            id = qHash(salt + key);
-        QnColorVector colors = qnGlobals->systemHealthColors();
-        return colors[id % colors.size()];
+            return colors.cpu;
+        if (key == QLatin1String("RAM"))
+            return colors.ram;
+        return colors.hddByKey(key);
     }
-
-
 
     /** Create path for the chart */
     QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
@@ -86,18 +58,18 @@ namespace {
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
-        bool first(true);
-
-        QnStatisticsDataIterator iter(values.values);
-        bool last = !iter.hasNext();
+        bool first = true;
+        bool last = false;
         *currentValue = -1;
+        
+        QLinkedList<qreal>::const_iterator backPos = values.values.end();
+        backPos--;
 
-        while (iter.hasNext()) {
-            qreal value = qMin(iter.next(), 1.0);
+        for(QLinkedList<qreal>::const_iterator pos = values.values.begin(); pos != values.values.end(); pos++) {
+            qreal value = qMin(*pos, 1.0);
             //bool noData = value < 0;
             value = qMax(value, -0.005);
-
-            last = !iter.hasNext();
+            last = pos == backPos;
             maxValue = qMax(maxValue, value);
             if (first) {
                 y1 = value * scale;
@@ -228,6 +200,10 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_storageLimit = m_manager->storageLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
+    /* Note that this slot is already connected to nameChanged signal in 
+     * base class's constructor.*/
+    connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
+
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
@@ -309,7 +285,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     /** Draw grid */
     {
         QPen grid;
-        grid.setColor(qnGlobals->systemHealthColorGrid());
+        grid.setColor(qnGlobals->statisticsColors().grid);
         grid.setWidthF(pen_width);
 
         QPainterPath grid_path;
@@ -357,7 +333,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         Q_UNUSED(penRollback)
 
         QPen main_pen;
-        main_pen.setColor(getColorByKey(QLatin1String("CPU")));
+        main_pen.setColor(qnGlobals->statisticsColors().frame);
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::MiterJoin);
 
@@ -367,15 +343,18 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         QnScopedPainterFontRollback fontRollback(painter);
         Q_UNUSED(fontRollback)
         QFont font(this->font());
+
 #ifdef Q_OS_LINUX
+        // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
         int fontSize = 20;
 #else
+        // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
         int fontSize = 80;
 #endif
         font.setPixelSize(fontSize);
         painter->setFont(font);
 
-        /* Draw text values */
+        /* Draw text values on the right side */
         {
             // modify this if you want to change font size
             qreal zoomCoef = 0.4 * offset;
@@ -446,7 +425,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 // Handlers
 // -------------------------------------------------------------------------- //
 QString QnServerResourceWidget::calculateTitleText() const {
-    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host()); // TODO: connect to change signal
+    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {

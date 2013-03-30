@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>428</width>
-    <height>337</height>
+    <width>703</width>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,34 +25,19 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QTreeWidget" name="gridLicenses">
+           <widget class="QTreeView" name="gridLicenses">
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
             <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <property name="itemsExpandable">
              <bool>false</bool>
             </property>
             <property name="sortingEnabled">
              <bool>true</bool>
             </property>
-            <property name="columnCount">
-             <number>3</number>
-            </property>
-            <attribute name="headerStretchLastSection">
-             <bool>true</bool>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>Licensed To</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Cameras</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>License key</string>
-             </property>
-            </column>
            </widget>
           </item>
           <item>

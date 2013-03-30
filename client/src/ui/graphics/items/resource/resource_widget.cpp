@@ -16,7 +16,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ui/common/color_transformations.h>
+#include <utils/math/color_transformations.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
@@ -132,11 +132,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
+    m_overlayVisible(0),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_desiredRotation(0)
+    m_overlayRotation(Qn::Angle0)
 {
     setAcceptHoverEvents(true);
+    setTransformOrigin(Center);
 
     /* Set up shadow. */
     shadowItem()->setColor(qnGlobals->shadowColor());
@@ -236,6 +238,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
+    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true);
 
 
     /* Footer overlay. */
@@ -271,15 +274,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_footerOverlayWidget->setLayout(footerOverlayLayout);
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
+    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true);
 
 
     /* Initialize resource. */
     m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
-    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(updateTitleText()));
+    connect(m_resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
     setChannelLayout(qn_resourceWidget_defaultContentLayout());
-
 
     /* Init static text. */
     m_noDataStaticText.setText(tr("NO DATA"));
@@ -292,6 +295,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_analogLicenseStaticText.setText(tr("Activate analog license to remove this message"));
+    m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
 
     /* Run handlers. */
@@ -355,10 +360,8 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
 
 void QnResourceWidget::setGeometry(const QRectF &geometry) {
     base_type::setGeometry(geometry);
-    setTransformOriginPoint(rect().center());
-
-    m_headerOverlayWidget->setDesiredSize(size());
-    m_footerOverlayWidget->setDesiredSize(size());
+    
+    updateOverlayWidgetsGeometry();
 }
 
 QString QnResourceWidget::titleText() const {
@@ -431,33 +434,6 @@ void QnResourceWidget::updateInfoText() {
     setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
 
-void QnResourceWidget::updateOverlayRotation(qreal rotation) {
-    while (rotation < -180)
-        rotation += 360;
-    while (rotation > 180)
-        rotation -= 360;
-    Qn::FixedItemRotation fixed;
-    if (rotation >= -45 && rotation <= 45) {
-        fixed = Qn::Angle0;
-        m_desiredRotation = 0;
-    }
-    else if (rotation > 135 || rotation < -135) {
-        fixed = Qn::Angle180;
-        m_desiredRotation = 180;
-    }
-    else if (rotation > 0) {
-        fixed = Qn::Angle270;
-        m_desiredRotation = 270;
-    }
-    else {
-        fixed = Qn::Angle90;
-        m_desiredRotation = 90;
-    }
-    m_headerOverlayWidget->setDesiredRotation(fixed);
-    m_footerOverlayWidget->setDesiredRotation(fixed);
-}
-
-
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
@@ -497,30 +473,6 @@ Qn::RenderStatus QnResourceWidget::channelRenderStatus(int channel) const {
     return m_channelState[channel].renderStatus;
 }
 
-bool QnResourceWidget::isDecorationsVisible() const {
-    return !qFuzzyIsNull(m_headerOverlayWidget->opacity()); /* Note that it's OK to check only header opacity here. */
-}
-
-void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
-    qreal opacity = visible ? 1.0 : 0.0;
-
-    if(animate) {
-        opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(opacity);
-        opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(opacity);
-    } else {
-        m_footerOverlayWidget->setOpacity(opacity);
-        m_headerOverlayWidget->setOpacity(opacity);
-    }
-}
-
-bool QnResourceWidget::isInfoVisible() const {
-    return (options() & DisplayInfo);
-}
-
-bool QnResourceWidget::isInfoButtonVisible() const {
-    return calculateButtonsVisibility() & InfoButton;
-}
-
 bool QnResourceWidget::isLocalActive() const {
     return m_localActive;
 }
@@ -529,23 +481,8 @@ void QnResourceWidget::setLocalActive(bool localActive) {
     m_localActive = localActive;
 }
 
-void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
-    setOption(DisplayInfo, visible);
-
-    qreal opacity = visible ? 1.0 : 0.0;
-
-    if(animate) {
-        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
-    } else {
-        m_footerWidget->setOpacity(opacity);
-    }
-
-    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
-        infoButton->setChecked(visible);
-}
-
 QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
-    return (QnResourceWidget::Buttons)buttonBar()->checkedButtons();
+    return static_cast<Buttons>(buttonBar()->checkedButtons());
 }
 
 void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
@@ -553,7 +490,23 @@ void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
 }
 
 QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
-    return (QnResourceWidget::Buttons)buttonBar()->visibleButtons();
+    return static_cast<Buttons>(buttonBar()->visibleButtons());
+}
+
+QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
+    Buttons result = InfoButton | RotateButton;
+
+    if(item() && item()->layout()) {
+        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
+        if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+            result |= CloseButton;
+    }
+
+    return result;
+}
+
+void QnResourceWidget::updateButtonsVisibility() {
+    m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
@@ -610,20 +563,23 @@ void QnResourceWidget::setChannelScreenSize(const QSize &size) {
     channelScreenSizeChangedNotify();
 }
 
-QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
-    Buttons result = InfoButton | RotateButton;
-
-    if(item() && item()->layout()) {
-        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-        if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
-            result |= CloseButton;
-    }
-
-    return result;
+bool QnResourceWidget::isInfoVisible() const {
+    return (options() & DisplayInfo);
 }
 
-void QnResourceWidget::updateButtonsVisibility() {
-    m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
+void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    setOption(DisplayInfo, visible);
+
+    qreal opacity = visible ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
+    } else {
+        m_footerWidget->setOpacity(opacity);
+    }
+
+    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
+        infoButton->setChecked(visible);
 }
 
 QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
@@ -677,6 +633,116 @@ void QnResourceWidget::setChannelLayout(const QnResourceVideoLayout *channelLayo
 
 int QnResourceWidget::channelCount() const {
     return m_channelsLayout->numberOfChannels();
+}
+
+void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport) {
+    if(!widget) {
+        qnNullWarning(widget);
+        return;
+    }
+
+    QnViewportBoundWidget *boundWidget = dynamic_cast<QnViewportBoundWidget *>(widget);
+    if(bindToViewport && !boundWidget) {
+        QGraphicsLinearLayout *boundLayout = new QGraphicsLinearLayout();
+        boundLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+        boundLayout->addItem(widget);
+
+        boundWidget = new QnViewportBoundWidget();
+        boundWidget->setLayout(boundLayout);
+    }
+    (boundWidget ? boundWidget : widget)->setParentItem(this);
+
+    QnFixedRotationTransform *rotationTransform = NULL;
+    if(autoRotate) {
+        rotationTransform = new QnFixedRotationTransform(widget);
+        rotationTransform->setTarget(widget);
+        rotationTransform->setAngle(m_overlayRotation);
+    }
+
+    OverlayWidget overlay;
+    overlay.visibility = visibility;
+    overlay.widget = widget;
+    overlay.boundWidget = boundWidget;
+    overlay.rotationTransform = rotationTransform;
+
+    m_overlayWidgets.push_back(overlay);
+
+    updateOverlayWidgetsGeometry();
+}
+
+void QnResourceWidget::removeOverlayWidget(QGraphicsWidget *widget) {
+
+    for(int i = 0; i < m_overlayWidgets.size(); i++) {
+        const OverlayWidget &overlay = m_overlayWidgets[i];
+        if(overlay.widget == widget) {
+            overlay.widget->setParentItem(NULL);
+            if(overlay.boundWidget && overlay.boundWidget != overlay.widget)
+                delete overlay.boundWidget;
+
+            m_overlayWidgets.removeAt(i);
+            return;
+        }
+    }
+}
+
+QnResourceWidget::OverlayVisibility QnResourceWidget::overlayWidgetVisibility(QGraphicsWidget *widget) const {
+    for(int i = 0; i < m_overlayWidgets.size(); i++)
+        if(m_overlayWidgets[i].widget == widget)
+            return m_overlayWidgets[i].visibility;
+    return Invisible;
+}
+
+void QnResourceWidget::setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility) {
+    for(int i = 0; i < m_overlayWidgets.size(); i++) {
+        if(m_overlayWidgets[i].widget == widget) {
+            m_overlayWidgets[i].visibility = visibility;
+            updateOverlayWidgetsVisibility();
+            return;
+        }
+    }
+}
+
+bool QnResourceWidget::isOverlayVisible() const {
+    return m_overlayVisible;
+}
+
+void QnResourceWidget::setOverlayVisible(bool visible, bool animate) {
+    m_overlayVisible = visible;
+
+    updateOverlayWidgetsVisibility(animate);
+}
+
+void QnResourceWidget::updateOverlayWidgetsGeometry() {
+    foreach(const OverlayWidget &overlay, m_overlayWidgets) {
+        QSizeF size = this->size();
+
+        if(overlay.rotationTransform) {
+            overlay.rotationTransform->setAngle(m_overlayRotation);
+
+            if(m_overlayRotation == Qn::Angle90 || m_overlayRotation == Qn::Angle270)
+                size.transpose();
+        }
+       
+        if(overlay.boundWidget) {
+            overlay.boundWidget->setFixedSize(size);
+        } else {
+            overlay.widget->resize(size);
+        }
+    }
+}
+
+void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
+    foreach(const OverlayWidget &overlay, m_overlayWidgets) {
+        if(overlay.visibility == UserVisible)
+            break;
+
+        qreal opacity = overlay.visibility == Invisible ? 0.0 : (m_overlayVisible ? 1.0 : 0.0);
+        if(animate) {
+            opacityAnimator(overlay.widget, 1.0)->animateTo(opacity);
+        } else {
+            overlay.widget->setOpacity(opacity);
+        }
+    }
 }
 
 
@@ -774,9 +840,9 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
 
     painter->translate(rect().center());
-    painter->rotate(m_desiredRotation);
+    painter->rotate(-1.0 * m_overlayRotation);
     painter->translate(offset * unit);
-    if (m_desiredRotation % 180 != 0) {
+    if (m_overlayRotation % 180 != 0) {
         qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
         painter->scale(ratio, ratio);
     }
@@ -806,7 +872,6 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     painter->fillRect(rect, QColor(0, 0, 0, 128));
 
     if(overlay == LoadingOverlay || overlay == PausedOverlay || overlay == EmptyOverlay) {
-        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
         qreal unit = qnGlobals->workbenchUnitSize();
 
         painter->beginNativePainting();
@@ -821,9 +886,10 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glPushMatrix();
         glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
         glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
-        glRotatef(m_desiredRotation, 0.0, 0.0, 1.0);
+        glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
+            qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
                 painter->opacity()
@@ -853,6 +919,9 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     } else if (overlay == UnauthorizedOverlay) {
         paintFlashingText(painter, m_unauthorizedStaticText, 0.1);
         paintFlashingText(painter, m_unauthorizedStaticText2, 0.025, QPointF(0.0, 0.1));
+    } else if (overlay == AnalogWithoutLicenseOverlay) {
+        for (int i = -5; i < 6; i++)
+            paintFlashingText(painter, m_analogLicenseStaticText, 0.025, QPointF(0.0, 0.05*i));
     }
 
 }
@@ -880,38 +949,44 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
 }
 
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    setDecorationsVisible();
+    setOverlayVisible();
     m_mouseInWidget = true;
 
     base_type::hoverEnterEvent(event);
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-    if(!isDecorationsVisible())
-        setDecorationsVisible();
+    if(!isOverlayVisible())
+        setOverlayVisible();
 
     base_type::hoverMoveEvent(event);
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isInfoVisible())
-        setDecorationsVisible(false);
+        setOverlayVisible(false);
     m_mouseInWidget = false;
 
     base_type::hoverLeaveEvent(event);
 }
 
 QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
-    if (change == QGraphicsItem::ItemRotationHasChanged)
-        updateOverlayRotation(value.toReal());
+    if (change == QGraphicsItem::ItemRotationHasChanged) {
+        Qn::FixedRotation overlayRotation = fixedRotationFromDegrees(rotation());
+        if(overlayRotation != m_overlayRotation) {
+            m_overlayRotation = overlayRotation;
+            updateOverlayWidgetsGeometry();
+        }
+    }
+
     return base_type::itemChange(change, value);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+    if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
         bool visible = isInfoVisible();
         setInfoVisible(visible);
-        setDecorationsVisible(visible || m_mouseInWidget);
+        setOverlayVisible(visible || m_mouseInWidget);
     }
 }
 void QnResourceWidget::at_iconButton_visibleChanged() {
@@ -924,6 +999,6 @@ void QnResourceWidget::at_iconButton_visibleChanged() {
 
 void QnResourceWidget::at_infoButton_toggled(bool toggled){
     setInfoVisible(toggled);
-    setDecorationsVisible(toggled || m_mouseInWidget);
+    setOverlayVisible(toggled || m_mouseInWidget);
 }
 

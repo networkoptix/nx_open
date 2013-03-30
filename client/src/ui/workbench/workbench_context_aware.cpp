@@ -10,6 +10,25 @@
 Q_GLOBAL_STATIC_WITH_ARGS(QnWorkbenchContext, qn_staticContext, (qnResPool))
 
 QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent) {
+    init(parent);
+}
+
+QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context) {
+    init(context);
+}
+
+QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, QnWorkbenchContext *context) {
+    if(context) {
+        init(context);
+    } else if(parent) {
+        init(parent);
+    } else {
+        qnNullCritical(parent);
+        m_context = qn_staticContext();
+    }
+}
+
+void QnWorkbenchContextAware::init(QObject *parent) {
     while(true) {
         if(parent == NULL) {
             qnCritical("No context-aware parent found.");
@@ -33,7 +52,9 @@ QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent) {
     }
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context): m_context(context) {
+void QnWorkbenchContextAware::init(QnWorkbenchContext *context) {
+    m_context = context;
+
     if(!context) {
         qnNullCritical(context);
         m_context = qn_staticContext();

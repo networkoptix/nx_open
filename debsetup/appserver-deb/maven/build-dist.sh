@@ -17,7 +17,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}
+STAGE=$STAGEBASE/${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
 PKGSTAGE=$STAGE$TARGET
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
@@ -63,7 +63,7 @@ install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${COMPANY_NAME}-ent
 install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
 
 # Copy libraries
-install -m 644 $PROXY_LIB_PATH/*.so* $LIBSTAGE
+cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
 
 # Strip and remove rpath
 for f in `find $LIBSTAGE -type f`
@@ -93,4 +93,4 @@ install -m 644 debian/conffiles $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)

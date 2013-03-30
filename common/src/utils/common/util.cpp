@@ -5,6 +5,8 @@
 #include <sys/time.h>
 #endif
 
+#include <QHostInfo>
+
 bool removeDir(const QString &dirName)
 {
     bool result = true;
@@ -142,6 +144,22 @@ qint64 getDiskFreeSpace(const QString& root)
     Q_UNUSED(status);
     return totalNumberOfFreeBytes;
 };
+
+qint64 getDiskTotalSpace(const QString& root)
+{
+    quint64 freeBytesAvailableToCaller = -1;
+    quint64 totalNumberOfBytes = -1;
+    quint64 totalNumberOfFreeBytes = -1;
+    BOOL status = GetDiskFreeSpaceEx(
+        (LPCWSTR) root.data(), // pointer to the directory name
+        (PULARGE_INTEGER) &freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
+        (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
+        (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
+        );
+    Q_UNUSED(status);
+    return totalNumberOfBytes;
+};
+
 #else 
 qint64 getDiskFreeSpace(const QString& root) {
     struct statvfs buf;
@@ -157,6 +175,22 @@ qint64 getDiskFreeSpace(const QString& root) {
         return -1;
     }
 }
+
+qint64 getDiskTotalSpace(const QString& root) {
+    struct statvfs buf;
+    if (statvfs(root.toUtf8().data(), &buf) == 0)
+    {
+        qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
+        //qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
+        //qint64 used = disk_size - free;
+
+        return disk_size;
+    }
+    else {
+        return -1;
+    }
+}
+
 #endif
 
 

@@ -1,14 +1,22 @@
 #include "abstract_ptz_controller.h"
 
-#include "core/resource/network_resource.h"
-#include "api/app_server_connection.h"
-#include "core/resource/camera_resource.h"
-#include "api/api_fwd.h"
-#include "core/resource/param.h"
+#include <utils/common/warnings.h>
 
-QnAbstractPtzController::QnAbstractPtzController(QnResourcePtr netRes)
-{
-    m_resource = qSharedPointerDynamicCast<QnVirtualCameraResource>(netRes);
+#include <api/api_fwd.h>
+#include <api/app_server_connection.h>
+
+#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/param.h>
+
+
+QnAbstractPtzController::QnAbstractPtzController(QnResource* resource) {
+    m_resource = dynamic_cast<QnSecurityCamResource*>(resource);
+    if(!m_resource)
+        qnWarning("Invalid non-camera resource '%1' provided to ptz controller.", resource ? resource->getName() : QLatin1String("NULL"));
+}
+
+QnAbstractPtzController::~QnAbstractPtzController() {
 
 }
 
@@ -23,10 +31,12 @@ void QnAbstractPtzController::getCalibrate(QnVirtualCameraResourcePtr res, qreal
     zoomVelocityCoeff = val.toFloat();
 }
 
+/*
 void QnAbstractPtzController::getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff)
 {
     getCalibrate(m_resource, xVelocityCoeff, yVelocityCoeff, zoomVelocityCoeff);
 }
+*/
 
 bool QnAbstractPtzController::calibrate(QnVirtualCameraResourcePtr res, qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff)
 {
@@ -34,21 +44,22 @@ bool QnAbstractPtzController::calibrate(QnVirtualCameraResourcePtr res, qreal xV
     res->setParam(QLatin1String("yVelocityCoeff"), yVelocityCoeff, QnDomainDatabase);
     res->setParam(QLatin1String("zoomVelocityCoeff"), zoomVelocityCoeff, QnDomainDatabase);
 
-    QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(res, errorStr) != 0) 
+    if (conn->saveSync(res) != 0) 
     {
         qCritical() << "QnPlOnvifResource::init: can't save resource PTZ params to Enterprise Controller. Resource physicalId: "
-            << res->getPhysicalId() << ". Error: " << errorStr;
+            << res->getPhysicalId() << ". Error: " << conn->getLastError();
         return false;
     }
     return true;
 }
 
+/*
 bool QnAbstractPtzController::calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff)
 {
     return calibrate(m_resource, xVelocityCoeff, yVelocityCoeff, zoomVelocityCoeff);
 }
+*/
 
 qreal QnAbstractPtzController::getXVelocityCoeff() const
 {

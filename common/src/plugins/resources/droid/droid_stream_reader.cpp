@@ -19,7 +19,6 @@ void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
 
 PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    QnLiveStreamProvider(res),
     m_rtpSession(),
     m_videoIoDevice(0),
     m_audioIoDevice(0),
@@ -47,7 +46,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    while (!m_needStop && !result)
+    while (!needToStop() && !result)
     {
         if (!m_gotSDP) {
             msleep(10);
@@ -93,7 +92,7 @@ void PlDroidStreamReader::openStream()
     m_tcpSock.setWriteTimeOut(DROID_TIMEOUT);
 
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
-    QString host = res->getHostAddress().toString();
+    QString host = res->getHostAddress();
 
     if (m_tcpSock.isClosed())
         m_tcpSock.reopen();
@@ -109,7 +108,7 @@ void PlDroidStreamReader::openStream()
 
     {
         QMutexLocker lock(&m_allReadersMutex);
-        quint32 ip = res->getHostAddress().toIPv4Address();
+        quint32 ip = resolveAddress(res->getHostAddress()).toIPv4Address();
         m_allReaders.insert(ip, this);
     }
     QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalPort()).
@@ -141,7 +140,7 @@ void PlDroidStreamReader::closeStream()
 {
     {
         QMutexLocker lock(&m_allReadersMutex);
-        quint32 ip = m_droidRes->getHostAddress().toIPv4Address();
+        quint32 ip = resolveAddress(m_droidRes->getHostAddress()).toIPv4Address();
         m_allReaders.remove(ip);
     }
 

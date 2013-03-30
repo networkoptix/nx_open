@@ -6,6 +6,10 @@
 #include <QtGui/QGraphicsItem>
 #include <QtCore/QMimeData>
 
+#include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+
 #include <utils/common/warnings.h>
 
 #include <ui/actions/action_manager.h>
@@ -103,7 +107,15 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
 }
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    m_resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    QnResourceList media = resources.filtered<QnMediaResource>();
+    QnResourceList layouts = resources.filtered<QnLayoutResource>();
+    QnResourceList servers = resources.filtered<QnMediaServerResource>();
+
+    m_resources = media;
+    m_resources << layouts;
+    m_resources << servers;
+
     if (m_resources.empty())
         return false;
 

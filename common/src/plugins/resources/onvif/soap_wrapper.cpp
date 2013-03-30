@@ -1,14 +1,21 @@
 #include "openssl/evp.h"
 
 #include "soap_wrapper.h"
-#include "onvif/Onvif.nsmap"
-#include "onvif/soapDeviceBindingProxy.h"
-#include "onvif/soapMediaBindingProxy.h"
-#include "onvif/soapPTZBindingProxy.h"
-#include "onvif/soapImagingBindingProxy.h"
-#include "onvif/wsseapi.h"
+#include <onvif/Onvif.nsmap>
+#include <onvif/soapDeviceBindingProxy.h>
+#include <onvif/soapDeviceIOBindingProxy.h>
+#include <onvif/soapMediaBindingProxy.h>
+#include <onvif/soapPTZBindingProxy.h>
+#include <onvif/soapImagingBindingProxy.h>
+#include <onvif/soapNotificationProducerBindingProxy.h>
+#include <onvif/soapCreatePullPointBindingProxy.h>
+#include <onvif/soapEventBindingProxy.h>
+#include <onvif/soapSubscriptionManagerBindingProxy.h>
+#include <onvif/soapPullPointSubscriptionBindingProxy.h>
+#include <onvif/wsseapi.h>
 
 #include <QtGlobal>
+
 
 namespace {
 
@@ -95,6 +102,16 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
+/*
+int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
+{ 
+    _wsse__Security *security = soap_wsse_add_Security(soap);
+    soap_wsse_add_UsernameTokenText(soap, id, username, password);
+    security->UsernameToken->Password->Type = (char*) wsse_PasswordTextURI;
+    return SOAP_OK;
+}
+*/
+
 } // anonymous namespace
 
 
@@ -108,9 +125,13 @@ const std::string DEFAULT_ONVIF_PASSWORD = "admin";
 static const int DIGEST_TIMEOUT_SEC = 60;
 
 template <class T>
-SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
-    m_login(0),
-    m_passwd(0),
+SoapWrapper<T>::SoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
     invoked(false),
     m_timeDrift(_timeDrift)
 {
@@ -122,7 +143,10 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& logi
 
     setLoginPassword(login, passwd);
 
-    m_soapProxy = new T();
+    if( !tcpKeepAlive )
+        m_soapProxy = new T();
+    else
+        m_soapProxy = new T( SOAP_IO_KEEPALIVE, SOAP_IO_KEEPALIVE );
     m_soapProxy->soap->send_timeout = SOAP_SEND_TIMEOUT;
     m_soapProxy->soap->recv_timeout = SOAP_RECEIVE_TIMEOUT;
     m_soapProxy->soap->connect_timeout = SOAP_CONNECT_TIMEOUT;
@@ -149,13 +173,8 @@ SoapWrapper<T>::~SoapWrapper()
 template <class T>
 void SoapWrapper<T>::cleanLoginPassword()
 {
-    if (m_login) {
-        delete[] m_login;
-        delete[] m_passwd;
-    }
-
-    m_login = 0;
-    m_passwd = 0;
+    m_login.clear();
+    m_passwd.clear();
 }
 
 template <class T>
@@ -163,19 +182,8 @@ void SoapWrapper<T>::setLoginPassword(const std::string& login, const std::strin
 {
     cleanLoginPassword();
 
-    m_login = new char[login.size() + 1];
-    strcpy(m_login, login.c_str());
-    m_login[login.size()] = '\0';
-
-    m_passwd = new char[passwd.size() + 1];
-    strcpy(m_passwd, passwd.c_str());
-    m_passwd[passwd.size()] = '\0';
-}
-
-template <class T>
-soap* SoapWrapper<T>::getSoap()
-{
-    return m_soapProxy->soap;
+    m_login = login;
+    m_passwd = passwd;
 }
 
 void correctTimeInternal(char* buffer, const QDateTime& dt)
@@ -199,18 +207,18 @@ void SoapWrapper<T>::beforeMethodInvocation()
         invoked = true;
     }
 
-    if (m_login && *m_login)
-        soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, NULL, m_login, m_passwd, time(NULL) + m_timeDrift);
+    if (!m_login.empty())
+        soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, NULL, m_login.c_str(), m_passwd.c_str(), time(NULL) + m_timeDrift);
 }
 
 template <class T>
-const char* SoapWrapper<T>::getLogin()
+const std::string& SoapWrapper<T>::getLogin()
 {
     return m_login;
 }
 
 template <class T>
-const char* SoapWrapper<T>::getPassword()
+const std::string& SoapWrapper<T>::getPassword()
 {
     return m_passwd;
 }
@@ -249,8 +257,19 @@ bool SoapWrapper<T>::isConflictError()
 // DeviceSoapWrapper
 //
 
-DeviceSoapWrapper::DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
-    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, _timeDrift),
+DeviceSoapWrapper::DeviceSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<DeviceBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive ),
     passwordsData(PasswordHelper::instance())
 {
 
@@ -346,6 +365,26 @@ int DeviceSoapWrapper::getDeviceInformation(DeviceInfoReq& request, DeviceInfoRe
     return m_soapProxy->GetDeviceInformation(m_endpoint, NULL, &request, &response);
 }
 
+int DeviceSoapWrapper::getServiceCapabilities( _onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response )
+{
+    return invokeMethod( &DeviceBindingProxy::GetServiceCapabilities, &request, &response );
+}
+
+int DeviceSoapWrapper::getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response )
+{
+    return invokeMethod( &DeviceBindingProxy::GetRelayOutputs, &request, &response );
+}
+
+int DeviceSoapWrapper::setRelayOutputState( _onvifDevice__SetRelayOutputState& request, _onvifDevice__SetRelayOutputStateResponse& response )
+{
+    return invokeMethod( &DeviceBindingProxy::SetRelayOutputState, &request, &response );
+}
+
+int DeviceSoapWrapper::setRelayOutputSettings( _onvifDevice__SetRelayOutputSettings& request, _onvifDevice__SetRelayOutputSettingsResponse& response )
+{
+    return invokeMethod( &DeviceBindingProxy::SetRelayOutputSettings, &request, &response );
+}
+
 int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
 {
     beforeMethodInvocation();
@@ -380,12 +419,72 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
     return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
 }
 
-//
-// MediaSoapWrapper
-//
 
-MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
-    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, _timeDrift),
+
+//////////////////////////////////////////////////////////
+// DeviceIOWrapper
+//////////////////////////////////////////////////////////
+
+DeviceIOWrapper::DeviceIOWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<DeviceIOBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive )
+{
+}
+
+DeviceIOWrapper::~DeviceIOWrapper()
+{
+}
+
+int DeviceIOWrapper::getDigitalInputs(
+    _onvifDeviceIO__GetDigitalInputs& request,
+    _onvifDeviceIO__GetDigitalInputsResponse& response )
+{
+    return invokeMethod( &DeviceIOBindingProxy::GetDigitalInputs, &request, &response );
+}
+
+int DeviceIOWrapper::getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response )
+{
+    return invokeMethod( &DeviceIOBindingProxy::GetRelayOutputs, &request, &response );
+}
+
+int DeviceIOWrapper::getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response )
+{
+    return invokeMethod( &DeviceIOBindingProxy::GetRelayOutputOptions, &request, &response );
+}
+
+int DeviceIOWrapper::setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response )
+{
+    return invokeMethod( &DeviceIOBindingProxy::SetRelayOutputSettings, &request, &response );
+}
+
+
+//////////////////////////////////////////////////////////
+// MediaSoapWrapper
+//////////////////////////////////////////////////////////
+
+MediaSoapWrapper::MediaSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<MediaBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive ),
     passwordsData(PasswordHelper::instance())
 {
 
@@ -412,6 +511,12 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
 {
     beforeMethodInvocation();
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoSources(m_endpoint, NULL, &request, &response);
 }
 
 int MediaSoapWrapper::getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response)
@@ -532,8 +637,19 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 // PtzSoapWrapper
 //
 
-PtzSoapWrapper::PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
-    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, _timeDrift),
+PtzSoapWrapper::PtzSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<PTZBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive ),
     passwordsData(PasswordHelper::instance())
 {
 
@@ -548,8 +664,19 @@ PtzSoapWrapper::~PtzSoapWrapper()
 // ImagingSoapWrapper
 //
 
-ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
-    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, _timeDrift),
+ImagingSoapWrapper::ImagingSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<ImagingBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive ),
     passwordsData(PasswordHelper::instance())
 {
 
@@ -636,40 +763,172 @@ int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& reque
     return rez;
 }
 
+
+//////////////////////////////////////////////////////////
+// NotificationProducerSoapWrapper
+//////////////////////////////////////////////////////////
+
+NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<NotificationProducerBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive )
+{
+}
+
+int NotificationProducerSoapWrapper::Subscribe(
+    _oasisWsnB2__Subscribe* const request,
+    _oasisWsnB2__SubscribeResponse* const response )
+{
+    return invokeMethod( &NotificationProducerBindingProxy::Subscribe, request, response );
+}
+
+
+//////////////////////////////////////////////////////////
+// CreatePullPointSoapWrapper
+//////////////////////////////////////////////////////////
+
+CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<CreatePullPointBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive )
+{
+}
+
+int CreatePullPointSoapWrapper::createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response )
+{
+    return invokeMethod( &CreatePullPointBindingProxy::CreatePullPoint, &request, &response );
+}
+
+
+//////////////////////////////////////////////////////////
+// PullPointSubscriptionWrapper
+//////////////////////////////////////////////////////////
+
+PullPointSubscriptionWrapper::PullPointSubscriptionWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<PullPointSubscriptionBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive )
+{
+}
+
+int PullPointSubscriptionWrapper::pullMessages( _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response )
+{
+    return invokeMethod( &PullPointSubscriptionBindingProxy::PullMessages, &request, &response );
+}
+
+
+//////////////////////////////////////////////////////////
+// EventSoapWrapper
+//////////////////////////////////////////////////////////
+
+EventSoapWrapper::EventSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<EventBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive )
+{
+}
+
+int EventSoapWrapper::createPullPointSubscription(
+    _onvifEvents__CreatePullPointSubscription& request,
+    _onvifEvents__CreatePullPointSubscriptionResponse& response )
+{
+    return invokeMethod( &EventBindingProxy::CreatePullPointSubscription, &request, &response );
+}
+
+
+//////////////////////////////////////////////////////////
+// SubscriptionManagerSoapWrapper
+//////////////////////////////////////////////////////////
+
+SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(
+    const std::string& endpoint,
+    const std::string& login,
+    const std::string& passwd,
+    int _timeDrift,
+    bool tcpKeepAlive )
+:
+    SoapWrapper<SubscriptionManagerBindingProxy>(
+        endpoint,
+        login,
+        passwd,
+        _timeDrift,
+        tcpKeepAlive )
+{
+}
+
+int SubscriptionManagerSoapWrapper::renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response )
+{
+    return invokeMethod( &SubscriptionManagerBindingProxy::Renew, &request, &response );
+}
+
+
+
 //
 // Explicit instantiating
 //
 
-template soap* SoapWrapper<DeviceBindingProxy>::getSoap();
-template const char* SoapWrapper<DeviceBindingProxy>::getLogin();
-template const char* SoapWrapper<DeviceBindingProxy>::getPassword();
+template const std::string& SoapWrapper<DeviceBindingProxy>::getLogin();
+template const std::string& SoapWrapper<DeviceBindingProxy>::getPassword();
 template int SoapWrapper<DeviceBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<DeviceBindingProxy>::getLastError();
 template const QString SoapWrapper<DeviceBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<DeviceBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<DeviceBindingProxy>::isConflictError();
 
-template soap* SoapWrapper<MediaBindingProxy>::getSoap();
-template const char* SoapWrapper<MediaBindingProxy>::getLogin();
-template const char* SoapWrapper<MediaBindingProxy>::getPassword();
+template const std::string& SoapWrapper<MediaBindingProxy>::getLogin();
+template const std::string& SoapWrapper<MediaBindingProxy>::getPassword();
 template int SoapWrapper<MediaBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<MediaBindingProxy>::getLastError();
 template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<MediaBindingProxy>::isConflictError();
 
-template soap* SoapWrapper<PTZBindingProxy>::getSoap();
-template const char* SoapWrapper<PTZBindingProxy>::getLogin();
-template const char* SoapWrapper<PTZBindingProxy>::getPassword();
+template const std::string& SoapWrapper<PTZBindingProxy>::getLogin();
+template const std::string& SoapWrapper<PTZBindingProxy>::getPassword();
 template int SoapWrapper<PTZBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<PTZBindingProxy>::getLastError();
 template const QString SoapWrapper<PTZBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<PTZBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<PTZBindingProxy>::isConflictError();
 
-template soap* SoapWrapper<ImagingBindingProxy>::getSoap();
-template const char* SoapWrapper<ImagingBindingProxy>::getLogin();
-template const char* SoapWrapper<ImagingBindingProxy>::getPassword();
+template const std::string& SoapWrapper<ImagingBindingProxy>::getLogin();
+template const std::string& SoapWrapper<ImagingBindingProxy>::getPassword();
 template int SoapWrapper<ImagingBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<ImagingBindingProxy>::getLastError();
 template const QString SoapWrapper<ImagingBindingProxy>::getEndpointUrl();

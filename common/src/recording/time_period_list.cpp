@@ -5,7 +5,7 @@ QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 time
     if (isEmpty())
         return end();
 
-    const_iterator itr = qUpperBound(begin(), end(), timeMs);
+    const_iterator itr = qUpperBound(constBegin(), constEnd(), timeMs);
     if (itr != begin())
         --itr;
 
@@ -15,6 +15,24 @@ QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 time
         ++itr;
 
     return itr;
+}
+
+qint64 QnTimePeriodList::roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const 
+{
+    qint64 timeMs = timeUsec/1000;
+    const_iterator period = findNearestPeriod(timeMs, searchForward);
+    if (period != constEnd()) {
+        if (period->contains(timeMs))
+            return timeUsec;
+        else if (searchForward)
+            return period->startTimeMs*1000;
+        else
+            return period->endTimeMs()*1000;
+    }
+    else if (searchForward)
+        return DATETIME_NOW;
+    else 
+        return 0;
 }
 
 bool QnTimePeriodList::intersects(const QnTimePeriod &period) const {        

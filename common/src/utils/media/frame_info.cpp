@@ -1,3 +1,4 @@
+
 #include "frame_info.h"
 #include "../common/util.h"
 
@@ -13,13 +14,47 @@ extern "C" {
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
-
 };
 
 
+/////////////////////////////////////////////////////
+//  class QnSysMemPictureData
+/////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////
+//  class QnOpenGLPictureData
+/////////////////////////////////////////////////////
+QnOpenGLPictureData::QnOpenGLPictureData(
+    SynchronizationContext* const syncCtx,
+//	GLXContext _glContext,
+	unsigned int _glTexture )
+:
+    QnAbstractPictureDataRef( syncCtx ),
+//	m_glContext( _glContext ),
+	m_glTexture( _glTexture )
+{
+}
+
+//!Returns context of texture
+//GLXContext QnOpenGLPictureData::glContext() const
+//{
+//    return m_glContext;
+//}
+
+//!Returns OGL texture name
+unsigned int QnOpenGLPictureData::glTexture() const
+{
+    return m_glTexture;
+}
+
+
+/////////////////////////////////////////////////////
+//  class CLVideoDecoderOutput
+/////////////////////////////////////////////////////
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
-    memset(this, 0, sizeof(*this));
+    memset( this, 0, sizeof(*this) );
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
@@ -47,10 +82,14 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 {
     if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
     {
-        // need to realocate dst memory 
+        // need to reallocate dst memory
         dst->setUseExternalData(false);
         int numBytes = avpicture_get_size((PixelFormat) src->format, src->width, src->height);
         avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, src->width, src->height);
+
+        dst->width = src->width;
+        dst->height = src->height;
+        dst->format = src->format;
 
         /*
         dst->linesize[0] = src->width;
@@ -72,10 +111,19 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 
     int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
 
+    dst->pkt_dts = src->pkt_dts;
+    dst->pkt_pts = src->pkt_pts;
+    dst->pts = src->pts;
+
+    dst->flags = src->flags;
+    dst->sample_aspect_ratio = src->sample_aspect_ratio ;
+    dst->channel = src->channel;
+    //TODO/IMPL
+    //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
+
     copyPlane(dst->data[0], src->data[0], dst->linesize[0], dst->linesize[0], src->linesize[0], src->height);
     copyPlane(dst->data[1], src->data[1], dst->linesize[1], dst->linesize[1], src->linesize[1], yu_h);
     copyPlane(dst->data[2], src->data[2], dst->linesize[2], dst->linesize[2], src->linesize[2], yu_h);
-
 }
 
 /*

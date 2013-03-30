@@ -23,10 +23,16 @@ OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, c
 
 OnvifCameraSettingsResp::~OnvifCameraSettingsResp()
 {
-    delete m_rangesSoapWrapper;
-    delete m_valsSoapWrapper;
-    delete m_rangesResponse;
     delete m_valsResponse;
+    m_valsResponse = NULL;
+    delete m_rangesResponse;
+    m_rangesResponse = NULL;
+    delete m_valsSoapWrapper;
+    m_valsSoapWrapper = NULL;
+    delete m_rangesSoapWrapper;
+    m_rangesSoapWrapper = NULL;
+    delete m_deviceSoapWrapper;
+    m_deviceSoapWrapper = NULL;
 }
 
 bool OnvifCameraSettingsResp::isEmpty() const
@@ -117,12 +123,12 @@ QString OnvifCameraSettingsResp::getImagingUrl() const
 
 QString OnvifCameraSettingsResp::getLogin() const
 {
-    return m_rangesSoapWrapper? QString::fromLatin1(m_rangesSoapWrapper->getLogin()): QString();
+    return m_rangesSoapWrapper? QString::fromStdString(m_rangesSoapWrapper->getLogin()): QString();
 }
 
 QString OnvifCameraSettingsResp::getPassword() const
 {
-    return m_rangesSoapWrapper? QString::fromLatin1(m_rangesSoapWrapper->getPassword()): QString();
+    return m_rangesSoapWrapper? QString::fromStdString(m_rangesSoapWrapper->getPassword()): QString();
 }
 
 int OnvifCameraSettingsResp::getTimeDrift() const
@@ -150,41 +156,41 @@ const QString& CommonStringValues::SEPARATOR = *(new QString(QLatin1String(","))
 
 const OnvifCameraSettingOperationAbstract& OnvifCameraSettingOperationAbstract::EMPTY_OPERATION = *(new OnvifCameraSettingOperationEmpty());
 
-QHash<QString, OnvifCameraSettingOperationAbstract*>& createOnvifCameraSettingOperationAbstract()
+static QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > createOnvifCameraSettingOperationAbstract()
 {
-    QHash<QString, OnvifCameraSettingOperationAbstract*>* tmp = new QHash<QString, OnvifCameraSettingOperationAbstract*>();
+    QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > tmp;
 
-    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yb Gain"),          new ImagingWhiteBalanceYbGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Iris"),                  new ImagingExposureIrisOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Exposure Time"),         new ImagingExposureExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Mode"),        new ImagingWideDynamicRangeModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Mode"),             new ImagingWhiteBalanceModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Gain"),              new ImagingExposureMaxGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Exposure Time"),     new ImagingExposureMinExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Level"),   new ImagingBacklightCompensationLevelOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Contrast"),                        new ImagingContrastOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Priority"),              new ImagingExposurePriorityOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Sharpness"),                       new ImagingSharpnessOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Mode"),              new ImagingIrCutFilterModesOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yr Gain"),          new ImagingWhiteBalanceYrGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Gain"),              new ImagingExposureMinGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Gain"),                  new ImagingExposureGainOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Mode"),                  new ImagingExposureModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Level"),       new ImagingWideDynamicRangeLevelOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Iris"),              new ImagingExposureMaxIrisOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Brightness"),                      new ImagingBrightnessOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Iris"),              new ImagingExposureMinIrisOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Mode"),    new ImagingBacklightCompensationModeOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Color Saturation"),                new ImagingColorSaturationOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Exposure Time"),     new ImagingExposureMaxExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               new MaintenanceSystemRebootOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), new MaintenanceSoftSystemFactoryDefaultOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), new MaintenanceHardSystemFactoryDefaultOperation());
+    tmp.insert(QString::fromLatin1("%%Imaging%%White Balance%%Yb Gain"),          QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceYbGainOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Iris"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureIrisOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Exposure Time"),         QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureExposureTimeOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Mode"),        QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWideDynamicRangeModeOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%White Balance%%Mode"),             QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceModeOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Gain"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxGainOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Exposure Time"),     QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinExposureTimeOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Level"),   QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBacklightCompensationLevelOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Contrast"),                        QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingContrastOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Priority"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposurePriorityOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Sharpness"),                       QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingSharpnessOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Mode"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingIrCutFilterModesOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%White Balance%%Yr Gain"),          QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceYrGainOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Gain"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinGainOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Gain"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureGainOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Mode"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureModeOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Level"),       QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWideDynamicRangeLevelOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Iris"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxIrisOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Brightness"),                      QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBrightnessOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Iris"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinIrisOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Mode"),    QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBacklightCompensationModeOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Color Saturation"),                QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingColorSaturationOperation()));
+    tmp.insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Exposure Time"),     QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxExposureTimeOperation()));
+    tmp.insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceSystemRebootOperation()));
+    tmp.insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceSoftSystemFactoryDefaultOperation()));
+    tmp.insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceHardSystemFactoryDefaultOperation()));
 
-    return *tmp;
+    return tmp;
 }
 
-const QHash<QString, OnvifCameraSettingOperationAbstract*> OnvifCameraSettingOperationAbstract::operations = createOnvifCameraSettingOperationAbstract();
+const QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > OnvifCameraSettingOperationAbstract::operations = createOnvifCameraSettingOperationAbstract();
 
 template<class T>
 bool OnvifCameraSettingOperationAbstract::compareAndSendToCamera(T* field, const T val, OnvifCameraSettingsResp& src) const
@@ -1205,7 +1211,7 @@ bool OnvifCameraSettingReader::isParamEnabled(const QString& /*id*/, const QStri
 void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QString& /*parentId*/)
 {
     QString id = value.getId();
-    QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it;
+    QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator it;
 
     CameraSetting currentSetting;
     switch(value.getType())

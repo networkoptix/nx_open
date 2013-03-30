@@ -31,7 +31,6 @@ public:
     void addDataProcessor(QnAbstractDataConsumer* dp);
     void removeDataProcessor(QnAbstractDataConsumer* dp);
 
-    virtual void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE) { Q_UNUSED(value); Q_UNUSED(currentTimeHint); }
     virtual bool isReverseMode() const { return false;}
 
     bool isConnectedToTheResource() const;
@@ -56,6 +55,8 @@ public:
 
     void disconnectFromResource();
 
+    /* One resource may have several providers used with different roles*/
+    virtual void setRole(QnResource::ConnectionRole role);
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
@@ -63,11 +64,11 @@ signals:
 protected:
     virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
-
 protected:
     QList<QnAbstractDataConsumer*> m_dataprocessors;
     mutable QMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
+    QnResource::ConnectionRole m_role;
 };
 
 #endif //stream_reader_514

@@ -4,6 +4,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
+#include <QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
@@ -12,7 +13,7 @@
 
 #include "version.h"
 #include "utils/common/util.h"
-#include "utils/common/module_resources.h"
+#include "media_server/media_server_module.h"
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"
@@ -33,10 +34,13 @@
 #include "qtservice.h"
 #include "server_message_processor.h"
 #include "settings.h"
+#include "motion/motion_helper.h"
 
 #include <fstream>
+#include "soap/soapserver.h"
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/resources/acti/acti_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
@@ -62,10 +66,27 @@
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
-#include "rest/handlers/gettime_handler.h"
+#include "events/mserver_business_rule_processor.h"
+#include <business/business_event_rule.h>
+#include <business/business_rule_processor.h>
+#include "rest/handlers/exec_action_handler.h"
+#include "rest/handlers/time_handler.h"
+#include "rest/handlers/ping_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
-#include "rest/handlers/ping_handler.h"
+#include "rest/handlers/ext_bevent_handler.h"
+#include <business/business_event_connector.h>
+#include "utils/common/synctime.h"
+#include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
+#include "core/resource_managment/mserver_resource_discovery_manager.h"
+#include "plugins/resources/mserver_resource_searcher.h"
+#include "rest/handlers/log_handler.h"
+#include "plugins/storage/dts/vmax480/vmax480_resource_searcher.h"
+#include "business/events/reasoned_business_event.h"
+#include "rest/handlers/favico_handler.h"
+#include "rest/handlers/storage_space_handler.h"
+#include "common/customization.h"
+
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -220,17 +241,97 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
 }
 
-QnAbstractStorageResourcePtr createDefaultStorage()
+QnStorageResourcePtr createStorage(const QString& path)
 {
-    //QnStorageResourcePtr storage(new QnStorageResource());
-    QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
+    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
-    storage->setUrl(defaultStoragePath());
+    storage->setUrl(path);
     storage->setSpaceLimit(5ll * 1000000000);
-
-    cl_log.log("Creating new storage", cl_logINFO);
+    storage->setUsedForWriting(storage->isStorageAvailableForWriting());
 
     return storage;
+}
+
+#ifdef Q_OS_WIN
+static int freeGB(QString drive)
+{
+    ULARGE_INTEGER freeBytes;
+
+    GetDiskFreeSpaceEx(drive.toStdWString().c_str(), &freeBytes, 0, 0);
+
+    return freeBytes.HighPart * 4 + (freeBytes.LowPart>> 30);
+}
+#endif
+
+static QStringList listRecordFolders()
+{
+    QStringList folderPaths;
+
+#ifdef Q_OS_WIN
+    //QString maxFreeSpaceDrive;
+    //int maxFreeSpace = 0;
+
+    foreach (QFileInfo drive, QDir::drives()) {
+        if (!drive.isWritable())
+            continue;
+
+        
+        QString path = drive.absolutePath();
+        
+        if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
+            continue;
+
+        folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        /*
+        int freeSpace = freeGB(path);
+
+        if (maxFreeSpaceDrive.isEmpty() || freeSpace > maxFreeSpace) {
+            maxFreeSpaceDrive = path;
+            maxFreeSpace = freeSpace;
+        }
+
+        if (freeSpace >= 100) {
+            cl_log.log(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
+            folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        }
+        */
+    }
+    /*
+    if (folderPaths.isEmpty()) {
+        cl_log.log(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
+        folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
+    }
+    */
+#endif
+
+#ifdef Q_OS_LINUX
+    folderPaths.append(getDataDirectory() + "/data");
+#endif
+
+    return folderPaths;
+}
+
+QnAbstractStorageResourceList createStorages()
+{
+    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+
+    QnAbstractStorageResourceList storages;
+    bool isBigStorageExist = false;
+    foreach(QString folderPath, listRecordFolders()) {
+        QnStorageResourcePtr storage = createStorage(folderPath);
+        isBigStorageExist |= storage->isUsedForWriting() && storage->getTotalSpace() > BIG_STORAGE_THRESHOLD;
+        storages.append(storage);
+        cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+    }
+    if (isBigStorageExist) {
+        for (int i = 0; i < storages.size(); ++i) {
+            QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
+            if (storage->getTotalSpace() <= BIG_STORAGE_THRESHOLD)
+                storage->setUsedForWriting(false);
+        }
+    }
+
+    return storages;
 }
 
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress)
@@ -253,32 +354,23 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
 #endif
 }
 
-QnMediaServerResourcePtr createServer()
-{
-    QnMediaServerResourcePtr serverPtr(new QnMediaServerResource());
-    serverPtr->setGuid(serverGuid());
-
-    serverPtr->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
-
-    return serverPtr;
-}
-
-QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
+QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResource::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
+    *pm = QnMediaServerResource::PM_None;
 
     while (servers.isEmpty())
     {
-        QByteArray errorString;
-        if (appServerConnection->getServers(servers, errorString) == 0)
+        if (appServerConnection->getServers(servers) == 0)
             break;
 
-        qDebug() << "findServer(): Call to registerServer failed. Reason: " << errorString;
+        qDebug() << "findServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(1000);
     }
 
     foreach(QnMediaServerResourcePtr server, servers)
     {
+        *pm = server->getPanicMode();
         if (server->getGuid() == serverGuid())
             return server;
     }
@@ -289,13 +381,12 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
 QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResourcePtr serverPtr)
 {
     QnMediaServerResourceList servers;
-    QByteArray errorString;
     serverPtr->setStatus(QnResource::Online);
 
     QByteArray authKey;
-    if (appServerConnection->registerServer(serverPtr, servers, authKey, errorString) != 0)
+    if (appServerConnection->saveServer(serverPtr, servers, authKey) != 0)
     {
-        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
+        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
 
         return QnMediaServerResourcePtr();
     }
@@ -425,7 +516,7 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
-    QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
 void initAppServerEventConnection(const QSettings &settings, const QnMediaServerResourcePtr& mediaServer)
@@ -447,27 +538,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
-}
-
-bool checkIfAppServerIsOld()
-{
-    // Check if that was 1.0/1.1
-    QUrl httpUrl;
-    httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
-    httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
-    httpUrl.setScheme("https");
-    httpUrl.setUserName("");
-    httpUrl.setPassword("");
-
-    QnHTTPRawResponse response;
-    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", response) == 204)
-    {
-        cl_log.log("Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler", cl_logERROR);
-        return true;
-    }
-
-    return false;
+    eventManager->init(appServerEventsUrl, settings.value("proxyAuthKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -527,16 +598,16 @@ void QnMain::stopObjects()
     }
 }
 
+static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
+
 void QnMain::loadResourcesFromECS()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    QByteArray errorString;
-
     QnVirtualCameraResourceList cameras;
-    while (appServerConnection->getCameras(cameras, m_mediaServer->getId(), errorString) != 0)
+    while (appServerConnection->getCameras(cameras, m_mediaServer->getId()) != 0)
     {
-        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
+        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(10000);
     }
 
@@ -556,12 +627,42 @@ void QnMain::loadResourcesFromECS()
             }
         }
     }
-    QnResourceDiscoveryManager::instance().registerManualCameras(manualCameras);
+    QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
+
+    //reading media servers list
+    QnMediaServerResourceList mediaServerList;
+    while( appServerConnection->getServers( mediaServerList) != 0 )
+    {
+        NX_LOG( QString::fromLatin1("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    //reading other servers' cameras
+    foreach( const QnMediaServerResourcePtr& mediaServer, mediaServerList )
+    {
+        if( mediaServer->getGuid() == serverGuid() )
+            continue;
+
+        qnResPool->addResource( mediaServer );
+        //requesting remote server cameras
+        QnVirtualCameraResourceList cameras;
+        while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
+        {
+            NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
+                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+        foreach( const QnVirtualCameraResourcePtr &camera, cameras )
+        {
+            camera->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
+            qnResPool->addResource( camera );
+        }
+    }
 
     QnCameraHistoryList cameraHistoryList;
-    while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+    while (appServerConnection->getCameraHistoryList(cameraHistoryList) != 0)
     {
-        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(1000);
     }
 
@@ -569,6 +670,28 @@ void QnMain::loadResourcesFromECS()
     {
         QnCameraHistoryPool::instance()->addCameraHistory(history);
     }
+
+    //loading business rules
+    QnUserResourceList users;
+    while( appServerConnection->getUsers(users) != 0 )
+    {
+        qDebug() << "QnMain::run(): Can't get users. Reason: " << appServerConnection->getLastError();
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    foreach(const QnUserResourcePtr &user, users)
+        qnResPool->addResource(user);
+
+    //loading business rules
+    QnBusinessEventRules rules;
+    while( appServerConnection->getBusinessRules(rules) != 0 )
+    {
+        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << appServerConnection->getLastError();
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    foreach(const QnBusinessEventRulePtr &rule, rules)
+        qnBusinessRuleProcessor->addBusinessRule( rule );
 }
 
 void QnMain::at_localInterfacesChanged()
@@ -586,21 +709,50 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
         qWarning() << "Error saving server: " << errorString;
 }
 
+void QnMain::at_timer()
+{
+    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnMain::at_noStorages()
+{
+    qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
+}
+
+void QnMain::at_storageFailure(QnResourcePtr storage)
+{
+    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError, storage);
+}
+
+void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
+{
+    qnBusinessRuleConnector->at_cameraIPConflict(
+        m_mediaServer,
+        host,
+        macAddrList,
+        qnSyncTime->currentUSecsSinceEpoch());
+}
+
+
 void QnMain::initTcpListener()
 {
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true));
-    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnFileSystemHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
-    QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/execAction", new QnExecActionHandler());
+    QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
+    QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
+    QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
@@ -614,6 +766,7 @@ void QnMain::initTcpListener()
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
+    m_progressiveDownloadingServer->start();
     m_progressiveDownloadingServer->enableSSLMode();
     m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
     m_restServer->start();
@@ -671,36 +824,50 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
+    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+
     // Create SessionManager
-    QnSessionManager* sm = QnSessionManager::instance();
+    QnSessionManager::instance()->start();
+    
+    //starting soap server to accept event notifications from onvif servers
+    QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::instance()->start();
 
-    QThread *thread = new QThread();
-    sm->moveToThread(thread);
+    QnResourcePool::initStaticInstance( new QnResourcePool() );
 
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+    QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
 
-    thread->start();
-    sm->start();
+    QnMotionHelper::initStaticInstance( new QnMotionHelper() );
 
+    QnBusinessEventConnector::initStaticInstance( new QnBusinessEventConnector() );
+    std::auto_ptr<QThread> connectorThread( new QThread() );
+    connectorThread->start();
+    qnBusinessRuleConnector->moveToThread(connectorThread.get());
+
+    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
+    connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
+    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr)), this, SLOT(at_storageFailure(QnResourcePtr)));
 
-    QByteArray errorString;
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
     {
-        if (checkIfAppServerIsOld())
-            return;
-
-        if (appServerConnection->connect(connectInfo, errorString) == 0)
+        if (appServerConnection->connect(connectInfo) == 0)
             break;
 
-        cl_log.log("Can't connect to Enterprise Controller: ", errorString.data(), cl_logWARNING);
-
-        QnSleep::msleep(1000);
+        cl_log.log("Can't connect to Enterprise Controller: ", appServerConnection->getLastError(), cl_logWARNING);
+        if (!needToStop())
+            QnSleep::msleep(1000);
     }
+    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+
+
+    QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
+    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
+    QnMServerResourceSearcher::instance()->start();
 
     if (needToStop())
         return;
@@ -751,12 +918,16 @@ void QnMain::run()
 
     QHostAddress publicAddress = getPublicAddress();
 
+    QnMediaServerResource::PanicMode pm;
     while (m_mediaServer.isNull())
     {
-        QnMediaServerResourcePtr server = findServer(appServerConnection);
+        QnMediaServerResourcePtr server = findServer(appServerConnection, &pm);
 
-        if (!server)
-            server = createServer();
+        if (!server) {
+            server = QnMediaServerResourcePtr(new QnMediaServerResource());
+            server->setGuid(serverGuid());
+            server->setPanicMode(pm);
+        }
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
 
@@ -774,8 +945,8 @@ void QnMain::run()
         server->setNetAddrList(serverIfaceList);
 
         QnAbstractStorageResourceList storages = server->getStorages();
-        if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
-            server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
+        if (storages.isEmpty())
+            server->setStorages(createStorages());
 
         m_mediaServer = registerServer(appServerConnection, server);
         if (m_mediaServer.isNull())
@@ -787,7 +958,7 @@ void QnMain::run()
     int status;
     do
     {
-        status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online, errorString);
+        status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online);
     } while (status != 0);
 
     initAppServerEventConnection(qSettings, m_mediaServer);
@@ -805,6 +976,7 @@ void QnMain::run()
     }
     qnStorageMan->loadFullFileCatalog();
 
+    QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
@@ -815,29 +987,36 @@ void QnMain::run()
     //IPPH264Decoder::dll.init();
 
     //============================
-    QnResourceDiscoveryManager::instance().setServer(true);
-    QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor);
 
-    QnResourceDiscoveryManager::instance().setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnTestCameraResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
-    //Onvif searcher should be the last:
-    QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
-    QnResourceDiscoveryManager::instance().addDTSServer(&QnColdStoreDTSSearcher::instance());
+#ifdef Q_OS_WIN
+    if (qnCustomization() == Qn::DwSpectrumCustomization)
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlVmax480ResourceSearcher::instance());
+#endif
+
+    //Onvif searcher should be the last:
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
+
+    
+
+    QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 
     //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
     //
-
-    connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
@@ -867,33 +1046,96 @@ void QnMain::run()
     }
     */
 
-    QnResourceDiscoveryManager::instance().setReady(true);
-    QnResourceDiscoveryManager::instance().start();
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    QnResourceDiscoveryManager::instance()->start();
 
 
-    connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
+    connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
+
+    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
+    if (lastRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer,
+                                                   lastRunningTime*1000,
+                                                   QnBusiness::MServerIssueStarted);
+
+    at_timer();
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    m_timer.start(60 * 1000);
+
 
     exec();
+
+    stopObjects();
+
+    QnResource::stopCommandProc();
+
+    delete QnRecordingManager::instance();
+    QnRecordingManager::initStaticInstance( NULL );
+
+    delete QnMServerResourceSearcher::instance();
+    QnMServerResourceSearcher::initStaticInstance( NULL );
+
+    QnResourceDiscoveryManager::instance()->stop();
+    QnResource::stopAsyncTasks();
+
+    delete QnResourceDiscoveryManager::instance();
+    QnResourceDiscoveryManager::init( NULL );
+
+    connectorThread->quit();
+    connectorThread->wait();
+
+    //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
+    delete QnBusinessEventConnector::instance();
+    QnBusinessEventConnector::initStaticInstance( NULL );
+
+    QnBusinessRuleProcessor::fini();
+
+    delete QnMotionHelper::instance();
+    QnMotionHelper::initStaticInstance( NULL );
+
+    delete QnVideoCameraPool::instance();
+    QnVideoCameraPool::initStaticInstance( NULL );
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
+
+    delete QnSoapServer::instance();
+    QnSoapServer::initStaticInstance( NULL );
+
+    av_lockmgr_register(NULL);
+
+    qSettings.setValue("lastRunningTime", 0);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
 public:
-    QnVideoService(int argc, char **argv)
-        : QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
-        m_main(argc, argv)
+    QnVideoService(int argc, char **argv): 
+        QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
+        m_main(argc, argv),
+        m_argc(argc),
+        m_argv(argv)
     {
         setServiceDescription(SERVICE_NAME);
     }
 
 protected:
-    void start()
+    virtual int executeApplication() override { 
+
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+
+        const int result = application()->exec();
+        //QnBusinessRuleProcessor::fini();
+
+        return result;
+    }
+
+    virtual void start() override
     {
-        QtSingleCoreApplication *app = application();
+        QtSingleCoreApplication *application = this->application();
+
         QString guid = serverGuid();
-
-        new QnPlatformAbstraction(app);
-
         if (guid.isEmpty())
         {
             cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
@@ -901,51 +1143,45 @@ protected:
             return;
         }
 
-        if (app->isRunning())
+        if (application->isRunning())
         {
             cl_log.log("Server already started", cl_logERROR);
             qApp->quit();
             return;
         }
 
-        serverMain(app->argc(), app->argv());
+        serverMain(application->argc(), application->argv());
         m_main.start();
     }
 
-    void stop()
+    virtual void stop() override
     {
-        m_main.exit();
-        m_main.wait();
         stopServer(0);
     }
 
 private:
     QnMain m_main;
+    int m_argc;
+    char **m_argv;
+
 };
 
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
 
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
-    QnRecordingManager::instance()->stop();
-    if (serviceMainInstance)
-    {
-        serviceMainInstance->stopObjects();
+    if (serviceMainInstance) {
+        serviceMainInstance->pleaseStop();
+        serviceMainInstance->exit();
+        serviceMainInstance->wait();
         serviceMainInstance = 0;
     }
-    QnVideoCameraPool::instance()->stop();
-    av_lockmgr_register(NULL);
+
     qApp->quit();
 }
 
-#include "api/session_manager.h"
-
 int main(int argc, char* argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
-
     QnVideoService service(argc, argv);
 
     int result = service.exec();

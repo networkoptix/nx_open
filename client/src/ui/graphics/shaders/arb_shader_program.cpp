@@ -27,9 +27,22 @@ QnArbShaderProgram::QnArbShaderProgram(const QGLContext *context, QObject *paren
     d(new QnArbShaderProgramPrivate(context))
 {}
 
-QnArbShaderProgram::~QnArbShaderProgram() {
-    if(d->fragmentProgram != UNINITIALIZED)
-        d->glDeleteProgramsARB(1, &d->fragmentProgram);
+QnArbShaderProgram::~QnArbShaderProgram()
+{
+    if(d->fragmentProgram == UNINITIALIZED)
+        return;
+
+    //deleting shader with proper current context
+    const QGLContext* currentContextBak = QGLContext::currentContext();
+    if( d->context() && (currentContextBak != d->context()) )
+        const_cast<QGLContext*>(d->context())->makeCurrent();
+    d->glDeleteProgramsARB(1, &d->fragmentProgram);
+    if( d->context() && currentContextBak != d->context() ) {
+        if( currentContextBak )
+            const_cast<QGLContext*>(currentContextBak)->makeCurrent();
+        else
+            const_cast<QGLContext*>(d->context())->doneCurrent();
+    }
 }
 
 bool QnArbShaderProgram::isValid() const {

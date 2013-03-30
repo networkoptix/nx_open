@@ -15,7 +15,7 @@
 
 QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
+    QnWorkbenchContextAware(parent, context),
     m_emptyTab(Qn::GeneralSettingsTab)
 {
     /* Create per-mode widgets. */
@@ -116,28 +116,29 @@ void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     setCurrentTab(mode(), tab);
 }
 
-int QnCameraSettingsWidget::activeCameraCount() const {
+void QnCameraSettingsWidget::setScheduleEnabled(bool enabled) {
     switch(mode()) {
     case SingleMode:
-        return m_singleWidget->isCameraActive() ? 1 : 0;
+        m_singleWidget->setScheduleEnabled(enabled);
+        break;
     case MultiMode:
-        return m_multiWidget->activeCameraCount();
+        m_multiWidget->setScheduleEnabled(enabled);
+        break;
     default:
-        return 0;
+        break;
     }
 }
 
-void QnCameraSettingsWidget::setCamerasActive(bool active) {
+bool QnCameraSettingsWidget::isScheduleEnabled() const {
     switch(mode()) {
     case SingleMode:
-        m_singleWidget->setCameraActive(active);
-        break;
+        return m_singleWidget->isScheduleEnabled();
     case MultiMode:
-        m_multiWidget->setCamerasActive(active);
-        break;
+        return m_multiWidget->isScheduleEnabled();
     default:
         break;
     }
+    return false;
 }
 
 bool QnCameraSettingsWidget::hasDbChanges() const {

@@ -195,11 +195,12 @@ void SetAlignHandle(dvd_reader_t *device, void *align)
 #include <sys/timeb.h>
 static int gettimeofday( struct timeval *tv, void *tz )
 {
-  struct timeb t;
-  ftime( &t );
-  tv->tv_sec = t.time;
-  tv->tv_usec = t.millitm * 1000;
-  return 0;
+    Q_UNUSED(tz)
+    struct timeb t;
+    ftime( &t );
+    tv->tv_sec = t.time;
+    tv->tv_usec = t.millitm * 1000;
+    return 0;
 }
 #endif
 
@@ -1387,7 +1388,7 @@ static int DVDReadBlocksPath( dvd_file_t *dvd_file, unsigned int offset,
         break;
       }
     } else {
-      offset -= dvd_file->title_sizes[ i ];
+      offset -= (unsigned int) dvd_file->title_sizes[ i ];
     }
   }
 
@@ -1449,7 +1450,8 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
 {
   unsigned char *secbuf_start;
   unsigned char *secbuf; //must be aligned to 2048-bytes for raw/O_DIRECT
-  unsigned int numsec, seek_sector, seek_byte;
+  unsigned int seek_sector, seek_byte;
+  size_t numsec;
   int ret;
 
   /* Check arguments. */
@@ -1474,10 +1476,10 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
 
   if( dvd_file->dvd->isImageFile ) {
     ret = DVDReadBlocksUDF( dvd_file, (uint32_t) seek_sector,
-                            (size_t) numsec, secbuf, DVDINPUT_NOFLAGS );
+                            numsec, secbuf, DVDINPUT_NOFLAGS );
   } else {
     ret = DVDReadBlocksPath( dvd_file, seek_sector,
-                             (size_t) numsec, secbuf, DVDINPUT_NOFLAGS );
+                            numsec, secbuf, DVDINPUT_NOFLAGS );
   }
 
   if( ret != (int) numsec ) {
@@ -1488,7 +1490,7 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
   memcpy( data, &(secbuf[ seek_byte ]), byte_size );
   free( secbuf_start );
 
-  dvd_file->seek_pos += byte_size;
+  dvd_file->seek_pos += (quint32) byte_size;
   return byte_size;
 }
 

@@ -9,6 +9,7 @@
 #include <version.h>
 
 struct QnProductFeatures {
+    bool freeLicenseIsTrial;
     int freeLicenseCount;
     QString freeLicenseKey;
 };
@@ -36,6 +37,7 @@ namespace Qn {
 
     inline QnProductFeatures calculateProductFeatures() {
         QnProductFeatures result;
+        result.freeLicenseIsTrial = QN_FREE_LICENSE_IS_TRIAL;
         result.freeLicenseCount = QN_FREE_LICENSE_COUNT;
         result.freeLicenseKey = QLatin1String(QN_FREE_LICENSE_KEY);
         return result;
@@ -45,7 +47,7 @@ namespace Qn {
 
 /**
  * \returns                             Customization with which this software
- *                                      version was built with.
+ *                                      version was built.
  */
 inline Qn::Customization qnCustomization() {
     /* Note that Q_GLOBAL_STATIC and other synchronization is not needed here. */
@@ -60,7 +62,7 @@ inline Qn::Customization qnCustomization() {
  */
 inline QnProductFeatures qnProductFeatures() {
     /* Note that Q_GLOBAL_STATIC and other synchronization is not needed here. */
-    static QnProductFeatures result = Qn::calculateProductFeatures();
+    static QnProductFeatures result = Qn::calculateProductFeatures(); // TODO: #Elric synch is actually needed!
     return result;
 }
 

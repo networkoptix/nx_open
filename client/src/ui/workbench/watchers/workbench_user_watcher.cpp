@@ -2,7 +2,6 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <client/client_meta_types.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -11,8 +10,6 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    QnClientMetaTypes::initialize();
-
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
@@ -40,7 +37,7 @@ void QnWorkbenchUserWatcher::setUserName(const QString &name) {
     m_userName = name;
 
     foreach(const QnUserResourcePtr &user, m_users)
-        at_userResource_nameChanged(user);
+        at_resource_nameChanged(user);
 }
 
 void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -49,9 +46,9 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &
         return;
 
     m_users.push_back(user);
-    connect(user.data(), SIGNAL(nameChanged()), this, SLOT(at_userResource_nameChanged()));
+    connect(user.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(at_resource_nameChanged(const QnResourcePtr &)));
 
-    at_userResource_nameChanged(user);
+    at_resource_nameChanged(user);
 }
 
 void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -59,22 +56,23 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
     if(!user)
         return;
 
-    disconnect(user.data(), SIGNAL(nameChanged()), this, SLOT(at_userResource_nameChanged()));
+    disconnect(user.data(), NULL, this, NULL);
     m_users.removeOne(user);
 
     if(user == m_user)
         setCurrentUser(QnUserResourcePtr()); /* Assume there are no users with duplicate names. */
 }
 
-void QnWorkbenchUserWatcher::at_userResource_nameChanged(const QnUserResourcePtr &user) {
-    if(user->getName() == m_userName) {
+void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resource) {
+    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+    if(!user)
+        return;
+
+    /* Logins are case-insensitive. */
+    if(user->getName().toLower() == m_userName.toLower()) {
         setCurrentUser(user);
     } else if(user == m_user) {
         setCurrentUser(QnUserResourcePtr());
     }
-}
-
-void QnWorkbenchUserWatcher::at_userResource_nameChanged() {
-    at_userResource_nameChanged(toSharedPointer(checked_cast<QnUserResource *>(sender())));
 }
 

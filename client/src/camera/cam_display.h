@@ -46,6 +46,8 @@ public:
     void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
     virtual bool processData(QnAbstractDataPacketPtr data);
 
+    virtual void pleaseStop() override;
+
     void pause();
     void resume();
 
@@ -55,7 +57,6 @@ public:
     void playAudio(bool play);
     void setSpeed(float speed);
     float getSpeed() const;
-    bool isSyncAllowed() const;
 
     // schedule to clean up buffers all; 
     // schedule - coz I do not want to introduce mutexes
@@ -85,11 +86,12 @@ public:
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;
-    QnArchiveStreamReader* getArchiveReader();
+    QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;
     void setFullScreen(bool fullScreen);
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -141,6 +143,9 @@ private:
 
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
+    void waitForFramesDisplayed();
+    void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
+    template <class T> void markIgnoreBefore(const T& queue, qint64 time);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -195,6 +200,7 @@ protected:
     int m_emptyPacketCounter;
     bool m_isStillImage;
     bool m_isLongWaiting;
+    bool m_skippingFramesStarted;
     
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;

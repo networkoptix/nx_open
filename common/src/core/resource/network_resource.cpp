@@ -3,21 +3,18 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
-#include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-#include "common/common_meta_types.h"
 
-QnNetworkResource::QnNetworkResource()
-    : QnResource(),
-      m_authenticated(true),
-      m_networkStatus(0),
-      m_networkTimeout(3000),
-      m_probablyNeedToUpdateStatus(false)
+QnNetworkResource::QnNetworkResource(): 
+    QnResource(),
+    m_authenticated(true),
+    m_networkStatus(0),
+    m_networkTimeout(5000),
+    m_probablyNeedToUpdateStatus(false)
 {
-    QnCommonMetaTypes::initilize();
-
-    addFlags(network | motion);
+    //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support
+    addFlags(network);
 }
 
 QnNetworkResource::~QnNetworkResource()
@@ -49,22 +46,29 @@ QString QnNetworkResource::getUniqueId() const
 }
 
 
-QHostAddress QnNetworkResource::getHostAddress() const
+QString QnNetworkResource::getHostAddress() const
 {
     //QMutexLocker mutex(&m_mutex);
     //return m_hostAddr;
     QString url = getUrl();
     if (url.indexOf(QLatin1String("://")) == -1)
-        return QHostAddress(url);
+        return url;
     else
-        return QHostAddress(QUrl(url).host());
+        return QUrl(url).host();
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
-    setUrl(ip.toString());
+    QUrl currentValue(getUrl());
+    if (currentValue.scheme().isEmpty()) {
+        setUrl(ip);
+    }
+    else {
+        currentValue.setHost(ip);
+        setUrl(currentValue.toString());
+    }
     return (domain == QnDomainMemory);
 }
 
@@ -138,14 +142,14 @@ int QnNetworkResource::httpPort() const
 QString QnNetworkResource::toString() const
 {
     QString result;
-    QTextStream(&result) << getName() << "(" << getHostAddress().toString() << ") live";
+    QTextStream(&result) << getName() << "(" << getHostAddress() << ") live";
     return result;
 }
 
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId();
+    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); // TODO: evil!
     return result;
 }
 
@@ -193,25 +197,8 @@ void QnNetworkResource::updateInner(QnResourcePtr other)
     if (other_casted)
     {
         m_auth = other_casted->m_auth;
+        m_macAddress = other_casted->m_macAddress;
     }
-}
-
-bool QnNetworkResource::hasRunningLiveProvider() const
-{
-    QMutexLocker locker(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
-    {
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
-        if (lp)
-        {
-            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
-            if (lr && lr->isRunning())
-                return true;
-        }
-    }
-
-
-    return false;
 }
 
 bool QnNetworkResource::shoudResolveConflicts() const
@@ -219,7 +206,7 @@ bool QnNetworkResource::shoudResolveConflicts() const
     return false;
 }
 
-bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
+bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
     if (source->getHostAddress() != getHostAddress())
     {
@@ -258,7 +245,7 @@ bool QnNetworkResource::conflicting()
     QnSleep::msleep(10);
 
     CLPing ping;
-    if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
+    if (!ping.ping(getHostAddress(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
     {
         //addNetworkStatus(QnNetworkResource::BadHostAddr);
         //return true;
@@ -285,6 +272,10 @@ bool QnNetworkResource::conflicting()
     return false;
 }
 
+int QnNetworkResource::getChannel() const
+{
+    return 0;
+}
 
 /*
 void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
