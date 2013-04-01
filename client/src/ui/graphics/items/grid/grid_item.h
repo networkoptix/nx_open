@@ -12,8 +12,8 @@ class VariantAnimator;
 class QnGridHighlightItem;
 
 class QnGridItem : public QGraphicsObject {
-    Q_OBJECT;
-    Q_PROPERTY(QColor color READ color WRITE setColor);
+    Q_OBJECT
+    Q_PROPERTY(QColor color READ color WRITE setColor)
 
 public:
     enum CellState {

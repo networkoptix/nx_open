@@ -24,6 +24,9 @@ QnResourceList QnActiResourceSearcher::findResources(void)
     QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((long) this);
     for (int i = 0; i < data.size(); ++i)
     {
+        if (shouldStop())
+            break;
+
         QString removeAddress = data[i].remoteAddress;
         QByteArray uuidStr("ACTI");
         uuidStr += data[i].remoteAddress.toUtf8();

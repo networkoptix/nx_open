@@ -116,6 +116,7 @@ namespace Qn {
      * displayed on top of those from the layers with lower numbers.
      */
     enum ItemLayer {
+        EMappingLayer,              /**< Layer for E-Mapping background. */
         BackLayer,                  /**< Back layer. */
         PinnedLayer,                /**< Layer for pinned items. */
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */

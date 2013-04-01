@@ -56,10 +56,10 @@ Q_DECLARE_METATYPE(QnServerStorageStateHash);
 // QnLicenseWarningState
 // -------------------------------------------------------------------------- //
 struct QnLicenseWarningState {
-    QnLicenseWarningState(): ignore(false) {}
-    QnLicenseWarningState(const QDateTime &lastWarningTime, bool ignore): lastWarningTime(lastWarningTime), ignore(ignore) {}
+    QnLicenseWarningState(): lastWarningTime(0), ignore(false) {}
+    QnLicenseWarningState(qint64 lastWarningTime, bool ignore): lastWarningTime(lastWarningTime), ignore(ignore) {}
 
-    QDateTime lastWarningTime;
+    qint64 lastWarningTime;
     bool ignore;
 };
 

@@ -115,7 +115,7 @@
     </message>
     <message>
         <source>Add camera(s)</source>
-        <translation type="unfinished">添加摄像机</translation>
+        <translation type="obsolete">添加摄像机</translation>
     </message>
     <message>
         <source>S&amp;tart IP:</source>
@@ -192,6 +192,10 @@
     <message>
         <source>Cl&amp;ose</source>
         <translation type="unfinished">关闭</translation>
+    </message>
+    <message>
+        <source>Server is offline</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -562,7 +566,7 @@
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished">摄像机</translation>
+        <translation type="obsolete">摄像机</translation>
     </message>
     <message>
         <source>Serial</source>
@@ -590,15 +594,22 @@
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished">类型</translation>
+        <translation type="obsolete">类型</translation>
     </message>
     <message>
         <source>License Key</source>
-        <translation type="unfinished">许可码</translation>
+        <translation type="obsolete">许可码</translation>
     </message>
     <message>
         <source>Expiry Date</source>
-        <translation type="unfinished">失效日期</translation>
+        <translation type="obsolete">失效日期</translation>
+    </message>
+</context>
+<context>
+    <name>LicenseNotificationDialog</name>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
     </message>
 </context>
 <context>
@@ -773,7 +784,7 @@ If this error persists, please contact your VMS administrator.</source>
     <message>
         <source>Connection could not be established.
 The Enterprise Controller is incompatible with this client. Please upgrade your client or contact your VMS administrator.</source>
-        <translation type="unfinished">连接无法建立。系统控制器与客户端不兼容。请升级客户端或联系视频系统管理员。</translation>
+        <translation type="obsolete">连接无法建立。系统控制器与客户端不兼容。请升级客户端或联系视频系统管理员。</translation>
     </message>
     <message>
         <source>Invalid parameters</source>
@@ -843,6 +854,30 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
     <message>
         <source>Host field cannot be empty.</source>
         <translation type="unfinished">主机名不能为空</translation>
+    </message>
+    <message>
+        <source>Launcher process is not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot restart the client in compatibility mode.
+Please close the application and start it again
+using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Would you like to restart client in compatibility mode?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1107,19 +1142,19 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished">免费</translation>
+        <translation type="obsolete">免费</translation>
     </message>
     <message>
         <source>Trial</source>
-        <translation type="unfinished">测试</translation>
+        <translation type="obsolete">测试</translation>
     </message>
     <message>
         <source>Analog</source>
-        <translation type="unfinished">模拟</translation>
+        <translation type="obsolete">模拟</translation>
     </message>
     <message>
         <source>Enterprise</source>
-        <translation type="unfinished">系统</translation>
+        <translation type="obsolete">系统</translation>
     </message>
 </context>
 <context>
@@ -2083,6 +2118,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Change Cell Spacing...</source>
         <translation type="unfinished">改变间距...</translation>
     </message>
+    <message>
+        <source>Layout Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -2270,6 +2309,13 @@ for recording at
     <message>
         <source>Recording is disabled for %1</source>
         <translation type="unfinished">%1 录像禁用</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n cameras</source>
+        <comment>...for</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2489,19 +2535,21 @@ for recording at
     </message>
     <message>
         <source>Camera(s) added successfully</source>
-        <translation type="unfinished">摄像机添加成功</translation>
+        <translation type="obsolete">摄像机添加成功</translation>
     </message>
     <message>
         <source>Error</source>
         <translation type="unfinished">错误</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Error while adding camera(s)</source>
-        <translation type="unfinished">添加摄像机时发生错误</translation>
+        <translation type="unfinished">
+            <numerusform>添加摄像机时发生错误</numerusform>
+        </translation>
     </message>
     <message>
         <source>Camera address filed must contain valid url or ip address</source>
-        <translation type="unfinished">摄像机地址必须包含有效的网址或IP地址</translation>
+        <translation type="obsolete">摄像机地址必须包含有效的网址或IP地址</translation>
     </message>
     <message>
         <source>Server returned an error:
@@ -2510,7 +2558,40 @@ for recording at
     </message>
     <message>
         <source>This server version supports only searching by ip address.</source>
-        <translation type="unfinished">该服务器版本仅支持通过IP地址搜索。</translation>
+        <translation type="obsolete">该服务器版本仅支持通过IP地址搜索。</translation>
+    </message>
+    <message>
+        <source>Add cameras to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select target mediaserver in the tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is offline.
+Camera addition is possible for online servers only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera address field must contain valid url or ip address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to server.
+Make sure server is available and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s) added successfully.
+It might take a few moments to populate them in the tree.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2641,11 +2722,11 @@ for recording at
     </message>
     <message>
         <source>%1 digital license(s) are used out of %2.</source>
-        <translation type="unfinished">%2 的数字许可已使用 %1</translation>
+        <translation type="obsolete">%2 的数字许可已使用 %1</translation>
     </message>
     <message>
         <source>%1 analog license(s) are used out of %2.</source>
-        <translation type="unfinished">%2 的模拟许可已使用 %1</translation>
+        <translation type="obsolete">%2 的模拟许可已使用 %1</translation>
     </message>
     <message>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
@@ -2653,11 +2734,13 @@ for recording at
     </message>
     <message>
         <source>Activate %1 more digital license(s).</source>
-        <translation type="unfinished">激活%1 数字许可</translation>
+        <translation type="obsolete">激活%1 数字许可</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Activate %1 more analog license(s).</source>
-        <translation type="unfinished">激活%1 模拟许可</translation>
+        <translation type="unfinished">
+            <numerusform>激活%1 模拟许可</numerusform>
+        </translation>
     </message>
     <message>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
@@ -2665,11 +2748,41 @@ for recording at
     </message>
     <message>
         <source>%1 more digital license(s) will be used.</source>
-        <translation type="unfinished">%1 数字许可将被使用</translation>
+        <translation type="obsolete">%1 数字许可将被使用</translation>
     </message>
     <message>
         <source>%1 more analog license(s) will be used.</source>
-        <translation type="unfinished">%1 模拟许可将被使用</translation>
+        <translation type="obsolete">%1 模拟许可将被使用</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more digital license(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more digital license(s) will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more analog license(s) will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2706,6 +2819,31 @@ for recording at
     <message>
         <source>Success</source>
         <translation type="unfinished">成功</translation>
+    </message>
+    <message>
+        <source>Request timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to the Enterprise Controller could not be established.
+Connection details that you have entered are incorrect, please try again.
+
+If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished">无法建立系统控制器连接。您输入的连接内容不正确，请重试。如果还有错误，请联系视频系统管理员。</translation>
+    </message>
+    <message>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+You will be asked to restart the client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3123,7 +3261,19 @@ for recording at
     <message>
         <source>%1 digital license(s) will be used out of %2.
 %3 analog  license(s) will be used out of %4.</source>
-        <translation type="unfinished">%2 的数字许可将被使用%1。%4 的模拟许可将被使用%3。</translation>
+        <translation type="obsolete">%2 的数字许可将被使用%1。%4 的模拟许可将被使用%3。</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog  license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3131,6 +3281,94 @@ for recording at
     <message>
         <source>%1 of %2 selected cameras have no input ports.</source>
         <translation type="unfinished">%2 选中摄像机中%1 没有输入端口。</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutSettingsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished">对话框</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View in full size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size (in cells):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout is locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User can edit layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open file</source>
+        <translation type="unfinished">打开文件</translation>
+    </message>
+    <message>
+        <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+        <translation type="unfinished">图片(*.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+</context>
+<context>
+    <name>QnLicenseListModel</name>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished">类型</translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished">摄像机</translation>
+    </message>
+    <message>
+        <source>License Key</source>
+        <translation type="unfinished">许可码</translation>
+    </message>
+    <message>
+        <source>Expiration Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished">从不</translation>
+    </message>
+    <message>
+        <source>Expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tomorrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>In %n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3198,7 +3436,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Never</source>
-        <translation type="unfinished">从不</translation>
+        <translation type="obsolete">从不</translation>
     </message>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
@@ -3228,6 +3466,17 @@ Archive Streams Allowed: %4</source>
     </message>
 </context>
 <context>
+    <name>QnLicenseNotificationDialog</name>
+    <message>
+        <source>Some of your licenses have expired.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some of your licenses will soon expire.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnLicenseWidget</name>
     <message>
         <source>Please send E-Mail with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key which should be filled in the field below.</source>
@@ -3248,6 +3497,14 @@ Archive Streams Allowed: %4</source>
     <message>
         <source>All files (*.*)</source>
         <translation type="unfinished">所有文件(*.*)</translation>
+    </message>
+    <message>
+        <source>Activate Trial License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Free License</source>
+        <translation type="unfinished">激活免费许可</translation>
     </message>
 </context>
 <context>
@@ -3362,11 +3619,23 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>%1 digital license(s) are used out of %2.</source>
-        <translation type="unfinished">%2的数字许可使用了%1。</translation>
+        <translation type="obsolete">%2的数字许可使用了%1。</translation>
     </message>
     <message>
         <source>%1 analog license(s) are used out of %2.</source>
-        <translation type="unfinished">%2 的模拟许可使用了%1。</translation>
+        <translation type="obsolete">%2 的模拟许可使用了%1。</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4010,11 +4279,23 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>%1 digital license(s) are used out of %2.</source>
-        <translation type="unfinished">%2 的数字许可中%1 已被使用</translation>
+        <translation type="obsolete">%2 的数字许可中%1 已被使用</translation>
     </message>
     <message>
         <source>%1 analog license(s) are used out of %2.</source>
-        <translation type="unfinished">%2 的模拟许可中%1 已被使用</translation>
+        <translation type="obsolete">%2 的模拟许可中%1 已被使用</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n digital license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4037,7 +4318,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>&amp;Signature</source>
-        <translation type="unfinished">签名</translation>
+        <translation type="obsolete">签名</translation>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
@@ -4985,6 +5266,15 @@ Please wait for the camera to go online.</source>
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished">尝试从系统控制器删除资源时发生错误。错误描述：&apos;%2&apos;</translation>
     </message>
+    <message>
+        <source>Layout with the same name already exists
+and you do not have the rights to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
@@ -5529,6 +5819,10 @@ hh:mm:ss</source>
     <message>
         <source>Get More Licenses...</source>
         <translation type="unfinished">获取更多许可...</translation>
+    </message>
+    <message>
+        <source>Firmware:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

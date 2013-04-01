@@ -8,6 +8,7 @@
 #include <QSet>
 #include <QStringList>
 #include <QReadWriteLock>
+#include <QThreadPool>
 #include "utils/common/qnid.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "resource_fwd.h"
@@ -220,6 +221,7 @@ public:
 
     virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
 
+    static void stopAsyncTasks();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
     void statusChanged(const QnResourcePtr &resource);
@@ -319,6 +321,7 @@ protected:
 
     mutable QnParamList m_resourceParamList;
 
+    static bool m_appStopping;
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -360,6 +363,8 @@ private:
 
     bool m_initialized;    
     QMutex m_initMutex;
+
+    static QThreadPool m_initAsyncPool;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);

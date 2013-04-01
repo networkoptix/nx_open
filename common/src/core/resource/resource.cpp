@@ -20,6 +20,9 @@
 
 #include "utils/common/synctime.h"
 
+bool QnResource::m_appStopping = false;
+QThreadPool QnResource::m_initAsyncPool;
+
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
@@ -831,10 +834,17 @@ private:
     QnResourcePtr m_resource;
 };
 
+void QnResource::stopAsyncTasks()
+{
+    m_appStopping = true;
+    m_initAsyncPool.waitForDone();
+}
+
+
 void QnResource::initAsync()
 {
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    QThreadPool::globalInstance()->start(task);
+    m_initAsyncPool.start(task);
 }
 
 bool QnResource::isInitialized() const

@@ -106,6 +106,7 @@ public:
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
+
 protected:
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function

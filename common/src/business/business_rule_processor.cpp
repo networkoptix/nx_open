@@ -97,9 +97,9 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
         }
         else if (action->getToggleState() == ToggleState::Off)
         {
-            m_actionInProgress[actionKey] = qMax(0, m_actionInProgress[actionKey]-1);
-            if (m_actionInProgress[actionKey] > 0)
+            if (--m_actionInProgress[actionKey] > 0)
                 return true; // ignore duplicated stop
+            m_actionInProgress.remove(actionKey);
         }
     }
 

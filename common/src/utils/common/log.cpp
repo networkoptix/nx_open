@@ -1,4 +1,5 @@
 #include "log.h"
+#include <sstream>
 #include <QTextStream>
 #include <QThread>
 #include <QDateTime>
@@ -61,18 +62,16 @@ public:
         if (logLevel > m_logLevel)
             return;
 
-        QByteArray th;
-        QTextStream textStream(&th);
-        textStream.setCodec("UTF-8");
-        textStream << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz"))
-            << QLatin1String(" Thread ") << QString::number((qint64)QThread::currentThread()->currentThreadId(), 16)
-            << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
-        textStream.flush();
+        std::ostringstream ostr;
+        ostr << QDateTime::currentDateTime().toString(lit("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
+            << " Thread " << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).data()
+            << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
+        ostr.flush();
 
         QMutexLocker mutx(&m_mutex);
         if (!m_file.isOpen())
             return;
-        m_file.write(th);
+        m_file.write(ostr.str().c_str());
         m_file.flush();
         if (m_file.size() >= m_maxFileSize)
             openNextFile();
