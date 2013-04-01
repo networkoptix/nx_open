@@ -9,7 +9,10 @@ QnLayoutResource::QnLayoutResource():
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
-    m_userCanEdit(false)
+    m_userCanEdit(false),
+    m_backgroundSize(1, 1),
+    m_backgroundImageId(0),
+    m_locked(false)
 {
     setStatus(Online, true);
     addFlags(QnResource::layout);
@@ -86,6 +89,9 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
         setCellAspectRatio(localOther->cellAspectRatio());
         setCellSpacing(localOther->cellSpacing());
         setUserCanEdit(localOther->userCanEdit());
+        setBackgroundImageId(localOther->backgroundImageId());
+        setBackgroundSize(localOther->backgroundSize());
+        setLocked(localOther->locked());
     }
 }
 
@@ -106,64 +112,6 @@ void QnLayoutResource::removeItem(const QUuid &itemUuid) {
 void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData &item) {
     QMutexLocker locker(&m_mutex);
     updateItemUnderLock(itemUuid, item);
-}
-
-qreal QnLayoutResource::cellAspectRatio() const {
-    QMutexLocker locker(&m_mutex);
-
-    return m_cellAspectRatio;
-}
-
-void QnLayoutResource::setCellAspectRatio(qreal cellAspectRatio) {
-    {
-        QMutexLocker locker(&m_mutex);
-
-        if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
-            return;
-
-        m_cellAspectRatio = cellAspectRatio;
-    }
-
-    emit cellAspectRatioChanged(::toSharedPointer(this));
-}
-
-QSizeF QnLayoutResource::cellSpacing() const {
-    QMutexLocker locker(&m_mutex);
-
-    return m_cellSpacing;
-}
-
-void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
-    {
-        QMutexLocker locker(&m_mutex);
-
-        if(qFuzzyCompare(m_cellSpacing, cellSpacing))
-            return;
-
-        m_cellSpacing = cellSpacing;
-    }
-
-    emit cellSpacingChanged(::toSharedPointer(this));
-}
-
-void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
-    setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
-}
-
-bool QnLayoutResource::userCanEdit() const {
-    QMutexLocker locker(&m_mutex);
-    return m_userCanEdit;
-}
-
-void QnLayoutResource::setUserCanEdit(bool value) {
-    {
-        QMutexLocker locker(&m_mutex);
-        if(m_userCanEdit == value)
-            return;
-        m_userCanEdit = value;
-    }
-
-    emit userCanEditChanged(::toSharedPointer(this));
 }
 
 void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
@@ -251,3 +199,109 @@ QHash<int, QVariant> QnLayoutResource::data() const {
 
     return m_dataByRole;
 }
+
+/********* Properties getters and setters **********/
+
+/********* Cell aspect ratio propert **********/
+qreal QnLayoutResource::cellAspectRatio() const {
+    QMutexLocker locker(&m_mutex);
+    return m_cellAspectRatio;
+}
+
+void QnLayoutResource::setCellAspectRatio(qreal cellAspectRatio) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+            return;
+        m_cellAspectRatio = cellAspectRatio;
+    }
+    emit cellAspectRatioChanged(::toSharedPointer(this));
+}
+
+/********* Cell spacing property **********/
+QSizeF QnLayoutResource::cellSpacing() const {
+    QMutexLocker locker(&m_mutex);
+    return m_cellSpacing;
+}
+
+void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+            return;
+        m_cellSpacing = cellSpacing;
+    }
+    emit cellSpacingChanged(::toSharedPointer(this));
+}
+
+void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
+    setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
+}
+
+/********* User Can Edit property **********/
+bool QnLayoutResource::userCanEdit() const {
+    QMutexLocker locker(&m_mutex);
+    return m_userCanEdit;
+}
+
+void QnLayoutResource::setUserCanEdit(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_userCanEdit == value)
+            return;
+        m_userCanEdit = value;
+    }
+
+    emit userCanEditChanged(::toSharedPointer(this));
+}
+
+
+
+/********* Background size property **********/
+QSize QnLayoutResource::backgroundSize() const {
+    QMutexLocker locker(&m_mutex);
+    return m_backgroundSize;
+}
+
+void QnLayoutResource::setBackgroundSize(QSize size) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_backgroundSize == size)
+            return;
+        m_backgroundSize = size;
+    }
+    emit backgroundSizeChanged(::toSharedPointer(this));
+}
+
+/********* Background image property **********/
+int QnLayoutResource::backgroundImageId() const {
+    QMutexLocker locker(&m_mutex);
+    return m_backgroundImageId;
+}
+
+void QnLayoutResource::setBackgroundImageId(int id) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_backgroundImageId == id)
+            return;
+        m_backgroundImageId = id;
+    }
+    emit backgroundImageChanged(::toSharedPointer(this));
+}
+
+/********* Locked property **********/
+bool QnLayoutResource::locked() const {
+    QMutexLocker locker(&m_mutex);
+    return m_locked;
+}
+
+void QnLayoutResource::setLocked(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_locked == value)
+            return;
+        m_locked = value;
+    }
+    emit lockedChanged(::toSharedPointer(this));
+}
+

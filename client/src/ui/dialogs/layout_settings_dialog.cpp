@@ -8,15 +8,18 @@
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
+    m_cache(new QnAppServerFileCache(this)),
     m_imageId(0)
 {
     ui->setupUi(this);
-/*
+
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
-*/
+
+    connect(m_cache, SIGNAL(imageLoaded(int,QImage)), this, SLOT(at_image_loaded(int, const QImage &)));
+
     updateControls();
 }
 
@@ -25,12 +28,17 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 }
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
-    /*
+
     m_imageId = layout->backgroundImageId();
+    if (m_imageId > 0) {
+        QImage img = m_cache->getImage(m_imageId);
+        at_image_loaded(m_imageId, img);
+    }
+
     ui->widthSpinBox->setValue(layout->backgroundSize().width());
     ui->heightSpinBox->setValue(layout->backgroundSize().height());
     ui->lockedCheckBox->setChecked(layout->locked());
-    */
+
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
     updateControls();
 }
@@ -38,12 +46,11 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
 bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout) {
     if (!hasChanges(layout))
         return false;
-    /*
+
+    layout->setUserCanEdit(ui->userCanEditCheckBox->isChecked());
     layout->setLocked(ui->lockedCheckBox->isChecked());
     layout->setBackgroundImageId(m_imageId);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
-    */
-    layout->setUserCanEdit(ui->userCanEditCheckBox->isChecked());
 
     // TODO: progress dialog uploading image?
     // TODO: remove unused image if any
@@ -52,7 +59,10 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
 }
 
 bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
-    /*
+
+    if (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit())
+        return true;
+
     if (ui->lockedCheckBox->isChecked() != layout->locked())
         return true;
 
@@ -61,12 +71,9 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
 
     QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
     return (m_imageId != layout->backgroundImageId() || newSize != layout->backgroundSize());
-    */
-    return ui->userCanEditCheckBox->isChecked() != layout->userCanEdit();
 }
 
 void QnLayoutSettingsDialog::updateControls() {
-    /*
     bool imagePresent = m_imageId > 0;
     bool locked = ui->lockedCheckBox->isChecked();
 
@@ -75,13 +82,30 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->viewButton->setEnabled(imagePresent);
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-*/
-    ui->lockedCheckBox->setVisible(false);
-    ui->backgroundGroupBox->setVisible(false);
 }
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {
 
+    QImage img = m_cache->getImage(m_imageId);
+    if (img.isNull())
+        return; //show message?
+
+    QDialog d(this);
+
+    QVBoxLayout *layout = new QVBoxLayout(&d);
+
+    QLabel* l = new QLabel(&d);
+    l->setPixmap(QPixmap::fromImage(img));
+    layout->addWidget(l);
+
+    QPushButton* b = new QPushButton(&d);
+    b->setText(tr("Close"));
+    connect(b, SIGNAL(clicked()), &d, SLOT(close()));
+    layout->addWidget(b);
+
+    d.setLayout(layout);
+    d.setModal(true);
+    d.exec();
 }
 
 void QnLayoutSettingsDialog::at_selectButton_clicked() {
@@ -108,8 +132,8 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
         ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
     }
 
-    m_imageId = 1;
-
+    //TODO: #GDM replace with uploading
+    m_imageId = m_cache->appendDebug(files[0]);
     updateControls();
 }
 
@@ -120,3 +144,16 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 
     updateControls();
 }
+
+void QnLayoutSettingsDialog::at_image_loaded(int id, const QImage &image) {
+    if (id != m_imageId)
+        return;
+    QPixmap pixmap;
+    if (!pixmap.convertFromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio)))
+        qWarning() << "Could not convert image";
+    ui->imageLabel->setPixmap(pixmap);
+}
+
+
+
+

@@ -39,6 +39,7 @@ class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
+class QnGridBackgroundItem;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
@@ -54,8 +55,8 @@ class QnCamDisplay;
  * It presents some low-level functions for viewport and item manipulation.
  */
 class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
-    Q_OBJECT;
-    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
+    Q_OBJECT
+    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity)
 
 public:
     /**
@@ -157,7 +158,12 @@ public:
     /**
      * \returns                         Grid item. 
      */
-    QnGridItem *gridItem();
+    QnGridItem *gridItem() const;
+
+    /**
+     * \returns                         Grid background item (E-Mapping).
+     */
+    QnGridBackgroundItem *gridBackgroundItem() const;
 
     /**
      * \param item                      Item to get widget for.
@@ -319,13 +325,13 @@ protected:
     void setWidgetsFrameOpacity(qreal opacity);
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
-
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
     void updateFrameWidths();
 
     void updateCurtainedCursor();
+    void updateBackground(const QnLayoutResourcePtr &layout);
 
     void at_scene_destroyed();
     void at_scene_selectionChanged();
@@ -398,6 +404,9 @@ private:
 
     /** Grid item. */
     QWeakPointer<QnGridItem> m_gridItem;
+
+    /** Grid background item. */
+    QWeakPointer<QnGridBackgroundItem> m_gridBackgroundItem;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;

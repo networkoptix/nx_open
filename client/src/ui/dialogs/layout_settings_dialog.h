@@ -5,6 +5,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <utils/app_server_file_cache.h>
+
 namespace Ui {
     class QnLayoutSettingsDialog;
 }
@@ -24,12 +26,15 @@ private slots:
     void at_selectButton_clicked();
     void at_clearButton_clicked();
 
+    void at_image_loaded(int id, const QImage& image);
+
     void updateControls();
 private:
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
+    QnAppServerFileCache *m_cache;
 
     int m_imageId;
 };
