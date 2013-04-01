@@ -93,6 +93,7 @@ public:
 
 signals:
     void motionSelectionChanged();
+    void zoomWindowChanged();
 
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;

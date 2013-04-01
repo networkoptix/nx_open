@@ -512,9 +512,9 @@ void QnResourceWidget::updateButtonsVisibility() {
 Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
     Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
 
-    /* This widget has no side frame sections in case aspect ratio is set. */
+    /* This widget has no side frame sections if aspect ratio is set. */
     if(hasAspectRatio())
-        result &= ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
+        result &= ~Qn::SideSections;
 
     return result;
 }

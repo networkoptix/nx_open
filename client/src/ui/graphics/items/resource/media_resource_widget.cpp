@@ -150,7 +150,12 @@ const QRectF &QnMediaResourceWidget::zoomWindow() const {
 }
 
 void QnMediaResourceWidget::setZoomWindow(const QRectF &zoomWindow) {
+    if(qFuzzyCompare(m_zoomWindow, zoomWindow))
+        return;
+
     m_zoomWindow = zoomWindow;
+
+    emit zoomWindowChanged();
 }
 
 int QnMediaResourceWidget::motionGridWidth() const {
