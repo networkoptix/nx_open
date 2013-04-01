@@ -42,8 +42,7 @@ QString QnSendMailBusinessAction::getSubject() const {
 
     switch (eventType) {
     case BusinessEventType::NotDefined:
-        qWarning() << "Undefined event has occured" << m_runtimeParams;
-        break;
+        return QObject::tr("Undefined event has occured");
 
     case BusinessEventType::Camera_Disconnect:
         return QObject::tr("Camera %1 was disconnected").arg(resourceName);
@@ -94,7 +93,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
                 .arg(resourceName);
         break;
     case BusinessEventType::Camera_Input:
-        return QObject::tr("%1 has caught an input signal on camera %2")
+        messageBody = QObject::tr("%1 has caught an input signal on camera %2")
                 .arg(serverName)
                 .arg(resourceName);
         break;
@@ -104,27 +103,27 @@ QString QnSendMailBusinessAction::getMessageBody() const {
                 .arg(resourceName);
         break;
     case BusinessEventType::Storage_Failure:
-        return QObject::tr("%1 %2 has detected %n storage issues", "", issueCount)
+        messageBody = QObject::tr("%1 \"%2\" has detected %n storage issues", "", issueCount)
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::Network_Issue:
-        return QObject::tr("%1 has experienced %n network issues with camera %2", "", issueCount)
+        messageBody = QObject::tr("%1 has experienced %n network issues with camera %2", "", issueCount)
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::MediaServer_Failure:
-        messageBody = QObject::tr("%1 %2 failure was detected")
+        messageBody = QObject::tr("%1 \"%2\" failure was detected")
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::Camera_Ip_Conflict:
-        messageBody = QObject::tr("%1 %2 has detected camera IP conflict")
+        messageBody = QObject::tr("%1 \"%2\" has detected camera IP conflict")
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::MediaServer_Conflict:
-        messageBody = QObject::tr("%1 %2 is conflicting with other server")
+        messageBody = QObject::tr("%1 \"%2\" is conflicting with other server")
                 .arg(serverName)
                 .arg(resourceName);
         break;
