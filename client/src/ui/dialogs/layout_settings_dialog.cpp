@@ -10,16 +10,19 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(new QnAppServerFileCache(this)),
-    m_imageId(0)
+    m_layoutImageId(0)
 {
     ui->setupUi(this);
+    ui->progressBar->setVisible(false);
 
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
+    connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
 
-    connect(m_cache, SIGNAL(imageLoaded(int,QImage)), this, SLOT(at_image_loaded(int, const QImage &)));
+    connect(m_cache, SIGNAL(imageLoaded(int)), this, SLOT(at_image_loaded(int)));
+    connect(m_cache, SIGNAL(imageStored(int)), this, SLOT(at_image_stored(int)));
 
     updateControls();
 }
@@ -30,11 +33,9 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
 
-    m_imageId = layout->backgroundImageId();
-    if (m_imageId > 0) {
-        QImage img = m_cache->getImage(m_imageId);
-        at_image_loaded(m_imageId, img);
-    }
+    m_layoutImageId = layout->backgroundImageId();
+    if (m_layoutImageId > 0)
+        m_cache->loadImage(m_layoutImageId);
 
     ui->widthSpinBox->setValue(layout->backgroundSize().width());
     ui->heightSpinBox->setValue(layout->backgroundSize().height());
@@ -50,7 +51,7 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
 
     layout->setUserCanEdit(ui->userCanEditCheckBox->isChecked());
     layout->setLocked(ui->lockedCheckBox->isChecked());
-    layout->setBackgroundImageId(m_imageId);
+    layout->setBackgroundImageId(m_layoutImageId);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
 
     // TODO: progress dialog uploading image?
@@ -67,15 +68,15 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
     if (ui->lockedCheckBox->isChecked() != layout->locked())
         return true;
 
-    if (layout->backgroundImageId() == 0 && m_imageId == 0)
+    if (layout->backgroundImageId() == 0 && m_layoutImageId == 0)
         return false;
 
     QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
-    return (m_imageId != layout->backgroundImageId() || newSize != layout->backgroundSize());
+    return (m_layoutImageId != layout->backgroundImageId() || newSize != layout->backgroundSize());
 }
 
 void QnLayoutSettingsDialog::updateControls() {
-    bool imagePresent = m_imageId > 0;
+    bool imagePresent = !m_filename.isEmpty() || m_layoutImageId > 0;
     bool locked = ui->lockedCheckBox->isChecked();
 
     ui->widthSpinBox->setEnabled(imagePresent && !locked);
@@ -86,7 +87,7 @@ void QnLayoutSettingsDialog::updateControls() {
 }
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {
-
+/*
     QImage img = m_cache->getImage(m_imageId);
     if (img.isNull())
         return; //show message?
@@ -107,6 +108,7 @@ void QnLayoutSettingsDialog::at_viewButton_clicked() {
     d.setLayout(layout);
     d.setModal(true);
     d.exec();
+*/
 }
 
 void QnLayoutSettingsDialog::at_selectButton_clicked() {
@@ -122,36 +124,60 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
     if (files.size() < 0)
         return;
 
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader();
-    loader->setInput(files[0]);
-    loader->setTransformationMode(Qt::FastTransformation);
-    loader->setSize(ui->imageLabel->size());
-    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
-    loader->start();
+    m_filename = files[0];
+    m_layoutImageId = 0;
 
-    //TODO: #GDM replace with uploading
-    m_imageId = m_cache->appendDebug(files[0]);
+    loadPreview();
     updateControls();
 }
 
 void QnLayoutSettingsDialog::at_clearButton_clicked() {
-    m_imageId = 0;
+    m_filename = QString();
+    m_layoutImageId = 0;
+
     //TODO: #GDM special icon with "No image" text or may be complete help on the theme.
     ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
 
     updateControls();
 }
 
-void QnLayoutSettingsDialog::at_image_loaded(int id, const QImage &image) {
-    if (id != m_imageId)
+void QnLayoutSettingsDialog::at_accepted() {
+    if (m_filename.isEmpty()) {
+        accept();
         return;
-    QPixmap pixmap;
-    if (!pixmap.convertFromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio)))
-        qWarning() << "Could not convert image";
-    ui->imageLabel->setPixmap(pixmap);
+    }
+
+    m_cache->storeImage(m_filename);
+    ui->progressBar->setVisible(true);
+}
+
+void QnLayoutSettingsDialog::at_image_loaded(int id) {
+    if (m_cache->getPath(id) != m_filename)
+        return;
+    loadPreview();
+}
+
+void QnLayoutSettingsDialog::at_image_stored(int id) {
+    ui->progressBar->setVisible(false);
+    m_layoutImageId = id;
+    accept();
+}
+
+void QnLayoutSettingsDialog::loadPreview() {
+    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    loader->setInput(m_filename);
+    loader->setTransformationMode(Qt::FastTransformation);
+    loader->setSize(ui->imageLabel->size());
+    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
+    loader->start();
+    ui->progressBar->setVisible(true);
 }
 
 void QnLayoutSettingsDialog::setPreview(const QImage &image) {
+    ui->progressBar->setVisible(false);
+    if (image.isNull())
+        return;
+
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
 
     qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
@@ -162,7 +188,6 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         ui->heightSpinBox->setValue(ui->heightSpinBox->maximum());
         ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
     }
-    qDebug() << "loaded";
 }
 
 

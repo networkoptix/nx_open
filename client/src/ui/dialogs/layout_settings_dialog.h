@@ -25,8 +25,10 @@ private slots:
     void at_viewButton_clicked();
     void at_selectButton_clicked();
     void at_clearButton_clicked();
+    void at_accepted();
 
-    void at_image_loaded(int id, const QImage& image);
+    void at_image_loaded(int id);
+    void at_image_stored(int id);
 
     void setPreview(const QImage& image);
 
@@ -34,11 +36,14 @@ private slots:
 private:
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
+    void loadPreview();
+
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
     QnAppServerFileCache *m_cache;
 
-    int m_imageId;
+    QString m_filename;
+    int m_layoutImageId;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

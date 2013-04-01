@@ -17,19 +17,20 @@ public slots:
     void setSize(const QSize &size);
     void setAspectRatioMode(const Qt::AspectRatioMode mode);
     void setTransformationMode(const Qt::TransformationMode mode);
+    void setDownScaleOnly(const bool value);
 
     void setInput(const QImage &input);
     void setInput(const QString &filename);
 
     void start();
 signals:
-    void error();
     void finished(const QImage &output);
 
 private:
     QSize m_size;
     Qt::AspectRatioMode m_aspectMode;
     Qt::TransformationMode m_transformationMode;
+    bool m_downScaleOnly;
     QImage m_input;
     QString m_inputFilename;
 };
@@ -46,13 +47,13 @@ public slots:
     void setSize(const QSize &size);
     void setAspectRatioMode(const Qt::AspectRatioMode mode);
     void setTransformationMode(const Qt::TransformationMode mode);
+    void setDownScaleOnly(const bool value);
 
     void setInput(const QImage &input);
     void setInput(const QString &filename);
 
     void start();
 signals:
-    void error();
     void finished(const QImage &output);
 
 private:

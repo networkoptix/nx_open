@@ -4,7 +4,8 @@
 QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
     QObject(),
     m_aspectMode(Qt::KeepAspectRatio),
-    m_transformationMode(Qt::SmoothTransformation)
+    m_transformationMode(Qt::SmoothTransformation),
+    m_downScaleOnly(true)
 {
 }
 
@@ -24,6 +25,10 @@ void QnThreadedImageLoaderPrivate::setTransformationMode(const Qt::Transformatio
     m_transformationMode = mode;
 }
 
+void QnThreadedImageLoaderPrivate::setDownScaleOnly(const bool value) {
+    m_downScaleOnly = value;
+}
+
 void QnThreadedImageLoaderPrivate::setInput(const QImage &input) {
     m_input = input;
 }
@@ -37,13 +42,15 @@ void QnThreadedImageLoaderPrivate::start() {
         m_input.load(m_inputFilename);
     }
 
-    if (m_input.isNull()) {
-        emit error();
-        delete this;
-        return;
+    QImage output = m_input;
+    if (!output.isNull() && m_size.isValid() && !m_size.isNull()) {
+        if (m_downScaleOnly)
+            m_size = m_size.boundedTo(output.size());
+
+        if (m_size != output.size())
+            output = output.scaled(m_size, m_aspectMode, m_transformationMode);
     }
 
-    QImage output = m_input.scaled(m_size, m_aspectMode, m_transformationMode);
     emit finished(output);
     delete this;
 }
@@ -54,7 +61,6 @@ QnThreadedImageLoader::QnThreadedImageLoader(QObject *parent) :
     m_loader(new QnThreadedImageLoaderPrivate())
 {
     connect(m_loader, SIGNAL(finished(QImage)), this, SIGNAL(finished(QImage)));
-    connect(m_loader, SIGNAL(error()), this, SIGNAL(error()));
 }
 
 QnThreadedImageLoader::~QnThreadedImageLoader() {
@@ -73,6 +79,10 @@ void QnThreadedImageLoader::setTransformationMode(const Qt::TransformationMode m
     m_loader->setTransformationMode(mode);
 }
 
+void QnThreadedImageLoader::setDownScaleOnly(const bool value) {
+    m_loader->setDownScaleOnly(value);
+}
+
 void QnThreadedImageLoader::setInput(const QImage &input) {
     m_loader->setInput(input);
 }
@@ -86,11 +96,9 @@ void QnThreadedImageLoader::start() {
     m_loader->moveToThread( thread );
 
     connect(thread, SIGNAL(started()), m_loader, SLOT(start()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
     connect(m_loader, SIGNAL(finished(QImage)), thread, SLOT(quit()));
-    connect(m_loader, SIGNAL(error()), thread, SLOT(quit()));
-
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
     thread->start();
 }
