@@ -36,7 +36,9 @@ int QnAppServerFileCache::appendDebug(QString path) {
     int i = 1;
     while (QFileInfo(getPath(i)).exists())
         i++;
-    QImage(path).save(getPath(i));
+
+
+//    QImage(path).save(getPath(i));
     return i;
 }
 

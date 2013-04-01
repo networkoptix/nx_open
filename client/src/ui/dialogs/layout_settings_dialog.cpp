@@ -4,6 +4,7 @@
 #include <QtGui/QFileDialog>
 
 #include <core/resource/layout_resource.h>
+#include <utils/threaded_image_loader.h>
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
@@ -121,16 +122,21 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
     if (files.size() < 0)
         return;
 
-    QPixmap image(files[0]);
-    ui->imageLabel->setPixmap(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio));
-    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
-    if (aspectRatio >= 1.0) {
-        ui->widthSpinBox->setValue(ui->widthSpinBox->maximum());
-        ui->heightSpinBox->setValue(qRound((qreal)ui->widthSpinBox->value() / aspectRatio));
-    } else {
-        ui->heightSpinBox->setValue(ui->heightSpinBox->maximum());
-        ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
-    }
+    QnThreadedImageLoader* loader = new QnThreadedImageLoader();
+    loader->setInput(files[0]);
+    loader->setTransformationMode(Qt::FastTransformation);
+    loader->setSize(ui->imageLabel->size());
+
+    QThread *thread = new QThread();
+    loader->moveToThread( thread );
+
+    connect(thread, SIGNAL(started()), loader, SLOT(start()));
+    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
+    connect(loader, SIGNAL(finished(QImage)), thread, SLOT(quit()));
+    connect(loader, SIGNAL(error()), thread, SLOT(quit()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+    thread->start();
 
     //TODO: #GDM replace with uploading
     m_imageId = m_cache->appendDebug(files[0]);
@@ -154,6 +160,18 @@ void QnLayoutSettingsDialog::at_image_loaded(int id, const QImage &image) {
     ui->imageLabel->setPixmap(pixmap);
 }
 
+void QnLayoutSettingsDialog::setPreview(const QImage &image) {
+    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
 
+    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+    if (aspectRatio >= 1.0) {
+        ui->widthSpinBox->setValue(ui->widthSpinBox->maximum());
+        ui->heightSpinBox->setValue(qRound((qreal)ui->widthSpinBox->value() / aspectRatio));
+    } else {
+        ui->heightSpinBox->setValue(ui->heightSpinBox->maximum());
+        ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
+    }
+    qDebug() << "loaded";
+}
 
 

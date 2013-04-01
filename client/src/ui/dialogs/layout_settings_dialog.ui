@@ -22,6 +22,12 @@
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
       <item>
        <widget class="QLabel" name="imageLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string notr="true"/>
         </property>

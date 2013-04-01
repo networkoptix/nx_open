@@ -28,6 +28,8 @@ private slots:
 
     void at_image_loaded(int id, const QImage& image);
 
+    void setPreview(const QImage& image);
+
     void updateControls();
 private:
     bool hasChanges(const QnLayoutResourcePtr &layout);
