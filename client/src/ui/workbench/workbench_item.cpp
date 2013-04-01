@@ -16,6 +16,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, 
     m_layout(NULL),
     m_resourceUid(resourceUid),
     m_uuid(uuid),
+    m_zoomWindow(0.0, 0.0, 1.0, 1.0),
     m_flags(0),
     m_rotation(0.0)
 {}
@@ -25,6 +26,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     m_layout(NULL),
     m_resourceUid(data.resource.path),
     m_uuid(data.uuid),
+    m_zoomWindow(0.0, 0.0, 1.0, 1.0),
     m_flags(0),
     m_rotation(0.0)
 {
@@ -40,6 +42,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
+    setZoomWindow(data.zoomWindow);
 
     m_dataByRole = data.dataByRole; // TODO
 }
@@ -60,6 +63,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.zoomWindow = zoomWindow();
     data.dataByRole = m_dataByRole;
 
     return data;
@@ -82,6 +86,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     result &= setFlag(Qn::Pinned, false);
     result &= setCombinedGeometry(data.combinedGeometry);
     setRotation(data.rotation);
+    setZoomWindow(data.zoomWindow);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     m_dataByRole = data.dataByRole; // TODO
@@ -101,6 +106,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
 
     data.flags = flags();
     data.rotation = rotation();
+    data.zoomWindow = zoomWindow();
     data.combinedGeometry = combinedGeometry();
     data.dataByRole = m_dataByRole;
 }
@@ -209,6 +215,15 @@ void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
     emit dataChanged(Qn::ItemFlagsRole);
 }
 
+void QnWorkbenchItem::setZoomWindow(const QRectF &zoomWindow) {
+    if(qFuzzyCompare(zoomWindow, m_zoomWindow))
+        return;
+
+    m_zoomWindow = zoomWindow;
+
+    emit zoomWindowChanged();
+}
+
 void QnWorkbenchItem::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
@@ -255,6 +270,8 @@ QVariant QnWorkbenchItem::data(int role) const {
         return m_geometryDelta;
     case Qn::ItemCombinedGeometryRole:
         return combinedGeometry();
+    case Qn::ItemZoomWindowRole:
+        return zoomWindow();
     case Qn::ItemFlagsRole:
         return static_cast<int>(m_flags);
     case Qn::ItemRotationRole:
@@ -302,6 +319,15 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             qnWarning("Provided combined geometry value '%1' is not convertible to QRectF.", value);
             return false;
         }
+    case Qn::ItemZoomWindowRole: {
+        if(value.canConvert<QRectF>()) {
+            setCombinedGeometry(value.toRectF());
+            return true;
+        } else {
+            qnWarning("Provided zoom window value '%1' is not convertible to QRectF.", value);
+            return false;
+        }
+    }
     case Qn::ItemFlagsRole: {
         bool ok;
         int flags = value.toInt(&ok);
