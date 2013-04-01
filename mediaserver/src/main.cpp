@@ -99,6 +99,7 @@ static const char COMPONENT_NAME[] = "MediaServer";
 static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
 
 class QnMain;
+static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -549,6 +550,7 @@ QnMain::QnMain(int argc, char* argv[])
     m_progressiveDownloadingServer(0),
     m_universalTcpListener(0)
 {
+    serviceMainInstance = this;
 }
 
 QnMain::~QnMain()
@@ -1063,8 +1065,6 @@ void QnMain::run()
 
     exec();
 
-    QnResource::onStopApplication();
-
     stopObjects();
 
     QnResource::stopCommandProc();
@@ -1076,7 +1076,7 @@ void QnMain::run()
     QnMServerResourceSearcher::initStaticInstance( NULL );
 
     QnResourceDiscoveryManager::instance()->stop();
-    QThreadPool::globalInstance()->waitForDone();
+    QnResource::stopAsyncTasks();
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
@@ -1156,9 +1156,6 @@ protected:
 
     virtual void stop() override
     {
-        m_main.pleaseStop();
-        m_main.exit();
-        m_main.wait();
         stopServer(0);
     }
 
@@ -1172,6 +1169,14 @@ private:
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
+
+    if (serviceMainInstance) {
+        serviceMainInstance->pleaseStop();
+        serviceMainInstance->exit();
+        serviceMainInstance->wait();
+        serviceMainInstance = 0;
+    }
+
     qApp->quit();
 }
 

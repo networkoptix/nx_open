@@ -28,14 +28,6 @@
     </message>
 </context>
 <context>
-    <name>OnvifResourceInformationFetcher</name>
-    <message>
-        <location filename="../src/plugins/resources/onvif/onvif_resource_information_fetcher.cpp" line="116"/>
-        <source>Unknown - %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QDnsLookup</name>
     <message>
         <location filename="../src/qt5/network/qdnslookup.cpp" line="449"/>
@@ -74,23 +66,23 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="39"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
         <source>Audio context must be specified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="53"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="91"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="77"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
         <source>Can&apos;t initialize audio encoder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="86"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Can&apos;t initialize audio decoder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -195,92 +187,178 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="38"/>
-        <source>User defined event</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="41"/>
+        <source>User Defined Event (%1) has occured</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="51"/>
-        <source>Camera %1 disconnected</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="49"/>
+        <source>Camera %1 was disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="54"/>
-        <source>Input signal on camera %1</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="52"/>
+        <source>Input signal was caught on camera %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="57"/>
-        <source>Motion detected on camera %1</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="55"/>
+        <source>Motion was detected on camera %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="98"/>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="58"/>
+        <source>Storage Failure at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="61"/>
+        <source>Network Issue at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="64"/>
+        <source>Media Server %1 Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="67"/>
+        <source>Camera IP Conflict at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="70"/>
+        <source>Media Server %1 Conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="75"/>
+        <source>Unknown Event has occured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="81"/>
+        <source>%1 Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="88"/>
+        <source>Undefined event has occured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="92"/>
+        <source>%1 has detected that camera %2 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="97"/>
+        <source>%1 has caught an input signal on camera %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="102"/>
+        <source>%1 has detected motion on camera %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="107"/>
+        <source>%1 %2 has detected %n storage issues</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="112"/>
+        <source>%1 has experienced %n network issues with camera %2</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="117"/>
+        <source>%1 %2 failure was detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="122"/>
+        <source>%1 %2 has detected camera IP conflict</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="127"/>
+        <source>%1 %2 is conflicting with other server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="133"/>
+        <source>User Defined Event (%1) has occured on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="137"/>
+        <source>Unknown Event has occured on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="171"/>
         <source>Input port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="147"/>
-        <source>at %1</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="212"/>
+        <source>at %1 on %2</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="216"/>
+        <source>%n times since %1 %2</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="232"/>
+        <source>No video frames were received during the last %1 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="149"/>
-        <source>%1 times since %2</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="237"/>
+        <source>Connection to camera was closed unexpectedly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="156"/>
-        <source>Adresates:</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="241"/>
+        <source>RTP packet was loss detected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="173"/>
-        <source>On</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="246"/>
+        <source>Server has been terminated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="176"/>
-        <source>Off</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="250"/>
+        <source>Server started after crash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="195"/>
-        <source>No video frame received during last %1 seconds.</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="254"/>
+        <source>An error has occured while writing to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="200"/>
-        <source>Connection to camera was unexpectedly closed</source>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="259"/>
+        <source>Writing speed of HDD/SSD at %1 was found to be insufficient to sustain continuous recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="207"/>
-        <source>RTP packet loss detected. Prev seq.=%1 next seq.=%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="214"/>
-        <source>Server terminated.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="218"/>
-        <source>Server started after crash.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="222"/>
-        <source>I/O Error occured at %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="227"/>
-        <source>Not enough HDD/SSD speed for recording at %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/actions/sendmail_business_action.cpp" line="245"/>
+        <location filename="../src/business/actions/sendmail_business_action.cpp" line="277"/>
         <source>conflicted with</source>
         <translation type="unfinished"></translation>
     </message>
@@ -435,34 +513,57 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>QnFfmpegTranscoder</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="100"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="106"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="110"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="116"/>
         <source>Can&apos;t create output context for format %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="131"/>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="208"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="137"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="214"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="170"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="176"/>
         <source>Transcoder error: for direct stream copy video frame size must exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="216"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="222"/>
         <source>Transcoder error: can&apos;t find codec</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
+        <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="257"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLicense</name>
+    <message>
+        <location filename="../src/licensing/license.cpp" line="230"/>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/licensing/license.cpp" line="231"/>
+        <source>Trial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/licensing/license.cpp" line="232"/>
+        <source>Analog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/licensing/license.cpp" line="233"/>
+        <source>Enterprise</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -558,32 +659,32 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="265"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="271"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="267"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="273"/>
         <source>Not Found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="269"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="275"/>
         <source>Not Implemented</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="271"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="277"/>
         <source>Unsupported Transport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="273"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="279"/>
         <source>Internal Server Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="275"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="281"/>
         <source>Invalid Parameter</source>
         <translation type="unfinished"></translation>
     </message>

@@ -21,6 +21,7 @@
 #include "utils/common/synctime.h"
 
 bool QnResource::m_appStopping = false;
+QThreadPool QnResource::m_initAsyncPool;
 
 QnResource::QnResource(): 
     QObject(),
@@ -34,12 +35,6 @@ QnResource::QnResource():
 {
     connect(this, SIGNAL(parameterValueChangedQueued(const QnResourcePtr &, const QnParam &)), this, SIGNAL(parameterValueChanged(const QnResourcePtr &, const QnParam &)), Qt::QueuedConnection);
 }
-
-void QnResource::onStopApplication()
-{
-    m_appStopping = true;
-}
-
 
 QnResource::~QnResource()
 {
@@ -839,10 +834,17 @@ private:
     QnResourcePtr m_resource;
 };
 
+void QnResource::stopAsyncTasks()
+{
+    m_appStopping = true;
+    m_initAsyncPool.waitForDone();
+}
+
+
 void QnResource::initAsync()
 {
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
-    QThreadPool::globalInstance()->start(task);
+    m_initAsyncPool.start(task);
 }
 
 bool QnResource::isInitialized() const

@@ -91,10 +91,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>S&amp;tart IP:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -160,6 +156,10 @@
     </message>
     <message>
         <source>Cl&amp;ose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -365,10 +365,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -384,16 +380,11 @@
         <source>Active Licenses</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>LicenseNotificationDialog</name>
     <message>
-        <source>Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>License Key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Expiry Date</source>
+        <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -498,11 +489,6 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection could not be established.
-The Enterprise Controller is incompatible with this client. Please upgrade your client or contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -569,6 +555,30 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
     </message>
     <message>
         <source>Host field cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process is not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot restart the client in compatibility mode.
+Please close the application and start it again
+using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Would you like to restart client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -810,22 +820,6 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Free</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Analog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enterprise</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1707,6 +1701,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Change Cell Spacing...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Layout Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -1897,6 +1895,14 @@ for recording at
         <source>Recording is disabled for %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>%1 of %n cameras</source>
+        <comment>...for</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -2078,20 +2084,15 @@ for recording at
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera(s) added successfully</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Error while adding camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera address filed must contain valid url or ip address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Server returned an error:
@@ -2099,8 +2100,38 @@ for recording at
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This server version supports only searching by ip address.</source>
+        <source>Add cameras to %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select target mediaserver in the tree.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server is offline.
+Camera addition is possible for online servers only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera address field must contain valid url or ip address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to server.
+Make sure server is available and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n camera(s) added successfully.
+It might take a few moments to populate them in the tree.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2206,36 +2237,54 @@ for recording at
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 digital license(s) are used out of %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 analog license(s) are used out of %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Activate %1 more digital license(s).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Activate %1 more analog license(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1 more digital license(s) will be used.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n digital license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%1 more analog license(s) will be used.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n analog license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more digital license(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more digital license(s) will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more analog license(s) will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2271,6 +2320,31 @@ for recording at
     </message>
     <message>
         <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Request timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to the Enterprise Controller could not be established.
+Connection details that you have entered are incorrect, please try again.
+
+If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2655,10 +2729,19 @@ for recording at
         <source>Recording cannot be enabled for some cameras</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1 digital license(s) will be used out of %2.
-%3 analog  license(s) will be used out of %4.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n digital license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n analog  license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2666,6 +2749,95 @@ for recording at
     <message>
         <source>%1 of %2 selected cameras have no input ports.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutSettingsDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View in full size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size (in cells):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout is locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User can edit layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLicenseListModel</name>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expiration Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tomorrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>In %n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2712,10 +2884,6 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Required at least %3 digital and %4 analog licenses.</source>
         <translation type="unfinished"></translation>
@@ -2733,6 +2901,17 @@ Locked to Hardware ID: %3&lt;br /&gt;
 &lt;br /&gt;
 &lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
 Archive Streams Allowed: %4</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLicenseNotificationDialog</name>
+    <message>
+        <source>Some of your licenses have expired.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some of your licenses will soon expire.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2756,6 +2935,14 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Trial License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Free License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2837,13 +3024,19 @@ Archive Streams Allowed: %4</source>
         <comment>PasswordEdit</comment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1 digital license(s) are used out of %2.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n digital license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%1 analog license(s) are used out of %2.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n analog license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3315,13 +3508,19 @@ All changes will be lost after program exit.</source>
         <source>Do not record motion</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1 digital license(s) are used out of %2.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n digital license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%1 analog license(s) are used out of %2.</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>%n analog license(s) are used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3340,10 +3539,6 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Signature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4124,6 +4319,15 @@ Please wait for the camera to go online.</source>
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Layout with the same name already exists
+and you do not have the rights to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
@@ -4549,6 +4753,10 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Get More Licenses...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firmware:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

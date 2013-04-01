@@ -683,6 +683,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
         }
     }
 
+    if (m_appStopping)
+        return false;
+
     //Trying to get onvif URLs
     {
         CapabilitiesReq request;
@@ -725,6 +728,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
                 : getDeviceOnvifUrl().toStdString();
         }
     }
+
+    if (m_appStopping)
+        return false;
 
     //Trying to get MAC
     {
