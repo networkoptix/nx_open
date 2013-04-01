@@ -16,6 +16,8 @@
 #include <QSharedPointer>
 #include <QString>
 
+#include "nx_plugin_api.h"
+
 
 //!Loads custom application plugins and provides plugin management methods
 /*!
@@ -39,8 +41,7 @@ public:
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins
-    template<class T>
-        QList<T*> findPlugins() const
+    template<class T> QList<T*> findPlugins() const
     {
         QMutexLocker lk( &m_mutex );
 
@@ -55,6 +56,19 @@ public:
         return foundPlugins;
     }
 
+    //!Searches for plugins of type \a T, derived from \a nxpl::NXPluginInterface among loaded plugins
+    template<class T> QList<T*> findNXPlugins() const
+    {
+        foreach( nxpl::NXPluginInterface* plugin, m_nxPlugins )
+        {
+            void* ptr = plugin->queryInterface( T::INTF_GUID );
+            if( ptr )
+                foundPlugins.push_back( static_cast<T*>(ptr) );
+        }
+
+        return foundPlugins;
+    }
+
     /*!
         This method must be called implicitly
     */
@@ -64,16 +78,19 @@ public:
     static PluginManager* instance( const QString& pluginDir = QString() );
 
 signals:
+    //!Emitted just after new plugin has been loaded
     void pluginLoaded();
-    void pluginUnloaded();
 
 private:
     const QString m_pluginDir;
     QList<QSharedPointer<QPluginLoader> > m_loadedPlugins;
+    QList<nxpl::NXPluginInterface*> m_nxPlugins;
     mutable QMutex m_mutex;
 
     void loadPlugins( const QString& dirToSearchIn );
-    void loadPlugin( const QString& fullFilePath );
+    bool loadQtPlugin( const QString& fullFilePath );
+    //!Loads \a nxpl::NXPluginInterface based plugin
+    bool loadNXPlugin( const QString& fullFilePath );
 };
 
 #endif /* PLUGINLOADER_H_ */
