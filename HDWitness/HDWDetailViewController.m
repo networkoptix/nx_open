@@ -43,15 +43,21 @@ enum MessageType {
 @end
 
 @interface Header : UICollectionReusableView
+@property (weak, nonatomic) IBOutlet UIImageView *image;
 @property (weak, nonatomic) IBOutlet UILabel *label;
 @property (weak, nonatomic) IBOutlet UILabel *summaryLabel;
 @end
 
 @implementation Header
 
-- (void)setText:(NSString*)text andSummary:(NSString*)summary {
-    self.label.text = text;
-    self.summaryLabel.text = summary;
+- (void)loadFromServer:(HDWServerModel*)server {
+    self.label.text = server.name;
+    self.summaryLabel.text = [NSString stringWithFormat:@"Address: %@", server.streamingUrl.host];
+    if (server.status.intValue == Online) {
+        self.image.image = [UIImage imageNamed:@"server.png"];
+    } else {
+        self.image.image = [UIImage imageNamed:@"server_offline.png"];
+    }
 }
 
 @end
@@ -112,6 +118,14 @@ enum MessageType {
                 [_servers removeCameraById:resourceId andServerId:parentId];
             }
         }
+    } else if (messageType == ResourceStatusChange) {
+        if ([objectName isEqual: @"Server"]) {
+            HDWServerModel *server = [_servers findServerById:message[@"resourceId"]];
+            [server setStatus:message[@"status"]];
+        } else if ([objectName isEqual: @"Camera"]) {
+            HDWCameraModel *camera = [_servers findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
+            [camera setStatus:message[@"status"]];
+        }
     }
 
     [self.collectionView performBatchUpdates:^{
@@ -122,7 +136,7 @@ enum MessageType {
         [self.collectionView insertItemsAtIndexPaths:newCameras];
 
 //        [self.collectionView reloadItemsAtIndexPaths:indexPaths];
-//        [self.collectionView reloadData];
+        [self.collectionView reloadData];
     } completion:nil];
 }
 
@@ -172,6 +186,9 @@ enum MessageType {
 
 - (void)configureView
 {
+    if (!_ecsConfig)
+        return;
+    
     NSString* urlString = [NSString stringWithFormat:@"https://%@:%@@%@:%@/", _ecsConfig.login, _ecsConfig.password, _ecsConfig.host, _ecsConfig.port];
     NSURL *baseUrl = [NSURL URLWithString:urlString];
     
@@ -281,8 +298,7 @@ enum MessageType {
     {
         Header *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerTitle" forIndexPath:indexPath];
         HDWServerModel *server = [_servers serverAtIndex:indexPath.section];
-        NSString *summary = [NSString stringWithFormat:@"Address: %@", server.streamingUrl.host];
-        [header setText: server.name andSummary:summary];
+        [header loadFromServer:server];
         
         //modify your header
         return header;

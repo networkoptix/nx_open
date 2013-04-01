@@ -9,7 +9,7 @@
 #import "HDWECSConfig.h"
 
 @implementation HDWECSConfig
-+ (HDWECSConfig*) initDefault {
++ (HDWECSConfig*) defaultConfig {
     HDWECSConfig* instance = [[HDWECSConfig alloc] init];
     instance.name = @"Womac";
     instance.host = @"10.0.2.180";

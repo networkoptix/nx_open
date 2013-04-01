@@ -25,6 +25,10 @@
     return self;
 }
 
+-(void) setStatus: (NSNumber*) newStatus {
+    _status = newStatus;
+}
+
 -(NSURL*) videoUrl {
     return [NSURL URLWithString:[NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=720p", _physicalId] relativeToURL:_server.streamingUrl];
 }
@@ -43,6 +47,7 @@
     if (self) {
         _serverId = dict[@"id"];
         _name = dict[@"name"];
+        _status = dict[@"status"];
         _streamingUrl = [NSURL URLWithString:dict[@"streamingUrl"]];
         
         cameras = [[NSMutableDictionary alloc] init];
@@ -58,6 +63,10 @@
 -(void) update: (HDWServerModel*) server {
     _name = server.name;
     _streamingUrl = server.streamingUrl;
+}
+
+-(void) setStatus: (NSNumber*) newStatus {
+    _status = newStatus;
 }
 
 -(HDWCameraModel*) findCameraById: (NSNumber*) cameraId {

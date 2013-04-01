@@ -17,5 +17,5 @@
 @property NSString *login;
 @property NSString *password;
 
-+ (HDWECSConfig*) initDefault;
++ (HDWECSConfig*) defaultConfig;
 @end

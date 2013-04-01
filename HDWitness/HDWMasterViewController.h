@@ -9,9 +9,12 @@
 #import <UIKit/UIKit.h>
 
 @class HDWDetailViewController;
+@class HDWECSConfig;
 
 @interface HDWMasterViewController : UITableViewController
 
 @property (strong, nonatomic) HDWDetailViewController *detailViewController;
+
+- (void)insertECSConfig:(HDWECSConfig*)ecsConfig;
 
 @end

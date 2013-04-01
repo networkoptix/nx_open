@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
+#import "HDWMasterViewController.h"
 #import "HDWECSViewController.h"
 #include "HDWECSConfig.h"
 
@@ -24,20 +25,22 @@
     [self.tableView setEditing:YES];
 }
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
+- (id) initWithConfig: (HDWECSConfig*)config {
+    self = [super init];
     if (self) {
-        item = nil;
+        [self setConfig:config];
     }
+    
     return self;
+}
+
+-(void) setConfig: (HDWECSConfig*)config {
+    item = config;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    item = [HDWECSConfig initDefault];
 
     self.dataSourceArray = @[
         @{
@@ -109,6 +112,7 @@
         CGFloat optionalRightMargin = 10.0;
         CGFloat optionalBottomMargin = 10.0;
         UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, cell.contentView.frame.size.width - 110 - optionalRightMargin, cell.contentView.frame.size.height - 10 - optionalBottomMargin)];
+        [textField addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventEditingChanged];
         textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
         textField.font = [UIFont systemFontOfSize:12.0];
         textField.backgroundColor = [UIColor clearColor];
@@ -173,6 +177,18 @@
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    HDWMasterViewController* masterController = (HDWMasterViewController*)segue.destinationViewController;
+    [masterController insertECSConfig:item];
+}
+
+- (IBAction)valueChanged:(UITextField *)sender {
+    UITableViewCell *cell = (UITableViewCell *)[sender superview];
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    
+    [item setValue:sender.text forKey:self.dataSourceArray[indexPath.row][@"Property"]];
 }
 
 @end

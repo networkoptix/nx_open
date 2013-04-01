@@ -27,6 +27,7 @@
 @property(readonly) NSURL *thumbnailUrl;
 
 -(HDWCameraModel*) initWithDict: (NSDictionary*) dict andServer: (HDWServerModel*) server;
+-(void) setStatus: (NSNumber*) newStatus;
 
 @end
 
@@ -37,6 +38,7 @@
     NSMutableDictionary *cameras;
 }
 
+@property(readonly) NSNumber *status;
 @property(readonly) NSUInteger cameraCount;
 @property(readonly) NSNumber *serverId;
 @property(readonly) NSString *name;
@@ -46,6 +48,8 @@
 
 -(HDWCameraModel*) cameraAtIndex:(NSUInteger)index;
 -(HDWCameraModel*) findCameraById: (NSNumber*) cameraId;
+
+-(void) setStatus: (NSNumber*) newStatus;
 -(void) addOrReplaceCamera: (HDWCameraModel*) camera;
 -(void) removeCameraById: (NSNumber*) cameraId;
 -(NSUInteger) indexOfCameraWithId: (NSNumber*) serverId;

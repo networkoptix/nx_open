@@ -14,6 +14,9 @@
     HDWECSConfig *item;
 }
 
+-(id) initWithConfig: (HDWECSConfig*)config;
+-(void) setConfig: (HDWECSConfig*)config;
+
 @property (nonatomic, retain) NSArray *dataSourceArray;
 
 @end

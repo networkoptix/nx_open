@@ -9,6 +9,7 @@
 #import "HDWMasterViewController.h"
 
 #import "HDWDetailViewController.h"
+#import "HDWECSViewController.h"
 #import "HDWECSConfig.h"
 
 @interface HDWMasterViewController () {
@@ -46,13 +47,18 @@
 
 - (void)insertNewObject:(id)sender
 {
-    
     if (!_objects) {
         _objects = [[NSMutableArray alloc] init];
     }
-    [_objects insertObject:[HDWECSConfig initDefault] atIndex:0];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+    
+    NSUInteger newIndex = _objects.count;
+    HDWECSConfig *ecsConfig = [HDWECSConfig defaultConfig];
+    [_objects insertObject:ecsConfig atIndex:newIndex];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:newIndex inSection:0];
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    
+    HDWECSViewController *ecsViewController = [[HDWECSViewController alloc] initWithConfig:ecsConfig];
+    [self.navigationController pushViewController:ecsViewController animated:YES];
 }
 
 #pragma mark - Table View
@@ -122,7 +128,18 @@
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         HDWECSConfig *object = _objects[indexPath.row];
         [[segue destinationViewController] setEcsConfig:object];
+    } else if ([[segue identifier] isEqualToString:@"showConfig"]) {
+        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+        HDWECSConfig *ecsConfig = _objects[indexPath.row];
+        [[segue destinationViewController] setConfig:ecsConfig];
     }
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+
+    [self.tableView reloadData];
 }
 
 @end
