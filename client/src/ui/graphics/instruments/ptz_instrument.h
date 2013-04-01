@@ -94,7 +94,6 @@ private:
     }
 
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
-
     void ensureOverlayWidget(QnMediaResourceWidget *widget);
     void ensureSelectionItem();
 

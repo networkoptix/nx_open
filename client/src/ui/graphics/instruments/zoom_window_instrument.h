@@ -26,6 +26,9 @@ private slots:
     void at_widget_aboutToBeDestroyed();
 
 private:
+    ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
+    void ensureOverlayWidget(QnMediaResourceWidget *widget);
+
     void updateZoomType(QnMediaResourceWidget *widget, bool registerAsType = true);
 
     void registerWidget(QnMediaResourceWidget *widget);

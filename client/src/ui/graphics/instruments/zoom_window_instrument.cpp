@@ -18,17 +18,26 @@ namespace {
 
 
 // -------------------------------------------------------------------------- //
-// ZoomSelectionWidget
+// ZoomWindowWidget
 // -------------------------------------------------------------------------- //
-class ZoomSelectionWidget: public GraphicsWidget, public ConstrainedResizable {
+class ZoomWindowWidget: public GraphicsWidget, public ConstrainedResizable {
     typedef GraphicsWidget base_type;
 public:
-    ZoomSelectionWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+    ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)
     {
         setWindowFrameMargins(zoomFrameWidth, zoomFrameWidth, zoomFrameWidth, zoomFrameWidth);
     }
 
+    QnMediaResourceWidget *target() const {
+        return m_target.data();
+    }
+
+    void setTarget(QnMediaResourceWidget *target) {
+        m_target = target;
+    }
+
+protected:
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         qreal l, t, r, b;
         getWindowFrameMargins(&l, &t, &r, &b);
@@ -54,6 +63,9 @@ public:
 
         return result;
     }
+
+private:
+    QWeakPointer<QnMediaResourceWidget> m_target;
 };
 
 
@@ -66,10 +78,36 @@ public:
     ZoomOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags)
     {
+        updateLayout();
+    }
+
+    void addZoomWindow(ZoomWindowWidget *zoomWindow) {
+        zoomWindow->setParentItem(this);
+        m_zoomWindows.push_back(zoomWindow);
+    }
+
+    void removeZoomWindow(ZoomWindowWidget *zoomWindow) {
+        zoomWindow->setParentItem(NULL);
+        m_zoomWindows.removeAll(zoomWindow);
+    }
+
+    virtual void setGeometry(const QRectF &rect) override {
+        QSizeF oldSize = size();
+
+        base_type::setGeometry(rect);
+
+        if(!qFuzzyCompare(oldSize, size()))
+            updateLayout();
+    }
+
+    void updateLayout() {
+        foreach(ZoomWindowWidget *zoomWindow, m_zoomWindows)
+            if(QnMediaResourceWidget *widget = zoomWindow->target())
+                zoomWindow->setGeometry(QnGeometry::transformed(widget->zoomWindow(), rect()));
     }
 
 private:
-
+    QList<ZoomWindowWidget *> m_zoomWindows;
 };
 
 
@@ -165,6 +203,24 @@ void ZoomWindowInstrument::updateZoomType(QnMediaResourceWidget *widget, bool re
 
     if(registerAsType)
         registerWidgetAs(widget, data.isZoomWindow);
+}
+
+ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
+    return m_dataByWidget[widget].overlayWidget;
+}
+
+void ZoomWindowInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
+    ZoomData &data = m_dataByWidget[widget];
+
+    ZoomOverlayWidget *overlay = data.overlayWidget;
+    if(overlay)
+        return;
+
+    overlay = new ZoomOverlayWidget();
+    overlay->setOpacity(0.0);
+    data.overlayWidget = overlay;
+
+    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, false, false);
 }
 
 bool ZoomWindowInstrument::registeredNotify(QGraphicsItem *item) {
