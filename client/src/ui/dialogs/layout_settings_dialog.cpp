@@ -126,17 +126,8 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
     loader->setInput(files[0]);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->imageLabel->size());
-
-    QThread *thread = new QThread();
-    loader->moveToThread( thread );
-
-    connect(thread, SIGNAL(started()), loader, SLOT(start()));
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
-    connect(loader, SIGNAL(finished(QImage)), thread, SLOT(quit()));
-    connect(loader, SIGNAL(error()), thread, SLOT(quit()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-    thread->start();
+    loader->start();
 
     //TODO: #GDM replace with uploading
     m_imageId = m_cache->appendDebug(files[0]);

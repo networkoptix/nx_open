@@ -7,7 +7,33 @@
 
 #include <QtGui/QImage>
 
-class QnThreadedImageLoaderData;
+class QnThreadedImageLoaderPrivate : public QObject
+{
+    Q_OBJECT
+public:
+    explicit QnThreadedImageLoaderPrivate();
+    ~QnThreadedImageLoaderPrivate();
+public slots:
+    void setSize(const QSize &size);
+    void setAspectRatioMode(const Qt::AspectRatioMode mode);
+    void setTransformationMode(const Qt::TransformationMode mode);
+
+    void setInput(const QImage &input);
+    void setInput(const QString &filename);
+
+    void start();
+signals:
+    void error();
+    void finished(const QImage &output);
+
+private:
+    QSize m_size;
+    Qt::AspectRatioMode m_aspectMode;
+    Qt::TransformationMode m_transformationMode;
+    QImage m_input;
+    QString m_inputFilename;
+};
+
 
 class QnThreadedImageLoader : public QObject
 {
@@ -30,11 +56,7 @@ signals:
     void finished(const QImage &output);
 
 private:
-    QSize m_size;
-    Qt::AspectRatioMode m_aspectMode;
-    Qt::TransformationMode m_transformationMode;
-    QImage m_input;
-    QString m_inputFilename;
+    QnThreadedImageLoaderPrivate* m_loader;
 };
 
 #endif // THREADED_IMAGE_LOADER_H
