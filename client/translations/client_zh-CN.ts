@@ -3599,7 +3599,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7%8 {1x?} {2 %3f?} {4M?}</translation>
+        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
     </message>
 </context>
 <context>
