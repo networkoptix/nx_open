@@ -77,7 +77,7 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     /* Check frame section. */
-    FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(widget);
+    FrameSectionQueryable *queryable = dynamic_cast<FrameSectionQueryable *>(widget);
     if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
         return false; /* Has no decorations and not queryable for frame sections. */
 

@@ -478,7 +478,11 @@ void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF& pos) const {
-    return base_type::windowFrameSectionAt(pos);
+    return windowFrameSectionAt(QRectF(pos, QSizeF(0, 0)));
+}
+
+Qn::WindowFrameSections GraphicsWidget::windowFrameSectionsAt(const QRectF &region) const {
+    return Qn::calculateRectangularFrameSections(windowFrameRect(), rect(), region);
 }
 
 bool GraphicsWidget::windowFrameEvent(QEvent *event) {

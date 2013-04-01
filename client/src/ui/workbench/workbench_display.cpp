@@ -125,8 +125,8 @@ namespace {
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
 
-    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005;
-    const qreal selectedFrameWidth = defaultFrameWidth * 2;
+    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings
+    const qreal selectedFrameWidth = defaultFrameWidth * 2; // TODO: #Elric same here
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;

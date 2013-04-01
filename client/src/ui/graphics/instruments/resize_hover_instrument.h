@@ -3,7 +3,7 @@
 
 #include "instrument.h"
 
-class FrameSectionQuearyable;
+class FrameSectionQueryable;
 
 class ResizeHoverInstrument: public Instrument {
 public:
@@ -26,7 +26,7 @@ protected:
 
 private:
     qreal m_effectiveDistance;
-    QHash<QGraphicsItem *, FrameSectionQuearyable *> m_queryableByItem;
+    QHash<QGraphicsItem *, FrameSectionQueryable *> m_queryableByItem;
 };
 
 
