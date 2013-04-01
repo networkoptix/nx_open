@@ -58,7 +58,8 @@ namespace {
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false)
+    m_binaryMotionMaskValid(false),
+    m_zoomWindow(0.0, 0.0, 1.0, 1.0)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
@@ -142,6 +143,14 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
+}
+
+const QRectF &QnMediaResourceWidget::zoomWindow() const {
+    return m_zoomWindow;
+}
+
+void QnMediaResourceWidget::setZoomWindow(const QRectF &zoomWindow) {
+    m_zoomWindow = zoomWindow;
 }
 
 int QnMediaResourceWidget::motionGridWidth() const {
@@ -354,7 +363,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
+    Qn::RenderStatus result = m_renderer->paint(channel, m_zoomWindow, rect, effectiveOpacity());
     
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();

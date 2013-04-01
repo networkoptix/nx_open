@@ -15,9 +15,11 @@
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
+#include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/common/geometry.h>
 
 #include "video_camera.h"
-#include "../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
+
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
@@ -124,7 +126,7 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
-Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
+Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
 {
     NX_LOG( QString::fromLatin1("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
 
@@ -145,12 +147,12 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
     } 
     else if( picLock->width() > 0 && picLock->height() > 0 )
     {
-        const float v_array[] = { (float)r.left(), (float)r.top(), (float)r.right(), (float)r.top(), (float)r.right(), (float)r.bottom(), (float)r.left(), (float)r.bottom() };
+        const float v_array[] = { (float)targetRect.left(), (float)targetRect.top(), (float)targetRect.right(), (float)targetRect.top(), (float)targetRect.right(), (float)targetRect.bottom(), (float)targetRect.left(), (float)targetRect.bottom() };
         switch( picLock->colorFormat() )
         {
             case PIX_FMT_RGBA:
         	    drawVideoTextureDirectly(
-           		    picLock->textureRect(),
+                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
            		    picLock->glTextures()[0],
            		    v_array );
                 break;
@@ -159,7 +161,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
         	    drawYV12VideoTexture(
                     picLock,
-                    picLock->textureRect(),
+                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
@@ -169,7 +171,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
             case PIX_FMT_NV12:
                 Q_ASSERT( isNV12ToRgbShaderUsed() );
         	    drawNV12VideoTexture(
-                    picLock->textureRect(),
+                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     v_array );

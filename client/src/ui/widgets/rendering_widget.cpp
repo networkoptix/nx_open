@@ -124,6 +124,7 @@ void QnRenderingWidget::paintGL() {
         glLoadIdentity();
         m_renderer->paint(
             0,
+            QRectF(0.0, 0.0, 1.0, 1.0),
             QnGeometry::expanded(QnGeometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
             1.0
         );

@@ -194,6 +194,18 @@ public:
     }
 
     /**
+     * \returns                         Zoom window of this item, in item-relative coordinates.
+     */
+    const QRectF &zoomWindow() const {
+        return m_zoomWindow;
+    }
+
+    /**
+     * \param zoomWindow                New zoom window for this item.
+     */
+    void setZoomWindow(const QRectF &zoomWindow);
+
+    /**
      * \returns                         Rotation angle of this item, in degrees.
      */
     qreal rotation() const {
@@ -252,6 +264,7 @@ signals:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
+    void zoomWindowChanged();
     void rotationChanged();
     void dataChanged(int role);
 
@@ -277,6 +290,9 @@ private:
 
     /** Grid-relative geometry delta of an item, in grid cells. Meaningful for unpinned items only. */
     QRectF m_geometryDelta;
+
+    /** Item-relative rectangle that defines the portion of the item to be shown. */
+    QRectF m_zoomWindow;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

@@ -396,6 +396,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
+    data.zoomWindow = QRectF(0.0, 0.0, 1.0, 1.0);
     if(usePosition) {
         data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -1786,6 +1787,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.flags = Qn::Pinned;
         item.uuid = QUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+        item.zoomWindow = QRectF(0.0, 0.0, 1.0, 1.0);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
         item.dataByRole[Qn::ItemPausedRole] = true;

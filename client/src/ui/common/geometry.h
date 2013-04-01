@@ -303,6 +303,7 @@ public:
 
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
+    static QRectF transformed(const QRectF &transform, const QRectF &rect);
 };
 
 #endif // QN_GEOMETRY_H
