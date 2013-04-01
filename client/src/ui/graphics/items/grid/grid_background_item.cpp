@@ -7,7 +7,11 @@
 #include <ui/animation/rect_animator.h>
 #include <ui/animation/variant_animator.h>
 
+#include <ui/graphics/opengl/gl_functions.h>
+
 #include <ui/workbench/workbench_grid_mapper.h>
+
+#include <utils/threaded_image_loader.h>
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
@@ -20,7 +24,7 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
 {
     setAcceptedMouseButtons(0);
 
-    connect(m_cache, SIGNAL(imageLoaded(int,QImage)), this, SLOT(at_image_loaded(int, const QImage &)));
+    connect(m_cache, SIGNAL(imageLoaded(int)), this, SLOT(at_image_loaded(int)));
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
@@ -36,9 +40,7 @@ QnGridBackgroundItem::~QnGridBackgroundItem() {
 void QnGridBackgroundItem::showWhenReady() {
     if (m_imageId == 0)
         return;
-    m_image = m_cache->getImage(m_imageId);
-    if (!m_image.isNull())
-        animatedShow();
+    m_cache->loadImage(m_imageId);
 }
 
 void QnGridBackgroundItem::animatedHide() {
@@ -149,9 +151,24 @@ void QnGridBackgroundItem::at_opacityAnimator_finished() {
          m_opacityAnimator->animateTo(m_targetOpacity);
 }
 
-void QnGridBackgroundItem::at_image_loaded(int id, const QImage &image) {
+void QnGridBackgroundItem::at_image_loaded(int id) {
     if (id != m_imageId)
         return;
+
+  //  int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+    int maxTextureSize = 4096;
+    //int maxTextureSize = 6144;
+
+    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    loader->setInput(m_cache->getPath(id));
+    loader->setSize(QSize(maxTextureSize, maxTextureSize));
+    //loader->setAspectRatioMode(Qt::IgnoreAspectRatio);
+    //loader->setDownScaleOnly(false);
+    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
+    loader->start();
+}
+
+void QnGridBackgroundItem::setImage(const QImage &image) {
     m_image = image;
     animatedShow();
 }

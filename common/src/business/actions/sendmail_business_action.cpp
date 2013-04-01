@@ -54,19 +54,19 @@ QString QnSendMailBusinessAction::getSubject() const {
         return QObject::tr("Motion was detected on camera %1").arg(resourceName);
 
     case BusinessEventType::Storage_Failure:
-        return QObject::tr("Storage Failure at %1").arg(resourceName);
+        return QObject::tr("Storage Failure at \"%1\"").arg(resourceName);
 
     case BusinessEventType::Network_Issue:
         return QObject::tr("Network Issue at %1").arg(resourceName);
 
     case BusinessEventType::MediaServer_Failure:
-        return QObject::tr("Media Server %1 Failure").arg(resourceName);
+        return QObject::tr("Media Server \"%1\" Failure").arg(resourceName);
 
     case BusinessEventType::Camera_Ip_Conflict:
-        return QObject::tr("Camera IP Conflict at %1").arg(resourceName);
+        return QObject::tr("Camera IP Conflict at \"%1\"").arg(resourceName);
 
     case BusinessEventType::MediaServer_Conflict:
-        return QObject::tr("Media Server %1 Conflict").arg(resourceName);
+        return QObject::tr("Media Server \"%1\" Conflict").arg(resourceName);
 
     default:
         break;
@@ -93,7 +93,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
                 .arg(resourceName);
         break;
     case BusinessEventType::Camera_Input:
-        messageBody = QObject::tr("%1 has caught an input signal on camera %2")
+        messageBody = QObject::tr("%1 has caught an input signal on camera %2:")
                 .arg(serverName)
                 .arg(resourceName);
         break;
@@ -103,27 +103,27 @@ QString QnSendMailBusinessAction::getMessageBody() const {
                 .arg(resourceName);
         break;
     case BusinessEventType::Storage_Failure:
-        messageBody = QObject::tr("%1 \"%2\" has detected %n storage issues", "", issueCount)
+        messageBody = QObject::tr("%1 \"%2\" has detected %n storage issues:", "", issueCount)
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::Network_Issue:
-        messageBody = QObject::tr("%1 has experienced %n network issues with camera %2", "", issueCount)
+        messageBody = QObject::tr("%1 has experienced %n network issues with camera %2:", "", issueCount)
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::MediaServer_Failure:
-        messageBody = QObject::tr("%1 \"%2\" failure was detected")
+        messageBody = QObject::tr("%1 \"%2\" failure was detected:")
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::Camera_Ip_Conflict:
-        messageBody = QObject::tr("%1 \"%2\" has detected camera IP conflict")
+        messageBody = QObject::tr("%1 \"%2\" has detected camera IP conflict:")
                 .arg(serverName)
                 .arg(resourceName);
         break;
     case BusinessEventType::MediaServer_Conflict:
-        messageBody = QObject::tr("%1 \"%2\" is conflicting with other server")
+        messageBody = QObject::tr("%1 \"%2\" is conflicting with other server:")
                 .arg(serverName)
                 .arg(resourceName);
         break;
