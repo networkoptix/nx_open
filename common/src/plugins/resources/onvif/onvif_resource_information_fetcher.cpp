@@ -19,7 +19,7 @@ static char* ANALOG_CAMERAS[][2] =
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
 {
-    for (int i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
+    for (uint i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
     {
         if (vendor == lit(ANALOG_CAMERAS[i][0]) && model == lit(ANALOG_CAMERAS[i][1]) )
             return true;
