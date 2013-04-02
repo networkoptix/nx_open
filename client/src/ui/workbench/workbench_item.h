@@ -205,6 +205,12 @@ public:
      */
     void setZoomWindow(const QRectF &zoomWindow);
 
+    const QUuid &zoomUuid() const {
+        return m_zoomUuid;
+    }
+
+    void setZoomUuid(const QUuid &zoomUuid);
+
     /**
      * \returns                         Rotation angle of this item, in degrees.
      */
@@ -265,6 +271,7 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomWindowChanged();
+    void zoomUuidChanged();
     void rotationChanged();
     void dataChanged(int role);
 
@@ -293,6 +300,8 @@ private:
 
     /** Item-relative rectangle that defines the portion of the item to be shown. */
     QRectF m_zoomWindow;
+
+    QUuid m_zoomUuid;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

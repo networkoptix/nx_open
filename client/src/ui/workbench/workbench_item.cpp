@@ -224,6 +224,15 @@ void QnWorkbenchItem::setZoomWindow(const QRectF &zoomWindow) {
     emit zoomWindowChanged();
 }
 
+void QnWorkbenchItem::setZoomUuid(const QUuid &zoomUuid) {
+    if(m_zoomUuid == zoomUuid)
+        return;
+
+    m_zoomUuid = zoomUuid;
+
+    emit zoomUuidChanged();
+}
+
 void QnWorkbenchItem::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
@@ -261,21 +270,23 @@ void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
 QVariant QnWorkbenchItem::data(int role) const {
     switch(role) {
     case Qn::ResourceUidRole:
-        return m_resourceUid;
+        return resourceUid();
     case Qn::ItemUuidRole:
-        return QVariant::fromValue<QUuid>(m_uuid);
+        return QVariant::fromValue<QUuid>(uuid());
     case Qn::ItemGeometryRole:
-        return m_geometry;
+        return geometry();
     case Qn::ItemGeometryDeltaRole:
-        return m_geometryDelta;
+        return geometryDelta();
     case Qn::ItemCombinedGeometryRole:
         return combinedGeometry();
     case Qn::ItemZoomWindowRole:
         return zoomWindow();
+    case Qn::ItemZoomUuidRole:
+        return QVariant::fromValue<QUuid>(zoomUuid());
     case Qn::ItemFlagsRole:
-        return static_cast<int>(m_flags);
+        return static_cast<int>(flags());
     case Qn::ItemRotationRole:
-        return m_rotation;
+        return rotation();
     default:
         return m_dataByRole.value(role);
     }
@@ -284,14 +295,14 @@ QVariant QnWorkbenchItem::data(int role) const {
 bool QnWorkbenchItem::setData(int role, const QVariant &value) {
     switch(role) {
     case Qn::ResourceUidRole:
-        if(value.toString() == m_resourceUid) {
+        if(value.toString() == resourceUid()) {
             return true;
         } else {
             qnWarning("Changing resource unique id of a workbench item is not supported.");
             return false;
         }
     case Qn::ItemUuidRole:
-        if(value.value<QUuid>() == m_uuid) {
+        if(value.value<QUuid>() == uuid()) {
             return true;
         } else {
             qnWarning("Changing UUID of a workbench item is not supported.");
@@ -325,6 +336,15 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return true;
         } else {
             qnWarning("Provided zoom window value '%1' is not convertible to QRectF.", value);
+            return false;
+        }
+    }
+    case Qn::ItemZoomUuidRole: {
+        if(value.canConvert<QUuid>()) {
+            setZoomUuid(value.value<QUuid>());
+            return true;
+        } else {
+            qnWarning("Provided zoom uuid value '%1' is not convertible to QUuid.", value);
             return false;
         }
     }

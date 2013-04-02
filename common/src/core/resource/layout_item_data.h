@@ -21,13 +21,14 @@ public:
     QUuid uuid;
     int flags;
     QRectF combinedGeometry;
+    QUuid zoomUuid;
     QRectF zoomWindow;
     qreal rotation;
 
     QHash<int, QVariant> dataByRole;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        if (l.uuid != r.uuid || l.flags != r.flags || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.zoomWindow, r.zoomWindow) || !qFuzzyCompare(l.rotation, r.rotation))
+        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomUuid != r.zoomUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.zoomWindow, r.zoomWindow) || !qFuzzyCompare(l.rotation, r.rotation))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

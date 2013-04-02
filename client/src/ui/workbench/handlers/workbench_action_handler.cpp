@@ -391,13 +391,14 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position, const QRectF &zoomWindow) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position, const QRectF &zoomWindow, const QUuid &zoomUuid) const {
     QnLayoutItemData data;
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomWindow = zoomWindow;
+    data.zoomUuid = zoomUuid;
     if(usePosition) {
         data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -3109,7 +3110,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     if(!widget)
         return;
 
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), QRectF(0.25, 0.25, 0.5, 0.5));
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), QRectF(0.25, 0.25, 0.5, 0.5), widget->item()->uuid());
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
