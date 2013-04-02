@@ -28,7 +28,6 @@ private slots:
     void at_viewButton_clicked();
     void at_selectButton_clicked();
     void at_clearButton_clicked();
-    void at_estimateSizeButton_clicked();
     void at_accepted();
 
     void at_image_loaded(int id);

@@ -37,6 +37,9 @@ public:
     QSize imageSize() const;
     void setImageSize(const QSize &imageSize);
 
+    int imageOpacity() const;
+    void setImageOpacity(int percent);
+
     QRect sceneBoundingRect() const;
 
     void showWhenReady();
@@ -58,6 +61,7 @@ private:
     QImage m_image;
     int m_imageId;
     QSize m_imageSize;
+    int m_imageOpacity;
     qreal m_targetOpacity;
     QRect m_sceneBoundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;

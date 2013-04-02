@@ -17,12 +17,10 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setProgress(false);
-    ui->estimateSizeButton->setEnabled(false);
 
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
-    connect(ui->estimateSizeButton, SIGNAL(clicked()), this, SLOT(at_estimateSizeButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
 
@@ -51,8 +49,8 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
 
     ui->widthSpinBox->setValue(layout->backgroundSize().width());
     ui->heightSpinBox->setValue(layout->backgroundSize().height());
+    ui->opacitySpinBox->setValue(layout->backgroundOpacity());
     ui->lockedCheckBox->setChecked(layout->locked());
-
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
     updateControls();
 }
@@ -65,6 +63,7 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     layout->setLocked(ui->lockedCheckBox->isChecked());
     layout->setBackgroundImageId(m_layoutImageId);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
+    layout->setBackgroundOpacity(ui->opacitySpinBox->value());
 
     // TODO: progress dialog uploading image?
     // TODO: remove unused image if any
@@ -74,15 +73,16 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
 
 bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
 
-    if (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit())
+    if (
+            (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit()) ||
+            (ui->lockedCheckBox->isChecked() != layout->locked()) ||
+            (ui->opacitySpinBox->value() != layout->backgroundOpacity())
+            )
         return true;
 
-    if (ui->lockedCheckBox->isChecked() != layout->locked())
-        return true;
-
+    // do not save size change if no image was set
     if (layout->backgroundImageId() == 0 && m_layoutImageId == 0)
         return false;
-
     QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
     return (m_layoutImageId != layout->backgroundImageId() || newSize != layout->backgroundSize());
 }
@@ -95,6 +95,7 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->heightSpinBox->setEnabled(imagePresent && !locked);
     ui->viewButton->setEnabled(imagePresent);
     ui->clearButton->setEnabled(imagePresent && !locked);
+    ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
 }
 
@@ -130,21 +131,9 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 
     //TODO: #GDM special icon with "No image" text or may be complete help on the theme.
     ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
-    ui->estimateSizeButton->setEnabled(false);
+    ui->estimateLabel->setText(QString());
 
     updateControls();
-}
-
-void QnLayoutSettingsDialog::at_estimateSizeButton_clicked() {
-    const QPixmap* pixmap = ui->imageLabel->pixmap();
-    qreal aspectRatio = (qreal)pixmap->width() / (qreal)pixmap->height();
-    if (aspectRatio >= 1.0) {
-        ui->widthSpinBox->setValue(ui->widthSpinBox->maximum());
-        ui->heightSpinBox->setValue(qRound((qreal)ui->widthSpinBox->value() / aspectRatio));
-    } else {
-        ui->heightSpinBox->setValue(ui->heightSpinBox->maximum());
-        ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
-    }
 }
 
 void QnLayoutSettingsDialog::at_accepted() {
@@ -155,6 +144,9 @@ void QnLayoutSettingsDialog::at_accepted() {
 
     m_cache->storeImage(m_filename);
     setProgress(true);
+    ui->lockedCheckBox->setEnabled(false);
+    ui->userCanEditCheckBox->setEnabled(false);
+    ui->buttonBox->setEnabled(false);
 }
 
 void QnLayoutSettingsDialog::at_image_loaded(int id) {
@@ -190,17 +182,26 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         return;
 
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-    ui->estimateSizeButton->setEnabled(true);
+
+    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+    int w, h;
+
+    qreal point = (qreal)ui->widthSpinBox->maximum() / (qreal)ui->heightSpinBox->maximum();
+    if (aspectRatio >= point) {
+        w = ui->widthSpinBox->maximum();
+        h = qRound((qreal)w / aspectRatio);
+    } else {
+        h = ui->heightSpinBox->maximum();
+        w = qRound((qreal)h * aspectRatio);
+    }
+    ui->estimateLabel->setText(tr("Aspect Ratio: %1x%2").arg(w).arg(h));
 }
 
 void QnLayoutSettingsDialog::setProgress(bool value) {
     ui->progressBar->setVisible(value);
     ui->backgroundGroupBox->setEnabled(!value);
-    ui->lockedCheckBox->setEnabled(!value);
-    ui->userCanEditCheckBox->setEnabled(!value);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
     if (!value)
         updateControls();
 }
-
 

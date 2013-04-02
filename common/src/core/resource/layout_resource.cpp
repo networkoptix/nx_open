@@ -273,7 +273,7 @@ void QnLayoutResource::setBackgroundSize(QSize size) {
     emit backgroundSizeChanged(::toSharedPointer(this));
 }
 
-/********* Background image property **********/
+/********* Background image id property **********/
 int QnLayoutResource::backgroundImageId() const {
     QMutexLocker locker(&m_mutex);
     return m_backgroundImageId;
@@ -287,6 +287,22 @@ void QnLayoutResource::setBackgroundImageId(int id) {
         m_backgroundImageId = id;
     }
     emit backgroundImageChanged(::toSharedPointer(this));
+}
+
+/********* Background opacity property **********/
+int QnLayoutResource::backgroundOpacity() const {
+    QMutexLocker locker(&m_mutex);
+    return m_backgroundOpacity;
+}
+
+void QnLayoutResource::setBackgroundOpacity(int percent) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_backgroundOpacity == percent)
+            return;
+        m_backgroundOpacity = percent;
+    }
+    emit backgroundOpacityChanged(::toSharedPointer(this));
 }
 
 /********* Locked property **********/

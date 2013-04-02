@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>514</height>
+    <width>448</width>
+    <height>548</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,10 +22,7 @@
      <property name="title">
       <string>Background</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLabel" name="imageLabel">
         <property name="sizePolicy">
@@ -38,10 +35,23 @@
          <string notr="true"/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../../../x86/build/client-custom.qrc">:/skin/tree/snapshot.png</pixmap>
+         <pixmap>:/skin/tree/snapshot.png</pixmap>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="maximum">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+        <property name="format">
+         <string/>
         </property>
        </widget>
       </item>
@@ -66,7 +76,7 @@
            <string>View in full size</string>
           </property>
           <property name="icon">
-           <iconset resource="../../../x86/build/client-custom.qrc">
+           <iconset>
             <normaloff>:/skin/item/search.png</normaloff>:/skin/item/search.png</iconset>
           </property>
           <property name="iconSize">
@@ -142,11 +152,51 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="estimateSizeButton">
+         <widget class="QLabel" name="estimateLabel">
           <property name="text">
-           <string>Estimate</string>
+           <string/>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="opacityLabel">
+          <property name="text">
+           <string>Opacity:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="opacitySpinBox">
+          <property name="suffix">
+           <string>%</string>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="singleStep">
+           <number>5</number>
+          </property>
+          <property name="value">
+           <number>70</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -185,19 +235,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QProgressBar" name="progressBar">
-     <property name="maximum">
-      <number>0</number>
-     </property>
-     <property name="value">
-      <number>-1</number>
-     </property>
-     <property name="format">
-      <string>Loading image...</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QCheckBox" name="lockedCheckBox">
      <property name="text">
       <string>Layout is locked</string>
@@ -226,7 +263,6 @@
   <zorder>backgroundGroupBox</zorder>
   <zorder>lockedCheckBox</zorder>
   <zorder>userCanEditCheckBox</zorder>
-  <zorder>progressBar</zorder>
  </widget>
  <tabstops>
   <tabstop>viewButton</tabstop>
@@ -236,9 +272,7 @@
   <tabstop>clearButton</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
- <resources>
-  <include location="../../../x86/build/client-custom.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -36,4 +36,5 @@ message Layout {
     optional int32  backgroundWidth   = 7;
     optional int32  backgroundHeight  = 8;
     optional bool   locked            = 9;
+    optional int32  backgroundOpacity = 10;
 }
