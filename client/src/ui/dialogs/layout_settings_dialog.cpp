@@ -14,6 +14,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->progressBar->setVisible(false);
+    ui->estimateSizeButton->setEnabled(false);
 
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
@@ -31,11 +32,18 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 {
 }
 
+void QnLayoutSettingsDialog::showEvent(QShowEvent *event) {
+    base_type::showEvent(event);
+    loadPreview();
+}
+
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
 
     m_layoutImageId = layout->backgroundImageId();
-    if (m_layoutImageId > 0)
+    if (m_layoutImageId > 0) {
+        m_filename = m_cache->getPath(m_layoutImageId);
         m_cache->loadImage(m_layoutImageId);
+    }
 
     ui->widthSpinBox->setValue(layout->backgroundSize().width());
     ui->heightSpinBox->setValue(layout->backgroundSize().height());
@@ -137,8 +145,21 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 
     //TODO: #GDM special icon with "No image" text or may be complete help on the theme.
     ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
+    ui->estimateSizeButton->setEnabled(false);
 
     updateControls();
+}
+
+void QnLayoutSettingsDialog::at_estimateSizeButton_clicked() {
+    const QPixmap* pixmap = ui->imageLabel->pixmap();
+    qreal aspectRatio = (qreal)pixmap->width() / (qreal)pixmap->height();
+    if (aspectRatio >= 1.0) {
+        ui->widthSpinBox->setValue(ui->widthSpinBox->maximum());
+        ui->heightSpinBox->setValue(qRound((qreal)ui->widthSpinBox->value() / aspectRatio));
+    } else {
+        ui->heightSpinBox->setValue(ui->heightSpinBox->maximum());
+        ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
+    }
 }
 
 void QnLayoutSettingsDialog::at_accepted() {
@@ -164,6 +185,9 @@ void QnLayoutSettingsDialog::at_image_stored(int id) {
 }
 
 void QnLayoutSettingsDialog::loadPreview() {
+    if (!this->isVisible())
+        return;
+
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_filename);
     loader->setTransformationMode(Qt::FastTransformation);
@@ -179,15 +203,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         return;
 
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-
-    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
-    if (aspectRatio >= 1.0) {
-        ui->widthSpinBox->setValue(ui->widthSpinBox->maximum());
-        ui->heightSpinBox->setValue(qRound((qreal)ui->widthSpinBox->value() / aspectRatio));
-    } else {
-        ui->heightSpinBox->setValue(ui->heightSpinBox->maximum());
-        ui->widthSpinBox->setValue(qRound((qreal)ui->heightSpinBox->value() * aspectRatio));
-    }
+    ui->estimateSizeButton->setEnabled(true);
 }
 
 

@@ -6,20 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>425</height>
+    <width>395</width>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
    <item>
     <widget class="QGroupBox" name="backgroundGroupBox">
      <property name="title">
       <string>Background</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
       <item>
        <widget class="QLabel" name="imageLabel">
         <property name="sizePolicy">
@@ -135,6 +141,13 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="estimateSizeButton">
+          <property name="text">
+           <string>Estimate</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -142,7 +155,7 @@
         <item>
          <widget class="QPushButton" name="selectButton">
           <property name="text">
-           <string>Select...</string>
+           <string>Select Image...</string>
           </property>
          </widget>
         </item>
