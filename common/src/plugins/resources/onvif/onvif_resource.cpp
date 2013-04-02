@@ -64,10 +64,17 @@ StrictResolution strictResolutionList[] =
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
 
+
+struct StrictBitrateInfo {
+    const char* model;
+    int minBitrate;
+    int maxBitrate;
+};
+
 // do not control bitrate for this cameras (but still control media quality parameter)
-const char* strictBitrateList[] =
+StrictBitrateInfo strictBitrateList[] =
 {
-    "DCS-7010L"
+    { "DCS-7010L", 4096, 1024*16 }
 };
 
 
@@ -494,14 +501,19 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-bool QnPlOnvifResource::canControlBitrate() const
+int QnPlOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
 {
-    for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(const char*); ++i)
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+}
+
+int QnPlOnvifResource::strictBitrate(int bitrate) const
+{
+    for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
     {
-        if (getModel() == lit(strictBitrateList[i]))
-            return false;
+        if (getModel() == lit(strictBitrateList[i].model))
+            return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
     }
-    return true;
+    return bitrate;
 }
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
