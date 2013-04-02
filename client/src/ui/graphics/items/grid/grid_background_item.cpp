@@ -38,9 +38,11 @@ QnGridBackgroundItem::~QnGridBackgroundItem() {
     return;
 }
 
-void QnGridBackgroundItem::showWhenReady() {
-    if (m_imageId == 0)
+void QnGridBackgroundItem::updateDisplay() {
+    if (m_imageId == 0) {
+        animatedHide();
         return;
+    }
     m_cache->loadImage(m_imageId);
 }
 
@@ -57,6 +59,8 @@ void QnGridBackgroundItem::animatedHide() {
 }
 
 void QnGridBackgroundItem::animatedShow() {
+    if (m_image.isNull())
+        return;
     /*
     m_targetOpacity = 0.7;
     if (!m_opacityAnimator)
@@ -116,7 +120,10 @@ int QnGridBackgroundItem::imageId() const {
 }
 
 void QnGridBackgroundItem::setImageId(int imageId) {
+    if (m_imageId == imageId)
+        return;
     m_imageId = imageId;
+    m_image = QImage();
 }
 
 QSize QnGridBackgroundItem::imageSize() const {
@@ -168,9 +175,8 @@ void QnGridBackgroundItem::at_image_loaded(int id) {
     if (id != m_imageId)
         return;
 
-  //  int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-    int maxTextureSize = 4096;
-    //int maxTextureSize = 6144;
+    int maxTextureSize =
+            qMax(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), 4096);
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_cache->getPath(id));

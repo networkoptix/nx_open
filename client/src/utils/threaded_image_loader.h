@@ -21,6 +21,7 @@ public slots:
 
     void setInput(const QImage &input);
     void setInput(const QString &filename);
+    void setOutput(const QString &filename);
 
     void start();
 signals:
@@ -33,6 +34,7 @@ private:
     bool m_downScaleOnly;
     QImage m_input;
     QString m_inputFilename;
+    QString m_outputFilename;
 };
 
 
@@ -51,6 +53,7 @@ public slots:
 
     void setInput(const QImage &input);
     void setInput(const QString &filename);
+    void setOutput(const QString &filename);
 
     void start();
 signals:

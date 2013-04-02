@@ -38,7 +38,9 @@ void QnAppServerFileCache::loadImage(int id) {
 }
 
 void QnAppServerFileCache::storeImage(const QString &filename) {
-    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+    //TODO: #GDM move const out of here
+    int maxTextureSize =
+            qMax(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), 4096);
 
     /*int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
                 id,
@@ -46,9 +48,14 @@ void QnAppServerFileCache::storeImage(const QString &filename) {
                 SLOT(at_fileUploaded(int handle, int id))
                 );*/
 
+    int i = 1;
+    while (QFileInfo(getPath(i)).exists())
+        i++;
+
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(filename);
     loader->setSize(QSize(maxTextureSize, maxTextureSize));
+    loader->setOutput(getPath(i));
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(saveImageDebug(QImage)));
     loader->start();
 
@@ -86,10 +93,7 @@ void QnAppServerFileCache::saveImageDebug(const QImage &image) {
     int i = 1;
     while (QFileInfo(getPath(i)).exists())
         i++;
-
-    QDir().mkpath(getFolder());
-    image.save(getPath(i), "png");
-    emit imageStored(i);
+    emit imageStored(i-1);
 }
 
 

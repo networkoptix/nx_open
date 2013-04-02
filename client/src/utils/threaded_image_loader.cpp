@@ -1,5 +1,7 @@
 #include "threaded_image_loader.h"
 
+#include <QtCore/QFileInfo>
+
 
 QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
     QObject(),
@@ -37,6 +39,10 @@ void QnThreadedImageLoaderPrivate::setInput(const QString &filename) {
     m_inputFilename = filename;
 }
 
+void QnThreadedImageLoaderPrivate::setOutput(const QString &filename) {
+    m_outputFilename = filename;
+}
+
 void QnThreadedImageLoaderPrivate::start() {
     if (!m_inputFilename.isEmpty()) {
         m_input.load(m_inputFilename);
@@ -49,6 +55,12 @@ void QnThreadedImageLoaderPrivate::start() {
 
         if (m_size != output.size())
             output = output.scaled(m_size, m_aspectMode, m_transformationMode);
+    }
+
+    if (!m_outputFilename.isEmpty()) {
+        QString folder = QFileInfo(m_outputFilename).absolutePath();
+        QDir().mkpath(folder);
+        output.save(m_outputFilename);
     }
 
     emit finished(output);
@@ -89,6 +101,10 @@ void QnThreadedImageLoader::setInput(const QImage &input) {
 
 void QnThreadedImageLoader::setInput(const QString &filename) {
     m_loader->setInput(filename);
+}
+
+void QnThreadedImageLoader::setOutput(const QString &filename) {
+    m_loader->setOutput(filename);
 }
 
 void QnThreadedImageLoader::start() {

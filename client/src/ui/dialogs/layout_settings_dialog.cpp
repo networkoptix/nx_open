@@ -16,6 +16,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     m_layoutImageId(0)
 {
     ui->setupUi(this);
+    ui->userCanEditCheckBox->setVisible(false);
+
     setProgress(false);
 
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
@@ -40,16 +42,14 @@ void QnLayoutSettingsDialog::showEvent(QShowEvent *event) {
 }
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
-
     m_layoutImageId = layout->backgroundImageId();
     if (m_layoutImageId > 0) {
         m_filename = m_cache->getPath(m_layoutImageId);
         m_cache->loadImage(m_layoutImageId);
+        ui->widthSpinBox->setValue(layout->backgroundSize().width());
+        ui->heightSpinBox->setValue(layout->backgroundSize().height());
+        ui->opacitySpinBox->setValue(layout->backgroundOpacity());
     }
-
-    ui->widthSpinBox->setValue(layout->backgroundSize().width());
-    ui->heightSpinBox->setValue(layout->backgroundSize().height());
-    ui->opacitySpinBox->setValue(layout->backgroundOpacity());
     ui->lockedCheckBox->setChecked(layout->locked());
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
     updateControls();
@@ -131,7 +131,7 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 
     //TODO: #GDM special icon with "No image" text or may be complete help on the theme.
     ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
-    ui->estimateLabel->setText(QString());
+//    ui->estimateLabel->setText(QString());
 
     updateControls();
 }
@@ -144,8 +144,7 @@ void QnLayoutSettingsDialog::at_accepted() {
 
     m_cache->storeImage(m_filename);
     setProgress(true);
-    ui->lockedCheckBox->setEnabled(false);
-    ui->userCanEditCheckBox->setEnabled(false);
+    ui->generalGroupBox->setEnabled(false);
     ui->buttonBox->setEnabled(false);
 }
 
@@ -183,7 +182,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
 
-    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+ /*   qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
     int w, h;
 
     qreal point = (qreal)ui->widthSpinBox->maximum() / (qreal)ui->heightSpinBox->maximum();
@@ -194,12 +193,11 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         h = ui->heightSpinBox->maximum();
         w = qRound((qreal)h * aspectRatio);
     }
-    ui->estimateLabel->setText(tr("Aspect Ratio: %1x%2").arg(w).arg(h));
+    ui->estimateLabel->setText(tr("Aspect Ratio: %1x%2").arg(w).arg(h));*/
 }
 
 void QnLayoutSettingsDialog::setProgress(bool value) {
-    ui->progressBar->setVisible(value);
-    ui->backgroundGroupBox->setEnabled(!value);
+    ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
     if (!value)
         updateControls();
