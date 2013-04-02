@@ -44,23 +44,28 @@ void QnGridBackgroundItem::showWhenReady() {
 }
 
 void QnGridBackgroundItem::animatedHide() {
+    /*
     m_targetOpacity = 0.0;
     if (!m_opacityAnimator)
         return;
 
     if (!m_opacityAnimator->isRunning())
         m_opacityAnimator->animateTo(m_targetOpacity);
+    */
+    setOpacity(0.0);
 }
 
 void QnGridBackgroundItem::animatedShow() {
+    /*
     m_targetOpacity = 0.7;
     if (!m_opacityAnimator)
         return;
 
     if (!m_opacityAnimator->isRunning())
         m_opacityAnimator->animateTo(m_targetOpacity);
+    */
+    setOpacity(0.7);
 }
-
 
 const QRectF& QnGridBackgroundItem::viewportRect() const {
     return m_rect;
@@ -121,12 +126,13 @@ void QnGridBackgroundItem::setImageSize(const QSize &imageSize) {
     if (m_imageSize == imageSize)
         return;
 
+    qDebug() << "image size updated to" << imageSize;
     m_imageSize = imageSize;
     updateGeometry();
 }
 
 QRect QnGridBackgroundItem::sceneBoundingRect() const {
-    if (m_image.isNull())
+    if (m_imageId == 0)
         return QRect();
     return m_sceneBoundingRect;
 }
@@ -140,9 +146,9 @@ void QnGridBackgroundItem::updateGeometry() {
     m_sceneBoundingRect = QRect(-left, -top, m_imageSize.width(), m_imageSize.height());
 
     QRectF targetRect = mapper()->mapFromGrid(m_sceneBoundingRect);
-    if (m_geometryAnimator)
-        m_geometryAnimator->animateTo(targetRect);
-    else
+//    if (m_geometryAnimator)
+//        m_geometryAnimator->animateTo(targetRect);
+//    else
         setViewportRect(targetRect);
 }
 
