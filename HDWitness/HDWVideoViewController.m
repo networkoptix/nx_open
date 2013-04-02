@@ -42,7 +42,6 @@
     //    NSURL *url = [NSURL URLWithString:@"http://admin:admin@10.0.2.133:81/videostream.cgi"];
 //    NSURL *url = [NSURL URLWithString:@"http://10.0.2.187:3451/media/00-1C-A6-01-21-97.mpjpeg"];
     
-    NSLog(@"Video Url: %@", _camera.videoUrl.absoluteString);
     self.imageView.username = _camera.videoUrl.user;
     self.imageView.password = _camera.videoUrl.password;
     self.imageView.url = _camera.videoUrl;

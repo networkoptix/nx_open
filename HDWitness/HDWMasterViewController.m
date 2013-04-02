@@ -97,7 +97,6 @@
     HDWECSConfig *object = _objects[indexPath.row];
     cell.textLabel.text = [object name];
     
-    NSLog(@"%@: %@", indexPath, [object name]);
     return cell;
 }
 

@@ -221,7 +221,7 @@
                     <collectionView key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="4" dataMode="prototypes" id="SGV-W6-32Z">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.032629925271739135" green="0.032629925271739135" blue="0.032629925271739135" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="ZHt-Od-gMl">
                             <size key="itemSize" width="160" height="95"/>
                             <size key="headerReferenceSize" width="50" height="40"/>
@@ -237,6 +237,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="camera_offline.png" translatesAutoresizingMaskIntoConstraints="NO" id="l0Y-MM-cFB" customClass="FXImageView">
+                                            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="29" id="9H4-du-Abi"/>
                                                 <constraint firstAttribute="width" constant="46" id="G7C-ao-E5i"/>
@@ -268,7 +269,7 @@
                                 </connections>
                             </collectionViewCell>
                         </cells>
-                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.70000000000000007" contentMode="center" reuseIdentifier="headerTitle" id="d8Y-pq-NFS" customClass="Header">
+                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="headerTitle" id="d8Y-pq-NFS" customClass="Header">
                             <rect key="frame" x="0.0" y="0.0" width="320" height="40"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>

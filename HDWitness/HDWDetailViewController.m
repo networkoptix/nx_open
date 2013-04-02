@@ -224,6 +224,8 @@ enum MessageType {
 {
     [super viewDidLoad];
 
+    [[FXImageView processingQueue] setMaxConcurrentOperationCount:100];
+    
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
     
@@ -258,7 +260,7 @@ enum MessageType {
 {
     HDWCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MyCell" forIndexPath:indexPath];
 
-    cell.imageView.asynchronous = NO;
+    cell.imageView.asynchronous = YES;
     cell.imageView.reflectionScale = 0.5f;
     cell.imageView.reflectionAlpha = 0.25f;
     cell.imageView.reflectionGap = 10.0f;
@@ -289,7 +291,10 @@ enum MessageType {
         }
             
     }
-//    [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
+    
+    if (camera.status.intValue == Online)
+        [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
+    
     cell.labelView.text = camera.name;
     
     return cell;
