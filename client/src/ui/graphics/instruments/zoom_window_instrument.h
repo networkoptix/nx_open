@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 
 class ZoomOverlayWidget;
+class ZoomWindowWidget;
 
 class QnMediaResourceWidget;
 
@@ -27,9 +28,12 @@ private slots:
 
 private:
     ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
-    void ensureOverlayWidget(QnMediaResourceWidget *widget);
+    ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
+    ZoomWindowWidget *windowWidget(QnMediaResourceWidget *widget) const;
 
     void updateZoomType(QnMediaResourceWidget *widget, bool registerAsType = true);
+    void updateWindowFromWidget(QnMediaResourceWidget *widget);
+    void updateWidgetFromWindow(ZoomWindowWidget *windowWidget);
 
     void registerWidget(QnMediaResourceWidget *widget);
     void unregisterWidget(QnMediaResourceWidget *widget);
@@ -37,15 +41,16 @@ private:
     void registerWidgetAs(QnMediaResourceWidget *widget, bool asZoomWindow);
     void unregisterWidgetAs(QnMediaResourceWidget *widget, bool asZoomWindow);
 
-    void registerLink(QnMediaResourceWidget *zoomWindow, QnMediaResourceWidget *target);
-    void unregisterLink(QnMediaResourceWidget *zoomWindow, QnMediaResourceWidget *target);
+    void registerLink(QnMediaResourceWidget *sourceWidget, QnMediaResourceWidget *targetWidget);
+    void unregisterLink(QnMediaResourceWidget *sourceWidget, QnMediaResourceWidget *targetWidget);
 
 private:
     struct ZoomData {
-        ZoomData(): isZoomWindow(false), overlayWidget(NULL) {}
+        ZoomData(): isZoomWindow(false), overlayWidget(NULL), windowWidget(NULL) {}
 
         bool isZoomWindow;
         ZoomOverlayWidget *overlayWidget;
+        ZoomWindowWidget *windowWidget;
     };
 
     struct ZoomWidgets {

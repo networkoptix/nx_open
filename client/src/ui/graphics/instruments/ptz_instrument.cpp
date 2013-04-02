@@ -651,12 +651,12 @@ PtzOverlayWidget *PtzInstrument::overlayWidget(QnMediaResourceWidget *widget) co
     return m_dataByWidget[widget].overlayWidget;
 }
 
-void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
+PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
 
     PtzOverlayWidget *overlay = data.overlayWidget;
     if(overlay)
-        return;
+        return overlay;
 
     overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
@@ -671,6 +671,7 @@ void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
     widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, false, false);
+    return overlay;
 }
 
 void PtzInstrument::ensureSelectionItem() {
