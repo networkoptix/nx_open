@@ -191,6 +191,7 @@ public:
 
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
+    bool canControlBitrate() const;
 signals:
     //!Emitted on camera input port state has been changed
     /*!
