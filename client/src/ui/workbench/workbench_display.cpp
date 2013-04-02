@@ -1046,10 +1046,10 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
+
     QRect backgroundBoundingRect = gridBackgroundItem()->sceneBoundingRect();
     if(backgroundBoundingRect.isNull())
         backgroundBoundingRect = QRect(0, 0, 1, 1);
-    qDebug() << "fin in view, image size " << gridBackgroundItem()->imageSize();
 
     QRect sceneBoundingRect = layoutBoundingRect.united(backgroundBoundingRect);
     return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));

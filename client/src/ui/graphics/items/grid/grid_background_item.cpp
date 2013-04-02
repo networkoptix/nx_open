@@ -125,8 +125,6 @@ QSize QnGridBackgroundItem::imageSize() const {
 void QnGridBackgroundItem::setImageSize(const QSize &imageSize) {
     if (m_imageSize == imageSize)
         return;
-
-    qDebug() << "image size updated to" << imageSize;
     m_imageSize = imageSize;
     updateGeometry();
 }
