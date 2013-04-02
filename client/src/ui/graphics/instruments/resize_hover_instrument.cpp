@@ -34,7 +34,7 @@ bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
     if(!item->isWidget())
         return false;
 
-    FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(item);
+    FrameSectionQueryable *queryable = dynamic_cast<FrameSectionQueryable *>(item);
     if(queryable != NULL)
         m_queryableByItem.insert(item, queryable);
 
@@ -47,7 +47,7 @@ void ResizeHoverInstrument::unregisteredNotify(QGraphicsItem *item) {
 
 bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
-    FrameSectionQuearyable *queryable = m_queryableByItem.value(item);
+    FrameSectionQueryable *queryable = m_queryableByItem.value(item);
     if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
         return false; /* Has no decorations and not queryable for frame sections. */
 

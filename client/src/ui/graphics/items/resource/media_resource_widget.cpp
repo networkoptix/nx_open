@@ -58,7 +58,8 @@ namespace {
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false)
+    m_binaryMotionMaskValid(false),
+    m_zoomWindow(0.0, 0.0, 1.0, 1.0)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
@@ -142,6 +143,19 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
+}
+
+const QRectF &QnMediaResourceWidget::zoomWindow() const {
+    return m_zoomWindow;
+}
+
+void QnMediaResourceWidget::setZoomWindow(const QRectF &zoomWindow) {
+    if(qFuzzyCompare(m_zoomWindow, zoomWindow))
+        return;
+
+    m_zoomWindow = zoomWindow;
+
+    emit zoomWindowChanged();
 }
 
 int QnMediaResourceWidget::motionGridWidth() const {
@@ -354,7 +368,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
+    Qn::RenderStatus result = m_renderer->paint(channel, m_zoomWindow, rect, effectiveOpacity());
     
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
@@ -627,6 +641,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             codecString = tr(" (%1)").arg(codecString);
     }
 
+    // TODO: #Elric no pre-spaces in translatable strings, translators mess it up.
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
     hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
@@ -646,8 +661,13 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
 
     QString decoderType = m_renderer->isHardwareDecoderUsed(0) ? tr(" HW") : tr(" SW");
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2)
-        .arg(codecString).arg(hqLqString)
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8")
+        .arg(size.width())
+        .arg(size.height())
+        .arg(fps, 0, 'f', 2)
+        .arg(mbps, 0, 'f', 2)
+        .arg(codecString)
+        .arg(hqLqString)
         .arg(decoderType)
         .arg(timeString);
 }

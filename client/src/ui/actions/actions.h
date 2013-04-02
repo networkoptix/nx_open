@@ -454,6 +454,11 @@ namespace Qn {
         OpenInFolderAction,
 
         /**
+         * Creates a zoom window for the given item.
+         */
+        CreateZoomWindowAction,
+
+        /**
          * Rotates item to normal orientation
          */
         Rotate0Action,

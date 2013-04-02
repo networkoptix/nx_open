@@ -16,6 +16,8 @@
 #include "actions/system_health_business_action.h"
 
 
+//#define REDUCE_NET_ISSUE_HACK
+
 static QnBusinessEventConnector* _instance = NULL;
 
 QnBusinessEventConnector::QnBusinessEventConnector()
@@ -87,6 +89,11 @@ void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource
 
 void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonText)
 {
+#ifdef REDUCE_NET_ISSUE_HACK
+    static int netIssueCounter;
+    if (++netIssueCounter % 10)
+        return; // mutex is not nessessary here
+#endif
     QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(
         resource,
         timeStamp,

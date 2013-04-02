@@ -6,22 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>425</height>
+    <width>395</width>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
    <item>
     <widget class="QGroupBox" name="backgroundGroupBox">
      <property name="title">
       <string>Background</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
       <item>
        <widget class="QLabel" name="imageLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string notr="true"/>
         </property>
@@ -129,6 +141,13 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QPushButton" name="estimateSizeButton">
+          <property name="text">
+           <string>Estimate</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -136,7 +155,7 @@
         <item>
          <widget class="QPushButton" name="selectButton">
           <property name="text">
-           <string>Select...</string>
+           <string>Select Image...</string>
           </property>
          </widget>
         </item>
@@ -163,6 +182,16 @@
        </layout>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="maximum">
+      <number>0</number>
+     </property>
+     <property name="value">
+      <number>-1</number>
+     </property>
     </widget>
    </item>
    <item>
@@ -194,6 +223,7 @@
   <zorder>backgroundGroupBox</zorder>
   <zorder>lockedCheckBox</zorder>
   <zorder>userCanEditCheckBox</zorder>
+  <zorder>progressBar</zorder>
  </widget>
  <tabstops>
   <tabstop>viewButton</tabstop>
@@ -207,22 +237,6 @@
   <include location="../../../x86/build/client-custom.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>QnLayoutSettingsDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>227</x>
-     <y>420</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>

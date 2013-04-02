@@ -11,17 +11,18 @@ public:
     explicit QnAppServerFileCache(QObject *parent = 0);
     ~QnAppServerFileCache();
 
-    QImage getImage(int id);
+    void loadImage(int id);
+    void storeImage(const QString &filename);
 
-    int appendDebug(QString path);
-
-signals:
-    void imageLoaded(int id, const QImage& image);
-private slots:
-    void at_fileLoaded(int handle, const QImage& image);
-private:
     QString getPath(int id) const;
+signals:
+    void imageLoaded(int id);
+    void imageStored(int id);
+private slots:
+    void at_fileLoaded(int handle, const QByteArray &data);
 
+    void saveImageDebug(const QImage& image);
+private:
     QHash<int, int> m_loading;
 };
 

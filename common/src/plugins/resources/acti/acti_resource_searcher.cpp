@@ -106,6 +106,8 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
 
 void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result)
 {
+    Q_UNUSED(discoveryAddr)
+    Q_UNUSED(host)
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 

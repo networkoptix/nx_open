@@ -139,6 +139,11 @@ namespace Qn {
 #include <QtCore/QString>
 
 /** Helper function to mark strings that are not to be translated. */
+inline QString lit(const QByteArray &data) {
+    return QLatin1String(data);
+}
+
+/** Helper function to mark strings that are not to be translated. */
 inline QString lit(const char *s) {
     return QLatin1String(s);
 }

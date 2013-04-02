@@ -16,12 +16,12 @@
  * This problem is solved by introducing a separate function that returns a set
  * of all window frame sections that intersect the given rectangle.
  */
-class FrameSectionQuearyable {
+class FrameSectionQueryable {
 public:
     /**
      * Virtual destructor.
      */
-    virtual ~FrameSectionQuearyable() {}
+    virtual ~FrameSectionQueryable() {}
 
     /**
      * \param region                    Region to get frame sections for, in widget coordinates.

@@ -866,6 +866,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition(this));
 
+    factory(Qn::CreateZoomWindowAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Create Zoom Window")).
+        condition(hasFlags(QnResource::media));
+
     factory().
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
          text(tr("Rotate to..."));

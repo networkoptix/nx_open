@@ -195,7 +195,7 @@
     </message>
     <message>
         <source>Server is offline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器离线</translation>
     </message>
 </context>
 <context>
@@ -857,27 +857,33 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未发现启动过程</translation>
     </message>
     <message>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again
 using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在兼容模式下无法重新启动客户端。请关闭程序通过开始菜单的快捷方式再次重新启动。</translation>
     </message>
     <message>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">您正在连接到不同版本的系统控制器：
+ - 客户端版本：%1
+ - 系统控制器版本：%2
+低于%3 的版本在兼容模式下不支持</translation>
     </message>
     <message>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Would you like to restart client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">您正在连接到不同版本的系统控制器：
+ - 客户端版本：%1
+ - 系统控制器版本：%2
+您希望在兼容模式下重新启动客户端吗？</translation>
     </message>
 </context>
 <context>
@@ -2120,7 +2126,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Layout Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">视窗设定...</translation>
     </message>
 </context>
 <context>
@@ -2314,7 +2320,7 @@ for recording at
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%n 摄像机中的%1</numerusform>
         </translation>
     </message>
 </context>
@@ -2562,35 +2568,35 @@ for recording at
     </message>
     <message>
         <source>Add cameras to %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">添加摄像机到 %1</translation>
     </message>
     <message>
         <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">添加摄像机...</translation>
     </message>
     <message>
         <source>Select target mediaserver in the tree.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在设备树中选择目标存储服务器</translation>
     </message>
     <message>
         <source>Server is offline.
 Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器离线。仅支持为在线服务器添加摄像机。</translation>
     </message>
     <message>
         <source>Camera address field must contain valid url or ip address</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机地址栏必须包含有效的网址或者IP地址</translation>
     </message>
     <message>
         <source>Could not connect to server.
 Make sure server is available and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法连接到服务器。请确认服务器在线并重新尝试。</translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s) added successfully.
 It might take a few moments to populate them in the tree.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%n 摄像机成功添加。可能需要一些时间显示在设备树中。</numerusform>
         </translation>
     </message>
 </context>
@@ -2757,31 +2763,31 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路数字许可已经使用。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路模拟许可已经使用。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Activate %n more digital license(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>激活%n路更多数字许可</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more digital license(s) will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%n路更多数字许可将被使用。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more analog license(s) will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%n路更多模拟许可将被使用。</numerusform>
         </translation>
     </message>
 </context>
@@ -2822,7 +2828,7 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">请求超时</translation>
     </message>
     <message>
         <source>Connection to the Enterprise Controller could not be established.
@@ -2836,14 +2842,20 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">系统控制器有不同版本：
+ - 客户端版本：%1
+ - 系统控制器版本：%2
+低于%3版本在兼容模式下不支持。</translation>
     </message>
     <message>
         <source>Enterprise Controller has a different version:
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">系统控制器有不同版本：
+ - 客户端版本：%1
+ - 系统控制器版本：%2
+您需要在兼容模式下重新启动客户端。</translation>
     </message>
 </context>
 <context>
@@ -3266,13 +3278,13 @@ You will be asked to restart the client in compatibility mode.</source>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路数字许可将被使用。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog  license(s) will be used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路模拟许可将被使用。</numerusform>
         </translation>
     </message>
 </context>
@@ -3291,31 +3303,31 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">背景</translation>
     </message>
     <message>
         <source>View in full size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">全尺寸浏览</translation>
     </message>
     <message>
         <source>Size (in cells):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">尺寸（在网格中）：</translation>
     </message>
     <message>
         <source>Select...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">选择...</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">清除</translation>
     </message>
     <message>
         <source>Layout is locked</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">视窗被锁定</translation>
     </message>
     <message>
         <source>User can edit layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">用户可以编辑视窗</translation>
     </message>
     <message>
         <source>Open file</source>
@@ -3342,11 +3354,11 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Expiration Date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">到期日期</translation>
     </message>
     <message>
         <source>Expires in</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">到期在</translation>
     </message>
     <message>
         <source>Never</source>
@@ -3354,20 +3366,20 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已经到期</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">今天</translation>
     </message>
     <message>
         <source>Tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">明天</translation>
     </message>
     <message numerus="yes">
         <source>In %n days</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>在%n天内</numerusform>
         </translation>
     </message>
 </context>
@@ -3469,11 +3481,11 @@ Archive Streams Allowed: %4</source>
     <name>QnLicenseNotificationDialog</name>
     <message>
         <source>Some of your licenses have expired.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">一些许可已经到期。</translation>
     </message>
     <message>
         <source>Some of your licenses will soon expire.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">一些许可即将到期。</translation>
     </message>
 </context>
 <context>
@@ -3500,7 +3512,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>Activate Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">激活测试许可</translation>
     </message>
     <message>
         <source>Activate Free License</source>
@@ -3587,7 +3599,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7%8 {1x?} {2 %3f?} {4M?}</translation>
+        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
     </message>
 </context>
 <context>
@@ -3628,13 +3640,13 @@ Archive Streams Allowed: %4</source>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路数字许可已经被使用</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路模拟许可已经被使用</numerusform>
         </translation>
     </message>
 </context>
@@ -4288,13 +4300,13 @@ You have only %2Gb left for video archive.</source>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路数字许可已经被使用</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1中的%n路模拟许可已经被使用</numerusform>
         </translation>
     </message>
 </context>
@@ -5269,11 +5281,11 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>Layout with the same name already exists
 and you do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">视窗重名，你没有权利覆盖。</translation>
     </message>
     <message>
         <source>Layout Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">视窗设定</translation>
     </message>
 </context>
 <context>
@@ -5822,7 +5834,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Firmware:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">固件：</translation>
     </message>
 </context>
 <context>

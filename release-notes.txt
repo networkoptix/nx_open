@@ -51,6 +51,7 @@ NEW FEATURES:
    - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
  
 IMPROVEMENTS:
+ - 
  - Storage Dialog is significantly redesigned. Now it is not necessary to specify the folder for the recording data, it is necessary to select the disks the recording will be performed to and the amount of free space to preserve. The software will do the last.
  - CTRL can be used in Calendar Search to select multiple dates
  - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
@@ -67,11 +68,13 @@ IMPROVEMENTS:
  - Health Monitoring colors can be customized
  - Now non-admin users (viewers) can create own layouts based on cameras that have been assigned to them 
  - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
+ - Camera Firmware is shown in Camera Properties
  - Manual Camera Addition Dialog is improved:
    - Last entered data is filled automatically
    - It is possible to perform other actions while manual camera addition is in progress 
  
 BUGS FIXED:
+ - If a camera is being viewed via Web/Android Client timeout is introduced (15 minutes). After this it is necessary to reconnect. This is done in order to reduce Media Server load.
  - If several cameras had different recording parameters it was not possible to set "Do not record" to them simultaneously
  - Identically named items were sorted randomly in Tree each time Client was started. Fixed
  - If the password for admin was changed, no changes were applied toEC until system restart. Fixed

@@ -132,8 +132,7 @@ void QnAboutDialog::retranslateUi()
     credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");
 #endif
 
-    int maxTextureSize = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize); // TODO: using opengl calls here is BAD. use estimate?
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
 
     QString gpu = 
         tr(

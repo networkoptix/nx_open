@@ -50,7 +50,8 @@ private slots:
     void updateGeometry();
 
     void at_opacityAnimator_finished();
-    void at_image_loaded(int id, const QImage& image);
+    void at_image_loaded(int id);
+    void setImage(const QImage& image);
 
 private:
     QRectF m_rect;

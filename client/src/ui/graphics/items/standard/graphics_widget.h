@@ -4,9 +4,11 @@
 #include <QtGui/QGraphicsWidget>
 #include "graphics_style.h"
 
+#include <ui/common/frame_section_queryable.h>
+
 class GraphicsWidgetPrivate;
 
-class GraphicsWidget: public QGraphicsWidget {
+class GraphicsWidget: public QGraphicsWidget, public FrameSectionQueryable {
     Q_OBJECT;
     
     typedef QGraphicsWidget base_type;
@@ -36,10 +38,12 @@ public:
          * Item's layout changes are handled by default implementation in
          * <tt>QGraphicsWidget</tt>. If this flag is not set, 
          * <tt>handlePendingLayoutRequests()</tt> function can be used to
-         * process all pending layout requests.
+         * force immediate processing of all pending layout requests, 
+         * e.g. before a paint event.
          * 
-         * Note that this flag is considered set if
-         * <tt>QGraphicsLayout::instantInvalidatePropagation()</tt> is <tt>true</tt>.
+         * Note that this flag has no effect if 
+         * <tt>QGraphicsLayout::instantInvalidatePropagation()</tt> is <tt>false</tt>.
+         * In this case layout changes are always handled by default implementation.
          *
          * This flag is not set by default.
          */
@@ -115,7 +119,9 @@ protected:
 
     virtual void initStyleOption(QStyleOption *option) const;
 
+    using FrameSectionQueryable::windowFrameSectionAt;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF& pos) const override;
+    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
 
 protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;

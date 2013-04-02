@@ -60,10 +60,10 @@ QnActiPtzController::QnActiPtzController(QnActiResource* resource):
     m_spaceMapper(NULL),
     m_zoomVelocity(0.0),
     m_moveVelocity(0, 0),
-    m_isFliped(false),
-    m_isMirrored(false),
     m_minAngle(0.0),
-    m_maxAngle(0.0)
+    m_maxAngle(0.0),
+    m_isFliped(false),
+    m_isMirrored(false)
 {
     init();
 }
@@ -116,7 +116,7 @@ void QnActiPtzController::init()
     qreal f35Min = f35Max / ANALOG_ZOOM;
 
     QVector<QPair<qreal, qreal> > data;
-    for (int i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
+    for (uint i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
         data << QPair<qreal, qreal>(toLogicalScale(pointsData[i][0], m_minAngle, m_maxAngle), pointsData[i][1] * f35Min);
     QnScalarSpaceMapper zMapper(data, Qn::ConstantExtrapolation);
 

@@ -125,8 +125,8 @@ namespace {
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
 
-    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005;
-    const qreal selectedFrameWidth = defaultFrameWidth * 2;
+    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings
+    const qreal selectedFrameWidth = defaultFrameWidth * 2; // TODO: #Elric same here
 
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
@@ -639,9 +639,6 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
-    if (layout->backgroundImageId() == 0)
-        return;
-
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
     gridBackgroundItem()->setImageId(layout->backgroundImageId());
     gridBackgroundItem()->showWhenReady();
@@ -1049,6 +1046,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
+
     QRect backgroundBoundingRect = gridBackgroundItem()->sceneBoundingRect();
     if(backgroundBoundingRect.isNull())
         backgroundBoundingRect = QRect(0, 0, 1, 1);
@@ -1119,6 +1117,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
     }
 
     synchronizeGeometry(widget, animate);
+    synchronizeZoomWindow(widget);
     synchronizeLayer(widget);
 }
 
@@ -1178,6 +1177,19 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
+}
+
+void QnWorkbenchDisplay::synchronizeZoomWindow(QnWorkbenchItem *item) {
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the given item. */
+
+    synchronizeZoomWindow(widget);
+}
+
+void QnWorkbenchDisplay::synchronizeZoomWindow(QnResourceWidget *widget) {
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        mediaWidget->setZoomWindow(widget->item()->zoomWindow());
 }
 
 void QnWorkbenchDisplay::synchronizeAllGeometries(bool animate) {
@@ -1548,6 +1560,10 @@ void QnWorkbenchDisplay::at_item_geometryChanged() {
 
 void QnWorkbenchDisplay::at_item_geometryDeltaChanged() {
     synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), true);
+}
+
+void QnWorkbenchDisplay::at_item_zoomWindowChanged() {
+    synchronizeZoomWindow(static_cast<QnWorkbenchItem *>(sender()));
 }
 
 void QnWorkbenchDisplay::at_item_rotationChanged() {

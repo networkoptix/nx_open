@@ -5,6 +5,10 @@
 
 #include <api/app_server_connection.h>
 
+#include <ui/graphics/opengl/gl_functions.h>
+
+#include <utils/threaded_image_loader.h>
+
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
     QObject(parent)
 {}
@@ -12,32 +16,42 @@ QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
 QnAppServerFileCache::~QnAppServerFileCache(){}
 
 
-QImage QnAppServerFileCache::getImage(int id) {
+void QnAppServerFileCache::loadImage(int id) {
     if (id <= 0)
-        return QImage();
+        return;
 
-    QString fullPath = getPath(id);
-    QImage img(fullPath);
-    if (img.isNull()) {
-        if (m_loading.values().contains(id))
-            return img; //we are already loading this id
-
-        int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
-                    id,
-                    this,
-                    SLOT(at_fileLoaded(int, const QImage &))
-        );
-        m_loading.insert(handle, id);
+    QFileInfo info(getPath(id));
+    if (info.exists()) {
+        emit imageLoaded(id);
+        return;
     }
-    return img;
+
+    if (m_loading.values().contains(id))
+      return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
+                id,
+                this,
+                SLOT(at_fileLoaded(int handle, const QByteArray &data))
+                );
+    m_loading.insert(handle, id);
 }
 
-int QnAppServerFileCache::appendDebug(QString path) {
-    int i = 1;
-    while (QFileInfo(getPath(i)).exists())
-        i++;
-    QImage(path).save(getPath(i));
-    return i;
+void QnAppServerFileCache::storeImage(const QString &filename) {
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+
+    /*int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+                id,
+                this,
+                SLOT(at_fileUploaded(int handle, int id))
+                );*/
+
+    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    loader->setInput(filename);
+    loader->setSize(QSize(maxTextureSize, maxTextureSize));
+    connect(loader, SIGNAL(finished(QImage)), this, SLOT(saveImageDebug(QImage)));
+    loader->start();
+
 }
 
 QString QnAppServerFileCache::getPath(int id) const {
@@ -51,16 +65,27 @@ QString QnAppServerFileCache::getPath(int id) const {
             .arg(id);
 }
 
-void QnAppServerFileCache::at_fileLoaded(int handle, const QImage &image) {
+void QnAppServerFileCache::at_fileLoaded(int handle, const QByteArray &data) {
     if (!m_loading.contains(handle))
         return;
+
     int id = m_loading[handle];
     m_loading.remove(handle);
-    if (!image.save(getPath(id)))
-        qWarning() << "Image cannot be saved" << getPath(id);
-    emit imageLoaded(id, image);
+
+    QFile file(getPath(id));
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    out.writeRawData(data, data.size());
+    emit imageLoaded(id);
 }
 
+void QnAppServerFileCache::saveImageDebug(const QImage &image) {
+    int i = 1;
+    while (QFileInfo(getPath(i)).exists())
+        i++;
+    image.save(getPath(i));
+    emit imageStored(i);
+}
 
 
 

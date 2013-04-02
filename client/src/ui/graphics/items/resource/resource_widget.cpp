@@ -509,16 +509,12 @@ void QnResourceWidget::updateButtonsVisibility() {
     m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
 }
 
-Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
-    return Qn::toQtFrameSection(static_cast<Qn::WindowFrameSection>(static_cast<int>(windowFrameSectionsAt(QRectF(pos, QSizeF(0.0, 0.0))))));
-}
-
 Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    Qn::WindowFrameSections result = Qn::calculateRectangularFrameSections(windowFrameRect(), rect(), region);
+    Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
 
-    /* This widget has no side frame sections in case aspect ratio is set. */
+    /* This widget has no side frame sections if aspect ratio is set. */
     if(hasAspectRatio())
-        result = result & ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
+        result &= ~Qn::SideSections;
 
     return result;
 }

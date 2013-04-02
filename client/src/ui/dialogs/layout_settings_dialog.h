@@ -14,29 +14,40 @@ namespace Ui {
 class QnLayoutSettingsDialog : public QDialog
 {
     Q_OBJECT
-    
+    typedef QDialog base_type;
+
 public:
     explicit QnLayoutSettingsDialog(QWidget *parent = 0);
     ~QnLayoutSettingsDialog();
     
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
+protected:
+    virtual void showEvent(QShowEvent *event) override;
 private slots:
     void at_viewButton_clicked();
     void at_selectButton_clicked();
     void at_clearButton_clicked();
+    void at_estimateSizeButton_clicked();
+    void at_accepted();
 
-    void at_image_loaded(int id, const QImage& image);
+    void at_image_loaded(int id);
+    void at_image_stored(int id);
+
+    void setPreview(const QImage& image);
 
     void updateControls();
 private:
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
+    void loadPreview();
+
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
     QnAppServerFileCache *m_cache;
 
-    int m_imageId;
+    QString m_filename;
+    int m_layoutImageId;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

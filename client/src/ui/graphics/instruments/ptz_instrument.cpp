@@ -868,8 +868,7 @@ void PtzInstrument::aboutToBeUninstalledNotify() {
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
-    bool result = base_type::registeredNotify(item);
-    if(!result)
+    if(!base_type::registeredNotify(item))
         return false;
 
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {

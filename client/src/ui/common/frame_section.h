@@ -21,6 +21,9 @@ namespace Qn {
         BottomSection =         1 << Qt::BottomSection,
         BottomLeftSection =     1 << Qt::BottomLeftSection,
         TitleBarArea =          1 << Qt::TitleBarArea,
+
+        CornerSections =        TopLeftSection | TopRightSection | BottomLeftSection | BottomRightSection,
+        SideSections =          TopSection | BottomSection | LeftSection | RightSection,
     };
 
     Q_DECLARE_FLAGS(WindowFrameSections, WindowFrameSection);
