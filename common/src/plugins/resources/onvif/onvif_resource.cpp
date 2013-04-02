@@ -71,7 +71,7 @@ struct StrictBitrateInfo {
     int maxBitrate;
 };
 
-// do not control bitrate for this cameras (but still control media quality parameter)
+// Strict bitrate range for specified cameras
 StrictBitrateInfo strictBitrateList[] =
 {
     { "DCS-7010L", 4096, 1024*16 }
