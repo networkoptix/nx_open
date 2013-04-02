@@ -44,6 +44,7 @@
 
 -(HDWCameraModel*) initWithDict: (NSDictionary*) dict andServer: (HDWServerModel*) server;
 -(void) setStatus: (NSNumber*) newStatus;
+-(void) setDisabled: (BOOL) newDisabled;
 
 @end
 

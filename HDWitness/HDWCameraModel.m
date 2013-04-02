@@ -67,6 +67,10 @@
     _status = newStatus;
 }
 
+-(void) setDisabled: (BOOL) newDisabled {
+    _disabled = newDisabled;
+}
+
 -(NSURL*) videoUrl {
     NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/media/%@.mpjpeg?resolution=240p", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
     return [NSURL URLWithString:path relativeToURL:_server.ecs.config.url];
@@ -104,6 +108,7 @@
 -(void) update: (HDWServerModel*) server {
     _name = server.name;
     _streamingUrl = server.streamingUrl;
+    _status = server.status;
 }
 
 -(void) setStatus: (NSNumber*) newStatus {

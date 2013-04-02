@@ -311,7 +311,6 @@
         if (imageURL)
         {
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:imageURL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:30.0];
-            NSLog(@"URL: %@", [imageURL absoluteString]);
             
             NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", imageURL.user, imageURL.password];
             NSData *plainTextData = [basicAuthCredentials dataUsingEncoding:NSUTF8StringEncoding];

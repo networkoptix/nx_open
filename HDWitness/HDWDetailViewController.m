@@ -121,13 +121,28 @@ enum MessageType {
             }
         }
     } else if (messageType == ResourceStatusChange) {
-        if ([objectName isEqual: @"Server"]) {
-            HDWServerModel *server = [_ecsModel findServerById:message[@"resourceId"]];
-            [server setStatus:message[@"status"]];
-        } else if ([objectName isEqual: @"Camera"]) {
+        if ([message objectForKey:@"parentId"]) {
             HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
             [camera setStatus:message[@"status"]];
+        } else {
+            HDWServerModel *server = [_ecsModel findServerById:message[@"resourceId"]];
+            [server setStatus:message[@"status"]];
         }
+    } else if (messageType == ResourceDisabledChange) {
+        HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
+        int disabled = ((NSString*)message[@"disabled"]).intValue;
+        if (disabled) {
+            NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:message[@"resourceId"] andServerId:message[@"parentId"]];
+            [camera setDisabled:YES];
+            
+            [removedCameras addObject:indexPath];
+        } else {
+            [camera setDisabled:NO];
+            NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:message[@"resourceId"] andServerId:message[@"parentId"]];
+            
+            [newCameras addObject:indexPath];
+        }
+        
     }
 
     [self.collectionView performBatchUpdates:^{
@@ -183,7 +198,6 @@ enum MessageType {
     [_ecsModel addServers: [serversDict allValues]];
     
     [self onGotResultsFromEcs];
-    NSLog(@"finished");
 }
 
 - (void)configureView
@@ -235,7 +249,6 @@ enum MessageType {
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [_socket setDelegate:nil];
     [_socket close];
-    NSLog(@"willMoveToParentViewController");
 }
 
 - (void)didReceiveMemoryWarning
@@ -284,7 +297,7 @@ enum MessageType {
         case Online: {
             [cell.imageView setImageWithContentsOfFile:@"camera.png"];
             break;
-        }
+        }	
             
         case Recording: {
             break;
