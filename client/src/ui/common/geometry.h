@@ -303,6 +303,7 @@ public:
 
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
+    // TODO: #Elric rename into something more sane
     static QRectF transformed(const QRectF &transform, const QRectF &rect);
 };
 

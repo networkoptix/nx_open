@@ -232,7 +232,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
-    m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    //m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
 
     /* Item instruments. */

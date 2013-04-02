@@ -457,9 +457,7 @@ public:
         base_type(parent, windowFlags) 
     {}
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
-        Q_UNUSED(option)
-        Q_UNUSED(widget)
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         QRectF rect = this->rect();
         qreal penWidth = qMin(rect.width(), rect.height()) / 16;
         QPointF center = rect.center();

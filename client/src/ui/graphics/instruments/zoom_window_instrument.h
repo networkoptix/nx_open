@@ -25,6 +25,7 @@ protected:
 private slots:
     void at_widget_zoomWindowChanged();
     void at_widget_aboutToBeDestroyed();
+    void at_zoomWindow_geometryChanged();
 
 private:
     ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
