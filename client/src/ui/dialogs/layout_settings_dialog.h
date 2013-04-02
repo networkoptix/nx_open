@@ -35,6 +35,7 @@ private slots:
     void at_image_stored(int id);
 
     void setPreview(const QImage& image);
+    void setProgress(bool value);
 
     void updateControls();
 private:

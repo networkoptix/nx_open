@@ -4,6 +4,9 @@
 #include <QtGui/QFileDialog>
 
 #include <core/resource/layout_resource.h>
+
+#include <ui/dialogs/image_preview_dialog.h>
+
 #include <utils/threaded_image_loader.h>
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
@@ -13,12 +16,13 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     m_layoutImageId(0)
 {
     ui->setupUi(this);
-    ui->progressBar->setVisible(false);
+    setProgress(false);
     ui->estimateSizeButton->setEnabled(false);
 
     connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
     connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
+    connect(ui->estimateSizeButton, SIGNAL(clicked()), this, SLOT(at_estimateSizeButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
 
@@ -95,28 +99,9 @@ void QnLayoutSettingsDialog::updateControls() {
 }
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {
-/*
-    QImage img = m_cache->getImage(m_imageId);
-    if (img.isNull())
-        return; //show message?
-
-    QDialog d(this);
-
-    QVBoxLayout *layout = new QVBoxLayout(&d);
-
-    QLabel* l = new QLabel(&d);
-    l->setPixmap(QPixmap::fromImage(img));
-    layout->addWidget(l);
-
-    QPushButton* b = new QPushButton(&d);
-    b->setText(tr("Close"));
-    connect(b, SIGNAL(clicked()), &d, SLOT(close()));
-    layout->addWidget(b);
-
-    d.setLayout(layout);
-    d.setModal(true);
-    d.exec();
-*/
+    QnImagePreviewDialog dialog;
+    dialog.openImage(m_filename);
+    dialog.exec();
 }
 
 void QnLayoutSettingsDialog::at_selectButton_clicked() {
@@ -169,7 +154,7 @@ void QnLayoutSettingsDialog::at_accepted() {
     }
 
     m_cache->storeImage(m_filename);
-    ui->progressBar->setVisible(true);
+    setProgress(true);
 }
 
 void QnLayoutSettingsDialog::at_image_loaded(int id) {
@@ -179,7 +164,7 @@ void QnLayoutSettingsDialog::at_image_loaded(int id) {
 }
 
 void QnLayoutSettingsDialog::at_image_stored(int id) {
-    ui->progressBar->setVisible(false);
+    setProgress(false);
     m_layoutImageId = id;
     accept();
 }
@@ -188,22 +173,34 @@ void QnLayoutSettingsDialog::loadPreview() {
     if (!this->isVisible())
         return;
 
+    ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
+
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_filename);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->imageLabel->size());
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
-    ui->progressBar->setVisible(true);
+    setProgress(true);
 }
 
 void QnLayoutSettingsDialog::setPreview(const QImage &image) {
-    ui->progressBar->setVisible(false);
+    setProgress(false);
     if (image.isNull())
         return;
 
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
     ui->estimateSizeButton->setEnabled(true);
+}
+
+void QnLayoutSettingsDialog::setProgress(bool value) {
+    ui->progressBar->setVisible(value);
+    ui->backgroundGroupBox->setEnabled(!value);
+    ui->lockedCheckBox->setEnabled(!value);
+    ui->userCanEditCheckBox->setEnabled(!value);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!value);
+    if (!value)
+        updateControls();
 }
 
 
