@@ -57,9 +57,24 @@ struct StrictResolution {
     QSize maxRes;
 };
 
+// strict maximum resolution for this models
+
 StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
+};
+
+
+struct StrictBitrateInfo {
+    const char* model;
+    int minBitrate;
+    int maxBitrate;
+};
+
+// Strict bitrate range for specified cameras
+StrictBitrateInfo strictBitrateList[] =
+{
+    { "DCS-7010L", 4096, 1024*16 }
 };
 
 
@@ -484,6 +499,21 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
 {
     QMutexLocker lock(&m_mutex);
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
+}
+
+int QnPlOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+{
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+}
+
+int QnPlOnvifResource::strictBitrate(int bitrate) const
+{
+    for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
+    {
+        if (getModel() == lit(strictBitrateList[i].model))
+            return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
+    }
+    return bitrate;
 }
 
 void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)

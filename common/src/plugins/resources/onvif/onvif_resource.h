@@ -191,6 +191,7 @@ public:
 
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
+    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -206,6 +207,7 @@ signals:
         qint64 timestamp);
 
 protected:
+    int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 

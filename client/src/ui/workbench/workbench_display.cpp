@@ -641,6 +641,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
 
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
     gridBackgroundItem()->setImageId(layout->backgroundImageId());
+    gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
     gridBackgroundItem()->showWhenReady();
     synchronizeSceneBounds();
 }
@@ -1508,6 +1509,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     if (layout->resource()) {
         connect(layout->resource().data(), SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
         connect(layout->resource().data(), SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+        connect(layout->resource().data(), SIGNAL(backgroundOpacityChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
     }
     updateBackground(layout->resource());
     synchronizeSceneBounds();
