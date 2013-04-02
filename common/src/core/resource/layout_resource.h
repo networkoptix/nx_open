@@ -62,8 +62,8 @@ public:
     virtual void setUrl(const QString& value) override;
 
     bool userCanEdit() const;
-
     void setUserCanEdit(bool value);
+
     /** Size of background image - in cells */
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
@@ -72,9 +72,14 @@ public:
     int backgroundImageId() const;
     void setBackgroundImageId(int id);
 
+    /** Background image opacity in percents */
+    int backgroundOpacity() const;
+    void setBackgroundOpacity(int percent);
+
     /** Locked state - locked layout cannot be modified in any way */
     bool locked() const;
     void setLocked(bool value);
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -86,6 +91,7 @@ signals:
 
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
+    void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
 protected:
     virtual void updateInner(QnResourcePtr other) override;
@@ -104,6 +110,7 @@ private:
     bool m_userCanEdit;
     QSize m_backgroundSize;
     int m_backgroundImageId;
+    int m_backgroundOpacity;
     bool m_locked;
 };
 
