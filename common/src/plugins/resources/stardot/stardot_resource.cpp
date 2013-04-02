@@ -136,7 +136,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
             QList<QByteArray> data = portInfo.split('/');
             m_rtspPort = data[0].toInt();
             if (data.size() > 1)
-                m_rtspTransport = lit(data[1]);
+                m_rtspTransport = lit((const char*)data[1]);
         }
     }
 }
