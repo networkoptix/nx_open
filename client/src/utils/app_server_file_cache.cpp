@@ -54,15 +54,18 @@ void QnAppServerFileCache::storeImage(const QString &filename) {
 
 }
 
-QString QnAppServerFileCache::getPath(int id) const {
+QString QnAppServerFileCache::getFolder() const {
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QUrl url = QnAppServerConnectionFactory::defaultUrl();
+    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/"))
+        .arg(path)
+        .arg(QLatin1String(url.encodedHost()))
+        .arg(url.port())
+        );
+}
 
-    return QString(QLatin1String("%1/cache/%2_%3/%4.png"))
-            .arg(path)
-            .arg(QLatin1String(url.encodedHost()))
-            .arg(url.port())
-            .arg(id);
+QString QnAppServerFileCache::getPath(int id) const {
+    return getFolder() + QString(QLatin1String("%4.png")).arg(id);
 }
 
 void QnAppServerFileCache::at_fileLoaded(int handle, const QByteArray &data) {
@@ -83,7 +86,9 @@ void QnAppServerFileCache::saveImageDebug(const QImage &image) {
     int i = 1;
     while (QFileInfo(getPath(i)).exists())
         i++;
-    image.save(getPath(i));
+
+    QDir().mkpath(getFolder());
+    image.save(getPath(i), "png");
     emit imageStored(i);
 }
 

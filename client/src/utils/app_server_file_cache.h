@@ -14,6 +14,7 @@ public:
     void loadImage(int id);
     void storeImage(const QString &filename);
 
+    QString getFolder() const;
     QString getPath(int id) const;
 signals:
     void imageLoaded(int id);
