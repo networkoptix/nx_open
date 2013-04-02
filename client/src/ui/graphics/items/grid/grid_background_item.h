@@ -42,7 +42,7 @@ public:
 
     QRect sceneBoundingRect() const;
 
-    void showWhenReady();
+    void updateDisplay();
     void animatedHide();
 
 protected:

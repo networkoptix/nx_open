@@ -642,7 +642,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
     gridBackgroundItem()->setImageId(layout->backgroundImageId());
     gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
-    gridBackgroundItem()->showWhenReady();
+    gridBackgroundItem()->updateDisplay();
     synchronizeSceneBounds();
 }
 
