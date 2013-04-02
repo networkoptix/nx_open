@@ -10,7 +10,6 @@
 
 #import "HDWDetailViewController.h"
 #import "HDWECSViewController.h"
-#import "HDWECSConfig.h"
 
 @interface HDWMasterViewController () {
     NSMutableArray *_objects;
@@ -31,6 +30,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    [self loadSettings];
+    if (!_objects) {
+        _objects = [[NSMutableArray alloc] init];
+    }
+    
 	// Do any additional setup after loading the view, typically from a nib.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
@@ -39,21 +44,33 @@
     self.detailViewController = (HDWDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
+-(void)loadSettings {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults synchronize];
+    
+    NSData *encodedObject = [defaults objectForKey:@"ecsconfigs"];
+    _objects = (NSMutableArray*)[NSKeyedUnarchiver unarchiveObjectWithData: encodedObject];
+}
+
+-(void)saveSettings {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSData *encodedObjects = [NSKeyedArchiver archivedDataWithRootObject:_objects];
+    [defaults setObject:encodedObjects forKey:@"ecsconfigs"];
+    [defaults synchronize];
+}
+
 - (void)insertNewObject:(id)sender
 {
-    if (!_objects) {
-        _objects = [[NSMutableArray alloc] init];
-    }
-    
     NSUInteger newIndex = _objects.count;
     HDWECSConfig *ecsConfig = [HDWECSConfig defaultConfig];
     [_objects insertObject:ecsConfig atIndex:newIndex];
+    [self saveSettings];
+    
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:newIndex inSection:0];
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     
@@ -79,6 +96,8 @@
 
     HDWECSConfig *object = _objects[indexPath.row];
     cell.textLabel.text = [object name];
+    
+    NSLog(@"%@: %@", indexPath, [object name]);
     return cell;
 }
 
@@ -92,6 +111,7 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [_objects removeObjectAtIndex:indexPath.row];
+        [self saveSettings];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
@@ -129,7 +149,7 @@
         HDWECSConfig *object = _objects[indexPath.row];
         [[segue destinationViewController] setEcsConfig:object];
     } else if ([[segue identifier] isEqualToString:@"showConfig"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
         HDWECSConfig *ecsConfig = _objects[indexPath.row];
         [[segue destinationViewController] setConfig:ecsConfig];
     }
@@ -139,6 +159,7 @@
 {
     [super viewWillAppear:animated];
 
+    [self saveSettings];
     [self.tableView reloadData];
 }
 

@@ -1,17 +1,20 @@
 
-PODS: 
-- AFNetworking (1.1.0)
-- FXImageView (1.2.3)
-- SocketRocket (0.2.0)
-
-COCOAPODS: 0.16.4
-
 SPEC CHECKSUMS: 
-  SocketRocket: bca43a94bd9aac3a629df42c06843402399ee67b
   AFNetworking: 761a418233d280c1e0580bcb76ff9cb4c3073d17
   FXImageView: 326359d30084919c14367f3753d7236a871c962a
+  NSData+Base64: 36c4e5b6479259c1a68866ccd2a8dd385c9744f7
+  SocketRocket: bca43a94bd9aac3a629df42c06843402399ee67b
 
 DEPENDENCIES: 
 - AFNetworking (= 1.1)
 - FXImageView (= 1.2.3)
+- NSData+Base64 (= 1.0.0)
 - SocketRocket (= 0.2.0)
+
+PODS: 
+- AFNetworking (1.1.0)
+- FXImageView (1.2.3)
+- NSData+Base64 (1.0.0)
+- SocketRocket (0.2.0)
+
+COCOAPODS: 0.16.4

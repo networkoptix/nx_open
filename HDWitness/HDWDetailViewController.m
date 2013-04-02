@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
+#import "NSString+Base64.h"
+
 #import "HDWDetailViewController.h"
 #import "HDWCollectionViewCell.h"
 
@@ -86,16 +88,16 @@ enum MessageType {
         
         // resource changed
         if ([objectName isEqual: @"Server"]) {
-            HDWServerModel* server = [[HDWServerModel alloc] initWithDict:resource];
+            HDWServerModel* server = [[HDWServerModel alloc] initWithDict:resource andECS:_ecsModel];
             
-            NSUInteger index = [_servers addOrUpdateServer:server];
+            NSUInteger index = [_ecsModel addOrUpdateServer:server];
             if (index != NSNotFound) {
                 [newServers addIndex:index];
             }
         } else if ([objectName isEqual: @"Camera"]) {
-            HDWCameraModel* camera = [[HDWCameraModel alloc] initWithDict:resource andServer:[_servers findServerById:resource[@"parentId"]]];
+            HDWCameraModel* camera = [[HDWCameraModel alloc] initWithDict:resource andServer:[_ecsModel findServerById:resource[@"parentId"]]];
             
-            NSIndexPath* indexPath = [_servers addOrReplaceCamera:camera];
+            NSIndexPath* indexPath = [_ecsModel addOrReplaceCamera:camera];
             if (indexPath) {
                 [newCameras addObject:indexPath];
             }
@@ -104,26 +106,26 @@ enum MessageType {
         NSNumber *resourceId = message[@"resourceId"];
         NSNumber *parentId = message[@"parentId"];
         
-        if ([_servers findServerById:resourceId]) {
-            NSUInteger serverIndex = [_servers indexOfServerWithId:resourceId];
+        if ([_ecsModel findServerById:resourceId]) {
+            NSUInteger serverIndex = [_ecsModel indexOfServerWithId:resourceId];
             
             if (serverIndex != NSNotFound) {
                 [removedServers addIndex:serverIndex];
-                [_servers removeServerById:resourceId];
+                [_ecsModel removeServerById:resourceId];
             }
-        } else if ([_servers findCameraById:resourceId atServer:parentId]) {
-            NSIndexPath *indexPath = [_servers indexPathOfCameraWithId:resourceId andServerId:parentId];
+        } else if ([_ecsModel findCameraById:resourceId atServer:parentId]) {
+            NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:resourceId andServerId:parentId];
             if (indexPath) {
                 [removedCameras addObject:indexPath];
-                [_servers removeCameraById:resourceId andServerId:parentId];
+                [_ecsModel removeCameraById:resourceId andServerId:parentId];
             }
         }
     } else if (messageType == ResourceStatusChange) {
         if ([objectName isEqual: @"Server"]) {
-            HDWServerModel *server = [_servers findServerById:message[@"resourceId"]];
+            HDWServerModel *server = [_ecsModel findServerById:message[@"resourceId"]];
             [server setStatus:message[@"status"]];
         } else if ([objectName isEqual: @"Camera"]) {
-            HDWCameraModel *camera = [_servers findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
+            HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
             [camera setStatus:message[@"status"]];
         }
     }
@@ -146,7 +148,7 @@ enum MessageType {
     if (_ecsConfig != newEcsConfig) {
         _ecsConfig = newEcsConfig;
         
-        _servers = [[HDWServersModel alloc] init];
+        _ecsModel = [[HDWECSModel alloc] initWithECSConfig:newEcsConfig];
         // Update the view.
 //        [self configureView];
     }
@@ -165,7 +167,7 @@ enum MessageType {
     
     NSArray *jsonServers = JSON[@"servers"];
     for (NSDictionary *jsonServer in jsonServers) {
-        HDWServerModel *server = [[HDWServerModel alloc] initWithDict:jsonServer];
+        HDWServerModel *server = [[HDWServerModel alloc] initWithDict:jsonServer andECS:_ecsModel];
         
         [serversDict setObject:server forKey:server.serverId];
     }
@@ -178,7 +180,7 @@ enum MessageType {
         [server addOrReplaceCamera:camera];
     }
     
-    [_servers addServers: [serversDict allValues]];
+    [_ecsModel addServers: [serversDict allValues]];
     
     [self onGotResultsFromEcs];
     NSLog(@"finished");
@@ -207,7 +209,7 @@ enum MessageType {
     NSMutableURLRequest *messageRequest = [NSMutableURLRequest requestWithURL:messageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:0];
     
     NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
-    [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", AFBase64EncodedStringFromString(basicAuthCredentials)] forHTTPHeaderField: @"Authorization"];
+    [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
     
     _socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
     [_socket setDelegate:self];
@@ -242,12 +244,12 @@ enum MessageType {
 
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    return _servers.count;
+    return _ecsModel.count;
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    HDWServerModel* server = [_servers serverAtIndex: section];
+    HDWServerModel* server = [_ecsModel serverAtIndex: section];
     
     return server.cameraCount;
 }
@@ -264,7 +266,7 @@ enum MessageType {
     cell.imageView.shadowBlur = 5.0f;
     cell.imageView.cornerRadius = 10.0f;
 
-    HDWCameraModel *camera = [_servers cameraAtIndexPath:indexPath];
+    HDWCameraModel *camera = [_ecsModel cameraAtIndexPath:indexPath];
 
     switch (camera.status.intValue) {
         case Offline: {
@@ -297,7 +299,7 @@ enum MessageType {
     if(kind == UICollectionElementKindSectionHeader)
     {
         Header *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerTitle" forIndexPath:indexPath];
-        HDWServerModel *server = [_servers serverAtIndex:indexPath.section];
+        HDWServerModel *server = [_ecsModel serverAtIndex:indexPath.section];
         [header loadFromServer:server];
         
         //modify your header
@@ -312,7 +314,7 @@ enum MessageType {
         NSArray* selectedItems = [self.collectionView indexPathsForSelectedItems];
         NSIndexPath *indexPath = [selectedItems objectAtIndex:0];
         
-        HDWCameraModel *camera = [_servers cameraAtIndexPath: indexPath];
+        HDWCameraModel *camera = [_ecsModel cameraAtIndexPath: indexPath];
         [[segue destinationViewController] setCamera:camera];
     }
 }

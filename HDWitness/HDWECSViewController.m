@@ -8,7 +8,7 @@
 
 #import "HDWMasterViewController.h"
 #import "HDWECSViewController.h"
-#include "HDWECSConfig.h"
+#import "HDWCameraModel.h"
 
 @interface HDWECSViewController ()
 
@@ -121,7 +121,13 @@
         textField.autocorrectionType = UITextAutocorrectionTypeNo;
         
         textField.placeholder = self.dataSourceArray[indexPath.row][@"Placeholder"];
-        textField.text = [item valueForKey: self.dataSourceArray[indexPath.row][@"Property"]];
+        
+        NSString *property = self.dataSourceArray[indexPath.row][@"Property"];
+        textField.text = [item valueForKey:property];
+        
+        if ([property isEqualToString:@"password"]) {
+            textField.secureTextEntry = YES;
+        }
         
         [cell.contentView addSubview:textField];
     }
@@ -179,13 +185,8 @@
      */
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    HDWMasterViewController* masterController = (HDWMasterViewController*)segue.destinationViewController;
-    [masterController insertECSConfig:item];
-}
-
 - (IBAction)valueChanged:(UITextField *)sender {
-    UITableViewCell *cell = (UITableViewCell *)[sender superview];
+    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
     
     [item setValue:sender.text forKey:self.dataSourceArray[indexPath.row][@"Property"]];

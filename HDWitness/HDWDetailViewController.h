@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "HDWEcsConfig.h"
 #import "HDWCameraModel.h"
 #import "HDWVideoViewController.h"
 #import "SRWebSocket.h"
@@ -15,7 +14,7 @@
 @interface HDWDetailViewController : UICollectionViewController <UISplitViewControllerDelegate, SRWebSocketDelegate>
 
 @property (strong, nonatomic) HDWECSConfig *ecsConfig;
-@property (strong, nonatomic) HDWServersModel *servers;
+@property (strong, nonatomic) HDWECSModel *ecsModel;
 
 @property (strong, nonatomic) SRWebSocket* socket;
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;

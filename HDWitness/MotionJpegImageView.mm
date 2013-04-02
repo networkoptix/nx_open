@@ -24,6 +24,7 @@
 // SOFTWARE.
 
 #import "MotionJpegImageView.h"
+#import "NSString+Base64.h"
 
 #pragma mark - Constants
 
@@ -97,7 +98,10 @@ static NSData *_endMarkerData = nil;
     else if (_url) {
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:_url];
 
-        [request setValue:@"bRememberMe=1; userLastLogin=admin; passwordLastLogin=admin; user=admin; password=admin; usr=admin; pwd=admin; usrLevel=0; bShowMenu=1" forHTTPHeaderField:@"Cookie"];
+         NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", _url.user, _url.password];
+        [request addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
+        
+//        [request setValue:@"bRememberMe=1; userLastLogin=admin; passwordLastLogin=admin; user=admin; password=admin; usr=admin; pwd=admin; usrLevel=0; bShowMenu=1" forHTTPHeaderField:@"Cookie"];
         _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     }
 }

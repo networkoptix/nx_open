@@ -25,12 +25,12 @@
 		C71D5B2C16ADBB9600C764B5 /* HDWitnessTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */; };
 		C734CB301705F70B003450BF /* server.png in Resources */ = {isa = PBXBuildFile; fileRef = C734CB2F1705F70B003450BF /* server.png */; };
 		C734CB321705F714003450BF /* server_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C734CB311705F714003450BF /* server_offline.png */; };
+		C73910DE170B2346004C80DA /* NSString+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = C73910DD170B2346004C80DA /* NSString+Base64.m */; };
 		C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */; };
 		C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EA170090E900AC48C4 /* camera_offline.png */; };
 		C744D1F11704B4B700AC48C4 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F01704B4B700AC48C4 /* Default-568h@2x.png */; };
 		C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */; };
 		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
-		C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */; };
 		C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */; };
 		C7C673EC17098A8E002560E2 /* icon_57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = C7C673EB17098A8E002560E2 /* icon_57x57.png */; };
 		C7C673EE17098A9F002560E2 /* icon_114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = C7C673ED17098A9F002560E2 /* icon_114x114.png */; };
@@ -84,6 +84,8 @@
 		C71D5B2B16ADBB9600C764B5 /* HDWitnessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HDWitnessTests.m; sourceTree = "<group>"; };
 		C734CB2F1705F70B003450BF /* server.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = server.png; sourceTree = "<group>"; };
 		C734CB311705F714003450BF /* server_offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = server_offline.png; sourceTree = "<group>"; };
+		C73910DC170B2346004C80DA /* NSString+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Base64.h"; sourceTree = "<group>"; };
+		C73910DD170B2346004C80DA /* NSString+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Base64.m"; sourceTree = "<group>"; };
 		C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCameraModel.h; sourceTree = "<group>"; };
 		C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCameraModel.m; sourceTree = "<group>"; };
 		C744D1EA170090E900AC48C4 /* camera_offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = camera_offline.png; path = ../camera_offline.png; sourceTree = "<group>"; };
@@ -98,8 +100,6 @@
 		C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCollectionViewCell.m; sourceTree = "<group>"; };
 		C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWECSViewController.h; sourceTree = "<group>"; };
 		C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWECSViewController.m; sourceTree = "<group>"; };
-		C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWEcsConfig.h; sourceTree = "<group>"; };
-		C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWEcsConfig.m; sourceTree = "<group>"; };
 		C7A7DD0016F923D000659CF3 /* MotionJpegImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MotionJpegImageView.h; sourceTree = "<group>"; };
 		C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MotionJpegImageView.mm; sourceTree = "<group>"; };
 		C7C673EB17098A8E002560E2 /* icon_57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_57x57.png; path = ../icon_57x57.png; sourceTree = "<group>"; };
@@ -188,11 +188,11 @@
 				C71D5B1616ADBB9600C764B5 /* HDWDetailViewController.m */,
 				C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */,
 				C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */,
-				C7A6423216AF1F00005E16B4 /* HDWEcsConfig.h */,
-				C7A6423316AF1F00005E16B4 /* HDWEcsConfig.m */,
 				C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */,
 				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
 				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
+				C73910DC170B2346004C80DA /* NSString+Base64.h */,
+				C73910DD170B2346004C80DA /* NSString+Base64.m */,
 			);
 			path = HDWitness;
 			sourceTree = "<group>";
@@ -388,11 +388,11 @@
 				C71D5B1416ADBB9600C764B5 /* HDWMasterViewController.m in Sources */,
 				C71D5B1716ADBB9600C764B5 /* HDWDetailViewController.m in Sources */,
 				C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */,
-				C7A6423416AF1F00005E16B4 /* HDWEcsConfig.m in Sources */,
 				C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */,
 				C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */,
 				C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */,
 				C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */,
+				C73910DE170B2346004C80DA /* NSString+Base64.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,7 +8,23 @@
 
 #import <Foundation/Foundation.h>
 
+@interface HDWECSConfig : NSObject {
+}
+
+@property NSString *name;
+@property NSString *host;
+@property NSString *port;
+@property NSString *login;
+@property NSString *password;
+
+@property (readonly) NSURL *url;
+
++ (HDWECSConfig*) defaultConfig;
+
+@end
+
 @class HDWServerModel;
+@class HDWECSModel;
 
 /**
  * Model representing Camera object
@@ -43,8 +59,9 @@
 @property(readonly) NSNumber *serverId;
 @property(readonly) NSString *name;
 @property(readonly) NSURL *streamingUrl;
+@property(readonly) HDWECSModel* ecs;
 
--(HDWServerModel*) initWithDict: (NSDictionary*) dict;
+-(HDWServerModel*) initWithDict: (NSDictionary*) dict andECS: (HDWECSModel*) ecs;
 
 -(HDWCameraModel*) cameraAtIndex:(NSUInteger)index;
 -(HDWCameraModel*) findCameraById: (NSNumber*) cameraId;
@@ -61,11 +78,14 @@
 /**
  * Model representing list of servers.
  */
-@interface HDWServersModel : NSObject {
+@interface HDWECSModel : NSObject {
+    HDWECSConfig* ecsConfig;
     NSMutableDictionary *servers;
 }
 
--(id)init;
+@property(readonly) HDWECSConfig* config;
+
+-(id)initWithECSConfig: (HDWECSConfig*)newConfig;
 
 -(void) addServers: (NSArray*) servers;
 -(void) addServer: (HDWServerModel*) server;

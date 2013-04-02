@@ -8,6 +8,44 @@
 
 #import "HDWCameraModel.h"
 
+@implementation HDWECSConfig
++ (HDWECSConfig*) defaultConfig {
+    HDWECSConfig* instance = [[HDWECSConfig alloc] init];
+    instance.name = @"Server";
+    instance.host = @"";
+    instance.port = @"7001";
+    instance.login = @"admin";
+    instance.password = @"";
+    
+    return instance;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    //Encode properties, other class variables, etc
+    [encoder encodeObject:self.name forKey:@"name"];
+    [encoder encodeObject:self.host forKey:@"host"];
+    [encoder encodeObject:self.port forKey:@"port"];
+    [encoder encodeObject:self.login forKey:@"login"];
+    [encoder encodeObject:self.password forKey:@"password"];
+}
+
+- (id)initWithCoder:(NSCoder *)decoder {
+    if((self = [super init])) {
+        //decode properties, other class vars
+        self.name = [decoder decodeObjectForKey:@"name"];
+        self.host = [decoder decodeObjectForKey:@"host"];
+        self.port = [decoder decodeObjectForKey:@"port"];
+        self.login = [decoder decodeObjectForKey:@"login"];
+        self.password = [decoder decodeObjectForKey:@"password"];
+    }
+    return self;
+}
+
+-(NSURL*) url {
+    return [NSURL URLWithString:[NSString stringWithFormat:@"https://%@:%@@%@:%@", _login, _password, _host, _port]];
+}
+@end
+
 @implementation HDWCameraModel
 
 -(HDWCameraModel*) initWithDict: (NSDictionary*) dict andServer: (HDWServerModel*) server {
@@ -30,18 +68,20 @@
 }
 
 -(NSURL*) videoUrl {
-    return [NSURL URLWithString:[NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=720p", _physicalId] relativeToURL:_server.streamingUrl];
+    NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/media/%@.mpjpeg?resolution=240p", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
+    return [NSURL URLWithString:path relativeToURL:_server.ecs.config.url];
 }
 
 -(NSURL*) thumbnailUrl {
-    return [NSURL URLWithString:[NSString stringWithFormat:@"/api/image?physicalId=%@&time=now&width=20", _physicalId] relativeToURL:_server.streamingUrl];
+    NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/api/image?physicalId=%@&time=now&width=20", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
+    return [NSURL URLWithString:path relativeToURL:_server.ecs.config.url];
 }
 
 @end
 
 @implementation HDWServerModel
 
--(HDWServerModel*) initWithDict: (NSDictionary*) dict {
+-(HDWServerModel*) initWithDict: (NSDictionary*) dict andECS: (HDWECSModel*) ecs {
     self = [super init];
     
     if (self) {
@@ -49,6 +89,7 @@
         _name = dict[@"name"];
         _status = dict[@"status"];
         _streamingUrl = [NSURL URLWithString:dict[@"streamingUrl"]];
+        _ecs = ecs;
         
         cameras = [[NSMutableDictionary alloc] init];
     }
@@ -123,15 +164,20 @@
 
 @end
 
-@implementation HDWServersModel
+@implementation HDWECSModel
 
--(id)init {
+-(id)initWithECSConfig: (HDWECSConfig*)config {
     self = [super init];
     if (self) {
+        ecsConfig = config;
         servers = [[NSMutableDictionary alloc] init];
     }
     
     return self;
+}
+
+-(HDWECSConfig*) config {
+    return ecsConfig;
 }
 
 -(void) addServers: (NSArray*) serversArray {
@@ -150,7 +196,7 @@
         [server update:newServer];
         return NSNotFound;
     } else {
-        [servers setObject:newServer forKey:newServer.serverId];
+        [self addServer:newServer];
         return [self indexOfServerWithId:newServer.serverId];
     }
 }

@@ -254,7 +254,7 @@
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
-                                <color key="backgroundColor" red="0.10871688179347827" green="0.10871688179347827" blue="0.10871688179347827" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstItem="u47-Ax-Osd" firstAttribute="top" secondItem="17S-bb-kjB" secondAttribute="top" constant="75" id="5oe-qd-xhS"/>
                                     <constraint firstItem="l0Y-MM-cFB" firstAttribute="centerY" secondItem="17S-bb-kjB" secondAttribute="centerY" type="default" id="GiA-i4-o2H"/>
@@ -383,9 +383,6 @@
         </class>
         <class className="HDWMasterViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWMasterViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="done:" candidateClass="UIStoryboardSegue"/>
-            </relationships>
         </class>
         <class className="HDWVideoViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWVideoViewController.h"/>
@@ -422,9 +419,6 @@
         </class>
         <class className="UICollectionViewLayout" superclassName="NSObject">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewLayout.h"/>
-        </class>
-        <class className="UIStoryboardSegue" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UIStoryboardSegue.h"/>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
