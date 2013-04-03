@@ -24,6 +24,7 @@ public:
     bool submitToResource(const QnLayoutResourcePtr &layout);
 protected:
     virtual void showEvent(QShowEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 private slots:
     void at_viewButton_clicked();
     void at_selectButton_clicked();

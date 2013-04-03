@@ -22,5 +22,6 @@ void QnImagePreviewDialog::openImage(const QString &filename) {
 }
 
 void QnImagePreviewDialog::setImage(const QImage &image) {
+    ui->stackedWidget->setCurrentIndex(0);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
 }
