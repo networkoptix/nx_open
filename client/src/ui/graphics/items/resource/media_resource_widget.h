@@ -45,8 +45,8 @@ public:
         return m_renderer;
     }
 
-    const QRectF &zoomWindow() const;
-    void setZoomWindow(const QRectF &zoomWindow);
+    const QRectF &zoomRect() const;
+    void setZoomRect(const QRectF &zoomRect);
 
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
@@ -93,7 +93,7 @@ public:
 
 signals:
     void motionSelectionChanged();
-    void zoomWindowChanged();
+    void zoomRectChanged();
 
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
@@ -180,7 +180,7 @@ private:
 
     QStaticText m_sensStaticText[10];
 
-    QRectF m_zoomWindow;
+    QRectF m_zoomRect;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

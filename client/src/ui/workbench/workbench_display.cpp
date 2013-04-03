@@ -1192,7 +1192,7 @@ void QnWorkbenchDisplay::synchronizeZoomWindow(QnWorkbenchItem *item) {
 
 void QnWorkbenchDisplay::synchronizeZoomWindow(QnResourceWidget *widget) {
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-        mediaWidget->setZoomWindow(widget->item()->zoomWindow());
+        mediaWidget->setZoomRect(widget->item()->zoomRect());
 }
 
 void QnWorkbenchDisplay::synchronizeAllGeometries(bool animate) {
