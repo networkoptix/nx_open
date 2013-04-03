@@ -667,6 +667,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
                 << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
                 << ". " << soapWrapper.getLastError();
 
+            if (soapWrapper.isNotAuthenticated())
+                setStatus(QnResource::Unauthorized);
+
+
             return false;
         } 
         else

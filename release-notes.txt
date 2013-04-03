@@ -9,7 +9,8 @@ NEW CAMERAS AND RECORDERS SUPPORTED:
  - AXISP1354
  - ACTI product line
  - Canon product line 
-
+ - Stardot product line
+ 
 NEW FEATURES:  
  - New license type is introduced. It will be used for analog cameras. Analog cameras are divided into 2 types:
    - DTS Based (i.e. VMAX Channels). For those cameras analog license is required for view live stream and archive (set on camera settings on the "General" tab). Recording is performed on DTS so the software only acruires recorded data from it.
@@ -51,7 +52,7 @@ NEW FEATURES:
    - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
  
 IMPROVEMENTS:
- - 
+ - Onvif support is improved so more ONVIF compliant cameras are supported
  - Storage Dialog is significantly redesigned. Now it is not necessary to specify the folder for the recording data, it is necessary to select the disks the recording will be performed to and the amount of free space to preserve. The software will do the last.
  - CTRL can be used in Calendar Search to select multiple dates
  - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
@@ -59,7 +60,7 @@ IMPROVEMENTS:
  - The "Do not show again" checkbox is added to the upgrade form. To re-enable it use "Check For Upgrade" Main Menu item
  - It is possible to view EC and Mediaserver logs via Web Interface. Use https://<EC IP>:<EC Port>/web/servers URL (i.e. https://127.0.0.1:7001/web/servers)
  - Auto storage selection is improved. While installing a media server, every available partition in the system must be added (if the partition has >100 GB free)
- - Manual RADASS Switch is added to the interface but not implemented in the code. We will think about it and maybe remove it
+ - Manual RADASS Switch is added to the interface. It applies to the whole layout one time only. After the layout is closed and reopened resolution is set back to Auto
  - If max fps has been reduced for motion+low, it will be reduced for all record modes in schedule (Arecont cameras only)
  - Now it is not necessary to select an item before export. Last selected item will be exported
  - Screen Recording form was redesigned
@@ -96,6 +97,10 @@ BUGS FIXED:
  - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed
  - If physically delete a file that was containing in a saved layout it was displayed incorrectly (Loading... was drawn). Fixed
  - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously 
+ - If more than 64 cameras are being recorded and in the same time opened for viewing, Linux Media Server could crash. Fixed
+ - Arecont Vision panoramic cameras now work at full resolutuion. It used to work in quarter resolution if medium or low quality was pulled
+ - Areconnt Vision Spartan 6 integration is improved
+ - Areconnt FPS jumping issue is fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
 
