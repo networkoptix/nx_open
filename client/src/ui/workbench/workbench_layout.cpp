@@ -220,6 +220,9 @@ bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry
         return false;
     }
 
+    if (resource()->locked())
+        return false;
+
     if(item->isPinned()) {
         return m_itemMap.isOccupiedBy(
             geometry,
@@ -270,6 +273,9 @@ bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, cons
         qnWarning("Sizes of the given containers do not match.");
         return false;
     }
+
+    if (resource()->locked())
+        return false;
 
     if (items.empty())
         return true;
