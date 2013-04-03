@@ -190,11 +190,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "386620591.570687"
+         timestampString = "386695194.739465"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "347"
-         endingLineNumber = "347"
+         startingLineNumber = "343"
+         endingLineNumber = "343"
          landmarkName = "-splitViewController:willHideViewController:withBarButtonItem:forPopoverController:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -216,11 +216,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "386620591.570687"
+         timestampString = "386695194.739465"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "354"
-         endingLineNumber = "354"
+         startingLineNumber = "350"
+         endingLineNumber = "350"
          landmarkName = "-splitViewController:willShowViewController:invalidatingBarButtonItem:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -242,11 +242,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "386620591.570687"
+         timestampString = "386695194.739465"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "385"
-         endingLineNumber = "385">
+         startingLineNumber = "381"
+         endingLineNumber = "381">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -654,11 +654,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "386620591.570687"
+         timestampString = "386695194.739465"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "353"
-         endingLineNumber = "353"
+         startingLineNumber = "349"
+         endingLineNumber = "349"
          landmarkName = "-splitViewController:willShowViewController:invalidatingBarButtonItem:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -784,11 +784,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "386620591.570687"
+         timestampString = "386695194.739465"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "352"
-         endingLineNumber = "352"
+         startingLineNumber = "348"
+         endingLineNumber = "348"
          landmarkName = "-splitViewController:willShowViewController:invalidatingBarButtonItem:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1057,11 +1057,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "HDWitness/HDWDetailViewController.m"
-         timestampString = "386620591.570687"
+         timestampString = "386695194.739465"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "298"
-         endingLineNumber = "298"
+         startingLineNumber = "299"
+         endingLineNumber = "299"
          landmarkName = "-collectionView:cellForItemAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1089,6 +1089,71 @@
          startingLineNumber = "145"
          endingLineNumber = "145"
          landmarkName = "-webSocket:didReceiveMessage:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Pods/FXImageView/FXImageView/FXImageView.m"
+         timestampString = "386700308.420415"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "449"
+         endingLineNumber = "449"
+         landmarkName = "-queueImageForProcessing"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Pods/FXImageView/FXImageView/FXImageView.m"
+         timestampString = "386700308.420415"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "234"
+         endingLineNumber = "234"
+         landmarkName = "-cacheKey"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Pods/FXImageView/FXImageView/FXImageView.m"
+         timestampString = "386700308.420415"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "450"
+         endingLineNumber = "450"
+         landmarkName = "-queueImageForProcessing"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Pods/FXImageView/FXImageView/FXImageView.m"
+         timestampString = "386698077.046674"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "104"
+         endingLineNumber = "104"
+         landmarkName = "-dealloc"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Pods/FXImageView/FXImageView/FXImageView.m"
+         timestampString = "386698833.066011"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "217"
+         endingLineNumber = "217"
+         landmarkName = "-imageHash:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

@@ -60,7 +60,7 @@
 /* Begin PBXFileReference section */
 		018DC436ACF84B178179263A /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		1381EE06ED874D8C96CB5F42 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DWSpectrum.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C71D5AF016ADBB9600C764B5 /* HDWitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HDWitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C71D5AF416ADBB9600C764B5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		C71D5AF616ADBB9600C764B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C71D5AF816ADBB9600C764B5 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -151,7 +151,7 @@
 		C71D5AF116ADBB9600C764B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */,
+				C71D5AF016ADBB9600C764B5 /* HDWitness.app */,
 				C71D5B1D16ADBB9600C764B5 /* HDWitnessTests.octest */,
 			);
 			name = Products;
@@ -261,7 +261,7 @@
 			);
 			name = HDWitness;
 			productName = HDWitness;
-			productReference = C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */;
+			productReference = C71D5AF016ADBB9600C764B5 /* HDWitness.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C71D5B1C16ADBB9600C764B5 /* HDWitnessTests */ = {

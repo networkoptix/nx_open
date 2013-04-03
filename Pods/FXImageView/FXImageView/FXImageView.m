@@ -100,6 +100,10 @@
 #pragma mark -
 #pragma mark Shared storage
 
+-(void)dealloc {
+    NSLog(@"Deactivating %@", self);
+}
+
 + (NSOperationQueue *)processingQueue
 {
     static NSOperationQueue *sharedQueue = nil;
@@ -209,6 +213,9 @@
 
 - (NSString *)imageHash:(UIImage *)image
 {
+    if (image == nil) {
+        return @"";
+    }
     static NSInteger hashKey = 1;
     NSString *number = objc_getAssociatedObject(image, @"FXImageHash");
     if (!number && image)
@@ -223,8 +230,9 @@
 {
     if (_cacheKey) return _cacheKey;
     
+//    NSLog(@"ICU: %@", self.imageContentURL);
     return [NSString stringWithFormat:@"%@_%@_%.2f_%.2f_%.2f_%@_%@_%.2f_%.2f_%i",
-            _imageContentURL ?: [self imageHash:_originalImage],
+            _imageContentURL ? _imageContentURL.absoluteString: [self imageHash:_originalImage],
             NSStringFromCGSize(self.bounds.size),
             _reflectionGap,
             _reflectionScale,

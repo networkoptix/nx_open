@@ -77,7 +77,7 @@
 }
 
 -(NSURL*) thumbnailUrl {
-    NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/api/image?physicalId=%@&time=now&width=160", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
+    NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/api/image?physicalId=%@&time=latest&width=160&format=png", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
     return [NSURL URLWithString:path relativeToURL:_server.ecs.config.url];
 }
 

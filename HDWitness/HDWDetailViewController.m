@@ -294,18 +294,14 @@ enum MessageType {
             break;
         }
             
-        case Online: {
+        case Online:
+        case Recording: {
             [cell.imageView setImageWithContentsOfFile:@"camera.png"];
             break;
         }	
-            
-        case Recording: {
-            break;
-        }
-            
     }
     
-    if (camera.status.intValue == Online)
+    if (camera.status.intValue == Online || camera.status.intValue == Recording)
         [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
     
     cell.labelView.text = camera.name;
