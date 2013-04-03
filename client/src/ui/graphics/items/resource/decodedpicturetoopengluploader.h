@@ -263,6 +263,8 @@ private:
     quint8* m_rgbaBuf;
     int m_fileNumber;
     bool m_hardwareDecoderUsed;
+    bool m_asyncUploadUsed;
+    QGLContext* m_initializedCtx;
 
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
@@ -274,7 +276,10 @@ private:
         unsigned int pboIndex,
         size_t sizeInBytes );
     void releasePictureBuffers();
+    void releasePictureBuffersNonSafe();
     void savePicToFile( AVFrame* const pic, int pts );
+    //!m_mutex MUST be locked before this call
+    void cancelUploadingInGUIThread();
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H
