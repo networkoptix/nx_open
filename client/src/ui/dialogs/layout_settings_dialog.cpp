@@ -2,8 +2,12 @@
 #include "ui_layout_settings_dialog.h"
 
 #include <QtCore/qmath.h>
+
 #include <QtGui/QFileDialog>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QPainter>
+#include <QtGui/QPen>
+#include <QtGui/QPaintEvent>
 
 #include <core/resource/layout_resource.h>
 
@@ -16,7 +20,60 @@ namespace {
     const int widthLimit = 20;      // in cells
     const int heightLimit = 20;     // in cells
     const int areaLimit = 100;      // in cells
+
+    const int labelFrameWidth = 4;  // in pixels
 }
+
+class QnFramedLabel: public QLabel {
+    typedef QLabel base_type;
+public:
+    explicit QnFramedLabel(QWidget* parent = 0):
+        base_type(parent),
+        m_opacityPercent(100)
+    {}
+    ~QnFramedLabel() {}
+
+    QSize size() const {
+        return base_type::size() - QSize(labelFrameWidth*2, labelFrameWidth*2);
+    }
+
+    int opacityPercent() const {
+        return m_opacityPercent;
+    }
+
+    void setOpacityPercent(int value) {
+        if (m_opacityPercent == value)
+            return;
+        m_opacityPercent = value;
+        repaint();
+    }
+
+protected:
+    virtual void paintEvent(QPaintEvent *event) override {
+        QPainter painter(this);
+        QRect fullRect = event->rect().adjusted(labelFrameWidth/2, labelFrameWidth/2, -labelFrameWidth/2, -labelFrameWidth/2);
+
+        if (pixmap() && !pixmap()->isNull()) {
+            painter.setOpacity(0.01 * m_opacityPercent);
+            QRect pix = pixmap()->rect();
+            int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
+            int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
+            painter.drawPixmap(x, y, *pixmap());
+        } else {
+            base_type::paintEvent(event);
+        }
+
+        painter.setOpacity(0.5);
+        QPen pen;
+        pen.setWidth(labelFrameWidth);
+        pen.setColor(QColor(Qt::lightGray));
+        painter.setPen(pen);
+        painter.drawRect(fullRect);
+    }
+
+private:
+    int m_opacityPercent;
+};
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
@@ -27,6 +84,14 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     m_estimatePending(false)
 {
     ui->setupUi(this);
+
+    imageLabel = new QnFramedLabel(ui->page);
+    imageLabel->setObjectName(QLatin1String("imageLabel"));
+    imageLabel->setText(tr("<No image>"));
+    imageLabel->setAlignment(Qt::AlignCenter);
+    imageLabel->setOpacityPercent(ui->opacitySpinBox->value());
+    ui->horizontalLayout->insertWidget(0, imageLabel, 1);
+
     ui->userCanEditCheckBox->setVisible(false);
     ui->widthSpinBox->setMaximum(widthLimit);
     ui->heightSpinBox->setMaximum(heightLimit);
@@ -38,6 +103,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
+    connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
 
     connect(m_cache, SIGNAL(imageLoaded(int)), this, SLOT(at_image_loaded(int)));
     connect(m_cache, SIGNAL(imageStored(int)), this, SLOT(at_image_stored(int)));
@@ -157,8 +223,8 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
     m_filename = QString();
     m_layoutImageId = 0;
 
-    ui->imageLabel->setPixmap(QPixmap());
-    ui->imageLabel->setText(tr("<No image>"));
+    imageLabel->setPixmap(QPixmap());
+    imageLabel->setText(tr("<No image>"));
 //    ui->estimateLabel->setText(QString());
 
     updateControls();
@@ -174,6 +240,10 @@ void QnLayoutSettingsDialog::at_accepted() {
     setProgress(true);
     ui->generalGroupBox->setEnabled(false);
     ui->buttonBox->setEnabled(false);
+}
+
+void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
+    imageLabel->setOpacityPercent(value);
 }
 
 void QnLayoutSettingsDialog::at_image_loaded(int id) {
@@ -192,15 +262,15 @@ void QnLayoutSettingsDialog::loadPreview() {
     if (!this->isVisible())
         return;
 
-    ui->imageLabel->setPixmap(QPixmap());
-    ui->imageLabel->setText(tr("<No image>"));
+    imageLabel->setPixmap(QPixmap());
+    imageLabel->setText(tr("<No image>"));
     if (m_filename.isEmpty())
         return;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_filename);
     loader->setTransformationMode(Qt::FastTransformation);
-    loader->setSize(ui->imageLabel->size());
+    loader->setSize(imageLabel->size());
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
     setProgress(true);
@@ -209,11 +279,11 @@ void QnLayoutSettingsDialog::loadPreview() {
 void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     setProgress(false);
     if (image.isNull()) {
-        ui->imageLabel->setPixmap(QPixmap());
-        ui->imageLabel->setText(tr("<Image cannot be loaded>"));
+        imageLabel->setPixmap(QPixmap());
+        imageLabel->setText(tr("<Image cannot be loaded>"));
         return;
     }
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+    imageLabel->setPixmap(QPixmap::fromImage(image));
 
     if (!m_estimatePending)
         return;

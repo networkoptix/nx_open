@@ -49,17 +49,7 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="page">
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
-          <item>
-           <widget class="QLabel" name="imageLabel">
-            <property name="text">
-             <string notr="true">&lt;No image&gt;</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
@@ -243,7 +233,7 @@
            <string>%</string>
           </property>
           <property name="minimum">
-           <number>1</number>
+           <number>5</number>
           </property>
           <property name="maximum">
            <number>100</number>
