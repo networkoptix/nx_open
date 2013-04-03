@@ -134,8 +134,8 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
     m_filename = QString();
     m_layoutImageId = 0;
 
-    //TODO: #GDM special icon with "No image" text or may be complete help on the theme.
-    ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
+    ui->imageLabel->setPixmap(QPixmap());
+    ui->imageLabel->setText(tr("<No image>"));
 //    ui->estimateLabel->setText(QString());
 
     updateControls();
@@ -169,7 +169,7 @@ void QnLayoutSettingsDialog::loadPreview() {
     if (!this->isVisible())
         return;
 
-    ui->imageLabel->setPixmap(QPixmap(QLatin1String(":/skin/tree/snapshot.png")));
+    ui->imageLabel->setPixmap(QPixmap());
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_filename);
@@ -182,9 +182,11 @@ void QnLayoutSettingsDialog::loadPreview() {
 
 void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     setProgress(false);
-    if (image.isNull())
+    if (image.isNull()) {
+        ui->imageLabel->setPixmap(QPixmap());
+        ui->imageLabel->setText(tr("<Image cannot be loaded>"));
         return;
-
+    }
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
 
  /*   qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
