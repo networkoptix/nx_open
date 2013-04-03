@@ -148,6 +148,8 @@ public:
      */
     QnWorkbenchItem *item(const QUuid &uuid) const;
 
+    QnWorkbenchItem *zoomTargetItem(const QnWorkbenchItem *item) const;
+
     /**
      * \param region                    Region to get pinned items at.
      * \returns                         Set of pinned items at the given region.
@@ -282,6 +284,8 @@ signals:
      */
     void itemAdded(QnWorkbenchItem *item);
 
+    void zoomTargetItemChanged(QnWorkbenchItem *item);
+
     /**
      * This signal is emitted whenever an item is about to be removed from
      * this layout. At the time of emit the item is still valid, but
@@ -325,6 +329,10 @@ private:
 
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
+    
+    QnWorkbenchItem *zoomTargetItemInternal(QnWorkbenchItem *item) const;
+    void updateZoomTargetItemInternal(QnWorkbenchItem *item, const QUuid &oldZoomTargetUuid, const QUuid &newZoomTargetUuid);
+    void emitZoomTargetItemChangedInternal(QnWorkbenchItem *item);
 
     void initCellParameters();
 
@@ -337,6 +345,13 @@ private:
 
     /** Set of all items on this layout. */
     QSet<QnWorkbenchItem *> m_items;
+
+    /** Map from item to its zoom target. */
+    QHash<QnWorkbenchItem *, QnWorkbenchItem *> m_zoomTargetItemByItem;
+
+    QMultiHash<QnWorkbenchItem *, QnWorkbenchItem *> m_itemsByZoomTargetItem;
+
+    QMultiHash<QUuid, QnWorkbenchItem *> m_pendingItemsByZoomTargetUuid;
 
     /** Set of item borders for fast bounding rect calculation. */
     QnRectSet m_rectSet;

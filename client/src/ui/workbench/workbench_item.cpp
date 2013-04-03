@@ -228,9 +228,24 @@ void QnWorkbenchItem::setZoomTargetUuid(const QUuid &zoomTargetUuid) {
     if(m_zoomTargetUuid == zoomTargetUuid)
         return;
 
-    m_zoomTargetUuid = zoomTargetUuid;
+    if(m_layout) {
+        QUuid oldZoomTargetUuid = m_zoomTargetUuid;
+        m_zoomTargetUuid = zoomTargetUuid;
+
+        ///m_layout->updateZoomTargetItemInternal(this, oldZoomTargetUuid, m_zoomTargetUuid); // TODO
+    } else {
+        m_zoomTargetUuid = zoomTargetUuid;
+    }
 
     emit zoomTargetUuidChanged();
+}
+
+QnWorkbenchItem *QnWorkbenchItem::zoomTargetItem() const {
+    if(m_layout) {
+        return m_layout->zoomTargetItem(this);
+    } else {
+        return NULL;
+    }
 }
 
 void QnWorkbenchItem::setRotation(qreal rotation) {

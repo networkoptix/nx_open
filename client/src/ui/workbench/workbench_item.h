@@ -205,11 +205,17 @@ public:
      */
     void setZoomRect(const QRectF &zoomRect);
 
+    bool isZoomItem() const {
+        return !m_zoomTargetUuid.isNull();
+    }
+
     const QUuid &zoomTargetUuid() const {
         return m_zoomTargetUuid;
     }
 
     void setZoomTargetUuid(const QUuid &zoomTargetUuid);
+
+    QnWorkbenchItem *zoomTargetItem() const;
 
     /**
      * \returns                         Rotation angle of this item, in degrees.
