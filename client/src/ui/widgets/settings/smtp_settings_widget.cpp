@@ -10,6 +10,8 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
 //TODO: #GDM use documentation from http://support.google.com/mail/bin/answer.py?hl=en&answer=1074635
@@ -52,6 +54,8 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     m_settingsReceived(false)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::SystemSettings_Server_Mail_Help);
 
     connect(ui->portComboBox,           SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_portComboBox_currentIndexChanged(int)));
     connect(ui->advancedCheckBox,       SIGNAL(toggled(bool)),              this,   SLOT(at_advancedCheckBox_toggled(bool)));

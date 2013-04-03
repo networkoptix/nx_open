@@ -17,6 +17,8 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
@@ -40,6 +42,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
+
+    setHelpTopic(this, Qn::EventsActions_Help);
+
     m_currentDetailsWidget = ui->detailsWidget;
 
     createActions();
