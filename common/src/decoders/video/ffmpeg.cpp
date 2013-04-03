@@ -222,13 +222,6 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
     }
     //Q_ASSERT(m_context->codec);
 
-    int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
-    int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);
-    if (numBytes > 0) {
-        m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
-    }
-
 //    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
@@ -286,6 +279,21 @@ int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
             return i;
     }
     return -1;
+}
+
+void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
+{
+    int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
+    int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);
+    if (numBytes > 0) {
+        if (m_deinterlaceBuffer)
+            av_free(m_deinterlaceBuffer);
+
+        m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
+        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
+        m_deinterlacedFrame->width = m_context->width;
+        m_deinterlacedFrame->height = m_context->height;
+    }
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
@@ -467,6 +475,10 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
 
         if (m_frame->interlaced_frame && m_mtDecoding)
         {
+
+            if (m_deinterlacedFrame->width != m_context->width || m_deinterlacedFrame->height != m_context->height)
+                reallocateDeinterlacedFrame();
+
             if (outFrame->isExternalData())
             {
                 if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height) == 0) {

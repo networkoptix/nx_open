@@ -318,6 +318,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
 
     at_updateWatcher_availableUpdateChanged();
+
+    action(Qn::CurrentLayoutSettingsAction)->setVisible(false);
+    action(Qn::LayoutSettingsAction)->setVisible(false);
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
