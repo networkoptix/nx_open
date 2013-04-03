@@ -170,6 +170,9 @@ void QnLayoutSettingsDialog::loadPreview() {
         return;
 
     ui->imageLabel->setPixmap(QPixmap());
+    ui->imageLabel->setText(tr("<No image>"));
+    if (m_filename.isEmpty())
+        return;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_filename);
