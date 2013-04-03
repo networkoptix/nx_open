@@ -41,6 +41,11 @@ void QnLayoutSettingsDialog::showEvent(QShowEvent *event) {
     loadPreview();
 }
 
+void QnLayoutSettingsDialog::resizeEvent(QResizeEvent *event) {
+    base_type::resizeEvent(event);
+//    loadPreview();
+}
+
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     m_layoutImageId = layout->backgroundImageId();
     if (m_layoutImageId > 0) {
