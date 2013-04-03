@@ -94,11 +94,15 @@ public:
             /* Nothing bad could come out of this call, so const_cast is OK. */
             const_cast<QGLContext *>(context)->makeCurrent();
         }
-
         m_initialized = true;
         locker.unlock();
 
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
+        QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+        if (vendor.contains("Intel") && renderer.contains("Intel(R) HD Graphics 3000"))
+            m_maxTextureSize = 4096; // magic const, see http://lists.apple.com/archives/mac-opengl/2012/Aug/msg00000.html
+        else
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
     }
     
 
