@@ -9,6 +9,8 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -19,6 +21,8 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::Wind
 {
     ui->setupUi(this);
     
+    setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
+
     connect(ui->backupButton, SIGNAL(clicked()), this, SLOT(at_backupButton_clicked()));
     connect(ui->restoreButton, SIGNAL(clicked()), this, SLOT(at_restoreButton_clicked()));
 }
