@@ -571,7 +571,11 @@ Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRect
 
 int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
     Q_UNUSED(pos)
-    if(options() & DisplayMotionSensitivity) {
+    if(calculateChannelOverlay(0) == AnalogWithoutLicenseOverlay) {
+        return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+    } else if(options() & ControlPtz) {
+        return Qn::MainWindow_MediaItem_Ptz_Help;
+    } else if(options() & DisplayMotionSensitivity) {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;

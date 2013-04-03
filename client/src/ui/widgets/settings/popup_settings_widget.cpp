@@ -7,11 +7,16 @@
 
 #include <health/system_health.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnPopupSettingsWidget)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
     for (int i = 0; i < BusinessEventType::Count; i++) {
         QCheckBox* checkbox = new QCheckBox(this);
