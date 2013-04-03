@@ -377,7 +377,7 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
 
     qint64 dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
     if (stream->cur_dts > 0)
-        avPkt.dts = qMax(stream->cur_dts+1, dts);
+        avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
     else
         avPkt.dts = dts;
     QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
