@@ -1184,10 +1184,10 @@ void DecodedPictureToOpenGLUploader::pleaseStop()
             m_cond.wait( lk.mutex() );
 
         const QGLContext* curCtx = QGLContext::currentContext();
-        if( curCtx != m_initializedCtx )
+        if( curCtx != m_initializedCtx && m_initializedCtx )
             m_initializedCtx->makeCurrent();
         releasePictureBuffersNonSafe();
-        if( curCtx != m_initializedCtx )
+        if( curCtx != m_initializedCtx && m_initializedCtx )
         {
             m_initializedCtx->doneCurrent();
             if( curCtx )
