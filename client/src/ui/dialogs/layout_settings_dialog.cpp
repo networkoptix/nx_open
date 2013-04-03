@@ -225,13 +225,12 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 
     imageLabel->setPixmap(QPixmap());
     imageLabel->setText(tr("<No image>"));
-//    ui->estimateLabel->setText(QString());
 
     updateControls();
 }
 
 void QnLayoutSettingsDialog::at_accepted() {
-    if (m_filename.isEmpty()) {
+    if (m_filename.isEmpty() || m_layoutImageId > 0) {
         accept();
         return;
     }
