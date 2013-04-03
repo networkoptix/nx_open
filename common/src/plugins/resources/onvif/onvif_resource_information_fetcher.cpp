@@ -13,8 +13,8 @@ const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
 static char* ANALOG_CAMERAS[][2] =
 {
-    {"AXIS", "Q7404"}
-    // todo: add analog vivotek camera here
+    {"AXIS", "Q7404"},
+	{"vivo_ironman", "VS8801"}
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
