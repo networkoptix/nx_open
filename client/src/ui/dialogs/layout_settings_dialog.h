@@ -49,6 +49,8 @@ private:
 
     QString m_filename;
     int m_layoutImageId;
+    qreal m_cellAspectRatio;
+    bool m_estimatePending;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

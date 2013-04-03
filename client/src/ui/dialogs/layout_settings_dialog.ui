@@ -181,11 +181,14 @@
           <property name="correctionMode">
            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
           </property>
+          <property name="suffix">
+           <string> cells</string>
+          </property>
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>20</number>
           </property>
           <property name="value">
            <number>10</number>
@@ -207,11 +210,14 @@
           <property name="correctionMode">
            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
           </property>
+          <property name="suffix">
+           <string> cells</string>
+          </property>
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>20</number>
           </property>
           <property name="value">
            <number>10</number>

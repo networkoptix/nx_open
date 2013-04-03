@@ -1,6 +1,7 @@
 #include "layout_settings_dialog.h"
 #include "ui_layout_settings_dialog.h"
 
+#include <QtCore/qmath.h>
 #include <QtGui/QFileDialog>
 #include <QtGui/QDesktopServices>
 
@@ -10,14 +11,25 @@
 
 #include <utils/threaded_image_loader.h>
 
+namespace {
+    //limits
+    const int widthLimit = 20;      // in cells
+    const int heightLimit = 20;     // in cells
+    const int areaLimit = 100;      // in cells
+}
+
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(new QnAppServerFileCache(this)),
-    m_layoutImageId(0)
+    m_layoutImageId(0),
+    m_cellAspectRatio((qreal)16/9),
+    m_estimatePending(false)
 {
     ui->setupUi(this);
     ui->userCanEditCheckBox->setVisible(false);
+    ui->widthSpinBox->setMaximum(widthLimit);
+    ui->heightSpinBox->setMaximum(heightLimit);
 
     setProgress(false);
 
@@ -58,6 +70,11 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     }
     ui->lockedCheckBox->setChecked(layout->locked());
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
+
+    qreal cellWidth = 1.0 + layout->cellSpacing().width();
+    qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+    m_cellAspectRatio = cellWidth / cellHeight;
+
     updateControls();
 }
 
@@ -130,6 +147,7 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
 
     m_filename = files[0];
     m_layoutImageId = 0;
+    m_estimatePending = true;
 
     loadPreview();
     updateControls();
@@ -197,18 +215,31 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     }
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
 
- /*   qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
-    int w, h;
+    if (!m_estimatePending)
+        return;
+    m_estimatePending = false;
 
-    qreal point = (qreal)ui->widthSpinBox->maximum() / (qreal)ui->heightSpinBox->maximum();
-    if (aspectRatio >= point) {
+    qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
+
+    int w, h;
+    qreal targetAspectRatio = aspectRatio / m_cellAspectRatio; // targetAspectRatio = w/h;
+    if (targetAspectRatio >= 1.0) { // width is greater than height
         w = ui->widthSpinBox->maximum();
-        h = qRound((qreal)w / aspectRatio);
+        h = qRound((qreal)w / targetAspectRatio);
     } else {
         h = ui->heightSpinBox->maximum();
-        w = qRound((qreal)h * aspectRatio);
+        w = qRound((qreal)h * targetAspectRatio);
     }
-    ui->estimateLabel->setText(tr("Aspect Ratio: %1x%2").arg(w).arg(h));*/
+
+    // limit w*h <= areaLimit; minor variations are available, e.g. 17*6 ~~= 100;
+    qreal areaCoef = qSqrt((qreal)w * h / areaLimit);
+    if (areaCoef > 1.0) {
+        w = qRound((qreal)w / areaCoef);
+        h = qRound((qreal)h / areaCoef);
+    }
+    ui->widthSpinBox->setValue(w);
+    ui->heightSpinBox->setValue(h);
+
 }
 
 void QnLayoutSettingsDialog::setProgress(bool value) {
