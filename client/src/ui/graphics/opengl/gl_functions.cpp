@@ -98,10 +98,12 @@ public:
         locker.unlock();
 
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+        GLint maxTextureSize;
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         if (vendor.contains("Intel"))
-            m_maxTextureSize = 4096; // magic const, see http://lists.apple.com/archives/mac-opengl/2012/Aug/msg00000.html
+            m_maxTextureSize = qMin(4096, maxTextureSize); // magic const, see http://lists.apple.com/archives/mac-opengl/2012/Aug/msg00000.html
         else
-            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
+            m_maxTextureSize = maxTextureSize;
     }
     
 
