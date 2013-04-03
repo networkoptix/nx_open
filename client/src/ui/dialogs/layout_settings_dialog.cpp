@@ -2,6 +2,7 @@
 #include "ui_layout_settings_dialog.h"
 
 #include <QtGui/QFileDialog>
+#include <QtGui/QDesktopServices>
 
 #include <core/resource/layout_resource.h>
 
@@ -105,6 +106,10 @@ void QnLayoutSettingsDialog::updateControls() {
 }
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {
+    QString path = QLatin1String("file:///") + m_filename;
+    if (QDesktopServices::openUrl(QUrl(path)))
+        return;
+
     QnImagePreviewDialog dialog;
     dialog.openImage(m_filename);
     dialog.exec();
