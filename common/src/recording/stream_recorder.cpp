@@ -373,10 +373,15 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
 
     AVPacket avPkt;
     av_init_packet(&avPkt);
-    avPkt.dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
+
+    qint64 dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
+    if (stream->cur_dts > 0)
+        avPkt.dts = qMax(stream->cur_dts+1, dts);
+    else
+        avPkt.dts = dts;
     QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
     if (video && (quint64)video->pts != AV_NOPTS_VALUE)
-        avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base);
+        avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
     else
         avPkt.pts = avPkt.dts;
 
