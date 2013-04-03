@@ -199,7 +199,7 @@ ZoomWindowInstrument::~ZoomWindowInstrument() {
 }
 
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
-    connect(widget, SIGNAL(zoomWindowChanged()), this, SLOT(at_widget_zoomWindowChanged()));
+    connect(widget, SIGNAL(zoomRectChanged()), this, SLOT(at_widget_zoomWindowChanged()));
     connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
     
     updateZoomType(widget, false);
@@ -280,19 +280,19 @@ void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *sourceWidget, Q
 void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget) {
     ZoomWindowWidget *windowWidget = this->windowWidget(widget);
 
-    windowWidget->overlay()->setWidgetRect(windowWidget, widget->zoomWindow());
+    windowWidget->overlay()->setWidgetRect(windowWidget, widget->zoomRect());
 }
 
 void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget) {
     ZoomOverlayWidget *overlayWidget = windowWidget->overlay();
     QnMediaResourceWidget *mediaWidget = overlayWidget->target();
 
-    mediaWidget->setZoomWindow(QnGeometry::cwiseDiv(windowWidget->rect(), overlayWidget->size()));
+    mediaWidget->setZoomRect(QnGeometry::cwiseDiv(windowWidget->rect(), overlayWidget->size()));
 }
 
 void ZoomWindowInstrument::updateZoomType(QnMediaResourceWidget *widget, bool registerAsType) {
     ZoomData &data = m_dataByWidget[widget];
-    bool isZoomWindow = !qFuzzyCompare(widget->zoomWindow(), QRectF(0.0, 0.0, 1.0, 1.0));
+    bool isZoomWindow = !qFuzzyCompare(widget->zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0));
     if(data.isZoomWindow == isZoomWindow)
         return;
 

@@ -194,22 +194,22 @@ public:
     }
 
     /**
-     * \returns                         Zoom window of this item, in item-relative coordinates.
+     * \returns                         Zoom rect of this item, in item-relative coordinates.
      */
-    const QRectF &zoomWindow() const {
-        return m_zoomWindow;
+    const QRectF &zoomRect() const {
+        return m_zoomRect;
     }
 
     /**
-     * \param zoomWindow                New zoom window for this item.
+     * \param zoomRect                  New zoom rect for this item.
      */
-    void setZoomWindow(const QRectF &zoomWindow);
+    void setZoomRect(const QRectF &zoomRect);
 
-    const QUuid &zoomUuid() const {
-        return m_zoomUuid;
+    const QUuid &zoomTargetUuid() const {
+        return m_zoomTargetUuid;
     }
 
-    void setZoomUuid(const QUuid &zoomUuid);
+    void setZoomTargetUuid(const QUuid &zoomTargetUuid);
 
     /**
      * \returns                         Rotation angle of this item, in degrees.
@@ -270,8 +270,8 @@ signals:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
-    void zoomWindowChanged();
-    void zoomUuidChanged();
+    void zoomRectChanged();
+    void zoomTargetUuidChanged();
     void rotationChanged();
     void dataChanged(int role);
 
@@ -299,9 +299,9 @@ private:
     QRectF m_geometryDelta;
 
     /** Item-relative rectangle that defines the portion of the item to be shown. */
-    QRectF m_zoomWindow;
+    QRectF m_zoomRect;
 
-    QUuid m_zoomUuid;
+    QUuid m_zoomTargetUuid;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;
