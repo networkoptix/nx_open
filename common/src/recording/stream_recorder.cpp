@@ -44,7 +44,6 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needReopen(false),
     m_isAudioPresent(false),
     m_audioTranscoder(0),
-    m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
@@ -56,6 +55,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
+    memset(m_videoTranscoder, 0, sizeof(m_videoTranscoder));
 }
 
 QnStreamRecorder::~QnStreamRecorder()
@@ -63,7 +63,8 @@ QnStreamRecorder::~QnStreamRecorder()
     stop();
     close();
     delete m_audioTranscoder;
-    delete m_videoTranscoder;
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        delete m_videoTranscoder[i];
 }
 
 /* It is impossible to write avi/mkv attribute in the end
@@ -349,10 +350,10 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
             md.clear();
         } while (result);
     }
-    else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
+    else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder[md->channelNumber])
     {
         QnAbstractMediaDataPtr result;
-        m_videoTranscoder->transcodePacket(md, &result);
+        m_videoTranscoder[md->channelNumber]->transcodePacket(md, &result);
         if (result && result->data.size() > 0)
             writeData(result, streamIndex);
     }
@@ -376,7 +377,7 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
 
     qint64 dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
     if (stream->cur_dts > 0)
-        avPkt.dts = qMax(stream->cur_dts+1, dts);
+        avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
     else
         avPkt.dts = dts;
     QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
@@ -475,6 +476,16 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         m_formatCtx->start_time = mediaData->timestamp;
 
         m_videoChannels = layout->numberOfChannels();
+        int bottomRightChannel = 0;
+        int hPos = -1, vPos = -1;
+        for (int i = 0; i < m_videoChannels; ++i) 
+        {
+            if (layout->h_position(i) >= hPos && layout->v_position(i) >= vPos) {
+                bottomRightChannel = i;
+                hPos = layout->h_position(i);
+                vPos  = layout->v_position(i);
+            }
+        }
 
         for (int i = 0; i < m_videoChannels; ++i) 
         {
@@ -504,13 +515,14 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 // transcode video
                 if (m_dstVideoCodec == CODEC_ID_NONE)
                     m_dstVideoCodec = CODEC_ID_MPEG4; // default value
-                m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
-                m_videoTranscoder->setMTMode(true);
-                m_videoTranscoder->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
-                m_videoTranscoder->setOnScreenDateOffset(m_onscreenDateOffset);
-                m_videoTranscoder->setQuality(QnQualityHighest);
-                m_videoTranscoder->open(mediaData);
-                avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
+                m_videoTranscoder[i] = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
+                m_videoTranscoder[i]->setMTMode(true);
+                if (m_role == Role_FileExportWithTime && i == bottomRightChannel)
+                    m_videoTranscoder[i]->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
+                m_videoTranscoder[i]->setOnScreenDateOffset(m_onscreenDateOffset);
+                m_videoTranscoder[i]->setQuality(QnQualityHighest);
+                m_videoTranscoder[i]->open(mediaData);
+                avcodec_copy_context(videoStream->codec, m_videoTranscoder[i]->getCodecContext());
             }
             else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->ctx()->width > 0)
             {
