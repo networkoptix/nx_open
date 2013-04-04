@@ -25,6 +25,11 @@ message Layout {
         required double bottom     = 6;
         required double rotation   = 7;
         required Resource resource = 8;
+        optional double zoomLeft   = 9;
+        optional double zoomTop    = 10;
+        optional double zoomRight  = 11;
+        optional double zoomBottom = 12;
+        optional string zoomTargetUuid = 13;
     }
 
     required double cellAspectRatio   = 1;
