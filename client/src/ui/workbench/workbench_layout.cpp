@@ -180,28 +180,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     m_itemsByUid[item->resourceUid()].insert(item);
     m_itemByUuid[item->uuid()] = item;
 
-    if(item->isZoomItem()) {
-        if(QnWorkbenchItem *zoomTargetItem = zoomTargetItemInternal(item)) {
-            m_zoomTargetItemByItem.insert(item, zoomTargetItem);
-            m_itemsByZoomTargetItem.insert(zoomTargetItem, item);
-        } else {
-            m_pendingItemsByZoomTargetUuid.insert(item->zoomTargetUuid(), item);
-        }
-    } /* else part is after the emit. */
-    
     emit itemAdded(item);
-
-    if(!item->isZoomItem()) {
-        if(m_pendingItemsByZoomTargetUuid.contains(item->uuid())) {
-            foreach(QnWorkbenchItem *zoomItem, m_pendingItemsByZoomTargetUuid.values(item->uuid())) {
-                m_zoomTargetItemByItem.insert(zoomItem, item);
-                m_itemsByZoomTargetItem.insert(item, zoomItem);
-                emitZoomTargetItemChangedInternal(zoomItem);
-            }
-
-            m_pendingItemsByZoomTargetUuid.remove(item->uuid());
-        }
-    }
 
     updateBoundingRectInternal();
 }
@@ -213,7 +192,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     }
 
     if(item->layout() != this) {
-        qnWarning("Cannot remove an item that belongs to a different layout.");
+        qnWarning("Cannot remove an item that does not belong to this layout.");
         return;
     }
 
@@ -226,23 +205,78 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     item->m_layout = NULL;
     m_items.remove(item);
 
-    if(item->isZoomItem()) {
-        if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item)) {
-            m_zoomTargetItemByItem.remove(item);
-            m_itemsByZoomTargetItem.remove(zoomTargetItem, item);
-        }
-    } else {
-        foreach(QnWorkbenchItem *zoomItem, m_itemsByZoomTargetItem.values(item)) {
-            m_zoomTargetItemByItem.remove(zoomItem);
-            m_itemsByZoomTargetItem.remove(item, zoomItem);
-            m_pendingItemsByZoomTargetUuid.insert(zoomItem->zoomTargetUuid(), zoomItem);
-            emitZoomTargetItemChangedInternal(zoomItem);
-        }
-    }
-
     emit itemRemoved(item);
 
     updateBoundingRectInternal();
+}
+
+void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    if(!item) {
+        qnNullWarning(item);
+        return;
+    }
+
+    if(!zoomTargetItem) {
+        qnNullWarning(zoomTargetItem);
+        return;
+    }
+
+    if(item->layout() != this || zoomTargetItem->layout() != this) {
+        qnWarning("Cannot create a zoom link between items that do not belong to this layout.");
+        return;
+    }
+
+    QnWorkbenchItem *currentZoomTargetItem = item->zoomTargetItem();
+    if(currentZoomTargetItem != NULL) {
+        if(currentZoomTargetItem == zoomTargetItem)
+            return;
+
+        removeZoomLinkInternal(item, currentZoomTargetItem, false);
+    }
+
+    addZoomLinkInternal(item, zoomTargetItem, true);
+}
+
+void QnWorkbenchLayout::addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem) {
+    m_zoomTargetItemByItem.insert(item, zoomTargetItem);
+    m_itemsByZoomTargetItem.insert(zoomTargetItem, item);
+
+    emit zoomLinkAdded(item, zoomTargetItem);
+    if(notifyItem)
+        emit item->zoomTargetItemChanged();
+}
+
+void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    if(!item) {
+        qnNullWarning(item);
+        return;
+    }
+
+    if(!zoomTargetItem) {
+        qnNullWarning(zoomTargetItem);
+        return;
+    }
+    
+    if(item->layout() != this || zoomTargetItem->layout() != this) {
+        qnWarning("Cannot remove a zoom link between items that do not belong to this layout.");
+        return;
+    }
+
+    if(m_zoomTargetItemByItem.value(item) != zoomTargetItem) {
+        qnWarning("Cannot remove a zoom link that does not exist in this layout.");
+        return;
+    }
+
+    removeZoomLinkInternal(item, zoomTargetItem, true);
+}
+
+void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem) {
+    m_zoomTargetItemByItem.remove(item);
+    m_itemsByZoomTargetItem.remove(zoomTargetItem, item);
+
+    emit zoomLinkRemoved(item, zoomTargetItem);
+    if(notifyItem)
+        emit item->zoomTargetItemChanged();
 }
 
 void QnWorkbenchLayout::clear()
@@ -295,25 +329,6 @@ void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geo
     updateBoundingRectInternal();
 
     item->setGeometryInternal(geometry);
-}
-
-QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItemInternal(QnWorkbenchItem *item) const {
-    if(!item || item->zoomTargetUuid().isNull())
-        return NULL;
-
-    QnWorkbenchItem *result = this->item(item->zoomTargetUuid());
-    if(result == item)
-        return NULL;
-
-    return result;
-}
-
-void QnWorkbenchLayout::updateZoomTargetItemInternal(QnWorkbenchItem *item, const QUuid &oldZoomTargetUuid, const QUuid &newZoomTargetUuid) {
-    // TODO
-}
-
-void QnWorkbenchLayout::emitZoomTargetItemChangedInternal(QnWorkbenchItem *item) {
-    emit zoomTargetItemChanged(item);
 }
 
 bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) {
@@ -464,8 +479,12 @@ QnWorkbenchItem *QnWorkbenchLayout::item(const QUuid &uuid) const {
     return m_itemByUuid.value(uuid, NULL);
 }
 
-QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItem(const QnWorkbenchItem *item) const {
+QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem *item) const {
     return m_zoomTargetItemByItem.value(item, NULL);
+}
+
+QList<QnWorkbenchItem *> QnWorkbenchLayout::zoomItems(QnWorkbenchItem *zoomTargetItem) const {
+    return m_itemsByZoomTargetItem.values(zoomTargetItem);
 }
 
 QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QRect &region) const {

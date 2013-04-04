@@ -201,19 +201,12 @@ public:
     }
 
     /**
-     * \param zoomRect                  New zoom rect for this item.
+     * Note that zoom rect will be used only if an appropriate zoom link is 
+     * created for this item in a layout.
+     * 
+     * \param zoomRect                  New zoom rect for this item. 
      */
     void setZoomRect(const QRectF &zoomRect);
-
-    bool isZoomItem() const {
-        return !m_zoomTargetUuid.isNull();
-    }
-
-    const QUuid &zoomTargetUuid() const {
-        return m_zoomTargetUuid;
-    }
-
-    void setZoomTargetUuid(const QUuid &zoomTargetUuid);
 
     QnWorkbenchItem *zoomTargetItem() const;
 
@@ -277,7 +270,7 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void zoomRectChanged();
-    void zoomTargetUuidChanged();
+    void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
 
@@ -306,8 +299,6 @@ private:
 
     /** Item-relative rectangle that defines the portion of the item to be shown. */
     QRectF m_zoomRect;
-
-    QUuid m_zoomTargetUuid;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

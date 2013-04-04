@@ -17,6 +17,7 @@
 
 class QnWorkbenchItem;
 
+// TODO: #Elric review doxydocs
 /**
  * Layout of a workbench.
  *
@@ -137,6 +138,31 @@ public:
     bool unpinItem(QnWorkbenchItem *item);
 
     /**
+     * Adds the given item to this layout. This layout takes ownership of the
+     * given item. If the given item already belongs to some other layout,
+     * it will first be removed from that layout.
+     *
+     * If the position where the item is to be placed is occupied, the item
+     * will be placed unpinned.
+     *
+     * \param item                      Item to add.
+     */
+    Q_SLOT void addItem(QnWorkbenchItem *item);
+
+    /**
+     * Removes the given item from this layout. Item's ownership is passed
+     * to the caller.
+     *
+     * \param item                      Item to remove
+     */
+    Q_SLOT void removeItem(QnWorkbenchItem *item);
+
+    /**
+     * Clears this layout by removing all its items.
+     */
+    Q_SLOT void clear();
+
+    /**
      * \param position                  Position to get item at.
      * \returns                         Pinned item at the given position, or NULL if the given position is empty.
      */
@@ -147,8 +173,6 @@ public:
      * \returns                         Item for the given universally unique identifier, or NULL if no such item exists in this layout.
      */
     QnWorkbenchItem *item(const QUuid &uuid) const;
-
-    QnWorkbenchItem *zoomTargetItem(const QnWorkbenchItem *item) const;
 
     /**
      * \param region                    Region to get pinned items at.
@@ -174,6 +198,14 @@ public:
     const QSet<QnWorkbenchItem *> &items() const {
         return m_items;
     }
+
+    void addZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+
+    void removeZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+
+    QnWorkbenchItem *zoomTargetItem(QnWorkbenchItem *item) const;
+
+    QList<QnWorkbenchItem *> zoomItems(QnWorkbenchItem *zoomTargetItem) const;
 
     /**
      * \returns                         Whether there are no items on this layout.
@@ -242,32 +274,6 @@ public:
         return m_dataByRole;
     }
 
-public slots:
-    /**
-     * Adds the given item to this layout. This layout takes ownership of the
-     * given item. If the given item already belongs to some other layout,
-     * it will first be removed from that layout.
-     *
-     * If the position where the item is to be placed is occupied, the item
-     * will be placed unpinned.
-     *
-     * \param item                      Item to add.
-     */
-    void addItem(QnWorkbenchItem *item);
-
-    /**
-     * Removes the given item from this layout. Item's ownership is passed
-     * to the caller.
-     *
-     * \param item                      Item to remove
-     */
-    void removeItem(QnWorkbenchItem *item);
-
-    /**
-     * Clears this layout by removing all its items.
-     */
-    void clear();
-    
 signals:
     /**
      * This signal is emitted when this layout is about to be destroyed
@@ -284,7 +290,8 @@ signals:
      */
     void itemAdded(QnWorkbenchItem *item);
 
-    void zoomTargetItemChanged(QnWorkbenchItem *item);
+    void zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+    void zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
 
     /**
      * This signal is emitted whenever an item is about to be removed from
@@ -330,9 +337,8 @@ private:
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
     
-    QnWorkbenchItem *zoomTargetItemInternal(QnWorkbenchItem *item) const;
-    void updateZoomTargetItemInternal(QnWorkbenchItem *item, const QUuid &oldZoomTargetUuid, const QUuid &newZoomTargetUuid);
-    void emitZoomTargetItemChangedInternal(QnWorkbenchItem *item);
+    void addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
+    void removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
 
     void initCellParameters();
 
@@ -349,9 +355,8 @@ private:
     /** Map from item to its zoom target. */
     QHash<QnWorkbenchItem *, QnWorkbenchItem *> m_zoomTargetItemByItem;
 
+    /** Map from zoom target item to its associated zoom items. */
     QMultiHash<QnWorkbenchItem *, QnWorkbenchItem *> m_itemsByZoomTargetItem;
-
-    QMultiHash<QUuid, QnWorkbenchItem *> m_pendingItemsByZoomTargetUuid;
 
     /** Set of item borders for fast bounding rect calculation. */
     QnRectSet m_rectSet;
