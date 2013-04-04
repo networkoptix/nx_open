@@ -175,8 +175,7 @@ void QnGridBackgroundItem::at_image_loaded(int id) {
     if (id != m_imageId)
         return;
 
-    int maxTextureSize =
-            qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), 4096);
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     //int maxTextureSize = 8192;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);

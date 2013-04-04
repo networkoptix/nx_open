@@ -65,7 +65,7 @@ IMPROVEMENTS:
  - Now it is not necessary to select an item before export. Last selected item will be exported
  - Screen Recording form was redesigned
  - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
- - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
+ - Preview Search Layout looks more compact: cells' Aspect Ratio are equal to source video's aspect ratio
  - Health Monitoring colors can be customized
  - Now non-admin users (viewers) can create own layouts based on cameras that have been assigned to them 
  - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
@@ -101,6 +101,7 @@ BUGS FIXED:
  - Arecont Vision panoramic cameras now work at full resolutuion. It used to work in quarter resolution if medium or low quality was pulled
  - Areconnt Vision Spartan 6 integration is improved
  - Areconnt FPS jumping issue is fixed
+ - If an error is returned from EC, the client displayed EC password in the error message. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
 

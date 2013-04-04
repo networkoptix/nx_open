@@ -1,7 +1,8 @@
 #ifndef LAYOUT_SETTINGS_DIALOG_H
 #define LAYOUT_SETTINGS_DIALOG_H
 
-#include <QDialog>
+#include <QtGui/QDialog>
+#include <QtGui/QLabel>
 
 #include <core/resource/resource_fwd.h>
 
@@ -10,6 +11,8 @@
 namespace Ui {
     class QnLayoutSettingsDialog;
 }
+
+class QnFramedLabel;
 
 class QnLayoutSettingsDialog : public QDialog
 {
@@ -30,6 +33,7 @@ private slots:
     void at_selectButton_clicked();
     void at_clearButton_clicked();
     void at_accepted();
+    void at_opacitySpinBox_valueChanged(int value);
 
     void at_image_loaded(int id);
     void at_image_stored(int id);
@@ -46,9 +50,12 @@ private:
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
     QnAppServerFileCache *m_cache;
+    QnFramedLabel* imageLabel;
 
     QString m_filename;
     int m_layoutImageId;
+    qreal m_cellAspectRatio;
+    bool m_estimatePending;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

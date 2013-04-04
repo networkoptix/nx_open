@@ -49,17 +49,7 @@
          <number>0</number>
         </property>
         <widget class="QWidget" name="page">
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
-          <item>
-           <widget class="QLabel" name="imageLabel">
-            <property name="text">
-             <string notr="true">&lt;No image&gt;</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
@@ -181,11 +171,14 @@
           <property name="correctionMode">
            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
           </property>
+          <property name="suffix">
+           <string> cells</string>
+          </property>
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>20</number>
           </property>
           <property name="value">
            <number>10</number>
@@ -207,11 +200,14 @@
           <property name="correctionMode">
            <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
           </property>
+          <property name="suffix">
+           <string> cells</string>
+          </property>
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>10</number>
+           <number>20</number>
           </property>
           <property name="value">
            <number>10</number>
@@ -237,7 +233,7 @@
            <string>%</string>
           </property>
           <property name="minimum">
-           <number>1</number>
+           <number>5</number>
           </property>
           <property name="maximum">
            <number>100</number>

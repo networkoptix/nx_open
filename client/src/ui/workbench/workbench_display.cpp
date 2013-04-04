@@ -313,9 +313,6 @@ void QnWorkbenchDisplay::deinitSceneView() {
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
 
-    if (!m_gridBackgroundItem.isNull())
-        delete gridBackgroundItem();
-
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
 
@@ -324,6 +321,10 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         removeItemInternal(item, true, false);
+
+
+    if (!m_gridBackgroundItem.isNull())
+        delete gridBackgroundItem();
 }
 
 void QnWorkbenchDisplay::initSceneView() {
