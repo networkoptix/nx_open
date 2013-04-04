@@ -34,6 +34,8 @@ namespace {
         ((RestoreDbObject,          "restoredb"))
         ((SettingObject,            "setting"))
         ((TestEmailSettingsObject,  "testEmailSettings"))
+        ((GetFileObject,            "getfile"))
+        ((PutFileObject,            "putfile"))
     );
 } // anonymous namespace
 
@@ -1017,17 +1019,32 @@ int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& 
     return addObjectAsync(EmailObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
-int QnAppServerConnection::requestStoredFileAsync(int id, QObject *target, const char *slot) {
-    //TODO: #GDM implement
-    // at_fileLoaded(int handle, const QByteArray &data)
-    return 1;
+int QnAppServerConnection::requestStoredFileAsync(const QString& filename, QObject *target, const char *slot)
+{
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, m_objectNameMapper->name(GetFileObject) + QLatin1String("/") + filename, m_requestHeaders, m_requestParams, target, slot);
+    //TODO: #GDM, slot format is at_fileLoaded(QnHTTPRawResponse, int)
 }
 
-int QnAppServerConnection::addStoredFileAsync(const QByteArray &data, QObject *target, const char *slot) {
-    //TODO: #GDM implement
-    // at_fileUploaded(int handle, int id)
-    return 1;
-}
+int QnAppServerConnection::addStoredFileAsync(const QString& filename, const QByteArray &filedata, QObject *target, const char *slot)
+{
+    QnRequestHeaderList requestHeaders(m_requestHeaders);
+
+    QByteArray bound("------------------------------0d5e4fc23bba");
+
+    QByteArray data("--" + bound);
+    data += "\r\n";
+    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toAscii() + "\"\r\n";
+    data += "Content-Type: application/octet-stream\r\n\r\n";
+    data += filedata;
+    data += "\r\n";
+    data += "--" + bound + "--";
+    data += "\r\n";
+
+    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Type"), QLatin1String("multipart/form-data; boundary=" + bound)));
+    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Length"), QString::number(data.length())));
+
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, m_objectNameMapper->name(PutFileObject), requestHeaders, m_requestParams, data, target, slot);
+    //TODO: #GDM, slot format is at_fileLoaded(QnHTTPRawResponse, int)}
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
 {

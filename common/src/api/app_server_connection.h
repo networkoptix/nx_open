@@ -105,8 +105,8 @@ public:
     int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     qint64 getCurrentTime();
 
-    int requestStoredFileAsync(int id, QObject *target, const char *slot);
-    int addStoredFileAsync(const QByteArray &data, QObject *target, const char *slot);
+    int requestStoredFileAsync(const QString& filename, QObject *target, const char *slot);
+    int addStoredFileAsync(const QString& filename, const QByteArray &data, QObject *target, const char *slot);
 
     // Asynchronous API
     int testConnectionAsync(QObject* target, const char* slot);

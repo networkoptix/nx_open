@@ -32,7 +32,7 @@ void QnAppServerFileCache::loadImage(int id) {
       return;
 
     int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
-                id,
+                QString(QLatin1String("GDM Fix Me")),
                 this,
                 SLOT(at_fileLoaded(int handle, const QByteArray &data))
                 );
@@ -84,6 +84,7 @@ void QnAppServerFileCache::at_imageConverted(int tag) {
     file.close();
 
     m_uploadingHandle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+                QString(QLatin1String("fixgdm.exe")),
                 data,
                 this,
                 SLOT(at_fileUploaded(int handle, int id))
