@@ -22,10 +22,12 @@ public slots:
     void setInput(const QImage &input);
     void setInput(const QString &filename);
     void setOutput(const QString &filename);
+    void setTag(int tag);
 
     void start();
 signals:
     void finished(const QImage &output);
+    void finished(int tag);
 
 private:
     QSize m_size;
@@ -35,6 +37,7 @@ private:
     QImage m_input;
     QString m_inputFilename;
     QString m_outputFilename;
+    int m_tag;
 };
 
 
@@ -54,10 +57,12 @@ public slots:
     void setInput(const QImage &input);
     void setInput(const QString &filename);
     void setOutput(const QString &filename);
+    void setTag(int tag);
 
     void start();
 signals:
     void finished(const QImage &output);
+    void finished(int tag);
 
 private:
     QnThreadedImageLoaderPrivate* m_loader;

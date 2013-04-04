@@ -16,15 +16,17 @@ public:
 
     QString getFolder() const;
     QString getPath(int id) const;
+    QString getUploadingPath() const;
 signals:
     void imageLoaded(int id);
     void imageStored(int id);
 private slots:
+    void at_imageConverted(int tag);
     void at_fileLoaded(int handle, const QByteArray &data);
-
-    void saveImageDebug(const QImage& image);
+    void at_fileUploaded(int handle, int id);
 private:
     QHash<int, int> m_loading;
+    int m_uploadingHandle;
 };
 
 #endif // APP_SERVER_FILE_CACHE_H

@@ -1019,6 +1019,13 @@ int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& 
 
 int QnAppServerConnection::requestStoredFileAsync(int id, QObject *target, const char *slot) {
     //TODO: #GDM implement
+    // at_fileLoaded(int handle, const QByteArray &data)
+    return 1;
+}
+
+int QnAppServerConnection::addStoredFileAsync(const QByteArray &data, QObject *target, const char *slot) {
+    //TODO: #GDM implement
+    // at_fileUploaded(int handle, int id)
     return 1;
 }
 
