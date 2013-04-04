@@ -137,6 +137,15 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
             delete item(uuid);
     }
 
+    /* Update zoom targets. */
+    foreach(QnLayoutItemData data, resource->getItems()) {
+        QnWorkbenchItem *item = this->item(data.uuid);
+        QnWorkbenchItem *currentZoomTargetItem = zoomTargetItem(item);
+        QnWorkbenchItem *expectedZoomTargetItem = this->item(data.zoomTargetUuid);
+        if(currentZoomTargetItem != expectedZoomTargetItem)
+            addZoomLink(item, expectedZoomTargetItem); /* Will automatically remove the old link if needed. */
+    }
+
     return result;
 }
 
@@ -147,8 +156,11 @@ void QnWorkbenchLayout::submit(const QnLayoutResourcePtr &resource) const {
 
     QnLayoutItemDataList datas;
     datas.reserve(items().size());
-    foreach(const QnWorkbenchItem *item, items()) 
-        datas.push_back(item->data());
+    foreach(QnWorkbenchItem *item, items()) {
+        QnLayoutItemData data = item->data();
+        data.zoomTargetUuid = this->zoomTargetUuidInternal(item);
+        datas.push_back(data);
+    }
 
     resource->setItems(datas);
 }
@@ -196,6 +208,13 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
         return;
     }
 
+    /* Remove all zoom links first. */
+    if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
+        removeZoomLink(item, zoomTargetItem);
+    foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
+        removeZoomLink(zoomItem, item);
+
+    /* Update internal data structures. */
     if(item->isPinned())
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
@@ -481,6 +500,11 @@ QnWorkbenchItem *QnWorkbenchLayout::item(const QUuid &uuid) const {
 
 QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem *item) const {
     return m_zoomTargetItemByItem.value(item, NULL);
+}
+
+QUuid QnWorkbenchLayout::zoomTargetUuidInternal(QnWorkbenchItem *item) const {
+    QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item);
+    return zoomTargetItem ? zoomTargetItem->uuid() : QUuid();
 }
 
 QList<QnWorkbenchItem *> QnWorkbenchLayout::zoomItems(QnWorkbenchItem *zoomTargetItem) const {

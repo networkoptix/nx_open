@@ -339,6 +339,7 @@ private:
     
     void addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
     void removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
+    QUuid zoomTargetUuidInternal(QnWorkbenchItem *item) const;
 
     void initCellParameters();
 

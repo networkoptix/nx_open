@@ -217,8 +217,10 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResource
         return; /* Was called back from at_layout_itemAdded because of layout resource living in a different thread. */
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
-    m_layout->addItem(new QnWorkbenchItem(itemData, this));
-
+    QnWorkbenchItem *item = new QnWorkbenchItem(itemData, this);
+    m_layout->addItem(item);
+    if(QnWorkbenchItem *zoomTargetItem = m_layout->item(itemData.uuid))
+        m_layout->addZoomLink(item, zoomTargetItem);
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &itemData) {
