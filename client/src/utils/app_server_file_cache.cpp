@@ -98,9 +98,13 @@ void QnAppServerFileCache::at_fileLoaded(int handle, const QByteArray &data) {
     m_loading.remove(handle);
 
     QFile file(getPath(id));
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly)) {
+        //TODO: #GDM what to do?
+        return;
+    }
     QDataStream out(&file);
     out.writeRawData(data, data.size());
+    file.close();
     emit imageLoaded(id);
 }
 
