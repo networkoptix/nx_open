@@ -106,6 +106,7 @@ public:
     qint64 getCurrentTime();
 
     int requestStoredFileAsync(int id, QObject *target, const char *slot);
+    int addStoredFileAsync(const QByteArray &data, QObject *target, const char *slot);
 
     // Asynchronous API
     int testConnectionAsync(QObject* target, const char* slot);
