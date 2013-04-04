@@ -50,17 +50,19 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override {
-        QPainter painter(this);
-        QRect fullRect = event->rect().adjusted(labelFrameWidth/2, labelFrameWidth/2, -labelFrameWidth/2, -labelFrameWidth/2);
+        bool pixmapExists = pixmap() && !pixmap()->isNull();
+        if (!pixmapExists)
+            base_type::paintEvent(event);
 
-        if (pixmap() && !pixmap()->isNull()) {
+        QPainter painter(this);
+        QRect fullRect = event->rect().adjusted(labelFrameWidth / 2, labelFrameWidth / 2, -labelFrameWidth / 2, -labelFrameWidth / 2);
+
+        if (pixmapExists) {
             painter.setOpacity(0.01 * m_opacityPercent);
             QRect pix = pixmap()->rect();
             int x = fullRect.left() + (fullRect.width() - pix.width()) / 2;
             int y = fullRect.top() + (fullRect.height() - pix.height()) / 2;
             painter.drawPixmap(x, y, *pixmap());
-        } else {
-            base_type::paintEvent(event);
         }
 
         painter.setOpacity(0.5);
