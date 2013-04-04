@@ -8,6 +8,8 @@
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 namespace {
     const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
@@ -55,6 +57,14 @@ public:
         m_overlay = overlay;
     }
 
+    QnMediaResourceWidget *zoomWidget() const {
+        return m_zoomWidget.data();
+    }
+
+    void setZoomWidget(QnMediaResourceWidget *zoomWidget) {
+        m_zoomWidget = zoomWidget;
+    }
+
 protected:
     virtual QSizeF constrainedSize(const QSizeF constraint) const override {
         if(m_aspectRatio < 0.0)
@@ -96,6 +106,7 @@ protected:
 
 private:
     QWeakPointer<ZoomOverlayWidget> m_overlay;
+    QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
     qreal m_aspectRatio;
 };
 
@@ -190,8 +201,11 @@ ZoomWindowWidget::~ZoomWindowWidget() {
 // ZoomWindowInstrument
 // -------------------------------------------------------------------------- //
 ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
-    base_type(Item, makeSet(), parent)
+    base_type(Item, makeSet(), parent),
+    QnWorkbenchContextAware(parent)
 {
+    connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
+    connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
@@ -199,11 +213,8 @@ ZoomWindowInstrument::~ZoomWindowInstrument() {
 }
 
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
-    connect(widget, SIGNAL(zoomRectChanged()), this, SLOT(at_widget_zoomWindowChanged()));
+    connect(widget, SIGNAL(zoomRectChanged()), this, SLOT(at_widget_zoomRectChanged()));
     connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
-    
-    updateZoomType(widget, false);
-    registerWidgetAs(widget, m_dataByWidget[widget].isZoomWindow);
 }
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
@@ -212,11 +223,10 @@ void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
 
     disconnect(widget, NULL, this, NULL);
 
-    unregisterWidgetAs(widget, m_dataByWidget[widget].isZoomWindow);
-
     m_dataByWidget.remove(widget);
 }
 
+#if 0
 void ZoomWindowInstrument::registerWidgetAs(QnMediaResourceWidget *widget, bool asZoomWindow) {
     ZoomWidgets &widgets = m_widgetsByResource[widget->resource()];
 
@@ -256,22 +266,24 @@ void ZoomWindowInstrument::unregisterWidgetAs(QnMediaResourceWidget *widget, boo
         }
     }
 }
+#endif
 
-void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *sourceWidget, QnMediaResourceWidget *targetWidget) {
-    ZoomData &data = m_dataByWidget[sourceWidget];
+void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget) {
+    ZoomData &data = m_dataByWidget[widget];
 
-    ZoomOverlayWidget *overlayWidget = ensureOverlayWidget(targetWidget);
-    
+    ZoomOverlayWidget *overlayWidget = ensureOverlayWidget(zoomTargetWidget);
+
     ZoomWindowWidget *windowWidget = new ZoomWindowWidget();
+    windowWidget->setZoomWidget(widget);
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
-    connect(windowWidget, SIGNAL(geometryChanged()), this, SLOT(at_zoomWindow_geometryChanged()));
+    connect(windowWidget, SIGNAL(geometryChanged()), this, SLOT(at_windowWidget_geometryChanged()));
 
-    updateWindowFromWidget(sourceWidget);
+    updateWindowFromWidget(widget);
 }
 
-void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *sourceWidget, QnMediaResourceWidget *targetWidget) {
-    ZoomData &data = m_dataByWidget[sourceWidget];
+void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget) {
+    ZoomData &data = m_dataByWidget[widget];
 
     delete data.windowWidget;
     data.windowWidget = NULL;
@@ -279,17 +291,21 @@ void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *sourceWidget, Q
 
 void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget) {
     ZoomWindowWidget *windowWidget = this->windowWidget(widget);
+    ZoomOverlayWidget *overlayWidget = windowWidget ? windowWidget->overlay() : NULL;
 
-    windowWidget->overlay()->setWidgetRect(windowWidget, widget->zoomRect());
+    if(windowWidget && overlayWidget)
+        overlayWidget->setWidgetRect(windowWidget, widget->zoomRect());
 }
 
 void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget) {
     ZoomOverlayWidget *overlayWidget = windowWidget->overlay();
-    QnMediaResourceWidget *mediaWidget = overlayWidget->target();
+    QnMediaResourceWidget *zoomWidget = windowWidget->zoomWidget();
 
-    mediaWidget->setZoomRect(QnGeometry::cwiseDiv(windowWidget->rect(), overlayWidget->size()));
+    if(overlayWidget && zoomWidget)
+        emit zoomRectChanged(zoomWidget, QnGeometry::cwiseDiv(windowWidget->geometry(), overlayWidget->size()));
 }
 
+#if 0
 void ZoomWindowInstrument::updateZoomType(QnMediaResourceWidget *widget, bool registerAsType) {
     ZoomData &data = m_dataByWidget[widget];
     bool isZoomWindow = !qFuzzyCompare(widget->zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0));
@@ -304,6 +320,7 @@ void ZoomWindowInstrument::updateZoomType(QnMediaResourceWidget *widget, bool re
     if(registerAsType)
         registerWidgetAs(widget, data.isZoomWindow);
 }
+#endif
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
     return m_dataByWidget[widget].overlayWidget;
@@ -351,14 +368,34 @@ void ZoomWindowInstrument::unregisteredNotify(QGraphicsItem *item) {
         unregisterWidget(widget);
 }
 
-void ZoomWindowInstrument::at_widget_zoomWindowChanged() {
-    updateZoomType(checked_cast<QnMediaResourceWidget *>(sender()));
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void ZoomWindowInstrument::at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    QnMediaResourceWidget *mediaZoomTargetWidget = dynamic_cast<QnMediaResourceWidget *>(zoomTargetWidget);
+
+    if(mediaWidget && mediaZoomTargetWidget)
+        registerLink(mediaWidget, mediaZoomTargetWidget);
+}
+
+void ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    QnMediaResourceWidget *mediaZoomTargetWidget = dynamic_cast<QnMediaResourceWidget *>(zoomTargetWidget);
+
+    if(mediaWidget && mediaZoomTargetWidget)
+        unregisterLink(mediaWidget, mediaZoomTargetWidget);
+}
+
+void ZoomWindowInstrument::at_widget_zoomRectChanged() {
+    updateWindowFromWidget(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
 void ZoomWindowInstrument::at_widget_aboutToBeDestroyed() {
     unregisterWidget(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
-void ZoomWindowInstrument::at_zoomWindow_geometryChanged() {
+void ZoomWindowInstrument::at_windowWidget_geometryChanged() {
     updateWidgetFromWindow(checked_cast<ZoomWindowWidget *>(sender()));
 }

@@ -798,6 +798,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
+    connect(item, SIGNAL(zoomRectChanged()),                            this, SLOT(at_item_zoomRectChanged()));
 
     m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
@@ -1175,7 +1176,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
     }
 
     synchronizeGeometry(widget, animate);
-    synchronizeZoomWindow(widget);
+    synchronizeZoomRect(widget);
     synchronizeLayer(widget);
 }
 
@@ -1237,15 +1238,15 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     }
 }
 
-void QnWorkbenchDisplay::synchronizeZoomWindow(QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::synchronizeZoomRect(QnWorkbenchItem *item) {
     QnResourceWidget *widget = this->widget(item);
     if(widget == NULL)
         return; /* No widget was created for the given item. */
 
-    synchronizeZoomWindow(widget);
+    synchronizeZoomRect(widget);
 }
 
-void QnWorkbenchDisplay::synchronizeZoomWindow(QnResourceWidget *widget) {
+void QnWorkbenchDisplay::synchronizeZoomRect(QnResourceWidget *widget) {
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         mediaWidget->setZoomRect(widget->item()->zoomRect());
 }
@@ -1574,8 +1575,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
-    connect(layout,             SIGNAL(zoomLindAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this,      SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
-    connect(layout,             SIGNAL(zoomLindRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this,    SLOT(at_layout_zoomLindRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this,      SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this,    SLOT(at_layout_zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
     if (layout->resource()) {
         connect(layout->resource(), SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
@@ -1635,8 +1636,8 @@ void QnWorkbenchDisplay::at_item_geometryDeltaChanged() {
     synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), true);
 }
 
-void QnWorkbenchDisplay::at_item_zoomWindowChanged() {
-    synchronizeZoomWindow(static_cast<QnWorkbenchItem *>(sender()));
+void QnWorkbenchDisplay::at_item_zoomRectChanged() {
+    synchronizeZoomRect(static_cast<QnWorkbenchItem *>(sender()));
 }
 
 void QnWorkbenchDisplay::at_item_rotationChanged() {
@@ -1771,3 +1772,5 @@ void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resour
         addZoomLinkInternal(item, item->zoomTargetItem());
     }
 }
+
+

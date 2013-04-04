@@ -222,6 +222,7 @@ void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect) {
     m_zoomRect = zoomRect;
 
     emit zoomRectChanged();
+    emit dataChanged(Qn::ItemZoomRectRole);
 }
 
 QnWorkbenchItem *QnWorkbenchItem::zoomTargetItem() const {

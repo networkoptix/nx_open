@@ -308,8 +308,8 @@ protected:
 
     void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
     void synchronizeGeometry(QnResourceWidget *widget, bool animate);
-    void synchronizeZoomWindow(QnWorkbenchItem *item);
-    void synchronizeZoomWindow(QnResourceWidget *widget);
+    void synchronizeZoomRect(QnWorkbenchItem *item);
+    void synchronizeZoomRect(QnResourceWidget *widget);
     void synchronizeAllGeometries(bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
@@ -371,10 +371,10 @@ protected slots:
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
-    void at_item_zoomWindowChanged();
+    void at_item_zoomRectChanged();
     void at_item_rotationChanged();
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
-    
+
     void at_curtainActivityInstrument_activityStopped();
     void at_curtainActivityInstrument_activityStarted();
     void at_widgetActivityInstrument_activityStopped();

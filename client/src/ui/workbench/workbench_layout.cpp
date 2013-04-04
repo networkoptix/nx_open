@@ -245,6 +245,11 @@ void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoom
         return;
     }
 
+    if(item == zoomTargetItem) {
+        qnWarning("Cannot create a loop zoom link.");
+        return;
+    }
+
     QnWorkbenchItem *currentZoomTargetItem = item->zoomTargetItem();
     if(currentZoomTargetItem != NULL) {
         if(currentZoomTargetItem == zoomTargetItem)
