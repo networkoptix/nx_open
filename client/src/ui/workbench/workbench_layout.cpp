@@ -1,11 +1,14 @@
 #include "workbench_layout.h"
+
 #include <limits>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
+
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
 #include "workbench_layout_synchronizer.h"
@@ -189,7 +192,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     }
 
     if(item->layout() != this) {
-        qnWarning("Cannot remove an item that belongs to a different layout.");
+        qnWarning("Cannot remove an item that does not belong to this layout.");
         return;
     }
 
@@ -205,6 +208,75 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     emit itemRemoved(item);
 
     updateBoundingRectInternal();
+}
+
+void QnWorkbenchLayout::addZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    if(!item) {
+        qnNullWarning(item);
+        return;
+    }
+
+    if(!zoomTargetItem) {
+        qnNullWarning(zoomTargetItem);
+        return;
+    }
+
+    if(item->layout() != this || zoomTargetItem->layout() != this) {
+        qnWarning("Cannot create a zoom link between items that do not belong to this layout.");
+        return;
+    }
+
+    QnWorkbenchItem *currentZoomTargetItem = item->zoomTargetItem();
+    if(currentZoomTargetItem != NULL) {
+        if(currentZoomTargetItem == zoomTargetItem)
+            return;
+
+        removeZoomLinkInternal(item, currentZoomTargetItem, false);
+    }
+
+    addZoomLinkInternal(item, zoomTargetItem, true);
+}
+
+void QnWorkbenchLayout::addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem) {
+    m_zoomTargetItemByItem.insert(item, zoomTargetItem);
+    m_itemsByZoomTargetItem.insert(zoomTargetItem, item);
+
+    emit zoomLinkAdded(item, zoomTargetItem);
+    if(notifyItem)
+        emit item->zoomTargetItemChanged();
+}
+
+void QnWorkbenchLayout::removeZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
+    if(!item) {
+        qnNullWarning(item);
+        return;
+    }
+
+    if(!zoomTargetItem) {
+        qnNullWarning(zoomTargetItem);
+        return;
+    }
+    
+    if(item->layout() != this || zoomTargetItem->layout() != this) {
+        qnWarning("Cannot remove a zoom link between items that do not belong to this layout.");
+        return;
+    }
+
+    if(m_zoomTargetItemByItem.value(item) != zoomTargetItem) {
+        qnWarning("Cannot remove a zoom link that does not exist in this layout.");
+        return;
+    }
+
+    removeZoomLinkInternal(item, zoomTargetItem, true);
+}
+
+void QnWorkbenchLayout::removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem) {
+    m_zoomTargetItemByItem.remove(item);
+    m_itemsByZoomTargetItem.remove(zoomTargetItem, item);
+
+    emit zoomLinkRemoved(item, zoomTargetItem);
+    if(notifyItem)
+        emit item->zoomTargetItemChanged();
 }
 
 void QnWorkbenchLayout::clear()
@@ -405,6 +477,14 @@ QnWorkbenchItem *QnWorkbenchLayout::item(const QPoint &position) const {
 
 QnWorkbenchItem *QnWorkbenchLayout::item(const QUuid &uuid) const {
     return m_itemByUuid.value(uuid, NULL);
+}
+
+QnWorkbenchItem *QnWorkbenchLayout::zoomTargetItem(QnWorkbenchItem *item) const {
+    return m_zoomTargetItemByItem.value(item, NULL);
+}
+
+QList<QnWorkbenchItem *> QnWorkbenchLayout::zoomItems(QnWorkbenchItem *zoomTargetItem) const {
+    return m_itemsByZoomTargetItem.values(zoomTargetItem);
 }
 
 QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QRect &region) const {
