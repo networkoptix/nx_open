@@ -287,7 +287,17 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, videoSize) != 0)
+        QnCodecTranscoder::Params codecParams;
+        QList<QPair<QString, QString> > queryItems = getDecodedUrl().queryItems();
+        for( QList<QPair<QString, QString> >::const_iterator
+            it = queryItems.begin();
+            it != queryItems.end();
+            ++it )
+        {
+            codecParams[it->first] = it->second;
+        }
+
+        if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, videoSize, -1, codecParams) != 0)
             //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
         {
             QByteArray msg;

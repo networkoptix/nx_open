@@ -166,6 +166,7 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
     {
         m_vTranscoder->setResolution(resolution);
         m_vTranscoder->setBitrate(bitrate);
+        m_vTranscoder->setParams(params);
     }
     return 0;
 }

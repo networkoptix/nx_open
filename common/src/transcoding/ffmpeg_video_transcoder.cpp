@@ -109,6 +109,34 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
     if (m_mtMode)
         m_encoderCtx->thread_count = QThread::idealThreadCount();
+
+    for( QMap<QString, QVariant>::const_iterator it = m_params.begin(); it != m_params.end(); ++it )
+    {
+        if( it.key() == QString::fromLatin1("quality") )
+        {
+            //100 - 1;
+            //0 - FF_LAMBDA_MAX;
+
+            //m_encoderCtx->quality = FF_LAMBDA_MAX - ((FF_LAMBDA_MAX - 1) * it.value().toInt() / 100);
+            m_encoderCtx->global_quality = INT_MAX / 50 * (it.value().toInt() - 50);
+            //compression_level;
+        }
+        else if( it.key() == QString::fromLatin1("qscale") )
+        {
+            m_encoderCtx->flags |= CODEC_FLAG_QSCALE;
+            m_encoderCtx->global_quality = FF_QP2LAMBDA * it.value().toInt();
+        }
+        else if( it.key() == QString::fromLatin1("qmin") )
+        {
+            m_encoderCtx->qmin = it.value().toInt();
+        }
+        else if( it.key() == QString::fromLatin1("qmax") )
+        {
+            m_encoderCtx->qmax = it.value().toInt();
+        }
+    }
+
+
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = QObject::tr("Can't initialize video encoder");
