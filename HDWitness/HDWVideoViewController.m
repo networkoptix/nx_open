@@ -49,6 +49,10 @@
 	// Do any additional setup after loading the view.
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    NSLog(@"Did disappear");
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

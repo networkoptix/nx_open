@@ -337,7 +337,7 @@ enum MessageType {
 
 - (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
 {
-    barButtonItem.title = NSLocalizedString(@"Master", @"Master");
+    barButtonItem.title = NSLocalizedString(@"Servers", @"Servers");
     [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
     self.masterPopoverController = popoverController;
 }
