@@ -11,6 +11,8 @@
 
 #include <client/client_globals.h>
 
+#include <utils/common/connective.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;
@@ -52,10 +54,10 @@ class QnScreenRecorder;
 /**
  * This class implements default scene manipulation logic.
  */
-class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected QnGeometry {
+class QnWorkbenchController: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry {
     Q_OBJECT
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     /**
@@ -156,7 +158,9 @@ protected slots:
     void at_widget_rotationStartRequested();
     void at_widget_rotationStopRequested();
 
+    void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
+    void at_accessController_permissionsChanged(const QnResourcePtr &resource);
 
     void at_selectAllAction_triggered();
     void at_startSmartSearchAction_triggered();
@@ -183,6 +187,7 @@ protected slots:
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
 
+    void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
 private:
     /* Global state. */
 
