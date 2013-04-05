@@ -18,6 +18,8 @@ namespace {
 
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
 
+    const qreal zoomWindowMinSize = 0.1;
+
 } // anonymous namespace
 
 class ZoomOverlayWidget;
@@ -187,7 +189,7 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, const QPoin
     /* Size constraints go first. */
     QSizeF maxSize = geometry.size();
     if(overlayWidget)
-        maxSize = QnGeometry::cwiseMin(maxSize, overlayWidget->size());
+        maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size()), overlayWidget->size() * zoomWindowMinSize);
     result = ConstrainedResizable::constrainedGeometry(geometry, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
     /* Position constraints go next. */
@@ -197,16 +199,16 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, const QPoin
 
             qreal xScaleFactor = 1.0;
             if(result.left() < constraint.left()) {
-                xScaleFactor = (result.left() - pinPoint->x()) / (constraint.left() - pinPoint->x());
+                xScaleFactor = (constraint.left() - pinPoint->x()) / (result.left() - pinPoint->x());
             } else if(result.right() > constraint.right()) {
-                xScaleFactor = (result.right() - pinPoint->x()) / (constraint.right() - pinPoint->x());
+                xScaleFactor = (constraint.right() - pinPoint->x()) /(result.right() - pinPoint->x());
             }
 
             qreal yScaleFactor = 1.0;
             if(result.top() < constraint.top()) {
-                yScaleFactor = (result.top() - pinPoint->y()) / (constraint.top() - pinPoint->y());
+                yScaleFactor = (constraint.top() - pinPoint->y()) / (result.top() - pinPoint->y());
             } else if(result.bottom() > constraint.bottom()) {
-                yScaleFactor = (result.bottom() - pinPoint->y()) / (constraint.bottom() - pinPoint->y());
+                yScaleFactor = (constraint.bottom() - pinPoint->y()) / (result.bottom() - pinPoint->y());
             }
 
             qreal scaleFactor = qMin(xScaleFactor, yScaleFactor);

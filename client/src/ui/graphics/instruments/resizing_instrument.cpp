@@ -158,11 +158,10 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     );
     /* We don't handle heightForWidth. */
 
-    QPointF pinPoint = widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
-    QPointF newPos = widget->pos() + m_startPinPoint - pinPoint;
+    QPointF newPos = widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
 
     if(m_constrained != NULL) {
-        QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), &pinPoint);
+        QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), &m_startPinPoint);
         newSize = newGeometry.size();
         newPos = newGeometry.topLeft();
     }
