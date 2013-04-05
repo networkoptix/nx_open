@@ -264,22 +264,21 @@ enum MessageType {
 
     [[FXImageView processingQueue] setMaxConcurrentOperationCount:100];
     
-//    UIBarButtonItem *systemsButton = [[UIBarButtonItem alloc] initWithTitle:@"Systems" style:UIBarButtonItemStylePlain target:self action:@selector(insertNewObject:)];
-//    [self.navigationItem hidesBackButton:NO];
-//    self.navigationItem.leftBarButtonItem = systemsButton;
-
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
     
     self.videoViewController = (HDWVideoViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
-- (void) viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void) viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     
-    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithTitle:@"Menu" style:UIBarButtonItemStylePlain target:self.splitViewController action:@selector(toggleMasterVisible:)];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithTitle:@"Systems" style:UIBarButtonItemStylePlain target:self.splitViewController action:@selector(toggleMasterVisible:)];
+        
+        self.navigationItem.leftBarButtonItem = menuButton;
+    }
     
-    self.navigationItem.leftBarButtonItem = menuButton;
 //    self.splitViewController toggleM
 //    self.navigationController.navigationBar
 };
