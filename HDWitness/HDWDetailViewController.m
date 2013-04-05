@@ -44,7 +44,7 @@ enum MessageType {
 - (void)configureView;
 @end
 
-@interface Header : UICollectionReusableView
+@interface Header : PSUICollectionReusableView
 @property (weak, nonatomic) IBOutlet UIImageView *image;
 @property (weak, nonatomic) IBOutlet UILabel *label;
 @property (weak, nonatomic) IBOutlet UILabel *summaryLabel;
@@ -65,6 +65,30 @@ enum MessageType {
 @end
 
 @implementation HDWDetailViewController
+
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscape;
+}
+
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+    return UIInterfaceOrientationLandscapeLeft;
+}
+
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        return NO;
+    }
+    
+    return YES;
+    
+}
 
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)rawMessage
 {
@@ -257,19 +281,19 @@ enum MessageType {
     // Dispose of any resources that can be recreated.
 }
 
--(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+-(NSInteger)numberOfSectionsInCollectionView:(PSUICollectionView *)collectionView
 {
     return _ecsModel.count;
 }
 
--(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+-(NSInteger)collectionView:(PSUICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     HDWServerModel* server = [_ecsModel serverAtIndex: section];
     
     return server.cameraCount;
 }
 
--(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+-(PSUICollectionViewCell *)collectionView:(PSUICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     HDWCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MyCell" forIndexPath:indexPath];
 
@@ -309,10 +333,10 @@ enum MessageType {
     return cell;
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    if(kind == UICollectionElementKindSectionHeader)
+- (PSUICollectionReusableView *)collectionView:(PSUICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+    if([kind isEqualToString:PSTCollectionElementKindSectionHeader])
     {
-        Header *header = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerTitle" forIndexPath:indexPath];
+        Header *header = [collectionView dequeueReusableSupplementaryViewOfKind:PSTCollectionElementKindSectionHeader withReuseIdentifier:@"headerTitle" forIndexPath:indexPath];
         HDWServerModel *server = [_ecsModel serverAtIndex:indexPath.section];
         [header loadFromServer:server];
         
@@ -321,6 +345,10 @@ enum MessageType {
     }
     
     return nil;
+}
+
+- (void)collectionView:(PSUICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    [self performSegueWithIdentifier: @"showVideo" sender: [collectionView cellForItemAtIndexPath:indexPath]];
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

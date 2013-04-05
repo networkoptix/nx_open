@@ -32,9 +32,6 @@
     [super viewDidLoad];
 
     [self loadSettings];
-    if (!_objects) {
-        _objects = [[NSMutableArray alloc] init];
-    }
     
 	// Do any additional setup after loading the view, typically from a nib.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
@@ -54,7 +51,11 @@
     [defaults synchronize];
     
     NSData *encodedObject = [defaults objectForKey:@"ecsconfigs"];
-    _objects = (NSMutableArray*)[NSKeyedUnarchiver unarchiveObjectWithData: encodedObject];
+    if (encodedObject) {
+        _objects = (NSMutableArray*)[NSKeyedUnarchiver unarchiveObjectWithData: encodedObject];
+    } else {
+        _objects = [[NSMutableArray alloc] init];
+    }
 }
 
 -(void)saveSettings {
@@ -92,7 +93,11 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+#else
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
+#endif
 
     HDWECSConfig *object = _objects[indexPath.row];
     cell.textLabel.text = [object name];
@@ -139,6 +144,10 @@
         HDWECSConfig *object = _objects[indexPath.row];
         self.detailViewController.ecsConfig = object;
     }
+}
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {
+    [self performSegueWithIdentifier: @"showConfig" sender: [tableView cellForRowAtIndexPath: indexPath]];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender

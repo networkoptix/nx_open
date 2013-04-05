@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="3">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
@@ -47,7 +47,6 @@
                                 </view>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <segue destination="SUh-SR-yo9" kind="push" identifier="showConfig" trigger="accessoryAction" id="SCh-5S-vXa"/>
                                     <segue destination="bav-FU-k39" kind="push" identifier="showDetail" id="jwv-En-MwE"/>
                                 </connections>
                             </tableViewCell>
@@ -59,6 +58,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Systems" id="36"/>
+                    <connections>
+                        <segue destination="SUh-SR-yo9" kind="push" identifier="showConfig" id="Vha-ai-aMf"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="17" sceneMemberID="firstResponder"/>
             </objects>
@@ -236,18 +238,12 @@
                                     <rect key="frame" x="0.0" y="0.0" width="160" height="95"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="camera_offline.png" translatesAutoresizingMaskIntoConstraints="NO" id="l0Y-MM-cFB" customClass="FXImageView">
+                                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="camera_offline.png" id="l0Y-MM-cFB" customClass="FXImageView">
+                                            <rect key="frame" x="56" y="33" width="46" height="29"/>
                                             <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="29" id="9H4-du-Abi"/>
-                                                <constraint firstAttribute="width" constant="46" id="G7C-ao-E5i"/>
-                                            </constraints>
                                         </imageView>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u47-Ax-Osd">
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="12" id="6Uu-Qt-wmC"/>
-                                                <constraint firstAttribute="width" constant="155" id="LoV-xN-Pch"/>
-                                            </constraints>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="u47-Ax-Osd">
+                                            <rect key="frame" x="0.0" y="75" width="155" height="12"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="8"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
@@ -256,16 +252,9 @@
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstItem="u47-Ax-Osd" firstAttribute="top" secondItem="17S-bb-kjB" secondAttribute="top" constant="75" id="5oe-qd-xhS"/>
-                                    <constraint firstItem="l0Y-MM-cFB" firstAttribute="centerY" secondItem="17S-bb-kjB" secondAttribute="centerY" type="default" id="GiA-i4-o2H"/>
-                                    <constraint firstItem="u47-Ax-Osd" firstAttribute="centerX" secondItem="l0Y-MM-cFB" secondAttribute="centerX" type="default" id="Nfg-El-BHc"/>
-                                    <constraint firstItem="u47-Ax-Osd" firstAttribute="leading" secondItem="17S-bb-kjB" secondAttribute="leading" constant="1" id="VsY-hN-utB"/>
-                                </constraints>
                                 <connections>
                                     <outlet property="imageView" destination="l0Y-MM-cFB" id="M0a-nT-gqN"/>
                                     <outlet property="labelView" destination="u47-Ax-Osd" id="DNd-TR-VvV"/>
-                                    <segue destination="aeR-Nu-8rE" kind="push" identifier="showVideo" id="AqJ-6e-NP6"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>
@@ -273,40 +262,23 @@
                             <rect key="frame" x="0.0" y="0.0" width="320" height="40"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4EV-QM-CLP">
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="23" id="Gxa-cr-37M"/>
-                                        <constraint firstAttribute="width" constant="272" id="rJC-Vq-WKC"/>
-                                    </constraints>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4EV-QM-CLP">
+                                    <rect key="frame" x="41" y="2" width="272" height="23"/>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="11"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label Summary" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tn7-SP-by9">
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="20" id="kwc-WT-A4i"/>
-                                    </constraints>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label Summary" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tn7-SP-by9">
+                                    <rect key="frame" x="41" y="16" width="272" height="20"/>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="9"/>
                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="server.png" translatesAutoresizingMaskIntoConstraints="NO" id="Un0-uF-Gee">
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="18" id="JmO-cF-jtL"/>
-                                        <constraint firstAttribute="width" constant="20" id="VA0-Ov-THL"/>
-                                    </constraints>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="server.png" id="Un0-uF-Gee">
+                                    <rect key="frame" x="10" y="11" width="20" height="18"/>
                                 </imageView>
                             </subviews>
                             <color key="backgroundColor" red="0.073709239130434812" green="0.073709239130434812" blue="0.073709239130434812" alpha="1" colorSpace="calibratedRGB"/>
-                            <constraints>
-                                <constraint firstItem="4EV-QM-CLP" firstAttribute="top" secondItem="d8Y-pq-NFS" secondAttribute="top" constant="2" id="3fq-jo-47u"/>
-                                <constraint firstItem="tn7-SP-by9" firstAttribute="trailing" secondItem="4EV-QM-CLP" secondAttribute="trailing" type="default" id="9Sk-Ut-puM"/>
-                                <constraint firstItem="4EV-QM-CLP" firstAttribute="leading" secondItem="d8Y-pq-NFS" secondAttribute="leading" constant="41" id="E0Z-bW-R1Y"/>
-                                <constraint firstItem="tn7-SP-by9" firstAttribute="top" secondItem="d8Y-pq-NFS" secondAttribute="top" constant="16" id="ant-Mq-Sfs"/>
-                                <constraint firstItem="Un0-uF-Gee" firstAttribute="centerY" secondItem="d8Y-pq-NFS" secondAttribute="centerY" type="default" id="e8b-Q5-ylY"/>
-                                <constraint firstItem="tn7-SP-by9" firstAttribute="leading" secondItem="4EV-QM-CLP" secondAttribute="leading" type="default" id="u8s-Nf-tk9"/>
-                                <constraint firstItem="Un0-uF-Gee" firstAttribute="leading" secondItem="d8Y-pq-NFS" secondAttribute="leading" constant="10" id="zw4-UW-lXG"/>
-                            </constraints>
                             <connections>
                                 <outlet property="image" destination="Un0-uF-Gee" id="1gJ-nK-kkv"/>
                                 <outlet property="label" destination="4EV-QM-CLP" id="htq-OU-avp"/>
@@ -319,6 +291,9 @@
                         </connections>
                     </collectionView>
                     <navigationItem key="navigationItem" id="C1n-1b-jZb"/>
+                    <connections>
+                        <segue destination="aeR-Nu-8rE" kind="push" identifier="showVideo" id="pqG-T1-ZI1"/>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IVb-qT-u6g" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -332,17 +307,13 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="X8A-Qr-Dyi" customClass="MotionJpegImageView">
+                            <view multipleTouchEnabled="YES" contentMode="scaleAspectFill" id="X8A-Qr-Dyi" customClass="MotionJpegImageView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="X8A-Qr-Dyi" firstAttribute="trailing" secondItem="ZKh-Uk-Cqj" secondAttribute="trailing" type="default" id="BCV-q0-BmO"/>
-                            <constraint firstItem="X8A-Qr-Dyi" firstAttribute="bottom" secondItem="ZKh-Uk-Cqj" secondAttribute="bottom" type="default" id="Uqk-xD-TdU"/>
-                            <constraint firstItem="X8A-Qr-Dyi" firstAttribute="top" secondItem="ZKh-Uk-Cqj" secondAttribute="top" type="default" id="qt8-Wz-csg"/>
-                            <constraint firstItem="X8A-Qr-Dyi" firstAttribute="leading" secondItem="ZKh-Uk-Cqj" secondAttribute="leading" type="default" id="wsA-Kj-Xb3"/>
-                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="2dz-mj-ajT"/>
                     <connections>
@@ -363,14 +334,14 @@
         <class className="FXImageView" superclassName="UIImageView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/FXImageView.h"/>
         </class>
-        <class className="HDWCollectionViewCell" superclassName="UICollectionViewCell">
+        <class className="HDWCollectionViewCell" superclassName="PSUICollectionViewCell">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWCollectionViewCell.h"/>
             <relationships>
                 <relationship kind="outlet" name="imageView" candidateClass="FXImageView"/>
                 <relationship kind="outlet" name="labelView" candidateClass="UILabel"/>
             </relationships>
         </class>
-        <class className="HDWDetailViewController" superclassName="UICollectionViewController">
+        <class className="HDWDetailViewController" superclassName="PSUICollectionViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWDetailViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="detailDescriptionLabel" candidateClass="UILabel"/>
@@ -389,7 +360,7 @@
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
             </relationships>
         </class>
-        <class className="Header" superclassName="UICollectionReusableView">
+        <class className="Header" superclassName="PSUICollectionReusableView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/Header.h"/>
             <relationships>
                 <relationship kind="outlet" name="image" candidateClass="UIImageView"/>
@@ -400,17 +371,11 @@
         <class className="MotionJpegImageView" superclassName="UIImageView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/MotionJpegImageView.h"/>
         </class>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        <class className="PSTCollectionViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionViewController.h"/>
         </class>
-        <class className="UICollectionReusableView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionReusableView.h"/>
-        </class>
-        <class className="UICollectionViewCell" superclassName="UICollectionReusableView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewCell.h"/>
-        </class>
-        <class className="UICollectionViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewController.h"/>
+        <class className="PSUICollectionViewController_" superclassName="PSTCollectionViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionViewController_.h"/>
         </class>
         <class className="UICollectionViewFlowLayout" superclassName="UICollectionViewLayout">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewFlowLayout.h"/>

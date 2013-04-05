@@ -29,6 +29,7 @@
 		C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */; };
 		C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EA170090E900AC48C4 /* camera_offline.png */; };
 		C744D1F11704B4B700AC48C4 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F01704B4B700AC48C4 /* Default-568h@2x.png */; };
+		C7484C45170F11D800A589CE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7484C44170F11D800A589CE /* QuartzCore.framework */; };
 		C7810ACF16BB1C5500670CD2 /* HDWCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */; };
 		C7A6423016AF00F6005E16B4 /* HDWECSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7A6422F16AF00F6005E16B4 /* HDWECSViewController.m */; };
 		C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */ = {isa = PBXBuildFile; fileRef = C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */; };
@@ -96,6 +97,7 @@
 		C744D1F41704B50D00AC48C4 /* Default-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Portrait@2x~ipad.png"; path = "../Default-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
 		C744D1F61704B51800AC48C4 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "../Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		C744D1F91704B52300AC48C4 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x~ipad.png"; path = "../Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
+		C7484C44170F11D800A589CE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCollectionViewCell.h; sourceTree = "<group>"; };
 		C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCollectionViewCell.m; sourceTree = "<group>"; };
 		C7A6422E16AF00F6005E16B4 /* HDWECSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWECSViewController.h; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7484C45170F11D800A589CE /* QuartzCore.framework in Frameworks */,
 				C71D5AF516ADBB9600C764B5 /* UIKit.framework in Frameworks */,
 				C71D5AF716ADBB9600C764B5 /* Foundation.framework in Frameworks */,
 				C71D5AF916ADBB9600C764B5 /* CoreGraphics.framework in Frameworks */,
@@ -160,6 +163,7 @@
 		C71D5AF316ADBB9600C764B5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7484C44170F11D800A589CE /* QuartzCore.framework */,
 				C71D5AF416ADBB9600C764B5 /* UIKit.framework */,
 				C71D5AF616ADBB9600C764B5 /* Foundation.framework */,
 				C71D5AF816ADBB9600C764B5 /* CoreGraphics.framework */,
@@ -514,7 +518,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HDWitness/HDWitness-Prefix.pch";
 				INFOPLIST_FILE = "HDWitness/HDWitness-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
@@ -528,7 +532,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "HDWitness/HDWitness-Prefix.pch";
 				INFOPLIST_FILE = "HDWitness/HDWitness-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;

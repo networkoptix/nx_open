@@ -14,6 +14,30 @@
 
 @implementation HDWVideoViewController
 
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscape;
+}
+
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+    return UIInterfaceOrientationLandscapeLeft;
+}
+
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        return NO;
+    }
+    
+    return YES;
+    
+}
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -39,9 +63,6 @@
 //    self.scrollView.contentSize=CGSizeMake(1280, 720);
 //    self.scrollView.delegate=self;
     
-    //    NSURL *url = [NSURL URLWithString:@"http://admin:admin@10.0.2.133:81/videostream.cgi"];
-//    NSURL *url = [NSURL URLWithString:@"http://10.0.2.187:3451/media/00-1C-A6-01-21-97.mpjpeg"];
-    
     self.imageView.username = _camera.videoUrl.user;
     self.imageView.password = _camera.videoUrl.password;
     self.imageView.url = _camera.videoUrl;
@@ -49,8 +70,8 @@
 	// Do any additional setup after loading the view.
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
-    NSLog(@"Did disappear");
+- (void) dealloc {
+    [self.imageView stop];
 }
 
 - (void)didReceiveMemoryWarning

@@ -6,10 +6,10 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
-#import <UIKit/UICollectionViewCell.h>
+#import <PSTCollectionView/PSTCollectionView.h>
 #import "FXImageView.h"
 
-@interface HDWCollectionViewCell : UICollectionViewCell
+@interface HDWCollectionViewCell : PSUICollectionViewCell
 
 @property (weak, nonatomic) IBOutlet FXImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *labelView;
