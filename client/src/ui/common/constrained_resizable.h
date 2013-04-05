@@ -42,30 +42,41 @@ public:
      */
     virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
 
-    static QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint, const QSizeF &constrainedSize) {
+    static QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QSizeF &constrainedSize) {
         if(qFuzzyCompare(constrainedSize, geometry.size()))
             return geometry;
 
-        if(!pinPoint)
+        if(pinCorner == Qn::NoCorner)
             return QRectF(geometry.topLeft(), constrainedSize);
 
+        QPointF pinPoint = QnGeometry::corner(geometry, pinCorner);
         QRectF result(
-            *pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(*pinPoint - geometry.topLeft(), geometry.size()), constrainedSize),
+            pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinPoint - geometry.topLeft(), geometry.size()), constrainedSize),
             constrainedSize
         );
 
         /* Handle zero size so that we don't return NaNs. */
-        if(qFuzzyIsNull(geometry.width()))
-            result.moveLeft(geometry.left());
-        if(qFuzzyIsNull(geometry.height()))
-            result.moveTop(geometry.top());
+        if(qFuzzyIsNull(geometry.width())) {
+            if(pinCorner == Qn::TopLeftCorner || pinCorner == Qn::BottomLeftCorner) {
+                result.moveLeft(geometry.left());
+            } else {
+                result.moveLeft(geometry.left() - result.width());
+            }
+        }
+        if(qFuzzyIsNull(geometry.height())) {
+            if(pinCorner == Qn::TopLeftCorner || pinCorner == Qn::TopRightCorner) {
+                result.moveTop(geometry.top());
+            } else {
+                result.moveTop(geometry.top() - result.height());
+            }
+        }
 
         return result;
     }
 
 protected:
-    virtual QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint) const override {
-        return constrainedGeometry(geometry, pinPoint, constrainedSize(geometry.size()));
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override {
+        return constrainedGeometry(geometry, pinCorner, constrainedSize(geometry.size()));
     }
 };
 

@@ -57,6 +57,7 @@ private:
     };
 
     QHash<QObject *, ZoomData> m_dataByWidget;
+    QSet<QObject *> m_processingWidgets;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H

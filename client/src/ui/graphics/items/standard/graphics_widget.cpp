@@ -745,17 +745,15 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         );
         /* We don't handle heightForWidth. */
 
-        QPointF *pinPointPointer = NULL;
         QPointF newPos;
         if(windowData->grabbedSection == Qt::TitleBarArea) {
             newPos = windowData->startPinPoint + q->mapToParent(event->pos());
         } else {
-            pinPointPointer = &windowData->startPinPoint;
             newPos = q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), windowData->grabbedSection));
         }
 
         if(windowData->constrained != NULL) {
-            QRectF newGeometry = windowData->constrained->constrainedGeometry(QRectF(newPos, newSize), pinPointPointer);
+            QRectF newGeometry = windowData->constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(windowData->grabbedSection));
             newSize = newGeometry.size();
             newPos = newGeometry.topLeft();
         }

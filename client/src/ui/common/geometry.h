@@ -6,6 +6,7 @@
 #include <QtCore/QSize>
 
 #include <utils/math/math.h>
+#include <common/common_globals.h>
 
 #include "margins.h"
 
@@ -307,6 +308,9 @@ public:
 
     // TODO: #Elric rename into something more sane
     static QRectF transformed(const QRectF &transform, const QRectF &rect);
+
+    static QPointF corner(const QRectF &rect, Qn::Corner corner);
+
 };
 
 #endif // QN_GEOMETRY_H

@@ -3,11 +3,13 @@
 
 #include <QtCore/QRectF>
 
+#include <common/common_globals.h>
+
 class ConstrainedGeometrically {
 public:
     virtual ~ConstrainedGeometrically() {}
 
-    virtual QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint) const = 0;
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const = 0;
 };
 
 

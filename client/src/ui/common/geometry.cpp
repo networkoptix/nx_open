@@ -360,3 +360,20 @@ QRectF QnGeometry::transformed(const QRectF &transform, const QRectF &rect) {
     );
 }
 
+QPointF QnGeometry::corner(const QRectF &rect, Qn::Corner corner) {
+    switch(corner) {
+        case Qn::TopLeftCorner: 
+            return rect.topLeft();
+        case Qn::TopRightCorner: 
+            return rect.topRight();
+        case Qn::BottomLeftCorner: 
+            return rect.bottomLeft();
+        case Qn::BottomRightCorner: 
+            return rect.bottomRight();
+        case Qn::NoCorner: 
+            return rect.center();
+        default:
+            qnWarning("Invalid corner value '%1'.", static_cast<int>(corner));
+            return rect.center();
+    }
+}

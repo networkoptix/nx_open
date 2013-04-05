@@ -64,7 +64,7 @@ public:
     }
 
 protected:
-    virtual QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint) const override;
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         qreal l, t, r, b;
@@ -182,7 +182,7 @@ ZoomWindowWidget::~ZoomWindowWidget() {
         overlay()->removeWidget(this);
 }
 
-QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint) const {
+QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const {
     ZoomOverlayWidget *overlayWidget = this->overlay();
     QRectF result = geometry;
 
@@ -190,32 +190,37 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, const QPoin
     QSizeF maxSize = geometry.size();
     if(overlayWidget)
         maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size()), overlayWidget->size() * zoomWindowMinSize);
-    result = ConstrainedResizable::constrainedGeometry(geometry, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
+    result = ConstrainedResizable::constrainedGeometry(geometry, pinCorner, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
     /* Position constraints go next. */
     if(overlayWidget) {
-        if(pinPoint) {
+        if(pinCorner != Qn::NoCorner) {
             QRectF constraint = overlayWidget->rect();
+            QPointF pinPoint = QnGeometry::corner(geometry, pinCorner);
 
             qreal xScaleFactor = 1.0;
             if(result.left() < constraint.left()) {
-                xScaleFactor = (constraint.left() - pinPoint->x()) / (result.left() - pinPoint->x());
+                xScaleFactor = (constraint.left() - pinPoint.x()) / (result.left() - pinPoint.x());
             } else if(result.right() > constraint.right()) {
-                xScaleFactor = (constraint.right() - pinPoint->x()) /(result.right() - pinPoint->x());
+                xScaleFactor = (constraint.right() - pinPoint.x()) /(result.right() - pinPoint.x());
             }
 
             qreal yScaleFactor = 1.0;
             if(result.top() < constraint.top()) {
-                yScaleFactor = (constraint.top() - pinPoint->y()) / (result.top() - pinPoint->y());
+                yScaleFactor = (constraint.top() - pinPoint.y()) / (result.top() - pinPoint.y());
             } else if(result.bottom() > constraint.bottom()) {
-                yScaleFactor = (constraint.bottom() - pinPoint->y()) / (result.bottom() - pinPoint->y());
+                yScaleFactor = (constraint.bottom() - pinPoint.y()) / (result.bottom() - pinPoint.y());
             }
 
             qreal scaleFactor = qMin(xScaleFactor, yScaleFactor);
-            result = ConstrainedResizable::constrainedGeometry(result, pinPoint, result.size() * scaleFactor);
+            result = ConstrainedResizable::constrainedGeometry(result, pinCorner, result.size() * scaleFactor);
         } else {
             result = QnGeometry::movedInto(result, overlayWidget->rect());
         }
+    }
+
+    if(qIsNaN(result.x()) || qIsNaN(result.y())) {
+        int a = 10;
     }
 
     return result;
@@ -298,19 +303,31 @@ void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *widget, QnMedia
 }
 
 void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget) {
+    if(m_processingWidgets.contains(widget))
+        return;
+    m_processingWidgets.insert(widget);
+
     ZoomWindowWidget *windowWidget = this->windowWidget(widget);
     ZoomOverlayWidget *overlayWidget = windowWidget ? windowWidget->overlay() : NULL;
 
     if(windowWidget && overlayWidget)
         overlayWidget->setWidgetRect(windowWidget, widget->zoomRect());
+
+    m_processingWidgets.remove(widget);
 }
 
 void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget) {
     ZoomOverlayWidget *overlayWidget = windowWidget->overlay();
     QnMediaResourceWidget *zoomWidget = windowWidget->zoomWidget();
 
+    if(m_processingWidgets.contains(zoomWidget))
+        return;
+    m_processingWidgets.insert(zoomWidget);
+
     if(overlayWidget && zoomWidget)
         emit zoomRectChanged(zoomWidget, QnGeometry::cwiseDiv(windowWidget->geometry(), overlayWidget->size()));
+
+    m_processingWidgets.remove(zoomWidget);
 }
 
 
