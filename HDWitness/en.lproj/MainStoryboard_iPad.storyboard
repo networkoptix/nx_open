@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="5">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
@@ -11,6 +11,10 @@
                     <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="6">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="qzJ-Qs-j3s">
+                        <rect key="frame" x="0.0" y="960" width="768" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="19" kind="relationship" relationship="rootViewController" id="25"/>
                     </connections>
@@ -19,39 +23,34 @@
             </objects>
             <point key="canvasLocation" x="448" y="-630"/>
         </scene>
-        <!--Detail View Controller - Detail-->
+        <!--Detail View Controller-->
         <scene sceneID="16">
             <objects>
-                <viewController storyboardIdentifier="" title="Detail" id="4" customClass="HDWDetailViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="" id="4" customClass="HDWDetailViewController" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" id="PVi-3v-Gvd">
                         <rect key="frame" x="0.0" y="64" width="703" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="s3O-OI-9cs">
-                            <size key="itemSize" width="50" height="50"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="s3O-OI-9cs">
+                            <size key="itemSize" width="256" height="168"/>
                             <size key="headerReferenceSize" width="50" height="50"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" restorationIdentifier="MyCell" reuseIdentifier="MyCell" id="3Bu-oN-Sbv" customClass="HDWCollectionViewCell">
-                                <rect key="frame" x="0.0" y="50" width="133" height="101"/>
+                                <rect key="frame" x="0.0" y="50" width="256" height="168"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="133" height="101"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="256" height="168"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="camera_offline.png" translatesAutoresizingMaskIntoConstraints="NO" id="3xA-GY-bLe" customClass="FXImageView">
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="29" id="DQF-TI-aCU"/>
-                                                <constraint firstAttribute="width" constant="46" id="VZR-jl-JvC"/>
-                                            </constraints>
+                                        <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="camera_offline.png" id="3xA-GY-bLe" customClass="FXImageView">
+                                            <rect key="frame" x="89" y="55" width="77" height="57"/>
                                         </imageView>
-                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I3j-c5-ceo">
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="155" id="CPc-oP-w4v"/>
-                                                <constraint firstAttribute="height" constant="12" id="rN9-yg-0XI"/>
-                                            </constraints>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="I3j-c5-ceo">
+                                            <rect key="frame" x="50" y="120" width="155" height="12"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="8"/>
                                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <nil key="highlightedColor"/>
@@ -59,14 +58,8 @@
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
-                                <color key="backgroundColor" red="0.1087168818" green="0.1087168818" blue="0.1087168818" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstItem="3xA-GY-bLe" firstAttribute="centerX" secondItem="3Bu-oN-Sbv" secondAttribute="centerX" type="default" id="4DQ-nN-RUP"/>
-                                    <constraint firstItem="I3j-c5-ceo" firstAttribute="top" secondItem="3Bu-oN-Sbv" secondAttribute="top" constant="81" id="A0F-xt-5Zf"/>
-                                    <constraint firstItem="3xA-GY-bLe" firstAttribute="centerY" secondItem="3Bu-oN-Sbv" secondAttribute="centerY" type="default" id="Riq-MP-cWL"/>
-                                    <constraint firstItem="3xA-GY-bLe" firstAttribute="centerX" secondItem="I3j-c5-ceo" secondAttribute="centerX" type="default" id="UOR-Sj-adD"/>
-                                </constraints>
-                                <size key="customSize" width="133" height="101"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <size key="customSize" width="256" height="168"/>
                                 <connections>
                                     <outlet property="imageView" destination="3xA-GY-bLe" id="NRl-dj-0Ky"/>
                                     <outlet property="labelView" destination="I3j-c5-ceo" id="kZd-We-17X"/>
@@ -77,40 +70,23 @@
                             <rect key="frame" x="0.0" y="0.0" width="703" height="50"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9DS-I5-VIQ">
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="23" id="MlE-w0-YQK"/>
-                                        <constraint firstAttribute="width" constant="272" id="t8z-EU-VSG"/>
-                                    </constraints>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9DS-I5-VIQ">
+                                    <rect key="frame" x="41" y="3" width="272" height="23"/>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="11"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label Summary" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6yg-sl-m41">
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="20" id="fiu-Lx-AkE"/>
-                                    </constraints>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label Summary" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="6yg-sl-m41">
+                                    <rect key="frame" x="41" y="24" width="272" height="20"/>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="9"/>
                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="server.png" translatesAutoresizingMaskIntoConstraints="NO" id="PQf-0i-3r7">
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="18" id="Bfb-Ym-ot9"/>
-                                        <constraint firstAttribute="width" constant="20" id="iPD-V4-iiA"/>
-                                    </constraints>
+                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="server.png" id="PQf-0i-3r7">
+                                    <rect key="frame" x="10" y="16" width="20" height="18"/>
                                 </imageView>
                             </subviews>
                             <color key="backgroundColor" red="0.073709239130000007" green="0.073709239130000007" blue="0.073709239130000007" alpha="1" colorSpace="calibratedRGB"/>
-                            <constraints>
-                                <constraint firstItem="6yg-sl-m41" firstAttribute="top" secondItem="2nJ-6J-SBX" secondAttribute="top" constant="24" id="1EA-dh-SRM"/>
-                                <constraint firstItem="6yg-sl-m41" firstAttribute="trailing" secondItem="9DS-I5-VIQ" secondAttribute="trailing" type="default" id="KYH-o5-jCq"/>
-                                <constraint firstItem="6yg-sl-m41" firstAttribute="leading" secondItem="9DS-I5-VIQ" secondAttribute="leading" type="default" id="O1N-r9-fgD"/>
-                                <constraint firstItem="PQf-0i-3r7" firstAttribute="leading" secondItem="2nJ-6J-SBX" secondAttribute="leading" constant="10" id="S7G-LC-BpJ"/>
-                                <constraint firstItem="PQf-0i-3r7" firstAttribute="centerY" secondItem="2nJ-6J-SBX" secondAttribute="centerY" type="default" id="dPw-v4-lJz"/>
-                                <constraint firstItem="9DS-I5-VIQ" firstAttribute="top" secondItem="2nJ-6J-SBX" secondAttribute="top" constant="3" id="frc-s3-im0"/>
-                                <constraint firstItem="9DS-I5-VIQ" firstAttribute="leading" secondItem="2nJ-6J-SBX" secondAttribute="leading" constant="41" id="g4D-7n-OvJ"/>
-                            </constraints>
                             <connections>
                                 <outlet property="label" destination="9DS-I5-VIQ" id="rht-Po-2bu"/>
                                 <outlet property="summaryLabel" destination="6yg-sl-m41" id="jS2-hw-vSP"/>
@@ -118,11 +94,14 @@
                         </collectionReusableView>
                     </collectionView>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Detail" id="53"/>
+                    <navigationItem key="navigationItem" id="53"/>
+                    <connections>
+                        <segue destination="goE-Yp-YX7" kind="push" identifier="showVideo" id="BhU-Pa-RHi"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="15" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1572" y="676"/>
+            <point key="canvasLocation" x="1536" y="756"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="18">
@@ -169,7 +148,6 @@
                                 </view>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <segue destination="6xO-ez-0CL" kind="push" trigger="accessoryAction" id="vPb-R6-IWz"/>
                                     <segue destination="42" kind="replace" identifier="showDetail" splitViewControllerTargetIndex="1" id="Qa3-fe-Cge"/>
                                 </connections>
                             </tableViewCell>
@@ -180,27 +158,36 @@
                             <outlet property="delegate" destination="19" id="21"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Master" id="40"/>
+                    <navigationItem key="navigationItem" title="Systems" id="40"/>
+                    <connections>
+                        <segue destination="6xO-ez-0CL" kind="push" identifier="showConfig" id="yJ0-sb-aws"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="859" y="-631"/>
+            <point key="canvasLocation" x="953" y="-607"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="50">
             <objects>
-                <navigationController id="42" sceneMemberID="viewController">
+                <navigationController wantsFullScreenLayout="YES" id="42" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="wZs-1y-H0P"/>
-                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="43">
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
+                    <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" barStyle="blackOpaque" id="43">
+                        <rect key="frame" x="0.0" y="-44" width="0.0" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="b5y-YO-UH7">
+                        <rect key="frame" x="0.0" y="960" width="768" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="4" kind="relationship" relationship="rootViewController" id="52"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="49" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="558" y="652"/>
+            <point key="canvasLocation" x="350" y="784"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="S0X-we-YYu">
@@ -352,7 +339,35 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8gQ-el-kdb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1396" y="-623"/>
+            <point key="canvasLocation" x="1772" y="-617"/>
+        </scene>
+        <!--Video View Controller-->
+        <scene sceneID="hsZ-zm-YKo">
+            <objects>
+                <viewController id="goE-Yp-YX7" customClass="HDWVideoViewController" sceneMemberID="viewController">
+                    <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="pDb-QM-ziA">
+                        <rect key="frame" x="0.0" y="64" width="703" height="704"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view multipleTouchEnabled="YES" contentMode="scaleToFill" id="I6k-5V-bDZ" customClass="MotionJpegImageView">
+                                <rect key="frame" x="0.0" y="0.0" width="703" height="704"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="abA-SN-XVU"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <connections>
+                        <outlet property="imageView" destination="I6k-5V-bDZ" id="ZLO-bh-zPk"/>
+                        <outlet property="scrollView" destination="pDb-QM-ziA" id="wVx-Sm-Uo9"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1MR-9f-OTy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2698" y="756"/>
         </scene>
     </scenes>
     <resources>
@@ -363,14 +378,14 @@
         <class className="FXImageView" superclassName="UIImageView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/FXImageView.h"/>
         </class>
-        <class className="HDWCollectionViewCell" superclassName="UICollectionViewCell">
+        <class className="HDWCollectionViewCell" superclassName="PSUICollectionViewCell_">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWCollectionViewCell.h"/>
             <relationships>
                 <relationship kind="outlet" name="imageView" candidateClass="FXImageView"/>
                 <relationship kind="outlet" name="labelView" candidateClass="UILabel"/>
             </relationships>
         </class>
-        <class className="HDWDetailViewController" superclassName="UICollectionViewController">
+        <class className="HDWDetailViewController" superclassName="PSUICollectionViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWDetailViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="detailDescriptionLabel" candidateClass="UILabel"/>
@@ -378,31 +393,54 @@
         </class>
         <class className="HDWECSViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWECSViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="valueChanged:" candidateClass="UITextField"/>
+            </relationships>
         </class>
         <class className="HDWMasterViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWMasterViewController.h"/>
         </class>
-        <class className="Header" superclassName="UICollectionReusableView">
+        <class className="HDWVideoViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWVideoViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="imageView" candidateClass="MotionJpegImageView"/>
+                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
+            </relationships>
+        </class>
+        <class className="Header" superclassName="PSUICollectionReusableView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/Header.h"/>
             <relationships>
+                <relationship kind="outlet" name="image" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="label" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="summaryLabel" candidateClass="UILabel"/>
             </relationships>
         </class>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        <class className="MotionJpegImageView" superclassName="UIImageView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/MotionJpegImageView.h"/>
         </class>
-        <class className="UICollectionReusableView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionReusableView.h"/>
+        <class className="PSTCollectionReusableView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionReusableView.h"/>
         </class>
-        <class className="UICollectionViewCell" superclassName="UICollectionReusableView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewCell.h"/>
+        <class className="PSTCollectionViewCell" superclassName="PSTCollectionReusableView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionViewCell.h"/>
         </class>
-        <class className="UICollectionViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewController.h"/>
+        <class className="PSTCollectionViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionViewController.h"/>
+        </class>
+        <class className="PSUICollectionReusableView_" superclassName="PSTCollectionReusableView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionReusableView_.h"/>
+        </class>
+        <class className="PSUICollectionViewCell_" superclassName="PSTCollectionViewCell">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionViewCell_.h"/>
+        </class>
+        <class className="PSUICollectionViewController_" superclassName="PSTCollectionViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionViewController_.h"/>
         </class>
         <class className="UICollectionViewFlowLayout" superclassName="UICollectionViewLayout">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewFlowLayout.h"/>
+        </class>
+        <class className="UICollectionViewLayout" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewLayout.h"/>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

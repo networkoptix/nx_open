@@ -155,7 +155,15 @@
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         HDWECSConfig *object = _objects[indexPath.row];
-        [[segue destinationViewController] setEcsConfig:object];
+    
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            [[segue destinationViewController] setEcsConfig:object];
+        } else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
+            UINavigationController* navigationViewController = [segue destinationViewController];
+            HDWDetailViewController* detailViewController = (HDWDetailViewController*) navigationViewController.topViewController;
+            detailViewController.title = object.name;
+            [detailViewController setEcsConfig:object];
+        }
     } else if ([[segue identifier] isEqualToString:@"showConfig"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
         HDWECSConfig *ecsConfig = _objects[indexPath.row];

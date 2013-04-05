@@ -264,11 +264,25 @@ enum MessageType {
 
     [[FXImageView processingQueue] setMaxConcurrentOperationCount:100];
     
+//    UIBarButtonItem *systemsButton = [[UIBarButtonItem alloc] initWithTitle:@"Systems" style:UIBarButtonItemStylePlain target:self action:@selector(insertNewObject:)];
+//    [self.navigationItem hidesBackButton:NO];
+//    self.navigationItem.leftBarButtonItem = systemsButton;
+
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
     
     self.videoViewController = (HDWVideoViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithTitle:@"Menu" style:UIBarButtonItemStylePlain target:self.splitViewController action:@selector(toggleMasterVisible:)];
+    
+    self.navigationItem.leftBarButtonItem = menuButton;
+//    self.splitViewController toggleM
+//    self.navigationController.navigationBar
+};
 
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [_socket setDelegate:nil];
@@ -365,7 +379,7 @@ enum MessageType {
 
 - (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
 {
-    barButtonItem.title = NSLocalizedString(@"Servers", @"Servers");
+    barButtonItem.title = NSLocalizedString(@"Systems", @"Systems");
     [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
     self.masterPopoverController = popoverController;
 }
