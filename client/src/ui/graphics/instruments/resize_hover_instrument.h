@@ -27,6 +27,7 @@ protected:
 private:
     qreal m_effectiveDistance;
     QHash<QGraphicsItem *, FrameSectionQueryable *> m_queryableByItem;
+    QSet<QGraphicsItem *> m_affectedItems;
 };
 
 

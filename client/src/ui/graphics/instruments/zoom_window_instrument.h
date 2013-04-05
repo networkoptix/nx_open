@@ -28,8 +28,8 @@ protected:
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
 private slots:
-    void at_widget_zoomRectChanged();
     void at_widget_aboutToBeDestroyed();
+    void at_widget_zoomRectChanged();
     void at_windowWidget_geometryChanged();
 
     void at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
@@ -40,22 +40,13 @@ private:
     ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
     ZoomWindowWidget *windowWidget(QnMediaResourceWidget *widget) const;
 
-/*    void updateZoomType(QnMediaResourceWidget *widget, bool registerAsType = true); */
-    void updateWindowFromWidget(QnMediaResourceWidget *widget);
-    void updateWidgetFromWindow(ZoomWindowWidget *windowWidget);
-
     void registerWidget(QnMediaResourceWidget *widget);
     void unregisterWidget(QnMediaResourceWidget *widget);
-
     void registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
     void unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
 
-
-/*    void registerWidgetAs(QnMediaResourceWidget *widget, bool asZoomWindow);
-    void unregisterWidgetAs(QnMediaResourceWidget *widget, bool asZoomWindow);
-
-    void registerLink(QnMediaResourceWidget *sourceWidget, QnMediaResourceWidget *targetWidget);
-    void unregisterLink(QnMediaResourceWidget *sourceWidget, QnMediaResourceWidget *targetWidget);*/
+    void updateWindowFromWidget(QnMediaResourceWidget *widget);
+    void updateWidgetFromWindow(ZoomWindowWidget *windowWidget);
 
 private:
     struct ZoomData {

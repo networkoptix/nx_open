@@ -5,6 +5,8 @@
 
 class QStyleOptionTitleBar;
 
+class ConstrainedResizable;
+
 class GraphicsStyle;
 class GraphicsWidgetSceneData;
 
@@ -19,6 +21,7 @@ public:
     bool movableAncestorIsSelected() const { return movableAncestorIsSelected(q_func()); }
 
     bool hasDecoration() const;
+    bool handlesFrameEvents() const;
 
 protected:
     void initStyleOptionTitleBar(QStyleOptionTitleBar *option);
@@ -52,10 +55,12 @@ protected:
         QRectF closeButtonRect;
         QPointF startPinPoint;
         QSizeF startSize;
+        ConstrainedResizable *resizable;
         WindowData(): 
             grabbedSection(Qt::NoSection), 
             closeButtonHovered(false), 
-            closeButtonGrabbed(false)
+            closeButtonGrabbed(false),
+            resizable(NULL)
         {}
     } *windowData;
 
