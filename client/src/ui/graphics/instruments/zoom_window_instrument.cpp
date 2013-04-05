@@ -28,8 +28,7 @@ class ZoomWindowWidget: public Instrumented<GraphicsWidget>, public ConstrainedR
     typedef Instrumented<GraphicsWidget> base_type;
 public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
-        base_type(parent, windowFlags),
-        m_aspectRatio(-1.0)
+        base_type(parent, windowFlags)
     {
         setWindowFrameMargins(zoomFrameWidth, zoomFrameWidth, zoomFrameWidth, zoomFrameWidth);
 
@@ -40,14 +39,6 @@ public:
     }
 
     virtual ~ZoomWindowWidget();
-
-    qreal aspectRatio() const {
-        return m_aspectRatio;
-    }
-
-    void setAspectRatio(qreal aspectRatio) {
-        m_aspectRatio = aspectRatio;
-    }
 
     ZoomOverlayWidget *overlay() const {
         return m_overlay.data();
@@ -67,15 +58,7 @@ public:
 
 protected:
     virtual QSizeF constrainedSize(const QSizeF constraint) const override {
-        if(m_aspectRatio < 0.0)
-            return constraint;
-        else
-            return QnGeometry::expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
-    }
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
-        painter->setPen(Qt::green);
-        painter->drawRect(rect());
+        return QnGeometry::expanded(QnGeometry::aspectRatio(size()), constraint, Qt::KeepAspectRatio);
     }
 
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
@@ -107,7 +90,6 @@ protected:
 private:
     QWeakPointer<ZoomOverlayWidget> m_overlay;
     QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
-    qreal m_aspectRatio;
 };
 
 
@@ -136,8 +118,7 @@ public:
         widget->setParentItem(this);
         m_rectByWidget.insert(widget, QRectF(0.0, 0.0, 1.0, 1.0));
         
-        updateLayout();
-        updateAspectRatio();
+        updateLayout(widget);
     }
 
     void removeWidget(ZoomWindowWidget *widget) {
@@ -154,7 +135,7 @@ public:
 
         m_rectByWidget[widget] = rect;
 
-        updateLayout();
+        updateLayout(widget);
     }
 
     QRectF widgetRect(ZoomWindowWidget *widget) const {
@@ -163,15 +144,11 @@ public:
 
     virtual void setGeometry(const QRectF &rect) override {
         QSizeF oldSize = size();
-        qreal oldAspectRatio = QnGeometry::aspectRatio(oldSize);
 
         base_type::setGeometry(rect);
 
         if(!qFuzzyCompare(oldSize, size()))
             updateLayout();
-
-        if(!qFuzzyCompare(oldAspectRatio, QnGeometry::aspectRatio(size())))
-            updateAspectRatio();
     }
 
 private:
@@ -182,16 +159,6 @@ private:
 
     void updateLayout(ZoomWindowWidget *widget) {
         widget->setGeometry(QnGeometry::transformed(rect(), m_rectByWidget.value(widget)));
-    }
-
-    void updateAspectRatio() {
-        qreal aspectRatio = QnGeometry::aspectRatio(size());
-        for(QHash<ZoomWindowWidget *, QRectF>::const_iterator pos = m_rectByWidget.begin(); pos != m_rectByWidget.end(); pos++)
-            pos.key()->setAspectRatio(aspectRatio);
-    }
-
-    void updateAspectRatio(ZoomWindowWidget *widget) {
-
     }
 
 private:

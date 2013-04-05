@@ -482,7 +482,13 @@ Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF& pos) 
 }
 
 Qn::WindowFrameSections GraphicsWidget::windowFrameSectionsAt(const QRectF &region) const {
-    return Qn::calculateRectangularFrameSections(windowFrameRect(), rect(), region);
+    Q_D(const GraphicsWidget);
+
+    if(!d->hasDecoration()) {
+        return Qn::NoSection;
+    } else {
+        return Qn::calculateRectangularFrameSections(windowFrameRect(), rect(), region);
+    }
 }
 
 bool GraphicsWidget::windowFrameEvent(QEvent *event) {
