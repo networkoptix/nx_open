@@ -608,7 +608,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
     if (media->dataType == QnAbstractMediaData::VIDEO)
-        m_transcoder.setVideoCodec(m_codec, method, videoSize);
+        m_transcoder.setVideoCodec(m_codec, method, QnQualityNormal, videoSize);
     else
         m_transcoder.setAudioCodec(m_codec, method);
     if (m_isVideo)

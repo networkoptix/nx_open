@@ -161,7 +161,7 @@ public:
 
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
-static int DEFAULT_MAX_CONNECTION_LIVE_TIME_MS = 30*60;    //30 minutes
+static int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
@@ -183,7 +183,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
 
     d->killTimerID = TimerManager::instance()->addTimer(
         this,
-        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME_MS ).toUInt()*MS_PER_SEC );
+        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt()*MS_PER_SEC );
 }
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
@@ -287,7 +287,11 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        QnCodecTranscoder::Params codecParams;
+        QnStreamQuality quality = QnQualityNormal;
+        if( getDecodedUrl().hasQueryItem(QnCodecParams::quality) )
+            quality = QnStreamQualityFromString(getDecodedUrl().queryItemValue(QnCodecParams::quality));
+
+        QnCodecParams::Value codecParams;
         QList<QPair<QString, QString> > queryItems = getDecodedUrl().queryItems();
         for( QList<QPair<QString, QString> >::const_iterator
             it = queryItems.begin();
@@ -297,8 +301,13 @@ void QnProgressiveDownloadingConsumer::run()
             codecParams[it->first] = it->second;
         }
 
-        if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, videoSize, -1, codecParams) != 0)
-            //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
+        if (d->transcoder.setVideoCodec(
+                d->videoCodec,
+                QnTranscoder::TM_FfmpegTranscode,
+                quality,
+                videoSize,
+                -1,
+                codecParams ) != 0 )
         {
             QByteArray msg;
             msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLocal8Bit();

@@ -23,6 +23,24 @@ QString QnStreamQualityToString(QnStreamQuality value) {
     return QObject::tr("Undefined");
 }
 
+QnStreamQuality QnStreamQualityFromString( const QString& str )
+{
+    if( str == QString::fromLatin1("lowest") )
+        return QnQualityLowest;
+    else if( str == QString::fromLatin1("low") )
+        return QnQualityLow;
+    else if( str == QString::fromLatin1("normal") )
+        return QnQualityNormal;
+    else if( str == QString::fromLatin1("high") )
+        return QnQualityHigh;
+    else if( str == QString::fromLatin1("highest") )
+        return QnQualityHighest;
+    else if( str == QString::fromLatin1("preset") )
+        return QnQualityPreSet;
+    else
+        return QnQualityPreSet;
+}
+
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
 QnMediaResource::QnMediaResource():
