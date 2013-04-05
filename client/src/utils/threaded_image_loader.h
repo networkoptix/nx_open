@@ -7,6 +7,9 @@
 
 #include <QtGui/QImage>
 
+/**
+ * @brief The QnThreadedImageLoaderPrivate class is private class. DO NOT USE it in your modules.
+ */
 class QnThreadedImageLoaderPrivate : public QObject
 {
     Q_OBJECT
@@ -39,6 +42,11 @@ private:
 };
 
 
+/**
+ * @brief The QnThreadedImageLoader class is intended for threaded processing of images.
+ * It allows to read, resize and save images in a separate thread. Does not require explicit
+ * memory deallocation.
+ */
 class QnThreadedImageLoader : public QObject
 {
     Q_OBJECT
@@ -47,18 +55,65 @@ public:
     ~QnThreadedImageLoader();
 
 public slots:
+    /**
+     * @brief setSize               Set target size of an image.
+     * @param size                  Size in pixels
+     */
     void setSize(const QSize &size);
+
+    /**
+     * @brief setAspectRatioMode    Set aspect ratio used in resize. Default value is Qt::KeepAspectRatio.
+     * @param mode                  Qt::AspectRatioMode
+     */
     void setAspectRatioMode(const Qt::AspectRatioMode mode);
+
+    /**
+     * @brief setTransformationMode Set transformation mode used in resize. Default value is Qt::SmoothTransformation.
+     * @param mode                  Qt::TransformationMode
+     */
     void setTransformationMode(const Qt::TransformationMode mode);
+
+    /**
+     * @brief setDownScaleOnly      Set downscale-only flag. If set image will not be upscaled. Default value is True.
+     * @param value                 Bool value
+     */
     void setDownScaleOnly(const bool value);
 
+    /**
+     * @brief setInput              Input image file. Have lower priority than setInput(QString)
+     * @param input
+     */
     void setInput(const QImage &input);
+
+    /**
+     * @brief setInput              Path to an image. Have greater priority than setInput(QImage)
+     * @param filename              Full path as used in currect OS.
+     */
     void setInput(const QString &filename);
+
+    /**
+     * @brief setOutput             Path where output image should be saved. If set, no direct QImage output
+     *                              will be provided. Allows to convert the image from one format to another.
+     * @param filename
+     */
     void setOutput(const QString &filename);
 
+    /**
+     * @brief start                 Start the image processing.
+     */
     void start();
 signals:
+
+    /**
+     * @brief finished              Signal that will be emitted when processing is finished and Output param is NOT SET.
+     * @param output                Result image.
+     */
     void finished(const QImage &output);
+
+    /**
+     * @brief finished              Signal that will be emitted when processing is finished and Output param is SET.
+     * @param output                Full path to the result image.
+     */
     void finished(const QString &output);
 
 private:
