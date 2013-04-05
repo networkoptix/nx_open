@@ -22,6 +22,8 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
     [self.tableView setEditing:YES];
 }
 
@@ -119,6 +121,7 @@
         textField.textColor = [self deepBlueColor];
         textField.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         
         textField.placeholder = self.dataSourceArray[indexPath.row][@"Placeholder"];
         
