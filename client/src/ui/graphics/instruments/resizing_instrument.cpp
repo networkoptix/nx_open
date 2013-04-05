@@ -102,7 +102,7 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
     m_section = section;
     m_widget = widget;
-    m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
+    m_constrained = dynamic_cast<ConstrainedGeometrically *>(widget);
 
     dragProcessor()->mousePressEvent(viewport, event);
 
@@ -158,12 +158,18 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     );
     /* We don't handle heightForWidth. */
 
-    if(m_resizable != NULL)
-        newSize = m_resizable->constrainedSize(newSize);
+    QPointF pinPoint = widget->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), m_section));
+    QPointF newPos = widget->pos() + m_startPinPoint - pinPoint;
+
+    if(m_constrained != NULL) {
+        QRectF newGeometry = m_constrained->constrainedGeometry(QRectF(newPos, newSize), &pinPoint);
+        newSize = newGeometry.size();
+        newPos = newGeometry.topLeft();
+    }
 
     /* Change size & position. */
     widget->resize(newSize);
-    widget->setPos(widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(widget->rect(), m_section)));
+    widget->setPos(newPos);
 
     emit resizing(info->view(), widget, ResizingInfo(this));
 }
@@ -173,7 +179,7 @@ void ResizingInstrument::finishDrag(DragInfo *info) {
         emit resizingFinished(info->view(), m_widget.data(), ResizingInfo(this));
 
     m_widget.clear();
-    m_resizable = NULL;
+    m_constrained = NULL;
 }
 
 void ResizingInstrument::finishDragProcess(DragInfo *info) {

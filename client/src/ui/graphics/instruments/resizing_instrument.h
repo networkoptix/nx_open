@@ -6,7 +6,7 @@
 
 #include "drag_processing_instrument.h"
 
-class ConstrainedResizable;
+class ConstrainedGeometrically;
 class ResizeHoverInstrument;
 class ResizingInstrument;
 
@@ -92,7 +92,7 @@ private:
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
     QWeakPointer<QGraphicsWidget> m_widget;
-    ConstrainedResizable *m_resizable;
+    ConstrainedGeometrically *m_constrained;
 };
 
 #endif // QN_RESIZING_INSTRUMENT_H

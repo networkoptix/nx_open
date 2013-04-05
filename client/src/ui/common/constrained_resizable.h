@@ -1,7 +1,10 @@
 #ifndef QN_CONSTRAINED_RESIZABLE
 #define QN_CONSTRAINED_RESIZABLE
 
-#include <QSizeF>
+#include <utils/math/fuzzy.h>
+
+#include "constrained_geometrically.h"
+#include "geometry.h"
 
 /**
  * This class is a workaround for a lack of mechanisms that would allow to 
@@ -16,7 +19,7 @@
  * resizing using Qt-supplied functionality. So we introduce a separate 
  * interface for that.
  */
-class ConstrainedResizable {
+class ConstrainedResizable: public ConstrainedGeometrically {
 public:
     /**
      * Virtual destructor.
@@ -38,6 +41,29 @@ public:
      * \returns                         Preferred size for the given constraint.
      */
     virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
+
+protected:
+    virtual QRectF constrainedGeometry(const QRectF geometry, const QPointF *pinPoint) const override {
+        QSizeF size = constrainedSize(geometry.size());
+        if(qFuzzyCompare(size, geometry.size()))
+            return geometry;
+
+        if(!pinPoint)
+            return QRectF(geometry.topLeft(), size);
+
+        QRectF result(
+            *pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(*pinPoint - geometry.topLeft(), geometry.size()), size),
+            size
+        );
+
+        /* Handle zero size so that we don't return NaNs. */
+        if(qFuzzyIsNull(geometry.width()))
+            result.moveLeft(geometry.left());
+        if(qFuzzyIsNull(geometry.height()))
+            result.moveTop(geometry.top());
+
+        return result;
+    }
 };
 
 
