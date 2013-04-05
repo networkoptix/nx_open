@@ -43,12 +43,16 @@ bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
 
 void ResizeHoverInstrument::unregisteredNotify(QGraphicsItem *item) {
     m_queryableByItem.remove(item);
+    m_affectedItems.remove(item);
 }
 
 bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
+    if(!satisfiesItemConditions(widget))
+        return false;
+    
     FrameSectionQueryable *queryable = m_queryableByItem.value(item);
-    if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
+    if(!queryable && !hasDecoration(widget))
         return false; /* Has no decorations and not queryable for frame sections. */
 
     Qt::WindowFrameSection section;
@@ -63,16 +67,17 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
     Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(section);
     if(widget->cursor().shape() != cursorShape)
         widget->setCursor(cursorShape);
+    m_affectedItems.insert(widget);
 
     return false;
 }
 
 bool ResizeHoverInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *) {
-    QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
-    if(!hasDecoration(widget))
+    if(!m_affectedItems.contains(item))
         return false;
 
-    widget->unsetCursor();
+    item->unsetCursor();
+
     return false;
 }
 

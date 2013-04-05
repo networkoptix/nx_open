@@ -234,6 +234,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_resizingInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_resizingInstrument->resizeHoverInstrument()->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));

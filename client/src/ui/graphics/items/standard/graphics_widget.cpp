@@ -14,6 +14,7 @@
 #include <utils/common/warnings.h>
 
 #include <ui/common/frame_section.h>
+#include <ui/common/constrained_resizable.h>
 
 class GraphicsWidgetSceneData: public QObject {
 public:
@@ -342,6 +343,57 @@ QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &v
     return result;
 }
 
+bool GraphicsWidget::event(QEvent *event) {
+    /* Filter events that we want to handle by ourself. */
+    switch(event->type()) {
+    case QEvent::GraphicsSceneMousePress:
+    case QEvent::GraphicsSceneMouseMove:
+    case QEvent::GraphicsSceneMouseRelease:
+    case QEvent::GraphicsSceneMouseDoubleClick:
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    case QEvent::GraphicsSceneHoverLeave:
+        break;
+    default:
+        return base_type::event(event);
+    }
+
+    /* Note that the following code is copied from QGraphicsWidget implementation, 
+     * so we don't need to call into the base class. */
+    Q_D(GraphicsWidget);
+
+    /* Forward the event to the layout first. */
+    if (layout())
+        layout()->widgetEvent(event);
+
+    /* Handle the event itself. */
+    switch (event->type()) {
+    case QEvent::GraphicsSceneMousePress:
+        if (windowFrameEvent(event))
+            return true;
+    case QEvent::GraphicsSceneMouseMove:
+    case QEvent::GraphicsSceneMouseRelease:
+    case QEvent::GraphicsSceneMouseDoubleClick:
+        d->ensureWindowData();
+        if (d->windowData->grabbedSection != Qt::NoSection)
+            return windowFrameEvent(event);
+        break;
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverMove:
+    case QEvent::GraphicsSceneHoverLeave:
+        windowFrameEvent(event);
+        /* Filter out hover events if they were sent to us only because of the
+         * decoration (special case in QGraphicsScenePrivate::dispatchHoverEvent). */
+        if (!acceptsHoverEvents())
+            return true;
+        break;
+    default:
+        break;
+    }
+    
+    return QObject::event(event);
+}
+
 void GraphicsWidget::changeEvent(QEvent *event) {
     Q_D(GraphicsWidget);
 
@@ -591,6 +643,7 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     ensureWindowData();
     windowData->grabbedSection = q->windowFrameSectionAt(event->pos());
     windowData->startSize = q->size();
+    windowData->resizable = dynamic_cast<ConstrainedResizable *>(q); /* We do dynamic_cast every time to feel safer during destruction. */
 
     if (windowData->closeButtonHovered) {
         windowData->closeButtonGrabbed = true;
@@ -645,7 +698,7 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         return;
     }
 
-    if (!(event->buttons() & Qt::LeftButton)) {
+    if(!(event->buttons() & Qt::LeftButton)) {
         event->ignore();
         return;
     }
@@ -663,10 +716,16 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         );
         /* We don't handle heightForWidth. */
 
+        if(windowData->resizable)
+            newSize = windowData->resizable->constrainedSize(newSize);
+
         /* Change size & position. */
-        q->resize(newSize);
-        if(windowData->grabbedSection != Qt::TitleBarArea)
+        if(windowData->grabbedSection == Qt::TitleBarArea) {
+            q->setPos(q->pos() + q->mapToParent(event->pos()) - q->mapToParent(event->lastPos()));
+        } else {
+            q->resize(newSize);
             q->setPos(q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(q->rect(), windowData->grabbedSection)));
+        }
         
         event->accept();
     }

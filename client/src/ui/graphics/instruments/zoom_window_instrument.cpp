@@ -32,6 +32,10 @@ public:
     {
         setWindowFrameMargins(zoomFrameWidth, zoomFrameWidth, zoomFrameWidth, zoomFrameWidth);
 
+        setAcceptedMouseButtons(Qt::LeftButton);
+        setHandlingFlag(ItemHandlesResizing, true);
+        setHandlingFlag(ItemHandlesMovement, true);
+
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
         
@@ -82,6 +86,8 @@ protected:
         if(result & Qn::SideSections) {
             result &= ~Qn::SideSections;
             result |= Qn::TitleBarArea;
+        } else if(result == Qn::NoSection) {
+            result = Qn::TitleBarArea;
         }
 
         return result;
