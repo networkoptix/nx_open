@@ -6,12 +6,6 @@
 
 #include <utils/common/log.h>
 
-#ifndef _WIN32
-#include <sys/types.h>
-#include <linux/unistd.h>
-
-static pid_t gettid(void) { return syscall(__NR_gettid); }
-#endif
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
@@ -188,13 +182,11 @@ bool QnTcpListener::enableSSLMode()
 
 void QnTcpListener::run()
 {
+    saveSysThreadID();
+
     Q_D(QnTcpListener);
 
-#ifdef _WIN32
-    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
-#else
-    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2, tid %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(gettid()), cl_logWARNING );
-#endif
+    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(sysThreadID()), cl_logWARNING );
     try
     {
         if (!d->serverSocket)
