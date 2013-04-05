@@ -31,6 +31,8 @@ public:
 
     void setAggregationInfo(const QnBusinessAggregationInfo &info);
 private:
+    QString getMotionUrl() const;
+
     QString eventTextString(BusinessEventType::Value eventType, const QnBusinessParams &params) const;
 
     QString resourceString(bool useUrl) const;
