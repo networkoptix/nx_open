@@ -23,6 +23,7 @@ public:
     static QPointF cwiseDiv(const QPointF &l, const QSizeF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseMin(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseMul(const QSizeF &l, const MarginsF &r);

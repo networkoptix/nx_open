@@ -29,6 +29,10 @@ QSizeF QnGeometry::cwiseDiv(const QSizeF &l, const QSizeF &r) {
     return QSizeF(l.width() / r.width(), l.height() / r.height());
 }
 
+QSizeF QnGeometry::cwiseMin(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(qMin(l.width(), r.width()), qMin(l.height(), r.height()));
+}
+
 MarginsF QnGeometry::cwiseMul(const MarginsF &l, const QSizeF &r) {
     return MarginsF(
         l.left()   * r.width(),

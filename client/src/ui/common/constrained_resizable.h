@@ -42,18 +42,16 @@ public:
      */
     virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
 
-protected:
-    virtual QRectF constrainedGeometry(const QRectF geometry, const QPointF *pinPoint) const override {
-        QSizeF size = constrainedSize(geometry.size());
-        if(qFuzzyCompare(size, geometry.size()))
+    static QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint, const QSizeF &constrainedSize) {
+        if(qFuzzyCompare(constrainedSize, geometry.size()))
             return geometry;
 
         if(!pinPoint)
-            return QRectF(geometry.topLeft(), size);
+            return QRectF(geometry.topLeft(), constrainedSize);
 
         QRectF result(
-            *pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(*pinPoint - geometry.topLeft(), geometry.size()), size),
-            size
+            *pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(*pinPoint - geometry.topLeft(), geometry.size()), constrainedSize),
+            constrainedSize
         );
 
         /* Handle zero size so that we don't return NaNs. */
@@ -63,6 +61,11 @@ protected:
             result.moveTop(geometry.top());
 
         return result;
+    }
+
+protected:
+    virtual QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint) const override {
+        return constrainedGeometry(geometry, pinPoint, constrainedSize(geometry.size()));
     }
 };
 

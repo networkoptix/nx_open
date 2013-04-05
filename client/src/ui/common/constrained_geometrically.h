@@ -7,7 +7,7 @@ class ConstrainedGeometrically {
 public:
     virtual ~ConstrainedGeometrically() {}
 
-    virtual QRectF constrainedGeometry(const QRectF geometry, const QPointF *pinPoint) const = 0;
+    virtual QRectF constrainedGeometry(const QRectF &geometry, const QPointF *pinPoint) const = 0;
 };
 
 

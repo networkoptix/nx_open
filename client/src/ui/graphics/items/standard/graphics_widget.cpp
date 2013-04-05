@@ -682,6 +682,7 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     switch(windowData->grabbedSection) {
     case Qt::TitleBarArea:
         if(handlingFlags & GraphicsWidget::ItemHandlesMovement) {
+            windowData->startPinPoint = q->pos() - q->mapToParent(event->pos());
             event->accept();
         } else {
             windowData->grabbedSection = Qt::NoSection;
@@ -747,7 +748,7 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         QPointF pinPoint, *pinPointPointer = NULL;
         QPointF newPos;
         if(windowData->grabbedSection == Qt::TitleBarArea) {
-            newPos = q->pos() + q->mapToParent(event->pos()) - q->mapToParent(event->lastPos());
+            newPos = windowData->startPinPoint + q->mapToParent(event->pos());
         } else {
             pinPoint = q->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), windowData->grabbedSection));
             pinPointPointer = &pinPoint;
