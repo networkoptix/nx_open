@@ -17,29 +17,29 @@ message Layout {
             optional string path = 2;
         };
 
-        required string uuid       = 1;
-        required int32 flags       = 2;
-        required double left       = 3;
-        required double top        = 4;
-        required double right      = 5;
-        required double bottom     = 6;
-        required double rotation   = 7;
-        required Resource resource = 8;
-        optional double zoomLeft   = 9;
-        optional double zoomTop    = 10;
-        optional double zoomRight  = 11;
-        optional double zoomBottom = 12;
-        optional string zoomTargetUuid = 13;
+        required string uuid            = 1;
+        required int32 flags            = 2;
+        required double left            = 3;
+        required double top             = 4;
+        required double right           = 5;
+        required double bottom          = 6;
+        required double rotation        = 7;
+        required Resource resource      = 8;
+        optional double zoomLeft        = 9;
+        optional double zoomTop         = 10;
+        optional double zoomRight       = 11;
+        optional double zoomBottom      = 12;
+        optional string zoomTargetUuid  = 13;
     }
 
-    required double cellAspectRatio   = 1;
-    required double cellSpacingWidth  = 2;
-    required double cellSpacingHeight = 3;
-    repeated Item   item              = 4;
-    optional bool   userCanEdit       = 5;    
-    optional int32  backgroundImageId = 6;
-    optional int32  backgroundWidth   = 7;
-    optional int32  backgroundHeight  = 8;
-    optional bool   locked            = 9;
-    optional int32  backgroundOpacity = 10;
+    required double cellAspectRatio         = 1;
+    required double cellSpacingWidth        = 2;
+    required double cellSpacingHeight       = 3;
+    repeated Item   item                    = 4;
+    optional bool   userCanEdit             = 5;
+    optional bool   locked                  = 6;
+    optional string backgroundImageFilename = 7;
+    optional int32  backgroundWidth         = 8;
+    optional int32  backgroundHeight        = 9;
+    optional int32  backgroundOpacity       = 10;
 }

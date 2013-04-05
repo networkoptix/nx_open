@@ -34,7 +34,10 @@ namespace {
         ((RestoreDbObject,          "restoredb"))
         ((SettingObject,            "setting"))
         ((TestEmailSettingsObject,  "testEmailSettings"))
+        ((GetFileObject,            "getfile"))
+        ((PutFileObject,            "putfile"))
     );
+
 } // anonymous namespace
 
 QnAppServerReplyProcessor::QnAppServerReplyProcessor(QnResourceFactory &resourceFactory, QnApiSerializer &serializer, int object): 
@@ -212,6 +215,14 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         emit finishedSendEmail(status, errorString, result == "OK", handle);
         break;
     }
+    case GetFileObject: {
+            emit finishedGetFile(status, result, handle);
+            break;
+        }
+    case PutFileObject: {
+            emit finishedPutFile(status, handle);
+            break;
+        }
     default:
         ;// TODO: #Elric warning?
     }
@@ -1017,9 +1028,47 @@ int QnAppServerConnection::sendEmailAsync(const QStringList& to, const QString& 
     return addObjectAsync(EmailObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
-int QnAppServerConnection::requestStoredFileAsync(int id, QObject *target, const char *slot) {
-    //TODO: #GDM implement
-    return 1;
+int QnAppServerConnection::requestStoredFileAsync(const QString& filename, QObject *target, const char *slot)
+{
+    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, GetFileObject);
+    QObject::connect(processor, SIGNAL(finishedGetFile(int, const QByteArray&, int)), target, slot);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url,
+                                                             m_objectNameMapper->name(GetFileObject) + QLatin1String("/") + filename,
+                                                             m_requestHeaders,
+                                                             m_requestParams,
+                                                             processor,
+                                                             SLOT(processReply(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::addStoredFileAsync(const QString& filename, const QByteArray &filedata, QObject *target, const char *slot)
+{
+    QnRequestHeaderList requestHeaders(m_requestHeaders);
+
+    QByteArray bound("------------------------------0d5e4fc23bba");
+
+    QByteArray data("--" + bound);
+    data += "\r\n";
+    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toAscii() + "\"\r\n";
+    data += "Content-Type: application/octet-stream\r\n\r\n";
+    data += filedata;
+    data += "\r\n";
+    data += "--" + bound + "--";
+    data += "\r\n";
+
+    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Type"), QLatin1String("multipart/form-data; boundary=" + bound)));
+    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Length"), QString::number(data.length())));
+
+    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, PutFileObject);
+    QObject::connect(processor, SIGNAL(finishedPutFile(int, int)), target, slot);
+
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url,
+                                                              m_objectNameMapper->name(PutFileObject),
+                                                              requestHeaders,
+                                                              m_requestParams,
+                                                              data,
+                                                              processor,
+                                                              SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

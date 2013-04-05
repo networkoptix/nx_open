@@ -323,4 +323,11 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+class QnLayoutSettingsActionCondition: public QnActionCondition {
+public:
+    QnLayoutSettingsActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

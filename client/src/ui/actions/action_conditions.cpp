@@ -353,3 +353,19 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() > 1)
+        return Qn::InvisibleAction;
+
+    QnResourcePtr resource;
+    if (resources.size() > 0)
+        resource = resources[0];
+    else
+        resource = context()->workbench()->currentLayout()->resource();
+
+    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    return resource->hasFlags(QnResource::layout) && !isExportedLayout
+            ? Qn::EnabledAction
+            : Qn::InvisibleAction;
+}

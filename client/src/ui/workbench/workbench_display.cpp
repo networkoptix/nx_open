@@ -644,7 +644,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
         return;
 
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
-    gridBackgroundItem()->setImageId(layout->backgroundImageId());
+    gridBackgroundItem()->setImageFilename(layout->backgroundImageFilename());
     gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
     gridBackgroundItem()->updateDisplay();
 
@@ -1107,10 +1107,11 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
     QRect backgroundBoundingRect = gridBackgroundItem()->sceneBoundingRect();
-    if(backgroundBoundingRect.isNull())
-        backgroundBoundingRect = QRect(0, 0, 1, 1);
 
-    QRect sceneBoundingRect = layoutBoundingRect.united(backgroundBoundingRect);
+    QRect sceneBoundingRect =  (backgroundBoundingRect.isNull())
+            ? layoutBoundingRect
+            : layoutBoundingRect.united(backgroundBoundingRect);
+
     return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
 }
 

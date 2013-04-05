@@ -11,7 +11,11 @@
 
 class QnLayoutItemData {
 public:
-    QnLayoutItemData(): flags(0), rotation(0), zoomRect(0.0, 0.0, 1.0, 1.0) {}
+    QnLayoutItemData():
+        flags(0),
+        zoomRect(0.0, 0.0, 1.0, 1.0),
+        rotation(0)
+    {}
 
     struct {
         QnId id;
