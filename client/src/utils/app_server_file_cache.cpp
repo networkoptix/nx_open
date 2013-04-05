@@ -126,7 +126,9 @@ void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
 
     QString filename = m_uploading[handle];
     m_uploading.remove(handle);
-
-    emit imageStored(filename, status == 0);
+    bool ok = status == 0;
+    if (!ok)
+        QFile::remove(getFullPath(filename));
+    emit imageStored(filename, ok);
 }
 
