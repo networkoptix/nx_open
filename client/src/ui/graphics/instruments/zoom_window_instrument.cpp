@@ -320,8 +320,11 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
         return;
     m_processingWidgets.insert(zoomWidget);
 
-    if(overlayWidget && zoomWidget)
-        emit zoomRectChanged(zoomWidget, QnGeometry::cwiseDiv(windowWidget->geometry(), overlayWidget->size()));
+    if(overlayWidget && zoomWidget) {
+        QRectF zoomRect = QnGeometry::cwiseDiv(windowWidget->geometry(), overlayWidget->size());
+        overlayWidget->setWidgetRect(windowWidget, zoomRect);
+        emit zoomRectChanged(zoomWidget, zoomRect);
+    }
 
     m_processingWidgets.remove(zoomWidget);
 }
