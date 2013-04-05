@@ -9,8 +9,10 @@
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/generic/clickable_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench.h>
 
 namespace {
     const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
@@ -24,11 +26,12 @@ namespace {
 
 class ZoomOverlayWidget;
 
+
 // -------------------------------------------------------------------------- //
 // ZoomWindowWidget
 // -------------------------------------------------------------------------- //
-class ZoomWindowWidget: public Instrumented<GraphicsWidget>, public ConstrainedGeometrically {
-    typedef Instrumented<GraphicsWidget> base_type;
+class ZoomWindowWidget: public Instrumented<QnClickableWidget>, public ConstrainedGeometrically {
+    typedef Instrumented<QnClickableWidget> base_type;
 public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)
@@ -36,6 +39,7 @@ public:
         setWindowFrameMargins(zoomFrameWidth, zoomFrameWidth, zoomFrameWidth, zoomFrameWidth);
 
         setAcceptedMouseButtons(Qt::LeftButton);
+        setClickableButtons(Qt::LeftButton);
         setHandlingFlag(ItemHandlesResizing, true);
         setHandlingFlag(ItemHandlesMovement, true);
 
@@ -288,6 +292,7 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaRe
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
     connect(windowWidget, SIGNAL(geometryChanged()), this, SLOT(at_windowWidget_geometryChanged()));
+    connect(windowWidget, SIGNAL(doubleClicked()), this, SLOT(at_windowWidget_doubleClicked()));
 
     updateWindowFromWidget(widget);
 }
@@ -397,4 +402,13 @@ void ZoomWindowInstrument::at_widget_zoomRectChanged() {
 
 void ZoomWindowInstrument::at_windowWidget_geometryChanged() {
     updateWidgetFromWindow(checked_cast<ZoomWindowWidget *>(sender()));
+}
+
+void ZoomWindowInstrument::at_windowWidget_doubleClicked() {
+    ZoomWindowWidget *windowWidget = checked_cast<ZoomWindowWidget *>(sender());
+
+    // TODO: #Elric does not belong here.
+    QnMediaResourceWidget *zoomWidget = windowWidget->zoomWidget();
+    if(zoomWidget)
+        workbench()->setItem(Qn::ZoomedRole, zoomWidget->item());
 }

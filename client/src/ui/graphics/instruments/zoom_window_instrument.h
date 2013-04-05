@@ -33,6 +33,7 @@ private slots:
     void at_widget_aboutToBeDestroyed();
     void at_widget_zoomRectChanged();
     void at_windowWidget_geometryChanged();
+    void at_windowWidget_doubleClicked();
 
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
