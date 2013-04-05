@@ -287,13 +287,25 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
             itemData.resource.id = pb_item.resource().id();
             itemData.resource.path = QString::fromUtf8(pb_item.resource().path().c_str());
 
-            itemData.uuid = QUuid(pb_item.uuid().c_str());
+            itemData.uuid = QUuid(QString::fromUtf8(pb_item.uuid().c_str()));
             itemData.flags = pb_item.flags();
             itemData.combinedGeometry.setLeft(pb_item.left());
             itemData.combinedGeometry.setTop(pb_item.top());
             itemData.combinedGeometry.setRight(pb_item.right());
             itemData.combinedGeometry.setBottom(pb_item.bottom());
             itemData.rotation = pb_item.rotation();
+
+            if(pb_item.has_zoomtargetuuid())
+                itemData.zoomTargetUuid = QUuid(QString::fromUtf8(pb_item.zoomtargetuuid().c_str()));
+
+            if(pb_item.has_zoomleft() && pb_item.has_zoomtop() && pb_item.has_zoomright() && pb_item.has_zoombottom()) {
+                itemData.zoomRect.setLeft(pb_item.zoomleft());
+                itemData.zoomRect.setTop(pb_item.zoomtop());
+                itemData.zoomRect.setRight(pb_item.zoomright());
+                itemData.zoomRect.setBottom(pb_item.zoombottom());
+            } else {
+                itemData.zoomRect = QRectF(0.0, 0.0, 1.0, 1.0);
+            }
 
             items.append(itemData);
         }
@@ -556,6 +568,11 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
             pb_item.set_right(itemIn.combinedGeometry.right());
             pb_item.set_bottom(itemIn.combinedGeometry.bottom());
             pb_item.set_rotation(itemIn.rotation);
+            pb_item.set_zoomtargetuuid(itemIn.zoomTargetUuid.toString().toUtf8().constData());
+            pb_item.set_zoomleft(itemIn.zoomRect.left());
+            pb_item.set_zoomtop(itemIn.zoomRect.top());
+            pb_item.set_zoomright(itemIn.zoomRect.right());
+            pb_item.set_zoombottom(itemIn.zoomRect.bottom());
         }
     }
 }

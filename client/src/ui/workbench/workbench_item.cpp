@@ -222,15 +222,15 @@ void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect) {
     m_zoomRect = zoomRect;
 
     emit zoomRectChanged();
+    emit dataChanged(Qn::ItemZoomRectRole);
 }
 
-void QnWorkbenchItem::setZoomTargetUuid(const QUuid &zoomTargetUuid) {
-    if(m_zoomTargetUuid == zoomTargetUuid)
-        return;
-
-    m_zoomTargetUuid = zoomTargetUuid;
-
-    emit zoomTargetUuidChanged();
+QnWorkbenchItem *QnWorkbenchItem::zoomTargetItem() const {
+    if(m_layout) {
+        return m_layout->zoomTargetItem(const_cast<QnWorkbenchItem *>(this));
+    } else {
+        return NULL;
+    }
 }
 
 void QnWorkbenchItem::setRotation(qreal rotation) {
@@ -281,8 +281,6 @@ QVariant QnWorkbenchItem::data(int role) const {
         return combinedGeometry();
     case Qn::ItemZoomRectRole:
         return zoomRect();
-    case Qn::ItemZoomTargetUuidRole:
-        return QVariant::fromValue<QUuid>(zoomTargetUuid());
     case Qn::ItemFlagsRole:
         return static_cast<int>(flags());
     case Qn::ItemRotationRole:
@@ -336,15 +334,6 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return true;
         } else {
             qnWarning("Provided zoom rect value '%1' is not convertible to QRectF.", value);
-            return false;
-        }
-    }
-    case Qn::ItemZoomTargetUuidRole: {
-        if(value.canConvert<QUuid>()) {
-            setZoomTargetUuid(value.value<QUuid>());
-            return true;
-        } else {
-            qnWarning("Provided zoom target uuid value '%1' is not convertible to QUuid.", value);
             return false;
         }
     }
