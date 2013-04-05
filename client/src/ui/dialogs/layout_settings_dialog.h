@@ -25,12 +25,13 @@ public:
     
     void readFromResource(const QnLayoutResourcePtr &layout);
     bool submitToResource(const QnLayoutResourcePtr &layout);
+
 protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
+
+    virtual bool eventFilter(QObject *target, QEvent *event) override;
 private slots:
-    void at_viewButton_clicked();
-    void at_selectButton_clicked();
     void at_clearButton_clicked();
     void at_accepted();
     void at_opacitySpinBox_valueChanged(int value);
@@ -42,11 +43,13 @@ private slots:
     void setProgress(bool value);
 
     void updateControls();
+
+    void viewFile();
+    void selectFile();
 private:
     bool hasChanges(const QnLayoutResourcePtr &layout);
 
     void loadPreview();
-
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
     QnAppServerFileCache *m_cache;

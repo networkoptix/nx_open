@@ -93,14 +93,16 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     imageLabel->setOpacityPercent(ui->opacitySpinBox->value());
     ui->horizontalLayout->insertWidget(0, imageLabel, 1);
 
+    imageLabel->installEventFilter(this);
+
     ui->userCanEditCheckBox->setVisible(false);
     ui->widthSpinBox->setMaximum(widthLimit);
     ui->heightSpinBox->setMaximum(heightLimit);
 
     setProgress(false);
 
-    connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(at_viewButton_clicked()));
-    connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(at_selectButton_clicked()));
+    connect(ui->viewButton,     SIGNAL(clicked()), this, SLOT(viewFile()));
+    connect(ui->selectButton,   SIGNAL(clicked()), this, SLOT(selectFile()));
     connect(ui->clearButton,    SIGNAL(clicked()), this, SLOT(at_clearButton_clicked()));
     connect(ui->lockedCheckBox, SIGNAL(clicked()), this, SLOT(updateControls()));
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
@@ -124,6 +126,16 @@ void QnLayoutSettingsDialog::showEvent(QShowEvent *event) {
 void QnLayoutSettingsDialog::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
 //    loadPreview();
+}
+
+bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
+    if (target == imageLabel && event->type() == QEvent::MouseButtonRelease) {
+        if (!m_newFilePath.isEmpty())
+            viewFile();
+        else
+            selectFile();
+    }
+    return base_type::eventFilter(target, event);
 }
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
@@ -186,37 +198,6 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-}
-
-void QnLayoutSettingsDialog::at_viewButton_clicked() {
-    QString path = QLatin1String("file:///") + m_newFilePath;
-    if (QDesktopServices::openUrl(QUrl(path)))
-        return;
-
-    QnImagePreviewDialog dialog;
-    dialog.openImage(m_newFilePath);
-    dialog.exec();
-}
-
-void QnLayoutSettingsDialog::at_selectButton_clicked() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
-    dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setNameFilter(tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)"));
-
-    if(!dialog->exec())
-        return;
-
-    QStringList files = dialog->selectedFiles();
-    if (files.size() < 0)
-        return;
-
-    m_newFilePath = files[0];
-    m_cachedFilename = QString();
-    m_estimatePending = true;
-
-    loadPreview();
-    updateControls();
 }
 
 void QnLayoutSettingsDialog::at_clearButton_clicked() {
@@ -287,6 +268,37 @@ void QnLayoutSettingsDialog::loadPreview() {
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
     setProgress(true);
+}
+
+void QnLayoutSettingsDialog::viewFile() {
+    QString path = QLatin1String("file:///") + m_newFilePath;
+    if (QDesktopServices::openUrl(QUrl(path)))
+        return;
+
+    QnImagePreviewDialog dialog;
+    dialog.openImage(m_newFilePath);
+    dialog.exec();
+}
+
+void QnLayoutSettingsDialog::selectFile() {
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open file")));
+    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog->setFileMode(QFileDialog::ExistingFile);
+    dialog->setNameFilter(tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)"));
+
+    if(!dialog->exec())
+        return;
+
+    QStringList files = dialog->selectedFiles();
+    if (files.size() < 0)
+        return;
+
+    m_newFilePath = files[0];
+    m_cachedFilename = QString();
+    m_estimatePending = true;
+
+    loadPreview();
+    updateControls();
 }
 
 void QnLayoutSettingsDialog::setPreview(const QImage &image) {

@@ -14,6 +14,7 @@
 #include <business/events/camera_input_business_event.h>
 
 #include "version.h"
+#include "api/app_server_connection.h"
 
 namespace BusinessActionParameters {
     static QLatin1String emailAddress("emailAddress");
@@ -72,6 +73,28 @@ QString QnSendMailBusinessAction::getSubject() const {
         break;
     }
     return QObject::tr("Unknown Event has occured");
+}
+
+QString QnSendMailBusinessAction::getMotionUrl() const
+{
+    int id = QnBusinessEventRuntime::getEventResourceId(m_runtimeParams);
+    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::rfAllResources) : QnResourcePtr();
+    if (!res)
+        return QString();
+    QnResourcePtr mserverRes = res->getParentResource();
+    if (!mserverRes)
+        return QString();
+
+    QUrl apPServerUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl mserverUrl = mserverRes->getUrl();
+    quint64 ts = QnBusinessEventRuntime::getEventTimestamp(m_runtimeParams);
+    QByteArray rnd = QByteArray::number(rand()).toHex();
+
+    QString result(lit("https://%1:%2/proxy/http/%3:%4/media/%5.webm?rand=%6&resolution=240p&pos=%7"));
+    result = result.arg(apPServerUrl.host()).arg(apPServerUrl.port(80)).arg(mserverUrl.host()).arg(mserverUrl.port(80)).
+        arg(res->getUniqueId()).arg(QLatin1String(rnd)).arg(ts/1000);
+
+    return result;
 }
 
 QString QnSendMailBusinessAction::getMessageBody() const {
@@ -147,6 +170,8 @@ QString QnSendMailBusinessAction::getMessageBody() const {
         messageBody += timestampString(detail.runtimeParams, detail.count);
     }
 
+    //if (eventType == BusinessEventType::Camera_Motion)
+    //    messageBody = QString(lit("<b><a href=\"%1\">%2</a></b>")).arg(getMotionUrl()).arg(messageBody.replace(lit("\n"), lit("<br>")));
     return messageBody;
 }
 

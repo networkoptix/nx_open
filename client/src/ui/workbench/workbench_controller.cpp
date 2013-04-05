@@ -170,7 +170,7 @@ namespace {
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
     m_cursorPos(invalidCursorPos()),
@@ -379,6 +379,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(workbench(),                SIGNAL(currentLayoutAboutToBeChanged()),                                                    this,                           SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
@@ -423,6 +424,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
+
+    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),                                                  this,                           SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+
     m_countdownCanceled = false;
     m_overlayLabel = 0;
     m_overlayLabelAnimation = 0;
@@ -1414,14 +1418,29 @@ void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView();
 }
 
+void QnWorkbenchController::at_workbench_currentLayoutAboutToBeChanged() {
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    if (!layout || !layout->resource())
+        return;
+
+    disconnect(layout->resource(), NULL, this, NULL);
+}
+
 void QnWorkbenchController::at_workbench_currentLayoutChanged() {
-    // TODO: subscribe to permission changes.
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    if (!layout)
+        return;
+    if (layout->resource()) {
+        connect(layout->resource(), SIGNAL(lockedChanged(const QnLayoutResourcePtr &)), this, SLOT(updateLayoutInstruments(const QnLayoutResourcePtr &)));
+    }
+    updateLayoutInstruments(layout->resource());
+}
 
-    Qn::Permissions permissions = accessController()->permissions(workbench()->currentLayout()->resource());
-    bool writable = permissions & Qn::WritePermission;
-
-    m_moveInstrument->setEnabled(writable);
-    m_resizingInstrument->setEnabled(writable);
+void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    if (!layout || !layout->resource() || layout->resource() != resource)
+        return;
+    updateLayoutInstruments(resource.dynamicCast<QnLayoutResource>());
 }
 
 void QnWorkbenchController::at_zoomedToggle_activated() {
@@ -1430,4 +1449,18 @@ void QnWorkbenchController::at_zoomedToggle_activated() {
 
 void QnWorkbenchController::at_zoomedToggle_deactivated() {
     m_handScrollInstrument->setMouseButtons(Qt::RightButton);
+}
+
+void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &layout) {
+    if (!layout) {
+        m_moveInstrument->setEnabled(false);
+        m_resizingInstrument->setEnabled(false);
+        return;
+    }
+
+    Qn::Permissions permissions = accessController()->permissions(layout);
+    bool writable = permissions & Qn::WritePermission;
+
+    m_moveInstrument->setEnabled(writable && !layout->locked());
+    m_resizingInstrument->setEnabled(writable && !layout->locked());
 }
