@@ -14,7 +14,7 @@
 #include <utils/common/warnings.h>
 
 #include <ui/common/frame_section.h>
-#include <ui/common/constrained_resizable.h>
+#include <ui/common/constrained_geometrically.h>
 #include <ui/common/scene_transformations.h>
 
 class GraphicsWidgetSceneData: public QObject {
@@ -671,7 +671,7 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     ensureWindowData();
     windowData->grabbedSection = resizingFrameSectionAt(event->pos(), event->widget());
     windowData->startSize = q->size();
-    windowData->resizable = dynamic_cast<ConstrainedResizable *>(q); /* We do dynamic_cast every time to feel safer during destruction. */
+    windowData->constrained = dynamic_cast<ConstrainedGeometrically *>(q); /* We do dynamic_cast every time to feel safer during destruction. */
 
     if (windowData->closeButtonHovered) {
         windowData->closeButtonGrabbed = true;
@@ -744,16 +744,25 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         );
         /* We don't handle heightForWidth. */
 
-        if(windowData->resizable)
-            newSize = windowData->resizable->constrainedSize(newSize);
+        QPointF pinPoint, *pinPointPointer = NULL;
+        QPointF newPos;
+        if(windowData->grabbedSection == Qt::TitleBarArea) {
+            newPos = q->pos() + q->mapToParent(event->pos()) - q->mapToParent(event->lastPos());
+        } else {
+            pinPoint = q->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), windowData->grabbedSection));
+            pinPointPointer = &pinPoint;
+            newPos = q->pos() + windowData->startPinPoint - pinPoint;
+        }
+
+        if(windowData->constrained != NULL) {
+            QRectF newGeometry = windowData->constrained->constrainedGeometry(QRectF(newPos, newSize), pinPointPointer);
+            newSize = newGeometry.size();
+            newPos = newGeometry.topLeft();
+        }
 
         /* Change size & position. */
-        if(windowData->grabbedSection == Qt::TitleBarArea) {
-            q->setPos(q->pos() + q->mapToParent(event->pos()) - q->mapToParent(event->lastPos()));
-        } else {
-            q->resize(newSize);
-            q->setPos(q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(q->rect(), windowData->grabbedSection)));
-        }
+        q->resize(newSize);
+        q->setPos(newPos);
         
         event->accept();
     }

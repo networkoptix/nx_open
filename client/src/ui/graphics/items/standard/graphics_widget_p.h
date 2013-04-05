@@ -5,7 +5,7 @@
 
 class QStyleOptionTitleBar;
 
-class ConstrainedResizable;
+class ConstrainedGeometrically;
 
 class GraphicsStyle;
 class GraphicsWidgetSceneData;
@@ -59,12 +59,12 @@ protected:
         QRectF closeButtonRect;
         QPointF startPinPoint;
         QSizeF startSize;
-        ConstrainedResizable *resizable;
+        ConstrainedGeometrically *constrained;
         WindowData(): 
             grabbedSection(Qt::NoSection), 
             closeButtonHovered(false), 
             closeButtonGrabbed(false),
-            resizable(NULL)
+            constrained(NULL)
         {}
     } *windowData;
 
