@@ -68,9 +68,9 @@ public:
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
-    /** Id of background image on EC */
-    int backgroundImageId() const;
-    void setBackgroundImageId(int id);
+    /** Filename of background image on EC */
+    QString backgroundImageFilename() const;
+    void setBackgroundImageFilename(const QString &filename);
 
     /** Background image opacity in percents */
     int backgroundOpacity() const;
@@ -109,7 +109,7 @@ private:
     QnTimePeriod m_localRange;
     bool m_userCanEdit;
     QSize m_backgroundSize;
-    int m_backgroundImageId;
+    QString m_backgroundImageFilename;
     int m_backgroundOpacity;
     bool m_locked;
 };

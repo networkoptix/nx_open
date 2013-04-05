@@ -26,6 +26,7 @@ public slots:
     void start();
 signals:
     void finished(const QImage &output);
+    void finished(const QString &output);
 
 private:
     QSize m_size;
@@ -58,6 +59,7 @@ public slots:
     void start();
 signals:
     void finished(const QImage &output);
+    void finished(const QString &output);
 
 private:
     QnThreadedImageLoaderPrivate* m_loader;

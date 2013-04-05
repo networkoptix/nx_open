@@ -15,7 +15,6 @@
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
-    m_imageId(0),
     m_imageSize(1, 1),
     m_imageOpacity(70),
     m_targetOpacity(0),
@@ -25,7 +24,7 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
 {
     setAcceptedMouseButtons(0);
 
-    connect(m_cache, SIGNAL(imageLoaded(int)), this, SLOT(at_image_loaded(int)));
+    connect(m_cache, SIGNAL(imageLoaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
@@ -39,11 +38,11 @@ QnGridBackgroundItem::~QnGridBackgroundItem() {
 }
 
 void QnGridBackgroundItem::updateDisplay() {
-    if (m_imageId == 0) {
+    if (m_imageFilename.isEmpty()) {
         animatedHide();
         return;
     }
-    m_cache->loadImage(m_imageId);
+    m_cache->loadImage(m_imageFilename);
 }
 
 void QnGridBackgroundItem::animatedHide() {
@@ -115,14 +114,14 @@ void QnGridBackgroundItem::setAnimationTimer(AnimationTimer *timer) {
     m_geometryAnimator->setTimer(timer);
 }
 
-int QnGridBackgroundItem::imageId() const {
-    return m_imageId;
+QString QnGridBackgroundItem::imageFilename() const {
+    return m_imageFilename;
 }
 
-void QnGridBackgroundItem::setImageId(int imageId) {
-    if (m_imageId == imageId)
+void QnGridBackgroundItem::setImageFilename(const QString &imageFilename) {
+    if (m_imageFilename == imageFilename)
         return;
-    m_imageId = imageId;
+    m_imageFilename = imageFilename;
     m_image = QImage();
 }
 
@@ -146,7 +145,7 @@ void QnGridBackgroundItem::setImageOpacity(int percent) {
 }
 
 QRect QnGridBackgroundItem::sceneBoundingRect() const {
-    if (m_imageId == 0)
+    if (m_imageFilename.isEmpty())
         return QRect();
     return m_sceneBoundingRect;
 }
@@ -171,15 +170,15 @@ void QnGridBackgroundItem::at_opacityAnimator_finished() {
          m_opacityAnimator->animateTo(m_targetOpacity);
 }
 
-void QnGridBackgroundItem::at_image_loaded(int id) {
-    if (id != m_imageId)
+void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
+    if (!ok || filename != m_imageFilename)
         return;
 
     int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     //int maxTextureSize = 8192;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(m_cache->getPath(id));
+    loader->setInput(m_cache->getFullPath(filename));
     loader->setSize(QSize(maxTextureSize, maxTextureSize));
     //loader->setAspectRatioMode(Qt::IgnoreAspectRatio);
     //loader->setDownScaleOnly(false);
