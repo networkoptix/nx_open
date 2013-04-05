@@ -18,7 +18,8 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 
 #ifdef Q_OS_LINUX
     Q_UNUSED(mode)
-    sock.bind(port);
+    if( !sock.bind(port) )
+        return false;
     res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
 #else
     res = !sock.bind(iface.address, port, mode);
