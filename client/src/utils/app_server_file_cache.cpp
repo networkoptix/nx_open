@@ -1,7 +1,10 @@
 #include "app_server_file_cache.h"
 
-#include <QDesktopServices>
-#include <QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QUuid>
+
+#include <QtGui/QDesktopServices>
 
 #include <api/app_server_connection.h>
 
@@ -9,118 +12,121 @@
 
 #include <utils/threaded_image_loader.h>
 
-#include "version.h"
-
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
-    QObject(parent),
-    m_uploadingHandle(0)
+    QObject(parent)
 {}
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
 
-void QnAppServerFileCache::loadImage(int id) {
-    if (id <= 0)
-        return;
+// -------------- Utility methods ----------------
 
-    QFileInfo info(getPath(id));
-    if (info.exists()) {
-        emit imageLoaded(id);
-        return;
-    }
-
-    if (m_loading.values().contains(id))
-      return;
-
-    int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
-                QString(QLatin1String("GDM Fix Me")),
-                this,
-                SLOT(at_fileLoaded(int handle, const QByteArray &data))
-                );
-    m_loading.insert(handle, id);
-}
-
-void QnAppServerFileCache::storeImage(const QString &filename) {
-    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(filename);
-    loader->setSize(QSize(maxTextureSize, maxTextureSize));
-    loader->setOutput(getUploadingPath());
-    connect(loader, SIGNAL(finished(int)), this, SLOT(at_imageConverted(int)));
-    loader->start();
-}
-
-QString QnAppServerFileCache::getFolder() const {
+QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QUrl url = QnAppServerConnectionFactory::defaultUrl();
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/"))
+    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4"))
                                     .arg(path)
                                     .arg(QLatin1String(url.encodedHost()))
                                     .arg(url.port())
+                                    .arg(filename)
                                     );
 }
 
-QString QnAppServerFileCache::getPath(int id) const {
-    return getFolder() + QString(QLatin1String("%4.png")).arg(id);
+// -------------- Loading image methods ----------------
+
+void QnAppServerFileCache::loadImage(const QString &filename) {
+    if (filename.isEmpty()) {
+        emit imageLoaded(filename, false);
+        return;
+    }
+
+    QFileInfo info(getFullPath(filename));
+    if (info.exists()) {
+        emit imageLoaded(filename, true);
+        return;
+    }
+
+    if (m_loading.values().contains(filename))
+      return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
+                filename,
+                this,
+                SLOT(at_fileLoaded(int, const QByteArray&, int))
+                );
+    m_loading.insert(handle, filename);
 }
 
-QString QnAppServerFileCache::getUploadingPath() const {
-    QString path = QDesktopServices::storageLocation(QDesktopServices::TempLocation);
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/%2/uploading.png"))
-                                    .arg(path)
-                                    .arg(QLatin1String(QN_PRODUCT_NAME))
-                                    );
+void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int handle) {
+    if (!m_loading.contains(handle))
+        return;
+
+    QString filename = m_loading[handle];
+    m_loading.remove(handle);
+
+    if (status != 0) {
+        emit imageLoaded(filename, false);
+        return;
+    }
+
+    QFile file(getFullPath(filename));
+    if (!file.open(QIODevice::WriteOnly)) {
+        emit imageLoaded(filename, false);
+        return;
+    }
+    QDataStream out(&file);
+    out.writeRawData(data, data.size());
+    file.close();
+
+    emit imageLoaded(filename, true);
 }
 
-void QnAppServerFileCache::at_imageConverted(int tag) {
-    Q_UNUSED(tag)
+// -------------- Uploading image methods ----------------
 
-    QFile file(getUploadingPath());
+void QnAppServerFileCache::storeImage(const QString &filePath) {
+    QString uuid =  QUuid::createUuid().toString();
+    QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
+
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    loader->setInput(filePath);
+    loader->setSize(QSize(maxTextureSize, maxTextureSize));
+    loader->setOutput(getFullPath(newFilename));
+    connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
+    loader->start();
+}
+
+void QnAppServerFileCache::at_imageConverted(const QString &filePath) {
+    QString filename = QFileInfo(filePath).fileName();
+
+    QFile file(filePath);
     if(!file.open(QIODevice::ReadOnly)) {
-        //TODO: #GDM data from image?
+        emit imageStored(filename, false);
         return;
     }
 
     QByteArray data = file.readAll();
     file.close();
 
-    m_uploadingHandle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
-                QString(QLatin1String("fixgdm.exe")),
+    if (m_uploading.values().contains(filename))
+        return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+                filename,
                 data,
                 this,
-                SLOT(at_fileUploaded(int handle, int id))
+                SLOT(at_fileUploaded(int, int))
                 );
+    m_uploading.insert(handle, filename);
 }
 
-void QnAppServerFileCache::at_fileLoaded(int handle, const QByteArray &data) {
-    if (!m_loading.contains(handle))
+
+void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
+    if (!m_uploading.contains(handle))
         return;
 
-    int id = m_loading[handle];
-    m_loading.remove(handle);
+    QString filename = m_uploading[handle];
+    m_uploading.remove(handle);
 
-    QFile file(getPath(id));
-    if (!file.open(QIODevice::WriteOnly)) {
-        //TODO: #GDM what to do?
-        return;
-    }
-    QDataStream out(&file);
-    out.writeRawData(data, data.size());
-    file.close();
-    emit imageLoaded(id);
-}
-
-void QnAppServerFileCache::at_fileUploaded(int handle, int id) {
-    if (m_uploadingHandle != handle)
-        return;
-    m_uploadingHandle = 0;
-
-    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(getUploadingPath());
-    loader->setSize(QSize(maxTextureSize, maxTextureSize));
-    loader->setOutput(getPath(id));
-    loader->setTag(id);
-    connect(loader, SIGNAL(finished(int)), this, SIGNAL(imageStored(int)));
-    loader->start();
+    emit imageStored(filename, status == 0);
 }
 

@@ -81,7 +81,6 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(new QnAppServerFileCache(this)),
-    m_layoutImageId(0),
     m_cellAspectRatio((qreal)16/9),
     m_estimatePending(false)
 {
@@ -107,8 +106,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
 
-    connect(m_cache, SIGNAL(imageLoaded(int)), this, SLOT(at_image_loaded(int)));
-    connect(m_cache, SIGNAL(imageStored(int)), this, SLOT(at_image_stored(int)));
+    connect(m_cache, SIGNAL(imageLoaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
 
     updateControls();
 }
@@ -128,10 +127,10 @@ void QnLayoutSettingsDialog::resizeEvent(QResizeEvent *event) {
 }
 
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
-    m_layoutImageId = layout->backgroundImageId();
-    if (m_layoutImageId > 0) {
-        m_filename = m_cache->getPath(m_layoutImageId);
-        m_cache->loadImage(m_layoutImageId);
+    m_cachedFilename = layout->backgroundImageFilename();
+    if (!m_cachedFilename.isEmpty()) {
+        m_newFilePath = m_cache->getFullPath(m_cachedFilename);
+        m_cache->loadImage(m_cachedFilename);
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
         ui->opacitySpinBox->setValue(layout->backgroundOpacity());
@@ -152,7 +151,7 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
 
     layout->setUserCanEdit(ui->userCanEditCheckBox->isChecked());
     layout->setLocked(ui->lockedCheckBox->isChecked());
-    layout->setBackgroundImageId(m_layoutImageId);
+    layout->setBackgroundImageFilename(m_cachedFilename);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
     layout->setBackgroundOpacity(ui->opacitySpinBox->value());
 
@@ -167,19 +166,18 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
     if (
             (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit()) ||
             (ui->lockedCheckBox->isChecked() != layout->locked()) ||
-            (ui->opacitySpinBox->value() != layout->backgroundOpacity())
+            (ui->opacitySpinBox->value() != layout->backgroundOpacity()) ||
+            (m_cachedFilename != layout->backgroundImageFilename())
             )
         return true;
 
     // do not save size change if no image was set
-    if (layout->backgroundImageId() == 0 && m_layoutImageId == 0)
-        return false;
     QSize newSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
-    return (m_layoutImageId != layout->backgroundImageId() || newSize != layout->backgroundSize());
+    return (!m_cachedFilename.isEmpty() && newSize != layout->backgroundSize());
 }
 
 void QnLayoutSettingsDialog::updateControls() {
-    bool imagePresent = !m_filename.isEmpty() || m_layoutImageId > 0;
+    bool imagePresent = !m_newFilePath.isEmpty();
     bool locked = ui->lockedCheckBox->isChecked();
 
     ui->widthSpinBox->setEnabled(imagePresent && !locked);
@@ -191,12 +189,12 @@ void QnLayoutSettingsDialog::updateControls() {
 }
 
 void QnLayoutSettingsDialog::at_viewButton_clicked() {
-    QString path = QLatin1String("file:///") + m_filename;
+    QString path = QLatin1String("file:///") + m_newFilePath;
     if (QDesktopServices::openUrl(QUrl(path)))
         return;
 
     QnImagePreviewDialog dialog;
-    dialog.openImage(m_filename);
+    dialog.openImage(m_newFilePath);
     dialog.exec();
 }
 
@@ -213,8 +211,8 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
     if (files.size() < 0)
         return;
 
-    m_filename = files[0];
-    m_layoutImageId = 0;
+    m_newFilePath = files[0];
+    m_cachedFilename = QString();
     m_estimatePending = true;
 
     loadPreview();
@@ -222,8 +220,8 @@ void QnLayoutSettingsDialog::at_selectButton_clicked() {
 }
 
 void QnLayoutSettingsDialog::at_clearButton_clicked() {
-    m_filename = QString();
-    m_layoutImageId = 0;
+    m_newFilePath = QString();
+    m_cachedFilename = QString();
 
     imageLabel->setPixmap(QPixmap());
     imageLabel->setText(tr("<No image>"));
@@ -232,12 +230,12 @@ void QnLayoutSettingsDialog::at_clearButton_clicked() {
 }
 
 void QnLayoutSettingsDialog::at_accepted() {
-    if (m_filename.isEmpty() || m_layoutImageId > 0) {
+    if (m_newFilePath.isEmpty() || !m_cachedFilename.isEmpty()) {
         accept();
         return;
     }
 
-    m_cache->storeImage(m_filename);
+    m_cache->storeImage(m_newFilePath);
     setProgress(true);
     ui->generalGroupBox->setEnabled(false);
     ui->buttonBox->setEnabled(false);
@@ -247,15 +245,29 @@ void QnLayoutSettingsDialog::at_opacitySpinBox_valueChanged(int value) {
     imageLabel->setOpacityPercent(value);
 }
 
-void QnLayoutSettingsDialog::at_image_loaded(int id) {
-    if (m_cache->getPath(id) != m_filename)
+void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
+    if (m_cache->getFullPath(filename) != m_newFilePath)
         return;
+    if (!ok) {
+        imageLabel->setText(tr("<Image cannot be loaded>"));
+        return;
+    }
     loadPreview();
 }
 
-void QnLayoutSettingsDialog::at_image_stored(int id) {
+void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
     setProgress(false);
-    m_layoutImageId = id;
+    if (!ok) {
+        imageLabel->setPixmap(QPixmap());
+        imageLabel->setText(tr("<Image cannot be uploaded>"));
+        m_cachedFilename = QString();
+        m_newFilePath = QString();
+        ui->generalGroupBox->setEnabled(true);
+        ui->buttonBox->setEnabled(true);
+        return;
+    }
+
+    m_cachedFilename = filename;
     accept();
 }
 
@@ -265,11 +277,11 @@ void QnLayoutSettingsDialog::loadPreview() {
 
     imageLabel->setPixmap(QPixmap());
     imageLabel->setText(tr("<No image>"));
-    if (m_filename.isEmpty())
+    if (m_newFilePath.isEmpty())
         return;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(m_filename);
+    loader->setInput(m_newFilePath);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(imageLabel->size());
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));

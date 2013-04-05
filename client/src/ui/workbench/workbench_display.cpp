@@ -641,7 +641,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
         return;
 
     gridBackgroundItem()->setImageSize(layout->backgroundSize());
-    gridBackgroundItem()->setImageId(layout->backgroundImageId());
+    gridBackgroundItem()->setImageFilename(layout->backgroundImageFilename());
     gridBackgroundItem()->setImageOpacity(layout->backgroundOpacity());
     gridBackgroundItem()->updateDisplay();
 

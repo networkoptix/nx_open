@@ -7,8 +7,7 @@ QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
     QObject(),
     m_aspectMode(Qt::KeepAspectRatio),
     m_transformationMode(Qt::SmoothTransformation),
-    m_downScaleOnly(true),
-    m_tag(0)
+    m_downScaleOnly(true)
 {
 }
 
@@ -44,11 +43,6 @@ void QnThreadedImageLoaderPrivate::setOutput(const QString &filename) {
     m_outputFilename = filename;
 }
 
-void QnThreadedImageLoaderPrivate::setTag(int tag)
-{
-    m_tag = tag;
-}
-
 void QnThreadedImageLoaderPrivate::start() {
     if (!m_inputFilename.isEmpty()) {
         m_input.load(m_inputFilename);
@@ -67,10 +61,10 @@ void QnThreadedImageLoaderPrivate::start() {
         QString folder = QFileInfo(m_outputFilename).absolutePath();
         QDir().mkpath(folder);
         output.save(m_outputFilename);
+        emit finished(m_outputFilename);
+    } else {
+        emit finished(output);
     }
-
-    emit finished(output);
-    emit finished(m_tag);
     delete this;
 }
 
@@ -80,7 +74,7 @@ QnThreadedImageLoader::QnThreadedImageLoader(QObject *parent) :
     m_loader(new QnThreadedImageLoaderPrivate())
 {
     connect(m_loader, SIGNAL(finished(QImage)), this, SIGNAL(finished(QImage)));
-    connect(m_loader, SIGNAL(finished(int)), this, SIGNAL(finished(int)));
+    connect(m_loader, SIGNAL(finished(QString)), this, SIGNAL(finished(QString)));
 }
 
 QnThreadedImageLoader::~QnThreadedImageLoader() {
@@ -113,11 +107,6 @@ void QnThreadedImageLoader::setInput(const QString &filename) {
 
 void QnThreadedImageLoader::setOutput(const QString &filename) {
     m_loader->setOutput(filename);
-}
-
-void QnThreadedImageLoader::setTag(int tag)
-{
-    m_loader->setTag(tag);
 }
 
 void QnThreadedImageLoader::start() {

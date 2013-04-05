@@ -48,6 +48,8 @@ signals:
     void finishedSetting(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle);
 	void finishedTestEmailSettings(int status, const QByteArray &errorString, bool result, int handle);
     void finishedSendEmail(int status, const QByteArray &errorString, bool result, int handle);
+    void finishedGetFile(int status, const QByteArray& data, int handle);
+    void finishedPutFile(int status, int handle);
 
 private:
     QnResourceFactory &m_resourceFactory;
@@ -105,7 +107,23 @@ public:
     int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     qint64 getCurrentTime();
 
+    /**
+     * @brief requestStoredFileAsync        Get stored file from EC
+     * @param filename                      Name of the file
+     * @param target                        Receiver object
+     * @param slot                          SLOT(int status, const QByteArray& data, int handle)
+     * @return                              Handle of the request
+     */
     int requestStoredFileAsync(const QString& filename, QObject *target, const char *slot);
+
+    /**
+     * @brief addStoredFileAsync            Put new file to EC
+     * @param filename                      Name of the file. Should contain GUID to avoid collisions
+     * @param data                          Contents of the file
+     * @param target                        Receiver object
+     * @param slot                          SLOT(int status, int handle)
+     * @return                              Handle of the request
+     */
     int addStoredFileAsync(const QString& filename, const QByteArray &data, QObject *target, const char *slot);
 
     // Asynchronous API

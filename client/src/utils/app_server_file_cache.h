@@ -11,22 +11,21 @@ public:
     explicit QnAppServerFileCache(QObject *parent = 0);
     ~QnAppServerFileCache();
 
-    void loadImage(int id);
-    void storeImage(const QString &filename);
+    void loadImage(const QString &filename);
+    void storeImage(const QString &filePath);
 
-    QString getFolder() const;
-    QString getPath(int id) const;
-    QString getUploadingPath() const;
+    /** Get full path to cached file with fixed filename */
+    QString getFullPath(const QString &filename) const;
 signals:
-    void imageLoaded(int id);
-    void imageStored(int id);
+    void imageLoaded(const QString& filename, bool ok);
+    void imageStored(const QString& filename, bool ok);
 private slots:
-    void at_imageConverted(int tag);
-    void at_fileLoaded(int handle, const QByteArray &data);
-    void at_fileUploaded(int handle, int id);
+    void at_imageConverted(const QString &filePath);
+    void at_fileLoaded(int status, const QByteArray& data, int handle);
+    void at_fileUploaded(int status, int handle);
 private:
-    QHash<int, int> m_loading;
-    int m_uploadingHandle;
+    QHash<int, QString> m_loading;
+    QHash<int, QString> m_uploading;
 };
 
 #endif // APP_SERVER_FILE_CACHE_H
