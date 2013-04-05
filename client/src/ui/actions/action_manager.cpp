@@ -869,7 +869,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CreateZoomWindowAction).
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Create Zoom Window")).
-        condition(hasFlags(QnResource::media));
+        condition(new QnCreateZoomWindowActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
