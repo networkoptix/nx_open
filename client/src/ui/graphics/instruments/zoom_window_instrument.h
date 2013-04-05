@@ -3,6 +3,8 @@
 
 #include "instrument.h"
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -32,6 +34,7 @@ private slots:
     void at_widget_zoomRectChanged();
     void at_windowWidget_geometryChanged();
 
+    void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
     void at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget);
 
@@ -58,6 +61,7 @@ private:
 
     QHash<QObject *, ZoomData> m_dataByWidget;
     QSet<QObject *> m_processingWidgets;
+    QWeakPointer<QnMediaResourceWidget> m_zoomedWidget;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H

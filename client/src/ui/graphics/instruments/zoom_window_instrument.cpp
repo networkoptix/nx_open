@@ -233,6 +233,7 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
 {
     connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
+    connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
@@ -353,6 +354,21 @@ void ZoomWindowInstrument::unregisteredNotify(QGraphicsItem *item) {
      * be unregistered in aboutToBeDestroyed handler. */
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item))
         unregisterWidget(widget);
+}
+
+void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role) {
+    if(role != Qn::ZoomedRole)
+        return;
+
+    if(m_zoomedWidget)
+        if(ZoomOverlayWidget *overlayWidget = this->overlayWidget(m_zoomedWidget.data()))
+            m_zoomedWidget.data()->setOverlayWidgetVisibility(overlayWidget, QnResourceWidget::AutoVisible);
+    
+    m_zoomedWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(role));
+
+    if(m_zoomedWidget)
+        if(ZoomOverlayWidget *overlayWidget = this->overlayWidget(m_zoomedWidget.data()))
+            m_zoomedWidget.data()->setOverlayWidgetVisibility(overlayWidget, QnResourceWidget::Invisible);
 }
 
 void ZoomWindowInstrument::at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {
