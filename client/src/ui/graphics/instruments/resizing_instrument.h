@@ -51,16 +51,14 @@ public:
     ResizingInstrument(QObject *parent = NULL);
     virtual ~ResizingInstrument();
 
-    ResizeHoverInstrument *resizeHoverInstrument() const {
-        return m_resizeHoverInstrument;
+    Instrument *resizeHoverInstrument() const;
+
+    qreal effectRadius() const {
+        return m_effectRadius;
     }
 
-    int effectiveDistance() const {
-        return m_effectiveDistance;
-    }
-
-    void setEffectiveDistance(int effectiveDistance) {
-        m_effectiveDistance = effectiveDistance;
+    void setEffectRadius(qreal effectRadius) {
+        m_effectRadius = effectRadius;
     }
 
 signals:
@@ -87,7 +85,7 @@ private:
     friend class ResizingInfo;
 
     ResizeHoverInstrument *m_resizeHoverInstrument;
-    int m_effectiveDistance;
+    qreal m_effectRadius;
     QPointF m_startPinPoint;
     QSizeF m_startSize;
     QTransform m_startTransform;

@@ -12,7 +12,7 @@ class GraphicsWidgetSceneData;
 
 class GraphicsWidgetPrivate {
 public:
-    GraphicsWidgetPrivate(): q_ptr(NULL), handlingFlags(0), transformOrigin(GraphicsWidget::Legacy), style(NULL), windowData(NULL) {};
+    GraphicsWidgetPrivate();
     virtual ~GraphicsWidgetPrivate();
 
     GraphicsWidgetSceneData *ensureSceneData();
@@ -39,10 +39,14 @@ protected:
     void windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event);
     void windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
+    Qn::WindowFrameSections resizingFrameSectionsAt(const QPointF &pos, QWidget *viewport) const;
+    Qt::WindowFrameSection resizingFrameSectionAt(const QPointF &pos, QWidget *viewport) const;
+
 protected:
     GraphicsWidget *q_ptr;
     GraphicsWidget::HandlingFlags handlingFlags;
     GraphicsWidget::TransformOrigin transformOrigin;
+    qreal resizeEffectRadius;
     QWeakPointer<GraphicsWidgetSceneData> sceneData;
     mutable GraphicsStyle *style;
     mutable QScopedPointer<GraphicsStyle> reserveStyle;

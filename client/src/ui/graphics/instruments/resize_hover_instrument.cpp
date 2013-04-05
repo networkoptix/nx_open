@@ -27,7 +27,7 @@ namespace {
 
 ResizeHoverInstrument::ResizeHoverInstrument(QObject *parent):
     Instrument(Item, makeSet(QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), parent),
-    m_effectiveDistance(0.0)
+    m_effectRadius(0.0)
 {}
 
 bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
@@ -59,7 +59,7 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
     if(queryable == NULL) {
         section = open(widget)->getWindowFrameSectionAt(event->pos());
     } else {
-        QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectiveDistance, m_effectiveDistance);
+        QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectRadius, m_effectRadius);
         qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
         section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
     }

@@ -41,11 +41,15 @@ Qt::WindowFrameSection ResizingInfo::frameSection() const {
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
-    m_effectiveDistance(0)
+    m_effectRadius(0.0)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
     ensureUninstalled();
+}
+
+Instrument *ResizingInstrument::resizeHoverInstrument() const {
+    return m_resizeHoverInstrument;
 }
 
 void ResizingInstrument::enabledNotify() {
@@ -86,9 +90,9 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     if(queryable == NULL) {
         section = open(widget)->getWindowFrameSectionAt(itemPos);
     } else {
-        QRectF effectiveRect = widget->mapRectFromScene(mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance)));
-        qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
-        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
+        QRectF effectRect = widget->mapRectFromScene(mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius)));
+        qreal effectRadius = qMax(effectRect.width(), effectRect.height());
+        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectRadius, effectRadius), QSizeF(2 * effectRadius, 2 * effectRadius)));
     }
     if(!isResizeGrip(section))
         return false;
@@ -109,9 +113,9 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     QGraphicsView *view = this->view(viewport);
 
-    QRectF effectiveRect = mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance));
-    qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
-    m_resizeHoverInstrument->setEffectiveDistance(effectiveDistance);
+    QRectF effectRect = mapRectToScene(view, QRectF(0, 0, m_effectRadius, m_effectRadius));
+    qreal effectRadius = qMax(effectRect.width(), effectRect.height());
+    m_resizeHoverInstrument->setEffectRadius(effectRadius);
 
     return base_type::paintEvent(viewport, event);
 }

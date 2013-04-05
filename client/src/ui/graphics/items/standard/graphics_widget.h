@@ -86,6 +86,9 @@ public:
     TransformOrigin transformOrigin() const;
     void setTransformOrigin(TransformOrigin transformOrigin);
 
+    qreal resizeEffectRadius() const;
+    void setResizeEffectRadius(qreal resizeEffectRadius);
+
     /**
      * \returns                         The area inside the widget's margins.
      */
