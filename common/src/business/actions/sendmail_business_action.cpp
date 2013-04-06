@@ -103,6 +103,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
     QString serverName = QObject::tr("%1 Server").arg(QLatin1String(VER_COMPANYNAME_STR));
     int issueCount = qMax(m_aggregationInfo.totalCount(), 1);
 
+    QString txt;
     QString messageBody;
 
     switch (eventType) {
@@ -121,9 +122,11 @@ QString QnSendMailBusinessAction::getMessageBody() const {
                 .arg(resourceName);
         break;
     case BusinessEventType::Camera_Motion:
-        messageBody = QObject::tr("%1 has detected motion on camera %2")
+        
+        txt = QObject::tr("%1 has detected motion on camera %2")
                 .arg(serverName)
                 .arg(resourceName);
+        messageBody = QString(lit("<a href=\"%1\">%2</a>")).arg(getMotionUrl()).arg(txt);
         break;
     case BusinessEventType::Storage_Failure:
         messageBody = QObject::tr("%1 \"%2\" has detected %n storage issues:", "", issueCount)
@@ -159,7 +162,7 @@ QString QnSendMailBusinessAction::getMessageBody() const {
             messageBody = QObject::tr("Unknown Event has occured on").arg(serverName);
         break;
     }
-    messageBody += QLatin1Char('\n');
+    messageBody += lit("<br>");
 
     if (m_aggregationInfo.totalCount() == 0) {
         messageBody += eventTextString(eventType, m_runtimeParams);
@@ -170,8 +173,6 @@ QString QnSendMailBusinessAction::getMessageBody() const {
         messageBody += timestampString(detail.runtimeParams, detail.count);
     }
 
-    //if (eventType == BusinessEventType::Camera_Motion)
-    //    messageBody = QString(lit("<b><a href=\"%1\">%2</a></b>")).arg(getMotionUrl()).arg(messageBody.replace(lit("\n"), lit("<br>")));
     return messageBody;
 }
 
