@@ -100,6 +100,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
     setCellAspectRatio(resource->cellAspectRatio());
     setCellSpacing(resource->cellSpacing());
+    setLocked(resource->locked());
 
     // TODO: note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
@@ -626,6 +627,14 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
     
     emit cellSpacingChanged();
     emit dataChanged(Qn::LayoutCellSpacingRole);
+}
+
+void QnWorkbenchLayout::setLocked(bool value) {
+    if (m_locked == value)
+        return;
+    m_locked = value;
+
+    emit lockedChanged();
 }
 
 void QnWorkbenchLayout::initCellParameters() {

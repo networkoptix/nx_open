@@ -102,6 +102,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
     connect(m_resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),                                 this, SLOT(at_resource_nameChanged()));
     connect(m_resource.data(),  SIGNAL(cellAspectRatioChanged(const QnLayoutResourcePtr &)),                this, SLOT(at_resource_cellAspectRatioChanged()));
     connect(m_resource.data(),  SIGNAL(cellSpacingChanged(const QnLayoutResourcePtr &)),                    this, SLOT(at_resource_cellSpacingChanged()));
+    connect(m_resource.data(),  SIGNAL(lockedChanged(const QnLayoutResourcePtr &)),                         this, SLOT(at_resource_lockedChanged()));
     connect(m_resource.data(),  SIGNAL(itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)),   this, SLOT(at_resource_itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
     connect(m_resource.data(),  SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)), this, SLOT(at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
     connect(m_resource.data(),  SIGNAL(itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &)), this, SLOT(at_resource_itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
@@ -284,6 +285,14 @@ void QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged() {
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
     m_layout->setCellSpacing(m_resource->cellSpacing());
+}
+
+void QnWorkbenchLayoutSynchronizer::at_resource_lockedChanged() {
+    if(!m_update)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_submit, false);
+    m_layout->setLocked(m_resource->locked());
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
