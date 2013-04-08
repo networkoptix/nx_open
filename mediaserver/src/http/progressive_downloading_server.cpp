@@ -50,6 +50,8 @@ public:
     {
         m_dataOutput.reset( new CachedOutputStream(owner) );
         m_dataOutput->start();
+
+        setObjectName( "QnProgressiveDownloadingDataConsumer" );
     }
 
     ~QnProgressiveDownloadingDataConsumer()
@@ -114,7 +116,11 @@ protected:
             }
         }
         else
+        {
+            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2:%3 due to transcode error (%4)").
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
+        }
         return true;
     }
 private:
@@ -184,6 +190,8 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
     d->killTimerID = TimerManager::instance()->addTimer(
         this,
         qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt()*MS_PER_SEC );
+
+    setObjectName( "QnProgressiveDownloadingConsumer" );
 }
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
@@ -432,8 +440,15 @@ void QnProgressiveDownloadingConsumer::run()
 
         //dataConsumer.sendResponse();
         dataConsumer.start();
-        while (dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated)
+        while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
+
+        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2:%3. Reason: %4").
+            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress()).arg(socket()->getForeignPort()).
+            arg((!dataConsumer.isRunning() ? QString::fromLatin1("Data consumer stopped") : 
+                (!d->socket->isConnected() ? QString::fromLatin1("Connection has been closed") :
+                 QString::fromLatin1("Terminated")))), cl_logDEBUG1 );
+
         dataConsumer.pleaseStop();
 
         QnByteArray emptyChunk((unsigned)0,0);
