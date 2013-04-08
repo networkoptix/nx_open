@@ -32,6 +32,7 @@ private:
 
     QString getRTPurl(int profileId) const;
     QString getQualityString() const;
+    bool isTextQualities(const QStringList& qualities) const;
 private:
     QnMulticodecRtpReader m_rtpReader;
     CLSimpleHTTPClient* mHttpClient;
