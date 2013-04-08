@@ -116,7 +116,7 @@ protected:
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
 
-    void showOverlayLabel(const QString &text, int width);
+    void showOverlayLabel(const QString &text);
     void initOverlayLabelAnimation();
 
 protected slots:

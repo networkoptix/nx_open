@@ -459,7 +459,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
         menu()->trigger(Qn::ToggleTourModeAction);
         return base_type::eventFilter(watched, event);
     }
-
+    else
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should clear selection. */
@@ -586,23 +586,33 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     menu->exec(pos);
 }
 
-void  QnWorkbenchController::showOverlayLabel(const QString &text, int width) {
+void  QnWorkbenchController::showOverlayLabel(const QString &text) {
+    const int borderRadius = 18;
+
     QWidget *view = display()->view();
 
     if (m_overlayLabel == 0) {
         m_overlayLabel = new QLabel(view);
         m_overlayLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
         m_overlayLabel->setAlignment(Qt::AlignCenter);
-        m_overlayLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
+        m_overlayLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px;"\
+                                                    "border-style: inset; border-color: #535353;"\
+                                                    "border-radius: " + QString::number(borderRadius).toLatin1() +"px;"\
+                                                    "background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
         m_overlayLabel->setFocusPolicy(Qt::NoFocus);
         m_overlayLabel->installEventFilter(this);
+        m_overlayLabel->show(); // fontmetrics are calculated here
+        m_overlayLabel->hide();
     }
 
-    m_overlayLabel->resize(width, 165);
+    m_overlayLabel->resize(m_overlayLabel->fontMetrics().width(text) + borderRadius*2,
+                           m_overlayLabel->fontMetrics().height() + borderRadius*2);
     m_overlayLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_overlayLabel->size()) / 2);
-    m_overlayLabel->setMask(createRoundRegion(18, 18, m_overlayLabel->rect()));
+    m_overlayLabel->setMask(createRoundRegion(borderRadius, borderRadius, m_overlayLabel->rect()));
     m_overlayLabel->setText(text);
     m_overlayLabel->show();
+
+    initOverlayLabelAnimation();
 }
 
 void  QnWorkbenchController::initOverlayLabelAnimation() {
@@ -644,8 +654,7 @@ void QnWorkbenchController::startRecording()
 
     m_countdownCanceled = false;
 
-    showOverlayLabel(tr("Recording in..."), 220);
-    initOverlayLabelAnimation();
+    showOverlayLabel(tr("Recording in..."));
 
     connect(m_overlayLabelAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
     connect(m_overlayLabelAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
@@ -1407,8 +1416,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
         return;
     }
 
-    showOverlayLabel(tr("Press any key to stop tour"), 280);
-    initOverlayLabelAnimation();
+    showOverlayLabel(tr("Press any key to stop tour"));
 
     connect(m_overlayLabelAnimation, SIGNAL(finished()), m_overlayLabel, SLOT(hide()));
     m_overlayLabelAnimation->start();
