@@ -24,7 +24,8 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     m_geometryAnimator(NULL),
     m_opacityAnimator(NULL),
     m_cache(new QnAppServerFileCache(this)),
-    m_imgUploaded( false )
+    m_imgUploaded(false),
+    m_imageStatus(None)
 {
     setAcceptedMouseButtons(0);
 
@@ -47,6 +48,9 @@ void QnGridBackgroundItem::updateDisplay() {
         animatedHide();
         return;
     }
+    if (m_imageStatus != None)
+        return;
+    m_imageStatus = Loading;
     m_cache->loadImage(m_imageFilename);
 }
 
@@ -132,6 +136,7 @@ void QnGridBackgroundItem::setImageFilename(const QString &imageFilename) {
     if (m_imageFilename == imageFilename)
         return;
     m_imageFilename = imageFilename;
+    m_imageStatus = None;
 
 #ifdef NATIVE_PAINT_BACKGROUND
     m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
@@ -186,7 +191,10 @@ void QnGridBackgroundItem::at_opacityAnimator_finished() {
 }
 
 void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
-    if (!ok || filename != m_imageFilename)
+    if (filename != m_imageFilename || m_imageStatus != Loading)
+        return;
+    m_imageStatus = Loaded;
+    if (!ok)
         return;
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);

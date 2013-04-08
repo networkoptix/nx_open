@@ -63,6 +63,12 @@ private slots:
     void setImage(const QImage& image);
 
 private:
+    enum ImageStatus {
+        None,
+        Loading,
+        Loaded
+    };
+
     QRectF m_rect;
     QImage m_image;
     QString m_imageFilename;
@@ -78,6 +84,7 @@ private:
     std::auto_ptr<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
     bool m_imgUploaded;
+    ImageStatus m_imageStatus;
 };
 
 
