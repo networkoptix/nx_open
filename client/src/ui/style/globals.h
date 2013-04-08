@@ -87,7 +87,7 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
         QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(QColor,   ptzColor,                       PTZ_COLOR,                              QColor(128, 196, 255, 255))
-        QN_DECLARE_R_PROPERTY(QColor,   zoomWindowColor,                ZOOM_WINDOW_COLOR,                      QColor(128, 255, 196, 255))
+        QN_DECLARE_R_PROPERTY(QColor,   zoomWindowColor,                ZOOM_WINDOW_COLOR,                      QColor(128, 196, 255, 255))
 
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
