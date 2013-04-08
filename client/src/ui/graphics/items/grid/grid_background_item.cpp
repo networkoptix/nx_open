@@ -13,7 +13,7 @@
 #include <utils/color_space/yuvconvert.h>
 
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
-#define NATIVE_PAINT_BACKGROUND
+//#define NATIVE_PAINT_BACKGROUND
 
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
@@ -200,6 +200,9 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_cache->getFullPath(filename));
     loader->setSize(m_cache->getMaxImageSize());
+//    loader->setSize(QSize(6144, 6144));
+//    loader->setDownScaleOnly(false);
+//    loader->setAspectRatioMode(Qt::IgnoreAspectRatio);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
     loader->start();
 }
@@ -258,9 +261,6 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     painter->endNativePainting();
 #else
     if (!m_image.isNull())
-    {
-        QSize imgSize = m_image.size();
         painter->drawImage(m_rect, m_image);
-    }
 #endif
 }
