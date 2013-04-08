@@ -25,7 +25,7 @@ void QnDlink_cam_info::clear()
     possibleBitrates.clear();
     possibleFps.clear();
 
-    possibleQualities = QString();
+    possibleQualities.clear();
 }
 
 bool QnDlink_cam_info::inited() const
@@ -254,10 +254,8 @@ bool QnPlDlinkResource::initInternal()
         }
         else if (line.contains(QLatin1String("qualities=")))
         {
-            m_camInfo.possibleQualities = getValueFromString(line);
-
-            if (m_camInfo.possibleQualities.toLower().contains(QLatin1String("good")))
-                m_camInfo.hasFixedQuality = true;
+            m_camInfo.possibleQualities = getValueFromString(line).split(lit(","));
+            m_camInfo.hasFixedQuality = true;
         }
         else if (line.contains(QLatin1String("vprofileurl")))
         {

@@ -31,7 +31,7 @@ private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QString getRTPurl(int profileId) const;
-
+    QString getQualityString() const;
 private:
     QnMulticodecRtpReader m_rtpReader;
     CLSimpleHTTPClient* mHttpClient;
