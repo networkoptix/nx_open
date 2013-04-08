@@ -32,6 +32,7 @@ protected:
 private slots:
     void at_widget_aboutToBeDestroyed();
     void at_widget_zoomRectChanged();
+    void at_widget_optionsChanged();
     void at_windowWidget_geometryChanged();
     void at_windowWidget_doubleClicked();
 
@@ -49,6 +50,7 @@ private:
     void registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
     void unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
 
+    void updateOverlayVisibility(QnMediaResourceWidget *widget);
     void updateWindowFromWidget(QnMediaResourceWidget *widget);
     void updateWidgetFromWindow(ZoomWindowWidget *windowWidget);
 

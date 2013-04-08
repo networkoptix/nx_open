@@ -12,6 +12,10 @@
 
 #include <utils/threaded_image_loader.h>
 
+namespace {
+    const int maxImageSize = 4096;
+}
+
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
     QObject(parent)
 {}
@@ -29,6 +33,11 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
                                     .arg(url.port())
                                     .arg(filename)
                                     );
+}
+
+QSize QnAppServerFileCache::getMaxImageSize() const {
+    int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
+    return QSize(value, value);
 }
 
 // -------------- Loading image methods ----------------
@@ -86,10 +95,9 @@ void QnAppServerFileCache::storeImage(const QString &filePath) {
     QString uuid =  QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
 
-    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(filePath);
-    loader->setSize(QSize(maxTextureSize, maxTextureSize));
+    loader->setSize(getMaxImageSize());
     loader->setOutput(getFullPath(newFilename));
     connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
     loader->start();

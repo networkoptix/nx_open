@@ -7,8 +7,6 @@
 #include <ui/animation/rect_animator.h>
 #include <ui/animation/variant_animator.h>
 
-#include <ui/graphics/opengl/gl_functions.h>
-
 #include <ui/workbench/workbench_grid_mapper.h>
 
 #include <utils/threaded_image_loader.h>
@@ -174,14 +172,9 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
     if (!ok || filename != m_imageFilename)
         return;
 
-    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-    //int maxTextureSize = 8192;
-
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_cache->getFullPath(filename));
-    loader->setSize(QSize(maxTextureSize, maxTextureSize));
-    //loader->setAspectRatioMode(Qt::IgnoreAspectRatio);
-    //loader->setDownScaleOnly(false);
+    loader->setSize(m_cache->getMaxImageSize());
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
     loader->start();
 }

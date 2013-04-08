@@ -16,6 +16,7 @@ public:
 
     /** Get full path to cached file with fixed filename */
     QString getFullPath(const QString &filename) const;
+    QSize getMaxImageSize() const;
 signals:
     void imageLoaded(const QString& filename, bool ok);
     void imageStored(const QString& filename, bool ok);
