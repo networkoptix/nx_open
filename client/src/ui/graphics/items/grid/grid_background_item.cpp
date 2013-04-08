@@ -215,6 +215,9 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 
     //image has to be uploaded before next paint
     m_imgUploaded = false;
+
+    m_renderer.reset();
+    m_imgUploader.reset();
 #else
     m_image = image;
 #endif
