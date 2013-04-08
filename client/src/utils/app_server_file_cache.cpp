@@ -1,7 +1,10 @@
 #include "app_server_file_cache.h"
 
-#include <QDesktopServices>
-#include <QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QUuid>
+
+#include <QtGui/QDesktopServices>
 
 #include <api/app_server_connection.h>
 
@@ -9,89 +12,131 @@
 
 #include <utils/threaded_image_loader.h>
 
+namespace {
+    const int maxImageSize = 4096;
+}
+
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
     QObject(parent)
 {}
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
 
+// -------------- Utility methods ----------------
 
-void QnAppServerFileCache::loadImage(int id) {
-    if (id <= 0)
-        return;
+QString QnAppServerFileCache::getFullPath(const QString &filename) const {
+    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QUrl url = QnAppServerConnectionFactory::defaultUrl();
+    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4"))
+                                    .arg(path)
+                                    .arg(QLatin1String(url.encodedHost()))
+                                    .arg(url.port())
+                                    .arg(filename)
+                                    );
+}
 
-    QFileInfo info(getPath(id));
-    if (info.exists()) {
-        emit imageLoaded(id);
+QSize QnAppServerFileCache::getMaxImageSize() const {
+    int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
+    return QSize(value, value);
+}
+
+// -------------- Loading image methods ----------------
+
+void QnAppServerFileCache::loadImage(const QString &filename) {
+    if (filename.isEmpty()) {
+        emit imageLoaded(filename, false);
         return;
     }
 
-    if (m_loading.values().contains(id))
+    QFileInfo info(getFullPath(filename));
+    if (info.exists()) {
+        emit imageLoaded(filename, true);
+        return;
+    }
+
+    if (m_loading.values().contains(filename))
       return;
 
     int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
-                id,
+                filename,
                 this,
-                SLOT(at_fileLoaded(int handle, const QByteArray &data))
+                SLOT(at_fileLoaded(int, const QByteArray&, int))
                 );
-    m_loading.insert(handle, id);
+    m_loading.insert(handle, filename);
 }
 
-void QnAppServerFileCache::storeImage(const QString &filename) {
-    /*int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
-                id,
-                this,
-                SLOT(at_fileUploaded(int handle, int id))
-                );*/
-
-    int i = 1;
-    while (QFileInfo(getPath(i)).exists())
-        i++;
-
-    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(filename);
-    loader->setSize(QSize(maxTextureSize, maxTextureSize));
-    loader->setOutput(getPath(i));
-    connect(loader, SIGNAL(finished(QImage)), this, SLOT(saveImageDebug(QImage)));
-    loader->start();
-
-}
-
-QString QnAppServerFileCache::getFolder() const {
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/"))
-        .arg(path)
-        .arg(QLatin1String(url.encodedHost()))
-        .arg(url.port())
-        );
-}
-
-QString QnAppServerFileCache::getPath(int id) const {
-    return getFolder() + QString(QLatin1String("%4.png")).arg(id);
-}
-
-void QnAppServerFileCache::at_fileLoaded(int handle, const QByteArray &data) {
+void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int handle) {
     if (!m_loading.contains(handle))
         return;
 
-    int id = m_loading[handle];
+    QString filename = m_loading[handle];
     m_loading.remove(handle);
 
-    QFile file(getPath(id));
-    file.open(QIODevice::WriteOnly);
+    if (status != 0) {
+        emit imageLoaded(filename, false);
+        return;
+    }
+
+    QFile file(getFullPath(filename));
+    if (!file.open(QIODevice::WriteOnly)) {
+        emit imageLoaded(filename, false);
+        return;
+    }
     QDataStream out(&file);
     out.writeRawData(data, data.size());
-    emit imageLoaded(id);
+    file.close();
+
+    emit imageLoaded(filename, true);
 }
 
-void QnAppServerFileCache::saveImageDebug(const QImage &image) {
-    int i = 1;
-    while (QFileInfo(getPath(i)).exists())
-        i++;
-    emit imageStored(i-1);
+// -------------- Uploading image methods ----------------
+
+void QnAppServerFileCache::storeImage(const QString &filePath) {
+    QString uuid =  QUuid::createUuid().toString();
+    QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
+
+    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    loader->setInput(filePath);
+    loader->setSize(getMaxImageSize());
+    loader->setOutput(getFullPath(newFilename));
+    connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
+    loader->start();
+}
+
+void QnAppServerFileCache::at_imageConverted(const QString &filePath) {
+    QString filename = QFileInfo(filePath).fileName();
+
+    QFile file(filePath);
+    if(!file.open(QIODevice::ReadOnly)) {
+        emit imageStored(filename, false);
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    if (m_uploading.values().contains(filename))
+        return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+                filename,
+                data,
+                this,
+                SLOT(at_fileUploaded(int, int))
+                );
+    m_uploading.insert(handle, filename);
 }
 
 
+void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
+    if (!m_uploading.contains(handle))
+        return;
+
+    QString filename = m_uploading[handle];
+    m_uploading.remove(handle);
+    bool ok = status == 0;
+    if (!ok)
+        QFile::remove(getFullPath(filename));
+    emit imageStored(filename, ok);
+}
 

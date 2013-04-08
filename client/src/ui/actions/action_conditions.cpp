@@ -7,8 +7,10 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <camera/resource_display.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -352,4 +354,39 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
     bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() > 1)
+        return Qn::InvisibleAction;
+
+    QnResourcePtr resource;
+    if (resources.size() > 0)
+        resource = resources[0];
+    else
+        resource = context()->workbench()->currentLayout()->resource();
+
+    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    return resource->hasFlags(QnResource::layout) && !isExportedLayout
+            ? Qn::EnabledAction
+            : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWidgetList &widgets) {
+    if(widgets.size() != 1)
+        return Qn::InvisibleAction;
+    
+    // TODO: #Elric there probably exists a better way to check it all.
+
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
+    if(!widget)
+        return Qn::InvisibleAction;
+
+    if(display()->zoomTargetWidget(widget))
+        return Qn::InvisibleAction;
+
+    if(widget->display()->videoLayout() && widget->display()->videoLayout()->numberOfChannels() > 1)
+        return Qn::InvisibleAction;
+    
+    return Qn::EnabledAction;
 }

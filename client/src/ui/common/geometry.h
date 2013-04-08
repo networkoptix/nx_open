@@ -6,6 +6,7 @@
 #include <QtCore/QSize>
 
 #include <utils/math/math.h>
+#include <common/common_globals.h>
 
 #include "margins.h"
 
@@ -23,6 +24,8 @@ public:
     static QPointF cwiseDiv(const QPointF &l, const QSizeF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseMin(const QSizeF &l, const QSizeF &r);
+    static QSizeF cwiseMax(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseDiv(const MarginsF &l, const QSizeF &r);
     static MarginsF cwiseMul(const QSizeF &l, const MarginsF &r);
@@ -305,6 +308,9 @@ public:
 
     // TODO: #Elric rename into something more sane
     static QRectF transformed(const QRectF &transform, const QRectF &rect);
+
+    static QPointF corner(const QRectF &rect, Qn::Corner corner);
+
 };
 
 #endif // QN_GEOMETRY_H

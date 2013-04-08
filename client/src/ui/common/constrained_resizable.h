@@ -1,7 +1,10 @@
 #ifndef QN_CONSTRAINED_RESIZABLE
 #define QN_CONSTRAINED_RESIZABLE
 
-#include <QSizeF>
+#include <utils/math/fuzzy.h>
+
+#include "constrained_geometrically.h"
+#include "geometry.h"
 
 /**
  * This class is a workaround for a lack of mechanisms that would allow to 
@@ -16,7 +19,7 @@
  * resizing using Qt-supplied functionality. So we introduce a separate 
  * interface for that.
  */
-class ConstrainedResizable {
+class ConstrainedResizable: public ConstrainedGeometrically {
 public:
     /**
      * Virtual destructor.
@@ -38,6 +41,43 @@ public:
      * \returns                         Preferred size for the given constraint.
      */
     virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
+
+    static QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QSizeF &constrainedSize) {
+        if(qFuzzyCompare(constrainedSize, geometry.size()))
+            return geometry;
+
+        if(pinCorner == Qn::NoCorner)
+            return QRectF(geometry.topLeft(), constrainedSize);
+
+        QPointF pinPoint = QnGeometry::corner(geometry, pinCorner);
+        QRectF result(
+            pinPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinPoint - geometry.topLeft(), geometry.size()), constrainedSize),
+            constrainedSize
+        );
+
+        /* Handle zero size so that we don't return NaNs. */
+        if(qFuzzyIsNull(geometry.width())) {
+            if(pinCorner == Qn::TopLeftCorner || pinCorner == Qn::BottomLeftCorner) {
+                result.moveLeft(geometry.left());
+            } else {
+                result.moveLeft(geometry.left() - result.width());
+            }
+        }
+        if(qFuzzyIsNull(geometry.height())) {
+            if(pinCorner == Qn::TopLeftCorner || pinCorner == Qn::TopRightCorner) {
+                result.moveTop(geometry.top());
+            } else {
+                result.moveTop(geometry.top() - result.height());
+            }
+        }
+
+        return result;
+    }
+
+protected:
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override {
+        return constrainedGeometry(geometry, pinCorner, constrainedSize(geometry.size()));
+    }
 };
 
 

@@ -31,8 +31,8 @@ public:
     AnimationTimer* animationTimer() const;
     void setAnimationTimer(AnimationTimer *timer);
 
-    int imageId() const;
-    void setImageId(int imageId);
+    QString imageFilename() const;
+    void setImageFilename(const QString &imageFilename);
 
     QSize imageSize() const;
     void setImageSize(const QSize &imageSize);
@@ -53,13 +53,13 @@ private slots:
     void updateGeometry();
 
     void at_opacityAnimator_finished();
-    void at_image_loaded(int id);
+    void at_imageLoaded(const QString& filename, bool ok);
     void setImage(const QImage& image);
 
 private:
     QRectF m_rect;
     QImage m_image;
-    int m_imageId;
+    QString m_imageFilename;
     QSize m_imageSize;
     int m_imageOpacity;
     qreal m_targetOpacity;

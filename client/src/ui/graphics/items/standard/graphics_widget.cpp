@@ -14,7 +14,8 @@
 #include <utils/common/warnings.h>
 
 #include <ui/common/frame_section.h>
-#include <ui/common/constrained_resizable.h>
+#include <ui/common/constrained_geometrically.h>
+#include <ui/common/scene_transformations.h>
 
 class GraphicsWidgetSceneData: public QObject {
 public:
@@ -46,12 +47,22 @@ Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
 
 namespace {
     const char *qn_sceneDataPropertyName = "_qn_sceneData";
+    static qreal qn_graphicsWidget_defaultResizeEffectRadius = 8.0;
 }
 
 
 // -------------------------------------------------------------------------- //
 // GraphicsWidgetPrivate
 // -------------------------------------------------------------------------- //
+GraphicsWidgetPrivate::GraphicsWidgetPrivate(): 
+    q_ptr(NULL), 
+    handlingFlags(0), 
+    transformOrigin(GraphicsWidget::Legacy), 
+    resizeEffectRadius(qn_graphicsWidget_defaultResizeEffectRadius), 
+    style(NULL), 
+    windowData(NULL) 
+{};
+
 GraphicsWidgetPrivate::~GraphicsWidgetPrivate() {
     if(windowData)
         delete windowData;
@@ -257,6 +268,14 @@ void GraphicsWidget::setTransformOrigin(TransformOrigin transformOrigin) {
     emit transformOriginChanged();
 }
 
+qreal GraphicsWidget::resizeEffectRadius() const {
+    return d_func()->resizeEffectRadius;
+}
+
+void GraphicsWidget::setResizeEffectRadius(qreal resizeEffectRadius) {
+    d_func()->resizeEffectRadius = resizeEffectRadius;
+}
+
 QRectF GraphicsWidget::contentsRect() const {
     qreal left, top, right, bottom;
     getContentsMargins(&left, &top, &right, &bottom);
@@ -344,7 +363,7 @@ QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &v
 }
 
 bool GraphicsWidget::event(QEvent *event) {
-    return base_type::event(event);
+    //return base_type::event(event);
 
     /* Filter events that we want to handle by ourself. */
     switch(event->type()) {
@@ -546,6 +565,22 @@ Qn::WindowFrameSections GraphicsWidget::windowFrameSectionsAt(const QRectF &regi
     }
 }
 
+Qn::WindowFrameSections GraphicsWidgetPrivate::resizingFrameSectionsAt(const QPointF &pos, QWidget *viewport) const {
+    Q_Q(const GraphicsWidget);
+
+    QGraphicsView *view = viewport ? dynamic_cast<QGraphicsView *>(viewport->parentWidget()) : NULL;
+    if(!view)
+        return q->windowFrameSectionsAt(QRectF(pos, QSizeF(0.0, 0.0)));
+
+    QRectF effectRect = q->mapRectFromScene(QnSceneTransformations::mapRectToScene(view, QRectF(0, 0, resizeEffectRadius, resizeEffectRadius)));
+    qreal effectRadius = qMax(effectRect.width(), effectRect.height());
+    return q->windowFrameSectionsAt(QRectF(pos - QPointF(effectRadius, effectRadius), QSizeF(2 * effectRadius, 2 * effectRadius)));
+}
+
+Qt::WindowFrameSection GraphicsWidgetPrivate::resizingFrameSectionAt(const QPointF &pos, QWidget *viewport) const {
+    return Qn::toNaturalQtFrameSection(resizingFrameSectionsAt(pos, viewport));
+}
+
 bool GraphicsWidget::windowFrameEvent(QEvent *event) {
     /* The code is copied from QGraphicsWidget implementation, 
      * so we don't need to call into the base class. */
@@ -573,30 +608,23 @@ bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
     if (!hasDecoration()) // TODO: #Elric invalid check
         return false;
 
-    if (q->rect().contains(event->pos())) {
-        /* Mouse has left the window frame and entered its interior. */
-        ensureWindowData();
-        if (windowData->hoveredSection != Qt::NoSection)
-            windowFrameHoverLeaveEvent(event);
-        return false;
-    }
-
     ensureWindowData();
     bool oldCloseButtonHovered = windowData->closeButtonHovered;
     windowData->closeButtonHovered = false;
     
-    /* Make sure that the coordinates (rect and pos) we send to the style are positive. */
-    QStyleOptionTitleBar option;
-    initStyleOptionTitleBar(&option);
-    mapToFrame(&option);
-
-    Qt::WindowFrameSection section = q->windowFrameSectionAt(event->pos());
+    Qt::WindowFrameSection section = resizingFrameSectionAt(event->pos(), event->widget());
     if(section == Qt::TitleBarArea) {
+        /* Make sure that the coordinates (rect and pos) we send to the style are positive. */
+        QStyleOptionTitleBar option;
+        initStyleOptionTitleBar(&option);
+        mapToFrame(&option);
+
         windowData->closeButtonRect = mapFromFrame(q->style()->subControlRect(QStyle::CC_TitleBar, &option, QStyle::SC_TitleBarCloseButton, q));
         windowData->closeButtonHovered = windowData->closeButtonRect.contains(event->pos());
     } else if(section == Qt::NoSection) {
         return false;
     }
+    windowData->hoveredSection = section;
 
     /* Update cursor. */
     if(handlingFlags & GraphicsWidget::ItemHandlesResizing) {
@@ -640,9 +668,9 @@ bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
         return false;
 
     ensureWindowData();
-    windowData->grabbedSection = q->windowFrameSectionAt(event->pos());
+    windowData->grabbedSection = resizingFrameSectionAt(event->pos(), event->widget());
     windowData->startSize = q->size();
-    windowData->resizable = dynamic_cast<ConstrainedResizable *>(q); /* We do dynamic_cast every time to feel safer during destruction. */
+    windowData->constrained = dynamic_cast<ConstrainedGeometrically *>(q); /* We do dynamic_cast every time to feel safer during destruction. */
 
     if (windowData->closeButtonHovered) {
         windowData->closeButtonGrabbed = true;
@@ -653,6 +681,7 @@ bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     switch(windowData->grabbedSection) {
     case Qt::TitleBarArea:
         if(handlingFlags & GraphicsWidget::ItemHandlesMovement) {
+            windowData->startPinPoint = q->pos() - q->mapToParent(event->pos());
             return true;
         } else {
             windowData->grabbedSection = Qt::NoSection;
@@ -709,16 +738,22 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         );
         /* We don't handle heightForWidth. */
 
-        if(windowData->resizable)
-            newSize = windowData->resizable->constrainedSize(newSize);
+        QPointF newPos;
+        if(windowData->grabbedSection == Qt::TitleBarArea) {
+            newPos = windowData->startPinPoint + q->mapToParent(event->pos());
+        } else {
+            newPos = q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), windowData->grabbedSection));
+        }
+
+        if(windowData->constrained != NULL) {
+            QRectF newGeometry = windowData->constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(windowData->grabbedSection));
+            newSize = newGeometry.size();
+            newPos = newGeometry.topLeft();
+        }
 
         /* Change size & position. */
-        if(windowData->grabbedSection == Qt::TitleBarArea) {
-            q->setPos(q->pos() + q->mapToParent(event->pos()) - q->mapToParent(event->lastPos()));
-        } else {
-            q->resize(newSize);
-            q->setPos(q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(q->rect(), windowData->grabbedSection)));
-        }
+        q->resize(newSize);
+        q->setPos(newPos);
         
         return true;
     } else {

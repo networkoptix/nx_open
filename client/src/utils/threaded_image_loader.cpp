@@ -61,9 +61,10 @@ void QnThreadedImageLoaderPrivate::start() {
         QString folder = QFileInfo(m_outputFilename).absolutePath();
         QDir().mkpath(folder);
         output.save(m_outputFilename);
+        emit finished(m_outputFilename);
+    } else {
+        emit finished(output);
     }
-
-    emit finished(output);
     delete this;
 }
 
@@ -73,6 +74,7 @@ QnThreadedImageLoader::QnThreadedImageLoader(QObject *parent) :
     m_loader(new QnThreadedImageLoaderPrivate())
 {
     connect(m_loader, SIGNAL(finished(QImage)), this, SIGNAL(finished(QImage)));
+    connect(m_loader, SIGNAL(finished(QString)), this, SIGNAL(finished(QString)));
 }
 
 QnThreadedImageLoader::~QnThreadedImageLoader() {

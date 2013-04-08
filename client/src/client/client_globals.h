@@ -131,21 +131,6 @@ namespace Qn {
 
 
     /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
-
-
-    /**
      * Flags describing how viewport margins affect viewport geometry.
      */
     enum MarginFlag {

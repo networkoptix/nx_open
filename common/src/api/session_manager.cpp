@@ -252,11 +252,16 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
 
-    foreach (QnRequestHeader header, headers)
+    bool skipContentType = false;
+    foreach (QnRequestHeader header, headers) {
+        if (header.first == QLatin1String("Content-Type"))
+            skipContentType = true;
         request.setRawHeader(header.first.toAscii(), header.second.toUtf8());
+    }
 
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
+    if (!skipContentType)
+        request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = NULL;
     switch(operation) {

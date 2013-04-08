@@ -29,6 +29,14 @@ QSizeF QnGeometry::cwiseDiv(const QSizeF &l, const QSizeF &r) {
     return QSizeF(l.width() / r.width(), l.height() / r.height());
 }
 
+QSizeF QnGeometry::cwiseMin(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(qMin(l.width(), r.width()), qMin(l.height(), r.height()));
+}
+
+QSizeF QnGeometry::cwiseMax(const QSizeF &l, const QSizeF &r) {
+    return QSizeF(qMax(l.width(), r.width()), qMax(l.height(), r.height()));
+}
+
 MarginsF QnGeometry::cwiseMul(const MarginsF &l, const QSizeF &r) {
     return MarginsF(
         l.left()   * r.width(),
@@ -352,3 +360,20 @@ QRectF QnGeometry::transformed(const QRectF &transform, const QRectF &rect) {
     );
 }
 
+QPointF QnGeometry::corner(const QRectF &rect, Qn::Corner corner) {
+    switch(corner) {
+        case Qn::TopLeftCorner: 
+            return rect.topLeft();
+        case Qn::TopRightCorner: 
+            return rect.topRight();
+        case Qn::BottomLeftCorner: 
+            return rect.bottomLeft();
+        case Qn::BottomRightCorner: 
+            return rect.bottomRight();
+        case Qn::NoCorner: 
+            return rect.center();
+        default:
+            qnWarning("Invalid corner value '%1'.", static_cast<int>(corner));
+            return rect.center();
+    }
+}

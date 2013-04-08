@@ -270,7 +270,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
     layout->setCellAspectRatio(pb_layout.cellaspectratio());
     layout->setCellSpacing(QSizeF(pb_layout.cellspacingwidth(), pb_layout.cellspacingheight()));
     layout->setUserCanEdit(pb_layout.usercanedit());
-    layout->setBackgroundImageId(pb_layout.backgroundimageid());
+    layout->setBackgroundImageFilename(QString::fromUtf8(pb_layout.backgroundimagefilename().c_str()));
     layout->setBackgroundSize(QSize(pb_layout.backgroundwidth(), pb_layout.backgroundheight()));
     layout->setBackgroundOpacity(pb_layout.backgroundopacity());
     layout->setLocked(pb_layout.locked());
@@ -547,7 +547,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
     pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
     pb_layout.set_cellspacingheight(layoutIn->cellSpacing().height());
     pb_layout.set_usercanedit(layoutIn->userCanEdit());
-    pb_layout.set_backgroundimageid(layoutIn->backgroundImageId());
+    pb_layout.set_backgroundimagefilename(layoutIn->backgroundImageFilename().toUtf8().constData());
     pb_layout.set_backgroundwidth(layoutIn->backgroundSize().width());
     pb_layout.set_backgroundheight(layoutIn->backgroundSize().height());
     pb_layout.set_backgroundopacity(layoutIn->backgroundOpacity());
