@@ -129,10 +129,11 @@ void QnLayoutSettingsDialog::resizeEvent(QResizeEvent *event) {
 }
 
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
-    if (target == imageLabel && event->type() == QEvent::MouseButtonRelease) {
+    if (target == imageLabel &&
+            event->type() == QEvent::MouseButtonRelease) {
         if (!m_newFilePath.isEmpty())
             viewFile();
-        else
+        else if (!ui->lockedCheckBox->isChecked())
             selectFile();
     }
     return base_type::eventFilter(target, event);

@@ -1106,6 +1106,9 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
     newLayout->setUserCanEdit(context()->user() == user);
+    newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
+    newLayout->setBackgroundOpacity(layout->backgroundOpacity());
+    newLayout->setBackgroundSize(layout->backgroundSize());
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
