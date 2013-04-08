@@ -33,7 +33,7 @@ struct QnDlink_cam_info
 
     QMap<int, QString> possibleBitrates;
     QList<int> possibleFps;
-    QString possibleQualities;
+    QStringList possibleQualities;
 
 };
 

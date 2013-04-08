@@ -179,6 +179,51 @@ void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
 
 //=====================================================================================
 
+int scaleInt(int value, int from, int to)
+{
+    return int (((double) value / (double) from) * to + 0.5);
+}
+
+QString PlDlinkStreamReader::getQualityString() const
+{
+    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+    QnDlink_cam_info info = res->getCamInfo();
+
+    if (!info.hasFixedQuality) 
+    {
+        int q;
+        switch (getQuality())
+        {
+        case QnQualityHighest:
+            q = 90;
+            break;
+
+        case QnQualityHigh:
+            q = 80;
+            break;
+
+        case QnQualityNormal:
+            q = 70;
+            break;
+
+        case QnQualityLow:
+            q = 50;
+            break;
+
+        case QnQualityLowest:
+            q = 40;
+            break;
+
+        default:
+            q = 60;
+            break;
+        }
+        return QString::number(q);
+    }
+    int qualityIndex = scaleInt((int) getQuality(), QnQualityHighest-QnQualityLowest+1, info.possibleQualities.size());
+    return info.possibleQualities[info.possibleQualities.size()-1 - qualityIndex]; // 0 is best quality for dlink
+}
+
 QString PlDlinkStreamReader::composeVideoProfile() 
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
@@ -251,35 +296,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     {
         t << "qualitymode=Fixquality" << "&";
         
-        int q;
-        switch (getQuality())
-        {
-        case QnQualityHighest:
-            q = 90;
-            break;
-
-        case QnQualityHigh:
-            q = 80;
-            break;
-
-        case QnQualityNormal:
-            q = 70;
-            break;
-
-        case QnQualityLow:
-            q = 50;
-            break;
-
-        case QnQualityLowest:
-            q = 40;
-            break;
-
-        default:
-            q = 60;
-            break;
-        }
-        
-        t << "quality=" << q;
+        t << "quality=" << getQualityString();
     }
 
     t.flush();
