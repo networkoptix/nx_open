@@ -1245,8 +1245,18 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     foreach(QnLayoutResourcePtr r, layouts)
         parameters.resources().removeOne(r);
 
-    if (!parameters.resources().empty())
+    if (workbench()->currentLayout()->resource()->locked() &&
+            !parameters.resources().empty() &&
+            layouts.empty()) {
+        QMessageBox::information(widget(),
+                                 tr("Layout is locked"),
+                                 tr("Layout is locked and cannot be changed."));
+    }
+
+
+    if (!parameters.resources().empty()) {
         menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+    }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
