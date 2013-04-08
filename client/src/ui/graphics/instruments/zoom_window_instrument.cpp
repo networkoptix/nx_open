@@ -16,7 +16,7 @@
 
 namespace {
     const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
-    const QColor zoomFrameColor = toTransparent(zoomWindowColor, 0.5);
+    const QColor zoomFrameColor = toTransparent(zoomWindowColor, 0.75);
 
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
 
