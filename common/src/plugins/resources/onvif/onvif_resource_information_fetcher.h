@@ -68,6 +68,7 @@ private:
     QString fetchSerial(const DeviceInfoResp& response) const;
     static bool isAnalogOnvifResource(const QString& vendor, const QString& model);
     static bool isModelContainVendor(const QString& vendor, const QString& model);
+    bool ignoreCamera(const EndpointAdditionalInfo& info) const;
 private:
     static const char *ONVIF_RT;
     QnId onvifTypeId;
