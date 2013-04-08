@@ -47,6 +47,8 @@ void QnGridBackgroundItem::updateDisplay() {
     if (m_imageFilename.isEmpty()) {
         animatedHide();
         return;
+    } else {
+        animatedShow();
     }
     if (m_imageStatus != None)
         return;
