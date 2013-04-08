@@ -271,6 +271,7 @@ ZoomWindowWidget *ZoomWindowInstrument::windowWidget(QnMediaResourceWidget *widg
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
     connect(widget, SIGNAL(zoomRectChanged()), this, SLOT(at_widget_zoomRectChanged()));
     connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
+    connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
 }
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
@@ -302,6 +303,22 @@ void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *widget, QnMedia
 
     delete data.windowWidget;
     data.windowWidget = NULL;
+}
+
+void ZoomWindowInstrument::updateOverlayVisibility(QnMediaResourceWidget *widget) {
+    ZoomOverlayWidget *overlayWidget = this->overlayWidget(widget);
+    if(!overlayWidget)
+        return;
+
+    QnResourceWidget::OverlayVisibility visibility;
+    if(widget == display()->widget(Qn::ZoomedRole)) {
+        visibility = QnResourceWidget::Invisible;
+    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity | QnResourceWidget::DisplayCrosshair)) {
+        visibility = QnResourceWidget::Invisible;
+    } else {
+        visibility = QnResourceWidget::AutoVisible;
+    }
+    widget->setOverlayWidgetVisibility(overlayWidget, visibility);
 }
 
 void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget) {
@@ -366,14 +383,12 @@ void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role) {
         return;
 
     if(m_zoomedWidget)
-        if(ZoomOverlayWidget *overlayWidget = this->overlayWidget(m_zoomedWidget.data()))
-            m_zoomedWidget.data()->setOverlayWidgetVisibility(overlayWidget, QnResourceWidget::AutoVisible);
+        updateOverlayVisibility(m_zoomedWidget.data());
     
     m_zoomedWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(role));
 
     if(m_zoomedWidget)
-        if(ZoomOverlayWidget *overlayWidget = this->overlayWidget(m_zoomedWidget.data()))
-            m_zoomedWidget.data()->setOverlayWidgetVisibility(overlayWidget, QnResourceWidget::Invisible);
+        updateOverlayVisibility(m_zoomedWidget.data());
 }
 
 void ZoomWindowInstrument::at_display_zoomLinkAdded(QnResourceWidget *widget, QnResourceWidget *zoomTargetWidget) {
@@ -400,6 +415,10 @@ void ZoomWindowInstrument::at_widget_zoomRectChanged() {
     updateWindowFromWidget(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
+void ZoomWindowInstrument::at_widget_optionsChanged() {
+    updateOverlayVisibility(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
 void ZoomWindowInstrument::at_windowWidget_geometryChanged() {
     updateWidgetFromWindow(checked_cast<ZoomWindowWidget *>(sender()));
 }
@@ -412,3 +431,4 @@ void ZoomWindowInstrument::at_windowWidget_doubleClicked() {
     if(zoomWidget)
         workbench()->setItem(Qn::ZoomedRole, zoomWidget->item());
 }
+
