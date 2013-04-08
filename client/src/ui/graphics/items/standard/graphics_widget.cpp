@@ -363,8 +363,6 @@ QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &v
 }
 
 bool GraphicsWidget::event(QEvent *event) {
-    //return base_type::event(event);
-
     /* Filter events that we want to handle by ourself. */
     switch(event->type()) {
     case QEvent::GraphicsSceneMousePress:
