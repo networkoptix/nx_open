@@ -30,7 +30,7 @@ private:
     QnAbstractMediaDataPtr getNextDataMJPEG();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
-    QStringList getRTPurls() const;
+    QString getRTPurl(int profileId) const;
 
 private:
     QnMulticodecRtpReader m_rtpReader;
