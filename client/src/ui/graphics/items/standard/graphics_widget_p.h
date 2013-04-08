@@ -33,11 +33,11 @@ protected:
 
     QPointF calculateTransformOrigin() const;
 
-    void windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    void windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event);
-    void windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    void windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    bool windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    bool windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event);
+    bool windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    bool windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event);
+    bool windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
 protected:
     GraphicsWidget *q_ptr;
