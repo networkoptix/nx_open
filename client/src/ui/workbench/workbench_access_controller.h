@@ -121,12 +121,12 @@ private:
         PermissionsData(): permissions(0), notifier(NULL) {}
 
         Qn::Permissions permissions;
-        mutable QnWorkbenchPermissionsNotifier *notifier;
+        QnWorkbenchPermissionsNotifier *notifier;
     };
 
     QnUserResourcePtr m_user;
     Qn::Permissions m_userPermissions;
-    QHash<QnResourcePtr, PermissionsData> m_dataByResource;
+    mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };
 
 
