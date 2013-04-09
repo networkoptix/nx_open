@@ -12,8 +12,10 @@
 #include <utils/threaded_image_loader.h>
 #include <utils/color_space/yuvconvert.h>
 
+#ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
 //#define NATIVE_PAINT_BACKGROUND
+#endif
 
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
@@ -257,6 +259,14 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     }   
 
     painter->beginNativePainting();
+
+    if( painter->opacity() < 1.0 )
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    m_imgUploader->setOpacity( painter->opacity() );
     m_renderer->paint(
         QRect(0, 0, m_imgAsFrame->width, m_imgAsFrame->height),
         m_rect );
