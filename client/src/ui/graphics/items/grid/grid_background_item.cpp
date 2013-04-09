@@ -9,7 +9,7 @@
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
-//#define NATIVE_PAINT_BACKGROUND
+#define NATIVE_PAINT_BACKGROUND
 #endif
 
 
