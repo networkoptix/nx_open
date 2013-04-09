@@ -140,6 +140,7 @@ void QnTcpListener::updatePort(int newPort)
 {
     Q_D(QnTcpListener);
     QMutexLocker lock(&d->portMutex);
+    qWarning() << Q_FUNC_INFO << __LINE__ << "new value" << newPort;
     d->newPort = newPort;
 }
 
@@ -177,6 +178,9 @@ bool QnTcpListener::enableSSLMode()
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
+
+    qWarning() << Q_FUNC_INFO << "Tcp listener started";
+
     if (!d->serverSocket)
         m_needStop = true;
     while (!needToStop())
@@ -184,13 +188,16 @@ void QnTcpListener::run()
         if (d->newPort)
         {
             QMutexLocker lock(&d->portMutex);
+            qWarning() << Q_FUNC_INFO << __LINE__ << "switch to port value" << d->newPort;
             removeAllConnections();
             delete d->serverSocket;
             d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
             d->newPort = 0;
         }
 
+        qWarning() << Q_FUNC_INFO << "before accept";
         TCPSocket* clientSocket = d->serverSocket->accept();
+        qWarning() << Q_FUNC_INFO << "after accept";
         if (clientSocket) {
             if (d->connections.size() > d->maxConnections)
             {
@@ -214,6 +221,7 @@ void QnTcpListener::run()
         removeDisconnectedConnections();
     }
     removeAllConnections();
+    qWarning() << Q_FUNC_INFO << "Tcp listener finished";
 }
 
 void* QnTcpListener::getOpenSSLContext()
