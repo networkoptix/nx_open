@@ -22,7 +22,12 @@ public:
 
     virtual QnResourceList findResources(void) override;
 protected:
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const QString& host,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result) override;
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

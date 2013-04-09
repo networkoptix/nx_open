@@ -7,6 +7,8 @@
 
 #include "pluginmanager.h"
 
+#include <set>
+
 #include <QAtomicPointer>
 #include <QCoreApplication>
 #include <QDir>
@@ -80,25 +82,37 @@ PluginManager* PluginManager::instance( const QString& pluginDir )
     return pluginManagerWrapper()->getPluginManager( pluginDir );
 }
 
-void PluginManager::loadPlugins()
+void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
 {
     QMutexLocker lk( &m_mutex );
 
+    std::set<QString> directoriesToSearchForPlugins;
+
     //loading plugins
     if( !m_pluginDir.isEmpty() )
-        loadPlugins( m_pluginDir );
+        directoriesToSearchForPlugins.insert( QDir(m_pluginDir).absolutePath() );
 
 #ifndef Q_OS_WIN32
     char* netOptixPluginDir = getenv("NETWORK_OPTIX_PLUGIN_DIR");
     if( netOptixPluginDir )
-        loadPlugins( QString::fromAscii(netOptixPluginDir) );
+        directoriesToSearchForPlugins.insert( QString::fromLatin1(netOptixPluginDir) );
 #endif
 
-    loadPlugins( QDir::currentPath() );
-    loadPlugins( QCoreApplication::applicationDirPath() );
+    //directoriesToSearchForPlugins.insert( QDir(QDir::currentPath()).absolutePath() );
+    directoriesToSearchForPlugins.insert( QDir(QCoreApplication::applicationDirPath()).absolutePath() );
+
+    for( std::set<QString>::const_iterator
+        it = directoriesToSearchForPlugins.begin();
+        it != directoriesToSearchForPlugins.end();
+        ++it )
+    {
+        loadPluginsFromDir( *it, pluginsToLoad );
+    }
+
+    //loadPluginsFromDir( QCoreApplication::applicationDirPath(), pluginsToLoad );
 }
 
-void PluginManager::loadPlugins( const QString& dirToSearchIn )
+void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad )
 {
     QDir pluginDir( dirToSearchIn );
     const QStringList& entries = pluginDir.entryList( QStringList(), QDir::Files | QDir::Readable );
@@ -106,7 +120,11 @@ void PluginManager::loadPlugins( const QString& dirToSearchIn )
     {
         if( !QLibrary::isLibrary( entry ) )
             continue;
-        if( !loadQtPlugin( pluginDir.path() + QString::fromAscii("/") + entry ) )
+
+        if( pluginsToLoad & ptQt )
+            loadQtPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
+
+        if( pluginsToLoad & ptNX )
             loadNXPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
     }
 }

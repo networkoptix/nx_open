@@ -42,6 +42,7 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/acti/acti_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "plugins/resources/third_party/third_party_resource_searcher.h"
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
@@ -87,6 +88,7 @@
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
+#include "plugins/pluginmanager.h"
 
 
 #define USE_SINGLE_STREAMING_PORT
@@ -870,6 +872,9 @@ void QnMain::run()
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
+    //Initializing plugin manager
+    PluginManager::instance()->loadPlugins();
+
     if (needToStop())
         return;
 
@@ -997,10 +1002,16 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnTestCameraResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
+#if 1  //Native AXIS disabled for AXIS plugin testring purpose
+    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher() );
+    QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
+#else
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
+#endif
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
 #ifdef Q_OS_WIN
@@ -1082,6 +1093,11 @@ void QnMain::run()
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+
+#ifdef _DEBUG
+    delete ThirdPartyResourceSearcher::instance();
+    ThirdPartyResourceSearcher::initStaticInstance( NULL );
+#endif
 
     connectorThread->quit();
     connectorThread->wait();

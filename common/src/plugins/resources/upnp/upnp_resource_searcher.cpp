@@ -189,7 +189,7 @@ void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& uuidStr, const Q
     if( !xmlReader.parse( &input ) )
         return;
 
-    processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), result);
+    processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), foundDeviceDescription, result);
 }
 
 void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)

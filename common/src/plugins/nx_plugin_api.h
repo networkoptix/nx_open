@@ -37,6 +37,7 @@ namespace nxpl
         /*!
             If pointer cannot be cast, NULL MUST be returned
             \return If not NULL, returned pointer can be safely cast to type, defined by \a interfaceID
+            \note This method increments reference counter
         */
         virtual void* queryInterface( const NX_GUID& interfaceID ) = 0;
         //!Increment reference counter
@@ -49,7 +50,7 @@ namespace nxpl
             When zero, object MUST be removed
             \return new reference count
         */
-        virtual void releaseRef() = 0;
+        virtual unsigned int releaseRef() = 0;
     };
 
     //!Type of plugin entry-point function

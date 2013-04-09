@@ -34,6 +34,7 @@ QnPlVmax480ResourceSearcher& QnPlVmax480ResourceSearcher::instance()
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
                                                 const QString& host, 
                                                 const UpnpDeviceInfo& devInfo,
+                                                const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
     QString mac = devInfo.serialNumber;

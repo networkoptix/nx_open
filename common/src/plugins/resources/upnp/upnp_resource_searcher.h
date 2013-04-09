@@ -26,7 +26,16 @@ public:
 
     void setSendRequests(bool value);
 protected:
-    virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) = 0;
+    /*!
+        \param devInfo Parameters, received by parsing \a xmlDevInfo
+        \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
+    */
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const QString& host,
+        const UpnpDeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result) = 0;
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const QString& host);

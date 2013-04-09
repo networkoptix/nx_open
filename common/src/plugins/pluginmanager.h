@@ -37,6 +37,16 @@ class PluginManager
     Q_OBJECT
 
 public:
+    enum PluginType
+    {
+        //!Qt-based plugins
+        ptQt = 1,
+        //!plugins, implementing on nx_plugin_api.h
+        ptNX = 2,
+
+        ptAll = ptQt | ptNX
+    };
+
     PluginManager( const QString& pluginDir = QString() );
     virtual ~PluginManager();
 
@@ -57,11 +67,15 @@ public:
     }
 
     //!Searches for plugins of type \a T, derived from \a nxpl::NXPluginInterface among loaded plugins
-    template<class T> QList<T*> findNXPlugins() const
+    /*!
+        Increments (implicitly using queryInterface) reference counter for returned pointers
+    */
+    template<class T> QList<T*> findNXPlugins( const nxpl::NX_GUID& guid ) const
     {
+        QList<T*> foundPlugins;
         foreach( nxpl::NXPluginInterface* plugin, m_nxPlugins )
         {
-            void* ptr = plugin->queryInterface( T::INTF_GUID );
+            void* ptr = plugin->queryInterface( guid );
             if( ptr )
                 foundPlugins.push_back( static_cast<T*>(ptr) );
         }
@@ -72,7 +86,7 @@ public:
     /*!
         This method must be called implicitly
     */
-    void loadPlugins();
+    void loadPlugins( PluginType pluginsToLoad = ptAll );
 
     //!Guess what
     static PluginManager* instance( const QString& pluginDir = QString() );
@@ -87,7 +101,7 @@ private:
     QList<nxpl::NXPluginInterface*> m_nxPlugins;
     mutable QMutex m_mutex;
 
-    void loadPlugins( const QString& dirToSearchIn );
+    void loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad );
     bool loadQtPlugin( const QString& fullFilePath );
     //!Loads \a nxpl::NXPluginInterface based plugin
     bool loadNXPlugin( const QString& fullFilePath );

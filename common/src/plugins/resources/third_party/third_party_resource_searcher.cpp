@@ -1,0 +1,223 @@
+/**********************************************************
+* 2 apr 2013
+* akolesnikov
+***********************************************************/
+
+#include <algorithm>
+
+#include <utils/common/log.h>
+
+#include "third_party_resource_searcher.h"
+#include "core/resource/camera_resource.h"
+#include "../../pluginmanager.h"
+
+
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
+{
+    QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNXPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
+    std::copy(
+        pluginList.begin(),
+        pluginList.end(),
+        std::back_inserter(m_thirdPartyCamPlugins) );
+}
+
+ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
+{
+}
+
+QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, const QnResourceParameters& parameters )
+{
+    QnNetworkResourcePtr result;
+
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+
+    if( resourceType.isNull() )
+    {
+        NX_LOG( QString::fromLatin1("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1 );
+        return result;
+    }
+
+    if( resourceType->getManufacture() != manufacture() )
+    {
+        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+        return result;
+    }
+
+    nxcip::CameraInfo cameraInfo;
+    //TODO/IMPL analyzing parameters, getting discoveryManager and filling in cameraInfo
+    for( QnResourceParameters::const_iterator
+        it = parameters.begin();
+        it != parameters.end();
+        ++it )
+    {
+        const QByteArray& valLatin1 = it.value().toLatin1();
+        if( it.key() == QLatin1String("physicalId") )
+            strcpy( cameraInfo.uid, valLatin1.data() );
+        else if( it.key() == QLatin1String("url") )
+            strcpy( cameraInfo.url, valLatin1.data() );
+        else if( it.key() == QLatin1String("name") )
+            strcpy( cameraInfo.modelName, valLatin1.data() );
+    }
+    nxcip_qt::CameraDiscoveryManager discoveryManager = m_thirdPartyCamPlugins[0];  //TODO/IMPL choose correct plugin
+    Q_ASSERT( discoveryManager.getRef() );
+
+    nxcip::BaseCameraManager* camManager = discoveryManager.createCameraManager( cameraInfo );
+    if( !camManager )
+        return QnThirdPartyResourcePtr();
+
+    result = QnVirtualCameraResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, discoveryManager ) );
+    result->setTypeId(resourceTypeId);
+
+    NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
+        arg(discoveryManager.getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
+
+    result->deserialize( parameters );
+    return result;
+}
+
+static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
+
+QString ThirdPartyResourceSearcher::manufacture() const
+{
+    return THIRD_PARTY_MANUFACTURER_NAME;
+}
+
+
+QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/)
+{
+    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+        it = m_thirdPartyCamPlugins.begin();
+        it != m_thirdPartyCamPlugins.end();
+        ++it )
+    {
+        if( it->checkHostAddress( &m_cameraInfoTempArray, url.toString(), auth.user(), auth.password() ) <= 0 )
+            continue;
+        return createResListFromCameraInfoList( &*it, m_cameraInfoTempArray );
+    }
+    return QList<QnResourcePtr>();
+}
+
+static ThirdPartyResourceSearcher* globalInstance = NULL;
+
+void ThirdPartyResourceSearcher::initStaticInstance( ThirdPartyResourceSearcher* _instance )
+{
+    globalInstance = _instance;
+}
+
+ThirdPartyResourceSearcher* ThirdPartyResourceSearcher::instance()
+{
+    return globalInstance;
+}
+
+QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
+    QnResourceList& /*result*/,
+    const QByteArray& responseData,
+    const QHostAddress& discoveryAddress )
+{
+    QList<QnNetworkResourcePtr> localResults;
+
+    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+        it = m_thirdPartyCamPlugins.begin();
+        it != m_thirdPartyCamPlugins.end();
+        ++it )
+    {
+        nxcip::CameraInfo cameraInfo;
+        if( !it->fromMDNSData( responseData, discoveryAddress, &cameraInfo ) )
+            continue;
+
+        QnNetworkResourcePtr res = createResourceFromCameraInfo( &*it, cameraInfo );
+        if( res )
+            localResults.push_back( res );
+        break;
+    }
+
+    return localResults;
+}
+
+void ThirdPartyResourceSearcher::processPacket(
+    const QHostAddress& discoveryAddr,
+    const QString& host,
+    const UpnpDeviceInfo& devInfo,
+    const QByteArray& xmlDevInfo,
+    QnResourceList& result )
+{
+    QList<QnNetworkResourcePtr> localResults;
+
+    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+        it = m_thirdPartyCamPlugins.begin();
+        it != m_thirdPartyCamPlugins.end();
+        ++it )
+    {
+        nxcip::CameraInfo cameraInfo;
+        if( !it->fromUpnpData( xmlDevInfo, &cameraInfo ) )
+            continue;
+
+        QnNetworkResourcePtr res = createResourceFromCameraInfo( &*it, cameraInfo );
+        if( res )
+            result.push_back( res );
+        return;
+    }
+}
+
+QnResourceList ThirdPartyResourceSearcher::findResources()
+{
+    const QnResourceList& mdnsFoundResList = QnMdnsResourceSearcher::findResources();
+    const QnResourceList& upnpFoundResList = QnUpnpResourceSearcher::findResources();
+    const QnResourceList& customFoundResList = doCustomSearch();
+    return mdnsFoundResList + upnpFoundResList + customFoundResList;
+}
+
+QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
+{
+    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+        it = m_thirdPartyCamPlugins.begin();
+        it != m_thirdPartyCamPlugins.end();
+        ++it )
+    {
+        int result = it->findCameras( &m_cameraInfoTempArray, QString() );
+        if( result <= 0 )
+            continue;
+
+        return createResListFromCameraInfoList( &*it, m_cameraInfoTempArray );
+    }
+    return QnResourceList();
+}
+
+QnResourceList ThirdPartyResourceSearcher::createResListFromCameraInfoList(
+    nxcip_qt::CameraDiscoveryManager* const discoveryManager,
+    const QVector<nxcip::CameraInfo>& cameraInfoArray )
+{
+    QnResourceList resList;
+    foreach( nxcip::CameraInfo info, cameraInfoArray )
+    {
+        QnThirdPartyResourcePtr res = createResourceFromCameraInfo( discoveryManager, info );
+        if( !res )
+            continue;
+        resList.push_back( res );
+    }
+    return resList;
+}
+
+static const QLatin1String THIRD_PARTY_MODEL_NAME( "THIRD_PARTY_COMMON" );
+
+QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo(
+    nxcip_qt::CameraDiscoveryManager* const discoveryManager,
+    const nxcip::CameraInfo& cameraInfo )
+{
+    QnId typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
+    if( !typeId.isValid() )
+        return QnThirdPartyResourcePtr();
+
+    nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
+    if( !camManager )
+        return QnThirdPartyResourcePtr();
+
+    discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
+    QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
+    resource->setTypeId(typeId);
+    resource->setName(QString::fromUtf8(cameraInfo.modelName));
+    resource->setModel(QString::fromUtf8(cameraInfo.modelName));
+    resource->setMAC(QString::fromUtf8(cameraInfo.uid));
+    resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
+    return resource;
+}

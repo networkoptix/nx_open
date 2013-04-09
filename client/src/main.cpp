@@ -468,7 +468,7 @@ int main(int argc, char **argv)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
-        PluginManager::instance()->loadPlugins();
+        PluginManager::instance()->loadPlugins( PluginManager::ptQt );
 
         /* Process input files. */
         for (int i = 1; i < argc; ++i)

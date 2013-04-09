@@ -6,6 +6,9 @@
 
 
 //!Network Optix Camera Integration Plugin API
+/*!
+    - all text values are NULL-terminated utf-8
+*/
 namespace nxcip
 {
     static const int MAX_TEXT_LEN = 1024;
@@ -13,6 +16,9 @@ namespace nxcip
     //!Error codes. Interface implementation MUST use these error codes when appropriate
     static const int NX_NO_ERROR = 0;
     static const int NX_NOT_AUTHORIZED = -1;
+    static const int NX_INVALID_ENCODER_NUMBER = 2;
+    static const int NX_UNSUPPORTED_RESOLUTION = -9;
+    static const int NX_OTHER_ERROR = -100;
 
 
     class BaseCameraManager;
@@ -20,14 +26,43 @@ namespace nxcip
     // {0D06134F-16D0-41c8-9752-A33E81FE9C75}
     static const nxpl::NX_GUID IID_CameraDiscoveryManager = { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x75 };
 
+    struct CameraInfo
+    {
+        //!required
+        char modelName[256];
+        //!Can be empty
+        char firmware[256];
+        //!Camera's unique identifier. MAC address can be used
+        char uid[256];
+        //!Camera management url
+        char url[MAX_TEXT_LEN];
+        //!Any data in implementation defined format
+        char auxiliaryData[256];
+        //!Plugin can specify default redentials to use with camera
+        char defaultLogin[256];
+        //!Plugin can specify default redentials to use with camera
+        char defaultPassword[256];
+
+        CameraInfo()
+        {
+            modelName[0] = 0;
+            firmware[0] = 0;
+            uid[0] = 0;
+            url[0] = 0;
+            auxiliaryData[0] = 0;
+            defaultLogin[0] = 0;
+            defaultPassword[0] = 0;
+        }
+    };
+
     //!This interface is used to find cameras and create \a BaseCameraManager instance
     /*!
-        Mediaserver has built-in UPNP support, plugin needs only implement \a fromUpnpData method.
-        If camera do not support upnp, vendor can provide its own search methodby implementing \a findCameras
+        Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a fromUpnpData or \a fromMDNSData method.
+        If camera do support neither UPNP nor MDNS, plugin can provide its own search method by implementing \a findCameras
     */
     class CameraDiscoveryManager
     :
-        public nxpl::NXPluginInterface
+        virtual public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraDiscoveryManager() {}
@@ -37,20 +72,6 @@ namespace nxcip
             \param buf Buffer of \a MAX_TEXT_LEN size
         */
         virtual void getVendorName( char* buf ) const = 0;
-
-        struct CameraInfo
-        {
-            //!required
-            char modelName[256];
-            //!Can be empty
-            char firmware[256];
-            //!Camera's unique identifier. MAC address can be used
-            char uid[256];
-            //!Camera management url
-            char url[MAX_TEXT_LEN];
-            //!Any data in implementation defined format
-            char auxiliary[256];
-        };
 
         static const int CAMERA_INFO_ARRAY_SIZE = 1024;
         //!Vendor-specific camera search method. Returns list of found cameras
@@ -72,6 +93,21 @@ namespace nxcip
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
         virtual int checkHostAddress( CameraInfo* cameras, const char* url, const char* login, const char* password ) = 0;
+        //!MDNS camera search method
+        /*!
+            Mediaserver calls this method when it finds unknown MDNS host.
+
+            If non-zero value is returned, \a cameraInfo MUST be filled by this method (it will be used later in call to \a createCameraManager).
+            \param discoveryAddress Source address of \a mdnsResponsePacket (for ipv4 it is ip-address)
+            \param mdnsResponsePacket Received MDNS packet
+            \param mdnsResponsePacketSize Size of \a mdnsResponsePacket in bytes
+            \return non zero, if upnp data is recognized, 0 otherwise
+        */
+        virtual int fromMDNSData(
+            const char* discoveryAddress,
+            const unsigned char* mdnsResponsePacket,
+            int mdnsResponsePacketSize,
+            CameraInfo* cameraInfo ) = 0;
         //!UPNP camera search method
         /*!
             Mediaserver calls this method when it finds unknown UPNP device.
@@ -79,12 +115,100 @@ namespace nxcip
             If non-zero value is returned, \a cameraInfo MUST be filled by this method (it will be used later in call to \a createCameraManager).
             \param upnpXMLData Contains upnp data as specified in [UPnP Device Architecture 1.1, section 2.3]
             \param upnpXMLDataSize Size of \a upnpXMLData in bytes
-            \return non-0, if upnp data is recognized, 0 otherwise
+            \return non zero, if upnp data is recognized, 0 otherwise
         */
         virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, CameraInfo* cameraInfo ) = 0;
 
         //!Creates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
+    };
+
+
+    struct Resolution
+    {
+        int width;
+        int height;
+
+        Resolution( int _width = 0, int _height = 0 )
+        :
+            width( _width ),
+            height( _height )
+        {
+        }
+    };
+    struct ResolutionInfo
+    {
+        Resolution resolution;
+        float maxFps;   //!Maximum fps, allowed for \a resolution
+
+        ResolutionInfo()
+        :
+            maxFps( 0 )
+        {
+        }
+    };
+
+    // {528FD641-52BB-4f8b-B279-6C21FEF5A2BB}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder = { 0x52, 0x8f, 0xd6, 0x41, 0x52, 0xbb, 0x4f, 0x8b, 0xb2, 0x79, 0x6c, 0x21, 0xfe, 0xf5, 0xa2, 0xbb };
+
+    //!Provides encoder parameter configuration and media stream access (by providing media stream url)
+    class CameraMediaEncoder
+    :
+        virtual public nxpl::NXPluginInterface
+    {
+    public:
+        virtual ~CameraMediaEncoder() {}
+
+        //!Returns url of media stream as NULL-terminated utf-8 string
+        /*!
+            Returned url MUST consider stream parameters set with setResolution, setFps, etc...
+            Supported protocols:\n
+                - rtsp. RTP with h.264 and motion jpeg supported
+                - http. Motion jpeg only supported
+            \param encoderNumber Encoder number starts with 0
+            \param urlBuf Buffer of size \a MAX_TEXT_LEN. MUST be NULL-terminated after return
+            \return 0 on success, otherwise - error code
+        */
+        virtual int getMediaUrl( char* urlBuf ) const = 0;
+
+        static const int MAX_RESOLUTION_LIST_SIZE = 64;
+
+        //!Returns supported resolution list
+        /*!
+            \param infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
+            \param infoListCount Returned number of supported resolutions
+            \return 0 on success, otherwise - error code
+        */
+        virtual int getResolutionList( ResolutionInfo* infoList, int* infoListCount ) const = 0;
+
+        //!Returns maximem bitrate in Kbps. 0 is interpreted as unlimited bitrate value
+        /*!
+            \param maxBitrate Returned value of max bitrate
+            \return 0 on success, otherwise - error code
+        */
+        virtual int getMaxBitrate( int* maxBitrate ) const = 0;
+
+        //!Change resolution on specified encoder
+        /*!
+            \return 0 on success, otherwise - error code
+        */
+        virtual int setResolution( const Resolution& resolution ) = 0;
+
+        /*!
+            Camera is allowed to select fps different from requested, but it should try to choose fps nearest to requested
+            \param fps Requested fps
+            \param selectedFps *selectedFps MUST be set to actual fps implied
+            \return 0 on success, otherwise - error code
+        */
+        virtual int setFps( const float& fps, float* selectedFps ) = 0;
+
+        /*!
+            Camera is allowed to select bitrate different from requested, but it should try to choose bitrate nearest to requested
+            \param bitrateKbps Requested bitrate in kbps
+            \param selectedBitrateKbps *selectedBitrateKbps MUST be set to actual bitrate implied
+            \return 0 on success, otherwise - error code
+        */
+        virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) = 0;
     };
 
 
@@ -96,9 +220,17 @@ namespace nxcip
     static const nxpl::NX_GUID IID_BaseCameraManager = { 0xb7, 0xaa, 0x2f, 0xe8, 0x75, 0x92, 0x44, 0x59, 0xa5, 0x2f, 0xb0, 0x5e, 0x8e, 0x8, 0x9a, 0xfe };
 
     //!Provides base camera operations: getting/settings fps, resolution, bitrate, media stream url(s). Also provides pointer to other camera-management interfaces
+    /*!
+        Mediaserver uses this interface in following way:\n
+            - requests encoder count with \a getEncoderCount and camera capabilities with \a getCameraCapabilities
+            - requests each encoder params with \a getResolutionList, \a getMaxBitrate
+            - analyzes camera capabilities and set selected encoder parameters with \a setResolution, \a setFps, \a setBitrate, \a setAudioEnabled
+            - requests media url(s) with \a getMediaUrl
+            - requests media stream(s) using provided url
+    */
     class BaseCameraManager
     :
-        public nxpl::NXPluginInterface
+        virtual public nxpl::NXPluginInterface
     {
     public:
         virtual ~BaseCameraManager() {}
@@ -106,56 +238,30 @@ namespace nxcip
         //!Provides maximum number of available encoders
         /*!
             E.g., if 2 means that camera supports dual-streaming, 3 - for tripple-streaming and so on.
+
+            - encoder number starts with 0
+            - encoders MUST be numbered in quality decrease order (0 - encoder with best quality, 1 - low-quality)
+
             \param encoderCount Contains encoder count on return
             \return 0 on success, otherwise - error code
         */
         virtual int getEncoderCount( int* encoderCount ) const = 0;
 
-        //!Returns url of media stream as NULL-terminated utf-8 string
+        //!Returns encoder by index
         /*!
-            Supported protocols:\n
-                - rtsp. RTP with h.264 and motion jpeg supported
-                - http with motion jpeg only 
-            \param encoderNumber Encoder number starts with 0
-            \param urlBuf Buffer of size \a MAX_TEXT_LEN. MUST be NULL-terminated after return
-            \return 0 on success, otherwise - error code
+            \return \a NX_NO_ERROR on success, otherwise - error code:\n
+                - \a NX_INVALID_ENCODER_NUMBER wrong \a encoderIndex value
+            \note BaseCameraManager holds reference to \a CameraMediaEncoder
         */
-        virtual int getMediaUrl( int encoderNumber, char* urlBuf ) const = 0;
-
-        static const int MAX_RESOLUTION_LIST_SIZE = 64;
-
-        struct Resolution
-        {
-            int width;
-            int height;
-        };
-        struct ResolutionInfo
-        {
-            Resolution resolution;
-            float maxFps;   //!Maximum fps, allowed for \a resolution
-        };
-        //!Returns supported resolution list
-        /*!
-            \param infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
-            \param infoListCount Returned number of supported resolutions
-            \return 0 on success, otherwise - error code
-        */
-        virtual int getResolutionList( int encoderNumber, ResolutionInfo* infoList, int* infoListCount ) const = 0;
-
-        //!Returns maximem bitrate in Kbps. 0 is interpreted as unlimited bitrate value
-        /*!
-            \param maxBitrate Returned value of max bitrate
-            \return 0 on success, otherwise - error code
-        */
-        virtual int getMaxBitrate( int encoderNumber, int* maxBitrate ) const = 0;
+        virtual int getEncoder( int encoderIndex, CameraMediaEncoder** encoderPtr ) = 0;
 
         enum CameraCapability
         { 
             hardwareMotionCapability    = 0x01, //!camera supports hardware motion. Plugin, returning this flag, MUST implement \a CameraMotionDataProvider interface
-            relayInputCapability        = 0x02,
-            relayOutputCapability       = 0x04,
-            ptzCapability               = 0x08,
-            audioCapability             = 0x10,
+            relayInputCapability        = 0x02, //!if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            relayOutputCapability       = 0x04, //!if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            ptzCapability               = 0x08, //!if this flag is enabled, \a CameraPTZManager MUST be implemented
+            audioCapability             = 0x10, //!if set, camera supports audio
             shareFpsCapability          = 0x20, //!if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
             sharePixelsCapability       = 0x40  //!if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
         };
@@ -166,34 +272,15 @@ namespace nxcip
         */
         virtual int getCameraCapabilities( unsigned int* capabilitiesMask ) const = 0;
 
-
         //!Set credentials for camera access
-        virtual void setCredentials( const char* username, const char* password );
+        virtual void setCredentials( const char* username, const char* password ) = 0;
 
-        //!Change resolution on specified encoder
+        //!Turn on/off audio on ALL encoders
         /*!
-            \param encoderNumber Encoder number starts with 0
+            \param audioEnabled If non-zero, audio should be enabled on ALL encoders, else - disabled
             \return 0 on success, otherwise - error code
         */
-        virtual int setResolution( int encoderNumber, const Resolution& resolution ) = 0;
-
-        /*!
-            Camera is allowed to select fps different from requested, but it should try to choose fps nearest to requested
-            \param encoderNumber Encoder number starts with 0
-            \param fps Requested fps
-            \param selectedFps *selectedFps MUST be set to actual fps implied
-            \return 0 on success, otherwise - error code
-        */
-        virtual int setFps( int encoderNumber, const float& fps, float* selectedFps ) = 0;
-
-        /*!
-            Camera is allowed to select bitrate different from requested, but it should try to choose bitrate nearest to requested
-            \param encoderNumber Encoder number starts with 0
-            \param bitrateKbps Requested bitrate in kbps
-            \param selectedBitrateKbps *selectedBitrateKbps MUST be set to actual bitrate implied
-            \return 0 on success, otherwise - error code
-        */
-        virtual int setBitrate( int encoderNumber, int bitrateKbps, int* selectedBitrateKbps ) = 0;
+        virtual int setAudioEnabled( int audioEnabled ) = 0;
 
         //!MUST return not-NULL if \a ptzCapability is present
         virtual CameraPTZManager* getPTZManager() const = 0;
@@ -217,7 +304,7 @@ namespace nxcip
     //!Pan–tilt–zoom management
     class CameraPTZManager
     :
-        public nxpl::NXPluginInterface
+        virtual public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraPTZManager() {}
@@ -285,7 +372,7 @@ namespace nxcip
     //!Provides access to motion detection support, implemented on camera
     class CameraMotionDataProvider
     :
-        public nxpl::NXPluginInterface
+        virtual public nxpl::NXPluginInterface
     {
     public:
         //TODO for later use
@@ -303,7 +390,7 @@ namespace nxcip
     //!Relay input/output management
     class CameraRelayIOManager
     :
-        public nxpl::NXPluginInterface
+        virtual public nxpl::NXPluginInterface
     {
     public:
         //!Returns list of IDs of available relay output ports
@@ -370,7 +457,7 @@ namespace nxcip
     //!Receives events on input port state change
     class CameraInputEventHandler
     :
-        public nxpl::NXPluginInterface
+        virtual public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraInputEventHandler() {}
