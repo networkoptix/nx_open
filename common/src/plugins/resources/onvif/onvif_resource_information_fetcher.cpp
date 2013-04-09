@@ -21,8 +21,8 @@ static char* ANALOG_CAMERAS[][2] =
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
 static char* IGNORE_VENDORS[][2] =
 {
-    {"*networkcamera*", "dcs-*"}, // DLINK
-    {"*spartan-6*", "*"}          // ArecontVision
+    {"*networkcamera*", "IP*"}, // DLINK
+    {"*", "*spartan-6*"}          // ArecontVision
 };
 
 
@@ -107,6 +107,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     if (isMacAlreadyExists(info.uniqId, result) || isMacAlreadyExists(mac, result)) {
         return;
     }
+
+    //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
+    //    int n = 0;
 
     if (ignoreCamera(info))
         return;
