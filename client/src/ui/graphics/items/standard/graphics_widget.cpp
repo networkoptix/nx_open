@@ -187,14 +187,14 @@ QPointF GraphicsWidgetPrivate::calculateTransformOrigin() const {
 // GraphicsWidget
 // -------------------------------------------------------------------------- //
 GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    QGraphicsWidget(parent, windowFlags),
+    base_type(parent, windowFlags),
     d_ptr(new GraphicsWidgetPrivate)
 {
     d_ptr->q_ptr = this;
 }
 
 GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    QGraphicsWidget(parent, windowFlags),
+    base_type(parent, windowFlags),
     d_ptr(&dd)
 {
     d_ptr->q_ptr = this;
@@ -390,6 +390,7 @@ bool GraphicsWidget::event(QEvent *event) {
     case QEvent::GraphicsSceneMousePress:
         if (windowFrameEvent(event))
             return true;
+        break;
     case QEvent::GraphicsSceneMouseMove:
     case QEvent::GraphicsSceneMouseRelease:
     case QEvent::GraphicsSceneMouseDoubleClick:
@@ -585,32 +586,25 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event) {
 
     switch (event->type()) {
     case QEvent::GraphicsSceneMousePress:
-        d->windowFrameMousePressEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
-        break;
+        return d->windowFrameMousePressEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
     case QEvent::GraphicsSceneMouseMove:
-        d->windowFrameMouseMoveEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
-        break;
+        return d->windowFrameMouseMoveEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
     case QEvent::GraphicsSceneMouseRelease:
-        d->windowFrameMouseReleaseEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
-        break;
+        return d->windowFrameMouseReleaseEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
     case QEvent::GraphicsSceneHoverMove:
-        d->windowFrameHoverMoveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
-        break;
+        return d->windowFrameHoverMoveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
     case QEvent::GraphicsSceneHoverLeave:
-        d->windowFrameHoverLeaveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
-        break;
+        return d->windowFrameHoverLeaveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
     default:
-        break;
+        return false;
     }
-    
-    return event->isAccepted();
 }
 
-void GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     Q_Q(GraphicsWidget);
 
-    if (!hasDecoration())
-        return;
+    if (!hasDecoration()) // TODO: #Elric invalid check
+        return false;
 
     ensureWindowData();
     bool oldCloseButtonHovered = windowData->closeButtonHovered;
@@ -626,7 +620,7 @@ void GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
         windowData->closeButtonRect = mapFromFrame(q->style()->subControlRect(QStyle::CC_TitleBar, &option, QStyle::SC_TitleBarCloseButton, q));
         windowData->closeButtonHovered = windowData->closeButtonRect.contains(event->pos());
     } else if(section == Qt::NoSection) {
-        event->ignore();
+        return false;
     }
     windowData->hoveredSection = section;
 
@@ -639,14 +633,15 @@ void GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
 
     if (windowData->closeButtonHovered != oldCloseButtonHovered)
         q->update(windowData->closeButtonRect);
+
+    return true;
 }
 
-void GraphicsWidgetPrivate::windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+bool GraphicsWidgetPrivate::windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    Q_UNUSED(event)
     Q_Q(GraphicsWidget);
 
-    Q_UNUSED(event);
-
-    if (hasDecoration()) {
+    if (hasDecoration()) { // TODO: #Elric invalid check
         /* Reset cursor. */
         if(handlingFlags & GraphicsWidget::ItemHandlesResizing)
             q->unsetCursor();
@@ -661,12 +656,15 @@ void GraphicsWidgetPrivate::windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent 
         windowData->closeButtonHovered = false;
         windowData->closeButtonRect = QRectF();
     }
+
+    return true;
 }
 
-void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event) {
+bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event) {
     Q_Q(GraphicsWidget);
+    
     if (event->button() != Qt::LeftButton)
-        return;
+        return false;
 
     ensureWindowData();
     windowData->grabbedSection = resizingFrameSectionAt(event->pos(), event->widget());
@@ -683,12 +681,11 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     case Qt::TitleBarArea:
         if(handlingFlags & GraphicsWidget::ItemHandlesMovement) {
             windowData->startPinPoint = q->pos() - q->mapToParent(event->pos());
-            event->accept();
+            return true;
         } else {
             windowData->grabbedSection = Qt::NoSection;
-            event->ignore();
+            return false;
         }
-        break;
     case Qt::LeftSection:
     case Qt::TopLeftSection:
     case Qt::TopSection:
@@ -699,22 +696,20 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     case Qt::BottomLeftSection:
         if(handlingFlags & GraphicsWidget::ItemHandlesResizing) {
             windowData->startPinPoint = q->mapToParent(Qn::calculatePinPoint(q->rect(), windowData->grabbedSection));
-            event->accept();
+            return true;
         } else {
             windowData->grabbedSection = Qt::NoSection;
-            event->ignore();
+            return false;
         }
-        break;
     case Qt::NoSection:
-        event->setAccepted(windowData->closeButtonGrabbed);
-        break;
+        //event->setAccepted(windowData->closeButtonGrabbed); // TODO: #Elric
+        return false;
     default:
-        event->ignore();
-        break;
+        return false;
     }
 }
 
-void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     Q_Q(GraphicsWidget);
 
     ensureWindowData();
@@ -723,14 +718,11 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         windowData->closeButtonHovered = windowData->closeButtonRect.contains(event->pos());
         if(oldCloseButtonHovered != windowData->closeButtonHovered)
             q->update(windowData->closeButtonRect);
-        event->accept();
-        return;
+        return true;
     }
 
-    if(!(event->buttons() & Qt::LeftButton)) {
-        event->ignore();
-        return;
-    }
+    if(!(event->buttons() & Qt::LeftButton))
+        return false;
 
     if(windowData->grabbedSection != Qt::NoSection) {
         QSizeF newSize = windowData->startSize + Qn::calculateSizeDelta(
@@ -762,11 +754,13 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         q->resize(newSize);
         q->setPos(newPos);
         
-        event->accept();
+        return true;
+    } else {
+        return false;
     }
 }
 
-void GraphicsWidgetPrivate::windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+bool GraphicsWidgetPrivate::windowFrameMouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     Q_Q(GraphicsWidget);
 
     ensureWindowData();
@@ -776,12 +770,14 @@ void GraphicsWidgetPrivate::windowFrameMouseReleaseEvent(QGraphicsSceneMouseEven
         if(windowData->closeButtonHovered)
             q->close();
 
-        event->accept();
+        return true;
     } else if(windowData->grabbedSection != Qt::NoSection) {
         if(event->buttons() == 0)
             windowData->grabbedSection = Qt::NoSection;
 
-        event->accept();
+        return true;
+    } else {
+        return false;
     }
 }
 

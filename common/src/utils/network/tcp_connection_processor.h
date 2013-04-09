@@ -35,6 +35,7 @@ public:
     //!Returns SSL*. including ssl.h here causes numerous compilation problems
     void* ssl() const;
     TCPSocket* socket() const;
+    QUrl getDecodedUrl() const;
 
 protected:
     virtual void parseRequest();
@@ -52,7 +53,6 @@ protected:
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
     bool readRequest();
-    QUrl getDecodedUrl() const;
 
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
 

@@ -14,6 +14,11 @@
 
 namespace {
     const int maxImageSize = 4096;
+//    const int maxImageSize = 6144;
+//    const int maxImageSize = 7168;
+//    const int maxImageSize = 7680;
+//    const int maxImageSize = 7936;
+//    const int maxImageSize = 8192;
 }
 
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
@@ -36,7 +41,7 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
 }
 
 QSize QnAppServerFileCache::getMaxImageSize() const {
-    int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+    int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
     return QSize(value, value);
 }
 

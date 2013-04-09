@@ -181,7 +181,23 @@ void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
 
 int scaleInt(int value, int from, int to)
 {
-    return int (((double) value / (double) from) * to + 0.5);
+    double step = 1.0 / (double) (from-1);
+    return int (step * value * (double) (to-1) + 0.5);
+}
+
+bool PlDlinkStreamReader::isTextQualities(const QStringList& qualities) const
+{
+    if (qualities.isEmpty())
+        return false;
+    QString val = qualities[0];
+    for (int i = 0; i < val.length(); ++i)
+    {
+        bool isDigit = val.at(i) >= L'0' && val.at(i) <= L'9';
+        if (!isDigit)
+            return true;
+    }
+
+    return false;
 }
 
 QString PlDlinkStreamReader::getQualityString() const
@@ -221,7 +237,9 @@ QString PlDlinkStreamReader::getQualityString() const
         return QString::number(q);
     }
     int qualityIndex = scaleInt((int) getQuality(), QnQualityHighest-QnQualityLowest+1, info.possibleQualities.size());
-    return info.possibleQualities[info.possibleQualities.size()-1 - qualityIndex]; // 0 is best quality for dlink
+    if (isTextQualities(info.possibleQualities))
+        qualityIndex = info.possibleQualities.size()-1 - qualityIndex; // index 0 is best quality if quality is text
+    return info.possibleQualities[qualityIndex];
 }
 
 QString PlDlinkStreamReader::composeVideoProfile() 

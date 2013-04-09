@@ -25,7 +25,6 @@ public:
 
     void setOnScreenDateOffset(int timeOffsetMs);
 
-    void setQuality(QnStreamQuality quality);
 private:
     int rescaleFrame();
     void doDrawOnScreenTime(CLVideoDecoderOutput* frame);
@@ -48,7 +47,6 @@ private:
     QFont m_timeFont;
     int m_dateTimeXOffs;
     int m_dateTimeYOffs;
-    QnStreamQuality m_quality;
     int m_onscreenDateOffset;
 
     int m_bufXOffs;

@@ -50,6 +50,8 @@ public:
     {
         m_dataOutput.reset( new CachedOutputStream(owner) );
         m_dataOutput->start();
+
+        setObjectName( "QnProgressiveDownloadingDataConsumer" );
     }
 
     ~QnProgressiveDownloadingDataConsumer()
@@ -114,7 +116,11 @@ protected:
             }
         }
         else
+        {
+            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2:%3 due to transcode error (%4)").
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
+        }
         return true;
     }
 private:
@@ -161,7 +167,7 @@ public:
 
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
-static int DEFAULT_MAX_CONNECTION_LIVE_TIME_MS = 30*60;    //30 minutes
+static int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
@@ -183,7 +189,9 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
 
     d->killTimerID = TimerManager::instance()->addTimer(
         this,
-        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME_MS ).toUInt()*MS_PER_SEC );
+        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt()*MS_PER_SEC );
+
+    setObjectName( "QnProgressiveDownloadingConsumer" );
 }
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
@@ -287,8 +295,27 @@ void QnProgressiveDownloadingConsumer::run()
             }
         }
 
-        if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, videoSize) != 0)
-            //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
+        QnStreamQuality quality = QnQualityNormal;
+        if( getDecodedUrl().hasQueryItem(QnCodecParams::quality) )
+            quality = QnStreamQualityFromString(getDecodedUrl().queryItemValue(QnCodecParams::quality));
+
+        QnCodecParams::Value codecParams;
+        QList<QPair<QString, QString> > queryItems = getDecodedUrl().queryItems();
+        for( QList<QPair<QString, QString> >::const_iterator
+            it = queryItems.begin();
+            it != queryItems.end();
+            ++it )
+        {
+            codecParams[it->first] = it->second;
+        }
+
+        if (d->transcoder.setVideoCodec(
+                d->videoCodec,
+                QnTranscoder::TM_FfmpegTranscode,
+                quality,
+                videoSize,
+                -1,
+                codecParams ) != 0 )
         {
             QByteArray msg;
             msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
@@ -413,8 +440,15 @@ void QnProgressiveDownloadingConsumer::run()
 
         //dataConsumer.sendResponse();
         dataConsumer.start();
-        while (dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated)
+        while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
+
+        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2:%3. Reason: %4").
+            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress()).arg(socket()->getForeignPort()).
+            arg((!dataConsumer.isRunning() ? QString::fromLatin1("Data consumer stopped") : 
+                (!d->socket->isConnected() ? QString::fromLatin1("Connection has been closed") :
+                 QString::fromLatin1("Terminated")))), cl_logDEBUG1 );
+
         dataConsumer.pleaseStop();
 
         QnByteArray emptyChunk((unsigned)0,0);
