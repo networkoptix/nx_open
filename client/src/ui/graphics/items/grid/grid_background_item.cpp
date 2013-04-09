@@ -2,11 +2,6 @@
 
 #include <QPainter>
 
-#include <ui/animation/animation_timer.h>
-#include <ui/animation/opacity_animator.h>
-#include <ui/animation/rect_animator.h>
-#include <ui/animation/variant_animator.h>
-
 #include <ui/workbench/workbench_grid_mapper.h>
 
 #include <utils/threaded_image_loader.h>
@@ -22,9 +17,6 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_imageSize(1, 1),
     m_imageOpacity(70),
-    m_targetOpacity(0),
-    m_geometryAnimator(NULL),
-    m_opacityAnimator(NULL),
     m_cache(new QnAppServerFileCache(this)),
     m_imgUploaded(false),
     m_imageStatus(None)
@@ -47,46 +39,17 @@ QRectF QnGridBackgroundItem::boundingRect() const {
 
 void QnGridBackgroundItem::updateDisplay() {
     if (m_imageFilename.isEmpty()) {
-        animatedHide();
+        setOpacity(0.0);
         return;
     } else {
-        animatedShow();
+        setOpacity(0.01 * m_imageOpacity);
+        updateGeometry();
     }
+
     if (m_imageStatus != None)
         return;
     m_imageStatus = Loading;
     m_cache->loadImage(m_imageFilename);
-}
-
-void QnGridBackgroundItem::animatedHide() {
-    /*
-    m_targetOpacity = 0.0;
-    if (!m_opacityAnimator)
-        return;
-
-    if (!m_opacityAnimator->isRunning())
-        m_opacityAnimator->animateTo(m_targetOpacity);
-    */
-    setOpacity(0.0);
-}
-
-void QnGridBackgroundItem::animatedShow() {
-#ifdef NATIVE_PAINT_BACKGROUND
-    if( !m_imgAsFrame )
-        return;
-#else
-    if (m_image.isNull())
-        return;
-#endif
-    /*
-    m_targetOpacity = 0.7;
-    if (!m_opacityAnimator)
-        return;
-
-    if (!m_opacityAnimator->isRunning())
-        m_opacityAnimator->animateTo(m_targetOpacity);
-    */
-    setOpacity(0.01 * m_imageOpacity);
 }
 
 const QRectF& QnGridBackgroundItem::viewportRect() const {
@@ -109,27 +72,6 @@ void QnGridBackgroundItem::setMapper(QnWorkbenchGridMapper *mapper) {
     connect(mapper,     SIGNAL(spacingChanged()),   this,   SLOT(updateGeometry()));
 
     updateGeometry();
-}
-
-
-AnimationTimer* QnGridBackgroundItem::animationTimer() const {
-    return m_geometryAnimator->timer();
-}
-
-void QnGridBackgroundItem::setAnimationTimer(AnimationTimer *timer) {
-    if (!m_geometryAnimator) {
-        m_geometryAnimator = new RectAnimator(this);
-        m_geometryAnimator->setTargetObject(this);
-        m_geometryAnimator->setAccessor(new PropertyAccessor("viewportRect"));
-    }
-
-    if (!m_opacityAnimator) {
-        m_opacityAnimator = opacityAnimator(this, 0.5);
-        m_opacityAnimator->setTimeLimit(2500);
-        connect(m_opacityAnimator, SIGNAL(finished()), this, SLOT(at_opacityAnimator_finished()));
-    }
-
-    m_geometryAnimator->setTimer(timer);
 }
 
 QString QnGridBackgroundItem::imageFilename() const {
@@ -157,7 +99,6 @@ void QnGridBackgroundItem::setImageSize(const QSize &imageSize) {
     if (m_imageSize == imageSize)
         return;
     m_imageSize = imageSize;
-    updateGeometry();
 }
 
 int QnGridBackgroundItem::imageOpacity() const {
@@ -183,15 +124,7 @@ void QnGridBackgroundItem::updateGeometry() {
     m_sceneBoundingRect = QRect(-left, -top, m_imageSize.width(), m_imageSize.height());
 
     QRectF targetRect = mapper()->mapFromGrid(m_sceneBoundingRect);
-//    if (m_geometryAnimator)
-//        m_geometryAnimator->animateTo(targetRect);
-//    else
-        setViewportRect(targetRect);
-}
-
-void QnGridBackgroundItem::at_opacityAnimator_finished() {
-    if (!qFuzzyCompare(this->opacity(), m_targetOpacity))
-         m_opacityAnimator->animateTo(m_targetOpacity);
+    setViewportRect(targetRect);
 }
 
 void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
@@ -209,9 +142,6 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_cache->getFullPath(filename));
     loader->setSize(m_cache->getMaxImageSize());
-//    loader->setSize(QSize(6144, 6144));
-//    loader->setDownScaleOnly(false);
-//    loader->setAspectRatioMode(Qt::IgnoreAspectRatio);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
     loader->start();
 }
@@ -248,7 +178,6 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #else
     m_image = image;
 #endif
-    animatedShow();
 }
 
 void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)

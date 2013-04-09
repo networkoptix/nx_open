@@ -57,7 +57,11 @@ public:
         Offline,
         Unauthorized,
         Online,
-        Recording };
+        Recording,
+
+        /** Locked status used in layouts only */
+        Locked = Recording
+    };
 
     enum Flag {
         network = 0x01,         /**< Has ip and mac. */
