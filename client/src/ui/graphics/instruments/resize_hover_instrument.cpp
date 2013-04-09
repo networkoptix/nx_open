@@ -27,14 +27,14 @@ namespace {
 
 ResizeHoverInstrument::ResizeHoverInstrument(QObject *parent):
     Instrument(Item, makeSet(QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), parent),
-    m_effectiveDistance(0.0)
+    m_effectRadius(0.0)
 {}
 
 bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
     if(!item->isWidget())
         return false;
 
-    FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(item);
+    FrameSectionQueryable *queryable = dynamic_cast<FrameSectionQueryable *>(item);
     if(queryable != NULL)
         m_queryableByItem.insert(item, queryable);
 
@@ -43,19 +43,23 @@ bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
 
 void ResizeHoverInstrument::unregisteredNotify(QGraphicsItem *item) {
     m_queryableByItem.remove(item);
+    m_affectedItems.remove(item);
 }
 
 bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
-    FrameSectionQuearyable *queryable = m_queryableByItem.value(item);
-    if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
+    if(!satisfiesItemConditions(widget))
+        return false;
+    
+    FrameSectionQueryable *queryable = m_queryableByItem.value(item);
+    if(!queryable && !hasDecoration(widget))
         return false; /* Has no decorations and not queryable for frame sections. */
 
     Qt::WindowFrameSection section;
     if(queryable == NULL) {
         section = open(widget)->getWindowFrameSectionAt(event->pos());
     } else {
-        QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectiveDistance, m_effectiveDistance);
+        QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectRadius, m_effectRadius);
         qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
         section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
     }
@@ -63,16 +67,17 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
     Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(section);
     if(widget->cursor().shape() != cursorShape)
         widget->setCursor(cursorShape);
+    m_affectedItems.insert(widget);
 
     return false;
 }
 
 bool ResizeHoverInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *) {
-    QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
-    if(!hasDecoration(widget))
+    if(!m_affectedItems.contains(item))
         return false;
 
-    widget->unsetCursor();
+    item->unsetCursor();
+
     return false;
 }
 

@@ -13,6 +13,16 @@
 
 #include <version.h>
 
+namespace {
+    QString toNativeDirPath(const QString &dirPath) {
+        QString result = QDir::toNativeSeparators(dirPath);
+        if(!result.endsWith(QDir::separator()))
+            result.append(QDir::separator());
+        return result;
+    }
+
+} // anonymous namespace
+
 QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
@@ -21,16 +31,12 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
     QnStorageSpaceReply reply;
 
     QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo();
-    for(int i = 0; i < partitions.size(); i++) {
-        QString path = QDir::toNativeSeparators(partitions[i].path);
-        if(!path.endsWith(QDir::separator()))
-            path.append(QDir::separator());
-        partitions[i].path = path;
-    }
+    for(int i = 0; i < partitions.size(); i++)
+        partitions[i].path = toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
     foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
-        QString path = QDir::toNativeSeparators(storage->getUrl());
+        QString path = toNativeDirPath(storage->getUrl());
         
         bool hasPartition = false;
         foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
@@ -72,7 +78,7 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
             continue;
 
         QnStorageSpaceData data;
-        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME);
+        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
         data.storageId = -1;
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;

@@ -457,9 +457,7 @@ public:
         base_type(parent, windowFlags) 
     {}
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
-        Q_UNUSED(option)
-        Q_UNUSED(widget)
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         QRectF rect = this->rect();
         qreal penWidth = qMin(rect.width(), rect.height()) / 16;
         QPointF center = rect.center();
@@ -651,12 +649,12 @@ PtzOverlayWidget *PtzInstrument::overlayWidget(QnMediaResourceWidget *widget) co
     return m_dataByWidget[widget].overlayWidget;
 }
 
-void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
+PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
 
     PtzOverlayWidget *overlay = data.overlayWidget;
     if(overlay)
-        return;
+        return overlay;
 
     overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
@@ -671,6 +669,7 @@ void PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
     widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, false, false);
+    return overlay;
 }
 
 void PtzInstrument::ensureSelectionItem() {
@@ -868,8 +867,7 @@ void PtzInstrument::aboutToBeUninstalledNotify() {
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
-    bool result = base_type::registeredNotify(item);
-    if(!result)
+    if(!base_type::registeredNotify(item))
         return false;
 
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {

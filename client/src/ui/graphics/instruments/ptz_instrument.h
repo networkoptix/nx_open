@@ -94,8 +94,7 @@ private:
     }
 
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
-
-    void ensureOverlayWidget(QnMediaResourceWidget *widget);
+    PtzOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
     void ensureSelectionItem();
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);

@@ -866,6 +866,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition(this));
 
+    factory(Qn::CreateZoomWindowAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Create Zoom Window")).
+        condition(new QnCreateZoomWindowActionCondition(this));
+
     factory().
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
          text(tr("Rotate to..."));
@@ -958,7 +963,7 @@ QnActionManager::QnActionManager(QObject *parent):
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
        text(tr("Layout Settings...")).
        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
-       condition(hasFlags(QnResource::layout));
+       condition(new QnLayoutSettingsActionCondition(this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1060,7 +1065,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CurrentLayoutSettingsAction).
         flags(Qn::Scene | Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
-        text(tr("Layout Settings..."));
+        text(tr("Layout Settings...")).
+        condition(new QnLayoutSettingsActionCondition(this));
 
     factory(Qn::ToggleTourModeHotkeyAction).
         flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).

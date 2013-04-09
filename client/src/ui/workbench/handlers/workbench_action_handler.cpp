@@ -269,6 +269,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
+    connect(action(Qn::CreateZoomWindowAction),                 SIGNAL(triggered()),    this,   SLOT(at_createZoomWindowAction_triggered()));
     connect(action(Qn::Rotate0Action),                          SIGNAL(triggered()),    this,   SLOT(at_rotate0Action_triggered()));
     connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
@@ -390,13 +391,14 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
 }
 
-void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
+void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position, const QRectF &zoomWindow, const QUuid &zoomUuid) const {
     QnLayoutItemData data;
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
-    data.zoomWindow = QRectF(0.0, 0.0, 1.0, 1.0);
+    data.zoomRect = zoomWindow;
+    data.zoomTargetUuid = zoomUuid;
     if(usePosition) {
         data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -1104,6 +1106,9 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
     newLayout->setUserCanEdit(context()->user() == user);
+    newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
+    newLayout->setBackgroundOpacity(layout->backgroundOpacity());
+    newLayout->setBackgroundSize(layout->backgroundSize());
     context()->resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
@@ -1243,8 +1248,18 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     foreach(QnLayoutResourcePtr r, layouts)
         parameters.resources().removeOne(r);
 
-    if (!parameters.resources().empty())
+    if (workbench()->currentLayout()->resource()->locked() &&
+            !parameters.resources().empty() &&
+            layouts.empty()) {
+        QMessageBox::information(widget(),
+                                 tr("Layout is locked"),
+                                 tr("Layout is locked and cannot be changed."));
+    }
+
+
+    if (!parameters.resources().empty()) {
         menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+    }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
@@ -1787,7 +1802,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.flags = Qn::Pinned;
         item.uuid = QUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
-        item.zoomWindow = QRectF(0.0, 0.0, 1.0, 1.0);
+        item.zoomRect = QRectF(0.0, 0.0, 1.0, 1.0);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
         item.dataByRole[Qn::ItemPausedRole] = true;
@@ -3101,6 +3116,14 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered(
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
     action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+}
+
+void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
+    QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
+    if(!widget)
+        return;
+
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), QRectF(0.25, 0.25, 0.5, 0.5), widget->item()->uuid());
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){

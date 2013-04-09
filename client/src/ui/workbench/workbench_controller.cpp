@@ -65,6 +65,7 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
+#include <ui/graphics/instruments/zoom_window_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -169,7 +170,7 @@ namespace {
 } // anonymous namespace
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
     m_cursorPos(invalidCursorPos()),
@@ -218,6 +219,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
     SignalingInstrument *sceneFocusSignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::FocusIn), this);
     PtzInstrument *ptzInstrument = new PtzInstrument(this);
+    ZoomWindowInstrument *zoomWindowInstrument = new ZoomWindowInstrument(this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -228,10 +230,12 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
-    m_resizingInstrument->setEffectiveDistance(8);
+    m_resizingInstrument->setEffectRadius(8);
 
     m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_resizingInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_resizingInstrument->resizeHoverInstrument()->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
@@ -260,6 +264,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(ptzInstrument);
+    m_manager->installInstrument(zoomWindowInstrument);
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);
@@ -299,6 +304,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                     this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)));
     connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
     connect(sceneFocusSignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                           this,                           SLOT(at_scene_focusIn(QGraphicsScene *, QEvent *)));
+    connect(zoomWindowInstrument,       SIGNAL(zoomRectChanged(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectChanged(QnMediaResourceWidget *, const QRectF &)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -373,6 +379,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(workbench(),                SIGNAL(currentLayoutAboutToBeChanged()),                                                    this,                           SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
@@ -417,6 +424,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
     }
+
+    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),                                                  this,                           SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
+
     m_countdownCanceled = false;
     m_overlayLabel = 0;
     m_overlayLabelAnimation = 0;
@@ -1076,6 +1086,10 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
     resourceWidget->item()->setRotation(widget->rotation());
 }
 
+void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
+    widget->item()->setZoomRect(zoomRect);
+}
+
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
@@ -1404,14 +1418,29 @@ void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView();
 }
 
+void QnWorkbenchController::at_workbench_currentLayoutAboutToBeChanged() {
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    if (!layout || !layout->resource())
+        return;
+
+    disconnect(layout->resource(), NULL, this, NULL);
+}
+
 void QnWorkbenchController::at_workbench_currentLayoutChanged() {
-    // TODO: subscribe to permission changes.
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    if (!layout)
+        return;
+    if (layout->resource()) {
+        connect(layout->resource(), SIGNAL(lockedChanged(const QnLayoutResourcePtr &)), this, SLOT(updateLayoutInstruments(const QnLayoutResourcePtr &)));
+    }
+    updateLayoutInstruments(layout->resource());
+}
 
-    Qn::Permissions permissions = accessController()->permissions(workbench()->currentLayout()->resource());
-    bool writable = permissions & Qn::WritePermission;
-
-    m_moveInstrument->setEnabled(writable);
-    m_resizingInstrument->setEnabled(writable);
+void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+    if (!layout || !layout->resource() || layout->resource() != resource)
+        return;
+    updateLayoutInstruments(resource.dynamicCast<QnLayoutResource>());
 }
 
 void QnWorkbenchController::at_zoomedToggle_activated() {
@@ -1420,4 +1449,18 @@ void QnWorkbenchController::at_zoomedToggle_activated() {
 
 void QnWorkbenchController::at_zoomedToggle_deactivated() {
     m_handScrollInstrument->setMouseButtons(Qt::RightButton);
+}
+
+void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &layout) {
+    if (!layout) {
+        m_moveInstrument->setEnabled(false);
+        m_resizingInstrument->setEnabled(false);
+        return;
+    }
+
+    Qn::Permissions permissions = accessController()->permissions(layout);
+    bool writable = permissions & Qn::WritePermission;
+
+    m_moveInstrument->setEnabled(writable && !layout->locked());
+    m_resizingInstrument->setEnabled(writable && !layout->locked());
 }

@@ -186,3 +186,4 @@ android-client/android-dw/**
 
 axiscamplugin/x86
 axiscamplugin/x64
+appserver/hostedfiles/*

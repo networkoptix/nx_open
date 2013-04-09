@@ -62,7 +62,7 @@ namespace Qn {
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemZoomWindowRole,                         /**< Role for item's zoom window. Value of type QRectF. */
+        ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
 
@@ -128,21 +128,6 @@ namespace Qn {
         EffectsLayer,               /**< Layer for top-level effects. */
         UiLayer                     /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
     };
-
-
-    /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
 
 
     /**

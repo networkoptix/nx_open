@@ -270,8 +270,9 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
     layout->setCellAspectRatio(pb_layout.cellaspectratio());
     layout->setCellSpacing(QSizeF(pb_layout.cellspacingwidth(), pb_layout.cellspacingheight()));
     layout->setUserCanEdit(pb_layout.usercanedit());
-    layout->setBackgroundImageId(pb_layout.backgroundimageid());
+    layout->setBackgroundImageFilename(QString::fromUtf8(pb_layout.backgroundimagefilename().c_str()));
     layout->setBackgroundSize(QSize(pb_layout.backgroundwidth(), pb_layout.backgroundheight()));
+    layout->setBackgroundOpacity(pb_layout.backgroundopacity());
     layout->setLocked(pb_layout.locked());
 
     if (pb_layout.item_size() > 0)
@@ -286,13 +287,25 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
             itemData.resource.id = pb_item.resource().id();
             itemData.resource.path = QString::fromUtf8(pb_item.resource().path().c_str());
 
-            itemData.uuid = QUuid(pb_item.uuid().c_str());
+            itemData.uuid = QUuid(QString::fromUtf8(pb_item.uuid().c_str()));
             itemData.flags = pb_item.flags();
             itemData.combinedGeometry.setLeft(pb_item.left());
             itemData.combinedGeometry.setTop(pb_item.top());
             itemData.combinedGeometry.setRight(pb_item.right());
             itemData.combinedGeometry.setBottom(pb_item.bottom());
             itemData.rotation = pb_item.rotation();
+
+            if(pb_item.has_zoomtargetuuid())
+                itemData.zoomTargetUuid = QUuid(QString::fromUtf8(pb_item.zoomtargetuuid().c_str()));
+
+            if(pb_item.has_zoomleft() && pb_item.has_zoomtop() && pb_item.has_zoomright() && pb_item.has_zoombottom()) {
+                itemData.zoomRect.setLeft(pb_item.zoomleft());
+                itemData.zoomRect.setTop(pb_item.zoomtop());
+                itemData.zoomRect.setRight(pb_item.zoomright());
+                itemData.zoomRect.setBottom(pb_item.zoombottom());
+            } else {
+                itemData.zoomRect = QRectF(0.0, 0.0, 1.0, 1.0);
+            }
 
             items.append(itemData);
         }
@@ -534,9 +547,10 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
     pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
     pb_layout.set_cellspacingheight(layoutIn->cellSpacing().height());
     pb_layout.set_usercanedit(layoutIn->userCanEdit());
-    pb_layout.set_backgroundimageid(layoutIn->backgroundImageId());
+    pb_layout.set_backgroundimagefilename(layoutIn->backgroundImageFilename().toUtf8().constData());
     pb_layout.set_backgroundwidth(layoutIn->backgroundSize().width());
     pb_layout.set_backgroundheight(layoutIn->backgroundSize().height());
+    pb_layout.set_backgroundopacity(layoutIn->backgroundOpacity());
     pb_layout.set_locked(layoutIn->locked());
 
     if (!layoutIn->getItems().isEmpty()) {
@@ -554,6 +568,11 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
             pb_item.set_right(itemIn.combinedGeometry.right());
             pb_item.set_bottom(itemIn.combinedGeometry.bottom());
             pb_item.set_rotation(itemIn.rotation);
+            pb_item.set_zoomtargetuuid(itemIn.zoomTargetUuid.toString().toUtf8().constData());
+            pb_item.set_zoomleft(itemIn.zoomRect.left());
+            pb_item.set_zoomtop(itemIn.zoomRect.top());
+            pb_item.set_zoomright(itemIn.zoomRect.right());
+            pb_item.set_zoombottom(itemIn.zoomRect.bottom());
         }
     }
 }

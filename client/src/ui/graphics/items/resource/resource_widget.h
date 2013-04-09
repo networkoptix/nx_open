@@ -33,7 +33,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public HelpTopicQueryable {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -279,7 +279,6 @@ protected:
         AnalogWithoutLicenseOverlay
     };
 
-    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 

@@ -11,11 +11,20 @@ const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
 
+// Add vendor and camera model to ommit ONVIF search (you have to add in case sensitive here)
 static char* ANALOG_CAMERAS[][2] =
 {
-    {"AXIS", "Q7404"}
-    // todo: add analog vivotek camera here
+    {"AXIS", "Q7404"},
+	{"vivo_ironman", "VS8801"}
 };
+
+// Add vendor and camera model to ommit ONVIF search (case insensitive)
+static char* IGNORE_VENDORS[][2] =
+{
+    {"*networkcamera*", "IP*"}, // DLINK
+    {"*", "*spartan-6*"}          // ArecontVision
+};
+
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
 {
@@ -74,6 +83,19 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     }
 }
 
+bool OnvifResourceInformationFetcher::ignoreCamera(const EndpointAdditionalInfo& info) const
+{
+    for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
+    {
+        QRegExp rxVendor(QLatin1String(IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
+        QRegExp rxName(QLatin1String(IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
+
+        if (rxVendor.exactMatch(info.manufacturer) && rxName.exactMatch(info.name))
+            return true;
+    }
+    return false;
+}
+
 void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
 {
     if (endpoint.isEmpty()) {
@@ -86,10 +108,11 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    if (info.name.toLower().contains(QLatin1String("spartan-6"))) // arecont cameras report spartan-6 as a name
-        return;
-    
+    //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
+    //    int n = 0;
 
+    if (ignoreCamera(info))
+        return;
 
     if (camersNamesData.isManufacturerSupported(info.manufacturer) && camersNamesData.isSupported(info.name)) {
         //qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;

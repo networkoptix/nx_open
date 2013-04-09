@@ -7,7 +7,6 @@
 
 
 extern int getIntParam(const char* pos);
-extern QString getValueFromString(const QString& line);
 
 #pragma pack(push,1)
 struct ACS_VideoHeader
@@ -88,14 +87,20 @@ void PlDlinkStreamReader::openStream()
     if (m_h264)
     //if (m_h264) //look_for_this_comment
     {
-        QStringList srtpUrls =  getRTPurls();
-        if (srtpUrls.size()<2)
+        QnDlink_cam_info info = res->getCamInfo();
+        if (info.videoProfileUrls.size() < 2 && role == QnResource::Role_SecondaryLiveVideo)
         {
-            qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting 2 urls.";
+            qWarning() << "No dualstreaming for DLink camera " << m_resource->getUrl() << ". Ignore second url request";
             return;
         }
 
-        QString url = (role == QnResource::Role_SecondaryLiveVideo) ? srtpUrls.at(1) : srtpUrls.at(0);
+        QString url =  getRTPurl(role == QnResource::Role_SecondaryLiveVideo ? 2 : 1);
+        if (url.isEmpty())
+        {
+            qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
+            return;
+        }
+
         m_rtpReader.setRequest(url);
         m_rtpReader.openStream();
     }
@@ -174,6 +179,69 @@ void PlDlinkStreamReader::updateStreamParamsBasedOnFps()
 
 //=====================================================================================
 
+int scaleInt(int value, int from, int to)
+{
+    double step = 1.0 / (double) (from-1);
+    return int (step * value * (double) (to-1) + 0.5);
+}
+
+bool PlDlinkStreamReader::isTextQualities(const QStringList& qualities) const
+{
+    if (qualities.isEmpty())
+        return false;
+    QString val = qualities[0];
+    for (int i = 0; i < val.length(); ++i)
+    {
+        bool isDigit = val.at(i) >= L'0' && val.at(i) <= L'9';
+        if (!isDigit)
+            return true;
+    }
+
+    return false;
+}
+
+QString PlDlinkStreamReader::getQualityString() const
+{
+    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+    QnDlink_cam_info info = res->getCamInfo();
+
+    if (!info.hasFixedQuality) 
+    {
+        int q;
+        switch (getQuality())
+        {
+        case QnQualityHighest:
+            q = 90;
+            break;
+
+        case QnQualityHigh:
+            q = 80;
+            break;
+
+        case QnQualityNormal:
+            q = 70;
+            break;
+
+        case QnQualityLow:
+            q = 50;
+            break;
+
+        case QnQualityLowest:
+            q = 40;
+            break;
+
+        default:
+            q = 60;
+            break;
+        }
+        return QString::number(q);
+    }
+    int qualityIndex = scaleInt((int) getQuality(), QnQualityHighest-QnQualityLowest+1, info.possibleQualities.size());
+    if (isTextQualities(info.possibleQualities))
+        qualityIndex = info.possibleQualities.size()-1 - qualityIndex; // index 0 is best quality if quality is text
+    return info.possibleQualities[qualityIndex];
+}
+
 QString PlDlinkStreamReader::composeVideoProfile() 
 {
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
@@ -246,76 +314,37 @@ QString PlDlinkStreamReader::composeVideoProfile()
     {
         t << "qualitymode=Fixquality" << "&";
         
-        int q;
-        switch (getQuality())
-        {
-        case QnQualityHighest:
-            q = 90;
-            break;
-
-        case QnQualityHigh:
-            q = 80;
-            break;
-
-        case QnQualityNormal:
-            q = 70;
-            break;
-
-        case QnQualityLow:
-            q = 50;
-            break;
-
-        case QnQualityLowest:
-            q = 40;
-            break;
-
-        default:
-            q = 60;
-            break;
-        }
-        
-        t << "quality=" << q;
+        t << "quality=" << getQualityString();
     }
 
     t.flush();
     return result;
 }
 
-
-QStringList PlDlinkStreamReader::getRTPurls() const
+QString PlDlinkStreamReader::getRTPurl(int profileId) const
 {
-
-    QStringList result;
-
     CLHttpStatus status;
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
 
-    QByteArray reply = downloadFile(status, QLatin1String("config/rtspurl.cgi"),  res->getHostAddress(), 80, 1000, res->getAuth());
+    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, res->getAuth());
 
-    if (status != CL_HTTP_SUCCESS)
+    if (status != CL_HTTP_SUCCESS || reply.isEmpty())
+        return QString();
+
+    int lastProfileId = -1;
+    QByteArray requiredProfile = QString(lit("profileid=%1")).arg(profileId).toUtf8();
+    QList<QByteArray> lines = reply.split('\n');
+    foreach(QByteArray line, lines)
     {
-        return result;
+        line = line.toLower().trimmed();
+        if (line.startsWith("profileid="))
+            lastProfileId = line.split('=')[1].toInt();
+        else if (line.startsWith("urlentry=") && lastProfileId == profileId)
+            return QString::fromUtf8(line.split('=')[1]);
     }
 
-
-    if (reply.size()==0)
-        return result;
-
-    QString file_s = QLatin1String(reply);
-    QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
-
-    foreach(QString line, lines)
-    {
-        if (line.toLower().contains(QLatin1String("urlentry=")))
-        {
-            result.push_back(getValueFromString(line));
-        }
-    }
-
-    return result;
-
-
+    return QString();
 }
 
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)

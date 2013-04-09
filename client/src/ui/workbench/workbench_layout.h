@@ -17,6 +17,7 @@
 
 class QnWorkbenchItem;
 
+// TODO: #Elric review doxydocs
 /**
  * Layout of a workbench.
  *
@@ -137,6 +138,31 @@ public:
     bool unpinItem(QnWorkbenchItem *item);
 
     /**
+     * Adds the given item to this layout. This layout takes ownership of the
+     * given item. If the given item already belongs to some other layout,
+     * it will first be removed from that layout.
+     *
+     * If the position where the item is to be placed is occupied, the item
+     * will be placed unpinned.
+     *
+     * \param item                      Item to add.
+     */
+    Q_SLOT void addItem(QnWorkbenchItem *item);
+
+    /**
+     * Removes the given item from this layout. Item's ownership is passed
+     * to the caller.
+     *
+     * \param item                      Item to remove
+     */
+    Q_SLOT void removeItem(QnWorkbenchItem *item);
+
+    /**
+     * Clears this layout by removing all its items.
+     */
+    Q_SLOT void clear();
+
+    /**
      * \param position                  Position to get item at.
      * \returns                         Pinned item at the given position, or NULL if the given position is empty.
      */
@@ -173,6 +199,14 @@ public:
         return m_items;
     }
 
+    void addZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+
+    void removeZoomLink(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+
+    QnWorkbenchItem *zoomTargetItem(QnWorkbenchItem *item) const;
+
+    QList<QnWorkbenchItem *> zoomItems(QnWorkbenchItem *zoomTargetItem) const;
+
     /**
      * \returns                         Whether there are no items on this layout.
      */
@@ -205,6 +239,18 @@ public:
      *                                  relative to cell width.
      */
     void setCellSpacing(const QSizeF &cellSpacing);
+
+    /**
+     * \returns                         Lock state of this layout.
+     */
+    bool locked() const {
+        return m_locked;
+    }
+
+    /**
+     * \param cellSpacing               New lock state for this layout.
+     */
+    void setLocked(bool value);
 
     /**
      * \returns                         Bounding rectangle of all pinned items in this layout.
@@ -240,32 +286,6 @@ public:
         return m_dataByRole;
     }
 
-public slots:
-    /**
-     * Adds the given item to this layout. This layout takes ownership of the
-     * given item. If the given item already belongs to some other layout,
-     * it will first be removed from that layout.
-     *
-     * If the position where the item is to be placed is occupied, the item
-     * will be placed unpinned.
-     *
-     * \param item                      Item to add.
-     */
-    void addItem(QnWorkbenchItem *item);
-
-    /**
-     * Removes the given item from this layout. Item's ownership is passed
-     * to the caller.
-     *
-     * \param item                      Item to remove
-     */
-    void removeItem(QnWorkbenchItem *item);
-
-    /**
-     * Clears this layout by removing all its items.
-     */
-    void clear();
-    
 signals:
     /**
      * This signal is emitted when this layout is about to be destroyed
@@ -281,6 +301,9 @@ signals:
      * \param item                      Item that was added.
      */
     void itemAdded(QnWorkbenchItem *item);
+
+    void zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
+    void zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
 
     /**
      * This signal is emitted whenever an item is about to be removed from
@@ -312,6 +335,8 @@ signals:
      */
     void cellSpacingChanged();
 
+    void lockedChanged();
+
     /**
      * This signal is emitted whenever data associated with the provided role is changed.
      * 
@@ -325,6 +350,10 @@ private:
 
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
     void updateBoundingRectInternal();
+    
+    void addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
+    void removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
+    QUuid zoomTargetUuidInternal(QnWorkbenchItem *item) const;
 
     void initCellParameters();
 
@@ -337,6 +366,12 @@ private:
 
     /** Set of all items on this layout. */
     QSet<QnWorkbenchItem *> m_items;
+
+    /** Map from item to its zoom target. */
+    QHash<QnWorkbenchItem *, QnWorkbenchItem *> m_zoomTargetItemByItem;
+
+    /** Map from zoom target item to its associated zoom items. */
+    QMultiHash<QnWorkbenchItem *, QnWorkbenchItem *> m_itemsByZoomTargetItem;
 
     /** Set of item borders for fast bounding rect calculation. */
     QnRectSet m_rectSet;
@@ -352,6 +387,9 @@ private:
 
     /** Spacing between cells, relative to cell width. */
     QSizeF m_cellSpacing;
+
+    /** Lock status of the layout. */
+    bool m_locked;
 
     /** Map from item's universally unique identifier to item. */
     QHash<QUuid, QnWorkbenchItem *> m_itemByUuid;

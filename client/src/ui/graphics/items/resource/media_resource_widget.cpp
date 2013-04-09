@@ -59,7 +59,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     QnResourceWidget(context, item, parent),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false),
-    m_zoomWindow(0.0, 0.0, 1.0, 1.0)
+    m_zoomRect(0.0, 0.0, 1.0, 1.0)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
@@ -145,12 +145,17 @@ QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
 }
 
-const QRectF &QnMediaResourceWidget::zoomWindow() const {
-    return m_zoomWindow;
+const QRectF &QnMediaResourceWidget::zoomRect() const {
+    return m_zoomRect;
 }
 
-void QnMediaResourceWidget::setZoomWindow(const QRectF &zoomWindow) {
-    m_zoomWindow = zoomWindow;
+void QnMediaResourceWidget::setZoomRect(const QRectF &zoomRect) {
+    if(qFuzzyCompare(m_zoomRect, zoomRect))
+        return;
+
+    m_zoomRect = zoomRect;
+
+    emit zoomRectChanged();
 }
 
 int QnMediaResourceWidget::motionGridWidth() const {
@@ -363,7 +368,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    Qn::RenderStatus result = m_renderer->paint(channel, m_zoomWindow, rect, effectiveOpacity());
+    Qn::RenderStatus result = m_renderer->paint(channel, m_zoomRect, rect, effectiveOpacity());
     
     /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
@@ -566,7 +571,11 @@ Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRect
 
 int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
     Q_UNUSED(pos)
-    if(options() & DisplayMotionSensitivity) {
+    if(calculateChannelOverlay(0) == AnalogWithoutLicenseOverlay) {
+        return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+    } else if(options() & ControlPtz) {
+        return Qn::MainWindow_MediaItem_Ptz_Help;
+    } else if(options() & DisplayMotionSensitivity) {
         return Qn::CameraSettings_Motion_Help;
     } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
@@ -636,6 +645,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             codecString = tr(" (%1)").arg(codecString);
     }
 
+    // TODO: #Elric no pre-spaces in translatable strings, translators mess it up.
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
     hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
@@ -655,8 +665,13 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
 
     QString decoderType = m_renderer->isHardwareDecoderUsed(0) ? tr(" HW") : tr(" SW");
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2)
-        .arg(codecString).arg(hqLqString)
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8")
+        .arg(size.width())
+        .arg(size.height())
+        .arg(fps, 0, 'f', 2)
+        .arg(mbps, 0, 'f', 2)
+        .arg(codecString)
+        .arg(hqLqString)
         .arg(decoderType)
         .arg(timeString);
 }

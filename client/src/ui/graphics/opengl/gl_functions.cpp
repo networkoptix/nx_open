@@ -94,7 +94,6 @@ public:
             /* Nothing bad could come out of this call, so const_cast is OK. */
             const_cast<QGLContext *>(context)->makeCurrent();
         }
-
         m_initialized = true;
         locker.unlock();
 

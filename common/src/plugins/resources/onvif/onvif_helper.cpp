@@ -40,6 +40,7 @@ const char* PasswordHelper::TOSHIBA_MANUFACTURER = "toshiba";
 const char* PasswordHelper::VIDEOIQ_MANUFACTURER = "videoiq";
 const char* PasswordHelper::VIVOTEK_MANUFACTURER = "vivotek";
 const char* PasswordHelper::UBIQUITI_MANUFACTURER = "ubiquiti";
+const char* PasswordHelper::CAMERA_MANUFACTURER = "camera";
 
 const char* ADMIN1 = "admin";
 const char* ADMIN2 = "Admin";
@@ -58,6 +59,7 @@ const char* PASSWD8 = "1111111";
 const char* PASSWD9 = "password";
 const char* PASSWD10 = "";
 const char* PASSWD11 = "ikwd";
+const char* PASSWD_CAMERA = "camera";
 
 //
 // PasswordHelper
@@ -171,6 +173,8 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo(VIVOTEK_MANUFACTURER, ROOT, PASSWD10);
 
     setPasswordInfo(UBIQUITI_MANUFACTURER, MAIN_USER1, MAIN_USER1);
+
+    setPasswordInfo(CAMERA_MANUFACTURER, ROOT, PASSWD_CAMERA);
 
     //if (cl_log.logLevel() >= cl_logDEBUG1) {
     //    printPasswords();

@@ -194,16 +194,21 @@ public:
     }
 
     /**
-     * \returns                         Zoom window of this item, in item-relative coordinates.
+     * \returns                         Zoom rect of this item, in item-relative coordinates.
      */
-    const QRectF &zoomWindow() const {
-        return m_zoomWindow;
+    const QRectF &zoomRect() const {
+        return m_zoomRect;
     }
 
     /**
-     * \param zoomWindow                New zoom window for this item.
+     * Note that zoom rect will be used only if an appropriate zoom link is 
+     * created for this item in a layout.
+     * 
+     * \param zoomRect                  New zoom rect for this item. 
      */
-    void setZoomWindow(const QRectF &zoomWindow);
+    void setZoomRect(const QRectF &zoomRect);
+
+    QnWorkbenchItem *zoomTargetItem() const;
 
     /**
      * \returns                         Rotation angle of this item, in degrees.
@@ -264,7 +269,8 @@ signals:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
-    void zoomWindowChanged();
+    void zoomRectChanged();
+    void zoomTargetItemChanged();
     void rotationChanged();
     void dataChanged(int role);
 
@@ -292,7 +298,7 @@ private:
     QRectF m_geometryDelta;
 
     /** Item-relative rectangle that defines the portion of the item to be shown. */
-    QRectF m_zoomWindow;
+    QRectF m_zoomRect;
 
     /** Item flags. */
     Qn::ItemFlags m_flags;

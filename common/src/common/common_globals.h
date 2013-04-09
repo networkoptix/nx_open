@@ -32,6 +32,35 @@ public:
     Q_NAMESPACE
 #endif
 
+    /**
+     * Generic enumeration describing borders of a rectangle.
+     */
+    enum Border {
+        NoBorders = 0,
+        LeftBorder = 0x1,
+        RightBorder = 0x2,
+        TopBorder = 0x4,
+        BottomBorder = 0x8,
+        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
+    };
+    Q_DECLARE_FLAGS(Borders, Border)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
+
+
+    /**
+     * Generic enumeration describing corners of a rectangle.
+     */
+    enum Corner {
+        NoCorner = 0,
+        TopLeftCorner = 0x1,
+        TopRightCorner = 0x2,
+        BottomLeftCorner = 0x4,
+        BottomRightCorner = 0x8,
+        AllCorners = TopLeftCorner | TopRightCorner | BottomLeftCorner | BottomRightCorner
+    };
+    Q_DECLARE_FLAGS(Corners, Corner)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Corners)
+
     enum ExtrapolationMode {
         ConstantExtrapolation,
         LinearExtrapolation,

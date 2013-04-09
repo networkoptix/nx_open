@@ -264,7 +264,8 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         */
         processSocket(sock, processedUuid, result);
     }
-    processSocket(m_receiveSocket, processedUuid, result);
+    if (m_receiveSocket)
+        processSocket(m_receiveSocket, processedUuid, result);
 
     return result;
 }

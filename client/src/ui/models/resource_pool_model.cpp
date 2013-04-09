@@ -767,6 +767,8 @@ QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
     if(!index.isValid())
         return QModelIndex();
 
+    // TODO: #Elric check that the node actually exists.
+
     return node(index)->parent()->index(Qn::NameColumn);
 }
 

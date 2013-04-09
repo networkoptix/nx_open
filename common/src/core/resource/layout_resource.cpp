@@ -11,7 +11,6 @@ QnLayoutResource::QnLayoutResource():
     m_cellSpacing(-1.0, -1.0),
     m_userCanEdit(false),
     m_backgroundSize(1, 1),
-    m_backgroundImageId(0),
     m_locked(false)
 {
     setStatus(Online, true);
@@ -89,7 +88,7 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
         setCellAspectRatio(localOther->cellAspectRatio());
         setCellSpacing(localOther->cellSpacing());
         setUserCanEdit(localOther->userCanEdit());
-        setBackgroundImageId(localOther->backgroundImageId());
+        setBackgroundImageFilename(localOther->backgroundImageFilename());
         setBackgroundSize(localOther->backgroundSize());
         setLocked(localOther->locked());
     }
@@ -273,20 +272,36 @@ void QnLayoutResource::setBackgroundSize(QSize size) {
     emit backgroundSizeChanged(::toSharedPointer(this));
 }
 
-/********* Background image property **********/
-int QnLayoutResource::backgroundImageId() const {
+/********* Background image id property **********/
+QString QnLayoutResource::backgroundImageFilename() const {
     QMutexLocker locker(&m_mutex);
-    return m_backgroundImageId;
+    return m_backgroundImageFilename;
 }
 
-void QnLayoutResource::setBackgroundImageId(int id) {
+void QnLayoutResource::setBackgroundImageFilename(const QString &filename) {
     {
         QMutexLocker locker(&m_mutex);
-        if (m_backgroundImageId == id)
+        if (m_backgroundImageFilename == filename)
             return;
-        m_backgroundImageId = id;
+        m_backgroundImageFilename = filename;
     }
     emit backgroundImageChanged(::toSharedPointer(this));
+}
+
+/********* Background opacity property **********/
+int QnLayoutResource::backgroundOpacity() const {
+    QMutexLocker locker(&m_mutex);
+    return m_backgroundOpacity;
+}
+
+void QnLayoutResource::setBackgroundOpacity(int percent) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_backgroundOpacity == percent)
+            return;
+        m_backgroundOpacity = percent;
+    }
+    emit backgroundOpacityChanged(::toSharedPointer(this));
 }
 
 /********* Locked property **********/

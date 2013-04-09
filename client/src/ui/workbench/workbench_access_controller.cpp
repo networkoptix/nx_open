@@ -67,7 +67,7 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
     if(!m_dataByResource.contains(resource))
         return NULL;
 
-    const PermissionsData &data = m_dataByResource[resource];
+    PermissionsData &data = m_dataByResource[resource];
     if(!data.notifier)
         data.notifier = new QnWorkbenchPermissionsNotifier(const_cast<QnWorkbenchAccessController *>(this));
     return data.notifier;

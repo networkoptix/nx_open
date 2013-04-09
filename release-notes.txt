@@ -1,77 +1,84 @@
 ----------------------------------------------- 1.5 -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
- - Digital Watchdog VMAX 480 Encoders
- - Axis Encoders (incl. PTZ)
- - Flex Watch Encoders (incl. PTZ)
- - Vivotek Encoders 
- - Arecont 12186 and 20365
- - AXISP1354
- - ACTI product line
- - Canon product line 
 
-NEW FEATURES:  
- - New license type is introduced. It will be used for analog cameras. Analog cameras are divided into 2 types:
-   - DTS Based (i.e. VMAX Channels). For those cameras analog license is required for view live stream and archive (set on camera settings on the "General" tab). Recording is performed on DTS so the software only acruires recorded data from it.
-   - Encoder channels (i.e. Flex Watch channels). Those cameras require a license for recording and may be viewed live without one. Recording is configured as usual. Such cameras are recorded directly by Media server.
- - License form is redesigned. Now the following data is displayed:
-   - Licensed To - License Name and the provider the license has been obtained from
-   - Type (analog/digital)
-   - Expiration Date - specified only for trial licenses, "never" for permanent-ones
- - Windows 8 is supported
- - E-Mails are introduced for Users. Each user is advised to have an e-mail. These e-mails will be used for notifications (see below)
- - Intuitive Mail Server settings. It is necessary to specify e-mail address and password of the account that is intended to be used for mail notifications. The system will do the rest. Additional parameters are available as well
- - client of any version can talk to any EC version
+ - Digital Watchdog VMAX 480 encoders
+ - Axis encoders (including PTZ)
+ - Flex Watch Encoders (including PTZ)
+ - Vivotek encoders
+ - Arecont Vision 12186 and 20365 models
+ - AXISP1354
+ - ACTi product line
+ - Canon product line
+ - StarDot product line
+
+ NEW FEATURES:  
+
+ - An analog license has been introduced. It is a new type of license that can only be used with analog cameras.
+ - Analog cameras are generally divided into two categories:
+    - DTS Based (i.e. VMAX Channels). When using this particular type of cameras, an analog license is required for live viewing and archiving (camera settings in the “General” tab). Recording is performed on DTS, so the software only acquires recorded data from it.
+    - Encoder channel (i.e. Flex Watch channels) cameras require a license to be able to record, but not for viewing purposes. Recording is configured as usual. Cameras are recorded directly by Media server.
+ - The license form has been redesigned to display the following information:
+   - Licensed To – the license name and the provider the license has been obtained from
+   - Type – analog or digital
+   - Expiration Date – applies to trial licenses only
+ - Windows 8 is now supported
+ - User emails have been introduced. Each user is advised to provide their email address for notification purposes.
+ - Intuitive Mail Server settings. Both email and password are required to receive notifications. The system will process the rest. Additional parameters are available (refer to the user manual for more information).
+ - Any client is now able to talk to any EC regardless of their versions
  - Events and Actions:
-   - Events: 
-     - Motion (camera(s) must be specified). Camera(s) must have Recording enabled
-     - Camera Disconnected (specific camera(s) may be specified). If not, any camera will trigger the event
-     - Storage Failure (in case Media Server is unable to write a file on a storage)
+   - Events:
+     - Motion (camera(s) must be specified). Camera(s) must have recording enabled.
+     - Camera Disconnected (camera(s) must be specified). If not, any camera will trigger the event.
+     - Storage Failure (in case Media Server is unable to write to storage)
      - Network Issue (RTP timeout or RTP packet loss)
-     - Camera IP Conflict (if several cameras or servers have the same IP address)
-     - Input Signal on Camera (if supported - ONVIF and Axis only)
+     - Camera IP Conflict (in case several cameras or servers share the same IP address)
+     - Input Signal on Camera (must be supported – ONVIF and Axis only)
      - Media Server Failure (in case Media Server goes down or reboots itself)
-     - Media Servers Conflict (if another Media Server that connected to another EC is pulling video from the same camera(s))
-	 - EC Connection Lost (results in notifications only)
-	 - Licenses are not configured (results in notifications only for Admin)
-	 - E-mail is not set (results in notifications only). Admin gets notifications about all users that have not emails specified
-	 - Storages are not configure properly (results in notifications only for Admin)
-   - Actions: 
-     - Camera Recording (camera(s) must be specified). Camera(s) must have Recording enabled
+     - Media Servers Conflict (whenever a Media Server connected to a different EC is pulling video from the same camera)
+     - EC Connection Lost – results in notifications only
+     - Licenses are not configured – received by Admin only
+     - E-mail is not set – Admin is notified when users do not provide their email addresses
+     - Storages are not configured properly (Admin is notified)
+   - Actions:
+     - Camera Recording (camera(s) must be specified). Camera(s) must have recording enabled.
      - Panic Recording
-     - Send Mail (user(s) and additional recipient(s) must be specified). Mail Server settings should be configured in Global Settings
-     - Show Notification (User roles may be specified). Notification parameters should be configured in Global Settings
-     - Camera Output(if supported - ONVIF and Axis only)     
-   - Each event/action is grouped in Rule. Rules can be configured in the Advanced Event Rules form (CTRL + E). Each rule has standard and advanced parameters
- - Hardware acceleration of video decoding (Intel Quick Sync only). The flag in System Settings will be available only if Intel HD graphics is enabled
+     - Send Mail (recipient(s) must be specified). Mail Server settings must be configured in Global Settings.
+     - Show Notification (user roles must be specified). Notification parameters must be configured in Global Settings.
+     - Camera Output (must be supported – ONVIF and Axis only)
+   - Each event/action is grouped in Rules. Rules can be configured Advanced Event Rules (CTRL + E). Each rule has standard and advanced parameters.
+ - Hardware acceleration of video decoding (Intel Quick Sync only). The flag in System Settings will only appear if Intel HD graphics is enabled.
  - PTZ is greatly improved:
-   - PTZ is now more intuitive and precise
-   - PTZ now works correctly for rotated/flipped Axis cameras
-   - PTZ positions can be saved/restored (if a camera supports positioning)
-   - The current view can be zoomed in a specific position (just draw a rectangle to zoom into or use Double Click to zoom out). Must be supported by the camera.
- 
+ - PTZ is now more intuitive and precise
+ - PTZ now works properly for rotated/flipped Axis cameras
+ - PTZ positions can be saved/restored (cameras must support PTZ positioning)
+ - Any position on the current view can be zoomed on by drawing a rectangle to zoom in or double-clicking zoom out). Must be supported by the camera.
+
 IMPROVEMENTS:
- - Storage Dialog is significantly redesigned. Now it is not necessary to specify the folder for the recording data, it is necessary to select the disks the recording will be performed to and the amount of free space to preserve. The software will do the last.
- - CTRL can be used in Calendar Search to select multiple dates
- - Both upper and low case sensitive characters are now accepted by the system as user name ('admin' and 'Admin' used to be different)
- - Domain names are allowed for the "Manual camera addition" form
- - The "Do not show again" checkbox is added to the upgrade form. To re-enable it use "Check For Upgrade" Main Menu item
- - It is possible to view EC and Mediaserver logs via Web Interface. Use https://<EC IP>:<EC Port>/web/servers URL (i.e. https://127.0.0.1:7001/web/servers)
- - Auto storage selection is improved. While installing a media server, every available partition in the system must be added (if the partition has >100 GB free)
- - Manual RADASS Switch is added to the interface but not implemented in the code. We will think about it and maybe remove it
- - If max fps has been reduced for motion+low, it will be reduced for all record modes in schedule (Arecont cameras only)
- - Now it is not necessary to select an item before export. Last selected item will be exported
- - Screen Recording form was redesigned
- - If several cameras are played back asynchronously (sync is off and positions are in different places in the archives) playback position is indicated for each item on Time Line.
- - Preview Search Layout looks more compact: celss' Aspect Ratio are equal to source video's aspect ratio
- - Health Monitoring colors can be customized
- - Now non-admin users (viewers) can create own layouts based on cameras that have been assigned to them 
- - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming
+ - ONVIF support is improved allowing more compliant cameras to be supported.
+ - Storage Dialog is significantly redesigned. It is no longer important to specify the folder for the recording data, however it is important to select the recording disks and conserved space. The software will process the rest.
+ - CTRL can now be used in Calendar Search for selecting multiple dates.
+ - Both upper and lower case characters are now accepted by the system.
+ - Domain names can now be added to the “Manual camera addition” form.
+ - The “Do Not Show Again” checkbox is added to the upgrade form. To re-enable, use the “Check for Upgrades” from the main menu.
+ - It is possible to view EC and Media Server logs via Web Interface. Use https://<EC IP>:<EC Port>/web/servers URL (i.e.https://127.0.0.1:7001/web/servers).
+ - Improved auto storage selection. When installing a media server, each and every available partition in the system must be added (if the partition has >100 GB free).
+ - A manual RADASS switch is added to the interface, however it has not been implemented into the code yet. More updates to come.
+ - If max fps is reduced to motion+low, it will be reduced for all the record modes in the schedule (Arecont Vision cameras only).
+ - An item must be selected prior to export.
+ - The screen recording form has been redesigned.
+ - If multiple cameras are played back asynchronously, the playback position will appear for every item on the timeline.
+ - Preview Search Layout is more streamlined: the aspect ratio of cells is equal to the aspect ratio of the source video.
+ - A user is able to customize colors on Health Monitoring’s UI.
+ - Non-admin users (viewers) can now create own layouts based on the cameras that are specifically assigned to them.
+ - Smart Search is not available if a camera does not support Motion Detection and Dual Streaming.
+ - Viewing a camera on Web/Android Client for over 15 minutes results in a timeout. Once back to active, it is recommended to reconnect in order to reduce the Media Server load.
  - Manual Camera Addition Dialog is improved:
-   - Last entered data is filled automatically
-   - It is possible to perform other actions while manual camera addition is in progress 
- 
+   - Latter data is filled automatically.
+   - Other actions can be performed while manual camera addition is in progress.
+
 BUGS FIXED:
+ - If a camera is being viewed via Web/Android Client timeout is introduced (15 minutes). After this it is necessary to reconnect. This is done in order to reduce Media Server load.
  - If several cameras had different recording parameters it was not possible to set "Do not record" to them simultaneously
  - Identically named items were sorted randomly in Tree each time Client was started. Fixed
  - If the password for admin was changed, no changes were applied toEC until system restart. Fixed
@@ -93,6 +100,11 @@ BUGS FIXED:
  - If create a layout for viewer and assign him cameras the viewer could not perform search in tree: cameras were not searchable. Fixed
  - If physically delete a file that was containing in a saved layout it was displayed incorrectly (Loading... was drawn). Fixed
  - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously 
+ - If more than 64 cameras are being recorded and in the same time opened for viewing, Linux Media Server could crash. Fixed
+ - Arecont Vision panoramic cameras now work at full resolutuion. It used to work in quarter resolution if medium or low quality was pulled
+ - Areconnt Vision Spartan 6 integration is improved
+ - Areconnt FPS jumping issue is fixed
+ - If an error is returned from EC, the client displayed EC password in the error message. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
 

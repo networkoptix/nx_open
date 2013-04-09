@@ -216,116 +216,116 @@
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="41"/>
         <source>User Defined Event (%1) has occured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">用户定义事件(%1)已发生</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="49"/>
         <source>Camera %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机%1离线</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="52"/>
         <source>Input signal was caught on camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机%1输入报警</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="55"/>
         <source>Motion was detected on camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机%1移动侦测报警</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="58"/>
         <source>Storage Failure at %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1存储故障</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="61"/>
         <source>Network Issue at %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1网络故障</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="64"/>
         <source>Media Server %1 Failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储服务器%1故障</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="67"/>
         <source>Camera IP Conflict at %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1摄像机IP冲突</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="70"/>
         <source>Media Server %1 Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">存储服务器%1冲突</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="75"/>
         <source>Unknown Event has occured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发生未知事件</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="81"/>
         <source>%1 Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1服务器</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="88"/>
         <source>Undefined event has occured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">发生未知事件</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="92"/>
         <source>%1 has detected that camera %2 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1监测到摄像机%2离线</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="97"/>
         <source>%1 has caught an input signal on camera %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1发现摄像机%2报警输入</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="102"/>
         <source>%1 has detected motion on camera %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1监测到摄像机%2移动侦测</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="107"/>
         <source>%1 %2 has detected %n storage issues</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1 %2 监测到%n 存储故障</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="112"/>
         <source>%1 has experienced %n network issues with camera %2</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>%1 监测到摄像机%2发生%n 网络故障</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="117"/>
         <source>%1 %2 failure was detected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">监测到%1 %2故障</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="122"/>
         <source>%1 %2 has detected camera IP conflict</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 %2被监测到摄像机IP冲突</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="127"/>
         <source>%1 %2 is conflicting with other server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 %2 正与其他服务器冲突</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="133"/>
         <source>User Defined Event (%1) has occured on %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">用户定义事件（%1）在%2 上发生</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="137"/>
         <source>Unknown Event has occured on</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未知事件已发生</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="171"/>
@@ -336,50 +336,50 @@
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="212"/>
         <source>at %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在%2 的 %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="216"/>
         <source>%n times since %1 %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
+            <numerusform>从%1 %2到现在发生%n 次</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="232"/>
         <source>No video frames were received during the last %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在过去的%1秒中没有接收到视频</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="237"/>
         <source>Connection to camera was closed unexpectedly</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机连接突然被中断</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="241"/>
         <source>RTP packet was loss detected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">侦测到RTP包丢失</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="246"/>
         <source>Server has been terminated</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器已经被终止</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="250"/>
         <source>Server started after crash</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器故障后重启</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="254"/>
         <source>An error has occured while writing to %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">当写入到%1 时发生错误</translation>
     </message>
     <message>
         <location filename="../src/business/actions/sendmail_business_action.cpp" line="259"/>
         <source>Writing speed of HDD/SSD at %1 was found to be insufficient to sustain continuous recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">在%1 上的硬盘写入速度无法满足连续录像的要求</translation>
     </message>
     <message>
         <source>at %1</source>
@@ -623,22 +623,22 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/licensing/license.cpp" line="230"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">免费</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="231"/>
         <source>Trial</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">测试版</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="232"/>
         <source>Analog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">模拟</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="233"/>
         <source>Enterprise</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">企业级</translation>
     </message>
 </context>
 <context>
