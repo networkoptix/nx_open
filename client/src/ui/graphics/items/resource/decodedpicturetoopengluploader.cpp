@@ -152,19 +152,34 @@ public:
         supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
     }
 
-    uchar* filler(uchar value, int size)
+    ~DecodedPictureToOpenGLUploaderPrivate()
     {
-        QMutexLocker locker(&fillerMutex);
-
-        QVector<uchar> &filler = fillers[value];
-
-        if( filler.size() < size )
+        for( int i = 0; i < FILLER_COUNT; ++i )
         {
-            filler.resize(size);
-            filler.fill(value);
+            if( m_fillers[i].size > 0 )
+            {
+                qFreeAligned( m_fillers[i].data );
+                m_fillers[i].data = NULL;
+                m_fillers[i].size = 0;
+            }
+        }
+    }
+
+    unsigned char* filler( unsigned char value, int size )
+    {
+        QMutexLocker lk( &m_fillerMutex );
+
+        Filler& filler = m_fillers[value];
+        if( filler.size < size )
+        {
+            filler.size = size;
+            if( filler.data )
+                qFreeAligned( filler.data );
+            filler.data = (unsigned char*)qMallocAligned( filler.size, FILLER_BUF_ALIGNMENT );
+            memset( filler.data, value, size );
         }
 
-        return &filler[0];
+        return filler.data;
     }
 
 public:
@@ -173,8 +188,24 @@ public:
     static int maxTextureSize;
 
 private:
-    QMutex fillerMutex;
-    QVector<uchar> fillers[256];
+    struct Filler
+    {
+        unsigned char* data;
+        size_t size;
+
+        Filler()
+        :
+            data( NULL ),
+            size( 0 )
+        {
+        }
+    };
+
+    static const int FILLER_COUNT = 256;
+    static const int FILLER_BUF_ALIGNMENT = 32;
+
+    QMutex m_fillerMutex;
+    Filler m_fillers[FILLER_COUNT];
 };
 
 int DecodedPictureToOpenGLUploaderPrivate::maxTextureSize = 0;
