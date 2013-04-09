@@ -41,8 +41,7 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
 }
 
 QSize QnAppServerFileCache::getMaxImageSize() const {
-    int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-//    int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
+    int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
     return QSize(value, value);
 }
 
