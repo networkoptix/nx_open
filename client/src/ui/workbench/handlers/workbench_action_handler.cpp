@@ -1423,7 +1423,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!layout)
         return;
 
-    if (!(accessController()->globalPermissions() & Qn::GlobalEditLayoutsPermission))
+    if(!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(widget()));
