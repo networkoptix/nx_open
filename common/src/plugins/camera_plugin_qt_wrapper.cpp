@@ -190,6 +190,11 @@ namespace nxcip_qt
         return m_intf->getEncoder( encoderIndex, encoderPtr );
     }
 
+    int BaseCameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
+    {
+        return m_intf->getCameraInfo( info );
+    }
+
     //!See nxcip::BaseCameraManager::getCameraCapabilities
     int BaseCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {

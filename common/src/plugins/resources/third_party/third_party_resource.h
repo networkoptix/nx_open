@@ -77,7 +77,7 @@ private:
         QList<nxcip::Resolution> resolutionList;
     };
 
-    const nxcip::CameraInfo m_camInfo;
+    nxcip::CameraInfo m_camInfo;
     nxcip_qt::BaseCameraManager m_camManager;
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;
     QVector<EncoderData> m_encoderData;

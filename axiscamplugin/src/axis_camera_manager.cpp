@@ -10,6 +10,7 @@
 #include <utils/network/simple_http_client.h>
 
 #include "axis_media_encoder.h"
+#include "axis_cam_params.h"
 
 
 AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
@@ -80,14 +81,26 @@ int AxisCameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder**
     return nxcip::NX_NO_ERROR;
 }
 
-static const int DEFAULT_AXIS_API_PORT = 80;
-static const int DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS = 5000;
+int AxisCameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
+{
+    int result = updateCameraInfo();
+    if( result )
+        return result;
+
+    *info = m_info;
+    return nxcip::NX_NO_ERROR;
+}
 
 //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
 int AxisCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 {
-    //TODO/IMPL
-    return 0;
+    //updating info, if needed
+    int result = updateCameraInfo();
+    if( result )
+        return result;
+
+    *capabilitiesMask = nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
+    return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
@@ -138,6 +151,11 @@ const nxcip::CameraInfo& AxisCameraManager::cameraInfo() const
     return m_info;
 }
 
+nxcip::CameraInfo& AxisCameraManager::cameraInfo()
+{
+    return m_info;
+}
+
 const QAuthenticator& AxisCameraManager::credentials() const
 {
     return m_credentials;
@@ -146,4 +164,26 @@ const QAuthenticator& AxisCameraManager::credentials() const
 bool AxisCameraManager::isAudioEnabled() const
 {
     return m_audioEnabled;
+}
+
+int AxisCameraManager::updateCameraInfo() const
+{
+    if( std::strlen(m_info.firmware) == 0 )
+    {
+        CLSimpleHTTPClient http( m_info.url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_credentials );
+        CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version") );
+        if( status != CL_HTTP_SUCCESS )
+            return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+
+        QByteArray firmware;
+        http.readAll( firmware );
+        firmware = firmware.mid(firmware.indexOf('=')+1);
+        const int firmwareLen = std::min<int>(sizeof(m_info.firmware)-1, firmware.size());
+        strncpy( m_info.firmware, firmware.data(), firmwareLen );
+        m_info.firmware[firmwareLen] = 0;
+    }
+
+    //TODO/IMPL requesting I/O port information (if needed)
+
+    return nxcip::NX_NO_ERROR;
 }

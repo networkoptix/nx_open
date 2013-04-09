@@ -6,21 +6,35 @@
 #include "axis_media_encoder.h"
 
 #include <algorithm>
+#include <cstring>
 
 #include <QAuthenticator>
 
 #include <utils/network/simple_http_client.h>
 
 #include "axis_camera_manager.h"
+#include "axis_cam_params.h"
 
+
+//min known fps of axis camera (in case we do not know model)
+static const float MIN_AXIS_CAMERA_FPS = 8.0;
 
 AxisMediaEncoder::AxisMediaEncoder( AxisCameraManager* const cameraManager )
 :
     m_refCount( 1 ),
     m_cameraManager( cameraManager ),
     m_currentFps( 15 ),
-    m_currentBitrateKbps( 0 )
+    m_currentBitrateKbps( 0 ),
+    m_maxAllowedFps( 0 )
 {
+    m_maxAllowedFps = MIN_AXIS_CAMERA_FPS;
+
+    for( size_t i = 0; i < sizeof(cameraFpsLimitArray) / sizeof(*cameraFpsLimitArray); ++i )
+        if( std::strcmp(cameraManager->cameraInfo().modelName, cameraFpsLimitArray[i].modelName) == 0 )
+        {
+            m_maxAllowedFps = cameraFpsLimitArray[i].fps;
+            break;
+        }
 }
 
 void* AxisMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -51,7 +65,8 @@ int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const
     QByteArray paramsStr;
     paramsStr.append("videocodec=h264");
     if( m_currentResolutionInfo.resolution.width * m_currentResolutionInfo.resolution.height > 0 )
-        paramsStr.append("&resolution=").append(m_currentResolutionInfo.resolution.width).append("x").append(m_currentResolutionInfo.resolution.height);
+        paramsStr.append("&resolution=").append(QByteArray::number(m_currentResolutionInfo.resolution.width)).
+            append("x").append(QByteArray::number(m_currentResolutionInfo.resolution.height));
     paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
     if( m_currentFps > 0 )
         paramsStr.append("&fps=").append(QByteArray::number(m_currentFps));
@@ -62,9 +77,6 @@ int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const
     sprintf( urlBuf, "rtsp://%s/axis-media/media.amp?%s", m_cameraManager->cameraInfo().url, paramsStr.data() );
     return nxcip::NX_NO_ERROR;
 }
-
-static const int DEFAULT_AXIS_API_PORT = 80;
-static const int DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS = 5000;
 
 int AxisMediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoListCount ) const
 {
@@ -90,9 +102,7 @@ int AxisMediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* i
 
 int AxisMediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    *maxBitrate = 30;   //TODO/IMPL get appropriate bitrate
-    //if( m_currentResolutionInfo.resolution.width * m_currentResolutionInfo.resolution.height > 0 )
-    //    *maxBitrate = m_currentResolutionInfo.maxFps;
+    *maxBitrate = 1000000;   //TODO/IMPL get appropriate bitrate
     return nxcip::NX_NO_ERROR;
 }
 
@@ -127,9 +137,10 @@ int AxisMediaEncoder::setResolution( const nxcip::Resolution& resolution )
 
 int AxisMediaEncoder::setFps( const float& fps, float* selectedFps )
 {
-    //TODO/IMPL check fps validness
-    m_currentFps = fps;
-    *selectedFps = m_currentFps;
+    //checking fps validity
+    *selectedFps = fps > m_maxAllowedFps ? m_maxAllowedFps : fps;
+    *selectedFps = fps <= 0 ? m_maxAllowedFps : fps;
+    m_currentFps = *selectedFps;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -140,22 +151,13 @@ int AxisMediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     return nxcip::NX_NO_ERROR;
 }
 
-//nxcip::BaseCameraManager* AxisMediaEncoder::getBaseCameraManager()
-//{
-//    return m_cameraManager;
-//}
-
 int AxisMediaEncoder::fetchCameraResolutionList() const
 {
     // determin camera max resolution
     CLSimpleHTTPClient http( m_cameraManager->cameraInfo().url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_cameraManager->credentials() );
     CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") );
     if( status != CL_HTTP_SUCCESS )
-    {
-        if( status == CL_HTTP_AUTH_REQUIRED )
-            return nxcip::NX_NOT_AUTHORIZED;
-        return nxcip::NX_OTHER_ERROR;
-    }
+        return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
     QByteArray body;
     http.readAll( body );
@@ -174,7 +176,7 @@ int AxisMediaEncoder::fetchCameraResolutionList() const
         const QByteArray& resolutionName = resolutionNameList[i].toLower().trimmed();
 
         m_supportedResolutions.resize( m_supportedResolutions.size()+1 );
-        m_supportedResolutions[i].maxFps = 30;  //TODO/IMPL get correct max fps
+        m_supportedResolutions[i].maxFps = m_maxAllowedFps;
         if( resolutionName == "qcif" )
         {
             m_supportedResolutions[i].resolution.width = 176;

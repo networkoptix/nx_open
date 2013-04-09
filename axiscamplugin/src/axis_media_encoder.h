@@ -49,6 +49,7 @@ private:
     float m_currentFps;
     int m_currentBitrateKbps;
     bool m_audioEnabled;
+    float m_maxAllowedFps;
 
     int fetchCameraResolutionList() const;
 };

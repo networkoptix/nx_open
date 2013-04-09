@@ -32,7 +32,9 @@ public:
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
     virtual int getEncoderCount( int* encoderCount ) const override;
     //!Implementation of nxcip::BaseCameraManager::getEncoder
-    virtual int getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr );
+    virtual int getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr ) override;
+    //!Implementation of nxcip::BaseCameraManager::getCameraInfo
+    virtual int getCameraInfo( nxcip::CameraInfo* info ) const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
     virtual int getCameraCapabilities( unsigned int* capabilitiesMask ) const override;
     //!Implementation of nxcip::BaseCameraManager::setCredentials
@@ -49,17 +51,20 @@ public:
     virtual void getErrorString( int errorCode, char* errorString ) const override;
 
     const nxcip::CameraInfo& cameraInfo() const;
+    nxcip::CameraInfo& cameraInfo();
     const QAuthenticator& credentials() const;
 
     bool isAudioEnabled() const;
 
 private:
     QAtomicInt m_refCount;
-    const nxcip::CameraInfo m_info;
+    mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
     mutable std::vector<AxisMediaEncoder*> m_encoders;
     bool m_audioEnabled;
+
+    int updateCameraInfo() const;
 };
 
 #endif  //AXIS_CAMERA_MANAGER_H

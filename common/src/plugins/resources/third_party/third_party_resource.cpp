@@ -14,6 +14,8 @@
 #include "third_party_stream_reader.h"
 
 
+static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
+
 QnThirdPartyResource::QnThirdPartyResource(
     const nxcip::CameraInfo& camInfo,
     nxcip::BaseCameraManager* camManager,
@@ -120,13 +122,23 @@ bool QnThirdPartyResource::initInternal()
 {
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
+    int result = m_camManager.getCameraInfo( &m_camInfo );
+    if( result != nxcip::NX_NO_ERROR )
+    {
+        NX_LOG( QString::fromLatin1("Error getting camera info from third-party camera %1:%2 (url %3). %4").
+            arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getErrorString(result)), cl_logDEBUG1 );
+        setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
+        return false;
+    }
+
     setFirmware( QString::fromUtf8(m_camInfo.firmware) );
 
     int encoderCount = 0;
-    int result = m_camManager.getEncoderCount( &encoderCount );
+    result = m_camManager.getEncoderCount( &encoderCount );
     if( result != nxcip::NX_NO_ERROR )
     {
-        NX_LOG( QString::fromLatin1("Error getting encoder count from camera %1:%2 (url %3). %4").
+        NX_LOG( QString::fromLatin1("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getErrorString(result)), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
@@ -135,7 +147,7 @@ bool QnThirdPartyResource::initInternal()
 
     if( encoderCount == 0 )
     {
-        NX_LOG( QString::fromLatin1("Camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
+        NX_LOG( QString::fromLatin1("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
         return false;
     }
@@ -145,7 +157,7 @@ bool QnThirdPartyResource::initInternal()
     result = m_camManager.getCameraCapabilities( &cameraCapabilities );
     if( result != nxcip::NX_NO_ERROR )
     {
-        NX_LOG( QString::fromLatin1("Error reading camera capabilities from camera %1:%2 (url %3). %4").
+        NX_LOG( QString::fromLatin1("Error reading camera capabilities from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getErrorString(result)), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
@@ -172,6 +184,7 @@ bool QnThirdPartyResource::initInternal()
 
     //reading resolution list
     QVector<nxcip::ResolutionInfo> resolutionInfoList;
+    float maxFps = 0;
     for( int encoderNumber = 0; encoderNumber < encoderCount; ++encoderNumber )
     {
         //const int result = m_camManager.getResolutionList( i, &resolutionInfoList );
@@ -185,7 +198,7 @@ bool QnThirdPartyResource::initInternal()
         }
         if( result != nxcip::NX_NO_ERROR )
         {
-            NX_LOG( QString::fromLatin1("Failed to get resolution list of camera %1:%2 encoder %3. %4").
+            NX_LOG( QString::fromLatin1("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").
                 arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
                 arg(encoderNumber).arg(m_camManager.getErrorString(result)), cl_logDEBUG1 );
             if( result == nxcip::NX_NOT_AUTHORIZED )
@@ -193,7 +206,18 @@ bool QnThirdPartyResource::initInternal()
             return false;
         }
         for( int j = 0; j < resolutionInfoList.size(); ++j )
+        {
             m_encoderData[encoderNumber].resolutionList.push_back( resolutionInfoList[j].resolution );
+            if( resolutionInfoList[j].maxFps > maxFps )
+                maxFps = resolutionInfoList[j].maxFps;
+        }
+    }
+
+    if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
+    {
+        NX_LOG( QString::fromLatin1("Failed to set %1 parameter to %2 for third-party camera %3:%4 (url %5)").
+            arg(MAX_FPS_PARAM_NAME).arg(maxFps).arg(m_discoveryManager.getVendorName()).
+            arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
     }
 
     //TODO/IMPL initializing I/O

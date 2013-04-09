@@ -115,6 +115,8 @@ namespace nxcip_qt
         int getEncoderCount( int* encoderCount ) const;
         //!See nxcip::BaseCameraManager::getEncoder
         int getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr );
+        //!See nxcip::BaseCameraManager::getCameraInfo
+        int getCameraInfo( nxcip::CameraInfo* info ) const;
         //!See nxcip::BaseCameraManager::getCameraCapabilities
         int getCameraCapabilities( unsigned int* capabilitiesMask ) const;
         //!See nxcip::BaseCameraManager::setCredentials

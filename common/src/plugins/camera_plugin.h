@@ -255,6 +255,13 @@ namespace nxcip
         */
         virtual int getEncoder( int encoderIndex, CameraMediaEncoder** encoderPtr ) = 0;
 
+        //!Fills \a info struct with camera data
+        /*!
+            \return 0 on success, otherwise - error code
+            \note This method can set some parameters that were navailable during discovery
+        */
+        virtual int getCameraInfo( CameraInfo* info ) const = 0;
+
         enum CameraCapability
         { 
             hardwareMotionCapability    = 0x01, //!camera supports hardware motion. Plugin, returning this flag, MUST implement \a CameraMotionDataProvider interface

@@ -11,6 +11,7 @@
 #include <QLatin1String>
 
 #include "axis_camera_manager.h"
+#include "axis_cam_params.h"
 
 
 AxisCameraDiscoveryManager::AxisCameraDiscoveryManager()
@@ -60,9 +61,6 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
     //TODO/IMPL
     return 0;
 }
-
-static const char* AXIS_DEFAULT_LOGIN = "root";
-static const char* AXIS_DEFAULT_PASSWORD = "root";
 
 int AxisCameraDiscoveryManager::fromMDNSData(
     const char* discoveredAddress,
@@ -119,8 +117,9 @@ int AxisCameraDiscoveryManager::fromMDNSData(
 
     smac = smac.toUpper();
 
-    strcpy( cameraInfo->uid, smac );
-    strcpy( cameraInfo->modelName, name );
+    memset( cameraInfo, 0, sizeof(*cameraInfo) );
+    strncpy( cameraInfo->uid, smac.data(), std::min<int>(sizeof(cameraInfo->uid)-1, smac.size()) );
+    strncpy( cameraInfo->modelName, name.data(), std::min<int>(sizeof(cameraInfo->modelName)-1, name.size()) );
     strcpy( cameraInfo->defaultLogin, AXIS_DEFAULT_LOGIN );
     strcpy( cameraInfo->defaultPassword, AXIS_DEFAULT_PASSWORD );
     strcpy( cameraInfo->url, discoveredAddress );
@@ -136,5 +135,8 @@ int AxisCameraDiscoveryManager::fromUpnpData( const char* upnpXMLData, int upnpX
 
 nxcip::BaseCameraManager* AxisCameraDiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
 {
-    return new AxisCameraManager( info );
+    AxisCameraManager* obj = new AxisCameraManager( info );
+    strcpy( obj->cameraInfo().defaultLogin, AXIS_DEFAULT_LOGIN );
+    strcpy( obj->cameraInfo().defaultPassword, AXIS_DEFAULT_PASSWORD );
+    return obj;
 }
