@@ -90,6 +90,7 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
         setUserCanEdit(localOther->userCanEdit());
         setBackgroundImageFilename(localOther->backgroundImageFilename());
         setBackgroundSize(localOther->backgroundSize());
+        setBackgroundOpacity(localOther->backgroundOpacity());
         setLocked(localOther->locked());
     }
 }

@@ -422,7 +422,6 @@ void QnWorkbenchDisplay::initSceneView() {
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
-    gridBackgroundItem()->setAnimationTimer(m_instrumentManager->animationTimer());
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -1480,7 +1479,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
-    gridBackgroundItem()->animatedHide();
+    gridBackgroundItem()->setOpacity(0.0);
 
 
     m_inChangeLayout = false;
