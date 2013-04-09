@@ -367,7 +367,7 @@ void QnProgressiveDownloadingConsumer::run()
         if( getDecodedUrl().hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
         {
             maxFramesToCacheBeforeDrop = getDecodedUrl().queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
-            dropLateFrames = maxFramesToCacheBeforeDrop > 0;
+            dropLateFrames = true;
         }
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,
