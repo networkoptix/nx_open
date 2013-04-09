@@ -19,7 +19,7 @@ void VMaxStreamFetcher::initPacketTime()
     m_emptyPacketTime = 0;
 }
 
-VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
+VMaxStreamFetcher::VMaxStreamFetcher(QnResource* dev, bool isLive):
     m_vMaxProxy(0),
     m_vmaxConnection(0),
     m_isLive(isLive),
@@ -31,7 +31,7 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResourcePtr dev, bool isLive):
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_keepAllChannels(false)
 {
-    m_res = dev.dynamicCast<QnNetworkResource>();
+    m_res = dynamic_cast<QnNetworkResource*>(dev);
     initPacketTime();
 }
 
@@ -198,7 +198,7 @@ void VMaxStreamFetcher::vmaxDisconnect()
 
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
 {
-    m_res.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
+    dynamic_cast<QnPlVmax480Resource*>(m_res)->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
 
     QMutexLocker lock(&m_mutex);
     foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
@@ -435,7 +435,7 @@ void VMaxStreamFetcher::notInUse()
     m_usageCount--;
 }
 
-VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive)
+VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive)
 {
     QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
     const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
@@ -450,7 +450,7 @@ VMaxStreamFetcher* VMaxStreamFetcher::getInstance(const QByteArray& clientGroupI
     return result;
 }
 
-void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive)
+void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive)
 {
     QByteArray vmaxIP = QUrl(res->getUrl()).host().toUtf8();
     const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
