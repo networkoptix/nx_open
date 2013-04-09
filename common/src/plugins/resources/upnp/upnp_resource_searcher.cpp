@@ -97,10 +97,10 @@ UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
         m_receiveSocket = new UDPSocket();
         m_receiveSocket->setReuseAddrFlag(true);
         m_receiveSocket->setLocalPort(GROUP_PORT);
-    }
-
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
-        m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+        
+        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
+            m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+        }
     }
 
 
