@@ -366,10 +366,14 @@ Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList
     else
         resource = context()->workbench()->currentLayout()->resource();
 
-    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
-    return resource->hasFlags(QnResource::layout) && !isExportedLayout
-            ? Qn::EnabledAction
-            : Qn::InvisibleAction;
+    if(!accessController()->hasPermissions(resource, Qn::EditLayoutSettingsPermission))
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+
+//    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+//    return resource->hasFlags(QnResource::layout) && !isExportedLayout
+//            ? Qn::EnabledAction
+//            : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWidgetList &widgets) {

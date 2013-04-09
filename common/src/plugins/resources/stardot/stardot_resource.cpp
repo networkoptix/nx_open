@@ -30,10 +30,10 @@ namespace
 };
 
 QnStardotResource::QnStardotResource():
-    m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
-    m_maxFps(30),
     m_resolutionNum(-1),
+    m_maxFps(30),
+    m_rtspPort(DEFAULT_RTSP_PORT),
     m_rtspTransport(lit("tcp")),
     m_motionMaskBinData(0)
 {
@@ -219,8 +219,6 @@ bool QnStardotResource::hasDualStreaming() const
 {
     return false;
 }
-
-static const QString motionData();
 
 void QnStardotResource::setMotionMaskPhysical(int channel)
 {

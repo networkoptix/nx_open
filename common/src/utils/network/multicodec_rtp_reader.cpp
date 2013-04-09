@@ -398,9 +398,19 @@ void QnMulticodecRtpReader::openStream()
         return;
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
-    QString transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
+    QString transport;
+    QVariant val;
+    m_resource->getParam(lit("rtpTransport"), val, QnDomainMemory);
+    transport = val.toString();
+
+    if (transport.isEmpty()) {
+        // if not defined, try transport from registry
+        transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
+    }
+
     if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
         transport = QLatin1String("AUTO");
+
     m_RtpSession.setTransport(transport);
     if (transport != QLatin1String("UDP"))
         m_RtpSession.setTCPReadBufferSize(1024*512);

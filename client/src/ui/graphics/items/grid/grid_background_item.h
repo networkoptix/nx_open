@@ -1,10 +1,16 @@
 #ifndef GRID_BACKGROUND_ITEM_H
 #define GRID_BACKGROUND_ITEM_H
 
+#include <memory>
+
 #include <QObject>
 #include <QGraphicsObject>
 
 #include <utils/app_server_file_cache.h>
+
+#include "../resource/decodedpicturetoopengluploader.h"
+#include "../../../../camera/gl_renderer.h"
+
 
 class QnWorkbenchGridMapper;
 class RectAnimator;
@@ -57,6 +63,12 @@ private slots:
     void setImage(const QImage& image);
 
 private:
+    enum ImageStatus {
+        None,
+        Loading,
+        Loaded
+    };
+
     QRectF m_rect;
     QImage m_image;
     QString m_imageFilename;
@@ -68,6 +80,12 @@ private:
     RectAnimator *m_geometryAnimator;
     VariantAnimator *m_opacityAnimator;
     QnAppServerFileCache *m_cache;
+    std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
+    std::auto_ptr<QnGLRenderer> m_renderer;
+    QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
+    bool m_imgUploaded;
+    ImageStatus m_imageStatus;
+    QHash<QString, QImage> m_imagesMemCache;
 };
 
 

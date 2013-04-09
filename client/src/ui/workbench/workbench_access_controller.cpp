@@ -127,20 +127,23 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
-    } else if (layout->locked()) {
-        return Qn::ReadPermission;
     } else if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+        if (layout->locked())
+            return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+        return Qn::FullLayoutPermissions;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
         if (layout->userCanEdit()) {
-            return Qn::ReadWriteSavePermission| Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify layout with this flag. */
+            if (layout->locked())
+                return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+            return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
         } else if(snapshotManager()->isLocal(layout)) {
+            qDebug() << "local layout found" << layout->getName();
             return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
         }
         else {

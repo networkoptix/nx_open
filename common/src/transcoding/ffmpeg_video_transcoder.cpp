@@ -21,7 +21,6 @@ m_imageBuffer(0),
 m_timeImg(0),
 m_dateTimeXOffs(0),
 m_dateTimeYOffs(0),
-m_quality(QnQualityNormal),
 m_onscreenDateOffset(0),
 m_bufXOffs(0),
 m_bufYOffs(0)
@@ -101,7 +100,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
     if (m_bitrate == -1)
-        m_bitrate = QnTranscoder::suggestBitrate(QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality);
+        m_bitrate = QnTranscoder::suggestMediaStreamParams( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
@@ -109,6 +108,34 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
     if (m_mtMode)
         m_encoderCtx->thread_count = QThread::idealThreadCount();
+
+    for( QMap<QString, QVariant>::const_iterator it = m_params.begin(); it != m_params.end(); ++it )
+    {
+        if( it.key() == QnCodecParams::global_quality )
+        {
+            //100 - 1;
+            //0 - FF_LAMBDA_MAX;
+
+            //m_encoderCtx->quality = FF_LAMBDA_MAX - ((FF_LAMBDA_MAX - 1) * it.value().toInt() / 100);
+            m_encoderCtx->global_quality = INT_MAX / 50 * (it.value().toInt() - 50);
+            //compression_level;
+        }
+        else if( it.key() == QnCodecParams::qscale )
+        {
+            m_encoderCtx->flags |= CODEC_FLAG_QSCALE;
+            m_encoderCtx->global_quality = FF_QP2LAMBDA * it.value().toInt();
+        }
+        else if( it.key() == QnCodecParams::qmin )
+        {
+            m_encoderCtx->qmin = it.value().toInt();
+        }
+        else if( it.key() == QnCodecParams::qmax )
+        {
+            m_encoderCtx->qmax = it.value().toInt();
+        }
+    }
+
+
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = QObject::tr("Can't initialize video encoder");
@@ -261,11 +288,6 @@ void QnFfmpegVideoTranscoder::setMTMode(bool value)
 void QnFfmpegVideoTranscoder::setDrawDateTime(OnScreenDatePos value)
 {
     m_dateTextPos = value;
-}
-
-void QnFfmpegVideoTranscoder::setQuality(QnStreamQuality quality)
-{
-    m_quality = quality;
 }
 
 void QnFfmpegVideoTranscoder::setOnScreenDateOffset(int timeOffsetMs)

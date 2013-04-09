@@ -5,14 +5,16 @@
 #include "ffmpeg_audio_transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
-QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
-    m_bitrate(-1)
+QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
+:
+    m_bitrate(-1),
+    m_quality(QnQualityNormal)
 {
     m_codecId = codecId;
 }
 
 
-void QnCodecTranscoder::setParams(const Params& params)
+void QnCodecTranscoder::setParams(const QnCodecParams::Value& params)
 {
     m_params = params;
 }
@@ -37,6 +39,11 @@ AVCodecContext* QnCodecTranscoder::getCodecContext()
 QString QnCodecTranscoder::getLastError() const
 {
     return m_lastErrMessage;
+}
+
+void QnCodecTranscoder::setQuality( QnStreamQuality quality )
+{
+    m_quality = quality;
 }
 
 // --------------------------- QnVideoTranscoder -----------------
@@ -98,7 +105,11 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-int QnTranscoder::suggestBitrate(QSize resolution, QnStreamQuality quality)
+int QnTranscoder::suggestMediaStreamParams(
+    CodecID codec,
+    QSize resolution,
+    QnStreamQuality quality,
+    QnCodecParams::Value* const params )
 {
     // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
@@ -127,15 +138,53 @@ int QnTranscoder::suggestBitrate(QSize resolution, QnStreamQuality quality)
 
     int result = hiEnd * resolutionFactor;
 
+    if( codec == CODEC_ID_MJPEG )
+    {
+        //setting qmin and qmax, since mjpeg encoder uses only these
+        if( params && !params->contains(QnCodecParams::qmin) && !params->contains(QnCodecParams::qmax) )
+        {
+            int qVal = 1;
+            switch( quality )
+            {
+                case QnQualityLowest:
+                    qVal = 100;
+                    break;
+                case QnQualityLow:
+                    qVal = 50;
+                    break;
+                case QnQualityNormal:
+                    qVal = 20;
+                    break;
+                case QnQualityHigh:
+                    qVal = 5;
+                    break;
+                case QnQualityHighest:
+                    qVal = 1;
+                    break;
+                default:
+                    break;
+            }
+
+            params->insert( QnCodecParams::qmin, qVal );
+            params->insert( QnCodecParams::qmax, qVal );
+        }
+    }
+
     return qMax(128,result)*1024;
 }
 
-int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
+int QnTranscoder::setVideoCodec(
+    CodecID codec,
+    TranscodeMethod method,
+    QnStreamQuality quality,
+    const QSize& resolution,
+    int bitrate,
+    QnCodecParams::Value params )
 {
     Q_UNUSED(params)
     if (bitrate == -1) {
         //bitrate = resolution.width() * resolution.height() * 5;
-        bitrate = suggestBitrate(resolution);
+        bitrate = suggestMediaStreamParams( codec, resolution, quality, &params );
     }
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
@@ -166,6 +215,8 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
     {
         m_vTranscoder->setResolution(resolution);
         m_vTranscoder->setBitrate(bitrate);
+        m_vTranscoder->setParams(params);
+        m_vTranscoder->setQuality(quality);
     }
     return 0;
 }

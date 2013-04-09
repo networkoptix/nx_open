@@ -170,7 +170,7 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     QMutexLocker lock(&d->sockMutex);
-    while (!needToStop() && size > 0 && d->socket->isConnected())
+    while( !needToStop() && size > 0 && d->socket->isConnected() )
     {
         int sended = 0;
         if (d->ssl)
@@ -183,6 +183,10 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 #endif
             data += sended;
             size -= sended;
+        }
+        else if( !d->ssl && d->socket->isConnected() )
+        {
+            continue;   //operation timed out?
         }
         else
         {

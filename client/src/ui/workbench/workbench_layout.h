@@ -241,6 +241,18 @@ public:
     void setCellSpacing(const QSizeF &cellSpacing);
 
     /**
+     * \returns                         Lock state of this layout.
+     */
+    bool locked() const {
+        return m_locked;
+    }
+
+    /**
+     * \param cellSpacing               New lock state for this layout.
+     */
+    void setLocked(bool value);
+
+    /**
      * \returns                         Bounding rectangle of all pinned items in this layout.
      */
     const QRect &boundingRect() const {
@@ -323,6 +335,8 @@ signals:
      */
     void cellSpacingChanged();
 
+    void lockedChanged();
+
     /**
      * This signal is emitted whenever data associated with the provided role is changed.
      * 
@@ -373,6 +387,9 @@ private:
 
     /** Spacing between cells, relative to cell width. */
     QSizeF m_cellSpacing;
+
+    /** Lock status of the layout. */
+    bool m_locked;
 
     /** Map from item's universally unique identifier to item. */
     QHash<QUuid, QnWorkbenchItem *> m_itemByUuid;

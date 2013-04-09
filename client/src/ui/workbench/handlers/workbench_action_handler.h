@@ -361,7 +361,9 @@ private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
+#ifdef Q_OS_WIN
     QString binaryFilterName(bool readOnly) const;
+#endif
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);

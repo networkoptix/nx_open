@@ -14,6 +14,11 @@
 
 namespace {
     const int maxImageSize = 4096;
+//    const int maxImageSize = 6144;
+//    const int maxImageSize = 7168;
+//    const int maxImageSize = 7680;
+//    const int maxImageSize = 7936;
+//    const int maxImageSize = 8192;
 }
 
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :

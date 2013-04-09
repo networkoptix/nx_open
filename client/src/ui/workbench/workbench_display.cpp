@@ -1206,7 +1206,13 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
-        QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        QSizeF maxWidgetSize;
+        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
+            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric
+        } else {
+            maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        }
+
         QPointF viewportCenter = viewportGeometry.center();
 
         /* Allow expansion no further than the maximal size, but no less than current size. */

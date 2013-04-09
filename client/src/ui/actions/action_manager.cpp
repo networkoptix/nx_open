@@ -962,8 +962,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::LayoutSettingsAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
        text(tr("Layout Settings...")).
-       requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
-       condition(new QnLayoutSettingsActionCondition(this));
+       requiredPermissions(Qn::EditLayoutSettingsPermission);
+//       condition(new QnLayoutSettingsActionCondition(this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1064,9 +1064,9 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CurrentLayoutSettingsAction).
         flags(Qn::Scene | Qn::NoTarget).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditLayoutsPermission).
-        text(tr("Layout Settings...")).
-        condition(new QnLayoutSettingsActionCondition(this));
+        requiredPermissions(Qn::CurrentLayoutParameter, Qn::EditLayoutSettingsPermission).
+        text(tr("Layout Settings..."));
+//        condition(new QnLayoutSettingsActionCondition(this));
 
     factory(Qn::ToggleTourModeHotkeyAction).
         flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).

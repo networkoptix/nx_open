@@ -107,7 +107,11 @@
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
 #include "camera/caching_time_period_loader.h"
-#include "launcher/nov_launcher.h"
+
+#ifdef Q_OS_WIN
+#include "launcher_win/nov_launcher.h"
+#endif
+
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
 
@@ -1419,7 +1423,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!layout)
         return;
 
-    if (!(accessController()->globalPermissions() & Qn::GlobalEditLayoutsPermission))
+    if(!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(widget()));
@@ -2448,6 +2452,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
+#ifdef Q_OS_WIN
 QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
     if (readOnly) {
@@ -2463,6 +2468,7 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
             return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
 }
+#endif
 
 void QnWorkbenchActionHandler::removeLayoutFromPool(QnLayoutResourcePtr existingLayout)
 {
@@ -2500,6 +2506,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString suggestion = layout->getName();
 
     bool exportReadOnly = false;
+
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
@@ -2507,13 +2514,16 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString mediaFileROFilter = tr("Media File (read only) (*.nov)");
 
     QString mediaFilter =
-              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
+            QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
             + filterSeparator
             + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileROFilter
+        #ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName(false)
             + filterSeparator
-            + binaryFilterName(true);
+            + binaryFilterName(true)
+        #endif
+            ;
 
     while (true) {
         QString selectedFilter;
@@ -2527,7 +2537,11 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedFilter.contains(mediaFileROFilter) || selectedFilter.contains(binaryFilterName(true));
+        exportReadOnly = selectedFilter.contains(mediaFileROFilter)
+        #ifdef Q_OS_WIN
+                || selectedFilter.contains(binaryFilterName(true))
+        #endif
+                ;
         if (fileName.isEmpty())
             return false;
 
@@ -2610,6 +2624,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
+    #ifdef Q_OS_WIN
     if (m_layoutFileName.endsWith(QLatin1String(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
@@ -2618,7 +2633,9 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             return;
         }
     }
-    else {
+    else
+#endif
+    {
         QFile::remove(fileName);
     }
 
@@ -2926,15 +2943,31 @@ Do you want to continue?"),
         previousDir = qnSettings->mediaFolder();
     }
 
-    QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+    QString filterSeparator(QLatin1String(";;"));
+    QString aviFileFilter = tr("AVI (*.avi)");
+    QString aviTsFileFilter = tr("AVI with Timestamps (Requires Transcoding)(*.avi)");
+    QString mkvFileFilter = tr("Matroska (*.mkv)");
+    QString mkvTsFileFilter = tr("Matroska  with Timestamps (Requires Transcoding)(*.mkv)");
+
+    QString allowedFormatFilter =
+            aviFileFilter
+            + filterSeparator
+            + mkvFileFilter
+            + filterSeparator
+            + aviTsFileFilter
+            + filterSeparator
+            + mkvTsFileFilter
+        #ifdef Q_OS_WIN
+            + filterSeparator
+            + binaryFilterName(false)
+        #endif
+            ;
 
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
-    QString allowedFormatFilter = tr("AVI (*.avi);;Matroska (*.mkv);;");
-    allowedFormatFilter += tr("AVI with Timestamps (Requires Transcoding)(*.avi);;Matroska  with Timestamps (Requires Transcoding)(*.mkv);;");
-    allowedFormatFilter += binaryFilterName(false);
     while (true) {
+        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             tr("Export Video As..."),
@@ -2964,7 +2997,7 @@ Do you want to continue?"),
             }
         }
 
-        if (fileName.endsWith(QLatin1String(".avi")))
+        if (selectedFilter.contains(aviFileFilter) || selectedFilter.contains(aviTsFileFilter))
         {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
@@ -2976,7 +3009,8 @@ Do you want to continue?"),
                     int result = QMessageBox::warning(
                         this->widget(), 
                         tr("AVI format is not recommended"), 
-                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"), // TODO: #Elric bad Engrish
+                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists."\
+                           "Press 'Yes' to continue export or 'No' to select other format"), // TODO: #Elric bad Engrish
                         QMessageBox::Yes | QMessageBox::No
                     );
                     if (result != QMessageBox::Yes)
@@ -2999,7 +3033,8 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    if (selectedExtension.toLower() == QLatin1String(".exe")) 
+#ifdef Q_OS_WIN
+    if (selectedFilter.contains(binaryFilterName(false)))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -3014,7 +3049,9 @@ Do you want to continue?"),
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false);
     }
-    else {
+    else
+#endif
+    {
         QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
         exportProgressDialog->setWindowTitle(tr("Exporting Video"));
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
