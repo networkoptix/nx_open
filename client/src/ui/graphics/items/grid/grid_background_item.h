@@ -85,6 +85,7 @@ private:
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
     bool m_imgUploaded;
     ImageStatus m_imageStatus;
+    QHash<QString, QImage> m_imagesMemCache;
 };
 
 

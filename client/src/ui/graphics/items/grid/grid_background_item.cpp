@@ -201,6 +201,11 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
     if (!ok)
         return;
 
+    if (m_imagesMemCache.contains(m_imageFilename)) {
+        setImage(m_imagesMemCache[m_imageFilename]);
+        return;
+    }
+
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(m_cache->getFullPath(filename));
     loader->setSize(m_cache->getMaxImageSize());
@@ -212,6 +217,13 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
 }
 
 void QnGridBackgroundItem::setImage(const QImage &image) {
+    if (m_imageStatus != Loaded)    // image name was changed during load
+        return;
+
+    if (!m_imagesMemCache.contains(m_imageFilename)) {
+        m_imagesMemCache.insert(m_imageFilename, image);
+    }
+
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to YUV format
     m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
