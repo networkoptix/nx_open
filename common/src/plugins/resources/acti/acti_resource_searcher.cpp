@@ -16,8 +16,6 @@ QnActiResourceSearcher::QnActiResourceSearcher():
     QObject(), QnUpnpResourceSearcher()
 {
     QnMdnsListener::instance()->registerConsumer((long) this);
-    m_manager = new QNetworkAccessManager();
-    connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyReceived(QNetworkReply*)));
 }
 
 QnActiResourceSearcher::~QnActiResourceSearcher()
@@ -66,7 +64,12 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
     CasheInfo info = m_cachedXml.value(host);
     if (info.xml.isEmpty() || info.timer.elapsed() > CACHE_UPDATE_TIME)
     {
-        if (!m_httpInProgress.contains(url.host())) {
+        if (!m_httpInProgress.contains(url.host())) 
+        {
+            if (!m_manager) {
+                m_manager = new QNetworkAccessManager();
+                connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyReceived(QNetworkReply*)));
+            }
             m_manager->get(QNetworkRequest(url));
             m_httpInProgress << url.host();
         }
