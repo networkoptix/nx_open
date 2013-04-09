@@ -317,6 +317,11 @@ void QnLayoutResource::setLocked(bool value) {
         if (m_locked == value)
             return;
         m_locked = value;
+
+        if (value)
+            setStatus(QnResource::Locked, true);
+        else
+            setStatus(QnResource::Online, true);
     }
     emit lockedChanged(::toSharedPointer(this));
 }
