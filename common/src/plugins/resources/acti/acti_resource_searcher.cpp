@@ -1,3 +1,5 @@
+#include <QNetworkReply>
+
 #include "acti_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "acti_resource.h"
@@ -8,10 +10,19 @@ extern QString getValueFromString(const QString& line);
 static const QString DEFAULT_LOGIN(QLatin1String("admin"));
 static const QString DEFAULT_PASSWORD(QLatin1String("123456"));
 static const int ACTI_DEVICEXML_PORT = 49152;
+static const int CACHE_UPDATE_TIME = 60 * 1000;
 
-QnActiResourceSearcher::QnActiResourceSearcher()
+QnActiResourceSearcher::QnActiResourceSearcher():
+    QObject(), QnUpnpResourceSearcher()
 {
     QnMdnsListener::instance()->registerConsumer((long) this);
+    m_manager = new QNetworkAccessManager();
+    connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyReceived(QNetworkReply*)));
+}
+
+QnActiResourceSearcher::~QnActiResourceSearcher()
+{
+    delete m_manager;
 }
 
 QnResourceList QnActiResourceSearcher::findResources(void)
@@ -37,21 +48,49 @@ QnResourceList QnActiResourceSearcher::findResources(void)
             if (processedUuid.contains(uuidStr))
                 continue;
 
-            processDeviceXml(uuidStr, QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(removeAddress).arg(ACTI_DEVICEXML_PORT), removeAddress, result);
+            QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(removeAddress).arg(ACTI_DEVICEXML_PORT)); // async request
+            //QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2")).arg(removeAddress).arg(80)); // test request
+            processDeviceXml(response, removeAddress, removeAddress, result);
             processedUuid << uuidStr;
         }
     }
+    
     return result;
+}
+
+QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QString host = url.host();
+    CasheInfo info = m_cachedXml.value(host);
+    if (info.xml.isEmpty() || info.timer.elapsed() > CACHE_UPDATE_TIME)
+    {
+        if (!m_httpInProgress.contains(url.host())) {
+            m_manager->get(QNetworkRequest(url));
+            m_httpInProgress << url.host();
+        }
+    }
+
+    return m_cachedXml.value(host).xml;
+}
+
+void QnActiResourceSearcher::at_replyReceived(QNetworkReply* reply)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QString host = reply->url().host();
+    m_cachedXml[host].xml = reply->readAll();
+    m_cachedXml[host].timer.restart();
+    m_httpInProgress.remove(host);
+
+    reply->deleteLater();
 }
 
 QnActiResourceSearcher& QnActiResourceSearcher::instance()
 {
     static QnActiResourceSearcher inst;
     return inst;
-}
-
-QnActiResourceSearcher::~QnActiResourceSearcher()
-{
 }
 
 QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
@@ -97,7 +136,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
 
     QByteArray uuidStr("ACTI");
     uuidStr += url.host().toUtf8();
-    processDeviceXml(uuidStr, QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(url.host()).arg(ACTI_DEVICEXML_PORT), url.host(), result);
+    readDeviceXml(uuidStr, QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(url.host()).arg(ACTI_DEVICEXML_PORT), url.host(), result);
     foreach(QnResourcePtr res, result)
         res.dynamicCast<QnNetworkResource>()->setAuth(auth);
 
