@@ -65,6 +65,11 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
         d->serverAddress = address;
         d->localPort = port;
         d->serverSocket = new TCPServerSocket(address.toString(), port, 5 ,true);
+        if( d->serverSocket->failed() )
+        {
+            NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Initial Bind failed: %3").arg(d->serverAddress.toString()).arg(d->localPort).
+                arg(d->serverSocket->lastError()), cl_logWARNING );
+        }
         d->maxConnections = maxConnections;
         d->ddosWarned = false;
         cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
@@ -200,10 +205,10 @@ void QnTcpListener::run()
                 removeAllConnections();
                 delete d->serverSocket;
                 d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
-                if (SystemError::getLastOSErrorCode() != 0 )
+                if( d->serverSocket->failed() )
                 {
-                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-                        arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Bind failed: %3").arg(d->serverAddress.toString()).arg(d->localPort).
+                        arg(d->serverSocket->lastError()), cl_logWARNING );
                     QThread::msleep(1000);
                     continue;
                 }

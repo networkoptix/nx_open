@@ -117,7 +117,9 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
 
 Socket::Socket(int type, int protocol)
 :
-    m_nonBlockingMode( false )
+    m_nonBlockingMode( false ),
+    m_status( 0 ),
+    m_prevErrorCode( SystemError::noError )
 {
     createSocket(type, protocol);
 }
@@ -145,7 +147,9 @@ void Socket::createSocket(int type, int protocol)
 
 Socket::Socket(int sockDesc)
 :
-    m_nonBlockingMode( false )
+    m_nonBlockingMode( false ),
+    m_status( 0 ),
+    m_prevErrorCode( SystemError::noError )
 {
     this->sockDesc = sockDesc;
 }
@@ -251,8 +255,8 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
         return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        m_lastError = tr("Set of local address and port failed (bind()). %1").arg(SystemError::toString(errorCode));
+        m_prevErrorCode = SystemError::getLastOSErrorCode();
+        m_lastError = tr("Set of local address and port failed (bind()). %1").arg(SystemError::toString(m_prevErrorCode));
         return false;
     }
 
@@ -615,10 +619,10 @@ TCPServerSocket::TCPServerSocket(unsigned short localPort, int queueLen)
 TCPServerSocket::TCPServerSocket(const QString &localAddress,
                                  unsigned short localPort, int queueLen, bool reuseAddr)
     : Socket(SOCK_STREAM, IPPROTO_TCP) {
-    setReuseAddrFlag(reuseAddr);
-    if (!setLocalAddressAndPort(localAddress, localPort))
+    if( !setReuseAddrFlag(reuseAddr) ||
+        !setLocalAddressAndPort(localAddress, localPort) )
     {
-        qnWarning("Can't create socket: %1.", m_lastError);
+        setStatus( Socket::sbFailed );
         return;
     }
 
@@ -911,6 +915,8 @@ bool Socket::setReuseAddrFlag(bool reuseAddr)
     int reuseAddrVal = reuseAddr;
 
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
+        m_prevErrorCode = SystemError::getLastOSErrorCode();
+        m_lastError = SystemError::getLastOSErrorText();
         qnWarning("Can't set SO_REUSEADDR flag to socket: %1.", strerror(errno));
         return false;
     }
@@ -962,6 +968,15 @@ bool Socket::isNonBlockingMode() const
 
 SystemError::ErrorCode Socket::prevErrorCode() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_prevErrorCode;
+}
+
+bool Socket::failed() const
+{
+    return (m_status & sbFailed) != 0;
+}
+
+void Socket::setStatus( StatusBit _status )
+{
+    m_status |= _status;
 }
