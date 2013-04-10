@@ -8,6 +8,9 @@
 
 #ifndef _WIN32
 #include <sys/types.h>
+#include <linux/unistd.h>
+
+pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
