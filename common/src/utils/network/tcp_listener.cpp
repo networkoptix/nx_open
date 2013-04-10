@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <linux/unistd.h>
 
-pid_t gettid(void) { return syscall(__NR_gettid); }
+static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
