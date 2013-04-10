@@ -316,15 +316,20 @@ namespace nxcip
     public:
         virtual ~CameraPTZManager() {}
 
+        // TODO: #Elric docz!
         enum Capability
         {
-            ContinuousPanTiltCapability         = 0x01,
-            ContinuousZoomCapability            = 0x02,
-            AbsolutePtzCapability               = 0x04,
-            OctagonalPtzCapability              = 0x08,
+            ContinuousPanCapability             = 0x001,
+            ContinuousTiltCapability            = 0x002,
+            ContinuousZoomCapability            = 0x004,
+            FullSpeedSpaceCapability            = 0x008,
             
-            //!Shortcuts
-            AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability
+            AbsolutePanCapability               = 0x010,
+            AbsoluteTiltCapability              = 0x020,
+            AbsoluteZoomCapability              = 0x040,
+            LogicalPositionSpaceCapability      = 0x080,
+
+            AutomaticStateUpdateCapability      = 0x100,
         };
 
         //!Returns bitset of \a Capability enumeration members
@@ -335,7 +340,7 @@ namespace nxcip
             All velocities are in range [-1..1]
             \return 0 on success, otherwise - error code
         */
-        virtual int startMove( float xVelocity, float yVelocity, float zoomVelocity ) = 0;
+        virtual int startMove( double panSpeed, double tiltSpeed, double zoomSpeed ) = 0;
 
         //!Stop moving
         /*!
@@ -343,26 +348,56 @@ namespace nxcip
         */
         virtual int stopMove() = 0;
 
-        //!Move to absolute position
+        //!Move to absolute physical position
         /*!
-            All values are in range, returned by getSpaceMapper. See \a getSpaceMapper()
+            All values are in device-specific ranges. See \a getPhysicalPosition().
             \return 0 on success, otherwise - error code
         */
-        virtual int moveTo( float xPos, float yPos, float zoomPos ) = 0;
+        virtual int setPhysicalPosition( double pan, double tilt, double zoom ) = 0;
 
-        //!Get absolute position in range, returned by getSpaceMapper. See \a getSpaceMapper()
+        //!Get absolute physical position.
         /*!
+            All returned values are in device-specific ranges and can be safely used only in
+            subsequent calls to \a setPhysicalPosition().
             \return 0 on success, otherwise - error code
         */
-        virtual int getPosition( float* xPos, float* yPos, float* zoomPos ) const = 0;
+        virtual int getPhysicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
 
-        static const int MAX_JSON_TEXT_SIZE = 128*1024;
+        //!Move to absolute logical position
         /*!
-            Used for absolute PTZ movement
-            \todo Ask #elric about JSON string format
-            \param buf utf-8 data. Buffer size defined by \a MAX_JSON_TEXT_SIZE
+            Pan and tilt values are in degrees, zoom is in 35mm equivalent. 
+            This function must be implemented if \a LogicalPositionSpaceCapability is present.
+            \return 0 on success, otherwise - error code
         */
-        virtual void getSpaceMapper( char* buf ) const = 0;
+        virtual int setLogicalPosition( double pan, double tilt, double zoom ) = 0;
+
+        //!Get absolute logical position.
+        /*!
+            Pan and tilt values are in degrees, zoom is in 35mm equivalent.
+            This function must be implemented if \a LogicalPositionSpaceCapability is present.
+            \return 0 on success, otherwise - error code
+        */
+        virtual int getLogicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
+
+        // TODO: #Elric this one needs additional thought. And docs.
+        struct LogicalPtzLimits {
+            double minPan, maxPan;
+            double minTilt, maxTilt;
+            double minZoom, maxZoom;
+        };
+
+        virtual int getLogicalLimits(LogicalPtzLimits *limits) = 0;
+        
+        //!Updates stored camera state (e.g. flip & mirror) so that movement commands work properly.
+        /*!
+            This function is needed mainly for cameras that do not automatically
+            adjust for flip, mirror and other changes in settings. 
+            In case camera's state was changed, user can manually trigger camera 
+            state update so that movement commands would work OK.
+
+            This function must be implemented if \a AutomaticStateUpdateCapability is not present.
+        */
+        virtual int updateState() = 0;
 
         //!Returns text description of error code
         /*!
