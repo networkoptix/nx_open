@@ -15,7 +15,8 @@
 typedef int socklen_t;
 typedef char raw_type;       // Type used for raw data on this platform
 #else
-#include <sys/select.h>
+#include <poll.h>
+//#include <sys/select.h>
 #include <sys/types.h>       // For data types
 #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
 #include <netdb.h>           // For getaddrinfo()
@@ -407,9 +408,20 @@ bool CommunicatingSocket::connect(
         waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
     for( ;; )
     {
-        timeVal.tv_sec  = timeoutMs/1000;
-        timeVal.tv_usec = timeoutMs%1000;
-        iSelRet = ::select( sockDesc + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
+        struct pollfd sockPollfd;
+        memset( &sockPollfd, 0, sizeof(sockPollfd) );
+        sockPollfd.fd = sockDesc;
+        sockPollfd.events = POLLOUT;
+#ifdef _GNU_SOURCE
+        sockPollfd.events |= POLLRDHUP;
+#endif
+        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
+
+
+        //timeVal.tv_sec  = timeoutMs/1000;
+        //timeVal.tv_usec = timeoutMs%1000;
+
+        //iSelRet = ::select( sockDesc + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
         if( iSelRet == -1 && errno == EINTR )
         {
             //modifying timeout for time we've already spent in select
@@ -629,16 +641,31 @@ TCPServerSocket::TCPServerSocket(const QString &localAddress,
     setListen(queueLen);
 }
 
-TCPSocket *TCPServerSocket::accept()  {
+TCPSocket *TCPServerSocket::accept()
+{
+    static const int ACCEPT_TIMEOUT_MSEC = 250;
+
+#ifdef _WIN32
     fd_set read_set;
     struct timeval timeout;
     FD_ZERO(&read_set);
     FD_SET(sockDesc, &read_set);
     timeout.tv_sec = 0;
-    timeout.tv_usec = 250 * 1000;
+    timeout.tv_usec = ACCEPT_TIMEOUT_MSEC * 1000;
 
     if (::select(sockDesc + 1, &read_set, NULL, NULL, &timeout) <= 0)
         return 0;
+#else
+    struct pollfd sockPollfd;
+    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    sockPollfd.fd = sockDesc;
+    sockPollfd.events = POLLIN;
+#ifdef _GNU_SOURCE
+    sockPollfd.events |= POLLRDHUP;
+#endif
+    if( ::poll( &sockPollfd, 1, ACCEPT_TIMEOUT_MSEC ) != 1 )
+        return NULL;
+#endif
 
     int newConnSD;
     if ((newConnSD = ::accept(sockDesc, NULL, 0)) < 0)
@@ -890,6 +917,7 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
 
 bool UDPSocket::hasData() const
 {
+#ifdef _WIN32
     fd_set read_set;
     struct timeval timeout;
     FD_ZERO(&read_set);
@@ -898,16 +926,22 @@ bool UDPSocket::hasData() const
     timeout.tv_usec = 0;
     switch( ::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
     {
-    case 0:             // timeout expired
-    {
-        return false;
-    }
-    case SOCKET_ERROR:  // error occured
-    {
-        return false;
-    }
+        case 0:             // timeout expired
+            return false;
+        case SOCKET_ERROR:  // error occured
+            return false;
     }
     return true;
+#else
+    struct pollfd sockPollfd;
+    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    sockPollfd.fd = sockDesc;
+    sockPollfd.events = POLLIN;
+#ifdef _GNU_SOURCE
+    sockPollfd.events |= POLLRDHUP;
+#endif
+    return ::poll( &sockPollfd, 1, 0 ) == 1;
+#endif
 }
 
 bool Socket::setReuseAddrFlag(bool reuseAddr)
