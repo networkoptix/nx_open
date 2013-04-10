@@ -143,7 +143,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                 return Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
             return Qn::FullLayoutPermissions; /* Can structurally modify layout with this flag. */
         } else if(snapshotManager()->isLocal(layout)) {
-            qDebug() << "local layout found" << layout->getName();
             return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
         }
         else {
