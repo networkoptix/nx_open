@@ -213,6 +213,7 @@ void QnTcpListener::run()
                     QThread::msleep(1000);
                     continue;
                 }
+                NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
 
                 d->localPort = d->newPort;
                 d->newPort = 0;
