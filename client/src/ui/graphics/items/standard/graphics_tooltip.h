@@ -11,9 +11,10 @@ public:
      * @brief showText      Show tooltip on the scene.
      * @param text          Text of the tooltip.
      * @param view          Graphics view owning the tooltip.
+     * @param item          Graphics item that provides the tip.
      * @param pos           Position of the mouse cursor in viewport coordinates.
      */
-    static void showText(QString text, QGraphicsView *view, const QPoint &pos);
+    static void showText(QString text, QGraphicsView *view, QGraphicsItem *item, const QPoint &pos);
 
     /**
      * @brief hideText      Hide displayed tool (if any).

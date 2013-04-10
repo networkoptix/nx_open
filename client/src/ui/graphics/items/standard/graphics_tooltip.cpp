@@ -203,10 +203,9 @@ bool GraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *even
     return base_type::sceneEventFilter(watched, event);
 }
 
-void GraphicsTooltip::showText(QString text, QGraphicsView *view, const QPoint &pos) {
+void GraphicsTooltip::showText(QString text, QGraphicsView *view, QGraphicsItem *item, const QPoint &pos) {
     QPointF scenePos = view->mapToScene(pos);
     QWidget *viewport = view->childAt(pos);
-    QGraphicsItem* item = view->itemAt(pos);
 
     QRectF sceneRect(
                 view->mapToScene(viewport->geometry().topLeft()),

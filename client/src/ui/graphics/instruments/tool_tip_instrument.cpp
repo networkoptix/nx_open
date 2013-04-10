@@ -80,6 +80,7 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     GraphicsTooltip::showText(
         itemToolTip(targetItem, targetItem->mapFromScene(scenePos)),
         view,
+        targetItem,
         helpEvent->pos()
     );
 
