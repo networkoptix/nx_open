@@ -165,7 +165,7 @@ public:
         }
     }
 
-    unsigned char* filler( unsigned char value, int size )
+    unsigned char* filler( unsigned char value, size_t size )
     {
         QMutexLocker lk( &m_fillerMutex );
 
@@ -298,7 +298,7 @@ public:
              * Note that this also must be done when contents size changes because
              * in this case even though the border pixels are initialized, they are
              * initialized with old contents, which is probably not what we want. */
-            int fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
+            size_t fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
             uchar *filler = m_renderer->filler(fillValue, fillSize);
 
             if (roundedWidth < textureSize.width()) {
