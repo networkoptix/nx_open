@@ -563,6 +563,8 @@ QnMain::~QnMain()
 
 void QnMain::stopObjects()
 {
+    qWarning() << "QnMain::stopObjects() called";
+
     if (m_restServer)
         m_restServer->pleaseStop();
     if (m_progressiveDownloadingServer)
@@ -1171,6 +1173,8 @@ private:
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
+
+    qWarning() << "stopServer called. signal=" << signal;
 
     if (serviceMainInstance) {
         serviceMainInstance->pleaseStop();

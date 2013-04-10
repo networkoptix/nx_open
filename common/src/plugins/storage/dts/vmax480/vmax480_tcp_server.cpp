@@ -174,6 +174,7 @@ bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
 void QnVMax480ConnectionProcessor::run()
 {
     Q_D(QnVMax480ConnectionProcessor);
+    saveSysThreadID();
 
     char uuidBuffer[UUID_LEN+1];
 

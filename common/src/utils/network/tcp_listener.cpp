@@ -123,6 +123,7 @@ void QnTcpListener::pleaseStop()
     QnLongRunnable::pleaseStop();
 
     Q_D(QnTcpListener);
+    qWarning() << "QnTcpListener::pleaseStop() called";
     d->serverSocket->close();
 }
 

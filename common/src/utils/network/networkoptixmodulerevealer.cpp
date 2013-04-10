@@ -84,6 +84,7 @@ static const unsigned int MULTICAST_GROUP_JOIN_TIMEOUT_MS = 60000;
 
 void NetworkOptixModuleRevealer::run()
 {
+    saveSysThreadID();
     cl_log.log( QString::fromAscii("NetworkOptixModuleRevealer started"), cl_logDEBUG1 );
 
     static const unsigned int REVEAL_PACKET_RESPONSE_LENGTH = 256;
