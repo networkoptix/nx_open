@@ -540,6 +540,7 @@ int main(int argc, char **argv)
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+//    qApp->processEvents(); //TODO: #Elric crashes
     return result;
 }
 

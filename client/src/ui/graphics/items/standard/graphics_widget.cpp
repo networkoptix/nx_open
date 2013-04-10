@@ -638,6 +638,7 @@ bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
 }
 
 bool GraphicsWidgetPrivate::windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    Q_UNUSED(event)
     Q_Q(GraphicsWidget);
 
     if (hasDecoration()) { // TODO: #Elric invalid check

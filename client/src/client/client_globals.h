@@ -177,6 +177,8 @@ namespace Qn {
 
         /* Layout-specific permissions. */
         AddRemoveItemsPermission                = 0x00100000,   /**< Permission to add or remove items from a layout. */
+        EditLayoutSettingsPermission            = 0x00200000,   /**< Permission to setup layout background or set locked flag. */
+        FullLayoutPermissions                   = ReadWriteSavePermission | WriteNamePermission | Qn::RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
         
         /* User-specific permissions. */
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */

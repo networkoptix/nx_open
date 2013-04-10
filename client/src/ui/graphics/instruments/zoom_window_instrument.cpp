@@ -299,6 +299,7 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaRe
 }
 
 void ZoomWindowInstrument::unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget) {
+    Q_UNUSED(zoomTargetWidget)
     ZoomData &data = m_dataByWidget[widget];
 
     delete data.windowWidget;

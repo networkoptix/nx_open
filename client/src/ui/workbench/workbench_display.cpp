@@ -409,20 +409,17 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), Qn::BackLayer);
-    m_gridItem.data()->setAnimationSpeed(2.0);
-    m_gridItem.data()->setAnimationTimeLimit(300);
+    opacityAnimator(m_gridItem.data())->setTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
-    m_gridItem.data()->setAnimationTimer(m_instrumentManager->animationTimer());
 
     m_gridBackgroundItem = new QnGridBackgroundItem();
     m_scene->addItem(gridBackgroundItem());
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
-    gridBackgroundItem()->setAnimationTimer(m_instrumentManager->animationTimer());
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -1206,7 +1203,13 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
-        QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        QSizeF maxWidgetSize;
+        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
+            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric
+        } else {
+            maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        }
+
         QPointF viewportCenter = viewportGeometry.center();
 
         /* Allow expansion no further than the maximal size, but no less than current size. */
@@ -1474,7 +1477,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
-    gridBackgroundItem()->animatedHide();
+    gridBackgroundItem()->setOpacity(0.0);
 
 
     m_inChangeLayout = false;

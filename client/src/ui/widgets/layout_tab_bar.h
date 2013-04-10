@@ -39,9 +39,11 @@ protected:
     virtual void tabRemoved(int index) override;
 
     QString layoutText(QnWorkbenchLayout *layout) const;
+    QIcon layoutIcon(QnWorkbenchLayout *layout) const;
 
     void updateCurrentLayout();
     void updateTabText(QnWorkbenchLayout *layout);
+    void updateTabIcon(QnWorkbenchLayout *layout);
 
 private slots:
     void at_tabCloseRequested(int index);
@@ -49,6 +51,7 @@ private slots:
     void at_tabMoved(int from, int to);
     
     void at_layout_nameChanged();
+    void at_layout_lockedChanged();
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
     
     void at_workbench_layoutsChanged();

@@ -41,7 +41,11 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
 }
 
 QSize QnAppServerFileCache::getMaxImageSize() const {
+#ifdef _WIN32
+    int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
+#else
     int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
+#endif
     return QSize(value, value);
 }
 
@@ -82,7 +86,10 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
         return;
     }
 
-    QFile file(getFullPath(filename));
+    QString filePath = getFullPath(filename);
+    QString folder = QFileInfo(filePath).absolutePath();
+    QDir().mkpath(folder);
+    QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
         emit imageLoaded(filename, false);
         return;

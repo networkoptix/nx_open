@@ -1669,6 +1669,8 @@ void QnWorkbenchUi::at_activityStarted() {
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     //QnResourceWidget *oldWidget = m_widgetByRole[role];
+    bool alreadyZoomed = m_widgetByRole[role] != NULL;
+
     QnResourceWidget *newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 
@@ -1680,7 +1682,8 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
 
     if(role == Qn::ZoomedRole) {
         if(newWidget) {
-            m_unzoomedOpenedPanels = openedPanels();
+            if (!alreadyZoomed)
+                m_unzoomedOpenedPanels = openedPanels();
             setOpenedPanels(openedPanels() & SliderPanel); /* Leave slider open. */
         } else {
             /* User may have opened some panels while zoomed, 
