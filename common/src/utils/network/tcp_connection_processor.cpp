@@ -160,16 +160,25 @@ void QnTCPConnectionProcessor::clearBuffer()
     d->sendBuffer.clear();
 }
 */
-void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
+bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
 {
-    //Q_D(QnTCPConnectionProcessor);
-    sendData(sendBuffer.data(), sendBuffer.size());
+    Q_D(QnTCPConnectionProcessor);
+
+    QMutexLocker lock(&d->sockMutex);
+    return sendData(sendBuffer.data(), sendBuffer.size());
+}
+
+bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    QMutexLocker lock(&d->sockMutex);
+    return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
 bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
-    QMutexLocker lock(&d->sockMutex);
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
         int sended = 0;
@@ -184,13 +193,9 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
             data += sended;
             size -= sended;
         }
-        else
-        {
-            return false;
-        }
     }
 
-    return true;
+    return d->socket->isConnected();
 }
 
 
@@ -244,7 +249,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (d->ssl)
         SSL_write(d->ssl, response.data(), response.size());
     else
-        d->socket->send(response.data(), response.size());
+        sendData(response.data(), response.size());
 }
 
 bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)

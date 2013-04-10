@@ -500,15 +500,19 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
         int errCode = getSystemErrCode();
-        if (/*errCode != ERR_TIMEOUT &&*/ errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
             mConnected = false;
     }
+    else if (sended == 0)
+        mConnected = false;
     return sended;
 #else
     int sended = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
         m_writeTimeoutMS );
     if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+        mConnected = false;
+    else if (sended == 0)
         mConnected = false;
     return sended;
 #endif

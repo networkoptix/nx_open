@@ -26,8 +26,6 @@ public:
     int getSocketTimeout();
 
     bool sendChunk(const QnByteArray& chunk);
-    bool sendData(const char* data, int size);
-    inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
 
     void execute(QMutex& mutex);
     virtual void pleaseStop();
@@ -35,6 +33,9 @@ public:
     //!Returns SSL*. including ssl.h here causes numerous compilation problems
     void* ssl() const;
     TCPSocket* socket() const;
+
+    bool sendBuffer(const QnByteArray& sendBuffer);
+    bool sendBuffer(const QByteArray& sendBuffer);
 
 protected:
     virtual void parseRequest();
@@ -44,7 +45,6 @@ protected:
     //QnByteArray& getSendBuffer();
     //void bufferData(const char* data, int size);
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
-    void sendBuffer(const QnByteArray& sendBuffer);
     //void clearBuffer();
 
     void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), bool displayDebug = false);
@@ -55,7 +55,9 @@ protected:
     QUrl getDecodedUrl() const;
 
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
-
+private:
+    bool sendData(const char* data, int size);
+    inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 
