@@ -1276,17 +1276,9 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
     return msgLen;
 }
 
-static int processorCount = 0;
-static QMutex mutex;
-
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
-
-    {
-        QMutexLocker lock(&mutex);
-        qWarning() << "QnRtspConnectionProcessor << started. count =" << ++processorCount;
-    }
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
@@ -1340,20 +1332,10 @@ void QnRtspConnectionProcessor::run()
         }
     }
 
-    {
-        QMutexLocker lock(&mutex);
-        qWarning() << "QnRtspConnectionProcessor << stopped. count =" << --processorCount;
-    }
-
     t.restart();
 
     d->deleteDP();
     d->socket->close();
-
-    {
-        QMutexLocker lock(&mutex);
-        qWarning() << "QnRtspConnectionProcessor << stopped. after close socket. time=" << t.elapsed() << "count =" << processorCount;
-    }
 
     d->trackInfo.clear();
     //deleteLater(); // does not works for this thread
