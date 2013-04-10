@@ -4,6 +4,8 @@
 #include "tcp_connection_processor.h"
 #include "ssl.h"
 
+#include <utils/common/log.h>
+
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
 class QnTcpListenerPrivate
@@ -178,11 +180,11 @@ bool QnTcpListener::enableSSLMode()
 
 void QnTcpListener::run()
 {
+    Q_D(QnTcpListener);
+
     NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1 );
     try
     {
-        Q_D(QnTcpListener);
-
         if (!d->serverSocket)
             m_needStop = true;
         while (!needToStop())
@@ -222,6 +224,7 @@ void QnTcpListener::run()
             {
                 NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
                     arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                QThread::msleep(1000);
             }
             removeDisconnectedConnections();
         }
