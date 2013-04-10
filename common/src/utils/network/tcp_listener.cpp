@@ -6,6 +6,10 @@
 
 #include <utils/common/log.h>
 
+#ifndef _WIN32
+#include <sys/types.h>
+#endif
+
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
 class QnTcpListenerPrivate
@@ -182,7 +186,11 @@ void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
 
-    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1 );
+#ifdef _WIN32
+    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
+#else
+    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2, tid %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(gettid()), cl_logWARNING );
+#endif
     try
     {
         if (!d->serverSocket)
@@ -195,6 +203,14 @@ void QnTcpListener::run()
                 removeAllConnections();
                 delete d->serverSocket;
                 d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
+                if (SystemError::getLastOSErrorCode() != 0 )
+                {
+                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+                        arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    QThread::msleep(1000);
+                    continue;
+                }
+
                 d->localPort = d->newPort;
                 d->newPort = 0;
             }
@@ -222,7 +238,7 @@ void QnTcpListener::run()
             }
             else
             {
-                if (SystemError::getLastOSErrorCode() != 0)
+                if (SystemError::getLastOSErrorCode() != 0 )
                 {
                     NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
                         arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
@@ -239,7 +255,7 @@ void QnTcpListener::run()
         NX_LOG( QString::fromLatin1("Exception in TCPListener (%1:%2). %3").
             arg(d->serverAddress.toString()).arg(d->localPort).arg(QString::fromLatin1(e.what())), cl_logWARNING );
     }
-    NX_LOG( QString::fromLatin1("Exiting QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1 );
+    NX_LOG( QString::fromLatin1("Exiting QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
 }
 
 void* QnTcpListener::getOpenSSLContext()
