@@ -142,6 +142,7 @@ void QnTcpListener::removeAllConnections()
     for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
         QnLongRunnable* processor = *itr;
+        NX_LOG( QString::fromLatin1("TCPListener. Stopping processor (sysThreadID %1)").arg(processor->sysThreadID()), cl_logWARNING );
         delete processor;
     }
     d->connections.clear();
@@ -203,6 +204,7 @@ void QnTcpListener::run()
             if (d->newPort)
             {
                 QMutexLocker lock(&d->portMutex);
+                NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
                 d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
@@ -251,6 +253,7 @@ void QnTcpListener::run()
             }
             removeDisconnectedConnections();
         }
+        NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Removing all connections before stop").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
         removeAllConnections();
     }
     catch( const std::exception& e )
