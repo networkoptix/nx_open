@@ -22,7 +22,7 @@ static char* ANALOG_CAMERAS[][2] =
 static char* IGNORE_VENDORS[][2] =
 {
     {"*networkcamera*", "dcs-*"}, // DLINK
-    {"*spartan-6*", "*"}          // ArecontVision
+    {"*", "*spartan-6*"}          // ArecontVision
 };
 
 
