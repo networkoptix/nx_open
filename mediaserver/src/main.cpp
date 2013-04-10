@@ -1174,6 +1174,8 @@ void stopServer(int signal)
 {
     Q_UNUSED(signal)
 
+    qWarning() << "stopServer called. signal=" << signal;
+
     if (serviceMainInstance) {
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();

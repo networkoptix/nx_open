@@ -159,6 +159,7 @@ QnMServerResourceSearcher::QnMServerResourceSearcher():
 
 void QnMServerResourceSearcher::run()
 {
+    saveSysThreadID();
     updateSocketList();
 
     while (!m_needStop)

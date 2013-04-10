@@ -40,6 +40,7 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(TCPSocket* socket, QnTc
 void QnUniversalRequestProcessor::run()
 {
     Q_D(QnUniversalRequestProcessor);
+    saveSysThreadID();
     if (readRequest()) 
     {
         QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');

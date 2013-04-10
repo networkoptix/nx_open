@@ -93,6 +93,7 @@ static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
 
 void NetworkOptixModuleFinder::run()
 {
+    saveSysThreadID();
     cl_log.log( QString::fromAscii("NetworkOptixModuleFinder started"), cl_logDEBUG1 );
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
