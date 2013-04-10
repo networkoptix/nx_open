@@ -222,9 +222,13 @@ void QnTcpListener::run()
             }
             else
             {
-                NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-                    arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
-                QThread::msleep(1000);
+                if (SystemError::getLastOSErrorCode() != 0)
+                {
+                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+                        arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    QThread::msleep(1000);
+                    d->newPort = d->localPort; // reopen tcp socket
+                }
             }
             removeDisconnectedConnections();
         }
