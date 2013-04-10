@@ -40,7 +40,7 @@ private:
     QnTimePeriod m_archiveRange;
     QTime m_waitTimer;
     VMaxStreamFetcher* m_streamFetcher;
-    QnResourcePtr m_res;
+    QnResource* m_res;
 };
 
 #endif // __VMAX480_CHUNK_READER_H__

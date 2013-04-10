@@ -4,6 +4,8 @@
 #include "tcp_connection_processor.h"
 #include "ssl.h"
 
+#include <utils/common/log.h>
+
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
 class QnTcpListenerPrivate
@@ -13,6 +15,7 @@ public:
         serverSocket = 0;
         newPort = 0;
         method = 0;
+        localPort = 0;
         ctx = 0;
     }
     TCPServerSocket* serverSocket;
@@ -22,6 +25,7 @@ public:
     QMutex connectionMtx;
     int newPort;
     QHostAddress serverAddress;
+    int localPort;
     const SSL_METHOD *method;
     SSL_CTX *ctx;
     int maxConnections;
@@ -58,6 +62,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     Q_D(QnTcpListener);
     try {
         d->serverAddress = address;
+        d->localPort = port;
         d->serverSocket = new TCPServerSocket(address.toString(), port, 5 ,true);
         d->maxConnections = maxConnections;
         d->ddosWarned = false;
@@ -92,7 +97,6 @@ void QnTcpListener::removeDisconnectedConnections()
         else 
             ++itr;
     }
-    //qWarning() << "after erase connections size=" << d->connections.size();
 }
 
 void QnTcpListener::removeOwnership(QnLongRunnable* processor)
@@ -177,43 +181,65 @@ bool QnTcpListener::enableSSLMode()
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
-    if (!d->serverSocket)
-        m_needStop = true;
-    while (!needToStop())
-    {
-        if (d->newPort)
-        {
-            QMutexLocker lock(&d->portMutex);
-            removeAllConnections();
-            delete d->serverSocket;
-            d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
-            d->newPort = 0;
-        }
 
-        TCPSocket* clientSocket = d->serverSocket->accept();
-        if (clientSocket) {
-            if (d->connections.size() > d->maxConnections)
+    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1 );
+    try
+    {
+        if (!d->serverSocket)
+            m_needStop = true;
+        while (!needToStop())
+        {
+            if (d->newPort)
             {
-                if (!d->ddosWarned) {
-                    qWarning() << "Too many TCP connections. Possible ddos attack! Ignore connection";
-                    d->ddosWarned = true;
-                }
-                delete clientSocket;
-                continue;
+                QMutexLocker lock(&d->portMutex);
+                removeAllConnections();
+                delete d->serverSocket;
+                d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
+                d->localPort = d->newPort;
+                d->newPort = 0;
             }
-            d->ddosWarned = false;
-            qDebug() << "New client connection from " << clientSocket->getPeerAddress() << ':' << clientSocket->getForeignPort();
-            QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
-            clientSocket->setReadTimeOut(processor->getSocketTimeout());
-            clientSocket->setWriteTimeOut(processor->getSocketTimeout());
-            
-            QMutexLocker lock(&d->connectionMtx);
-            d->connections << processor;
-            processor->start();
+
+            TCPSocket* clientSocket = d->serverSocket->accept();
+            if (clientSocket) {
+                if (d->connections.size() > d->maxConnections)
+                {
+                    if (!d->ddosWarned) {
+                        qWarning() << "Too many TCP connections. Possible ddos attack! Ignore connection";
+                        d->ddosWarned = true;
+                    }
+                    delete clientSocket;
+                    continue;
+                }
+                d->ddosWarned = false;
+                qDebug() << "New client connection from " << clientSocket->getPeerAddress() << ':' << clientSocket->getForeignPort();
+                QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
+                clientSocket->setReadTimeOut(processor->getSocketTimeout());
+                clientSocket->setWriteTimeOut(processor->getSocketTimeout());
+                
+                QMutexLocker lock(&d->connectionMtx);
+                d->connections << processor;
+                processor->start();
+            }
+            else
+            {
+                if (SystemError::getLastOSErrorCode() != 0)
+                {
+                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+                        arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    QThread::msleep(1000);
+                    d->newPort = d->localPort; // reopen tcp socket
+                }
+            }
+            removeDisconnectedConnections();
         }
-        removeDisconnectedConnections();
+        removeAllConnections();
     }
-    removeAllConnections();
+    catch( const std::exception& e )
+    {
+        NX_LOG( QString::fromLatin1("Exception in TCPListener (%1:%2). %3").
+            arg(d->serverAddress.toString()).arg(d->localPort).arg(QString::fromLatin1(e.what())), cl_logWARNING );
+    }
+    NX_LOG( QString::fromLatin1("Exiting QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1 );
 }
 
 void* QnTcpListener::getOpenSSLContext()

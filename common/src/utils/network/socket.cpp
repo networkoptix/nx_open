@@ -524,12 +524,16 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
         if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
     }
+    else if (rtn == 0)
+        mConnected = false;
     return rtn;
 #else
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
         m_readTimeoutMS );
     if( bytesRead == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
+        mConnected = false;
+    else if (bytesRead == 0)
         mConnected = false;
     return bytesRead;
 #endif
