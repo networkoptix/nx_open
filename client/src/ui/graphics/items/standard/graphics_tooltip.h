@@ -3,16 +3,25 @@
 
 #include <QtCore/QString>
 #include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsView>
 
 class GraphicsTooltip {
 public:
-    // TODO: #GDM add doxydocs here --- what are the coordinates passed, in which coordinate system (scene, viewport, item?).
-    // 
-    // Passing viewport as QRectF is not a good idea as scene<->view transformation is, generally speaking, an unrestricted homography.
-    // I think we should just pass the graphics view, defaulted to NULL.
+    /**
+     * @brief showText      Show tooltip on the scene.
+     * @param text          Text of the tooltip.
+     * @param view          Graphics view owning the tooltip.
+     * @param pos           Position of the mouse cursor in viewport coordinates.
+     */
+    static void showText(QString text, QGraphicsView *view, const QPoint &pos);
 
-    static void showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport);
+    /**
+     * @brief hideText      Hide displayed tool (if any).
+     */
     static inline void hideText() { showText(QString(), NULL, QPointF(), QRectF()); }
+private:
+    static void showText(QString text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect);
 };
+
 
 #endif // QN_GRAPHICS_TOOLTIP_H

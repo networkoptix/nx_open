@@ -72,17 +72,15 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
             break;
         }
     }
-
     if(!targetItem) {
         helpEvent->ignore();
         return true; /* Eat it anyway. */
     }
 
     GraphicsTooltip::showText(
-        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)), 
-        targetItem, 
-        scenePos, 
-        QRectF(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()))
+        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)),
+        view,
+        helpEvent->pos()
     );
 
     helpEvent->accept();
