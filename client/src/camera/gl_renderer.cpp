@@ -100,6 +100,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     /* Prepare shaders. */
     m_yuy2ToRgbShaderProgram.reset( new QnYuy2ToRgbShaderProgram(context) );
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
+    m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
     //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxTextureSizeVal );
@@ -114,6 +115,7 @@ void QnGLRenderer::beforeDestroy()
 {
     m_yuy2ToRgbShaderProgram.reset();
     m_yv12ToRgbShaderProgram.reset();
+    m_yv12ToRgbaShaderProgram.reset();
     m_nv12ToRgbShaderProgram.reset();
 }
 
@@ -158,9 +160,16 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 break;
 
             case PIX_FMT_YUVA420P:
-            {
-                int x = 0;
-            }
+                Q_ASSERT( isYV12ToRgbaShaderUsed() );
+        	    drawYVA12VideoTexture(
+                    picLock,
+                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
+                    picLock->glTextures()[0],
+                    picLock->glTextures()[1],
+                    picLock->glTextures()[2],
+                    picLock->glTextures()[3],
+                    v_array );
+                break;
 
             case PIX_FMT_YUV420P:
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
@@ -286,6 +295,60 @@ void QnGLRenderer::drawYV12VideoTexture(
     m_yv12ToRgbShaderProgram->release();
 }
 
+#ifndef GL_TEXTURE3
+#   define GL_TEXTURE3                          0x84C3
+#endif
+
+void QnGLRenderer::drawYVA12VideoTexture(
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
+	const QRectF& tex0Coords,
+	unsigned int tex0ID,
+	unsigned int tex1ID,
+	unsigned int tex2ID,
+	unsigned int tex3ID,
+	const float* v_array )
+{
+    float tx_array[8] = {
+        (float)tex0Coords.x(), (float)tex0Coords.y(),
+        (float)tex0Coords.right(), (float)tex0Coords.top(),
+        (float)tex0Coords.right(), (float)tex0Coords.bottom(),
+        (float)tex0Coords.x(), (float)tex0Coords.bottom()
+    };
+
+    NX_LOG( QString::fromLatin1("Rendering YUV420 textures %1, %2, %3").
+        arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
+
+    glEnable(GL_TEXTURE_2D);
+    DEBUG_CODE(glCheckError("glEnable"));
+
+	m_yv12ToRgbaShaderProgram->bind();
+    m_yv12ToRgbaShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+
+	glActiveTexture(GL_TEXTURE3);
+	DEBUG_CODE(glCheckError("glActiveTexture"));
+	glBindTexture(GL_TEXTURE_2D, tex3ID);
+	DEBUG_CODE(glCheckError("glBindTexture"));
+
+	glActiveTexture(GL_TEXTURE2);
+	DEBUG_CODE(glCheckError("glActiveTexture"));
+	glBindTexture(GL_TEXTURE_2D, tex2ID);
+	DEBUG_CODE(glCheckError("glBindTexture"));
+
+	glActiveTexture(GL_TEXTURE1);
+	DEBUG_CODE(glCheckError("glActiveTexture"));
+	glBindTexture(GL_TEXTURE_2D, tex1ID);
+	DEBUG_CODE(glCheckError("glBindTexture"));
+
+	glActiveTexture(GL_TEXTURE0);
+	DEBUG_CODE(glCheckError("glActiveTexture"));
+	glBindTexture(GL_TEXTURE_2D, tex0ID);
+	DEBUG_CODE(glCheckError("glBindTexture"));
+
+    drawBindedTexture( v_array, tx_array );
+
+    m_yv12ToRgbaShaderProgram->release();
+}
+
 void QnGLRenderer::drawNV12VideoTexture(
 	const QRectF& tex0Coords,
 	unsigned int yPlaneTexID,
@@ -373,6 +436,16 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_yv12ToRgbShaderProgram.get()
         && m_yv12ToRgbShaderProgram->isValid();
+}
+
+bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
+{
+    return (features() & QnGlFunctions::ArbPrograms)
+        && (features() & QnGlFunctions::OpenGL1_3)
+        && !(features() & QnGlFunctions::ShadersBroken)
+        && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_yv12ToRgbaShaderProgram.get()
+        && m_yv12ToRgbaShaderProgram->isValid();
 }
 
 bool QnGLRenderer::isNV12ToRgbShaderUsed() const

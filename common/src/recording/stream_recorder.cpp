@@ -724,7 +724,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 #else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
     QnSignHelper signHelper;
-    signHelper.setLogo(m_logo);
+    signHelper.setLogo(QPixmap::fromImage(m_logo));
     signHelper.setSign(getSignature());
     QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_lastIFrame);
 
@@ -754,7 +754,7 @@ void QnStreamRecorder::setRole(Role role)
     m_forceDefaultCtx = m_role == Role_ServerRecording || m_role == Role_FileExportWithEmptyContext;
 }
 
-void QnStreamRecorder::setSignLogo(QPixmap logo)
+void QnStreamRecorder::setSignLogo(const QImage& logo)
 {
     m_logo = logo;
 }

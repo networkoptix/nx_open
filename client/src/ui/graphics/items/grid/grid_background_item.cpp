@@ -9,10 +9,10 @@
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
-//#define NATIVE_PAINT_BACKGROUND
+#define NATIVE_PAINT_BACKGROUND
 #ifdef NATIVE_PAINT_BACKGROUND
 //!use YUV 420 with alpha plane
-//#define USE_YUVA420
+#define USE_YUVA420
 #endif
 #endif
 
@@ -232,7 +232,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     m_imgUploader->setOpacity( painter->opacity() );
     m_renderer->paint(
-        QRect(0, 0, m_imgAsFrame->width, m_imgAsFrame->height),
+        QRect(0, 0, 1, 1),
         m_rect );
     painter->endNativePainting();
 #else
