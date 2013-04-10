@@ -157,6 +157,11 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
            		    v_array );
                 break;
 
+            case PIX_FMT_YUVA420P:
+            {
+                int x = 0;
+            }
+
             case PIX_FMT_YUV420P:
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
         	    drawYV12VideoTexture(

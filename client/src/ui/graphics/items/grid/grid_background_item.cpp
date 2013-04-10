@@ -9,7 +9,11 @@
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
-#define NATIVE_PAINT_BACKGROUND
+//#define NATIVE_PAINT_BACKGROUND
+#ifdef NATIVE_PAINT_BACKGROUND
+//!use YUV 420 with alpha plane
+//#define USE_YUVA420
+#endif
 #endif
 
 
@@ -157,6 +161,22 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to YUV format
     m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
+#ifdef USE_YUVA420
+    m_imgAsFrame->reallocate( image.width(), image.height(), PIX_FMT_YUVA420P );
+    bgra_to_yva12_sse2_intr(
+        image.bits(),
+        image.bytesPerLine(),
+        m_imgAsFrame->data[0],
+        m_imgAsFrame->data[1],
+        m_imgAsFrame->data[2],
+        m_imgAsFrame->data[3],
+        m_imgAsFrame->linesize[0],
+        m_imgAsFrame->linesize[1],
+        m_imgAsFrame->linesize[3],
+        image.width(),
+        image.height(),
+        false );
+#else
     m_imgAsFrame->reallocate( image.width(), image.height(), PIX_FMT_YUV420P );
     bgra_to_yv12_sse2_intr(
         image.bits(),
@@ -169,6 +189,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
         image.width(),
         image.height(),
         false );
+#endif
 
     //image has to be uploaded before next paint
     m_imgUploaded = false;
@@ -190,6 +211,8 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     {
         m_imgUploader.reset( new DecodedPictureToOpenGLUploader(QGLContext::currentContext()) );
         m_renderer.reset( new QnGLRenderer(QGLContext::currentContext(), *m_imgUploader) );
+        m_imgUploader->setYV12ToRgbShaderUsed(m_renderer->isYV12ToRgbShaderUsed());
+        m_imgUploader->setNV12ToRgbShaderUsed(m_renderer->isNV12ToRgbShaderUsed());
     }
 
     if( !m_imgUploaded )
