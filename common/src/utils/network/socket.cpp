@@ -381,15 +381,16 @@ bool CommunicatingSocket::connect(
             return true;        //async connect started
     }
 
+    int iSelRet = 0;
+
+#ifdef _WIN32
     timeval timeVal;
     fd_set wrtFDS;
-    int iSelRet = 0;
 
     /* monitor for incomming connections */
     FD_ZERO(&wrtFDS);
     FD_SET(sockDesc, &wrtFDS);
 
-#ifdef _WIN32
     /* set timeout values */
     timeVal.tv_sec  = timeoutMs/1000;
     timeVal.tv_usec = timeoutMs%1000;
@@ -443,6 +444,9 @@ bool CommunicatingSocket::connect(
             timeoutMs -= millisAlreadySlept;
             continue;
         }
+
+        if( (sockPollfd.revents & POLLOUT) == 0 )
+            iSelRet = 0;
         break;
     }
 #endif
@@ -663,8 +667,11 @@ TCPSocket *TCPServerSocket::accept()
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
 #endif
-    if( ::poll( &sockPollfd, 1, ACCEPT_TIMEOUT_MSEC ) != 1 )
+    if( ::poll( &sockPollfd, 1, ACCEPT_TIMEOUT_MSEC ) != 1 ||
+        (sockPollfd.revents & POLLIN) == 0 )
+    {
         return NULL;
+    }
 #endif
 
     int newConnSD;
