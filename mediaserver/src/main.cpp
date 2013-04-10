@@ -563,6 +563,8 @@ QnMain::~QnMain()
 
 void QnMain::stopObjects()
 {
+    qWarning() << "QnMain::stopObjects() called";
+
     if (m_restServer)
         m_restServer->pleaseStop();
     if (m_progressiveDownloadingServer)
