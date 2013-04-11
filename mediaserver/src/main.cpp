@@ -1062,8 +1062,9 @@ void QnMain::run()
                                                    QnBusiness::MServerIssueStarted);
 
     at_timer();
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    m_timer.start(60 * 1000);
+    QTimer timer;
+    connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    timer.start(60 * 1000);
 
 
     exec();

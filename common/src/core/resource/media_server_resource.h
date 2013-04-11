@@ -64,8 +64,8 @@ public:
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
-    QString getProxyHost() const;
-    int getProxyPort() const;
+    QString getProxyHost();
+    int getProxyPort();
 
     QString getVersion() const;
     void setVersion(const QString& version);
