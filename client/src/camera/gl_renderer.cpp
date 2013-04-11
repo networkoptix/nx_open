@@ -153,15 +153,15 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         switch( picLock->colorFormat() )
         {
             case PIX_FMT_RGBA:
-        	    drawVideoTextureDirectly(
+                drawVideoTextureDirectly(
                     QnGeometry::transformed(picLock->textureRect(), sourceRect),
-           		    picLock->glTextures()[0],
-           		    v_array );
+                    picLock->glTextures()[0],
+                    v_array );
                 break;
 
             case PIX_FMT_YUVA420P:
                 Q_ASSERT( isYV12ToRgbaShaderUsed() );
-        	    drawYVA12VideoTexture(
+                drawYVA12VideoTexture(
                     picLock,
                     QnGeometry::transformed(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
@@ -173,7 +173,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
             case PIX_FMT_YUV420P:
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
-        	    drawYV12VideoTexture(
+                drawYV12VideoTexture(
                     picLock,
                     QnGeometry::transformed(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
@@ -184,7 +184,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
             case PIX_FMT_NV12:
                 Q_ASSERT( isNV12ToRgbShaderUsed() );
-        	    drawNV12VideoTexture(
+                drawNV12VideoTexture(
                     QnGeometry::transformed(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
@@ -220,9 +220,9 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 }
 
 void QnGLRenderer::drawVideoTextureDirectly(
-	const QRectF& /*tex0Coords*/,
-	unsigned int tex0ID,
-	const float* v_array )
+    const QRectF& /*tex0Coords*/,
+    unsigned int tex0ID,
+    const float* v_array )
 {
     cl_log.log( QString::fromAscii("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
 
@@ -253,11 +253,11 @@ void QnGLRenderer::drawVideoTextureDirectly(
 
 void QnGLRenderer::drawYV12VideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
-	const QRectF& tex0Coords,
-	unsigned int tex0ID,
-	unsigned int tex1ID,
-	unsigned int tex2ID,
-	const float* v_array )
+    const QRectF& tex0Coords,
+    unsigned int tex0ID,
+    unsigned int tex1ID,
+    unsigned int tex2ID,
+    const float* v_array )
 {
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
@@ -272,23 +272,23 @@ void QnGLRenderer::drawYV12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     DEBUG_CODE(glCheckError("glEnable"));
 
-	m_yv12ToRgbShaderProgram->bind();
+    m_yv12ToRgbShaderProgram->bind();
     m_yv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
 
-	glActiveTexture(GL_TEXTURE2);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex2ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE2);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex2ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
-	glActiveTexture(GL_TEXTURE1);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex1ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE1);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex1ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
-	glActiveTexture(GL_TEXTURE0);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex0ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE0);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex0ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
@@ -301,12 +301,12 @@ void QnGLRenderer::drawYV12VideoTexture(
 
 void QnGLRenderer::drawYVA12VideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
-	const QRectF& tex0Coords,
-	unsigned int tex0ID,
-	unsigned int tex1ID,
-	unsigned int tex2ID,
-	unsigned int tex3ID,
-	const float* v_array )
+    const QRectF& tex0Coords,
+    unsigned int tex0ID,
+    unsigned int tex1ID,
+    unsigned int tex2ID,
+    unsigned int tex3ID,
+    const float* v_array )
 {
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
@@ -321,28 +321,28 @@ void QnGLRenderer::drawYVA12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     DEBUG_CODE(glCheckError("glEnable"));
 
-	m_yv12ToRgbaShaderProgram->bind();
+    m_yv12ToRgbaShaderProgram->bind();
     m_yv12ToRgbaShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
 
-	glActiveTexture(GL_TEXTURE3);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex3ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE3);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex3ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
-	glActiveTexture(GL_TEXTURE2);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex2ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE2);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex2ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
-	glActiveTexture(GL_TEXTURE1);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex1ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE1);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex1ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
-	glActiveTexture(GL_TEXTURE0);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, tex0ID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE0);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, tex0ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
@@ -350,10 +350,10 @@ void QnGLRenderer::drawYVA12VideoTexture(
 }
 
 void QnGLRenderer::drawNV12VideoTexture(
-	const QRectF& tex0Coords,
-	unsigned int yPlaneTexID,
-	unsigned int uvPlaneTexID,
-	const float* v_array )
+    const QRectF& tex0Coords,
+    unsigned int yPlaneTexID,
+    unsigned int uvPlaneTexID,
+    const float* v_array )
 {
     float tx_array[8] = {
         0.0f, 0.0f,
@@ -365,22 +365,22 @@ void QnGLRenderer::drawNV12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     DEBUG_CODE(glCheckError("glEnable"));
 
-	m_nv12ToRgbShaderProgram->bind();
-	//m_nv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+    m_nv12ToRgbShaderProgram->bind();
+    //m_nv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
     m_nv12ToRgbShaderProgram->setYTexture( yPlaneTexID );
     m_nv12ToRgbShaderProgram->setUVTexture( uvPlaneTexID );
     m_nv12ToRgbShaderProgram->setOpacity( m_decodedPictureProvider.opacity() );
     m_nv12ToRgbShaderProgram->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
-	glActiveTexture(GL_TEXTURE1);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE1);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
-	glActiveTexture(GL_TEXTURE0);
-	DEBUG_CODE(glCheckError("glActiveTexture"));
-	glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
-	DEBUG_CODE(glCheckError("glBindTexture"));
+    glActiveTexture(GL_TEXTURE0);
+    DEBUG_CODE(glCheckError("glActiveTexture"));
+    glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
 
     drawBindedTexture( v_array, tx_array );
 
