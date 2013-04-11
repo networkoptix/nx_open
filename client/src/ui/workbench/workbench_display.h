@@ -170,7 +170,10 @@ public:
      */
     QnGridBackgroundItem *gridBackgroundItem() const;
 
-
+    /**
+     * \returns                         Item for graphics messages.
+     */
+    QnGraphicsMessageBoxItem *graphicsMessageBoxItem() const;
 
     /**
      * \param item                      Item to get widget for.

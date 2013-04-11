@@ -110,7 +110,7 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
     restartExpireTimer();
 
     if (newText.length() > 0)
-        QnGraphicsMessageBox::information(newItem, newText);
+        QnGraphicsMessageBox::information(newText);
 }
 
 void GraphicsTooltipLabel::hideTip()
