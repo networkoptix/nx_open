@@ -445,21 +445,6 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
-  /*  if (watched == m_overlayLabel) {
-        if (event->type() != QEvent::KeyPress)
-            return base_type::eventFilter(watched, event);
-        //TODO: #GDM duplicating code with main_window.cpp
-        if (!action(Qn::ToggleTourModeAction)->isChecked())
-            return base_type::eventFilter(watched, event);
-
-        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
-        if (pKeyEvent->key() == Qt::Key_Alt || pKeyEvent->key() == Qt::Key_Control)
-            return base_type::eventFilter(watched, event);
-
-        menu()->trigger(Qn::ToggleTourModeAction);
-        return base_type::eventFilter(watched, event);
-    }
-    else*/
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should clear selection. */
@@ -633,6 +618,8 @@ void QnWorkbenchController::stopRecording()
 
 void QnWorkbenchController::at_recordingAnimation_finished()
 {
+    if (m_recordingCountdownLabel)
+        m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
         if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
@@ -644,7 +631,7 @@ void QnWorkbenchController::at_recordingAnimation_finished()
 
 void QnWorkbenchController::at_recordingAnimation_tick(int tick)
 {
-    if (m_recordingCountdownLabel)
+    if (!m_recordingCountdownLabel)
         return;
 
     if (m_countdownCanceled) {
