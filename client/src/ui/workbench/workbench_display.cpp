@@ -48,6 +48,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -452,7 +453,6 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties

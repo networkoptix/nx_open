@@ -43,10 +43,11 @@ class QnLayoutTabBar;
 class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
+class QnGraphicsMessageBoxItem;
 
 class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
-    Q_OBJECT;
-    Q_ENUMS(Flags Flag);
+    Q_OBJECT
+    Q_ENUMS(Flags Flag)
 
     typedef QObject base_type;
 
@@ -59,9 +60,9 @@ public:
         HideWhenNormal = 0x2, 
 
         /** Whether controls affect viewport margins. */
-        AdjustMargins = 0x4,
+        AdjustMargins = 0x4
     };
-    Q_DECLARE_FLAGS(Flags, Flag);
+    Q_DECLARE_FLAGS(Flags, Flag)
 
     enum Panel {
         NoPanel = 0x0,
@@ -70,7 +71,7 @@ public:
         SliderPanel = 0x4,
         HelpPanel = 0x8
     };
-    Q_DECLARE_FLAGS(Panels, Panel);
+    Q_DECLARE_FLAGS(Panels, Panel)
 
     QnWorkbenchUi(QObject *parent = NULL);
 
@@ -211,6 +212,7 @@ private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels);
 
+    void initGraphicsMessageBox();
 private slots:
     void updateHelpContext();
     
@@ -468,7 +470,7 @@ private:
     QnImageButtonWidget *m_popupShowButton;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Panels);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Panels)
 
 #endif // QN_WORKBENCH_UI_H

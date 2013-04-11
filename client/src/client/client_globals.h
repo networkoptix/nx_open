@@ -126,7 +126,9 @@ namespace Qn {
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer                     /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        MessageBoxLayer,            /**< Layer for graphics text messages. */
+        LayerCount
     };
 
 

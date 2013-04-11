@@ -67,9 +67,10 @@
 #include <ui/graphics/instruments/ptz_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
 
+#include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/help/help_handler.h>
 
@@ -176,7 +177,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_screenRecorder(0)
+    m_screenRecorder(NULL),
+    m_countdownCanceled(false),
+    m_recordingCountdownLabel(NULL),
+    m_tourModeHintLabel(NULL)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -426,10 +430,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     }
 
     connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),                                                  this,                           SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
-
-    m_countdownCanceled = false;
-    m_overlayLabel = 0;
-    m_overlayLabelAnimation = 0;
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -445,21 +445,6 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == m_overlayLabel) {
-        if (event->type() != QEvent::KeyPress)
-            return base_type::eventFilter(watched, event);
-        //TODO: #GDM duplicating code with main_window.cpp
-        if (!action(Qn::ToggleTourModeAction)->isChecked())
-            return base_type::eventFilter(watched, event);
-
-        QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(event);
-        if (pKeyEvent->key() == Qt::Key_Alt || pKeyEvent->key() == Qt::Key_Control)
-            return base_type::eventFilter(watched, event);
-
-        menu()->trigger(Qn::ToggleTourModeAction);
-        return base_type::eventFilter(watched, event);
-    }
-
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should clear selection. */
@@ -586,38 +571,6 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     menu->exec(pos);
 }
 
-void  QnWorkbenchController::showOverlayLabel(const QString &text, int width) {
-    QWidget *view = display()->view();
-
-    if (m_overlayLabel == 0) {
-        m_overlayLabel = new QLabel(view);
-        m_overlayLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-        m_overlayLabel->setAlignment(Qt::AlignCenter);
-        m_overlayLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
-        m_overlayLabel->setFocusPolicy(Qt::NoFocus);
-        m_overlayLabel->installEventFilter(this);
-    }
-
-    m_overlayLabel->resize(width, 165);
-    m_overlayLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_overlayLabel->size()) / 2);
-    m_overlayLabel->setMask(createRoundRegion(18, 18, m_overlayLabel->rect()));
-    m_overlayLabel->setText(text);
-    m_overlayLabel->show();
-}
-
-void  QnWorkbenchController::initOverlayLabelAnimation() {
-    if (m_overlayLabelAnimation == 0) {
-        m_overlayLabelAnimation = new QPropertyAnimation(m_overlayLabel, "windowOpacity", m_overlayLabel);
-        m_overlayLabelAnimation->setEasingCurve(QEasingCurve::OutCubic);
-        m_overlayLabelAnimation->setDuration(3000);
-        m_overlayLabelAnimation->setStartValue(1.0);
-        m_overlayLabelAnimation->setEndValue(0.6);
-
-    }
-    m_overlayLabelAnimation->disconnect();
-}
-
-
 // -------------------------------------------------------------------------- //
 // Screen recording
 // -------------------------------------------------------------------------- //
@@ -628,7 +581,7 @@ void QnWorkbenchController::startRecording()
         return;
     }
 
-    if(m_screenRecorder->isRecording() || (m_overlayLabelAnimation && m_overlayLabelAnimation->state() == QAbstractAnimation::Running)) {
+    if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
@@ -643,13 +596,9 @@ void QnWorkbenchController::startRecording()
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
     m_countdownCanceled = false;
-
-    showOverlayLabel(tr("Recording in..."), 220);
-    initOverlayLabelAnimation();
-
-    connect(m_overlayLabelAnimation, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
-    connect(m_overlayLabelAnimation, SIGNAL(valueChanged(QVariant)), this, SLOT(at_recordingAnimation_valueChanged(QVariant)));
-    m_overlayLabelAnimation->start();
+    m_recordingCountdownLabel = QnGraphicsMessageBox::information(tr("Recording in..."));
+    connect(m_recordingCountdownLabel, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
+    connect(m_recordingCountdownLabel, SIGNAL(tick(int)), this, SLOT(at_recordingAnimation_tick(int)));
 }
 
 void QnWorkbenchController::stopRecording()
@@ -669,7 +618,9 @@ void QnWorkbenchController::stopRecording()
 
 void QnWorkbenchController::at_recordingAnimation_finished()
 {
-    m_overlayLabel->hide();
+    if (m_recordingCountdownLabel)
+        m_recordingCountdownLabel->setOpacity(0.0);
+    m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
         if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
             if (m_screenRecorder) // just in case =)
@@ -678,30 +629,19 @@ void QnWorkbenchController::at_recordingAnimation_finished()
     m_countdownCanceled = false;
 }
 
-void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &)
+void QnWorkbenchController::at_recordingAnimation_tick(int tick)
 {
-    static double TICKS = 3;
-
-    QPropertyAnimation *animation = qobject_cast<QPropertyAnimation *>(sender());
-    if (!animation)
-        return;
-
-    double normValue = 1.0 - (double) animation->currentTime() / animation->duration();
-
-    QLabel *label = qobject_cast<QLabel *>(animation->targetObject());
-    if (!label)
+    if (!m_recordingCountdownLabel)
         return;
 
     if (m_countdownCanceled) {
-        label->setText(tr("Cancelled"));
+        m_recordingCountdownLabel->setText(tr("Cancelled"));
         return;
     }
+    int left = m_recordingCountdownLabel->timeout() - tick;
+    int n = qMax(1, (left + 500) / 1000);
 
-    double d = normValue * (TICKS+1);
-    if (d < TICKS) {
-        const int n = int (d) + 1;
-        label->setText(tr("Recording in...") + QString::number(n));
-    }
+    m_recordingCountdownLabel->setText(tr("Recording in...") + QString::number(n));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
@@ -1391,27 +1331,20 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
 
 void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
-        if (!m_overlayLabel)
-            return;
-        m_overlayLabel->hide();
-        if (!m_overlayLabelAnimation)
-            return;
-        m_overlayLabelAnimation->stop();
+        if (m_tourModeHintLabel) {
+            m_tourModeHintLabel->hideImmideately();
+            disconnect(m_tourModeHintLabel, 0, this, 0);
+            m_tourModeHintLabel = NULL;
+        }
         return;
     }
+    m_tourModeHintLabel = QnGraphicsMessageBox::information(tr("Press any key to stop the tour"));
+    connect(m_tourModeHintLabel, SIGNAL(finished()), this, SLOT(at_tourModeLabel_finished()));
+}
 
-
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
-        return;
-    }
-
-    showOverlayLabel(tr("Press any key to stop tour"), 280);
-    initOverlayLabelAnimation();
-
-    connect(m_overlayLabelAnimation, SIGNAL(finished()), m_overlayLabel, SLOT(hide()));
-    m_overlayLabelAnimation->start();
+void QnWorkbenchController::at_tourModeLabel_finished() {
+    if (m_tourModeHintLabel)
+       m_tourModeHintLabel = NULL;
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {

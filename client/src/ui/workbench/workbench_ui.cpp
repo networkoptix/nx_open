@@ -48,6 +48,7 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/actions/action_manager.h>
@@ -676,6 +677,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
     connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
 
+    initGraphicsMessageBox();
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
@@ -1566,6 +1568,30 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels) {
     setHelpOpened(panels & HelpPanel);
 }
 
+void QnWorkbenchUi::initGraphicsMessageBox() {
+    UiElementsInstrument* messageBoxInstrument = new UiElementsInstrument(this);
+    m_instrumentManager->installInstrument(messageBoxInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    QGraphicsWidget *graphicsMessageBoxWidget = messageBoxInstrument->widget();
+    display()->setLayer(graphicsMessageBoxWidget, Qn::MessageBoxLayer);
+
+    QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    messageBoxVLayout->setSpacing(0.0);
+
+    QGraphicsLinearLayout* messageBoxHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    messageBoxHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    messageBoxHLayout->setSpacing(0.0);
+
+    graphicsMessageBoxWidget->setLayout(messageBoxHLayout);
+
+    messageBoxHLayout->addStretch();
+    messageBoxHLayout->addItem(messageBoxVLayout);
+    messageBoxHLayout->addStretch();
+
+    messageBoxVLayout->addStretch();
+    messageBoxVLayout->addItem(new QnGraphicsMessageBoxItem(graphicsMessageBoxWidget));
+    messageBoxVLayout->addStretch();
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers

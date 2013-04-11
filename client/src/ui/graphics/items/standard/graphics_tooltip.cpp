@@ -15,6 +15,8 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 
+#include <ui/graphics/items/standard/graphics_message_box.h>
+
 #include <utils/common/checked_cast.h>
 
 namespace {
