@@ -963,8 +963,8 @@ int QnRtspConnectionProcessor::composePlay()
         d->clientGuid = d->requestHeaders.value("x-guid").toUtf8();
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
-        d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
+        //d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
+        //d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
         createPredefinedTracks();
     }
 
@@ -1276,22 +1276,16 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
     return msgLen;
 }
 
-static int processorCount = 0;
-static QMutex mutex;
-
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    {
-        QMutexLocker lock(&mutex);
-        qWarning() << "QnRtspConnectionProcessor << started. count =" << ++processorCount;
-    }
+    saveSysThreadID();
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
-    d->socket->setReadTimeOut(1000*1000);
-    d->socket->setWriteTimeOut(1000*1000);
+    //d->socket->setReadTimeOut(1000*1000);
+    //d->socket->setWriteTimeOut(1000*1000);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();
@@ -1340,20 +1334,10 @@ void QnRtspConnectionProcessor::run()
         }
     }
 
-    {
-        QMutexLocker lock(&mutex);
-        qWarning() << "QnRtspConnectionProcessor << stopped. count =" << --processorCount;
-    }
-
     t.restart();
 
     d->deleteDP();
     d->socket->close();
-
-    {
-        QMutexLocker lock(&mutex);
-        qWarning() << "QnRtspConnectionProcessor << stopped. after close socket. time=" << t.elapsed() << "count =" << processorCount;
-    }
 
     d->trackInfo.clear();
     //deleteLater(); // does not works for this thread

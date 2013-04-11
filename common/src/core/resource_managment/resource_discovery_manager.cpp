@@ -159,6 +159,7 @@ void QnResourceDiscoveryManager::pleaseStop()
 
 void QnResourceDiscoveryManager::run()
 {
+    saveSysThreadID();
     m_runNumber = 0;
     m_timer.reset( new QTimer() );
     m_timer->setSingleShot( true );

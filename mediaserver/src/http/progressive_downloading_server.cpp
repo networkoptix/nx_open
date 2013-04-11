@@ -279,6 +279,7 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
+    saveSysThreadID();
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 

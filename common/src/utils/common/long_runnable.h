@@ -27,6 +27,8 @@ public:
 
     void smartSleep(int ms);
 
+    int sysThreadID() const;
+
 public slots:
     virtual void start(Priority priority = InheritPriority);
     virtual void pleaseStop();
@@ -40,8 +42,11 @@ protected:
     volatile bool m_needStop;
     volatile bool m_onPause;
     QSemaphore m_semaphore;
+    int m_sysThreadID;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     DEBUG_CODE(const std::type_info *m_type;)
+
+    void saveSysThreadID();
 };
 
 

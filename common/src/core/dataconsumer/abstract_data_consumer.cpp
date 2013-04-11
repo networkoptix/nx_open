@@ -30,6 +30,9 @@ void QnAbstractDataConsumer::endOfRun()
 void QnAbstractDataConsumer::run()
 {
 //    const int timeoutMs = 100;
+
+    saveSysThreadID();
+
     while(!needToStop())
     {
         pauseDelay();

@@ -68,6 +68,8 @@ void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
 
+    saveSysThreadID();
+
     bool ready = true;
     if (d->clientRequest.isEmpty())
         ready = readRequest();
