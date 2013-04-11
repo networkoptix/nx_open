@@ -844,13 +844,14 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
     disconnect(item, NULL, this, NULL);
 
-    removeZoomLinksInternal(item);
-
-    QnResourceWidget *widget = m_widgetByItem.value(item);
+    QnResourceWidget *widget = this->widget(item);
     if(widget == NULL) {
         assert(!destroyItem);
         return false; /* The widget wasn't created. */
     }
+
+    /* Remove all linked zoom items. */
+    removeZoomLinksInternal(item);
 
     disconnect(widget, NULL, this, NULL);
     if(widgets(widget->resource()).size() == 1)
