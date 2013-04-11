@@ -48,6 +48,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -324,6 +325,9 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     if (!m_gridBackgroundItem.isNull())
         delete gridBackgroundItem();
+
+    if (!m_graphicsMessageBoxItem.isNull())
+        delete m_graphicsMessageBoxItem.data();
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -420,6 +424,9 @@ void QnWorkbenchDisplay::initSceneView() {
     setLayer(gridBackgroundItem(), Qn::EMappingLayer);
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
+
+    m_graphicsMessageBoxItem = new QnGraphicsMessageBoxItem();
+
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));

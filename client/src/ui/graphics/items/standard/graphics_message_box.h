@@ -7,11 +7,15 @@
 
 const int defaultMessageTimeout = 3;
 
-class QnGraphicsMessageBox : public GraphicsLabel
+class QnGraphicsMessageBoxItem: public QGraphicsItem {
+
+};
+
+class QnGraphicsMessageBox : public Animated<GraphicsLabel>
 {
     Q_OBJECT
 
-    typedef GraphicsLabel base_type;
+    typedef Animated<GraphicsLabel> base_type;
 public:
     explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL);
     ~QnGraphicsMessageBox();
