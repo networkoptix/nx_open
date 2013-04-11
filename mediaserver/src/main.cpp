@@ -429,7 +429,6 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-    signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
