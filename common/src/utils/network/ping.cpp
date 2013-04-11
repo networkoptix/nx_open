@@ -95,25 +95,22 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
     }
     else
     {
-        cl_log.log(ip + QLatin1String(" CLPing: Call to IcmpSendEcho failed"), cl_logERROR);
-
-        printf("Call to IcmpSendEcho failed.\n");
+        QString errStr;
         dwError = GetLastError();
+
         switch (dwError) {
         case IP_BUF_TOO_SMALL:
-            cl_log.log(QLatin1String("CLPing: tReplyBufferSize to small"), cl_logERROR);
-            //printf("\tReplyBufferSize to small\n");
+            errStr = lit("ReplyBufferSize to small");
             break;
         case IP_REQ_TIMED_OUT:
-            cl_log.log(QLatin1String("CLPing: \tRequest timed out"), cl_logERROR);
-            //printf("\tRequest timed out\n");
+            errStr = lit("Request timed out");
             break;
         default:
-            cl_log.log(QLatin1String("CLPing: \tExtended error returned "), (int)dwError, cl_logERROR);
-            //printf("\tExtended error returned: %ld\n", dwError);
+            errStr = lit("Extended error returned");
             break;
         }
-        /**/
+        
+        qWarning() << "Failed to ping camera" << ip << "error:" << errStr;
 
         return false;
     }
