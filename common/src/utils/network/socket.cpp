@@ -947,7 +947,7 @@ bool UDPSocket::hasData() const
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
 #endif
-    return ::poll( &sockPollfd, 1, 0 ) == 1;
+    return (::poll( &sockPollfd, 1, 0 ) == 1) && ((sockPollfd.revents & POLLIN) != 0);
 #endif
 }
 
