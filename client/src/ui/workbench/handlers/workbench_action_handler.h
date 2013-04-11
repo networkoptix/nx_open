@@ -336,6 +336,7 @@ protected slots:
     void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
+    void at_layoutCamera_exportFinished2();
     void at_layout_exportFinished();
     void at_layoutCamera_exportFailed(QString errorMessage);
 
@@ -423,6 +424,8 @@ private:
     QnMediaResourcePtr m_exportedMediaRes;
     //QString m_layoutExportMessage;
     LayoutExportMode m_layoutExportMode;
+    int m_exportRetryCount; // anitvirus sometimes block exe file. workaround
+    QString m_exportTmpFileName;
     int m_healthRequestHandle;
 
     QTimer *m_tourTimer;
