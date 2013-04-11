@@ -70,6 +70,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
@@ -1255,9 +1256,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     if (workbench()->currentLayout()->resource()->locked() &&
             !parameters.resources().empty() &&
             layouts.empty()) {
-        QMessageBox::information(widget(),
-                                 tr("Layout is locked"),
-                                 tr("Layout is locked and cannot be changed."));
+        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
     }
 
 

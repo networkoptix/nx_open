@@ -21,6 +21,7 @@ public:
     virtual QRectF boundingRect() const override;
 
     void addItem(QGraphicsLayoutItem* item);
+    void removeItem(QGraphicsLayoutItem* item);
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 private:
@@ -33,14 +34,29 @@ class QnGraphicsMessageBox : public Animated<GraphicsLabel>
 
     typedef Animated<GraphicsLabel> base_type;
 public:
-    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString());
+    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0);
     ~QnGraphicsMessageBox();
     
-    static void information(const QString &text);
+    static QnGraphicsMessageBox* information(const QString &text);
+
+    int timeout() const;
+public slots:
+    void hideImmideately();
+
+signals:
+    void finished();
+    void tick(int time);
+
 protected:
-    virtual int getTimeout();
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+private slots:
+    void at_animationIn_finished();
+
+private:
+    int m_timeout;
+
 };
 
 #endif // GRAPHICS_MESSAGE_BOX_H

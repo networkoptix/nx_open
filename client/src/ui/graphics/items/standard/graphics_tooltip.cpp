@@ -108,9 +108,6 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
     newItem->installSceneEventFilter(this);
     newItem->setAcceptHoverEvents(true); // this won't be undone, can be stored in inner field
     restartExpireTimer();
-
-    if (newText.length() > 0)
-        QnGraphicsMessageBox::information(newText);
 }
 
 void GraphicsTooltipLabel::hideTip()
