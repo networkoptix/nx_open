@@ -64,10 +64,7 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
     if (restUrl != m_apiUrl)
     {
         m_apiUrl = restUrl;
-
-        /* We want the video server connection to be deleted in its associated thread, 
-         * no matter where the reference count reached zero. Hence the custom deleter. */
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+        m_restConnection.clear();
     }
 }
 
@@ -103,6 +100,13 @@ QList<QHostAddress> QnMediaServerResource::getNetAddrList()
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
+    QMutexLocker lock(&m_mutex);
+
+    /* We want the video server connection to be deleted in its associated thread, 
+     * no matter where the reference count reached zero. Hence the custom deleter. */
+    if (!m_restConnection && !m_apiUrl.isEmpty())
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+
     return m_restConnection;
 }
 
@@ -306,14 +310,17 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
         determineOptimalNetIF();
 }
 
-QString QnMediaServerResource::getProxyHost() const
+
+QString QnMediaServerResource::getProxyHost()
 {
-    return m_restConnection->getProxyHost();
+    QnMediaServerConnectionPtr connection = apiConnection();
+    return connection ? connection->getProxyHost() : QString();
 }
 
-int QnMediaServerResource::getProxyPort() const
+int QnMediaServerResource::getProxyPort()
 {
-    return m_restConnection->getProxyPort();
+    QnMediaServerConnectionPtr connection = apiConnection();
+    return connection ? connection->getProxyPort() : 0;
 }
 
 QString QnMediaServerResource::getVersion() const
