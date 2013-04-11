@@ -3,7 +3,10 @@
 #include <QtGui/QStyle>
 #include <QtGui/QStyleOption>
 #include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
 
+#include <ui/graphics/items/standard/graphics_frame.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 QnGraphicsMessageBoxItem *instance = NULL;
 
@@ -15,12 +18,13 @@ QnGraphicsMessageBoxItem::QnGraphicsMessageBoxItem(QGraphicsItem *parent):
     m_layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_layout->setSpacing(2.0);
     setLayout(m_layout);
+    setAcceptedMouseButtons(Qt::NoButton);
 
     setOpacity(0.7);
 }
 
 QnGraphicsMessageBoxItem::~QnGraphicsMessageBoxItem() {
-    instance = NULL;
+  //  instance = NULL;
 }
 
 void QnGraphicsMessageBoxItem::addItem(QGraphicsLayoutItem *item) {
@@ -38,9 +42,21 @@ void QnGraphicsMessageBoxItem::paint(QPainter *painter, const QStyleOptionGraphi
 //-----------------------QnGraphicsMessageBox---------------------------------------//
 
 
-QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent) :
+QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text) :
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
+    setText(text);
+    setFrameShape(GraphicsFrame::NoFrame);
+
+    QFont font;
+    font.setPixelSize(22);
+    setFont(font);
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, QColor(166, 166, 166));
+    setPalette(palette);
+
+    setAcceptedMouseButtons(Qt::NoButton);
 }
 
 QnGraphicsMessageBox::~QnGraphicsMessageBox() {
@@ -51,32 +67,36 @@ void QnGraphicsMessageBox::information(const QString &text) {
     if (!instance)
         return;
 
-    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance);
-    box->setText(text);
-    box->setFrameShape(GraphicsFrame::StyledPanel);
-    box->setLineWidth(5);
-    box->setFrameRect(QRectF(0, 0, 100, 100));
-
-    QFont font;
-    font.setPointSize(20);
-    box->setFont(font);
+    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text);
     instance->addItem(box);
-
-    QFontMetrics metrics(font);
-
-    box->resize(metrics.width(text) + 18*2,
-                metrics.height() + 18*2);
 }
 
 int QnGraphicsMessageBox::getTimeout() {
     return 3;
 }
 
+QSizeF QnGraphicsMessageBox::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
+    QSizeF hint = base_type::sizeHint(which, constraint);
+    return hint + QSizeF(18*2, 18*2);
+}
 
 void QnGraphicsMessageBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-/*    QStyleOptionFrame opt;
-    opt.rect = rect().toRect();
+/*
+    m_overlayLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px;"\
+                                                "border-style: inset; border-color: #535353;"\
+                                                "border-radius: 18px;"\
+                                                "background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
 
-    style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);*/
+*/
+    QPainterPath path;
+    path.addRoundedRect(rect(), 18, 18);
+
+    QnScopedPainterPenRollback penRollback(painter, QColor(83, 83, 83));
+    QnScopedPainterBrushRollback brushRollback(painter, QColor(33, 33, 80));
+    painter->drawPath(path);
+    Q_UNUSED(penRollback)
+    Q_UNUSED(brushRollback)
+
     base_type::paint(painter, option, widget);
 }
+

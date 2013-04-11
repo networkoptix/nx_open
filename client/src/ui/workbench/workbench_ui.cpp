@@ -677,11 +677,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
     connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
 
-    m_graphicsMessageBoxItem = new QnGraphicsMessageBoxItem(m_controlsWidget);
-//    display()->setLayer(m_graphicsMessageBoxItem, Qn::MessageBoxLayer);
-    m_titleItem->setProperty(Qn::NoHandScrollOver, true);
-//    graphicsMessageBoxItem()->setOpacity(0.8);
-
+    initGraphicsMessageBox();
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
@@ -1572,6 +1568,30 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels) {
     setHelpOpened(panels & HelpPanel);
 }
 
+void QnWorkbenchUi::initGraphicsMessageBox() {
+    UiElementsInstrument* messageBoxInstrument = new UiElementsInstrument(this);
+    m_instrumentManager->installInstrument(messageBoxInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    QGraphicsWidget *graphicsMessageBoxWidget = messageBoxInstrument->widget();
+    display()->setLayer(graphicsMessageBoxWidget, Qn::MessageBoxLayer);
+
+    QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    messageBoxVLayout->setSpacing(0.0);
+
+    QGraphicsLinearLayout* messageBoxHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    messageBoxHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    messageBoxHLayout->setSpacing(0.0);
+
+    graphicsMessageBoxWidget->setLayout(messageBoxHLayout);
+
+    messageBoxHLayout->addStretch();
+    messageBoxHLayout->addItem(messageBoxVLayout);
+    messageBoxHLayout->addStretch();
+
+    messageBoxVLayout->addStretch();
+    messageBoxVLayout->addItem(new QnGraphicsMessageBoxItem(graphicsMessageBoxWidget));
+    messageBoxVLayout->addStretch();
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1736,13 +1756,6 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_helpItem->pos().y(),
         m_helpItem->size().width(),
         m_helpItem->size().height() - oldRect.height() + rect.height()
-    ));
-
-    m_graphicsMessageBoxItem->setGeometry(QRectF(
-        (rect.width()  - m_graphicsMessageBoxItem->size().width()) * 0.5,
-        (rect.height() - m_graphicsMessageBoxItem->size().height()) * 0.5,
-        m_graphicsMessageBoxItem->size().width(),
-        m_graphicsMessageBoxItem->size().height()
     ));
 
     updateTreeGeometry();

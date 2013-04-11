@@ -5,14 +5,15 @@
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/animation/animated.h>
 
 const int defaultMessageTimeout = 3;
 
-class QnGraphicsMessageBoxItem: public QGraphicsWidget
+class QnGraphicsMessageBoxItem: public GraphicsWidget
 {
     Q_OBJECT
-    typedef QGraphicsWidget base_type;
+    typedef GraphicsWidget base_type;
 
 public:
     explicit QnGraphicsMessageBoxItem(QGraphicsItem *parent = NULL);
@@ -32,12 +33,13 @@ class QnGraphicsMessageBox : public Animated<GraphicsLabel>
 
     typedef Animated<GraphicsLabel> base_type;
 public:
-    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL);
+    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString());
     ~QnGraphicsMessageBox();
     
     static void information(const QString &text);
 protected:
     virtual int getTimeout();
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
 
