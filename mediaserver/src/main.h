@@ -46,7 +46,6 @@ private:
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QTimer m_timer;
 };
 
 #endif // MAIN_H
