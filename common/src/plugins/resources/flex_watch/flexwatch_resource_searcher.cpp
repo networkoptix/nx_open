@@ -5,8 +5,23 @@
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "utils/network/mac_address.h"
 
+static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
+
 QnFlexWatchResourceSearcher::QnFlexWatchResourceSearcher(): OnvifResourceSearcher()
+    ,m_sockUpdateTime(0)
 {
+}
+
+QnFlexWatchResourceSearcher::~QnFlexWatchResourceSearcher()
+{
+    clearSocketList();
+}
+
+void QnFlexWatchResourceSearcher::clearSocketList()
+{
+    foreach(QUdpSocket* sock, m_sockList)
+        delete sock;
+    m_sockList.clear();
 }
 
 QnFlexWatchResourceSearcher& QnFlexWatchResourceSearcher::instance()
@@ -15,43 +30,69 @@ QnFlexWatchResourceSearcher& QnFlexWatchResourceSearcher::instance()
     return inst;
 }
 
-QnResourceList QnFlexWatchResourceSearcher::findResources()
+bool QnFlexWatchResourceSearcher::updateSocketList()
 {
-    QnResourceList result;
+    qint64 curretTime = getUsecTimer();
+    if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
+    {
+        clearSocketList();
+        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+        {
+            QUdpSocket* sock = new QUdpSocket();
+            if (!bindToInterface(*sock, iface, 51001)) {
+                delete sock;
+                continue;
+            }
+            m_sockList << sock;
+        }
+        m_sockUpdateTime = curretTime;
+        return true;
+    }
+    return false;
+}
 
+void QnFlexWatchResourceSearcher::sendBroadcast()
+{
     QByteArray requestPattertn("53464a001c0000000000000000000000____f850000101000000d976");
-
-    OnvifResourceInformationFetcher onfivFetcher;
-
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (QUdpSocket* sock, m_sockList)
     {
         if (shouldStop())
-            return QnResourceList();
+            break;
 
         QByteArray rndPattern = QByteArray::number(rand(),16);
         while (rndPattern.size() < 4)
             rndPattern = "0" + rndPattern;
         QByteArray pattern = requestPattertn.replace("____", rndPattern);
         QByteArray request = QByteArray::fromHex(pattern);
-
-        QUdpSocket sock;
-
-        if (!bindToInterface(sock, iface, 51001))
-            continue;
-        
         // sending broadcast
-        sock.writeDatagram(request.data(), request.size(),QHostAddress::Broadcast, 51000);
+        sock->writeDatagram(request.data(), request.size(),QHostAddress::Broadcast, 51000);
+    }
+}
 
-        QnSleep::msleep(1000); // to avoid 100% cpu usage
+QnResourceList QnFlexWatchResourceSearcher::findResources()
+{
+    if (updateSocketList()) {
+        sendBroadcast();
+        QnSleep::msleep(1000);
+    }
 
-        while (sock.hasPendingDatagrams())
+    QnResourceList result;
+
+    QSet<QString> processedMac;
+
+    foreach (QUdpSocket* sock, m_sockList)
+    {
+        if (shouldStop())
+            return QnResourceList();
+
+        while (sock->hasPendingDatagrams())
         {
             QByteArray datagram;
-            datagram.resize(sock.pendingDatagramSize());
+            datagram.resize(sock->pendingDatagramSize());
 
             QHostAddress sender;
             quint16 senderPort;
-            sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
+            sock->readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
 
             if (!datagram.startsWith("SFJ"))
                 continue;
@@ -65,13 +106,21 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
                 continue;
             //info.mac = QString::fromLocal8Bit(datagram.mid(30,6).toHex());
             info.mac = QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
+
+            if (processedMac.contains(info.mac))
+                continue;
+            processedMac << info.mac;
+
             info.uniqId = info.mac;
             info.discoveryIp = sender.toString();
 
+            OnvifResourceInformationFetcher onfivFetcher;
             onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result);
 
         }
 
     }
+
+    sendBroadcast();
     return result;
 }

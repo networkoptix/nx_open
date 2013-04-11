@@ -6,11 +6,9 @@
 const int androidRecvPort = 5559;
 static const int READ_IF_TIMEOUT = 1000000ll * 30;
 
-QnPlDroidResourceSearcher::QnPlDroidResourceSearcher():
-    m_controlPortListener(QHostAddress::Any, DROID_CONTROL_TCP_SERVER_PORT)
+QnPlDroidResourceSearcher::QnPlDroidResourceSearcher()
 {
     m_lastReadSocketTime = 0;
-    m_controlPortListener.start();
 }
 
 QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()
