@@ -42,7 +42,6 @@ class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnGridBackgroundItem;
-class QnGraphicsMessageBoxItem;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
@@ -169,11 +168,6 @@ public:
      * \returns                         Grid background item (E-Mapping).
      */
     QnGridBackgroundItem *gridBackgroundItem() const;
-
-    /**
-     * \returns                         Item for graphics messages.
-     */
-    QnGraphicsMessageBoxItem *graphicsMessageBoxItem() const;
 
     /**
      * \param item                      Item to get widget for.
@@ -438,9 +432,6 @@ private:
 
     /** Grid background item. */
     QWeakPointer<QnGridBackgroundItem> m_gridBackgroundItem;
-
-    /** Graphics MessageBox item. */
-    QWeakPointer<QnGraphicsMessageBoxItem> m_graphicsMessageBoxItem;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;

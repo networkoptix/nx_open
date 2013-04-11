@@ -16,6 +16,7 @@ QnGraphicsMessageBoxItem::QnGraphicsMessageBoxItem(QGraphicsItem *parent):
     m_layout->setSpacing(2.0);
     setLayout(m_layout);
 
+    setOpacity(0.7);
 }
 
 QnGraphicsMessageBoxItem::~QnGraphicsMessageBoxItem() {
@@ -34,6 +35,9 @@ void QnGraphicsMessageBoxItem::paint(QPainter *painter, const QStyleOptionGraphi
     base_type::paint(painter, option, widget);
 }
 
+//-----------------------QnGraphicsMessageBox---------------------------------------//
+
+
 QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent) :
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
@@ -51,18 +55,17 @@ void QnGraphicsMessageBox::information(const QString &text) {
     box->setText(text);
     box->setFrameShape(GraphicsFrame::StyledPanel);
     box->setLineWidth(5);
-    box->setFrameRect(QRectF(200, 200, 400, 200));
+    box->setFrameRect(QRectF(0, 0, 100, 100));
 
     QFont font;
-    font.setPixelSize(22);
+    font.setPointSize(20);
     box->setFont(font);
     instance->addItem(box);
 
-//    m_messages.append(msg);
+    QFontMetrics metrics(font);
 
-    //QWidget *viewport = view->childAt(pos);
-
-
+    box->resize(metrics.width(text) + 18*2,
+                metrics.height() + 18*2);
 }
 
 int QnGraphicsMessageBox::getTimeout() {
@@ -71,9 +74,9 @@ int QnGraphicsMessageBox::getTimeout() {
 
 
 void QnGraphicsMessageBox::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    QStyleOptionFrame opt;
+/*    QStyleOptionFrame opt;
     opt.rect = rect().toRect();
 
-    style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);
+    style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);*/
     base_type::paint(painter, option, widget);
 }

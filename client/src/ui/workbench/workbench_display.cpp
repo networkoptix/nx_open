@@ -325,9 +325,6 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     if (!m_gridBackgroundItem.isNull())
         delete gridBackgroundItem();
-
-    if (!m_graphicsMessageBoxItem.isNull())
-        delete graphicsMessageBoxItem();
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -425,11 +422,6 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
-    m_graphicsMessageBoxItem = new QnGraphicsMessageBoxItem();
-    m_scene->addItem(graphicsMessageBoxItem());
-    setLayer(graphicsMessageBoxItem(), Qn::MessageBoxLayer);
-    graphicsMessageBoxItem()->setOpacity(0.8);
-
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -460,10 +452,6 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
-}
-
-QnGraphicsMessageBoxItem *QnWorkbenchDisplay::graphicsMessageBoxItem() const {
-    return m_graphicsMessageBoxItem.data();
 }
 
 // -------------------------------------------------------------------------- //

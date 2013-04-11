@@ -48,6 +48,7 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/actions/action_manager.h>
@@ -675,6 +676,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_popupShowButton->setVisible(false);
     connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
     connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
+
+    m_graphicsMessageBoxItem = new QnGraphicsMessageBoxItem(m_controlsWidget);
+//    display()->setLayer(m_graphicsMessageBoxItem, Qn::MessageBoxLayer);
+    m_titleItem->setProperty(Qn::NoHandScrollOver, true);
+//    graphicsMessageBoxItem()->setOpacity(0.8);
 
 
     /* Connect to display. */
@@ -1730,6 +1736,13 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_helpItem->pos().y(),
         m_helpItem->size().width(),
         m_helpItem->size().height() - oldRect.height() + rect.height()
+    ));
+
+    m_graphicsMessageBoxItem->setGeometry(QRectF(
+        (rect.width()  - m_graphicsMessageBoxItem->size().width()) * 0.5,
+        (rect.height() - m_graphicsMessageBoxItem->size().height()) * 0.5,
+        m_graphicsMessageBoxItem->size().width(),
+        m_graphicsMessageBoxItem->size().height()
     ));
 
     updateTreeGeometry();

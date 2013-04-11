@@ -43,6 +43,7 @@ class QnLayoutTabBar;
 class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
+class QnGraphicsMessageBoxItem;
 
 class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT;
@@ -466,6 +467,8 @@ private:
     /* Notifications window-related state */
 
     QnImageButtonWidget *m_popupShowButton;
+
+    QnGraphicsMessageBoxItem* m_graphicsMessageBoxItem;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
