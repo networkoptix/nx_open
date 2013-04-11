@@ -2,7 +2,7 @@
 #define _STREAM_RECORDER_H__
 
 #include <QBuffer>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
 
 #include <utils/common/cryptographic_hash.h>
 
@@ -56,7 +56,7 @@ public:
     */
     void setNeedCalcSignature(bool value);
 
-    void setSignLogo(QPixmap logo);
+    void setSignLogo(const QImage& logo);
 
     /*
     * Return hash value 
@@ -150,7 +150,7 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
     QnCryptographicHash m_mdctx;
-    QPixmap m_logo;
+    QImage m_logo;
     QString m_container;
     int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;

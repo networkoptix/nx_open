@@ -47,6 +47,7 @@ public:
     bool isHardwareDecoderUsed() const;
 
     bool isYV12ToRgbShaderUsed() const;
+    bool isYV12ToRgbaShaderUsed() const;
     bool isNV12ToRgbShaderUsed() const;
 
 private:
@@ -61,6 +62,7 @@ private:
     unsigned int m_prevFrameSequence;
     std::auto_ptr<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     std::auto_ptr<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
+    std::auto_ptr<QnYv12ToRgbaShaderProgram> m_yv12ToRgbaShaderProgram;
     std::auto_ptr<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
     bool m_timeChangeEnabled;
     mutable QMutex m_mutex;
@@ -79,6 +81,15 @@ private:
     	unsigned int tex1ID,
     	unsigned int tex2ID,
     	const float* v_array );
+    //!Draws YUV420 with alpha channel
+    void drawYVA12VideoTexture(
+        const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
+	    const QRectF& tex0Coords,
+	    unsigned int tex0ID,
+	    unsigned int tex1ID,
+	    unsigned int tex2ID,
+	    unsigned int tex3ID,
+	    const float* v_array );
     //!Draws to the screen NV12 image represented with two textures (Y-plane and UV-plane) using shader which mixes both planes to RGB
     void drawNV12VideoTexture(
     	const QRectF& tex0Coords,

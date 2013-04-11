@@ -101,13 +101,13 @@ public:
             PBOData();
         };
 
-        static const size_t TEXTURE_COUNT = 3;
+        static const size_t MAX_TEXTURE_COUNT = 4;
 
         PixelFormat m_colorFormat;
         int m_width;
         int m_height;
         mutable std::vector<GLuint> m_picTextures;
-        QScopedPointer<QnGlRendererTexture> m_textures[TEXTURE_COUNT];
+        QScopedPointer<QnGlRendererTexture> m_textures[MAX_TEXTURE_COUNT];
         unsigned int m_sequence;
         quint64 m_pts;
         QnMetaDataV1Ptr m_metadata;

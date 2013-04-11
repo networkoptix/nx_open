@@ -338,6 +338,7 @@ protected slots:
     void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
+    void at_layoutCamera_exportFinished2();
     void at_layout_exportFinished();
     void at_layoutCamera_exportFailed(QString errorMessage);
 
@@ -361,7 +362,9 @@ private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
+#ifdef Q_OS_WIN
     QString binaryFilterName(bool readOnly) const;
+#endif
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
@@ -425,6 +428,8 @@ private:
     QnMediaResourcePtr m_exportedMediaRes;
     //QString m_layoutExportMessage;
     LayoutExportMode m_layoutExportMode;
+    int m_exportRetryCount; // anitvirus sometimes block exe file. workaround
+    QString m_exportTmpFileName;
     int m_healthRequestHandle;
 
     QTimer *m_tourTimer;

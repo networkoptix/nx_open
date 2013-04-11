@@ -110,7 +110,7 @@ protected:
         bool recording = false, scheduled = false;
         if(resource) {
             if(!resource->isDisabled()) {
-                if(resource->getStatus() == QnResource::Recording)
+                if(resource->getStatus() == QnResource::Recording && resource.dynamicCast<QnVirtualCameraResource>())
                     recording = true;
             } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
                 foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {

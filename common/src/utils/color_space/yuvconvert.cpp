@@ -353,6 +353,25 @@ void bgra_to_yv12_sse2_intr(const quint8* rgba, int xStride, quint8* y, quint8* 
     }
 }
 
+void bgra_to_yva12_sse2_intr(
+    const quint8* rgba, int xStride,
+    quint8* y, quint8* u, quint8* v, quint8* a,
+    int yStride, int uvStride, int aStride,
+    int width, int height,
+    bool flip )
+{
+    bgra_to_yv12_sse2_intr( rgba, xStride, y, u, v, yStride, uvStride, width, height, flip );
+
+    //copying alpha plane to \a a
+    for( int yLine = 0; yLine < height/2; ++yLine )
+    {
+        for( int x = 0; x < width; ++x )
+            *(a+x) = *((rgba + x*4)+3);
+        rgba += xStride;
+        a += aStride;
+    }
+}
+
 void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int width, int height, bool /*flip*/)
 {
     int xStride = width*4;

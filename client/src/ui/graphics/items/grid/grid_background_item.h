@@ -6,16 +6,13 @@
 #include <QObject>
 #include <QGraphicsObject>
 
+#include <camera/gl_renderer.h>
+
+#include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+
 #include <utils/app_server_file_cache.h>
 
-#include "../resource/decodedpicturetoopengluploader.h"
-#include "../../../../camera/gl_renderer.h"
-
-
 class QnWorkbenchGridMapper;
-class RectAnimator;
-class VariantAnimator;
-class AnimationTimer;
 
 class QnGridBackgroundItem : public QGraphicsObject
 {
@@ -34,9 +31,6 @@ public:
     QnWorkbenchGridMapper *mapper() const;
     void setMapper(QnWorkbenchGridMapper *mapper);
 
-    AnimationTimer* animationTimer() const;
-    void setAnimationTimer(AnimationTimer *timer);
-
     QString imageFilename() const;
     void setImageFilename(const QString &imageFilename);
 
@@ -49,16 +43,12 @@ public:
     QRect sceneBoundingRect() const;
 
     void updateDisplay();
-    void animatedHide();
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private slots:
-    void animatedShow();
     void updateGeometry();
 
-    void at_opacityAnimator_finished();
     void at_imageLoaded(const QString& filename, bool ok);
     void setImage(const QImage& image);
 
@@ -74,17 +64,15 @@ private:
     QString m_imageFilename;
     QSize m_imageSize;
     int m_imageOpacity;
-    qreal m_targetOpacity;
     QRect m_sceneBoundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
-    RectAnimator *m_geometryAnimator;
-    VariantAnimator *m_opacityAnimator;
     QnAppServerFileCache *m_cache;
     std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
     std::auto_ptr<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
     bool m_imgUploaded;
     ImageStatus m_imageStatus;
+    QHash<QString, QImage> m_imagesMemCache;
 };
 
 

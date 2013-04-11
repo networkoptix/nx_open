@@ -68,15 +68,20 @@ void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
 
+    saveSysThreadID();
+
     bool ready = true;
     if (d->clientRequest.isEmpty())
         ready = readRequest();
 
+    bool isKeepAlive = false;
+    QElapsedTimer t;
+    t.restart();
     while (1)
     {
-        bool isKeepAlive = false;
         if (ready)
         {
+            t.restart();
             parseRequest();
             isKeepAlive = d->requestHeaders.value(QLatin1String("Connection")).toLower() == QString(QLatin1String("keep-alive"));
             if (isKeepAlive) {
@@ -153,7 +158,7 @@ void QnRestConnectionProcessor::run()
 
             sendResponse("HTTP", rez, contentType, contentEncoding, false);
         }
-        if (!isKeepAlive)
+        if (!isKeepAlive || t.elapsed() >= d->socketTimeout || !d->socket->isConnected())
             break;
         ready = readRequest();
     }

@@ -59,7 +59,7 @@ void QnVMax480LiveProvider::openStream()
 
 
     if (m_maxStream == 0)
-        m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource, true);
+        m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource.data(), true);
     m_opened = m_maxStream->registerConsumer(this); 
 
     /*
@@ -75,7 +75,7 @@ void QnVMax480LiveProvider::closeStream()
         m_maxStream->unregisterConsumer(this);
     }
     if (m_maxStream)
-        m_maxStream->freeInstance(GROUP_ID, m_resource, true);
+        m_maxStream->freeInstance(GROUP_ID, m_resource.data(), true);
     m_maxStream = 0;
 
     //vmaxDisconnect();

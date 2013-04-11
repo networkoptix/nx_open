@@ -643,19 +643,16 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
             if (soapRes == SOAP_EOF) 
             {
                 //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
-                soap_destroy(soapWsddProxy.soap);
-                soap_end(soapWsddProxy.soap);
-                break;
             } 
             else 
             {
                 qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                     << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                     << ". Interface: " << (iface ? iface->address.toString() : camAddr->toString());
-                soap_destroy(soapWsddProxy.soap);
-                soap_end(soapWsddProxy.soap);
-                continue;
             }
+            soap_destroy(soapWsddProxy.soap);
+            soap_end(soapWsddProxy.soap);
+            break;
         }
 
         if (wsddProbeMatches.wsdd__ProbeMatches)

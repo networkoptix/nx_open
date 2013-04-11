@@ -852,7 +852,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     display()->bringToFront(m_resizedWidget);
-    display()->gridItem()->animatedShow();
+    opacityAnimator(display()->gridItem())->animateTo(1.0);
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
@@ -896,7 +896,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     TRACE("RESIZING FINISHED");
 
-    display()->gridItem()->animatedHide();
+    opacityAnimator(display()->gridItem())->animateTo(0.0);
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     if(m_resizedWidget == item && item != NULL) {
@@ -945,7 +945,7 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     display()->setLayer(items, Qn::FrontLayer);
 
     /* Show grid. */
-    display()->gridItem()->animatedShow();
+    opacityAnimator(display()->gridItem())->animateTo(1.0);
 }
 
 void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) {
@@ -1032,7 +1032,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     TRACE("MOVE FINISHED");
 
     /* Hide grid. */
-    display()->gridItem()->animatedHide();
+    opacityAnimator(display()->gridItem())->animateTo(0.0);
 
     if(!m_draggedWorkbenchItems.empty()) {
         QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();

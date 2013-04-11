@@ -43,7 +43,7 @@ bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
     qDebug() << "before vmaxConnect";
 
     if (m_maxStream == 0)
-        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res, false);
+        m_maxStream = VMaxStreamFetcher::getInstance(m_groupId, m_res.data(), false);
     int consumerCount = 0;
     m_isOpened = m_maxStream->registerConsumer(this, &consumerCount, !m_thumbnailsMode, !m_thumbnailsMode);
     m_ignoreNextSeek = consumerCount > 1;
@@ -96,7 +96,7 @@ void QnVMax480ArchiveDelegate::close()
         m_isOpened = false;
     }
     if (m_maxStream)
-        VMaxStreamFetcher::freeInstance(m_groupId, m_res, false);
+        VMaxStreamFetcher::freeInstance(m_groupId, m_res.data(), false);
     m_maxStream = 0;
 }
 
