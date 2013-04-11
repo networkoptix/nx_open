@@ -210,10 +210,17 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     }
 
     /* Remove all zoom links first. */
+#if 0 // TODO: #Elric does not belong here?
     if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
         removeZoomLink(item, zoomTargetItem);
     foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
         removeZoomLink(zoomItem, item);
+#else 
+    if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
+        removeZoomLink(item, zoomTargetItem);
+    foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
+        removeItem(zoomItem);
+#endif
 
     /* Update internal data structures. */
     if(item->isPinned())
