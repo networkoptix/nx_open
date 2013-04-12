@@ -80,7 +80,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
-    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(at_advancedButton_clicked()));
+    connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(updateAdvancedAction()));
 
     connect(context,  SIGNAL(userChanged(const QnUserResourcePtr &)),          this, SLOT(at_context_userChanged()));
 
@@ -216,13 +216,6 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     deleteRule(model);
 }
 
-void QnBusinessRulesDialog::at_advancedButton_clicked() {
-    bool isAdvancedVisible = !m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model();
-    m_currentDetailsWidget->setVisible(isAdvancedVisible);
-    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
-    //TODO: #GDM remove duplicate code
-}
-
 void QnBusinessRulesDialog::at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle) {
 
     if (handle != m_loadingHandle)
@@ -294,6 +287,12 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     Q_UNUSED(bottomRight)
     if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
         updateControlButtons();
+}
+
+void QnBusinessRulesDialog::updateAdvancedAction() {
+    bool isAdvancedVisible = !m_currentDetailsWidget->isVisible() && m_currentDetailsWidget->model();
+    m_currentDetailsWidget->setVisible(isAdvancedVisible);
+    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
 }
 
 void QnBusinessRulesDialog::createActions() {
@@ -387,10 +386,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
 
     ui->advancedButton->setEnabled(loaded && m_currentDetailsWidget->model());
     m_advancedAction->setEnabled(loaded && m_currentDetailsWidget->model());
-
-    bool isAdvancedVisible = m_currentDetailsWidget->isVisible() & loaded && m_currentDetailsWidget->model();
-    m_currentDetailsWidget->setVisible(isAdvancedVisible);
-    m_advancedAction->setText(isAdvancedVisible ? tr("Hide Advanced") : tr("Show Advanced"));
-
     ui->addRuleButton->setEnabled(hasRights && loaded);
+
+    updateAdvancedAction();
 }

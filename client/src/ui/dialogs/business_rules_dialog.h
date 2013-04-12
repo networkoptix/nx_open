@@ -54,7 +54,6 @@ private slots:
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
     void at_deleteButton_clicked();
-    void at_advancedButton_clicked();
 
     void at_resources_received(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
     void at_resources_saved(int status, const QByteArray& errorString, const QnBusinessEventRules &rules, int handle);
@@ -64,6 +63,7 @@ private slots:
     void at_tableViewport_resizeEvent();
     void at_model_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
+    void updateAdvancedAction();
 private:
     Q_DISABLE_COPY(QnBusinessRulesDialog)
 

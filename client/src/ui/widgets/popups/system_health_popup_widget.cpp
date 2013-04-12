@@ -29,7 +29,7 @@ QnSystemHealthPopupWidget::QnSystemHealthPopupWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setBorderColor(qnGlobals->popupFrameSystem()); //TODO: #GDM skin color
+    setBorderColor(qnGlobals->popupFrameSystem());
     connect(ui->fixButton,      SIGNAL(clicked()), this, SLOT(at_fixButton_clicked()));
     connect(ui->postponeButton, SIGNAL(clicked()), this, SLOT(at_postponeButton_clicked()));
 }
