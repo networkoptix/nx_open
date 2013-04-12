@@ -17,7 +17,7 @@ struct UpnpDeviceInfo
     QString presentationUrl;
 };
 
-class QnUpnpResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
     QnUpnpResourceSearcher();

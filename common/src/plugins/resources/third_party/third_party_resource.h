@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_RESOURCE_H
 #define THIRD_PARTY_RESOURCE_H
 
+#include <memory>
+
 #include <QSharedPointer>
 
 #include "core/resource/camera_resource.h"
@@ -15,8 +17,11 @@
 //!Camera resource, integrated via external driver. Routes requests to \a nxcip::BaseCameraManager interface
 class QnThirdPartyResource
 :
-    public QnPhysicalCameraResource
+    public QnPhysicalCameraResource,
+    public nxcip::CameraInputEventHandler
 {
+    Q_OBJECT
+
 public:
     QnThirdPartyResource(
         const nxcip::CameraInfo& camInfo,
@@ -25,7 +30,7 @@ public:
     virtual ~QnThirdPartyResource();
 
     //!Implementation of QnResource::getPtzController
-    QnAbstractPtzController* getPtzController();
+    virtual QnAbstractPtzController* getPtzController() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
     //!Implementation of QnSecurityCamResource::manufacture
@@ -41,7 +46,21 @@ public:
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
-    virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS );
+    virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
+
+    //!Implementation of nxpl::NXPluginInterface::queryInterface
+    virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    //!Implementation of nxpl::NXPluginInterface::queryInterface
+    virtual unsigned int addRef() override;
+    //!Implementation of nxpl::NXPluginInterface::queryInterface
+    virtual unsigned int releaseRef() override;
+
+    //!Implementation of nxcip::CameraInputEventHandler::inputPortStateChanged
+    virtual void inputPortStateChanged(
+        nxcip::CameraRelayIOManager* source,
+        const char* inputPortID,
+        bool newState,
+        unsigned long int timestamp ) override;
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
 
@@ -57,7 +76,7 @@ signals:
         QnResourcePtr resource,
         const QString& inputPortID,
         bool value,
-        qint64 timestamp);
+        qint64 timestamp );
 
 protected:
     //!Implementation of QnResource::initInternal
@@ -81,6 +100,10 @@ private:
     nxcip_qt::BaseCameraManager m_camManager;
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;
     QVector<EncoderData> m_encoderData;
+    std::auto_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
+    QAtomicInt m_refCounter;
+
+    bool initializeIOPorts();
 };
 
 typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;

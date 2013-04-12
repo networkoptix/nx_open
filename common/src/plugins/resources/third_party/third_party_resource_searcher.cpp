@@ -82,15 +82,32 @@ QString ThirdPartyResourceSearcher::manufacture() const
     return THIRD_PARTY_MANUFACTURER_NAME;
 }
 
-
-QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/)
+QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        if( it->checkHostAddress( &m_cameraInfoTempArray, url.toString(), auth.user(), auth.password() ) <= 0 )
+        QString addressStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
+        addressStr.remove( QLatin1Char('/') );
+        const QString& userName = auth.user();
+        const QString& password = auth.password();
+        int result = it->checkHostAddress(
+            &m_cameraInfoTempArray,
+            addressStr,
+            &userName,
+            &password );
+        if( result == nxcip::NX_NOT_AUTHORIZED )
+        {
+            //trying one again with no login/password (so that plugin can use default ones)
+            result = it->checkHostAddress(
+                &m_cameraInfoTempArray,
+                addressStr,
+                NULL,
+                NULL );
+        }
+        if( result <= 0 )
             continue;
         return createResListFromCameraInfoList( &*it, m_cameraInfoTempArray );
     }
@@ -215,9 +232,10 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
-    resource->setName(QString::fromUtf8(cameraInfo.modelName));
-    resource->setModel(QString::fromUtf8(cameraInfo.modelName));
-    resource->setMAC(QString::fromUtf8(cameraInfo.uid));
+    resource->setName( QString::fromUtf8(cameraInfo.modelName) );
+    resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
+    resource->setMAC( QString::fromUtf8(cameraInfo.uid) );
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
+    resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     return resource;
 }

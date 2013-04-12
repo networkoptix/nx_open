@@ -11,6 +11,10 @@
 #include <plugins/camera_plugin.h>
 
 
+//
+/*!
+    Implements only MDNS search method (\a nxcip::CameraDiscoveryManager::fromMDNSData method)
+*/
 class AxisCameraDiscoveryManager
 :
     public nxcip::CameraDiscoveryManager
@@ -24,7 +28,7 @@ public:
 
     virtual void getVendorName( char* buf ) const override;
     virtual int findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr ) override;
-    virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* url, const char* login, const char* password ) override;
+    virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;
     virtual int fromMDNSData(
         const char* discoveredAddress,
         const unsigned char* mdnsResponsePacket,

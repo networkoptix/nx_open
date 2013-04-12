@@ -47,8 +47,8 @@ public:
     virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
     virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
-    //!Implementation of nxcip::BaseCameraManager::getErrorString
-    virtual void getErrorString( int errorCode, char* errorString ) const override;
+    //!Implementation of nxcip::BaseCameraManager::getLastErrorString
+    virtual void getLastErrorString( char* errorString ) const override;
 
     const nxcip::CameraInfo& cameraInfo() const;
     nxcip::CameraInfo& cameraInfo();

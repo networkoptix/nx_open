@@ -141,7 +141,7 @@ nxcip::CameraRelayIOManager* AxisCameraManager::getCameraRelayIOManager() const
 }
 
 //!Implementation of nxcip::BaseCameraManager::getErrorString
-void AxisCameraManager::getErrorString( int errorCode, char* errorString ) const
+void AxisCameraManager::getLastErrorString( char* errorString ) const
 {
     //TODO/IMPL
 }

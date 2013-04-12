@@ -8,7 +8,10 @@
 #include <cstddef>
 #include <cstring>
 
+#include <QAuthenticator>
 #include <QLatin1String>
+
+#include <utils/network/simple_http_client.h>
 
 #include "axis_camera_manager.h"
 #include "axis_cam_params.h"
@@ -52,14 +55,77 @@ void AxisCameraDiscoveryManager::getVendorName( char* buf ) const
 
 int AxisCameraDiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
 {
-    //supporting only UPNP-discovery
+    //supporting only MDNS-discovery
     return 0;
 }
 
-int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* url, const char* login, const char* password )
+int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
-    //TODO/IMPL
-    return 0;
+    QString host;
+    int port = DEFAULT_AXIS_API_PORT;
+
+    const char* sepPos = strchr( address, ':' );
+    if( sepPos )
+    {
+        host = QString::fromLatin1( address, sepPos-address );
+        port = atoi( sepPos+1 );
+    }
+    else
+    {
+        //no port specified
+        host = QString::fromLatin1( address );
+    }
+
+    QAuthenticator credentials;
+    const char* loginToUse = login ? login : AXIS_DEFAULT_LOGIN;
+    const char* passwordToUse = password ? password : AXIS_DEFAULT_PASSWORD;
+    credentials.setUser( QString::fromUtf8(loginToUse) );
+    credentials.setPassword( QString::fromUtf8(passwordToUse) );
+
+    CLSimpleHTTPClient http( host, port, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, credentials );
+    //CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list") );
+    CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") );
+    if( status != CL_HTTP_SUCCESS )
+        return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    QByteArray responseBody;
+    http.readAll( responseBody );
+    if( responseBody.isEmpty() )
+        return 0;
+    const QList<QByteArray>& lines = responseBody.split( '\n' );
+
+    QByteArray modelName;
+    QByteArray mac;
+    QByteArray firmware;
+    foreach( QByteArray line, lines )
+    {
+        //line has format param=value
+        int paramValueSepPos = line.indexOf('=');
+        if( paramValueSepPos == -1 )
+            continue;   //unknown param format
+        const QByteArray& paramName = line.mid(0, paramValueSepPos).trimmed();
+        const QByteArray& paramValue = line.mid(paramValueSepPos+1).trimmed();
+
+        if( paramName == "root.Network.Bonjour.FriendlyName" )  //has format: <product name> - <serialnumber>
+            modelName = paramValue.mid(0, paramValue.indexOf('-')).trimmed();
+        else if( paramName == "root.Network.eth0.MACAddress" )
+            mac = paramValue;
+        else if( paramName == "root.Properties.Firmware.Version" )
+            firmware = paramValue;
+    }
+
+    if( modelName.isEmpty() || mac.isEmpty() )
+        return 0;
+
+    memset( cameras, 0, sizeof(*cameras) );
+    strncpy( cameras->uid, mac.data(), std::min<int>(sizeof(cameras->uid)-1, mac.size()) );
+    strncpy( cameras->modelName, modelName.data(), std::min<int>(sizeof(cameras->modelName)-1, modelName.size()) );
+    strncpy( cameras->firmware, firmware.data(), std::min<int>(sizeof(cameras->firmware)-1, firmware.size()) );
+    const QByteArray& hostUtf8 = host.toUtf8();
+    strncpy( cameras->url, hostUtf8.data(), std::min<int>(sizeof(cameras->url)-1, hostUtf8.size()) );
+    strcpy( cameras->defaultLogin, loginToUse );
+    strcpy( cameras->defaultPassword, passwordToUse );
+
+    return 1;
 }
 
 int AxisCameraDiscoveryManager::fromMDNSData(
@@ -70,11 +136,11 @@ int AxisCameraDiscoveryManager::fromMDNSData(
 {
     const QByteArray& msdnResponse = QByteArray::fromRawData( (const char*)mdnsResponsePacket, mdnsResponsePacketSize );
 
+    //parsing mdns response
     QByteArray smac;
     QByteArray name;
 
     int iqpos = msdnResponse.indexOf("AXIS");
-
 
     if (iqpos<0)
         return 0;
@@ -95,17 +161,13 @@ int AxisCameraDiscoveryManager::fromMDNSData(
     if (macpos+12 > msdnResponse.size())
         return 0;
 
-
     //macpos++; // -
 
     while(msdnResponse.at(macpos)==' ')
         ++macpos;
 
-
     if (macpos+12 > msdnResponse.size())
         return 0;
-
-
 
     for (int i = 0; i < 12; i++)
     {

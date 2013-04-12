@@ -359,6 +359,7 @@ struct ManualSearcherHelper
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
+            Q_ASSERT( ns );
             resList = ns->checkHostAddr(url, auth, true);
             if (!resList.isEmpty())
                 break;

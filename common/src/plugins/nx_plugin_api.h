@@ -9,6 +9,9 @@
     - each plugin MUST export function of type \a nxpl::createNXPluginInstanceProc with name \a createNXPluginInstance with "C" linkage
     - each interface MUST inherit \a nxpl::NXPluginInterface
     - each interface has GUID (\a IID_{interface_name} const non-member)
+
+    \note Use in multithreaded environment:\n
+        - \a NXPluginInterface::releaseRef is not guaranteed to be called from thread that called \a NXPluginInterface::addRef
 */
 namespace nxpl
 {
@@ -43,12 +46,14 @@ namespace nxpl
         //!Increment reference counter
         /*!
             \return new reference count
+            \note \a NXPluginInterface::releaseRef is not guaranteed to be called from thread that called \a NXPluginInterface::addRef
         */
         virtual unsigned int addRef() = 0;
         //!Decrement reference counter
         /*!
             When zero, object MUST be removed
             \return new reference count
+            \note \a NXPluginInterface::releaseRef is not guaranteed to be called from thread that called \a NXPluginInterface::addRef
         */
         virtual unsigned int releaseRef() = 0;
     };

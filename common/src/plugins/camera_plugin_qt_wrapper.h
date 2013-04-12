@@ -10,6 +10,7 @@
 #include <QList>
 #include <QVector>
 #include <QString>
+#include <QMutex>
 
 #include "camera_plugin.h"
 
@@ -20,25 +21,41 @@
 */
 namespace nxcip_qt
 {
+    template<class InterfaceType>
     class CommonInterfaceRefManager
     {
     public:
         //!Do not calls \a intf->addRef. It MUST be called prior
-        CommonInterfaceRefManager( nxpl::NXPluginInterface* const intf );
+        CommonInterfaceRefManager( InterfaceType* const intf )
+        :
+            m_intf( intf )
+        {
+        }
+
         //!Calls \a addRef
-        CommonInterfaceRefManager( const CommonInterfaceRefManager& );
-        virtual ~CommonInterfaceRefManager();
+        CommonInterfaceRefManager( const CommonInterfaceRefManager& origin )
+        :
+            m_intf( origin.m_intf )
+        {
+            m_intf->addRef();
+        }
+
+        virtual ~CommonInterfaceRefManager()
+        {
+            m_intf->releaseRef();
+        }
+
+    protected:
+        InterfaceType* const m_intf;
 
     private:
-        nxpl::NXPluginInterface* const m_intf;
-
         CommonInterfaceRefManager& operator=( const CommonInterfaceRefManager& );
     };
 
     //!Wrapper for \a nxcip::CameraDiscoveryManager
     class CameraDiscoveryManager
     :
-        public CommonInterfaceRefManager
+        public CommonInterfaceRefManager<nxcip::CameraDiscoveryManager>
     {
     public:
         CameraDiscoveryManager( nxcip::CameraDiscoveryManager* const intf );
@@ -54,7 +71,7 @@ namespace nxcip_qt
         int findCameras( QVector<nxcip::CameraInfo>* const cameras, const QString& localInterfaceIPAddr );
 
         //!See nxcip::CameraDiscoveryManager::checkHostAddress
-        int checkHostAddress( QVector<nxcip::CameraInfo>* const cameras, const QString& url, const QString& login, const QString& password );
+        int checkHostAddress( QVector<nxcip::CameraInfo>* const cameras, const QString& url, const QString* login, const QString* password );
 
         //!See nxcip::CameraDiscoveryManager::fromMDNSData
         int fromMDNSData( const QByteArray& mdnsResponsePacket, const QHostAddress& discoveredAddress, nxcip::CameraInfo* cameraInfo );
@@ -66,13 +83,13 @@ namespace nxcip_qt
         nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info );
 
     private:
-        nxcip::CameraDiscoveryManager* const m_intf;
+        mutable QMutex m_mutex;
         char* m_texBuf;
     };
 
     class CameraMediaEncoder
     :
-        public CommonInterfaceRefManager
+        public CommonInterfaceRefManager<nxcip::CameraMediaEncoder>
     {
     public:
         CameraMediaEncoder( nxcip::CameraMediaEncoder* const intf );
@@ -94,16 +111,18 @@ namespace nxcip_qt
         int setBitrate( int bitrateKbps, int* selectedBitrateKbps );
 
     private:
-        nxcip::CameraMediaEncoder* const m_intf;
         char* m_textBuf;
 
         CameraMediaEncoder( const CameraMediaEncoder& );
     };
 
     //!Wrapper for \a nxcip::BaseCameraManager
+    /*!
+        \note All methods are thread-safe
+    */
     class BaseCameraManager
     :
-        public CommonInterfaceRefManager
+        public CommonInterfaceRefManager<nxcip::BaseCameraManager>
     {
     public:
         BaseCameraManager( nxcip::BaseCameraManager* const intf );
@@ -131,15 +150,54 @@ namespace nxcip_qt
         //!See nxcip::BaseCameraManager::getCameraRelayIOManager
         nxcip::CameraRelayIOManager* getCameraRelayIOManager() const;
 
-        //!See nxcip::BaseCameraManager::getErrorString
-        QString getErrorString( int errorCode ) const;
+        //!See nxcip::BaseCameraManager::getLastErrorString
+        QString getLastErrorString() const;
 
     private:
-        nxcip::BaseCameraManager* const m_intf;
+        mutable QMutex m_mutex;
         int m_prevErrorCode;
         char* m_textBuf;
 
         BaseCameraManager( const BaseCameraManager& );
+    };
+
+    //!Wrapper for \a nxcip::CameraRelayIOManager
+    class CameraRelayIOManager
+    :
+        public CommonInterfaceRefManager<nxcip::CameraRelayIOManager>
+    {
+    public:
+        CameraRelayIOManager( nxcip::CameraRelayIOManager* const intf );
+        ~CameraRelayIOManager();
+
+        nxcip::CameraRelayIOManager* getRef() { return m_intf; }
+
+        //!See nxcip::CameraRelayIOManager::getRelayOutputList
+        int getRelayOutputList( QStringList* const ids ) const;
+        //!See nxcip::CameraRelayIOManager::getInputPortList
+        int getInputPortList( QStringList* const ids ) const;
+        //!See nxcip::CameraRelayIOManager::setRelayOutputState
+        int setRelayOutputState(
+            const QString& outputID,
+            bool activate,
+            unsigned int autoResetTimeoutMS );
+        //!See nxcip::CameraRelayIOManager::startInputPortMonitoring
+        int startInputPortMonitoring();
+        //!See nxcip::CameraRelayIOManager::stopInputPortMonitoring
+        void stopInputPortMonitoring();
+        //!See nxcip::CameraRelayIOManager::registerEventHandler
+        void registerEventHandler( nxcip::CameraInputEventHandler* handler );
+        //!See nxcip::CameraRelayIOManager::unregisterEventHandler
+        void unregisterEventHandler( nxcip::CameraInputEventHandler* handler );
+
+        //!See nxcip::CameraRelayIOManager::getLastErrorString
+        QString getLastErrorString() const;
+
+    private:
+        char** m_idsList;
+        char* m_textBuf;
+
+        CameraRelayIOManager( const CameraRelayIOManager& );
     };
 }
 

@@ -5,40 +5,21 @@
 
 #include "camera_plugin_qt_wrapper.h"
 
+#include <QMutexLocker>
+
 
 namespace nxcip_qt
 {
-    CommonInterfaceRefManager::CommonInterfaceRefManager( nxpl::NXPluginInterface* const intf )
-    :
-        m_intf( intf )
-    {
-    }
-
-    CommonInterfaceRefManager::CommonInterfaceRefManager( const CommonInterfaceRefManager& origin )
-    :
-        m_intf( origin.m_intf )
-    {
-        m_intf->addRef();
-    }
-
-    CommonInterfaceRefManager::~CommonInterfaceRefManager()
-    {
-        m_intf->releaseRef();
-    }
-
-
     CameraDiscoveryManager::CameraDiscoveryManager( nxcip::CameraDiscoveryManager* const intf )
     :
-        CommonInterfaceRefManager( intf ),
-        m_intf( intf ),
+        CommonInterfaceRefManager<nxcip::CameraDiscoveryManager>( intf ),
         m_texBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
     }
 
     CameraDiscoveryManager::CameraDiscoveryManager( const CameraDiscoveryManager& right )
     :
-        CommonInterfaceRefManager( right ),
-        m_intf( right.m_intf ),
+        CommonInterfaceRefManager<nxcip::CameraDiscoveryManager>( right ),
         m_texBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
     }
@@ -51,6 +32,7 @@ namespace nxcip_qt
     //!See nxcip::CameraDiscoveryManager::getVendorName
     QString CameraDiscoveryManager::getVendorName() const
     {
+        QMutexLocker lk( &m_mutex );
         m_intf->getVendorName( m_texBuf );
         return QString::fromUtf8( m_texBuf );
     }
@@ -69,14 +51,18 @@ namespace nxcip_qt
     int CameraDiscoveryManager::checkHostAddress(
         QVector<nxcip::CameraInfo>* const cameras,
         const QString& url,
-        const QString& login,
-        const QString& password )
+        const QString* login,
+        const QString* password )
     {
         cameras->resize( nxcip::CameraDiscoveryManager::CAMERA_INFO_ARRAY_SIZE );
         const QByteArray& urlUtf8 = url.toUtf8();
-        const QByteArray& loginUtf8 = login.toUtf8();
-        const QByteArray& passwordUtf8 = password.toUtf8();
-        int result = m_intf->checkHostAddress( cameras->data(), urlUtf8.data(), loginUtf8.data(), passwordUtf8.data() );
+        const QByteArray loginUtf8 = login ? login->toUtf8() : QByteArray();
+        const QByteArray passwordUtf8 = password ? password->toUtf8() : QByteArray();
+        int result = m_intf->checkHostAddress(
+            cameras->data(),
+            urlUtf8.data(),
+            login ? loginUtf8.data() : NULL,
+            password ? passwordUtf8.data() : NULL );
         cameras->resize( result > 0 ? result : 0 );
         return result;
     }
@@ -109,8 +95,7 @@ namespace nxcip_qt
     ////////////////////////////////////////////////////////////
     CameraMediaEncoder::CameraMediaEncoder( nxcip::CameraMediaEncoder* const intf )
     :
-        CommonInterfaceRefManager( intf ),
-        m_intf( intf ),
+        CommonInterfaceRefManager<nxcip::CameraMediaEncoder>( intf ),
         m_textBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
     }
@@ -168,8 +153,7 @@ namespace nxcip_qt
     ////////////////////////////////////////////////////////////
     BaseCameraManager::BaseCameraManager( nxcip::BaseCameraManager* const intf )
     :
-        CommonInterfaceRefManager( intf ),
-        m_intf( intf ),
+        CommonInterfaceRefManager<nxcip::BaseCameraManager>( intf ),
         m_textBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
     }
@@ -182,28 +166,33 @@ namespace nxcip_qt
     //!See nxcip::BaseCameraManager::getEncoderCount
     int BaseCameraManager::getEncoderCount( int* encoderCount ) const
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getEncoderCount( encoderCount );
     }
 
     int BaseCameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getEncoder( encoderIndex, encoderPtr );
     }
 
     int BaseCameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getCameraInfo( info );
     }
 
     //!See nxcip::BaseCameraManager::getCameraCapabilities
     int BaseCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getCameraCapabilities( capabilitiesMask );
     }
 
     //!See nxcip::BaseCameraManager::setCredentials
     void BaseCameraManager::setCredentials( const QString& username, const QString& password )
     {
+        QMutexLocker lk( &m_mutex );
         const QByteArray& usernameUtf8 = username.toUtf8();
         const QByteArray& passwordUtf8 = password.toUtf8();
         m_intf->setCredentials( usernameUtf8.data(), passwordUtf8.data() );
@@ -211,30 +200,136 @@ namespace nxcip_qt
 
     int BaseCameraManager::setAudioEnabled( bool audioEnabled )
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->setAudioEnabled( audioEnabled ? 1 : 0 );
     }
 
     //!See nxcip::BaseCameraManager::getPTZManager
     nxcip::CameraPTZManager* BaseCameraManager::getPTZManager() const
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getPTZManager();
     }
 
     //!See nxcip::BaseCameraManager::getCameraMotionDataProvider
     nxcip::CameraMotionDataProvider* BaseCameraManager::getCameraMotionDataProvider() const
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getCameraMotionDataProvider();
     }
 
     //!See nxcip::BaseCameraManager::getCameraRelayIOManager
     nxcip::CameraRelayIOManager* BaseCameraManager::getCameraRelayIOManager() const
     {
+        QMutexLocker lk( &m_mutex );
         return m_intf->getCameraRelayIOManager();
     }
 
-    QString BaseCameraManager::getErrorString( int errorCode ) const
+    QString BaseCameraManager::getLastErrorString() const
     {
-        m_intf->getErrorString( errorCode, m_textBuf );
+        QMutexLocker lk( &m_mutex );
+        m_intf->getLastErrorString( m_textBuf );
+        return QString::fromUtf8( m_textBuf );
+    }
+
+
+    ////////////////////////////////////////////////////////////
+    //// CameraRelayIOManager class
+    ////////////////////////////////////////////////////////////
+
+    CameraRelayIOManager::CameraRelayIOManager( nxcip::CameraRelayIOManager* const intf )
+    :
+        CommonInterfaceRefManager<nxcip::CameraRelayIOManager>( intf ),
+        m_idsList( NULL ),
+        m_textBuf( new char[nxcip::MAX_TEXT_LEN] )
+    {
+        m_idsList = new char*[nxcip::MAX_RELAY_PORT_COUNT];
+        for( size_t i = 0; i < nxcip::MAX_RELAY_PORT_COUNT; ++i )
+        {
+            m_idsList[i] = new char[nxcip::MAX_ID_LEN];
+            m_idsList[i][0] = 0;
+        }
+    }
+
+    CameraRelayIOManager::~CameraRelayIOManager()
+    {
+        for( size_t i = 0; i < nxcip::MAX_RELAY_PORT_COUNT; ++i )
+            delete[] m_idsList[i];
+        delete[] m_idsList;
+        m_idsList = NULL;
+
+        delete[] m_textBuf;
+        m_textBuf = NULL;
+    }
+
+    //!See nxcip::CameraRelayIOManager::getRelayOutputList
+    int CameraRelayIOManager::getRelayOutputList( QStringList* const ids ) const
+    {
+        int idNum = 0;
+        int result = m_intf->getRelayOutputList( m_idsList, &idNum );
+        if( result )
+            return result;
+        if( idNum > nxcip::MAX_RELAY_PORT_COUNT )
+            return nxcip::NX_UNDEFINED_BEHAVOUR;
+
+        for( int i = 0; i < idNum; ++i )
+            ids->push_back( QString::fromUtf8(m_idsList[i], std::min<size_t>(strlen(m_idsList[i]), nxcip::MAX_ID_LEN) ) );
+        return result;
+    }
+
+    //!See nxcip::CameraRelayIOManager::getInputPortList
+    int CameraRelayIOManager::getInputPortList( QStringList* const ids ) const
+    {
+        int idNum = 0;
+        int result = m_intf->getInputPortList( m_idsList, &idNum );
+        if( result )
+            return result;
+        if( idNum > nxcip::MAX_RELAY_PORT_COUNT )
+            return nxcip::NX_UNDEFINED_BEHAVOUR;
+
+        for( int i = 0; i < idNum; ++i )
+            ids->push_back( QString::fromUtf8(m_idsList[i], std::min<size_t>(strlen(m_idsList[i]), nxcip::MAX_ID_LEN) ) );
+        return result;
+    }
+
+    //!See nxcip::CameraRelayIOManager::setRelayOutputState
+    int CameraRelayIOManager::setRelayOutputState(
+        const QString& outputID,
+        bool activate,
+        unsigned int autoResetTimeoutMS )
+    {
+        const QByteArray& outputIDUtf8 = outputID.toUtf8();
+        return m_intf->setRelayOutputState( outputIDUtf8.data(), activate, autoResetTimeoutMS );
+    }
+
+    //!See nxcip::CameraRelayIOManager::startInputPortMonitoring
+    int CameraRelayIOManager::startInputPortMonitoring()
+    {
+        return m_intf->startInputPortMonitoring();
+    }
+
+    //!See nxcip::CameraRelayIOManager::stopInputPortMonitoring
+    void CameraRelayIOManager::stopInputPortMonitoring()
+    {
+        return m_intf->stopInputPortMonitoring();
+    }
+
+    //!See nxcip::CameraRelayIOManager::registerEventHandler
+    void CameraRelayIOManager::registerEventHandler( nxcip::CameraInputEventHandler* handler )
+    {
+        m_intf->registerEventHandler( handler );
+    }
+
+    //!See nxcip::CameraRelayIOManager::unregisterEventHandler
+    void CameraRelayIOManager::unregisterEventHandler( nxcip::CameraInputEventHandler* handler )
+    {
+        m_intf->unregisterEventHandler( handler );
+    }
+
+    //!See nxcip::CameraRelayIOManager::getLastErrorString
+    QString CameraRelayIOManager::getLastErrorString() const
+    {
+        m_intf->getLastErrorString( m_textBuf );
         return QString::fromUtf8( m_textBuf );
     }
 }

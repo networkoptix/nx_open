@@ -8,6 +8,10 @@
 //!Network Optix Camera Integration Plugin API
 /*!
     - all text values are NULL-terminated utf-8
+
+    \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
+        - single interface pointer is never used concurrently by multiple threads, but different pointers to same interface 
+            (e.g., \a BaseCameraManager) can be used by different threads concurrently
 */
 namespace nxcip
 {
@@ -18,6 +22,8 @@ namespace nxcip
     static const int NX_NOT_AUTHORIZED = -1;
     static const int NX_INVALID_ENCODER_NUMBER = 2;
     static const int NX_UNSUPPORTED_RESOLUTION = -9;
+    static const int NX_UNDEFINED_BEHAVOUR = -20;
+    static const int NX_NOT_IMPLEMENTED = -21;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -87,12 +93,13 @@ namespace nxcip
         //!Check host for camera presence
         /*!
             This method is used to add camera with known ip (e.g., if multicast is disabled in network)
-            \param url String "host:port", port is optional
-            \param login
-            \param password
+            \param address String "host:port", port is optional
+            \param address
+            \param login If NULL, default login is used
+            \param password If NULL, default password is used
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
-        virtual int checkHostAddress( CameraInfo* cameras, const char* url, const char* login, const char* password ) = 0;
+        virtual int checkHostAddress( CameraInfo* cameras, const char* address, const char* login, const char* password ) = 0;
         //!MDNS camera search method
         /*!
             Mediaserver calls this method when it finds unknown MDNS host.
@@ -296,12 +303,11 @@ namespace nxcip
         //!MUST return not-NULL if \a relayInputCapability is present
         virtual CameraRelayIOManager* getCameraRelayIOManager() const = 0;
 
-        //!Returns text description of error code
+        //!Returns text description of last error
         /*!
-            \param errorCode Result code returned by any setter method
             \param errorString Buffer of \a MAX_TEXT_LEN_SIZE
         */
-        virtual void getErrorString( int errorCode, char* errorString ) const = 0;
+        virtual void getLastErrorString( char* errorString ) const = 0;
     };
 
 
@@ -399,12 +405,11 @@ namespace nxcip
         */
         virtual int updateState() = 0;
 
-        //!Returns text description of error code
+        //!Returns text description of last error
         /*!
-            \param errorCode Result code returned by any setter method
             \param errorString Buffer of \a MAX_TEXT_LEN_SIZE
         */
-        virtual void getErrorString( int errorCode, char* errorString ) const = 0;
+        virtual void getLastErrorString( char* errorString ) const = 0;
     };
 
 
@@ -426,10 +431,13 @@ namespace nxcip
     // {872F473F-72CF-4397-81E6-C06D42E97113}
     static const nxpl::NX_GUID IID_CameraRelayIOManager = { 0x87, 0x2f, 0x47, 0x3f, 0x72, 0xcf, 0x43, 0x97, 0x81, 0xe6, 0xc0, 0x6d, 0x42, 0xe9, 0x71, 0x13 };
 
-    static const int MAX_ID_LEN = 32;
-    static const int MAX_RELAY_PORT_COUNT = 16;
+    static const int MAX_ID_LEN = 64;
+    static const int MAX_RELAY_PORT_COUNT = 32;
 
     //!Relay input/output management
+    /*!
+        It is implementation defined which thread event (\a CameraInputEventHandler::inputPortStateChanged) will be delivered to
+    */
     class CameraRelayIOManager
     :
         virtual public nxpl::NXPluginInterface
@@ -470,26 +478,39 @@ namespace nxcip
         virtual int startInputPortMonitoring() = 0;
 
         //!Stop monitoring input port
+        /*!
+            Implementation MUST guarantee:\n
+                - no \a CameraInputEventHandler::inputPortStateChanged method MUST be called after this method have returned
+                - if \a CameraInputEventHandler::inputPortStateChanged is currently running in different thread, 
+                    this method MUST block until \a CameraInputEventHandler::inputPortStateChanged has returned
+        */
         virtual void stopInputPortMonitoring() = 0;
 
         //!Registers \a handler as event receiver
         /*!
-            \note Does not call \a huandler->addRef
+            Usually, events are delivered (by \a handler->inputPortStateChanged call) to some plugin internal thread
+            \note Does not call \a handler->addRef
         */
-        void registerEventHandler( CameraInputEventHandler* handler );
+        virtual void registerEventHandler( CameraInputEventHandler* handler ) = 0;
 
         //!Removes \a handler from event receiver list
         /*!
             If \a handler is not registered, nothing is done
+            Implementation MUST guarantee:\n
+                - no \a handler->inputPortStateChanged method MUST be called after this method have returned
+                - if \a handler->inputPortStateChanged is currently running in different thread, 
+                    this method MUST block until \a handler->inputPortStateChanged has returned
+            
+            \note \a handler->releaseRef() is not called in this method
         */
-        void unregisterEventHandler( CameraInputEventHandler* handler );
+        virtual void unregisterEventHandler( CameraInputEventHandler* handler ) = 0;
 
-        //!Returns text description of error code
+        //!Returns text description of last error
         /*!
             \param errorCode Result code returned by any setter method
             \param errorString Buffer of \a MAX_TEXT_LEN_SIZE
         */
-        virtual void getErrorString( int errorCode, char* errorString ) const = 0;
+        virtual void getLastErrorString( char* errorString ) const = 0;
     };
 
 

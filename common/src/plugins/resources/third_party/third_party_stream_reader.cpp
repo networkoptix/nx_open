@@ -47,6 +47,9 @@ void ThirdPartyStreamReader::openStream()
         return;
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
+    if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
+        return;
+
     const nxcip::Resolution& resolution = (role == QnResource::Role_LiveVideo) 
         ? getMaxResolution(encoderNumber) 
         : getNearestResolution(encoderNumber, DEFAULT_SECOND_STREAM_RESOLUTION);
@@ -56,8 +59,7 @@ void ThirdPartyStreamReader::openStream()
     float selectedFps = 0;
     if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
         return;
-    if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-        return;
+
     QString mediaUrlStr;
     if( cameraEncoder.getMediaUrl( &mediaUrlStr ) != nxcip::NX_NO_ERROR )
         return;

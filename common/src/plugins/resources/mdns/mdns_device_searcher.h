@@ -7,7 +7,7 @@
 
 bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 
-class QnMdnsResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnMdnsResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 protected:
     QnMdnsResourceSearcher();
