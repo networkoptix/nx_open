@@ -1,9 +1,9 @@
 #include "instrumented.h"
 #include "instrument_manager.h"
 
-detail::InstrumentedBase::InstrumentedBase(): m_scene(NULL) {}
+InstrumentedBase::InstrumentedBase(): m_scene(NULL) {}
 
-void detail::InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem *item) {
+void InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem *item) {
     if(m_scene == scene)
         return;
 

@@ -645,6 +645,7 @@ void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibili
 
         boundWidget = new QnViewportBoundWidget();
         boundWidget->setLayout(boundLayout);
+        boundWidget->setAcceptedMouseButtons(0);
     }
     (boundWidget ? boundWidget : widget)->setParentItem(this);
 

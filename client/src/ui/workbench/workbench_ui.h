@@ -20,7 +20,6 @@ class QGraphicsLinearLayout;
 class QnVideoCamera;
 
 class InstrumentManager;
-class UiElementsInstrument;
 class ActivityListenerInstrument;
 class FpsCountingInstrument;
 class VariantAnimator;
@@ -281,9 +280,6 @@ private:
 
     /** Instrument manager for the scene. */
     InstrumentManager *m_instrumentManager;
-
-    /** Ui elements instrument. */
-    UiElementsInstrument *m_uiElementsInstrument;
 
     /** Fps counting instrument. */
     FpsCountingInstrument *m_fpsCountingInstrument;

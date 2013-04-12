@@ -16,8 +16,8 @@
 
 class PtzSplashItem;
 class PtzSelectionItem;
-class PtzStaticOverlayWidget;
-class PtzDynamicOverlayWidget;
+class PtzOverlayWidget;
+class PtzElementsWidget;
 class PtzManipulatorWidget;
 
 class QnWorkbenchPtzController;
@@ -74,8 +74,8 @@ private slots:
     void at_zoomOutButton_released();
     void at_zoomButton_activated(qreal speed);
 
-    void updateOverlayWidgets();
-    void updateOverlayWidgets(QnMediaResourceWidget *widget);
+    void updateOverlayWidget();
+    void updateOverlayWidget(QnMediaResourceWidget *widget);
     void updateCapabilities(const QnSecurityCamResourcePtr &resource);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
@@ -93,11 +93,15 @@ private:
     PtzSelectionItem *selectionItem() const {
         return m_selectionItem.data();
     }
-
-    PtzStaticOverlayWidget *staticOverlayWidget(QnMediaResourceWidget *widget) const;
-    PtzDynamicOverlayWidget *dynamicOverlayWidget(QnMediaResourceWidget *widget) const;
-    void ensureOverlayWidgets(QnMediaResourceWidget *widget);
     void ensureSelectionItem();
+
+    PtzElementsWidget *elementsWidget() const {
+        return m_elementsWidget.data();
+    }
+    void ensureElementsWidget();
+
+    PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
+    PtzOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
@@ -111,14 +115,13 @@ private:
 
 private:
     struct PtzData {
-        PtzData(): capabilities(0), staticOverlayWidget(NULL), dynamicOverlayWidget(NULL) {}
+        PtzData(): capabilities(0), overlayWidget(NULL) {}
 
         Qn::CameraCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
         QRectF pendingAbsoluteMove;
-        PtzStaticOverlayWidget *staticOverlayWidget;
-        PtzDynamicOverlayWidget *dynamicOverlayWidget;
+        PtzOverlayWidget *overlayWidget;
     };
 
     QnWorkbenchPtzController *m_ptzController;
@@ -128,6 +131,7 @@ private:
     qreal m_expansionSpeed;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;
+    QWeakPointer<PtzElementsWidget> m_elementsWidget;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
     QWeakPointer<PtzManipulatorWidget> m_manipulator;

@@ -28,7 +28,6 @@
 #include <ui/animation/opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
-#include <ui/graphics/instruments/ui_elements_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
@@ -44,6 +43,7 @@
 #include <ui/graphics/items/generic/clickable_widget.h>
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
+#include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
@@ -214,10 +214,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
-    m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
-    m_instrumentManager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
@@ -226,7 +224,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
 
     /* Create controls. */
-    m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
+    m_controlsWidget = new QnUiElementsWidget();
+    m_controlsWidget->setAcceptedMouseButtons(0);
+    display()->scene()->addItem(m_controlsWidget);
     display()->setLayer(m_controlsWidget, Qn::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
@@ -1569,9 +1569,9 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels) {
 }
 
 void QnWorkbenchUi::initGraphicsMessageBox() {
-    UiElementsInstrument* messageBoxInstrument = new UiElementsInstrument(this);
-    m_instrumentManager->installInstrument(messageBoxInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
-    QGraphicsWidget *graphicsMessageBoxWidget = messageBoxInstrument->widget();
+    QGraphicsWidget *graphicsMessageBoxWidget = new QnUiElementsWidget();
+    graphicsMessageBoxWidget->setAcceptedMouseButtons(0);
+    display()->scene()->addItem(graphicsMessageBoxWidget);
     display()->setLayer(graphicsMessageBoxWidget, Qn::MessageBoxLayer);
 
     QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);

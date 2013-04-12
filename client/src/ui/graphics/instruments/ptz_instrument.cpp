@@ -25,6 +25,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -274,6 +275,8 @@ public:
         if(qFuzzyCompare(size, m_size))
             return;
 
+        qDebug() << size;
+
         m_size = size;
 
         invalidatePath();
@@ -475,13 +478,13 @@ public:
 
 
 // -------------------------------------------------------------------------- //
-// PtzStaticOverlayWidget
+// PtzOverlayWidget
 // -------------------------------------------------------------------------- //
-class PtzStaticOverlayWidget: public QGraphicsWidget {
+class PtzOverlayWidget: public QGraphicsWidget {
     typedef QGraphicsWidget base_type;
 
 public:
-    PtzStaticOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+    PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags)
     {
         setAcceptedMouseButtons(0);
@@ -586,13 +589,13 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// PtzDynamicOverlayWidget
+// PtzElementsWidget
 // -------------------------------------------------------------------------- //
-class PtzDynamicOverlayWidget: public QGraphicsWidget {
-    typedef QGraphicsWidget base_type;
+class PtzElementsWidget: public QnUiElementsWidget {
+    typedef QnUiElementsWidget base_type;
 
 public:
-    PtzDynamicOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+    PtzElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)
     {
         setAcceptedMouseButtons(0);
@@ -603,6 +606,7 @@ public:
 
         m_arrowItem->setOpacity(0.0);
         m_pointerItem->setOpacity(0.0);
+        m_pointerItem->setSize(QSizeF(24.0, 24.0));
     }
 
     PtzArrowItem *arrowItem() const {
@@ -611,23 +615,6 @@ public:
 
     PtzPointerItem *pointerItem() const {
         return m_pointerItem;
-    }
-
-    virtual void setGeometry(const QRectF &rect) override {
-        QSizeF oldSize = size();
-
-        base_type::setGeometry(rect);
-
-        if(!qFuzzyCompare(oldSize, size()))
-            updateSizes();
-    }
-
-private:
-    void updateSizes() {
-        QRectF rect = this->rect();
-        qreal centralWidth = qMin(rect.width(), rect.height()) / 32;
-
-        m_pointerItem->setSize(QSizeF(centralWidth, centralWidth));
     }
 
 private:
@@ -679,72 +666,72 @@ PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     return result;
 }
 
-PtzStaticOverlayWidget *PtzInstrument::staticOverlayWidget(QnMediaResourceWidget *widget) const {
-    return m_dataByWidget[widget].staticOverlayWidget;
+PtzOverlayWidget *PtzInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
+    return m_dataByWidget[widget].overlayWidget;
 }
 
-PtzDynamicOverlayWidget *PtzInstrument::dynamicOverlayWidget(QnMediaResourceWidget *widget) const {
-    return m_dataByWidget[widget].dynamicOverlayWidget;
-}
-
-void PtzInstrument::ensureOverlayWidgets(QnMediaResourceWidget *widget) {
+PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
 
-    if(data.staticOverlayWidget)
-        return;
+    if(data.overlayWidget)
+        return data.overlayWidget;
 
-    PtzStaticOverlayWidget *staticOverlay = new PtzStaticOverlayWidget();
-    staticOverlay->setOpacity(0.0);
-    staticOverlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
-    staticOverlay->zoomInButton()->setTarget(widget);
-    staticOverlay->zoomOutButton()->setTarget(widget);
-    data.staticOverlayWidget = staticOverlay;
+    PtzOverlayWidget *overlay = new PtzOverlayWidget();
+    overlay->setOpacity(0.0);
+    overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
+    overlay->zoomInButton()->setTarget(widget);
+    overlay->zoomOutButton()->setTarget(widget);
+    data.overlayWidget = overlay;
 
-    connect(staticOverlay->zoomInButton(),  SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
-    connect(staticOverlay->zoomInButton(),  SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
-    connect(staticOverlay->zoomOutButton(), SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
-    connect(staticOverlay->zoomOutButton(), SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
+    connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
+    connect(overlay->zoomInButton(),    SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
+    connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
+    connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
-    widget->addOverlayWidget(staticOverlay, QnResourceWidget::Invisible, true, false);
+    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false);
 
-    PtzDynamicOverlayWidget *dynamicOverlay = new PtzDynamicOverlayWidget();
-    dynamicOverlay->setOpacity(0.0);
-    data.dynamicOverlayWidget = dynamicOverlay;
-
-    widget->addOverlayWidget(dynamicOverlay, QnResourceWidget::Invisible, false, false);
+    return overlay;
 }
 
 void PtzInstrument::ensureSelectionItem() {
-    if(selectionItem() != NULL)
+    if(selectionItem())
         return;
 
     m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
-    if(scene() != NULL)
+    if(scene())
         scene()->addItem(selectionItem());
 }
 
-void PtzInstrument::updateOverlayWidgets() {
-    updateOverlayWidgets(checked_cast<QnMediaResourceWidget *>(sender()));
+void PtzInstrument::ensureElementsWidget() {
+    if(elementsWidget())
+        return;
+
+    m_elementsWidget = new PtzElementsWidget();
+    display()->setLayer(elementsWidget(), Qn::EffectsLayer);
+    
+    if(scene())
+        scene()->addItem(elementsWidget());
 }
 
-void PtzInstrument::updateOverlayWidgets(QnMediaResourceWidget *widget) {
+void PtzInstrument::updateOverlayWidget() {
+    updateOverlayWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
+void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
     bool hasCrosshair = widget->options() & QnResourceWidget::DisplayCrosshair;
 
     if(hasCrosshair)
-        ensureOverlayWidgets(widget);
+        ensureOverlayWidget(widget);
 
     QnResourceWidget::OverlayVisibility visibility = hasCrosshair ? QnResourceWidget::AutoVisible : QnResourceWidget::Invisible;
 
-    if(PtzStaticOverlayWidget *staticOverlay = staticOverlayWidget(widget)) {
+    if(PtzOverlayWidget *staticOverlay = overlayWidget(widget)) {
         widget->setOverlayWidgetVisibility(staticOverlay, visibility);
         staticOverlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
     }
-
-    if(PtzDynamicOverlayWidget *dynamicOverlay = dynamicOverlayWidget(widget))
-        widget->setOverlayWidgetVisibility(dynamicOverlay, visibility);
 }
 
 void PtzInstrument::updateCapabilities(const QnSecurityCamResourcePtr &resource) {
@@ -766,7 +753,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
         data.capabilities &= ~Qn::AbsolutePtzCapability; /* No mapper? Can't use absolute movement. */
 
     if(oldCapabilities != data.capabilities)
-        updateOverlayWidgets(widget);
+        updateOverlayWidget(widget);
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
@@ -893,6 +880,7 @@ void PtzInstrument::processPtzDoubleClick() {
 // -------------------------------------------------------------------------- //
 void PtzInstrument::installedNotify() {
     assert(selectionItem() == NULL);
+    assert(elementsWidget() == NULL);
 
     base_type::installedNotify();
 }
@@ -909,6 +897,8 @@ void PtzInstrument::aboutToBeUninstalledNotify() {
 
     if(selectionItem())
         delete selectionItem();
+    if(elementsWidget())
+        delete elementsWidget();
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
@@ -917,13 +907,13 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
 
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
         if(QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
-            connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidgets()));
+            connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
             data.currentSpeed = data.requestedSpeed = m_ptzController->movement(camera);
 
             updateCapabilities(widget);
-            updateOverlayWidgets(widget);
+            updateOverlayWidget(widget);
 
             return true;
         }
@@ -1021,8 +1011,8 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
         return false; /* Ignore clicks on widget frame. */
 
     PtzManipulatorWidget *manipulator = NULL;
-    if(PtzStaticOverlayWidget *staticOverlay = staticOverlayWidget(target)) {
-        manipulator = staticOverlay->manipulatorWidget();
+    if(PtzOverlayWidget *overlay = overlayWidget(target)) {
+        manipulator = overlay->manipulatorWidget();
         if(!manipulator->isVisible() || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
             manipulator = NULL;
     }
@@ -1067,7 +1057,9 @@ void PtzInstrument::startDrag(DragInfo *) {
     } else {
         manipulator()->setCursor(Qt::BlankCursor);
         target()->setCursor(Qt::BlankCursor);
-        opacityAnimator(dynamicOverlayWidget(target())->arrowItem(), 0.5)->animateTo(1.0);
+
+        ensureElementsWidget();
+        opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
         /* Everything else will be initialized in the first call to drag(). */
     }
 
@@ -1121,11 +1113,12 @@ void PtzInstrument::dragMove(DragInfo *info) {
         }
 
         qreal speedMagnitude = length(speed);
-        qreal arrowSize = scale / 16.0 * (0.4 + 2.6 * speedMagnitude);
+        qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
-        PtzArrowItem *arrowItem = dynamicOverlayWidget(target())->arrowItem();
-        arrowItem->moveTo(target()->rect().center(), info->mouseItemPos());
-        arrowItem->setSize(QSize(arrowSize, arrowSize));
+        ensureElementsWidget();
+        PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
+        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), info->mouseItemPos()));
+        arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
     }
@@ -1146,7 +1139,9 @@ void PtzInstrument::finishDrag(DragInfo *) {
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
-            opacityAnimator(dynamicOverlayWidget(target())->arrowItem())->animateTo(0.0);
+            
+            ensureElementsWidget();
+            opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
         }
     }
 
