@@ -722,7 +722,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
-    return;
+    delete m_controlsWidget;
 }
 
 Qn::ActionScope QnWorkbenchUi::currentScope() const {
