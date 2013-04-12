@@ -65,7 +65,7 @@ public:
     };
     Q_DECLARE_FLAGS(Buttons, Button)
 
-    // TODO: Refactoring needed.
+    // TODO: #Elric Refactoring needed.
     enum OverlayVisibility {
         Invisible,
         UserVisible,

@@ -587,7 +587,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
 
 
     factory(Qn::BusinessEventsAction).

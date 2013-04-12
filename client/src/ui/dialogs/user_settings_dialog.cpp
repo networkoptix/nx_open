@@ -124,7 +124,7 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
 //        ui->accessRightsGroupbox->setEnabled(editable);
         setReadOnly(ui->accessRightsComboBox, !editable);
         setReadOnly(ui->accessRightsGroupbox, !editable);
-        // TODO: #gdm if readonly then do not save anyway
+        // TODO: #GDM if readonly then do not save anyway
         break;
     case Email:
         ui->emailEdit->setVisible(visible);

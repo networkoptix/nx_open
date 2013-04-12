@@ -777,7 +777,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
 void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *scene, QEvent *event) {
     Q_UNUSED(scene)
-    // TODO: evil hack to prevent focus jumps when scene is focused.
+    // TODO: #Elric evil hack to prevent focus jumps when scene is focused.
     QFocusEvent *focusEvent = static_cast<QFocusEvent *>(event);
     *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
 }

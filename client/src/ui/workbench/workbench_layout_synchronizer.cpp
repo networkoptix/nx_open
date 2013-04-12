@@ -199,7 +199,7 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItemsLater() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged() {
-    update(); // TODO: check why there is no update guard here
+    update(); // TODO: #Elric check why there is no update guard here
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {

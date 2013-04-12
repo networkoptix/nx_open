@@ -102,7 +102,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setCellSpacing(resource->cellSpacing());
     setLocked(resource->locked());
 
-    // TODO: note that we keep items that are not present in resource's data.
+    // TODO: #Elric note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
     const QHash<int, QVariant> data = resource->data();
     for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)

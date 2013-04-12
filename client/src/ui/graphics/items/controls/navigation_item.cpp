@@ -264,7 +264,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
     //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO
-    // TODO: handlers must be implemented elsewhere
+    // TODO: #Elric handlers must be implemented elsewhere
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));

@@ -48,7 +48,7 @@ namespace {
         return QString();
     }
 
-    // TODO: #gdm fill aggregationComboBox in cpp file so that
+    // TODO: #GDM fill aggregationComboBox in cpp file so that
     // names & numbers are in one place. Store steps in userData.
 
     // make sure size is equal to ui->aggregationComboBox->count()

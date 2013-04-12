@@ -58,7 +58,7 @@ void QnResourceDirectoryBrowser::cleanup()
 
 QnResourceList QnResourceDirectoryBrowser::findResources()
 {
-    if (m_resourceReady) // TODO: if path check list is changed, this check will prevent us from re-updating the resource list.
+    if (m_resourceReady) // TODO: #Elric if path check list is changed, this check will prevent us from re-updating the resource list.
     {
         return QnResourceList();
     }
@@ -218,7 +218,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QIODevice* itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
     QTextStream itemTimeZones(itemTimeZonesIO);
 
-    // TODO: here is bad place to add resources to pool. need refactor
+    // TODO: #Elric here is bad place to add resources to pool. need refactor
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();

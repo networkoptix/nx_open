@@ -9,7 +9,7 @@
 #include <ui/common/tool_tip_queryable.h>
 
 namespace {
-    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: implement like in help topic accessor, with bubbleUp.
+    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: #Elric implement like in help topic accessor, with bubbleUp.
         QWidget *childWidget = widget->childAt(pos);
         if(!childWidget)
             childWidget = widget;

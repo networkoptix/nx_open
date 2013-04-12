@@ -334,7 +334,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_instrumentManager->registerScene(m_scene);
 
     /* Note that selection often changes there and back, and we don't want such changes to 
-     * affect our logic, so we use queued connections here. */ // TODO: I don't see queued connections
+     * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged())); 
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
@@ -1563,7 +1563,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             
             qint64 displayTime = time;
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
-                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: do offset adjustments in one place
+                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
             QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);

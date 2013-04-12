@@ -322,7 +322,7 @@ void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 end
     while(m_processingStack.size() > maxStackSize)
         m_processingStack.pop();
 
-    // if(m_processingStack.size() == 1) // TODO: for some reason, this doesn't work in some cases.
+    // if(m_processingStack.size() == 1) // TODO: #Elric for some reason, this doesn't work in some cases.
         emit processingRequested();
 }
 

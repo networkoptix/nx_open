@@ -31,7 +31,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     m_syncPlay(NULL)
 {
     /* Prepare syncplay. */
-    m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
+    m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: #Elric QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
 
     /* Connect to display. */
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                this,       SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -84,7 +84,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
     
     result.started = m_syncPlay->isEnabled();
     if(result.started) {
-        result.speed = 1.0; // TODO: need getSpeed() here.
+        result.speed = 1.0; // TODO: #Elric need getSpeed() here.
         result.time = m_syncPlay->getCurrentTime();
     }
     
@@ -181,7 +181,7 @@ void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
     if(!(resource->flags() & QnResource::sync))
-        return; // TODO: implement reverse handling?
+        return; // TODO: #Elric implement reverse handling?
 
     foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {
         if(widget->resource() == resource) {
