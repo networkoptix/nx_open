@@ -74,6 +74,9 @@
 -(NSURL*) videoUrl {
     NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/media/%@.mpjpeg?resolution=240p&qmin=10&qmax=10", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
     return [NSURL URLWithString:path relativeToURL:_server.ecs.config.url];
+    
+//    NSString *path = [NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=240p&qmin=10&qmax=10", _physicalId];
+//    return [NSURL URLWithString:path relativeToURL:_server.streamingUrl];
 }
 
 -(NSURL*) thumbnailUrl {

@@ -28,6 +28,7 @@
 
 #pragma mark - Constants
 
+#define FPS_MEASURE_SECONDS 5
 #define END_MARKER_BYTES { 0xFF, 0xD9 }
 
 static NSData *_endMarkerData = nil;
@@ -39,6 +40,59 @@ static NSData *_endMarkerData = nil;
 @end
 
 #pragma mark - Implementation
+
+@implementation FpsCounter
+
++(FpsCounter*) fpsCounterWithInterval: (NSUInteger)interval {
+    return [[FpsCounter alloc] initWithInterval:interval];
+}
+
+-(FpsCounter*) initWithInterval: (NSUInteger)interval {
+    self = [super init];
+    if (self) {
+        _interval = interval;
+        _timestampQueue = [NSMutableArray array];
+    }
+    
+    return self;
+}
+
+-(void) clearOld: (double)currentTime {
+    NSIndexSet *indexesToRemove = [_timestampQueue indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+        if (currentTime - ((NSNumber*)obj).doubleValue > _interval)
+            return YES;
+        else {
+            *stop = YES;
+            return NO;
+        }
+    }];
+    [_timestampQueue removeObjectsAtIndexes:indexesToRemove];
+}
+
+-(void) postDisplay {
+    double currentTime = CFAbsoluteTimeGetCurrent();
+    [self clearOld:currentTime];
+    [_timestampQueue addObject:[NSNumber numberWithDouble:currentTime]];
+}
+
+-(NSUInteger) currentFps {
+    if (_timestampQueue.count == 0)
+        return 0;
+    
+    double currentTime = CFAbsoluteTimeGetCurrent();
+    [self clearOld:currentTime];
+    
+    double first = [[_timestampQueue objectAtIndex:0] doubleValue];
+    
+    double measureInterval = currentTime - first;
+    if (measureInterval < 0.5)
+        return 0;
+    
+//    NSLog(@"%lf", _timestampQueue.count / measureInterval);
+    return round(_timestampQueue.count / measureInterval);
+}
+
+@end
 
 @implementation MotionJpegImageView
 
@@ -55,27 +109,48 @@ static NSData *_endMarkerData = nil;
 
 #pragma mark - Initializers
 
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+- (void) doInit {
+    _url = nil;
+    _receivedData = nil;
+    _username = nil;
+    _password = nil;
+    _allowSelfSignedCertificates = NO;
+    if (_fpsCounter == nil)
+        _fpsCounter = [FpsCounter fpsCounterWithInterval:FPS_MEASURE_SECONDS];
+    
+    if (_endMarkerData == nil) {
+        uint8_t endMarker[2] = END_MARKER_BYTES;
+        _endMarkerData = [[NSData alloc] initWithBytes:endMarker length:2];
+    }
+    
+    self.contentMode = UIViewContentModeScaleAspectFit;
+}
+
+- (id) init {
+    self = [super init];
     
     if (self) {
-        _url = nil;
-        _receivedData = nil;
-        _username = nil;
-        _password = nil;
-        _allowSelfSignedCertificates = NO;
-        
-        if (_endMarkerData == nil) {
-            uint8_t endMarker[2] = END_MARKER_BYTES;
-            _endMarkerData = [[NSData alloc] initWithBytes:endMarker length:2];
-        }
-        
-        self.contentMode = UIViewContentModeScaleAspectFit;
+        [self doInit];
     }
     
     return self;
 }
 
+- (id) initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    
+    if (self) {
+        [self doInit];
+    }
+    
+    return self;
+}
+
+-(void) setUrl:(NSURL *)url {
+    [self doInit];
+    
+    _url = url;
+}
 -(void)awakeFromNib {
     [super awakeFromNib];
     
@@ -83,7 +158,8 @@ static NSData *_endMarkerData = nil;
         uint8_t endMarker[2] = END_MARKER_BYTES;
         _endMarkerData = [[NSData alloc] initWithBytes:endMarker length:2];
     }
-    
+
+    _fpsCounter = [FpsCounter fpsCounterWithInterval:FPS_MEASURE_SECONDS];
     self.contentMode = UIViewContentModeScaleAspectFit;
 }
 
@@ -96,6 +172,8 @@ static NSData *_endMarkerData = nil;
         // continue
     }
     else if (_url) {
+        NSLog(@"Playing %@", [_url absoluteString]);
+        
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:_url];
 
          NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", _url.user, _url.password];
@@ -125,6 +203,28 @@ static NSData *_endMarkerData = nil;
 
 #pragma mark - NSURLConnection Delegate Methods
 
+-(UIImage*) drawTextOnPic:(NSString*) bottomText
+                  inImage:(UIImage*)  image
+{
+    
+    UIFont *font = [UIFont boldSystemFontOfSize:12];
+    UIGraphicsBeginImageContext(image.size);
+    [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
+    
+    CGRect rect = CGRectMake(5.0f,5.0f,image.size.width-20.0f, image.size.height);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetShadow(context, CGSizeMake(2.5f, 2.5f), 5.0f);
+    
+    
+    [[UIColor redColor] set];
+    [bottomText drawInRect:CGRectIntegral(rect) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentRight];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     _receivedData = [[NSMutableData alloc] init];
 }
@@ -141,15 +241,17 @@ static NSData *_endMarkerData = nil;
         NSData *imageData = [_receivedData subdataWithRange:NSMakeRange(0, endLocation)];
         UIImage *receivedImage = [UIImage imageWithData:imageData];
         if (receivedImage) {
-            self.image = receivedImage;
+            [_fpsCounter postDisplay];
+            self.image = [self drawTextOnPic:[NSString stringWithFormat:@"FPS: %d", [_fpsCounter currentFps]] inImage:receivedImage];
         }
     }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    NSLog(@"connectionDidFinishLoading");
 }
 
--                    (BOOL)connection:(NSURLConnection *)connection 
+- (BOOL)connection:(NSURLConnection *)connection
 canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
     BOOL allow = NO;
     if ([protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
@@ -162,7 +264,7 @@ canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
     return allow;
 }
 
--                (void)connection:(NSURLConnection *)connection 
+-                (void)connection:(NSURLConnection *)connection
 didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     if ([challenge previousFailureCount] == 0 &&
         _username && _username.length > 0 &&
@@ -185,6 +287,10 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
 
 - (void)connection:(NSURLConnection *)connection 
   didFailWithError:(NSError *)error {
+    NSLog(@"didFailWithError: %@", error);
+    [self stop];
+    _connection = nil;
+    [self play];
 }
 
 #pragma mark - CredentialAlertView Delegate Methods

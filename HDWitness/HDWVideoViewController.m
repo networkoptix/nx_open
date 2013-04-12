@@ -51,9 +51,16 @@
 //    return self.imageView;
 //}
 
+- (void)showTimeSelector {
+    
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
+    self.navigationItem.rightBarButtonItem = addButton;
 
     self.imageView.allowSelfSignedCertificates = YES;
     self.imageView.allowClearTextCredentials = YES;
@@ -67,10 +74,11 @@
     self.imageView.password = _camera.videoUrl.password;
     self.imageView.url = _camera.videoUrl;
     [self.imageView play];
+    
 	// Do any additional setup after loading the view.
 }
 
-- (void) dealloc {
+- (void)dealloc {
     [self.imageView stop];
 }
 

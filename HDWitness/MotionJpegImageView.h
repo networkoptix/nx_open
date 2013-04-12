@@ -25,6 +25,20 @@
 
 #import <UIKit/UIKit.h>
 
+@interface FpsCounter : NSObject  {
+    NSUInteger _interval;
+    NSMutableArray *_timestampQueue;
+}
+
++(FpsCounter*) fpsCounterWithInterval: (NSUInteger)interval;
+
+-(id) initWithInterval: (NSUInteger)interval;
+
+-(void) postDisplay;
+-(NSUInteger) currentFps;
+
+@end
+
 @interface MotionJpegImageView : UIImageView {
     
 @private
@@ -35,7 +49,7 @@
     NSString *_password;
     BOOL _allowSelfSignedCertificates;
     BOOL _allowClearTextCredentials;
-    
+    FpsCounter *_fpsCounter;
 }
 
 @property (nonatomic, readwrite, copy) NSURL *url;
