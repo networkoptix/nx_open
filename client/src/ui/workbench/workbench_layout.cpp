@@ -34,7 +34,7 @@ namespace {
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
     QObject(parent)
 {
-    // TODO: this does not belong here.
+    // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
@@ -48,7 +48,7 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
         return;
     }
 
-    // TODO: this does not belong here.
+    // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
@@ -102,7 +102,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setCellSpacing(resource->cellSpacing());
     setLocked(resource->locked());
 
-    // TODO: note that we keep items that are not present in resource's data.
+    // TODO: #Elric note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
     const QHash<int, QVariant> data = resource->data();
     for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)
@@ -210,10 +210,17 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     }
 
     /* Remove all zoom links first. */
+#if 0 // TODO: #Elric does not belong here?
     if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
         removeZoomLink(item, zoomTargetItem);
     foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
         removeZoomLink(zoomItem, item);
+#else 
+    if(QnWorkbenchItem *zoomTargetItem = this->zoomTargetItem(item))
+        removeZoomLink(item, zoomTargetItem);
+    foreach(QnWorkbenchItem *zoomItem, this->zoomItems(item))
+        removeItem(zoomItem);
+#endif
 
     /* Update internal data structures. */
     if(item->isPinned())

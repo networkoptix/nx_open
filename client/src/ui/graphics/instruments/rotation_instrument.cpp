@@ -101,6 +101,8 @@ public:
         /* We cheat with the bounding rect, but properly calculating it is not worth it. */
         qreal d = std::numeric_limits<qreal>::max() / 4;
         m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
+
+        setAcceptedMouseButtons(0);
     }
 
     virtual QRectF boundingRect() const override {

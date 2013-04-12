@@ -91,7 +91,7 @@ void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
 
 void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
     // TODO: #GDM also update checked state!
-    // TODO: maybe tristate for 'show all' checkbox would be better.
+    // TODO: #GDM maybe tristate for 'show all' checkbox would be better.
     foreach (QCheckBox* checkbox, m_businessRulesCheckBoxes) {
         checkbox->setEnabled(!checked);
     }

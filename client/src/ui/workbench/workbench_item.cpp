@@ -32,11 +32,11 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
 {
     if(m_resourceUid.isEmpty()) {
         qnWarning("Creating a workbench item from item data with invalid unique id.");
-        // TODO: fix layout item data conventions.
+        // TODO: #Elric fix layout item data conventions.
 
         QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
         if(resource)
-            m_resourceUid = resource->getUniqueId(); // TODO: add warning if NULL?
+            m_resourceUid = resource->getUniqueId(); // TODO: #Elric add warning if NULL?
     }
 
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
@@ -44,7 +44,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setCombinedGeometry(data.combinedGeometry);
     setZoomRect(data.zoomRect);
 
-    m_dataByRole = data.dataByRole; // TODO
+    m_dataByRole = data.dataByRole; // TODO: #Elric
 }
 
 QnWorkbenchItem::~QnWorkbenchItem() {

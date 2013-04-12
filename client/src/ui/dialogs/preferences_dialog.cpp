@@ -48,7 +48,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->setupUi(this);
 
     ui->maxVideoItemsLabel->hide();
-    ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
+    ui->maxVideoItemsSpinBox->hide(); // TODO: #Elric Cannot edit max number of items on the scene.
 
     if(m_settings->isBackgroundEditable()) {
         ui->backgroundColorPicker->setAutoFillBackground(false);
@@ -201,7 +201,7 @@ void QnPreferencesDialog::submitToSettings() {
 
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
-    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
+    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: #Elric re-check if it is needed here.
 
     m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
 
@@ -278,7 +278,7 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
-    //TODO: call setDirectory
+    //TODO: #Elric call setDirectory
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;

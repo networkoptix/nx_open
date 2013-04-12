@@ -130,7 +130,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
 
         bool isUnsupported = 
             (widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server)) ||
-            !(widget->resource()->flags() & QnResource::utc); // TODO: this is wrong, we need a flag for exported files.
+            !(widget->resource()->flags() & QnResource::utc); // TODO: #GDM this is wrong, we need a flag for exported files.
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -205,7 +205,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(QnResource::user))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: move this to permissions.
+        if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: #Elric move this to permissions.
             if(resource->getStatus() == QnResource::Offline)
                 continue; /* Can remove only if offline. */
 
@@ -329,7 +329,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
     bool watchable = !(resources[0]->flags() & QnResource::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
     return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
 
-    // TODO: this will fail (?) if we have sync with some UTC resource on the scene.
+    // TODO: #Elric this will fail (?) if we have sync with some UTC resource on the scene.
 }
 
 Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {

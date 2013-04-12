@@ -17,6 +17,7 @@
 class PtzSplashItem;
 class PtzSelectionItem;
 class PtzOverlayWidget;
+class PtzElementsWidget;
 class PtzManipulatorWidget;
 
 class QnWorkbenchPtzController;
@@ -92,10 +93,15 @@ private:
     PtzSelectionItem *selectionItem() const {
         return m_selectionItem.data();
     }
+    void ensureSelectionItem();
+
+    PtzElementsWidget *elementsWidget() const {
+        return m_elementsWidget.data();
+    }
+    void ensureElementsWidget();
 
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
     PtzOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
-    void ensureSelectionItem();
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
@@ -125,6 +131,7 @@ private:
     qreal m_expansionSpeed;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;
+    QWeakPointer<PtzElementsWidget> m_elementsWidget;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
     QWeakPointer<PtzManipulatorWidget> m_manipulator;

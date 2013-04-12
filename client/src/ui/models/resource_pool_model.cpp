@@ -201,7 +201,7 @@ public:
             if(!bastard)
                 bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
             if(!bastard)
-                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); // TODO: hack hack hack
+                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
@@ -580,7 +580,7 @@ private:
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType, bool isFlat):
+QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat, QObject *parent):
     QAbstractItemModel(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
@@ -674,7 +674,7 @@ void QnResourcePoolModel::deleteNode(Node *node) {
            node->type() == Qn::ItemNode ||
            node->type() == Qn::RecorderNode);
 
-    // TODO: implement this in Node's destructor.
+    // TODO: #Elric implement this in Node's destructor.
 
     foreach(Node *childNode, node->children())
         deleteNode(childNode);

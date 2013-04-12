@@ -48,6 +48,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -333,7 +334,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_instrumentManager->registerScene(m_scene);
 
     /* Note that selection often changes there and back, and we don't want such changes to 
-     * affect our logic, so we use queued connections here. */ // TODO: I don't see queued connections
+     * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged())); 
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
@@ -352,7 +353,7 @@ void QnWorkbenchDisplay::initSceneView() {
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
         if (!QGLFormat::hasOpenGL()) {
-            qnCritical("Software rendering is not supported."); // TODO: this check must be performed on startup.
+            qnCritical("Software rendering is not supported."); // TODO: #Elric this check must be performed on startup.
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
@@ -452,7 +453,6 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -746,7 +746,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
     const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
 
-    if (m_widgets.size() >= maxItemCount) { // TODO: item limit must be changeable.
+    if (m_widgets.size() >= maxItemCount) { // TODO: #Elric item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
@@ -757,7 +757,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: unsupported for now
+    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
     }
@@ -844,13 +844,14 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem) {
     disconnect(item, NULL, this, NULL);
 
-    removeZoomLinksInternal(item);
-
-    QnResourceWidget *widget = m_widgetByItem.value(item);
+    QnResourceWidget *widget = this->widget(item);
     if(widget == NULL) {
         assert(!destroyItem);
         return false; /* The widget wasn't created. */
     }
+
+    /* Remove all linked zoom items. */
+    removeZoomLinksInternal(item);
 
     disconnect(widget, NULL, this, NULL);
     if(widgets(widget->resource()).size() == 1)
@@ -1562,7 +1563,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             
             qint64 displayTime = time;
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
-                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: do offset adjustments in one place
+                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
             QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);

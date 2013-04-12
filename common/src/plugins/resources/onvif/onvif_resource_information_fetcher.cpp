@@ -12,14 +12,14 @@ const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
 
 // Add vendor and camera model to ommit ONVIF search (you have to add in case sensitive here)
-static char* ANALOG_CAMERAS[][2] =
+static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
 	{"vivo_ironman", "VS8801"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
-static char* IGNORE_VENDORS[][2] =
+static const char* IGNORE_VENDORS[][2] =
 {
     {"*networkcamera*", "IP*"}, // DLINK
     {"*", "*spartan-6*"}          // ArecontVision

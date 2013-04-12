@@ -13,9 +13,9 @@
 #include <utils/license_usage_helper.h>
 
 
-QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
+QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnExportCameraSettingsDialog()),
     m_recordingEnabled(true),
     m_motionUsed(false),
@@ -26,7 +26,7 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
 {
     ui->setupUi(this);
 
-    m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
+    m_resourceModel = new QnResourcePoolModel(Qn::ServersNode, false, this);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);

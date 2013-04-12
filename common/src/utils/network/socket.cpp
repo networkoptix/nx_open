@@ -873,7 +873,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qnWarning("Multicast group join failed (setsockopt()).");
+            qWarning() << "failed to join multicast group" << multicastGroup;
             return false;
     }
     return true;
@@ -887,7 +887,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qnWarning("Multicast group join failed (setsockopt()).");
+            qWarning() << "failed to join multicast group" << multicastGroup << "from IF" << multicastIF;
             return false;
     }
     return true;
@@ -947,7 +947,7 @@ bool UDPSocket::hasData() const
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
 #endif
-    return ::poll( &sockPollfd, 1, 0 ) == 1;
+    return (::poll( &sockPollfd, 1, 0 ) == 1) && ((sockPollfd.revents & POLLIN) != 0);
 #endif
 }
 

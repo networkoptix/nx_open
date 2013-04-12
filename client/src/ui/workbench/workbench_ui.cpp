@@ -28,7 +28,6 @@
 #include <ui/animation/opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
-#include <ui/graphics/instruments/ui_elements_instrument.h>
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/bounding_instrument.h>
@@ -44,10 +43,12 @@
 #include <ui/graphics/items/generic/clickable_widget.h>
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
+#include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/actions/action_manager.h>
@@ -213,10 +214,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
-    m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
-    m_instrumentManager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
@@ -225,7 +224,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_fpsCountingInstrument,    SIGNAL(fpsChanged(qreal)),                                                                  this,                           SLOT(at_fpsChanged(qreal)));
 
     /* Create controls. */
-    m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
+    m_controlsWidget = new QnUiElementsWidget();
+    m_controlsWidget->setAcceptedMouseButtons(0);
+    display()->scene()->addItem(m_controlsWidget);
     display()->setLayer(m_controlsWidget, Qn::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
@@ -436,7 +437,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: why height is zero here?
+    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: #Elric why height is zero here?
     m_titleYAnimator->setSpeed(32.0 * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
@@ -643,7 +644,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: why height is zero at this point?
+    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: #Elric why height is zero at this point?
     m_sliderYAnimator->setSpeed(70.0 * 2.0); 
     m_sliderYAnimator->setTimeLimit(500);
 
@@ -676,6 +677,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(opacityAnimator(m_popupShowButton), SIGNAL(finished()),                 this,           SLOT(updatePopupButtonAnimation()));
     connect(action(Qn::TogglePopupsAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_togglePopupsAction_toggled(bool)));
 
+    initGraphicsMessageBox();
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
@@ -1121,7 +1123,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
-    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: does this belong here?
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
@@ -1352,7 +1354,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
+        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 }
 
@@ -1566,6 +1568,30 @@ void QnWorkbenchUi::setOpenedPanels(Panels panels) {
     setHelpOpened(panels & HelpPanel);
 }
 
+void QnWorkbenchUi::initGraphicsMessageBox() {
+    QGraphicsWidget *graphicsMessageBoxWidget = new QnUiElementsWidget();
+    graphicsMessageBoxWidget->setAcceptedMouseButtons(0);
+    display()->scene()->addItem(graphicsMessageBoxWidget);
+    display()->setLayer(graphicsMessageBoxWidget, Qn::MessageBoxLayer);
+
+    QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    messageBoxVLayout->setSpacing(0.0);
+
+    QGraphicsLinearLayout* messageBoxHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    messageBoxHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    messageBoxHLayout->setSpacing(0.0);
+
+    graphicsMessageBoxWidget->setLayout(messageBoxHLayout);
+
+    messageBoxHLayout->addStretch();
+    messageBoxHLayout->addItem(messageBoxVLayout);
+    messageBoxHLayout->addStretch();
+
+    messageBoxVLayout->addStretch();
+    messageBoxVLayout->addItem(new QnGraphicsMessageBoxItem(graphicsMessageBoxWidget));
+    messageBoxVLayout->addStretch();
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1623,7 +1649,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setHelpOpened(false, isFullscreen);
         setSliderOpened(false, isFullscreen);
 
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: change code so that this call is not needed.
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
         action(Qn::FitInViewAction)->trigger();
 
         m_inFreespace = true;
@@ -1663,7 +1689,7 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        if(widget->isInfoVisible()) // TODO: wrong place?
+        if(widget->isInfoVisible()) // TODO: #Elric wrong place?
             widget->setOverlayVisible(true);
 }
 

@@ -587,7 +587,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
 
 
     factory(Qn::BusinessEventsAction).
@@ -688,7 +688,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenNewWindowLayoutsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open Layout(s) in a New Window")). // TODO: split into sinle- & multi- action
+        text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).

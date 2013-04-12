@@ -50,6 +50,7 @@ class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
+class QnGraphicsMessageBox;
 
 /**
  * This class implements default scene manipulation logic.
@@ -116,9 +117,6 @@ protected:
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
 
-    void showOverlayLabel(const QString &text, int width);
-    void initOverlayLabelAnimation();
-
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -181,11 +179,13 @@ protected slots:
     void at_screenRecorder_recordingStarted();
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
-    void at_recordingAnimation_valueChanged(const QVariant &value);
+    void at_recordingAnimation_tick(int tick);
     void at_recordingAnimation_finished();
 
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
+
+    void at_tourModeLabel_finished();
 
     void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
 private:
@@ -285,11 +285,9 @@ private:
     bool m_countdownCanceled;
 
     /** Screen recording countdown label. */
-    QLabel *m_overlayLabel;
+    QnGraphicsMessageBox *m_recordingCountdownLabel;
 
-    /** Animation for screen recording countdown. */
-    QPropertyAnimation *m_overlayLabelAnimation;
-
+    QnGraphicsMessageBox *m_tourModeHintLabel;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

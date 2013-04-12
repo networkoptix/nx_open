@@ -77,7 +77,7 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
     qnLicensePool->replaceLicenses(licenses);
 }
 
-bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: 'insert' parameter is hacky. Get rid of it and write some nicer code.
+bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: #Elric 'insert' parameter is hacky. Get rid of it and write some nicer code.
 {
     bool result = false;
     QnResourcePtr ownResource;

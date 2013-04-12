@@ -227,7 +227,7 @@ void QnWorkbenchPtzPresetManager::at_context_userChanged() {
 
 void QnWorkbenchPtzPresetManager::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle) {
     Q_UNUSED(errorString)
-    // TODO: check status
+    // TODO: #Elric check status
 
     if(status != 0) {
         qnWarning("Failed to save/load ptz presets.");

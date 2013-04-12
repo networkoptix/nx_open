@@ -16,12 +16,16 @@
 
 #include <ui/style/globals.h>
 #include <ui/help/help_topics.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/style/statistics_colors.h>
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
 /** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
@@ -88,7 +92,7 @@ namespace {
              * for this line segment, producing NaNs in its output.
              * These NaNs are then fed to GPU, resulting in artifacts. */
 
-            // TODO: #gdm This logic seems overly complicated to me.
+            // TODO: #GDM This logic seems overly complicated to me.
             //            I'm sure we can do the same with a code that is at least three times shorter.
 
             /* Drawing only second part of the arc, cut at the beginning */
@@ -186,12 +190,17 @@ namespace {
 
 } // anonymous namespace
 
+// -------------------------------------------------------------------------- //
+// QnServerResourceWidget
+// -------------------------------------------------------------------------- //
+
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
     m_manager(context->instance<QnMediaServerStatisticsManager>()),
     m_lastHistoryId(-1),
     m_counter(0),
-    m_renderStatus(Qn::NothingRendered)
+    m_renderStatus(Qn::NothingRendered),
+    m_maxMaskUsed(1)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource) 
@@ -203,6 +212,8 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     /* Note that this slot is already connected to nameChanged signal in 
      * base class's constructor.*/
     connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
+
+    addLegendOverlay();
 
     /* Run handlers. */
     updateButtonsVisibility();
@@ -318,6 +329,9 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         graphPen.setCapStyle(Qt::FlatCap);
 
         foreach(QString key, m_sortedKeys) {
+            if (!m_checkedFlagByKey.value(key, true))
+                continue;
+
             QnStatisticsData &stats = m_history[key];
             qreal currentValue = 0;
             QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - space_offset*2), elapsed_step, &currentValue);
@@ -410,6 +424,9 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             legendPen.setWidthF(pen_width * 2 * unzoom);
 
             foreach(QString key, m_sortedKeys) {
+                if (!m_checkedFlagByKey.value(key, true))
+                    continue;
+
                 legendPen.setColor(getColorByKey(key));
                 painter->setPen(legendPen);
                 painter->strokePath(legend, legendPen);
@@ -460,6 +477,8 @@ void QnServerResourceWidget::at_statistics_received() {
         qSort(tmp.begin(), tmp.end(), statisticsDataLess);
         foreach(QnStatisticsData key, tmp)
             m_sortedKeys.append(key.description);
+
+        updateLegend();
     }
 
     m_lastHistoryId = id;
@@ -467,4 +486,70 @@ void QnServerResourceWidget::at_statistics_received() {
 
     m_elapsedTimer.restart();
     m_counter++;
+}
+
+void QnServerResourceWidget::addLegendOverlay() {
+    m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Vertical);
+    m_legendButtonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
+    connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
+
+    QGraphicsLinearLayout *legendOverlayVLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    legendOverlayVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    legendOverlayVLayout->addStretch(1);
+    legendOverlayVLayout->addItem(m_legendButtonBar);
+    legendOverlayVLayout->addStretch(2);
+
+    QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    legendOverlayHLayout->addItem(legendOverlayVLayout);
+    legendOverlayHLayout->addStretch();
+
+    QnViewportBoundWidget *legendOverlayWidget = new QnViewportBoundWidget(this);
+    legendOverlayWidget->setLayout(legendOverlayHLayout);
+    legendOverlayWidget->setAcceptedMouseButtons(Qt::LeftButton);
+    legendOverlayWidget->setOpacity(1.0);
+    addOverlayWidget(legendOverlayWidget, AutoVisible, true);
+}
+
+void QnServerResourceWidget::updateLegend() {
+
+    int visibleMask = 0;
+    int checkedMask = 0;
+
+    foreach (QString key, m_sortedKeys) {
+        int mask;
+        if (!m_buttonMaskByKey.contains(key)) {
+            mask = m_maxMaskUsed;
+            m_maxMaskUsed *= 2;
+            m_buttonMaskByKey[key] = mask;
+        } else {
+            mask = m_buttonMaskByKey[key];
+        }
+        visibleMask |= mask;
+
+        if (!m_legendButtonBar->button(mask)) {
+            QnImageButtonWidget *infoButton = new QnImageButtonWidget();
+            infoButton->setIcon(qnSkin->icon("item/info.png"));
+            infoButton->setCheckable(true);
+            infoButton->setProperty(Qn::NoBlockMotionSelection, true);
+            infoButton->setToolTip(key);
+            m_legendButtonBar->addButton(mask, infoButton);
+        }
+
+        bool checked =  m_checkedFlagByKey.value(key, true);
+        if (checked)
+            checkedMask |= mask;
+    }
+    m_legendButtonBar->setCheckedButtons(checkedMask);
+    m_legendButtonBar->setVisibleButtons(visibleMask);
+}
+
+void QnServerResourceWidget::at_legend_checkedButtonsChanged() {
+    int checkedMask = m_legendButtonBar->checkedButtons();
+    foreach (QString key, m_sortedKeys) {
+        if (!m_buttonMaskByKey.contains(key))
+            continue;
+        int mask = m_buttonMaskByKey[key];
+        m_checkedFlagByKey[key] = ((checkedMask & mask) > 0);
+    }
 }

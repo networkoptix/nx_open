@@ -292,7 +292,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
                 QnFrameScaler::downscale(tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
             else {
                 if (!rescaleFrame(*(tmpFrame.data()), *outFrame, tmpFrame->width / scaleFactor, tmpFrame->height / scaleFactor)) // universal scaler
-                    { /* do nothing. */ } // TODO: wtf?
+                    { /* do nothing. */ } // TODO: #Elric wtf?
             }
         }
         m_drawer->draw(outFrame);

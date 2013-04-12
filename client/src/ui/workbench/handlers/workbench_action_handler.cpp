@@ -70,6 +70,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
@@ -103,7 +104,7 @@
 #include "file_processor.h"
 #include "version.h"
 
-// TODO: remove this include
+// TODO: #Elric remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
 #include "camera/caching_time_period_loader.h"
@@ -183,8 +184,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
-    m_exportRetryCount(0),
     m_exportedCamera(0),
+    m_exportRetryCount(0),
     m_healthRequestHandle(0),
     m_tourTimer(new QTimer())
 {
@@ -296,7 +297,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
-    //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
+    //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: #Elric not needed?
 
     context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
 
@@ -523,7 +524,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
 
             QnWorkbenchLayoutList currentLayouts = workbench()->layouts();
             at_resources_saved(processor->status(), processor->errorString(), processor->resources(), processor->handle());
-            return workbench()->layouts() == currentLayouts; // TODO: This is an ugly hack, think of a better solution.
+            return workbench()->layouts() == currentLayouts; // TODO: #Elric This is an ugly hack, think of a better solution.
         }
     } else {
         return false;
@@ -545,7 +546,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             snapshotManager()->save(normalResources, object, slot);
 
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
-            if (validateItemTypes(fileResource)) { // TODO: and if not?
+            if (validateItemTypes(fileResource)) { // TODO: #Elric and if not?
                 bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
                 saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
             }
@@ -710,7 +711,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         return;
     }
 
-    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: evil!
+    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: #Elric evil!
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
@@ -877,7 +878,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
-    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
+    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
     at_checkSystemHealthAction_triggered(); //TODO: #GDM place to corresponding place
 }
@@ -949,7 +950,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         return;
     }
 
-    // TODO: server & media resources only!
+    // TODO: #Elric server & media resources only!
     QnResourceList resources = parameters.resources();
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
@@ -969,7 +970,7 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    // TODO: server & media resources only!
+    // TODO: #Elric server & media resources only!
     QnResourceList resources = menu()->currentParameters(sender()).resources();
     if(resources.isEmpty()) 
         return;
@@ -1107,7 +1108,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     newLayout->setGuid(QUuid::createUuid());
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
-    newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+    newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: #Elric this does not belong here.
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
     newLayout->setUserCanEdit(context()->user() == user);
@@ -1256,9 +1257,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     if (workbench()->currentLayout()->resource()->locked() &&
             !parameters.resources().empty() &&
             layouts.empty()) {
-        QMessageBox::information(widget(),
-                                 tr("Layout is locked"),
-                                 tr("Layout is locked and cannot be changed."));
+        QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
     }
 
 
@@ -1576,11 +1575,11 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         connectionInfo = processor->info();
     }
 
-    // TODO: maybe we need to check server-client compatibility here?
+    // TODO: #Elric maybe we need to check server-client compatibility here?
 
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
 
-    QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
+    QnClientMessageProcessor::instance()->stop(); // TODO: #Elric blocks gui thread.
     QnSessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
@@ -1601,7 +1600,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->setLayoutsUpdated(false);
     resourcePool()->removeResources(remoteResources);
-    // Also remove layouts that were just added and have no 'remote' flag set. TODO: hack. 
+    // Also remove layouts that were just added and have no 'remote' flag set.
+    //TODO: #Elric hack.
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
         if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
             resourcePool()->removeResource(layout);
@@ -1628,11 +1628,11 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     if(context()->user() && !closeAllLayouts(true))
         return;
 
-    // TODO: Factor out common code from reconnect/disconnect/login actions.
+    // TODO: #GDM Factor out common code from reconnect/disconnect/login actions.
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
-    QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
+    QnClientMessageProcessor::instance()->stop(); // TODO: #Elric blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
@@ -1641,7 +1641,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->setLayoutsUpdated(false);
     resourcePool()->removeResources(remoteResources);
-    // Also remove layouts that were just added and have no 'remote' flag set. TODO: hack. 
+    // Also remove layouts that were just added and have no 'remote' flag set.
+    //TODO: #Elric hack.
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
         if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
             resourcePool()->removeResource(layout);
@@ -1650,7 +1651,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     qnLicensePool->reset();
 
     QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
-    // TODO: save workbench state on logout.
+    // TODO: #Elric save workbench state on logout.
 
     if (popupCollectionWidget())
         popupCollectionWidget()->clear();
@@ -1707,7 +1708,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 16; // TODO: take it from config?
+    const qint64 maxItems = 16; // TODO: #Elric take it from config?
 
     if(period.durationMs < steps[1]) {
         QMessageBox::warning(widget(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
@@ -1797,7 +1798,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: #Elric this does not belong here.
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -1950,7 +1951,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     if(!dialog->exec())
         return;
 
-    // TODO: move submitToResources here.
+    // TODO: #Elric move submitToResources here.
     connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
@@ -2070,7 +2071,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
         resource->setName(name);
         if(QnWorkbenchLayout::instance(layout))
-            QnWorkbenchLayout::instance(layout)->setName(name); // TODO: hack
+            QnWorkbenchLayout::instance(layout)->setName(name); // TODO: #Elric hack
 
         if(!changed)
             snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -2183,7 +2184,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: #Elric this does not belong here.
     resourcePool()->addResource(layout);
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -2192,7 +2193,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
-    if(context()->user()) { // TODO: factor out
+    if(context()->user()) { // TODO: #Elric factor out
         QnWorkbenchState state;
         workbench()->submit(state);
 
@@ -2210,7 +2211,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.size() != 1)
         return;
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: check
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: #Elric check
     if (!widget) //e.g. server item
         return;
 
@@ -2235,7 +2236,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    // TODO: move out, common code
+    // TODO: #Elric move out, common code
     QString timeString;
     qint64 time = display->camDisplay()->getCurrentTime() / 1000;
     if(widget->resource()->flags() & QnResource::utc) {
@@ -2392,7 +2393,7 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
 
     QnTimePeriod exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 
-    if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: implement more precise estimation
+    if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
             this->widget(),
             tr("Warning"),
@@ -2497,7 +2498,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     else
         return false; // not used
 
-    QSettings settings; // TODO: replace with QnSettings
+    QSettings settings; // TODO: #Elric replace with QnSettings
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
@@ -2738,7 +2739,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         }
     }
 
-	// TODO: export progress dialog can be already deleted?
+    // TODO: #Elric export progress dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
     m_exportPeriod = exportPeriod;
@@ -2749,7 +2750,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
 void QnWorkbenchActionHandler::at_layout_exportFinished()
 {
-    disconnect(sender(), NULL, this, NULL); // TODO: not needed here.
+    disconnect(sender(), NULL, this, NULL); // TODO: #Elric not needed here.
 
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
@@ -2942,7 +2943,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 
-    if(period.durationMs > 1000 * 60 * 30) { // TODO: implement more precise estimation
+    if(period.durationMs > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
             this->widget(),
             tr("Warning"),
@@ -2959,7 +2960,7 @@ Do you want to continue?"),
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
     QSettings settings;
-    settings.beginGroup(QLatin1String("export")); // TODO: replace with QnSettings
+    settings.beginGroup(QLatin1String("export")); // TODO: #Elric replace with QnSettings
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     if (!previousDir.length()){
         previousDir = qnSettings->mediaFolder();
@@ -3269,7 +3270,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
         return;
     }
 
-    action(Qn::JumpToLiveAction)->trigger(); // TODO: ?
+    action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     context()->instance<QnWorkbenchPtzController>()->setPosition(camera, preset.logicalPosition);
 }
 

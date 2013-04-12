@@ -25,6 +25,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -274,6 +275,8 @@ public:
         if(qFuzzyCompare(size, m_size))
             return;
 
+        qDebug() << size;
+
         m_size = size;
 
         invalidatePath();
@@ -490,27 +493,15 @@ public:
         m_manipulatorWidget = new PtzManipulatorWidget(this);
         m_zoomInButton = new PtzZoomButtonWidget(this);
         m_zoomOutButton = new PtzZoomButtonWidget(this);
-        m_arrowItem = new PtzArrowItem(this);
-        m_pointerItem = new PtzPointerItem(this);
 
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
-        m_arrowItem->setOpacity(0.0);
-        m_pointerItem->setOpacity(0.0);
 
         updateLayout();
     }
 
     PtzManipulatorWidget *manipulatorWidget() const {
         return m_manipulatorWidget;
-    }
-
-    PtzArrowItem *arrowItem() const {
-        return m_arrowItem;
-    }
-
-    PtzPointerItem *pointerItem() const {
-        return m_pointerItem;
     }
 
     PtzZoomButtonWidget *zoomInButton() const {
@@ -535,7 +526,7 @@ public:
         Q_UNUSED(widget)
         QRectF rect = this->rect();
 
-        QVector<QPointF> crosshairLines; // TODO: cache these?
+        QVector<QPointF> crosshairLines; // TODO: #Elric cache these?
 
         QPointF center = rect.center();
         qreal d0 = qMin(rect.width(), rect.height()) / 4.0;
@@ -586,17 +577,47 @@ private:
         QPointF xStep(centralWidth, 0), yStep(0, centralWidth);
 
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
-
-        m_pointerItem->setSize(QSizeF(centralWidth, centralWidth));
     }
 
 private:
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzZoomButtonWidget *m_zoomInButton;
     PtzZoomButtonWidget *m_zoomOutButton;
+};
+
+
+// -------------------------------------------------------------------------- //
+// PtzElementsWidget
+// -------------------------------------------------------------------------- //
+class PtzElementsWidget: public QnUiElementsWidget {
+    typedef QnUiElementsWidget base_type;
+
+public:
+    PtzElementsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+        base_type(parent, windowFlags)
+    {
+        setAcceptedMouseButtons(0);
+
+        /* Note that construction order is important as it defines which items are on top. */
+        m_arrowItem = new PtzArrowItem(this);
+        m_pointerItem = new PtzPointerItem(this);
+
+        m_arrowItem->setOpacity(0.0);
+        m_pointerItem->setOpacity(0.0);
+        m_pointerItem->setSize(QSizeF(24.0, 24.0));
+    }
+
+    PtzArrowItem *arrowItem() const {
+        return m_arrowItem;
+    }
+
+    PtzPointerItem *pointerItem() const {
+        return m_pointerItem;
+    }
+
+private:
     PtzArrowItem *m_arrowItem;
     PtzPointerItem *m_pointerItem;
 };
@@ -652,11 +673,10 @@ PtzOverlayWidget *PtzInstrument::overlayWidget(QnMediaResourceWidget *widget) co
 PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
 
-    PtzOverlayWidget *overlay = data.overlayWidget;
-    if(overlay)
-        return overlay;
+    if(data.overlayWidget)
+        return data.overlayWidget;
 
-    overlay = new PtzOverlayWidget();
+    PtzOverlayWidget *overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
@@ -668,20 +688,32 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
     connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
-    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, false, false);
+    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false);
+
     return overlay;
 }
 
 void PtzInstrument::ensureSelectionItem() {
-    if(selectionItem() != NULL)
+    if(selectionItem())
         return;
 
     m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
-    if(scene() != NULL)
+    if(scene())
         scene()->addItem(selectionItem());
+}
+
+void PtzInstrument::ensureElementsWidget() {
+    if(elementsWidget())
+        return;
+
+    m_elementsWidget = new PtzElementsWidget();
+    display()->setLayer(elementsWidget(), Qn::EffectsLayer);
+    
+    if(scene())
+        scene()->addItem(elementsWidget());
 }
 
 void PtzInstrument::updateOverlayWidget() {
@@ -694,11 +726,11 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
     if(hasCrosshair)
         ensureOverlayWidget(widget);
 
-    if(PtzOverlayWidget *overlay = overlayWidget(widget)) {
-        widget->setOverlayWidgetVisibility(overlay, hasCrosshair ? QnResourceWidget::AutoVisible : QnResourceWidget::Invisible);
-        //opacityAnimator(overlay, 0.5)->animateTo(hasCrosshair ? 1.0 : 0.0);
+    QnResourceWidget::OverlayVisibility visibility = hasCrosshair ? QnResourceWidget::AutoVisible : QnResourceWidget::Invisible;
 
-        overlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
+    if(PtzOverlayWidget *staticOverlay = overlayWidget(widget)) {
+        widget->setOverlayWidgetVisibility(staticOverlay, visibility);
+        staticOverlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
     }
 }
 
@@ -848,6 +880,7 @@ void PtzInstrument::processPtzDoubleClick() {
 // -------------------------------------------------------------------------- //
 void PtzInstrument::installedNotify() {
     assert(selectionItem() == NULL);
+    assert(elementsWidget() == NULL);
 
     base_type::installedNotify();
 }
@@ -864,6 +897,8 @@ void PtzInstrument::aboutToBeUninstalledNotify() {
 
     if(selectionItem())
         delete selectionItem();
+    if(elementsWidget())
+        delete elementsWidget();
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
@@ -1022,7 +1057,9 @@ void PtzInstrument::startDrag(DragInfo *) {
     } else {
         manipulator()->setCursor(Qt::BlankCursor);
         target()->setCursor(Qt::BlankCursor);
-        opacityAnimator(overlayWidget(target())->arrowItem(), 0.5)->animateTo(1.0);
+
+        ensureElementsWidget();
+        opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
         /* Everything else will be initialized in the first call to drag(). */
     }
 
@@ -1076,18 +1113,18 @@ void PtzInstrument::dragMove(DragInfo *info) {
         }
 
         qreal speedMagnitude = length(speed);
-        qreal arrowSize = scale / 16.0 * (0.4 + 2.6 * speedMagnitude);
+        qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
-        PtzArrowItem *arrowItem = overlayWidget(target())->arrowItem();
-        arrowItem->moveTo(target()->rect().center(), info->mouseItemPos());
-        arrowItem->setSize(QSize(arrowSize, arrowSize));
+        ensureElementsWidget();
+        PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
+        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), info->mouseItemPos()));
+        arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo *info) {
-    Q_UNUSED(info)
+void PtzInstrument::finishDrag(DragInfo *) {
     if(target()) {
         if(!manipulator()) {
             ensureSelectionItem();
@@ -1102,7 +1139,9 @@ void PtzInstrument::finishDrag(DragInfo *info) {
         } else {
             manipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
-            opacityAnimator(overlayWidget(target())->arrowItem())->animateTo(0.0);
+            
+            ensureElementsWidget();
+            opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
         }
     }
 

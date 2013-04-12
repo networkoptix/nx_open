@@ -20,7 +20,7 @@ public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
-    // TODO: this also handles non-camera offsets, so 'server' naming is not entirely correct.
+    // TODO: #Elric this also handles non-camera offsets, so 'server' naming is not entirely correct.
 
     qint64 utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 

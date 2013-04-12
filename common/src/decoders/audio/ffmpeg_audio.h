@@ -14,13 +14,13 @@ public:
     ~CLFFmpegAudioDecoder();
 
     static AVSampleFormat audioFormatQtToFfmpeg(const QnAudioFormat& fmt);
+
 private:
     AVCodec *codec;
-    AVCodecContext *c;
+    AVCodecContext *c; // TODO: #VASILENKO please name these members properly
 
     static bool m_first_instance;
     CodecID m_codec;
-    //===================
 };
 
 #endif //cl_ffmpeg_h

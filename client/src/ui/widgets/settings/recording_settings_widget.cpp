@@ -73,7 +73,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     if (dwm->isSupported()) {
         ui->disableAeroCheckBox->setEnabled(true);
     } else {
-        // TODO: why the hell do we clear it all?
+        // TODO: #GDM why the hell do we clear it all?
         ui->screenComboBox->clear();
         int screen = desktop->primaryScreen();
         QRect geometry = desktop->screenGeometry(screen);

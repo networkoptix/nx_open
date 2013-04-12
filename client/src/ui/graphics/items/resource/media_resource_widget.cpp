@@ -36,7 +36,7 @@
 #include "resource_widget.h"
 
 
-// TODO: remove
+//TODO: #Elric remove
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
 
@@ -73,7 +73,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
 
-    // TODO: 
+    // TODO: #Elric
     // Strictly speaking, this is a hack.
     // We shouldn't be using OpenGL context in class constructor.
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
@@ -548,7 +548,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
         return Qn::RecordingType_Never;
 
-    // TODO: this should be a resource parameter that is update from the server.
+    // TODO: #Elric this should be a resource parameter that is update from the server.
 
     QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
     int dayOfWeek = dateTime.date().dayOfWeek();
@@ -655,7 +655,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
         qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(0) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: do offset adjustments in one place
+            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
         timeString = tr("\t%1").arg(
             m_display->camDisplay()->isRealTimeSource() ? 
@@ -760,7 +760,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 
     if(checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton, false);
-        action(Qn::JumpToLiveAction)->trigger(); // TODO: evil hack! Won't work if SYNC is off and this item is not selected?
+        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 

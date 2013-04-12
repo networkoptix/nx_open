@@ -142,7 +142,7 @@ void QnAboutDialog::retranslateUi()
             "<b>OpenGL max texture size</b>: %4.<br/>\n"
         ).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION)))).
-        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: same shit, OpenGL calls.
+        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: #Elric same shit, OpenGL calls.
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR)))).
         arg(maxTextureSize);
 

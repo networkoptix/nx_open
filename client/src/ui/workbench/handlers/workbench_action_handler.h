@@ -32,7 +32,7 @@ class QnCameraAdditionDialog;
 class QnVideoCamera;
 class QnPopupCollectionWidget;
 
-// TODO: move out.
+// TODO: #Elric move out.
 struct QnThumbnailsSearchState {
     QnThumbnailsSearchState(): step(0) {}
     QnThumbnailsSearchState(const QnTimePeriod &period, qint64 step): period(period), step(step) {}
@@ -129,7 +129,7 @@ namespace detail {
 } // namespace detail
 
 
-// TODO: split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
+// TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
  * This class implements logic for client actions.
  */

@@ -152,7 +152,7 @@ public:
     void setRulerHeight(qreal rulerHeight);
 
     QnThumbnailsLoader *thumbnailsLoader() const;
-    void setThumbnailsLoader(QnThumbnailsLoader *value, qreal aspectRatio); // TODO: remove aspectRatio
+    void setThumbnailsLoader(QnThumbnailsLoader *value, qreal aspectRatio); // TODO: #Elric remove aspectRatio
 
     const QVector<qint64> &indicators() const;
     void setIndicators(const QVector<qint64> &indicators);
