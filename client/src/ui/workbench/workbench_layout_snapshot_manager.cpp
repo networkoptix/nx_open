@@ -241,7 +241,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
     setFlags(layoutResource, flags);
 
-    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: this code does not belong here.
+    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: #Elric this code does not belong here.
     
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);

@@ -85,7 +85,7 @@ public:
         return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
     }
 
-    // TODO: move out?
+    // TODO: #Elric move out?
     static bool isFile(const QnLayoutResourcePtr &resource);
 
 signals:

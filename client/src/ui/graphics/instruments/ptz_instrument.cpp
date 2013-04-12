@@ -526,7 +526,7 @@ public:
         Q_UNUSED(widget)
         QRectF rect = this->rect();
 
-        QVector<QPointF> crosshairLines; // TODO: cache these?
+        QVector<QPointF> crosshairLines; // TODO: #Elric cache these?
 
         QPointF center = rect.center();
         qreal d0 = qMin(rect.width(), rect.height()) / 4.0;

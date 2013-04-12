@@ -117,7 +117,7 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
     int changedButtons = m_checkedButtons ^ checkedButtons;
     m_checkedButtons = checkedButtons;
 
-    // TODO: We have a problem here.
+    // TODO: #Elric We have a problem here.
     // if checked state changes during submit, we won't catch it.
     submitCheckedButtons(changedButtons);
 

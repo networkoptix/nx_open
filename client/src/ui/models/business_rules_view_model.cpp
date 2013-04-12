@@ -276,7 +276,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_comments = businessRule->comments();
     m_schedule = businessRule->schedule();
 
-    updateActionTypesModel();//TODO: connect on dataChanged?
+    updateActionTypesModel();//TODO: #GDM connect on dataChanged?
 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
@@ -373,7 +373,7 @@ QnResourceList QnBusinessRuleViewModel::eventResources() const {
 
 void QnBusinessRuleViewModel::setEventResources(const QnResourceList &value) {
     if (m_eventResources == value)
-        return; //TODO: check equal
+        return; //TODO: #GDM check equal
 
     m_eventResources = value;
     m_modified = true;
@@ -600,7 +600,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
     switch (column) {
         case QnBusiness::SourceColumn:
             {
-                QnResourceList resources = m_eventResources; //TODO: filtered by type
+                QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
                 if (!BusinessEventType::isResourceRequired(m_eventType)) {
                     return qnResIconCache->icon(QnResourceIconCache::Servers);
                 } else if (resources.size() == 1) {
@@ -626,7 +626,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                         return qnResIconCache->icon(QnResourceIconCache::Users);
                 }
 
-                QnResourceList resources = m_actionResources; //TODO: filtered by type
+                QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
                 if (!BusinessActionType::requiresCameraResource(m_actionType)) {
                     return qnResIconCache->icon(QnResourceIconCache::Servers);
                 } else if (resources.size() == 1) {
@@ -725,7 +725,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
         return tr("%n Camera(s)", "", cameras.size());
     }
 
-    QnResourceList resources = m_eventResources; //TODO: filtered by type
+    QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
     if (!BusinessEventType::isResourceRequired(m_eventType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
@@ -977,7 +977,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     m_rules.removeAt(row);
     endRemoveRows();
 
-    //TODO: check if dataChanged is required, check row
+    //TODO: #GDM check if dataChanged is required, check row
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 

@@ -437,7 +437,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: why height is zero here?
+    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: #Elric why height is zero here?
     m_titleYAnimator->setSpeed(32.0 * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
@@ -644,7 +644,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: why height is zero at this point?
+    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: #Elric why height is zero at this point?
     m_sliderYAnimator->setSpeed(70.0 * 2.0); 
     m_sliderYAnimator->setTimeLimit(500);
 
@@ -1123,7 +1123,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
-    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: does this belong here?
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
@@ -1354,7 +1354,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
+        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 }
 
@@ -1649,7 +1649,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setHelpOpened(false, isFullscreen);
         setSliderOpened(false, isFullscreen);
 
-        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: change code so that this call is not needed.
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
         action(Qn::FitInViewAction)->trigger();
 
         m_inFreespace = true;
@@ -1689,7 +1689,7 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        if(widget->isInfoVisible()) // TODO: wrong place?
+        if(widget->isInfoVisible()) // TODO: #Elric wrong place?
             widget->setOverlayVisible(true);
 }
 

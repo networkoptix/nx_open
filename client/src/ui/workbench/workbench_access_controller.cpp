@@ -126,7 +126,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
-        return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
+        return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: #Elric listen to changes
     } else if (QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else if (m_userPermissions & Qn::GlobalEditLayoutsPermission) {

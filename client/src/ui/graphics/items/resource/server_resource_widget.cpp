@@ -88,7 +88,7 @@ namespace {
              * for this line segment, producing NaNs in its output.
              * These NaNs are then fed to GPU, resulting in artifacts. */
 
-            // TODO: #gdm This logic seems overly complicated to me.
+            // TODO: #GDM This logic seems overly complicated to me.
             //            I'm sure we can do the same with a code that is at least three times shorter.
 
             /* Drawing only second part of the arc, cut at the beginning */

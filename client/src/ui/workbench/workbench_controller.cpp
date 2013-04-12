@@ -660,7 +660,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
 
-    QSettings settings; // TODO: replace with QnSettings
+    QSettings settings; // TODO: #Elric replace with QnSettings
     settings.beginGroup(QLatin1String("videoRecording"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -777,7 +777,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
 void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *scene, QEvent *event) {
     Q_UNUSED(scene)
-    // TODO: evil hack to prevent focus jumps when scene is focused.
+    // TODO: #Elric evil hack to prevent focus jumps when scene is focused.
     QFocusEvent *focusEvent = static_cast<QFocusEvent *>(event);
     *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
 }

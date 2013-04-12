@@ -265,7 +265,7 @@ bool QnWorkbenchNavigator::setLive(bool live) {
     if (live) {
         m_timeSlider->setValue(m_timeSlider->maximum(), true);
     } else {
-        m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: need to save position here.
+        m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: #Elric need to save position here.
     }
     return true;
 }
@@ -418,7 +418,7 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
     QnWorkbenchItem *item = widget->item();
 
     QnTimePeriod window(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
-    if(m_timeSlider->windowEnd() == m_timeSlider->maximum()) // TODO: check that widget supports live.
+    if(m_timeSlider->windowEnd() == m_timeSlider->maximum()) // TODO: #Elric check that widget supports live.
         window.durationMs = -1;
     item->setData(Qn::ItemSliderWindowRole, QVariant::fromValue<QnTimePeriod>(window));
 
@@ -571,7 +571,7 @@ void QnWorkbenchNavigator::stepBackward() {
         quint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
         if (reader->isSingleShotMode())
-            m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: wtf?
+            m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
 
         reader->previousFrame(currentTime);
     }
@@ -664,7 +664,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     m_timeSlider->finishAnimations();
 
     if(m_currentMediaWidget) {
-        QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: evil hacks...
+        QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: #Elric evil hacks...
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
     }
 
@@ -838,7 +838,7 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
         targetPeriod.addPeriod(boundingPeriod.intersected(calendarPeriod));
     }
 
-    // TODO: 'All cameras' line is shown even when SYNC is off, so this condition is not valid.
+    // TODO: #Elric 'All cameras' line is shown even when SYNC is off, so this condition is not valid.
     // We need to set all targets every time.
     if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
         foreach(QnResourceWidget *widget, m_syncedWidgets)
@@ -1075,7 +1075,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         Qn::SliderScope, 
         QnActionParameters(currentTarget(Qn::SliderScope)).
             withArgument(Qn::TimePeriodParameter, selection).
-            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)). // TODO: move this out into global scope!
+            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)). // TODO: #Elric move this out into global scope!
             withArgument(Qn::AllTimePeriodsParameter, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingRole))
     ));
     if(menu->isEmpty())

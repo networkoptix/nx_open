@@ -23,7 +23,7 @@ public:
     void setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods);
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
-    // TODO: #gdm function/accessor name should convey what it does/modifies,
+    // TODO: #GDM function/accessor name should convey what it does/modifies,
     // not where it should be used in some other class. 
     // 
     // Calendar knows nothing about central / non-central widgets, resources,

@@ -2061,7 +2061,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         emptyPictureBuf->setColorFormat( PIX_FMT_RGBA );
 
-        // TODO: free memory immediately for still images
+        // TODO: #ak free memory immediately for still images
     }
 
     //TODO/IMPL should place fence here and in getUploadedPicture should take only that picture, whose m_glFence is signaled

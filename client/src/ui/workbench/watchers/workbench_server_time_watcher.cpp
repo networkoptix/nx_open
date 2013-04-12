@@ -49,7 +49,7 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
 }
 
 qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
-    // TODO: duplicate code.
+    // TODO: #Elric duplicate code.
     qint64 utcOffset = this->utcOffset(server, Qn::InvalidUtcOffset);
     if(utcOffset == Qn::InvalidUtcOffset)
         return defaultValue;

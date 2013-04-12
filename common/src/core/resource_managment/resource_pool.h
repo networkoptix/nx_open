@@ -97,7 +97,7 @@ public:
         return activeCamerasByClass(true);
     }
 
-    // TODO #gdm: this is a hack. Fix.
+    // TODO #GDM: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
 

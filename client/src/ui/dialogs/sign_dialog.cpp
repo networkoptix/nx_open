@@ -17,7 +17,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 
-// TODO: replace with QnRenderingWidget
+// TODO: #Elric replace with QnRenderingWidget
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
