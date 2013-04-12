@@ -455,12 +455,17 @@ int serverMain(int argc, char *argv[])
     }
 
     QString logLevel;
+    QString rebuildArchive;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "1");
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
+    if (rebuildArchive.toInt())
+        DeviceFileCatalog::setRebuildArchive(true);
+    
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
