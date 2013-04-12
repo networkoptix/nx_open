@@ -60,6 +60,8 @@ applauncher/client.mak*
 applauncher/x86
 applauncher/x64
 
+axiscamplugin/x86
+
 client/bin
 client/build
 client/src/Info.plist
