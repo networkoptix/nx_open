@@ -221,28 +221,32 @@ protected:
 //        return QSizeF(24.0, 120.0);
 //    }
 
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
+
+        QRectF imgRect = QRectF(0, 0, legendImgSize, legendImgSize);
+        QRectF textRect = rect.adjusted(legendImgSize + 2, 0, -legendImgSize - 2, 0);
+        qDebug() << rect << imgRect << textRect;
 
 //        bool isPressed = (startState & PRESSED) || (endState & PRESSED);
         {
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
-            painter->fillRect(rect(), Qt::lightGray);
+            painter->fillRect(rect, Qt::lightGray);
 
             painter->setBrush(getColorByKey(m_key));
-            QRectF r = rect().adjusted(legendImgSize, 0, 0, 0);
-            painter->drawRoundedRect(rect().adjusted(0, 0, -legendTextSize, 0), 4, 4);
+            painter->drawRoundedRect(imgRect, 4, 4);
 
             QFont font;
             font.setPixelSize(22);
             QnScopedPainterFontRollback  fontRollback(painter, font);
             painter->setPen(QPen(Qt::white, 3));
-            painter->drawText(r, m_key);
+            painter->drawText(textRect, m_key);
         }
 
-        base_type::paint(painter, startState, endState, progress, widget);
+        //base_type::paint(painter, startState, endState, progress, widget, rect().adjusted(0, 0, -legendTextSize, 0));
+        base_type::paint(painter, startState, endState, progress, widget, imgRect);
 
         painter->setOpacity(opacity);
     }

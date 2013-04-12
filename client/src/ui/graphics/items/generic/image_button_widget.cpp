@@ -250,17 +250,15 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
     StateFlags hoverState = m_state | HOVERED;
     StateFlags normalState = m_state & ~HOVERED;
-    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget));
+    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
 }
 
-void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
     painter->beginNativePainting();
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor(1.0, 1.0, 1.0, painter->opacity());
-
-    QRectF rect = this->rect();
 
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
@@ -643,12 +641,12 @@ QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent):
     startListening();
 }
 
-void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
     QnScopedPainterTransformRollback guard(painter);
-    painter->translate(rect().center());
+    painter->translate(rect.center());
     painter->rotate(m_rotation);
-    painter->translate(-rect().center());
-    QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
+    painter->translate(-rect.center());
+    QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
 }
 
 void QnRotatingImageButtonWidget::tick(int deltaMSecs) {

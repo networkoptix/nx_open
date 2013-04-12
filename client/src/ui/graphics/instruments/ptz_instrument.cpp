@@ -424,7 +424,7 @@ public:
     }
 
 protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
 
@@ -432,10 +432,10 @@ protected:
         {
             QnScopedPainterPenRollback penRollback(painter, QPen(isPressed ? ptzArrowBorderColor : ptzItemBorderColor, qMax(size().height(), size().width()) / 16.0));
             QnScopedPainterBrushRollback brushRollback(painter, isPressed ? ptzArrowBaseColor : ptzItemBaseColor);
-            painter->drawEllipse(rect());
+            painter->drawEllipse(rect);
         }
 
-        base_type::paint(painter, startState, endState, progress, widget);
+        base_type::paint(painter, startState, endState, progress, widget, rect);
 
         painter->setOpacity(opacity);
     }
