@@ -57,7 +57,7 @@ private:
  * available, and move to another animation timer in case the item's scene is
  * changed.
  */
-template<class Base, bool baseIsAnimated = boost::is_base_of<AnimatedBase, Base>::value >
+template<class Base, bool baseIsAnimated = boost::is_base_of<AnimatedBase, Base>::value>
 class Animated: public Base, public AnimatedBase {
 public:
     QN_FORWARD_CONSTRUCTOR(Animated, Base, { updateScene(this->scene()); });
