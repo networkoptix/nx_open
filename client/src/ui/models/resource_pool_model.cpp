@@ -580,7 +580,7 @@ private:
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType, bool isFlat):
+QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat, QObject *parent):
     QAbstractItemModel(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
