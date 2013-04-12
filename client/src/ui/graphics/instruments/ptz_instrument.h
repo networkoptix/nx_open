@@ -16,7 +16,8 @@
 
 class PtzSplashItem;
 class PtzSelectionItem;
-class PtzOverlayWidget;
+class PtzStaticOverlayWidget;
+class PtzDynamicOverlayWidget;
 class PtzManipulatorWidget;
 
 class QnWorkbenchPtzController;
@@ -73,8 +74,8 @@ private slots:
     void at_zoomOutButton_released();
     void at_zoomButton_activated(qreal speed);
 
-    void updateOverlayWidget();
-    void updateOverlayWidget(QnMediaResourceWidget *widget);
+    void updateOverlayWidgets();
+    void updateOverlayWidgets(QnMediaResourceWidget *widget);
     void updateCapabilities(const QnSecurityCamResourcePtr &resource);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
@@ -93,8 +94,9 @@ private:
         return m_selectionItem.data();
     }
 
-    PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
-    PtzOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
+    PtzStaticOverlayWidget *staticOverlayWidget(QnMediaResourceWidget *widget) const;
+    PtzDynamicOverlayWidget *dynamicOverlayWidget(QnMediaResourceWidget *widget) const;
+    void ensureOverlayWidgets(QnMediaResourceWidget *widget);
     void ensureSelectionItem();
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
@@ -109,13 +111,14 @@ private:
 
 private:
     struct PtzData {
-        PtzData(): capabilities(0), overlayWidget(NULL) {}
+        PtzData(): capabilities(0), staticOverlayWidget(NULL), dynamicOverlayWidget(NULL) {}
 
         Qn::CameraCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
         QRectF pendingAbsoluteMove;
-        PtzOverlayWidget *overlayWidget;
+        PtzStaticOverlayWidget *staticOverlayWidget;
+        PtzDynamicOverlayWidget *dynamicOverlayWidget;
     };
 
     QnWorkbenchPtzController *m_ptzController;
