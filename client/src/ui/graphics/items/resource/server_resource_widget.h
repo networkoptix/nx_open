@@ -45,11 +45,15 @@ protected:
 
 private slots:
     void at_statistics_received();
+    void at_legend_checkedButtonsChanged();
 
 private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
+    void addLegendOverlay();
+
+    void updateLegend();
 private:
     QnMediaServerStatisticsManager *m_manager;
 
@@ -85,6 +89,12 @@ private:
 
     /** Helper for the background painting. */
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
+
+    QnImageButtonBar *m_legendButtonBar;
+
+    QHash<QString, bool> m_checkedFlagByKey;
+    QHash<QString, int> m_buttonMaskByKey;
+    int m_maxMaskUsed;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)
