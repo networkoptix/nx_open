@@ -188,7 +188,71 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
+    const int legendImgSize = 24;
+    const int legendTextSize = 120;
 } // anonymous namespace
+
+// -------------------------------------------------------------------------- //
+// PtzZoomButtonWidget
+// -------------------------------------------------------------------------- //
+class LegendButtonWidget: public QnImageButtonWidget {
+    typedef QnImageButtonWidget base_type;
+
+public:
+    LegendButtonWidget(const QString &key):
+        base_type(NULL, 0),
+        m_key(key)
+    {
+        setCheckable(true);
+        setProperty(Qn::NoBlockMotionSelection, true);
+        setToolTip(key);
+        setIcon(qnSkin->icon("item/check.png"));
+    }
+
+
+protected:
+//    virtual QSizeF sizeHint() override {
+//
+//    }
+
+//    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
+//        QSizeF hint = base_type::sizeHint(which, constraint);
+
+//        return QSizeF(24.0, 120.0);
+//    }
+
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+        qreal opacity = painter->opacity();
+        painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
+
+//        bool isPressed = (startState & PRESSED) || (endState & PRESSED);
+        {
+            QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
+            QnScopedPainterBrushRollback brushRollback(painter);
+            painter->fillRect(rect(), Qt::lightGray);
+
+            painter->setBrush(getColorByKey(m_key));
+            QRectF r = rect().adjusted(legendImgSize, 0, 0, 0);
+            painter->drawRoundedRect(rect().adjusted(0, 0, -legendTextSize, 0), 4, 4);
+
+            QFont font;
+            font.setPixelSize(22);
+            QnScopedPainterFontRollback  fontRollback(painter, font);
+            painter->setPen(QPen(Qt::white, 3));
+            painter->drawText(r, m_key);
+        }
+
+        base_type::paint(painter, startState, endState, progress, widget);
+
+        painter->setOpacity(opacity);
+    }
+
+    qreal stateOpacity(StateFlags stateFlags) {
+        return (stateFlags & HOVERED) ? 1.0 : 0.5;
+    }
+private:
+    QString m_key;
+};
 
 // -------------------------------------------------------------------------- //
 // QnServerResourceWidget
@@ -490,7 +554,7 @@ void QnServerResourceWidget::at_statistics_received() {
 
 void QnServerResourceWidget::addLegendOverlay() {
     m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Vertical);
-    m_legendButtonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
+    m_legendButtonBar->setUniformButtonSize(QSizeF(legendImgSize + legendTextSize, legendImgSize));
     connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
 
     QGraphicsLinearLayout *legendOverlayVLayout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -528,12 +592,7 @@ void QnServerResourceWidget::updateLegend() {
         visibleMask |= mask;
 
         if (!m_legendButtonBar->button(mask)) {
-            QnImageButtonWidget *infoButton = new QnImageButtonWidget();
-            infoButton->setIcon(qnSkin->icon("item/info.png"));
-            infoButton->setCheckable(true);
-            infoButton->setProperty(Qn::NoBlockMotionSelection, true);
-            infoButton->setToolTip(key);
-            m_legendButtonBar->addButton(mask, infoButton);
+            m_legendButtonBar->addButton(mask, new LegendButtonWidget(key));
         }
 
         bool checked =  m_checkedFlagByKey.value(key, true);
