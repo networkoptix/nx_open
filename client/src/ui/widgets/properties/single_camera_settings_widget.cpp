@@ -8,7 +8,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
-//TODO: #elric #gdm asked: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #gdm ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -215,7 +215,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         }
 #endif
 
-        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >"); // TODO: evil!
+        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >"); // TODO: #Elric evil!
         serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
     }
 }
@@ -697,7 +697,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; /* Do not show message twice. */
 
     if(!m_camera)
-        return; // TODO: investigate why we get here with null camera
+        return; // TODO: #Elric investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
     int maxFps = m_camera->getMaxFps();

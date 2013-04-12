@@ -57,7 +57,7 @@ private:
     qreal m_hue;
     qreal m_saturation;
     qint64 m_lastDisplayedTime;
-    QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: get rid of this
+    QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
     std::auto_ptr<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;

@@ -168,8 +168,8 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
     layout->setBackgroundOpacity(ui->opacitySpinBox->value());
 
-    // TODO: progress dialog uploading image?
-    // TODO: remove unused image if any
+    // TODO: #GDM progress dialog uploading image?
+    // TODO: #GDM remove unused image if any
 
     return true;
 }

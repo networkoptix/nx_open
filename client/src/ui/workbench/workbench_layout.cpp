@@ -34,7 +34,7 @@ namespace {
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
     QObject(parent)
 {
-    // TODO: this does not belong here.
+    // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
@@ -48,7 +48,7 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
         return;
     }
 
-    // TODO: this does not belong here.
+    // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();

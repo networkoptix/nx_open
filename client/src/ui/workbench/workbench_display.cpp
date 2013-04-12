@@ -353,7 +353,7 @@ void QnWorkbenchDisplay::initSceneView() {
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
         if (!QGLFormat::hasOpenGL()) {
-            qnCritical("Software rendering is not supported."); // TODO: this check must be performed on startup.
+            qnCritical("Software rendering is not supported."); // TODO: #Elric this check must be performed on startup.
         } else {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
@@ -746,7 +746,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
     const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
 
-    if (m_widgets.size() >= maxItemCount) { // TODO: item limit must be changeable.
+    if (m_widgets.size() >= maxItemCount) { // TODO: #Elric item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
@@ -757,7 +757,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: unsupported for now
+    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
     }

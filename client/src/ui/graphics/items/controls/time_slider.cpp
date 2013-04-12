@@ -1589,7 +1589,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     for(; highlightIndex < stepCount; highlightIndex++)
         if(!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
             break;
-    highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: remove this line.
+    highlightIndex = qMin(highlightIndex, stepCount - 1); //TODO: #Elric remove this line.
     const QnTimeStep &highlightStep = m_steps[highlightIndex];
 
     /* Do some precalculations. */

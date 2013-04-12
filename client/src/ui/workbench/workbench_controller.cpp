@@ -660,7 +660,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("recorded_video");
 
-    QSettings settings; // TODO: replace with QnSettings
+    QSettings settings; // TODO: #Elric replace with QnSettings
     settings.beginGroup(QLatin1String("videoRecording"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();

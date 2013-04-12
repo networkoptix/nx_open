@@ -498,7 +498,7 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
             pos.value()->setChecked(pos.key() & rights);
     m_inUpdateDependensies = false;
 
-    updateDependantPermissions(); // TODO: rename to something more sane, connect properly
+    updateDependantPermissions(); // TODO: #GDM rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {

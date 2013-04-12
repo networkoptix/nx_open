@@ -21,7 +21,7 @@ class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContext
     Q_OBJECT
 
 public:
-    // TODO: #gdm parent is always the last parameter in constructor. This is a Qt convention.
+    // TODO: #GDM parent is always the last parameter in constructor. This is a Qt convention.
     explicit QnResourcePoolModel(QObject *parent = 0, Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false);
     virtual ~QnResourcePoolModel();
 

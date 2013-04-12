@@ -75,7 +75,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent, QnWorkbenchContext
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
 
-    //TODO: show description label if no rules are loaded
+    //TODO: #GDM show description label if no rules are loaded
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
@@ -112,7 +112,7 @@ void QnBusinessRulesDialog::reject() {
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
-                ); //TODO: calculate once and use anywhere
+                ); //TODO: #GDM calculate once and use anywhere
     if (!hasChanges) {
         base_type::reject();
         return;
@@ -185,13 +185,13 @@ void QnBusinessRulesDialog::at_context_userChanged() {
 
 void QnBusinessRulesDialog::at_message_ruleChanged(const QnBusinessEventRulePtr &rule) {
     m_rulesViewModel->updateRule(rule);
-    //TODO: ask user
+    //TODO: #GDM ask user
 }
 
 void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
     m_rulesViewModel->deleteRule(id);
     m_pendingDeleteRules.removeOne(id);
-    //TODO: ask user
+    //TODO: #GDM ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {

@@ -39,7 +39,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                         this,       SLOT(at_workbench_currentLayoutChanged()));
     
     /* Prepare counter. */
-    m_counter = new QnCounter(1); // TODO: this one also doesn't get destroyed.
+    m_counter = new QnCounter(1); // TODO: #Elric this one also doesn't get destroyed.
     connect(this,                       SIGNAL(destroyed()),                                    m_counter,  SLOT(decrement()));
     connect(m_counter,                  SIGNAL(reachedZero()),                                  m_syncPlay, SLOT(deleteLater()));
     connect(m_counter,                  SIGNAL(reachedZero()),                                  m_counter,  SLOT(deleteLater()));
@@ -129,7 +129,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     QnVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
-    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: two setExternalTimeSource calls, WTF?
+    camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: #Elric two setExternalTimeSource calls, WTF?
 
     m_counter->increment();
     connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));

@@ -6,7 +6,7 @@ Qn::FixedRotation fixedRotationFromDegrees(qreal degrees){
     int angle = qRound(degrees);
 
     //
-    // TODO: #gdm 
+    // TODO: #GDM 
     // The logic here seems overly complicated to me.
     // Much simpler solution would be:
     // 

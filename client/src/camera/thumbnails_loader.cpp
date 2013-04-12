@@ -262,7 +262,7 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         return; /* We'll be called again from the event loop. */
     }
 
-    // TODO: there probably is a better place for checking size restrictions.
+    // TODO: #Elric there probably is a better place for checking size restrictions.
     if(m_thumbnailByTime.size() * m_scaleTargetSize.width() * m_scaleTargetSize.width() * 4 > maxThumbnailCacheSize) {
         invalidateThumbnailsLocked();
         return; /* We'll be called again from the event loop. */
@@ -453,7 +453,7 @@ void QnThumbnailsLoader::process() {
                 frame = qSharedPointerDynamicCast<QnCompressedVideoData>(client->getNextData());
             }
 
-            if(!invalidated && m_decode) { // TODO: m_decode check may be wrong here.
+            if(!invalidated && m_decode) { // TODO: #Elric m_decode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
                 QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
@@ -482,7 +482,7 @@ void QnThumbnailsLoader::process() {
 #endif
 
     /* Go on with processing. */
-    QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: use connections.
+    QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: #Elric use connections.
 }
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
@@ -539,7 +539,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
         m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
-        // TODO: sws_getContext may fail and return NULL.
+        // TODO: #Elric sws_getContext may fail and return NULL.
     }
 }
 

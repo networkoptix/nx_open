@@ -36,14 +36,14 @@ namespace {
 
 } // anonymous namespace
 
-QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
+QSettings qSettings;	//TODO: #Elric remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
 QnSettings::QnSettings():
     m_settings(new QSettings(this)),
     m_loading(true)
 {
-    QnClientMetaTypes::initialize(); // TODO: remove
+    QnClientMetaTypes::initialize(); // TODO: #Elric remove
 
     init();
 

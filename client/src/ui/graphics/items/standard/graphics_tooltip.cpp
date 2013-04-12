@@ -152,7 +152,7 @@ void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
     // default pos - below the button and below the cursor
     QRectF cursorRect = item()->sceneTransform().mapRect(QRectF(0, 0, 10, 20));
 
-    // TODO: doesn't work well with tree tooltips
+    // TODO: #Elric doesn't work well with tree tooltips
     //p.setY(qMax(p.y() + cursorRect.height(), item()->sceneBoundingRect().y() + item()->sceneBoundingRect().height()));
     p.setY(p.y() + cursorRect.height());
 
