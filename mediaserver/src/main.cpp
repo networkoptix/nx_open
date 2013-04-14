@@ -566,6 +566,23 @@ QnMain::~QnMain()
     stopObjects();
 }
 
+void QnMain::stopSync()
+{
+    if (serviceMainInstance) {
+        serviceMainInstance->pleaseStop();
+        serviceMainInstance->exit();
+        serviceMainInstance->wait();
+        serviceMainInstance = 0;
+    }
+    qApp->quit();
+}
+
+void QnMain::stopAsync()
+{
+    QTimer::singleShot(0, this, SLOT(stopSync()));
+}
+
+
 void QnMain::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
@@ -1166,7 +1183,8 @@ protected:
 
     virtual void stop() override
     {
-        stopServer(0);
+        if (serviceMainInstance)
+            serviceMainInstance->stopSync();
     }
 
 private:
@@ -1178,18 +1196,10 @@ private:
 
 void stopServer(int signal)
 {
-    Q_UNUSED(signal)
-
-    qWarning() << "stopServer called. signal=" << signal;
-
     if (serviceMainInstance) {
-        serviceMainInstance->pleaseStop();
-        serviceMainInstance->exit();
-        serviceMainInstance->wait();
-        serviceMainInstance = 0;
+        qWarning() << "got signal" << signal << "stop server!";
+        serviceMainInstance->stopAsync();
     }
-
-    qApp->quit();
 }
 
 int main(int argc, char* argv[])
