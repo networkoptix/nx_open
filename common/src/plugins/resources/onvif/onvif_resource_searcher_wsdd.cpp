@@ -79,11 +79,11 @@ int nullGsoapFdisconnect(struct soap*)
     return SOAP_OK;
 }
 
-//Socket send through QUdpSocket
+//Socket send through UdpSocket
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
-    QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
-    qSocket.writeDatagram(QByteArray(s, (int) n), WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
+    UDPSocket& qSocket = *reinterpret_cast<UDPSocket*>(soap->user);
+    qSocket.sendTo(s, n, lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -108,7 +108,17 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 </s:Body>\
 </s:Envelope>";
 
-//Socket send through QUdpSocket
+
+// avoid SOAP select call
+size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
+{
+    UDPSocket* qSocket = reinterpret_cast<UDPSocket*>(soap->user);
+    int readed = qSocket->recv(data, maxSize);
+    return (size_t) qMax(0, readed);
+}
+
+
+//Socket send through UDPSocket
 int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 {
     QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data());
@@ -120,13 +130,13 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
     Q_UNUSED(s)
     Q_UNUSED(n)
     QString msgId;
-    QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
+    UDPSocket& qSocket = *reinterpret_cast<UDPSocket*>(soap->user);
 
     QString guid = QUuid::createUuid().toString();
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
     QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
-    qSocket.writeDatagram(data, WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
+    qSocket.sendTo(data.data(), data.size(), lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -141,14 +151,15 @@ int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
     Q_UNUSED(s)
     Q_UNUSED(n)
     QString msgId;
-    QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
+    UDPSocket& socket = *reinterpret_cast<UDPSocket*>(soap->user);
 
     QString guid = QUuid::createUuid().toString();
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
     QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
-    qSocket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
-    qSocket.write(data);
+    //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
+    //socket.write(data);
+    socket.sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -573,11 +584,12 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
     if (m_shouldStop)
         return;
 
-    QUdpSocket qSocket;
+    UDPSocket socket;
+    socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
 
     if (iface) 
     {
-        if (!bindToInterface(qSocket, *iface))
+        if (!socket.bindToInterface(*iface))
             return;
     } 
     else 
@@ -591,13 +603,14 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
     soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
     soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
     soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
-    soapWsddProxy.soap->user = &qSocket;
+    soapWsddProxy.soap->user = &socket;
     soapWsddProxy.soap->fconnect = nullGsoapFconnect;
     soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
     soapWsddProxy.soap->fsend = iface? gsoapFsendSmall : gsoapFsendSmallUnicast;
+    soapWsddProxy.soap->frecv = gsoapFrecv;
     soapWsddProxy.soap->fopen = NULL;
-    soapWsddProxy.soap->socket = qSocket.socketDescriptor();
-    soapWsddProxy.soap->master = qSocket.socketDescriptor();
+    soapWsddProxy.soap->socket = socket.handle();
+    soapWsddProxy.soap->master = socket.handle();
 
     wsdd__ProbeType wsddProbe;
     wsa__EndpointReferenceType replyTo;
@@ -672,7 +685,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
 
     soapWsddProxy.soap->socket = SOAP_INVALID_SOCKET;
     soapWsddProxy.soap->master = SOAP_INVALID_SOCKET;
-    qSocket.close();
+    socket.close();
 }
 
 CameraInfo OnvifResourceSearcherWsdd::findCamera(const QHostAddress& camAddr) const
