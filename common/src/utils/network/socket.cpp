@@ -670,7 +670,7 @@ int TCPServerSocket::accept(int sockDesc)
     if( ::poll( &sockPollfd, 1, ACCEPT_TIMEOUT_MSEC ) != 1 ||
         (sockPollfd.revents & POLLIN) == 0 )
     {
-        return NULL;
+        return -1;
     }
 #endif
 
