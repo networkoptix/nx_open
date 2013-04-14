@@ -294,7 +294,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks)
 {
     QDir dir(folder);
-    foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot), QDir::Name)
+    foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
         if (fi.isDir())
             scanMediaFiles(fi.absoluteFilePath(), storage, allChunks);
