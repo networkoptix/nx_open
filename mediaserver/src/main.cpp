@@ -365,7 +365,7 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
         if (appServerConnection->getServers(servers) == 0)
             break;
 
-        qDebug() << "findServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
+        qDebug() << "findServer(): Call to getServers failed. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(1000);
     }
 
