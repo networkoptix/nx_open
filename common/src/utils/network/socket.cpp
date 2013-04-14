@@ -645,7 +645,7 @@ TCPServerSocket::TCPServerSocket(const QString &localAddress,
     setListen(queueLen);
 }
 
-TCPSocket *TCPServerSocket::accept()
+int TCPServerSocket::accept(int sockDesc)
 {
     static const int ACCEPT_TIMEOUT_MSEC = 250;
 
@@ -658,7 +658,7 @@ TCPSocket *TCPServerSocket::accept()
     timeout.tv_usec = ACCEPT_TIMEOUT_MSEC * 1000;
 
     if (::select(sockDesc + 1, &read_set, NULL, NULL, &timeout) <= 0)
-        return 0;
+        return -1;
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
@@ -677,12 +677,24 @@ TCPSocket *TCPServerSocket::accept()
     int newConnSD;
     if ((newConnSD = ::accept(sockDesc, NULL, 0)) < 0)
     {
-        return 0;
+        return -1;
     }
 
-    TCPSocket* result = new TCPSocket(newConnSD);
-    result->mConnected = true;
-    return result;
+    return newConnSD;
+}
+
+
+TCPSocket *TCPServerSocket::accept()
+{
+    int newConnSD = accept(sockDesc);
+    if (newConnSD >= 0) {
+        TCPSocket* result = new TCPSocket(newConnSD);
+        result->mConnected = true;
+        return result;
+    }
+    else {
+        return 0;
+    }
 }
 
 void TCPServerSocket::setListen(int queueLen)  {

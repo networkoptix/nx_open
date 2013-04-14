@@ -32,6 +32,7 @@ public:
         const QString& notificationProducerAddress );
     //!Cancel registration of \a resource
     void removeResourceRegistration( QnPlOnvifResource* const resource );
+    virtual	SOAP_SOCKET accept() override;
 
 private:
     std::map<QString, QnPlOnvifResource*> m_notificationProducerAddressToResource;
