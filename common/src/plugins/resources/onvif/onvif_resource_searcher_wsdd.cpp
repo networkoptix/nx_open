@@ -585,7 +585,6 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
         return;
 
     UDPSocket socket;
-    socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
 
     if (iface) 
     {
@@ -596,6 +595,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
     {
         return;
     }
+    socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
 
     QStringList addrPrefixes = getAddrPrefixes(iface ? iface->address.toString() : camAddr->toString());
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
