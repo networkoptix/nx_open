@@ -56,6 +56,12 @@ private:
 class Socket {
     Q_DECLARE_TR_FUNCTIONS(Socket)
 public:
+    //TODO/IMPL draft refactoring of socket operation result receiving. Enum introduced like in std stream bits
+    enum StatusBit
+    {
+        sbFailed = 1
+    };
+
     /**
      *   Close and deallocate this socket
      */
@@ -147,6 +153,7 @@ public:
     bool setNonBlockingMode(bool val);
     //!Returns true, if in non-blocking mode
     bool isNonBlockingMode() const;
+    bool failed() const;
     SystemError::ErrorCode prevErrorCode() const;
 
 protected:
@@ -157,9 +164,12 @@ protected:
     Socket(int sockDesc);
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
     void createSocket(int type, int protocol);
+    void setStatus( StatusBit _status );
 
 private:
     bool m_nonBlockingMode;
+    unsigned int m_status;
+    SystemError::ErrorCode m_prevErrorCode;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -314,6 +324,7 @@ public:
      *   @return new connection socket
      *   @exception SocketException thrown if attempt to accept a new connection fails
      */
+    static int accept(int sockDesc);
     TCPSocket *accept() ;
 
 private:

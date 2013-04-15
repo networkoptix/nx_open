@@ -14,6 +14,7 @@ CachedOutputStream::CachedOutputStream( QnTCPConnectionProcessor* const tcpOutpu
     m_tcpOutput( tcpOutput ),
     m_failed( false )
 {
+    setObjectName( "CachedOutputStream" );
 }
 
 CachedOutputStream::~CachedOutputStream()
@@ -52,7 +53,7 @@ void CachedOutputStream::run()
         if( packetToSend.isEmpty() )
             break;
 
-        if( !m_tcpOutput->sendData( packetToSend ) )
+        if( !m_tcpOutput->sendBuffer( packetToSend ) )
         {
             m_failed = true;
             break;
