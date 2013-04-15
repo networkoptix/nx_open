@@ -1,5 +1,6 @@
 #include "fixed_rotation.h"
 
+#include <cmath>
 #include <QtGui/QGraphicsWidget>
 
 Qn::FixedRotation fixedRotationFromDegrees(qreal degrees){
