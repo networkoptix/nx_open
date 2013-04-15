@@ -18,8 +18,8 @@
 
 
 AxisCameraDiscoveryManager::AxisCameraDiscoveryManager()
-:
-    m_refCount( 1 )
+//:
+//    m_refCount( 1 )
 {
 }
 
@@ -33,18 +33,18 @@ void* AxisCameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interface
     return NULL;
 }
 
-unsigned int AxisCameraDiscoveryManager::addRef()
-{
-    return m_refCount.fetchAndAddOrdered(1) + 1;
-}
-
-unsigned int AxisCameraDiscoveryManager::releaseRef()
-{
-    unsigned int newRefCounter = m_refCount.fetchAndAddOrdered(-1) - 1;
-    if( newRefCounter == 0 )
-        delete this;
-    return newRefCounter;
-}
+//unsigned int AxisCameraDiscoveryManager::addRef()
+//{
+//    return m_refCount.fetchAndAddOrdered(1) + 1;
+//}
+//
+//unsigned int AxisCameraDiscoveryManager::releaseRef()
+//{
+//    unsigned int newRefCounter = m_refCount.fetchAndAddOrdered(-1) - 1;
+//    if( newRefCounter == 0 )
+//        delete this;
+//    return newRefCounter;
+//}
 
 static const char* VENDOR_NAME = "AXIS";
 
@@ -83,7 +83,6 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
     credentials.setPassword( QString::fromUtf8(passwordToUse) );
 
     CLSimpleHTTPClient http( host, port, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, credentials );
-    //CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list") );
     CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") );
     if( status != CL_HTTP_SUCCESS )
         return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
