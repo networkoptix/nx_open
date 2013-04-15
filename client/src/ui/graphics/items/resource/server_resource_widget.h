@@ -43,17 +43,18 @@ protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private slots:
     void at_statistics_received();
     void at_legend_checkedButtonsChanged();
+    void at_headerOverlayWidget_opacityChanged(const QVariant &value);
 
 private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-    void addLegendOverlay();
-    void addStatisticsOverlay();
+    void addOverlays();
 
     void updateLegend();
 private:
@@ -99,6 +100,7 @@ private:
     QHash<QString, bool> m_checkedFlagByKey;
     QHash<QString, int> m_buttonMaskByKey;
     int m_maxMaskUsed;
+    qreal m_infoOpacity;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)

@@ -14,7 +14,8 @@
 #include <api/media_server_statistics_manager.h>
 #include <api/media_server_statistics_data.h>
 
-#include <ui/style/globals.h>
+#include <ui/animation/variant_animator.h>
+#include <ui/animation/opacity_animator.h>
 #include <ui/help/help_topics.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
@@ -24,6 +25,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
+#include <ui/style/globals.h>
 #include <ui/style/statistics_colors.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -387,6 +389,9 @@ protected:
 
             /* Draw text values on the right side */
             {
+                qreal opacity = painter->opacity();
+                painter->setOpacity(opacity * m_widget->m_infoOpacity);
+
                 qreal x = (offsetX * 1.1 + ow);
                 foreach(QString key, m_widget->m_sortedKeys) {
                     if (!m_widget->m_checkedFlagByKey.value(key, true))
@@ -399,6 +404,7 @@ protected:
                     if (interValue >= 0)
                         painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
                 }
+                painter->setOpacity(opacity);
             }
         }
     }
@@ -416,7 +422,8 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
-    m_maxMaskUsed(1)
+    m_maxMaskUsed(1),
+    m_infoOpacity(0.0)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource) 
@@ -429,7 +436,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
      * base class's constructor.*/
     connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
 
-    addLegendOverlay();
+    addOverlays();
 
     /* Run handlers. */
     updateButtonsVisibility();
@@ -512,6 +519,14 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton | InfoButton);
 }
 
+QVariant QnServerResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
+    if(change == QGraphicsItem::ItemSceneHasChanged) {
+        connect(opacityAnimator(headerOverlayWidget()), SIGNAL(valueChanged(const QVariant &)), this, SLOT(at_headerOverlayWidget_opacityChanged(const QVariant &)));
+    }
+
+    return base_type::itemChange(change, value);
+}
+
 void QnServerResourceWidget::at_statistics_received() {
     qint64 id = m_manager->historyId(m_resource);
     if (id < 0) {
@@ -551,7 +566,7 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 }
 
-void QnServerResourceWidget::addLegendOverlay() {
+void QnServerResourceWidget::addOverlays() {
     m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Horizontal);
     connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
 
@@ -559,22 +574,23 @@ void QnServerResourceWidget::addLegendOverlay() {
     legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     legendOverlayHLayout->addStretch();
     legendOverlayHLayout->addItem(m_legendButtonBar);
+    m_legendButtonBar->setOpacity(m_infoOpacity);
     legendOverlayHLayout->addStretch();
 
     StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
     statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 
-    QGraphicsLinearLayout *legendOverlayVLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    legendOverlayVLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    legendOverlayVLayout->setSpacing(0.5);
-    legendOverlayVLayout->addItem(statisticsOverlayWidget);
-    legendOverlayVLayout->addItem(legendOverlayHLayout);
+    QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    mainOverlayLayout->setSpacing(0.5);
+    mainOverlayLayout->addItem(statisticsOverlayWidget);
+    mainOverlayLayout->addItem(legendOverlayHLayout);
 
-    QnViewportBoundWidget *legendOverlayWidget = new QnViewportBoundWidget(this);
-    legendOverlayWidget->setLayout(legendOverlayVLayout);
-    legendOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-    legendOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(legendOverlayWidget, UserVisible, true);
+    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
+    mainOverlayWidget->setLayout(mainOverlayLayout);
+    mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+    mainOverlayWidget->setOpacity(1.0);
+    addOverlayWidget(mainOverlayWidget, UserVisible, true);
 }
 
 void QnServerResourceWidget::updateLegend() {
@@ -613,4 +629,9 @@ void QnServerResourceWidget::at_legend_checkedButtonsChanged() {
         int mask = m_buttonMaskByKey[key];
         m_checkedFlagByKey[key] = ((checkedMask & mask) > 0);
     }
+}
+
+void QnServerResourceWidget::at_headerOverlayWidget_opacityChanged(const QVariant &value) {
+    m_infoOpacity = value.toDouble();
+    m_legendButtonBar->setOpacity(m_infoOpacity);
 }

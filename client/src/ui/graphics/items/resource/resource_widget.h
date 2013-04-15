@@ -327,6 +327,10 @@ protected:
         return m_iconButton;
     }
 
+    QnViewportBoundWidget* headerOverlayWidget() const {
+        return m_headerOverlayWidget;
+    }
+
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
