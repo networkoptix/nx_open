@@ -39,12 +39,13 @@
 @property(readonly) BOOL disabled;
 
 @property(readonly) HDWServerModel *server;
-@property(readonly) NSURL *videoUrl;
-@property(readonly) NSURL *thumbnailUrl;
 
 -(HDWCameraModel*) initWithDict: (NSDictionary*) dict andServer: (HDWServerModel*) server;
 -(void) setStatus: (NSNumber*) newStatus;
 -(void) setDisabled: (BOOL) newDisabled;
+-(NSURL *) liveUrl;
+-(NSURL *) archiveUrlForDate: (NSDate*)date;
+-(NSURL *) thumbnailUrl;
 
 @end
 

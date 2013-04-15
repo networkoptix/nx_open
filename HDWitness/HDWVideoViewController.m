@@ -8,6 +8,8 @@
 
 #import "HDWVideoViewController.h"
 
+#define NOW_INTERVAL 1e+4 // 10 seconds
+
 @interface HDWVideoViewController ()
 
 @end
@@ -51,16 +53,34 @@
 //    return self.imageView;
 //}
 
-- (void)showTimeSelector {
+- (void)showTimeSelector: (id)sender {
+    [self.imageView stop];
     
+    [self performSegueWithIdentifier:@"setTime" sender:self];
 }
 
-- (void)viewDidLoad
-{
+- (void)onCalendarDispose: (HDWCalendarViewController *)calendarView {
+    NSURL *url;
+    
+    if ([calendarView liveSelected])
+        url = [_camera liveUrl];
+    else {
+        if (fabs([calendarView.selectedDate timeIntervalSinceNow]) < NOW_INTERVAL)
+            url = [_camera liveUrl];
+        else
+            url = [_camera archiveUrlForDate:calendarView.selectedDate];
+    }
+    
+    self.imageView.url = url;
+    [self.imageView play];
+}
+
+- (void)viewDidLoad {
     [super viewDidLoad];
 
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
-    self.navigationItem.rightBarButtonItem = addButton;
+    UIBarButtonItem *archiveButton =
+        [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
+    self.navigationItem.rightBarButtonItem = archiveButton;
 
     self.imageView.allowSelfSignedCertificates = YES;
     self.imageView.allowClearTextCredentials = YES;
@@ -70,9 +90,10 @@
 //    self.scrollView.contentSize=CGSizeMake(1280, 720);
 //    self.scrollView.delegate=self;
     
-    self.imageView.username = _camera.videoUrl.user;
-    self.imageView.password = _camera.videoUrl.password;
-    self.imageView.url = _camera.videoUrl;
+    NSURL *liveUrl = [_camera liveUrl];
+    self.imageView.username = liveUrl.user;
+    self.imageView.password = liveUrl.password;
+    self.imageView.url = liveUrl;
     [self.imageView play];
     
 	// Do any additional setup after loading the view.

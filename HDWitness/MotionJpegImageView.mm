@@ -187,6 +187,7 @@ static NSData *_endMarkerData = nil;
 - (void)pause {
     if (_connection) {
         [_connection cancel];
+        _connection = nil;
     }
 }
 

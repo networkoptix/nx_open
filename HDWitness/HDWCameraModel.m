@@ -44,6 +44,7 @@
 -(NSURL*) url {
     return [NSURL URLWithString:[NSString stringWithFormat:@"https://%@:%@@%@:%@", _login, _password, _host, _port]];
 }
+
 @end
 
 @implementation HDWCameraModel
@@ -71,12 +72,27 @@
     _disabled = newDisabled;
 }
 
--(NSURL*) videoUrl {
-    NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/media/%@.mpjpeg?resolution=240p&qmin=10&qmax=10", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId];
+-(NSURL*) videoUrlForDate: (NSDate*)date resolution: (NSUInteger)resolution andQuality: (NSUInteger)quality {
+    NSString *position;
+    if (date) {
+        long long msecs = [date timeIntervalSince1970] * 1000ll;
+        position = [NSString stringWithFormat:@"%lld", msecs];
+    } else {
+        position = @"now";
+    }
+        
+    NSString *path = [NSString stringWithFormat:@"/proxy/http/%@:%@/media/%@.mpjpeg?resolution=%dp&qmin=%d&qmax=%d&pos=%@&sfd=", _server.streamingUrl.host, _server.streamingUrl.port, _physicalId, resolution, quality, quality, position];
     return [NSURL URLWithString:path relativeToURL:_server.ecs.config.url];
-    
+}
+
+-(NSURL*) liveUrl {
+    return [self videoUrlForDate:nil resolution:240 andQuality:10];
 //    NSString *path = [NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=240p&qmin=10&qmax=10", _physicalId];
 //    return [NSURL URLWithString:path relativeToURL:_server.streamingUrl];
+}
+
+-(NSURL*) archiveUrlForDate: (NSDate*)date {
+    return [self videoUrlForDate:date resolution:240 andQuality:10];
 }
 
 -(NSURL*) thumbnailUrl {

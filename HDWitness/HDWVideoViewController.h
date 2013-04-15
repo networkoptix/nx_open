@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+#import "HDWCalendarViewController.h"
 #import "HDWCameraModel.h"
 #import "MotionJpegImageView.h"
 
@@ -17,5 +18,7 @@
 
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet MotionJpegImageView *imageView;
+
+- (void)onCalendarDispose: (HDWCalendarViewController *)calendarView;
 
 @end

@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HDWCalendarViewController : UIViewController
+@interface HDWCalendarViewController : UIViewController {
+    BOOL _liveSelected;
+}
+
+@property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
+@property (readonly) NSDate* selectedDate;
+
+- (BOOL)liveSelected;
 
 @end

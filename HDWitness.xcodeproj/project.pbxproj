@@ -46,6 +46,7 @@
 		C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */; };
 		C7CCD4421705E16600BA30DF /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = C7CCD4411705E16600BA30DF /* camera.png */; };
 		C7CCD4441705E3EA00BA30DF /* camera_unauthorized.png in Resources */ = {isa = PBXBuildFile; fileRef = C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */; };
+		C7FEBFFE171C480800F808F9 /* HDWCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7FEBFFD171C480800F808F9 /* HDWCalendarViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,6 +113,8 @@
 		C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWVideoViewController.m; sourceTree = "<group>"; };
 		C7CCD4411705E16600BA30DF /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
 		C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera_unauthorized.png; sourceTree = "<group>"; };
+		C7FEBFFC171C480800F808F9 /* HDWCalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCalendarViewController.h; sourceTree = "<group>"; };
+		C7FEBFFD171C480800F808F9 /* HDWCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCalendarViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,6 +195,8 @@
 				C71D5B1616ADBB9600C764B5 /* HDWDetailViewController.m */,
 				C7810ACD16BB1C5500670CD2 /* HDWCollectionViewCell.h */,
 				C7810ACE16BB1C5500670CD2 /* HDWCollectionViewCell.m */,
+				C7FEBFFC171C480800F808F9 /* HDWCalendarViewController.h */,
+				C7FEBFFD171C480800F808F9 /* HDWCalendarViewController.m */,
 				C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */,
 				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
 				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
@@ -397,6 +402,7 @@
 				C7A7DD0216F923D000659CF3 /* MotionJpegImageView.mm in Sources */,
 				C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */,
 				C73910DE170B2346004C80DA /* NSString+Base64.m in Sources */,
+				C7FEBFFE171C480800F808F9 /* HDWCalendarViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
