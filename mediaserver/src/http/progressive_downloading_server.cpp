@@ -193,7 +193,7 @@ public:
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
-static int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
+static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
@@ -213,9 +213,11 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    d->killTimerID = TimerManager::instance()->addTimer(
-        this,
-        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt()*MS_PER_SEC );
+    const int sessionLiveTimeoutSec = qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    if( sessionLiveTimeoutSec > 0 )
+        d->killTimerID = TimerManager::instance()->addTimer(
+            this,
+            sessionLiveTimeoutSec*MS_PER_SEC );
 
     setObjectName( "QnProgressiveDownloadingConsumer" );
 }
