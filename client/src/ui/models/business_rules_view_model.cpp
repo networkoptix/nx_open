@@ -857,7 +857,7 @@ int QnBusinessRulesViewModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid())
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
     return m_rules[index.row()]->data(index.column(), role);
