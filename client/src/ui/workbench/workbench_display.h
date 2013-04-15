@@ -352,6 +352,8 @@ protected slots:
     void updateCurtainedCursor();
     void updateBackground(const QnLayoutResourcePtr &layout);
 
+    void at_instrumentManager_sceneChanged();
+
     void at_scene_destroyed();
     void at_scene_selectionChanged();
 
