@@ -40,6 +40,8 @@ bool QnTestCameraResourceSearcher::updateSocketList()
             DiscoveryInfo info(new QUdpSocket(), iface.address);
             if (info.sock->bind(iface.address, 0))
                 m_sockList << info;
+            else
+                delete info.sock;
         }
         m_sockUpdateTime = curretTime;
         return true;
