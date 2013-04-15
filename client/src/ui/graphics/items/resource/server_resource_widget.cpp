@@ -533,7 +533,7 @@ void QnServerResourceWidget::addLegendOverlay() {
 
     QnViewportBoundWidget *legendOverlayWidget = new QnViewportBoundWidget(this);
     legendOverlayWidget->setLayout(legendOverlayVLayout);
-    legendOverlayWidget->setAcceptedMouseButtons(Qt::LeftButton);
+    legendOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     legendOverlayWidget->setOpacity(1.0);
     addOverlayWidget(legendOverlayWidget, AutoVisible, true);
     legendOverlayWidget->setVisible(true);
