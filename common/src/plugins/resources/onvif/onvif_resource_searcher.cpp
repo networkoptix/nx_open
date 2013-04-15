@@ -151,8 +151,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             if (NameHelper::instance().isSupported(modelName))
                 return resList;
         }
-        QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
-        if (rt)
+
+        OnvifResourceInformationFetcher fetcher;
+        QnId rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
+        if (rt.isValid())
             resource->setTypeId(rt);
 
         if(!resource->getUniqueId().isEmpty())

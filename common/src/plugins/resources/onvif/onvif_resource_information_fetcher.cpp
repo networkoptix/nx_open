@@ -11,11 +11,12 @@ const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
 
-// Add vendor and camera model to ommit ONVIF search (you have to add in case sensitive here)
+// Add vendor and camera model to ommit ONVIF search (you have to add in case insensitive here)
 static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
-	{"vivo_ironman", "VS8801"}
+	{"vivo_ironman", "VS8801"},
+    {"VIVOTEK", "VS8801"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
@@ -25,12 +26,12 @@ static const char* IGNORE_VENDORS[][2] =
     {"*", "*spartan-6*"}          // ArecontVision
 };
 
-
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
 {
     for (uint i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
     {
-        if (vendor == lit(ANALOG_CAMERAS[i][0]) && model == lit(ANALOG_CAMERAS[i][1]) )
+        if (vendor.compare(QString(lit(ANALOG_CAMERAS[i][0])), Qt::CaseInsensitive) == 0 && 
+            model.compare(QString(lit(ANALOG_CAMERAS[i][1])), Qt::CaseInsensitive) == 0)
             return true;
     }
     return false;
@@ -223,6 +224,17 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 }
 
+QnId OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
+{
+    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    if (rt.isValid())
+        return rt;
+    else if (isAnalogOnvifResource(manufacturer, model) && onvifAnalogTypeId.isValid())
+        return onvifAnalogTypeId;
+    else 
+        return onvifTypeId; // no child resourceType found. Use root ONVIF resource type
+}
+
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QString& firmware, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& model, 
     const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
@@ -233,6 +245,9 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     if (!resource)
         return resource;
 
+    resource->setTypeId(getOnvifResourceType(manufacturer, model));
+
+    /*
     QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
     if (rt.isValid())
         resource->setTypeId(rt);
@@ -240,7 +255,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setTypeId(onvifAnalogTypeId);
     else 
         resource->setTypeId(onvifTypeId); // no child resourceType found. Use root ONVIF resource type
-
+    */
 
     resource->setHostAddress(QHostAddress(sender).toString(), QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);

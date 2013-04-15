@@ -180,12 +180,12 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     //Put base model in list
     m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
-        getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr)));
+        getHostAddress(), 80, getNetworkTimeout(), getAuth(), baseIdStr)));
 
     //Put expanded model in list
     if (!suffix.isEmpty()) {
         m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
-            getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
+            getHostAddress(), 80, getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
     }
 }
 

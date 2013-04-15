@@ -109,6 +109,7 @@ private:
     bool m_isWritableStorageAvail;
     bool m_bigStorageExists;
     QTime m_lastTestTime;
+    QTime m_storageWarnTimer;
 };
 
 #define qnStorageMan QnStorageManager::instance()

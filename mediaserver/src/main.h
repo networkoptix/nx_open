@@ -23,7 +23,9 @@ public:
 
     void stopObjects();
     void run();
-
+public slots:
+    void stopAsync();
+    void stopSync();
 private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
