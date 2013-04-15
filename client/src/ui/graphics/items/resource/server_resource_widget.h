@@ -11,6 +11,7 @@
 
 class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
+class StatisticsOverlayWidget;
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -52,9 +53,12 @@ private:
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
     void addLegendOverlay();
+    void addStatisticsOverlay();
 
     void updateLegend();
 private:
+    friend class StatisticsOverlayWidget;
+
     QnMediaServerStatisticsManager *m_manager;
 
     /** Video server resource. */

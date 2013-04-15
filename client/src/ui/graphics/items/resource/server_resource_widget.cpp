@@ -29,7 +29,8 @@
 #include <ui/workbench/workbench_context.h>
 
 /** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
-#define REQUEST_TIME 2000 // TODO: #GDM extract this one from server's response (updatePeriod element).
+//TODO: #GDM extract this one from server's response (updatePeriod element).
+#define REQUEST_TIME 2000
 
 namespace {
     /** Convert angle from radians to degrees */
@@ -72,7 +73,7 @@ namespace {
         for(QLinkedList<qreal>::const_iterator pos = values.values.begin(); pos != values.values.end(); pos++) {
             qreal value = qMin(*pos, 1.0);
             //bool noData = value < 0;
-            value = qMax(value, -0.005);
+            value = qMax(value, 0.0);
             last = pos == backPos;
             maxValue = qMax(maxValue, value);
             if (first) {
@@ -195,7 +196,7 @@ namespace {
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
-// PtzZoomButtonWidget
+// LegendButtonWidget
 // -------------------------------------------------------------------------- //
 class LegendButtonWidget: public QnImageButtonWidget {
     typedef QnImageButtonWidget base_type;
@@ -209,6 +210,10 @@ public:
         setProperty(Qn::NoBlockMotionSelection, true);
         setToolTip(key);
         setIcon(qnSkin->icon("item/check.png"));
+    }
+
+    ~LegendButtonWidget() {
+
     }
 
 
@@ -261,6 +266,161 @@ protected:
     }
 private:
     QString m_key;
+};
+
+// -------------------------------------------------------------------------- //
+// StatisticsOverlayWidget
+// -------------------------------------------------------------------------- //
+
+class StatisticsOverlayWidget: public GraphicsWidget {
+    typedef GraphicsWidget base_type;
+public:
+    StatisticsOverlayWidget(QGraphicsItem *parent = NULL, QnServerResourceWidget* widget = NULL):
+        base_type(parent),
+        m_widget(widget)
+    {
+    }
+
+    ~StatisticsOverlayWidget() {
+    }
+
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
+        return base_type::sizeHint(which == Qt::MinimumSize ? which : Qt::MaximumSize, constraint);
+    }
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override {
+        Q_UNUSED(widget)
+
+        QRectF rect = option->rect;
+
+        qreal width = rect.width();
+        qreal height = rect.height();
+
+        qreal offsetX = width / 20.0;
+        qreal offsetY = legendSpacing;
+
+        qreal pen_width = 1.0;
+
+        qreal ow = width - offsetX*2;
+        qreal oh = height - offsetY*2;
+
+
+        if (ow <= 0 || oh <= 0)
+            return;
+
+        QRectF inner(offsetX, offsetY, ow, oh);
+
+        qreal elapsed_step = m_widget->m_renderStatus == Qn::CannotRender ? 0 :
+                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
+
+        const qreal x_step = (qreal)ow*1.0/(m_widget->m_storageLimit - 2);
+        const qreal y_step = oh * 0.025;
+
+        /** Draw grid */
+        {
+            QPen grid;
+            grid.setColor(qnGlobals->statisticsColors().grid);
+            grid.setWidthF(pen_width);
+
+            QPainterPath grid_path;
+            for (qreal i = offsetX - (x_step * (elapsed_step + m_widget->m_counter%4 - 4)); i < ow + offsetX; i += x_step*4){
+                grid_path.moveTo(i, offsetY);
+                grid_path.lineTo(i, oh + offsetY);
+            }
+            for (qreal i = y_step*4 + offsetY; i < oh + offsetY; i += y_step*4){
+                grid_path.moveTo(offsetX, i);
+                grid_path.lineTo(ow + offsetX, i);
+            }
+            painter->strokePath(grid_path, grid);
+        }
+
+        QMap<QString, qreal> displayValues;
+
+        /** Draw graph lines */
+        {
+            QnScopedPainterTransformRollback transformRollback(painter);
+            Q_UNUSED(transformRollback)
+
+            qreal space_offset = pen_width * 2;
+
+            QTransform graphTransform = painter->transform();
+            graphTransform.translate(offsetX, oh + offsetY - space_offset);
+            painter->setTransform(graphTransform);
+
+            QPen graphPen;
+            graphPen.setWidthF(pen_width * 2);
+            graphPen.setCapStyle(Qt::FlatCap);
+
+            foreach(QString key, m_widget->m_sortedKeys) {
+                if (!m_widget->m_checkedFlagByKey.value(key, true))
+                    continue;
+
+                QnStatisticsData &stats = m_widget->m_history[key];
+                qreal currentValue = 0;
+                QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - 2*space_offset) , elapsed_step, &currentValue);
+                displayValues[key] = currentValue;
+                graphPen.setColor(getColorByKey(key));
+                painter->strokePath(path, graphPen);
+            }
+        }
+
+        /** Draw frame and legend */
+        {
+            QnScopedPainterPenRollback penRollback(painter);
+            Q_UNUSED(penRollback)
+
+            QPen main_pen;
+            main_pen.setColor(qnGlobals->statisticsColors().frame);
+            main_pen.setWidthF(pen_width * 2);
+            main_pen.setJoinStyle(Qt::MiterJoin);
+
+            painter->setPen(main_pen);
+            painter->drawRect(inner);
+
+            QnScopedPainterFontRollback fontRollback(painter);
+            Q_UNUSED(fontRollback)
+            QFont font(this->font());
+
+    #ifdef Q_OS_LINUX
+            // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
+            int fontSize = 20;
+    #else
+            // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
+            int fontSize = 80;
+    #endif
+            font.setPixelSize(legendFontSize);
+            painter->setFont(font);
+
+            /* Draw text values on the right side */
+            {
+                // modify this if you want to change font size
+              //  qreal zoomCoef = 0.4 * offset;
+
+                //qreal zoom(zoomCoef / fontSize);
+                //qreal unzoom(fontSize / zoomCoef);
+                qreal zoom = 1.0;
+                qreal unzoom = 1.0;
+
+                painter->scale(zoom, zoom);
+                qreal x = unzoom * (offsetX * 1.1 + ow);
+                foreach(QString key, m_widget->m_sortedKeys) {
+                    if (!m_widget->m_checkedFlagByKey.value(key, true))
+                        continue;
+
+                    qreal interValue = displayValues[key];
+                    main_pen.setColor(getColorByKey(key));
+                    painter->setPen(main_pen);
+                    qreal y = unzoom * (offsetY + oh * (1.0 - interValue));
+                    if (interValue >= 0)
+                        painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
+                }
+                painter->scale(unzoom, unzoom);
+            }
+        }
+    }
+private:
+    QnServerResourceWidget* m_widget;
 };
 
 // -------------------------------------------------------------------------- //
@@ -322,11 +482,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     qreal height = rect.height();
     qreal min = qMin(width, height);
 
-    QRectF legendOffset = painter->combinedTransform().inverted().
-            mapRect(QRectF(rect.bottomLeft(), QSizeF(legendImgSize + legendSpacing, legendImgSize + legendSpacing)));
-    qreal offset = min / 20.0; //qMax(min / 20.0, legendOffset.height());
-
-    qreal pen_width = width / 500.0;
+    qreal offset = min / 20.0;
 
     qreal oh = height - offset*2;
     qreal ow = width - offset*2;
@@ -334,7 +490,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     if (ow <= 0 || oh <= 0)
         return;
 
-    QRectF inner(offset, offset, ow, oh); 
+    QRectF inner(offset, offset, ow, oh);
 
     /** Draw background */
     if(!m_backgroundGradientPainter)
@@ -360,110 +516,6 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glDisable(GL_BLEND);
     }
     painter->endNativePainting();
-
-
-    qreal elapsed_step = m_renderStatus == Qn::CannotRender ? 0 :
-            (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
-
-    const qreal x_step = (qreal)ow*1.0/(m_storageLimit - 2);
-    const qreal y_step = oh * 0.025;
-
-    /** Draw grid */
-    {
-        QPen grid;
-        grid.setColor(qnGlobals->statisticsColors().grid);
-        grid.setWidthF(pen_width);
-
-        QPainterPath grid_path;
-        for (qreal i = offset - (x_step * (elapsed_step + m_counter%4 - 4)); i < ow + offset; i += x_step*4){
-            grid_path.moveTo(i, offset);
-            grid_path.lineTo(i, oh + offset);
-        }
-        for (qreal i = y_step*4 + offset; i < oh + offset; i += y_step*4){
-            grid_path.moveTo(offset, i);
-            grid_path.lineTo(ow + offset, i);
-        }
-        painter->strokePath(grid_path, grid);
-    }
-
-    QList<qreal> values;
-
-    /** Draw graph lines */
-    {
-        QnScopedPainterTransformRollback transformRollback(painter);
-        Q_UNUSED(transformRollback)
-
-        qreal space_offset = pen_width * 2;
-
-        QTransform graphTransform = painter->transform();
-        graphTransform.translate(offset, oh + offset - space_offset);
-        painter->setTransform(graphTransform);
-
-        QPen graphPen;
-        graphPen.setWidthF(pen_width * 2);
-        graphPen.setCapStyle(Qt::FlatCap);
-
-        foreach(QString key, m_sortedKeys) {
-            if (!m_checkedFlagByKey.value(key, true))
-                continue;
-
-            QnStatisticsData &stats = m_history[key];
-            qreal currentValue = 0;
-            QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - space_offset*2), elapsed_step, &currentValue);
-            values.append(currentValue);
-            graphPen.setColor(getColorByKey(key));
-            painter->strokePath(path, graphPen);
-        }
-    }
-
-    /** Draw frame and legend */
-    {
-        QnScopedPainterPenRollback penRollback(painter);
-        Q_UNUSED(penRollback)
-
-        QPen main_pen;
-        main_pen.setColor(qnGlobals->statisticsColors().frame);
-        main_pen.setWidthF(pen_width * 2);
-        main_pen.setJoinStyle(Qt::MiterJoin);
-
-        painter->setPen(main_pen);
-        painter->drawRect(inner);
-
-        QnScopedPainterFontRollback fontRollback(painter);
-        Q_UNUSED(fontRollback)
-        QFont font(this->font());
-
-#ifdef Q_OS_LINUX
-        // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
-        int fontSize = 20;
-#else
-        // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
-        int fontSize = 80;
-#endif
-        font.setPixelSize(fontSize);
-        painter->setFont(font);
-
-        /* Draw text values on the right side */
-        {
-            // modify this if you want to change font size
-            qreal zoomCoef = 0.4 * offset;
-
-            qreal zoom(zoomCoef / fontSize);
-            qreal unzoom(fontSize / zoomCoef);
-
-            painter->scale(zoom, zoom);
-            qreal x = unzoom * (offset * 1.1 + ow);
-            for (int i = 0; i < values.length(); i++){
-                qreal interValue = values[i];
-                main_pen.setColor(getColorByKey(m_sortedKeys.at(i)));
-                painter->setPen(main_pen);
-                qreal y = unzoom * (offset + oh * (1.0 - interValue));
-                if (interValue >= 0)
-                    painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
-            }
-            painter->scale(unzoom, unzoom);
-        }
-    }
 }
 
 // -------------------------------------------------------------------------- //
@@ -474,7 +526,7 @@ QString QnServerResourceWidget::calculateTitleText() const {
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
-    return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
+    return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton | InfoButton);
 }
 
 void QnServerResourceWidget::at_statistics_received() {
@@ -526,17 +578,22 @@ void QnServerResourceWidget::addLegendOverlay() {
     legendOverlayHLayout->addItem(m_legendButtonBar);
     legendOverlayHLayout->addStretch();
 
+    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
+    statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+    statisticsOverlayWidget->setOpacity(1.0);
+    statisticsOverlayWidget->setVisible(true);
+
     QGraphicsLinearLayout *legendOverlayVLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    legendOverlayVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    legendOverlayVLayout->addStretch();
+    legendOverlayVLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    legendOverlayVLayout->setSpacing(0.5);
+    legendOverlayVLayout->addItem(statisticsOverlayWidget);
     legendOverlayVLayout->addItem(legendOverlayHLayout);
 
     QnViewportBoundWidget *legendOverlayWidget = new QnViewportBoundWidget(this);
     legendOverlayWidget->setLayout(legendOverlayVLayout);
     legendOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     legendOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(legendOverlayWidget, AutoVisible, true);
-    legendOverlayWidget->setVisible(true);
+    addOverlayWidget(legendOverlayWidget, UserVisible, true);
 }
 
 void QnServerResourceWidget::updateLegend() {
