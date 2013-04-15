@@ -184,7 +184,7 @@ namespace {
 
 
 QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_instrumentManager(display()->instrumentManager()),
     m_flags(0),
@@ -670,7 +670,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ToggleSliderAction), SIGNAL(toggled(bool)),                  this,           SLOT(at_toggleSliderAction_toggled(bool)));
 
     /* Notifications button */
-
     m_popupShowButton = newActionButton(action(Qn::TogglePopupsAction), 2.5, -1, m_controlsWidget);
     m_popupShowButton->setProperty(Qn::NoHandScrollOver, true);
     m_popupShowButton->setVisible(false);
@@ -722,6 +721,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
+    /* The disconnect call is needed so that our methods don't get triggered while
+     * the ui machinery is shutting down. */
+    disconnectAll();
+
     delete m_controlsWidget;
 }
 

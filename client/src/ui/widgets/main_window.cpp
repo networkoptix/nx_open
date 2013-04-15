@@ -143,10 +143,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up scene & view. */
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    setHelpTopic(scene, Qn::MainWindow_Scene_Help);
+    m_scene.reset(new QGraphicsScene(this));
+    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
-    m_view = new QnGraphicsView(scene);
+    m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
@@ -163,12 +163,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-    display()->setScene(scene);
-    display()->setView(m_view);
+    display()->setScene(m_scene.data());
+    display()->setView(m_view.data());
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
-    m_controller = new QnWorkbenchController(this);
-    m_ui = new QnWorkbenchUi(this);
+    m_controller.reset(new QnWorkbenchController(this));
+    m_ui.reset(new QnWorkbenchUi(this));
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
 
@@ -212,7 +212,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
-    menu()->setTargetProvider(m_ui);
+    menu()->setTargetProvider(m_ui.data());
 
 
     /* Tab bar. */
@@ -261,7 +261,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
     m_viewLayout->setSpacing(0);
-    m_viewLayout->addWidget(m_view);
+    m_viewLayout->addWidget(m_view.data());
 
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
@@ -471,7 +471,7 @@ bool QnMainWindow::event(QEvent *event) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
             
-        QApplication::sendEvent(m_ui, event);
+        QApplication::sendEvent(m_ui.data(), event);
         result = true;
     }
 
