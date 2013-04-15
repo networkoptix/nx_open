@@ -494,14 +494,6 @@ private:
 
 
 
-    /* Helpers. */
-
-    /** Stored dummy scene. */
-    QGraphicsScene *m_dummyScene;
-
-
-    
-
     QnThumbnailsLoader *m_loader;
 };
 

@@ -161,7 +161,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_frameOpacityAnimator(NULL),
-    m_dummyScene(new QGraphicsScene(this)),
     m_loader(NULL)
 {
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
@@ -246,13 +245,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
-
-    setScene(m_dummyScene);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
-    m_dummyScene = NULL;
-
     setScene(NULL);
 }
 
@@ -263,15 +258,8 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene && m_view)
         deinitSceneView();
 
-    /* Prepare new scene. */
     m_scene = scene;
-    if(!m_scene && m_dummyScene) {
-        m_dummyScene->clear();
-        m_scene = m_dummyScene;
-    }
 
-    /* Set up new scene.
-     * It may be NULL only when this function is called from destructor. */
     if(m_scene && m_view)
         initSceneView();
 }
