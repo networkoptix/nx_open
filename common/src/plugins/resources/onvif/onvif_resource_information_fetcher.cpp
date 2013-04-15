@@ -15,7 +15,8 @@ const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 static char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
-	{"vivo_ironman", "VS8801"}
+	{"vivo_ironman", "VS8801"},
+    {"vivotek", "VS8801"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
