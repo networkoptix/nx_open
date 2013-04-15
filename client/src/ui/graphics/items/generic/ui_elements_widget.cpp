@@ -44,6 +44,9 @@ QVariant QnUiElementsWidget::itemChange(GraphicsItemChange change, const QVarian
                 }
             }
         }
+        break;
+    default:
+        break;
     }
 
     return base_type::itemChange(change, value);

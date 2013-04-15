@@ -323,7 +323,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         removeItemInternal(item, true, false);
 
-    if (!m_gridBackgroundItem.isNull())
+    if (gridBackgroundItem())
         delete gridBackgroundItem();
 }
 
@@ -1104,7 +1104,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
     if(layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
-    QRect backgroundBoundingRect = gridBackgroundItem()->sceneBoundingRect();
+    QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
 
     QRect sceneBoundingRect =  (backgroundBoundingRect.isNull())
             ? layoutBoundingRect
@@ -1478,8 +1478,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
-    gridBackgroundItem()->setOpacity(0.0);
-
+    if(gridBackgroundItem())
+        gridBackgroundItem()->setOpacity(0.0);
 
     m_inChangeLayout = false;
 }
