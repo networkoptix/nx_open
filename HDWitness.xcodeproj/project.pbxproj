@@ -46,6 +46,7 @@
 		C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */; };
 		C7CCD4421705E16600BA30DF /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = C7CCD4411705E16600BA30DF /* camera.png */; };
 		C7CCD4441705E3EA00BA30DF /* camera_unauthorized.png in Resources */ = {isa = PBXBuildFile; fileRef = C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */; };
+		C7D38DB8171D83EC00BDEFD3 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = C7D38DB7171D83EC00BDEFD3 /* Settings.bundle */; };
 		C7FEBFFE171C480800F808F9 /* HDWCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C7FEBFFD171C480800F808F9 /* HDWCalendarViewController.m */; };
 /* End PBXBuildFile section */
 
@@ -113,6 +114,7 @@
 		C7CAEBD316F9795100824E4B /* HDWVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWVideoViewController.m; sourceTree = "<group>"; };
 		C7CCD4411705E16600BA30DF /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
 		C7CCD4431705E3EA00BA30DF /* camera_unauthorized.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera_unauthorized.png; sourceTree = "<group>"; };
+		C7D38DB7171D83EC00BDEFD3 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
 		C7FEBFFC171C480800F808F9 /* HDWCalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCalendarViewController.h; sourceTree = "<group>"; };
 		C7FEBFFD171C480800F808F9 /* HDWCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCalendarViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,6 +181,7 @@
 		C71D5AFA16ADBB9600C764B5 /* HDWitness */ = {
 			isa = PBXGroup;
 			children = (
+				C7D38DB7171D83EC00BDEFD3 /* Settings.bundle */,
 				C7A7DD0016F923D000659CF3 /* MotionJpegImageView.h */,
 				C7A7DD0116F923D000659CF3 /* MotionJpegImageView.mm */,
 				C71D5B0316ADBB9600C764B5 /* HDWAppDelegate.h */,
@@ -199,9 +202,9 @@
 				C7FEBFFD171C480800F808F9 /* HDWCalendarViewController.m */,
 				C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */,
 				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
-				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 				C73910DC170B2346004C80DA /* NSString+Base64.h */,
 				C73910DD170B2346004C80DA /* NSString+Base64.m */,
+				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 			);
 			path = HDWitness;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				C71D5AED16ADBB9600C764B5 /* Frameworks */,
 				C71D5AEE16ADBB9600C764B5 /* Resources */,
 				AE62E7FD64E64EFF95E8EAA5 /* Copy Pods Resources */,
+				C7D38DB9171D8AEF00BDEFD3 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -344,6 +348,7 @@
 				C7C673F717098B25002560E2 /* Default-Portrait@2x~ipad.png in Resources */,
 				C7C673F817098B30002560E2 /* Default-Landscape~ipad.png in Resources */,
 				C7C673F917098B37002560E2 /* Default-Landscape@2x~ipad.png in Resources */,
+				C7D38DB8171D83EC00BDEFD3 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,6 +389,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+		C7D38DB9171D8AEF00BDEFD3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "git_version=$(git log -1 --format=\"%h\")\ngit_branch=$(git symbolic-ref --short -q HEAD)\n\nbuild_time=$(date \"+%m/%d/%y %H:%M\")\n\ninfo_plist=\"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_FOLDER_PATH}/Info.plist\"\nsettings_plist=\"${SRCROOT}/Settings.bundle/Root.plist\"\n\nCFBundleShortVersionString=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"${info_plist}\")\nCFBundleVersion=\"$CFBundleShortVersionString ($git_version)\"\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion '$CFBundleVersion'\" \"$info_plist\"\n/usr/libexec/PlistBuddy -c \"Add :BuildTime string '$build_time'\" \"$info_plist\"\n\n/usr/libexec/PlistBuddy -c \"Set :PreferenceSpecifiers:3:DefaultValue '${CFBundleVersion}'\" \"$settings_plist\"\n/usr/libexec/PlistBuddy -c \"Set :PreferenceSpecifiers:4:DefaultValue '$build_time'\" \"$settings_plist\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

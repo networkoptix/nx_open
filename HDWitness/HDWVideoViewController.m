@@ -8,7 +8,7 @@
 
 #import "HDWVideoViewController.h"
 
-#define NOW_INTERVAL 1e+4 // 10 seconds
+#define NOW_INTERVAL 10.0 // 10 seconds
 
 @interface HDWVideoViewController ()
 
@@ -22,7 +22,7 @@
 
 
 - (NSUInteger)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskLandscape;
+    return UIInterfaceOrientationMaskAll;
 }
 
 

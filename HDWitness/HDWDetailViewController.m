@@ -338,8 +338,10 @@ enum MessageType {
         }	
     }
     
-    if (camera.status.intValue == Online || camera.status.intValue == Recording)
+    if (camera.status.intValue == Online || camera.status.intValue == Recording) {
+        NSLog(@"Thumbnail URL: %@", [camera.thumbnailUrl absoluteString]);
         [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
+    }
     
     cell.labelView.text = camera.name;
     

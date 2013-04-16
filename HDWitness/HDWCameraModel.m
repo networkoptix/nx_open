@@ -72,7 +72,10 @@
     _disabled = newDisabled;
 }
 
--(NSURL*) videoUrlForDate: (NSDate*)date resolution: (NSUInteger)resolution andQuality: (NSUInteger)quality {
+-(NSURL*) videoUrlForDate: (NSDate*)date andQuality: (NSUInteger)quality {
+    NSInteger resolution = [[[NSUserDefaults standardUserDefaults] objectForKey:@"resolution_preference"] integerValue];
+    NSLog(@"Resolution: %d", resolution);
+
     NSString *position;
     if (date) {
         long long msecs = [date timeIntervalSince1970] * 1000ll;
@@ -86,13 +89,13 @@
 }
 
 -(NSURL*) liveUrl {
-    return [self videoUrlForDate:nil resolution:240 andQuality:10];
+    return [self videoUrlForDate:nil andQuality:10];
 //    NSString *path = [NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=240p&qmin=10&qmax=10", _physicalId];
 //    return [NSURL URLWithString:path relativeToURL:_server.streamingUrl];
 }
 
 -(NSURL*) archiveUrlForDate: (NSDate*)date {
-    return [self videoUrlForDate:date resolution:240 andQuality:10];
+    return [self videoUrlForDate:date andQuality:10];
 }
 
 -(NSURL*) thumbnailUrl {
