@@ -64,15 +64,19 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     try {
         d->serverAddress = address;
         d->localPort = port;
-        d->serverSocket = new TCPServerSocket(address.toString(), port, 5 ,true);
-        if( d->serverSocket->failed() )
-        {
-            NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Initial Bind failed: %3").arg(d->serverAddress.toString()).arg(d->localPort).
-                arg(d->serverSocket->lastError()), cl_logWARNING );
-        }
+        d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
         d->maxConnections = maxConnections;
         d->ddosWarned = false;
-        cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
+        if( d->serverSocket->failed() )
+        {
+            NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+                arg(d->serverSocket->prevErrorCode()).arg(d->serverSocket->lastError()), cl_logWARNING );
+            qCritical() << "Can't start TCP listener at address" << address << ":" << port << ". "
+                "Reason: " << d->serverSocket->lastError() << "("<<d->serverSocket->prevErrorCode()<<")";
+        }
+        else {
+            cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
+        }
     }
     catch(const SocketException &e) {
         qCritical() << "Can't start TCP listener at address" << address << ":" << port << ". Reason: " << e.what();
@@ -220,6 +224,8 @@ void QnTcpListener::run()
             }
 
             TCPSocket* clientSocket = d->serverSocket->accept();
+//            delete clientSocket;
+//            clientSocket = NULL;
             if (clientSocket) {
                 if (d->connections.size() > d->maxConnections)
                 {
@@ -242,10 +248,10 @@ void QnTcpListener::run()
             }
             else
             {
-                if (SystemError::getLastOSErrorCode() != 0 )
+                if( d->serverSocket->failed() )
                 {
                     NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-                        arg(SystemError::getLastOSErrorCode()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                        arg(d->serverSocket->prevErrorCode()).arg(d->serverSocket->lastError()), cl_logWARNING );
                     QThread::msleep(1000);
                     d->newPort = d->localPort; // reopen tcp socket
                 }

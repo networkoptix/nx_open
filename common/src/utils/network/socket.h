@@ -163,8 +163,10 @@ protected:
     Socket(int type, int protocol) ;
     Socket(int sockDesc);
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
-    void createSocket(int type, int protocol);
-    void setStatus( StatusBit _status );
+    bool createSocket(int type, int protocol);
+    void setStatusBit( StatusBit _status );
+    void clearStatusBit( StatusBit _status );
+    void saveErrorInfo();
 
 private:
     bool m_nonBlockingMode;
@@ -324,11 +326,17 @@ public:
      *   @return new connection socket
      *   @exception SocketException thrown if attempt to accept a new connection fails
      */
+    TCPSocket* accept() ;
+
     static int accept(int sockDesc);
-    TCPSocket *accept() ;
 
 private:
-    void setListen(int queueLen) ;
+    /*! 
+        \return fd (>=0) on success, <0 on error (-2 if timed out)
+    */
+    static int acceptWithTimeout( int sockDesc );
+
+    bool setListen(int queueLen) ;
 };
 
 /**

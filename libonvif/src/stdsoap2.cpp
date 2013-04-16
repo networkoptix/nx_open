@@ -57,7 +57,16 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # pragma convert(819)	/* EBCDIC to ASCII */
 #endif
 
+#if !defined(HAVE_POLL) && defined(__GNUC__)
+#define HAVE_POLL
+#endif
+
 #include "stdsoap2.h"
+
+#ifndef HAVE_POLL
+#error "HAVE_POLL is not defined!!!"
+#endif
+
 #if GSOAP_VERSION != GSOAP_LIB_VERSION
 # error "GSOAP VERSION MISMATCH IN LIBRARY: PLEASE REINSTALL PACKAGE"
 #endif
