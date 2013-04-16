@@ -20,6 +20,21 @@
     return instance;
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    
+    HDWECSConfig *newConfig = [[HDWECSConfig allocWithZone:zone] init];
+    
+    if (newConfig) {
+        newConfig->_name = [_name copyWithZone:zone];
+        newConfig->_host = [_host copyWithZone:zone];
+        newConfig->_port = [_port copyWithZone:zone];
+        newConfig->_login = [_login copyWithZone:zone];
+        newConfig->_password= [_password copyWithZone:zone];
+    }
+    
+    return newConfig;
+}
+
 - (void)encodeWithCoder:(NSCoder *)encoder {
     //Encode properties, other class variables, etc
     [encoder encodeObject:self.name forKey:@"name"];

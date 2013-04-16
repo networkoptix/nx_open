@@ -11,12 +11,12 @@
 @class HDWECSConfig;
 
 @interface HDWECSViewController : UITableViewController {
-    HDWECSConfig *item;
 }
 
 -(id) initWithConfig: (HDWECSConfig*)config;
--(void) setConfig: (HDWECSConfig*)config;
 
+@property (copy) HDWECSConfig *config;
 @property (nonatomic, retain) NSArray *dataSourceArray;
+@property (nonatomic, assign) id delegate;
 
 @end

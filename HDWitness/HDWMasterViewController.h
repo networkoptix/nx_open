@@ -15,4 +15,6 @@
 
 @property (strong, nonatomic) HDWDetailViewController *detailViewController;
 
+- (void)addECSConfig: (HDWECSConfig*)ecsConfig;
+
 @end

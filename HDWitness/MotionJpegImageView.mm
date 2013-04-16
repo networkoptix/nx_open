@@ -115,6 +115,7 @@ static NSData *_endMarkerData = nil;
     _username = nil;
     _password = nil;
     _allowSelfSignedCertificates = NO;
+    _needReconnect = NO;
     if (_fpsCounter == nil)
         _fpsCounter = [FpsCounter fpsCounterWithInterval:FPS_MEASURE_SECONDS];
     
@@ -149,6 +150,10 @@ static NSData *_endMarkerData = nil;
 -(void) setUrl:(NSURL *)url {
     [self doInit];
     
+    if (_url != url) {
+        _needReconnect = YES;
+    }
+    
     _url = url;
 }
 -(void)awakeFromNib {
@@ -168,6 +173,11 @@ static NSData *_endMarkerData = nil;
 #pragma mark - Public Methods
 
 - (void)play {
+    if (_needReconnect) {
+        [self stop];
+        _needReconnect = NO;
+    }
+    
     if (_connection) {
         // continue
     }

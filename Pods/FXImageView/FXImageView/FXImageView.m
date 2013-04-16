@@ -100,10 +100,6 @@
 #pragma mark -
 #pragma mark Shared storage
 
--(void)dealloc {
-    NSLog(@"Deactivating %@", self);
-}
-
 + (NSOperationQueue *)processingQueue
 {
     static NSOperationQueue *sharedQueue = nil;

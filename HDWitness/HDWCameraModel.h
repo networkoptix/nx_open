@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface HDWECSConfig : NSObject {
+@interface HDWECSConfig : NSObject<NSCopying> {
 }
 
 @property NSString *name;
@@ -20,6 +20,8 @@
 @property (readonly) NSURL *url;
 
 + (HDWECSConfig*) defaultConfig;
+
+- (id)copyWithZone:(NSZone *)zone;
 
 @end
 

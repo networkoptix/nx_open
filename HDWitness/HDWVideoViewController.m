@@ -75,6 +75,14 @@
     [self.imageView play];
 }
 
+- (void)setUrlAndPlay {
+    NSURL *liveUrl = [_camera liveUrl];
+    self.imageView.username = liveUrl.user;
+    self.imageView.password = liveUrl.password;
+    self.imageView.url = liveUrl;
+    [self.imageView play];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -84,17 +92,22 @@
 
     self.imageView.allowSelfSignedCertificates = YES;
     self.imageView.allowClearTextCredentials = YES;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onAppDidEnterBackground:)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onAppWillEnterForeground:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+    [self setUrlAndPlay];
 //    self.scrollView.minimumZoomScale=0.5;
 //    self.scrollView.maximumZoomScale=6.0;
 //    self.scrollView.contentSize=CGSizeMake(1280, 720);
 //    self.scrollView.delegate=self;
     
-    NSURL *liveUrl = [_camera liveUrl];
-    self.imageView.username = liveUrl.user;
-    self.imageView.password = liveUrl.password;
-    self.imageView.url = liveUrl;
-    [self.imageView play];
     
 	// Do any additional setup after loading the view.
 }
@@ -109,4 +122,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)onAppDidEnterBackground:(NSNotification *)notification {
+    [self.imageView pause];
+}
+
+- (void)onAppWillEnterForeground:(NSNotification *)notification {
+    [self setUrlAndPlay];
+}
 @end

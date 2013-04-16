@@ -16,28 +16,42 @@
 
 @implementation HDWECSViewController
 
-- (UIColor *) deepBlueColor
-{
+- (UIColor *) deepBlueColor {
     return [UIColor colorWithRed:0x28/255.0f green:0x42/255.0f blue:0x75/255.0f alpha:1];
+}
+
+- (void)onCancel: (id)sender {
+    _config = nil;
+    
+    [self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)onSave: (id)sender {
+    // Add validation stuff here
+    
+    [self dismissModalViewControllerAnimated:YES];
+    [[self delegate] addECSConfig:_config];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self.tableView setEditing:YES];
+    
+    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(onSave:)];
+    self.navigationItem.rightBarButtonItem = saveButton;
+    
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(onCancel:)];
+    self.navigationItem.leftBarButtonItem = cancelButton;
 }
 
-- (id) initWithConfig: (HDWECSConfig*)config {
+- (id)initWithConfig: (HDWECSConfig*)config {
     self = [super init];
     if (self) {
         [self setConfig:config];
     }
     
     return self;
-}
-
--(void) setConfig: (HDWECSConfig*)config {
-    item = config;
 }
 
 - (void)viewDidLoad
@@ -126,7 +140,7 @@
         textField.placeholder = self.dataSourceArray[indexPath.row][@"Placeholder"];
         
         NSString *property = self.dataSourceArray[indexPath.row][@"Property"];
-        textField.text = [item valueForKey:property];
+        textField.text = [_config valueForKey:property];
         
         if ([property isEqualToString:@"password"]) {
             textField.secureTextEntry = YES;
@@ -192,7 +206,7 @@
     UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
     
-    [item setValue:sender.text forKey:self.dataSourceArray[indexPath.row][@"Property"]];
+    [_config setValue:sender.text forKey:self.dataSourceArray[indexPath.row][@"Property"]];
 }
 
 @end

@@ -41,12 +41,19 @@
     self.detailViewController = (HDWDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
+- (void)addECSConfig: (HDWECSConfig*)ecsConfig {
+    NSUInteger newIndex = _objects.count;
+    [_objects insertObject:ecsConfig atIndex:newIndex];
+    [self saveSettings];
+    [self.tableView reloadData];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
--(void)loadSettings {
+- (void)loadSettings {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults synchronize];
     
@@ -58,7 +65,7 @@
     }
 }
 
--(void)saveSettings {
+- (void)saveSettings {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *encodedObjects = [NSKeyedArchiver archivedDataWithRootObject:_objects];
     [defaults setObject:encodedObjects forKey:@"ecsconfigs"];
@@ -67,16 +74,20 @@
 
 - (void)insertNewObject:(id)sender
 {
-    NSUInteger newIndex = _objects.count;
-    HDWECSConfig *ecsConfig = [HDWECSConfig defaultConfig];
-    [_objects insertObject:ecsConfig atIndex:newIndex];
-    [self saveSettings];
+    [self performSegueWithIdentifier:@"showConfig" sender:self];
     
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:newIndex inSection:0];
-    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+//    NSUInteger newIndex = _objects.count;
+//    HDWECSConfig *ecsConfig = [HDWECSConfig defaultConfig];
+//    [_objects insertObject:ecsConfig atIndex:newIndex];
+//    [self saveSettings];
+//    
+//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:newIndex inSection:0];
+//    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+//    
+//    HDWECSViewController *ecsViewController = [[HDWECSViewController alloc] initWithConfig:ecsConfig];
+//    [self performSegueWithIdentifier:@"showConfig" sender:self];
     
-    HDWECSViewController *ecsViewController = [[HDWECSViewController alloc] initWithConfig:ecsConfig];
-    [self.navigationController pushViewController:ecsViewController animated:YES];
+//    [self.navigationController pushViewController:ecsViewController animated:YES];
 }
 
 #pragma mark - Table View
@@ -166,8 +177,14 @@
         }
     } else if ([[segue identifier] isEqualToString:@"showConfig"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
-        HDWECSConfig *ecsConfig = _objects[indexPath.row];
-        [[segue destinationViewController] setConfig:ecsConfig];
+        HDWECSViewController *ecsViewController = (HDWECSViewController *)[[segue destinationViewController] topViewController];
+        ecsViewController.delegate = self;
+        
+        if (indexPath) {
+            ecsViewController.config = _objects[indexPath.row];
+        } else {
+            ecsViewController.config = [HDWECSConfig defaultConfig];
+        }
     }
 }
 

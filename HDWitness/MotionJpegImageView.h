@@ -50,6 +50,7 @@
     BOOL _allowSelfSignedCertificates;
     BOOL _allowClearTextCredentials;
     FpsCounter *_fpsCounter;
+    BOOL _needReconnect;
 }
 
 @property (nonatomic, readwrite, copy) NSURL *url;
