@@ -136,6 +136,8 @@
         textField.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         textField.autocorrectionType = UITextAutocorrectionTypeNo;
         textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        textField.tag = indexPath.row;
+        textField.delegate = self;
         
         textField.placeholder = self.dataSourceArray[indexPath.row][@"Placeholder"];
         
@@ -150,6 +152,19 @@
     }
     
     return cell;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    int currentTag = textField.tag;
+    if (currentTag < self.dataSourceArray.count - 1) {
+        UITextField *nextField = (UITextField *)[self.view viewWithTag:currentTag + 1];
+        [nextField becomeFirstResponder];
+    } else if (currentTag == self.dataSourceArray.count - 1) {
+        [self onSave:textField];
+        return NO;
+    }
+    
+    return YES;
 }
 
 // Override to support conditional editing of the table view.

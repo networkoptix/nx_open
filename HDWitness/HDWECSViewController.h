@@ -10,7 +10,7 @@
 
 @class HDWECSConfig;
 
-@interface HDWECSViewController : UITableViewController {
+@interface HDWECSViewController : UITableViewController<UITextFieldDelegate> {
 }
 
 -(id) initWithConfig: (HDWECSConfig*)config;
