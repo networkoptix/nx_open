@@ -257,8 +257,6 @@ void InstrumentManagerPrivate::unregisterViewportInternal(QObject *viewport) {
 }
 
 void InstrumentManagerPrivate::registerItemInternal(QGraphicsItem *item) {
-    qDebug() << "REGISTER" << static_cast<void *>(item) << typeid(item).name();
-
     items.insert(item);
 
     item->installSceneEventFilter(filterItem);
@@ -267,8 +265,6 @@ void InstrumentManagerPrivate::registerItemInternal(QGraphicsItem *item) {
 }
 
 void InstrumentManagerPrivate::unregisterItemInternal(QGraphicsItem *item) {
-    qDebug() << "UNREGISTER" << static_cast<void *>(item) << typeid(item).name();
-
     items.remove(item);
 
     if(filterItem != NULL) 
