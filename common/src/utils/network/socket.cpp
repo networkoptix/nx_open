@@ -605,9 +605,10 @@ TCPSocket::TCPSocket(const QString &foreignAddress, unsigned short foreignPort)
 bool TCPSocket::reopen()
 {
     close();
-    if( createSocket(SOCK_STREAM, IPPROTO_TCP) )
+    if( createSocket(SOCK_STREAM, IPPROTO_TCP) ) {
+        clearStatusBit( Socket::sbFailed );
         return true;
-
+    }
     saveErrorInfo();
     setStatusBit( Socket::sbFailed );
     return false;
