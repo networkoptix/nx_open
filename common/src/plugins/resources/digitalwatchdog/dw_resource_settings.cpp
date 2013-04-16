@@ -38,7 +38,7 @@ bool DWCameraProxy::getFromCameraImpl(const QByteArray& query)
         return true;
     }
 
-    qWarning() << "DWCameraProxy::getFromCameraImpl: HTTP GET request '" << query.data() << "' failed: status: " << status;
+    qWarning() << "DWCameraProxy::getFromCameraImpl: HTTP GET request '" << query.data() << "' failed: status: " << status << "host=" << m_host << ":" << m_port;
     return false;
 }
 

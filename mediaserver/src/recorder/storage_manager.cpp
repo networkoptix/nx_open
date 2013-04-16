@@ -28,6 +28,7 @@ QnStorageManager::QnStorageManager():
     m_bigStorageExists(false)
 {
     m_lastTestTime.restart();
+    m_storageWarnTimer.restart();
 }
 
 void QnStorageManager::loadFullFileCatalog()
@@ -528,7 +529,10 @@ void QnStorageManager::putFileNumToCache(const QString& base, int fileNum)
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
 {
     if (!storage) {
-        qWarning() << "No disk storages";
+        if (m_storageWarnTimer.elapsed() > 5000) {
+            qWarning() << "No disk storages";
+            m_storageWarnTimer.restart();
+        }
         return QString();
     }
     Q_ASSERT(camera != 0);
