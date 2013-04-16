@@ -576,7 +576,8 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 #ifdef Q_OS_WIN
 bool QnMainWindow::winEvent(MSG *message, long *result)
 {
-    if(m_dwm->widgetWinEvent(message, result))
+    /* Note that we may get here when dwm is already destroyed. */
+    if(m_dwm && m_dwm->widgetWinEvent(message, result))
         return true;
 
     return base_type::winEvent(message, result);

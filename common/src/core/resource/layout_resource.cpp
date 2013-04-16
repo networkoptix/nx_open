@@ -11,6 +11,7 @@ QnLayoutResource::QnLayoutResource():
     m_cellSpacing(-1.0, -1.0),
     m_userCanEdit(false),
     m_backgroundSize(1, 1),
+    m_backgroundOpacity(0),
     m_locked(false)
 {
     setStatus(Online, true);
