@@ -203,6 +203,8 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
 GraphicsWidget::~GraphicsWidget() {
     if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData())
         sd->pendingLayoutWidgets.remove(this);
+
+    setFocusProxy(NULL); // TODO: #Elric #Qt5.0 workaround for a qt bug that is fixed in Qt5.0
 }
 
 GraphicsStyle *GraphicsWidget::style() const {
