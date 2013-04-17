@@ -114,6 +114,7 @@
 #endif
 
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource/resource_directory_browser.h"
 
 // -------------------------------------------------------------------------- //
@@ -1498,7 +1499,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
-    QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));
+    QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(widget(), context()));
     dialog->setModal(true);
     while(true) {
         if(!dialog->exec())

@@ -1,12 +1,15 @@
-#ifndef LOGINDIALOG_H
-#define LOGINDIALOG_H
+#ifndef QN_LOGIN_DIALOG_H
+#define QN_LOGIN_DIALOG_H
 
 #include <QtGui/QDialog>
-#include "connectinfo.h"
+
 #include <utils/settings.h>
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
+
+#include <ui/workbench/workbench_context_aware.h>
+
+#include "connectinfo.h"
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -22,17 +25,18 @@ namespace Ui {
     class LoginDialog;
 }
 
-class LoginDialog : public QDialog {
+class QnLoginDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
-    explicit LoginDialog(QnWorkbenchContext *context, QWidget *parent = 0);
-    virtual ~LoginDialog();
+    explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    virtual ~QnLoginDialog();
 
     QUrl currentUrl() const;
     QString currentName() const;
     QnConnectInfoPtr currentInfo() const;
 
     bool restartPending() const;
+
 public slots:
     virtual void accept() override;
     virtual void reject() override;
@@ -57,6 +61,7 @@ protected:
     bool restartInCompatibilityMode(QnConnectInfoPtr connectInfo);
 
     bool sendCommandToLauncher(const QString &version, const QStringList &arguments);
+
 private slots:
     void updateAcceptibility();
     void updateFocus();
@@ -68,26 +73,20 @@ private slots:
     void at_connectionsComboBox_currentIndexChanged(int index);
     void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
-    void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
-        const QString& remoteHostAddress, bool isLocal, const QString& seed);
+    void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
     void at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
 
 private:
-    Q_DISABLE_COPY(LoginDialog)
-
     QScopedPointer<Ui::LoginDialog> ui;
-    QWeakPointer<QnWorkbenchContext> m_context;
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
     int m_requestHandle;
     QnConnectInfoPtr m_connectInfo;
 
-    QnRenderingWidget* m_renderingWidget;
-    NetworkOptixModuleFinder* m_entCtrlFinder;
+    QnRenderingWidget *m_renderingWidget;
+    NetworkOptixModuleFinder *m_entCtrlFinder;
 
-    /**
-     * @brief m_foundEcs    Hash list of automatically found Enterprise Controllers based on seed as key.
-     */
+    /** Hash list of automatically found Enterprise Controllers based on seed as key. */
     QMultiHash<QString, QUrl> m_foundEcs;
 
     bool m_restartPending;
