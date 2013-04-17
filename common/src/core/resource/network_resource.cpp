@@ -208,9 +208,9 @@ bool QnNetworkResource::shoudResolveConflicts() const
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
-    if (source->getHostAddress() != getHostAddress())
+    if (source->getUrl() != getUrl())
     {
-        setHostAddress(source->getHostAddress());
+        setUrl(source->getUrl());
         return true;
     }
 
