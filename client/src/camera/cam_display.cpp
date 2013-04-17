@@ -782,11 +782,9 @@ void QnCamDisplay::setSpeed(float speed)
     {
         if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0)) {
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
-            if (m_extTimeSrc) {
-                qint64 time = m_extTimeSrc->getCurrentTime();
-                if (time != DATETIME_NOW)
-                    blockTimeValue(time);
-            }
+            qint64 time = getExternalTime();
+            if (time != DATETIME_NOW)
+                blockTimeValue(time);
         }
         if (speed < 0 && m_speed >= 0) {
             for (int i = 0; i < CL_MAX_CHANNELS; ++i)
