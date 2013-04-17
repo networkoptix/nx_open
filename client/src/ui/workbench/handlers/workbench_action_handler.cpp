@@ -2209,11 +2209,8 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(widgets.size() != 1)
-        return;
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: #Elric check
-    if (!widget) //e.g. server item
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(menu()->currentParameters(sender()).widget());
+    if (!widget)
         return;
 
     QnResourceDisplay *display = widget->display();
@@ -2224,14 +2221,23 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         QList<QImage> images;
         for (int i = 0; i < layout->numberOfChannels(); ++i)
             images.push_back(display->camDisplay()->getScreenshot(i));
-        QSize size = images[0].size();
-        screenshot = QImage(size.width() * layout->width(), size.height() * layout->height(), QImage::Format_ARGB32);
-        screenshot.fill(0);
-        
+        QSize channelSize = images[0].size();
+        QSize totalSize = QSize(channelSize.width() * layout->width(), channelSize.height() * layout->height());
+        QRectF zoomRect = widget->zoomRect();
+
+        screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
+        screenshot.fill(qRgba(0, 0, 0, 0));
         QPainter p(&screenshot);
         p.setCompositionMode(QPainter::CompositionMode_Source);
-        for (int i = 0; i < layout->numberOfChannels(); ++i)
-            p.drawImage(QPoint(layout->h_position(i) * size.width(), layout->v_position(i) * size.height()), images[i]);
+        for (int i = 0; i < layout->numberOfChannels(); ++i) {
+            p.drawImage(
+                QPoint(
+                    layout->h_position(i) * channelSize.width() - zoomRect.left() * totalSize.width(), 
+                    layout->v_position(i) * channelSize.height() - zoomRect.top() * totalSize.height()
+                ), 
+                images[i]
+            );
+        }
     } else {
         qnWarning("No channels in resource '%1' of type '%2'.", widget->resource()->getName(), widget->resource()->metaObject()->className());
         return;
@@ -2248,13 +2254,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
-    settings.beginGroup(QLatin1String("screenshots"));
-
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    if (!previousDir.length()){
+    QString previousDir = qnSettings->lastScreenshotDir();
+    if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    }
 
     QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(
@@ -2275,10 +2277,8 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             addToResourcePool(filePath);
         }
         
-        settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+        qnSettings->setLastScreenshotDir(QFileInfo(filePath).absolutePath());
     }
-
-    settings.endGroup();
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {

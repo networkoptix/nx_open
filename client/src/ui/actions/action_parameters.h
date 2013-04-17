@@ -68,6 +68,7 @@ public:
 
     QnResourceWidgetList widgets(const QString &key = QString()) const;
 
+    // TODO: #Elric remove
     void setFocusElement(QString element);
 
     QString focusElement() const;
