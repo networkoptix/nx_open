@@ -12,6 +12,7 @@
 #include <QtGui/QWhatsThis>
 #include <QtGui/QInputDialog>
 #include <QtGui/QLineEdit>
+#include <QtGui/QCheckBox>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -65,6 +66,7 @@
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
+#include <ui/dialogs/custom_file_dialog.h>
 
 #include <youtube/youtubeuploaddialog.h>
 
@@ -2968,18 +2970,12 @@ Do you want to continue?"),
 
     QString filterSeparator(QLatin1String(";;"));
     QString aviFileFilter = tr("AVI (*.avi)");
-    QString aviTsFileFilter = tr("AVI with Timestamps (Requires Transcoding)(*.avi)");
     QString mkvFileFilter = tr("Matroska (*.mkv)");
-    QString mkvTsFileFilter = tr("Matroska  with Timestamps (Requires Transcoding)(*.mkv)");
 
     QString allowedFormatFilter =
             aviFileFilter
             + filterSeparator
             + mkvFileFilter
-            + filterSeparator
-            + aviTsFileFilter
-            + filterSeparator
-            + mkvTsFileFilter
         #ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName(false)
@@ -2988,18 +2984,27 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString selectedFilter;
+    bool withTimestamps;
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
-        fileName = QFileDialog::getSaveFileName(
-            this->widget(), 
-            tr("Export Video As..."),
-            previousDir + QDir::separator() + suggestion,
-            allowedFormatFilter,
-            &selectedFilter,
-            QFileDialog::DontUseNativeDialog
-        );
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this->widget(),
+                                                                         tr("Export Video As..."),
+                                                                         previousDir + QDir::separator() + suggestion,
+                                                                         allowedFormatFilter));
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        QCheckBox* tsCheckbox = new QCheckBox(dialog.data());
+        tsCheckbox->setText(tr("Include Timestamps (Requires Transcoding)"));
+        tsCheckbox->setChecked(false);
+        dialog->addWidget(tsCheckbox);
+        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+            return;
+
+        fileName = dialog->selectedFiles().value(0);
+        selectedExtension = dialog->selectedFilter().mid(dialog->selectedFilter().lastIndexOf(QLatin1Char('.')), 4);
+        withTimestamps = tsCheckbox->isChecked();
 
         if (fileName.isEmpty())
             return;
@@ -3020,7 +3025,7 @@ Do you want to continue?"),
             }
         }
 
-        if (selectedFilter.contains(aviFileFilter) || selectedFilter.contains(aviTsFileFilter))
+        if (dialog->selectedFilter().contains(aviFileFilter))
         {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
@@ -3057,7 +3062,7 @@ Do you want to continue?"),
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (selectedFilter.contains(binaryFilterName(false)))
+    if (dialog->selectedFilter().contains(binaryFilterName(false)))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -3093,7 +3098,7 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (selectedFilter.contains(tr("with Timestamps")))
+        if (withTimestamps)
             role = QnStreamRecorder::Role_FileExportWithTime;
         QnMediaResourcePtr mediaRes = m_exportedCamera->getDevice().dynamicCast<QnMediaResource>();
         int timeOffset = 0;
