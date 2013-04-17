@@ -20,7 +20,7 @@
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_imageSize(1, 1),
-    m_imageOpacity(70),
+    m_imageOpacity(0.7),
     m_cache(new QnAppServerFileCache(this)),
     m_imgUploaded(false),
     m_imageStatus(None)
@@ -46,7 +46,7 @@ void QnGridBackgroundItem::updateDisplay() {
         setOpacity(0.0);
         return;
     } else {
-        setOpacity(0.01 * m_imageOpacity);
+        setOpacity(m_imageOpacity);
         updateGeometry();
     }
 
@@ -105,12 +105,12 @@ void QnGridBackgroundItem::setImageSize(const QSize &imageSize) {
     m_imageSize = imageSize;
 }
 
-int QnGridBackgroundItem::imageOpacity() const {
+qreal QnGridBackgroundItem::imageOpacity() const {
     return m_imageOpacity;
 }
 
-void QnGridBackgroundItem::setImageOpacity(int percent) {
-    m_imageOpacity = percent;
+void QnGridBackgroundItem::setImageOpacity(qreal value) {
+    m_imageOpacity = qBound(0.0, value, 1.0);
 }
 
 QRect QnGridBackgroundItem::sceneBoundingRect() const {

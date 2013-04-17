@@ -948,6 +948,13 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
 
+    factory(Qn::SetAsBackgroundAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        requiredPermissions(Qn::CurrentLayoutParameter, Qn::EditLayoutSettingsPermission).
+        text(tr("Set as Layout Background")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::url | QnResource::local | QnResource::still_image));
+
     factory(Qn::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
