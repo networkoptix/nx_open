@@ -547,7 +547,7 @@ double CLFFmpegVideoDecoder::getSampleAspectRatio() const
     if (qAbs(result)< 1e-7) 
     {
         result = 1.0;
-        if (m_context->width == 720) { // TODO: add a table!
+        if (m_context->width == 720) { // TODO: #vasilenko add a table!
             if (m_context->height == 480)
                 result = (4.0/3.0) / (720.0/480.0);
             else if (m_context->height == 576)

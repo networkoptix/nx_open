@@ -30,7 +30,7 @@ enum VC1Code{
 enum Profile {
     PROFILE_SIMPLE,
     PROFILE_MAIN,
-    PROFILE_COMPLEX, ///< TODO: WMV9 specific
+    PROFILE_COMPLEX, ///< TODO #vasilenko WMV9 specific
     PROFILE_ADVANCED
 };
 //@}

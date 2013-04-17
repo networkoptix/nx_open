@@ -90,7 +90,7 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->beforeUpdate();
 
     {
-        // TODO: use ordered mutex locker here to avoid deadlocks.
+        // TODO: #Elric use ordered mutex locker here to avoid deadlocks.
         QMutexLocker mutexLocker(&m_mutex); 
         QMutexLocker mutexLocker2(&other->m_mutex); 
         updateInner(other); 

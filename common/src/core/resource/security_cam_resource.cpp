@@ -499,7 +499,7 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
     bool result = base_type::setParam(name, val, domain);
     if(result && name == lit("cameraCapabilities"))
-        emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: we don't check whether they have actually changed. This better be fixed.
+        emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
     return result;
 }
 

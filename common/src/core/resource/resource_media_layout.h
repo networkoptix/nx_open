@@ -85,7 +85,7 @@ public:
         return 1;
     }
 
-    // TODO: use QSize here
+    // TODO: #Elric use QSize here
 
     virtual int width() const override
     {
@@ -97,7 +97,7 @@ public:
         return 1;
     }
 
-    // TODO: use QPoint here.
+    // TODO: #Elric use QPoint here.
 
     virtual int h_position(int /*channel*/) const override
     {

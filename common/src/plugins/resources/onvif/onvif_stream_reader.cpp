@@ -328,7 +328,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     VideoEncoder* result = fetchVideoEncoder(response, isPrimary);
 
     if (result) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         info.videoEncoderId = QString::fromStdString(result->token);
         updateVideoEncoder(*result, isPrimary);
 
@@ -354,7 +354,7 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     for (;iter != response.Configurations.end(); ++iter) 
     {
         VideoEncoder* conf = *iter;
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         if (conf && id == QString::fromStdString(conf->token)) {
             /*
             if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec())
@@ -499,7 +499,7 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* p
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
-        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: EVIL!
+        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: #Elric EVIL!
         {
             bool ptzMatched = profile && profile->PTZConfiguration;
             if (!ptzMatched)
@@ -590,7 +590,7 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
     AudioEncoder* result = fetchAudioEncoder(response, isPrimary);
 
     if (result) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         info.audioEncoderId = QString::fromStdString(result->token);
         updateAudioEncoder(*result, isPrimary);
         return sendAudioEncoderToCamera(*result);
@@ -608,7 +608,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
     std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.begin();
     for (; iter != response.Configurations.end(); ++iter) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         if (*iter && id == QString::fromStdString((*iter)->token)) {
             return *iter;
         }
@@ -690,7 +690,7 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
 
     std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
     for (; it != response.Configurations.end(); ++it) {
-        //TODO:UTF unuse std::string
+        //TODO: #vasilenko UTF unuse std::string
         if (*it && id == QString::fromStdString((*it)->token)) {
             return *it;
         }

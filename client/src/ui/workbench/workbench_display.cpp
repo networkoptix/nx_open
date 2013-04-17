@@ -1542,7 +1542,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(paused) {
             if(widget->display()->archiveReader()) {
                 widget->display()->archiveReader()->pauseMedia();
-                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #vasilenko check that this call doesn't break anything
             }
         }
 

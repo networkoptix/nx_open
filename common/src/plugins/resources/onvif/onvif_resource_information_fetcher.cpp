@@ -124,7 +124,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QString model = info.name;
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
-    //TODO:UTF unuse std::string
+    //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
@@ -297,7 +297,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 
 QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
-    //TODO:UTF unuse std::string
+    //TODO: #vasilenko UTF unuse std::string
     return response.HardwareId.empty()
         ? QString()
         : QString::fromStdString(response.HardwareId) + QLatin1String("::") +
