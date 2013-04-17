@@ -473,6 +473,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
+    // TODO: #Elric use QnPlatformProcess here.
 #ifdef Q_OS_WIN
     int priority = REALTIME_PRIORITY_CLASS;
     int hrez = SetPriorityClass(GetCurrentProcess(), priority);
