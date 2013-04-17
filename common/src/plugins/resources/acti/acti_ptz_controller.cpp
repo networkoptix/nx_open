@@ -90,9 +90,9 @@ void QnActiPtzController::init()
     QByteArray mirrorMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_MIRROR_MODE"), status);
     m_isMirrored = mirrorMode.toInt() == 1;
 
-    m_capabilities |= QnCommonGlobals::AbsolutePtzCapability;
-    m_capabilities |= QnCommonGlobals::ContinuousPanTiltCapability;
-    m_capabilities |= QnCommonGlobals::ContinuousZoomCapability;
+    m_capabilities |= Qn::AbsolutePtzCapability;
+    m_capabilities |= Qn::ContinuousPanTiltCapability;
+    m_capabilities |= Qn::ContinuousZoomCapability;
 
     qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
     qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
@@ -101,7 +101,7 @@ void QnActiPtzController::init()
     qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
     if (!m_isFliped) {
         qSwap(minTiltPhysical, maxTiltPhysical);
-        m_capabilities &= ~QnCommonGlobals::AbsolutePtzCapability; // acti 8111 has bug for absolute position if flip turned off
+        m_capabilities &= ~Qn::AbsolutePtzCapability; // acti 8111 has bug for absolute position if flip turned off
     }
 
     QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
