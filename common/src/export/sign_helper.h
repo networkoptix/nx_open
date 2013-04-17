@@ -33,7 +33,7 @@ public:
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
     //void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
     
-    /** TODO: remove magic const from the function */
+    //TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);

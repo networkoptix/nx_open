@@ -10,7 +10,7 @@ class QN_EXPORT QnResourceLayout
 {
 public:
     //returns number of audio or video channels device has
-    virtual int numberOfChannels() const = 0; // TODO: rename to channelCount()
+    virtual int numberOfChannels() const = 0; // TODO: #Elric rename to channelCount()
 };
 
 class QnResourceAudioLayout: public QnResourceLayout

@@ -52,7 +52,7 @@ public:
 
     QHash<int, QVariant> data() const;
 
-    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: hack
+    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
 
     QnTimePeriod getLocalRange() const;
     void setLocalRange(const QnTimePeriod& value);

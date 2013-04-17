@@ -19,7 +19,7 @@ struct QnMotionWindow
 
 //typedef QnMotionWindow[QnMotionWindow::MAX_SENSITIVITY-QnMotionWindow::MIN_SENSITIVITY+1] QnMotionRegion;
 
-// TODO: rename header
+// TODO: #Elric rename header
 
 class QnMotionRegion
 {
