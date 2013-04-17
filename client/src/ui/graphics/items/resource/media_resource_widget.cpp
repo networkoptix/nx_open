@@ -159,11 +159,11 @@ void QnMediaResourceWidget::setZoomRect(const QRectF &zoomRect) {
 }
 
 int QnMediaResourceWidget::motionGridWidth() const {
-    return MD_WIDTH * channelLayout()->width();
+    return MD_WIDTH * channelLayout()->size().width();
 }
 
 int QnMediaResourceWidget::motionGridHeight() const {
-    return MD_HEIGHT * channelLayout()->height();
+    return MD_HEIGHT * channelLayout()->size().height();
 }
 
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
@@ -178,7 +178,7 @@ QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
 }
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
-    return QPoint(channelLayout()->h_position(channel) * MD_WIDTH, channelLayout()->v_position(channel) * MD_HEIGHT);
+    return cwiseMul(channelLayout()->position(channel), QSize(MD_WIDTH, MD_HEIGHT));
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
@@ -267,11 +267,11 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
     if (m_camera) {
         const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
-        for (int i = 0; i < layout->numberOfChannels(); ++i) {
+        for (int i = 0; i < layout->channelCount(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
-            r.translate(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT);
+            r.translate(channelGridOffset(i));
             r = gridRect.intersected(r);
-            r.translate(-layout->h_position(i)*MD_WIDTH, -layout->v_position(i)*MD_HEIGHT);
+            r.translate(-channelGridOffset(i));
             if (!r.isEmpty()) {
                 m_motionSensitivity[i].addRect(sensitivity, r);
                 changed = true;
@@ -293,8 +293,8 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
     if (m_camera) {
         const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
-        for (int i = 0; i < layout->numberOfChannels(); ++i) {
-            QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
+        for (int i = 0; i < layout->channelCount(); ++i) {
+            QRect r(channelGridOffset(i), QSize(MD_WIDTH, MD_HEIGHT));
             if (r.contains(channelPos)) {
                 channelPos -= r.topLeft();
                 channel = i;
@@ -735,7 +735,7 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 }
 
 void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
-    setAspectRatio(static_cast<qreal>(size.width() * channelLayout()->width()) / (size.height() * channelLayout()->height()));
+    setAspectRatio(QnGeometry::aspectRatio(size) * QnGeometry::aspectRatio(channelLayout()->size()));
 }
 
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {

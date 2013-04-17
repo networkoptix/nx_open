@@ -2217,24 +2217,21 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     const QnResourceVideoLayout *layout = display->videoLayout();
 
     QImage screenshot;
-    if (layout->numberOfChannels() > 0) {
+    if (layout->channelCount() > 0) {
         QList<QImage> images;
-        for (int i = 0; i < layout->numberOfChannels(); ++i)
+        for (int i = 0; i < layout->channelCount(); ++i)
             images.push_back(display->camDisplay()->getScreenshot(i));
         QSize channelSize = images[0].size();
-        QSize totalSize = QSize(channelSize.width() * layout->width(), channelSize.height() * layout->height());
+        QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
         QRectF zoomRect = widget->zoomRect();
 
         screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
         screenshot.fill(qRgba(0, 0, 0, 0));
         QPainter p(&screenshot);
         p.setCompositionMode(QPainter::CompositionMode_Source);
-        for (int i = 0; i < layout->numberOfChannels(); ++i) {
+        for (int i = 0; i < layout->channelCount(); ++i) {
             p.drawImage(
-                QPoint(
-                    layout->h_position(i) * channelSize.width() - zoomRect.left() * totalSize.width(), 
-                    layout->v_position(i) * channelSize.height() - zoomRect.top() * totalSize.height()
-                ), 
+                QnGeometry::cwiseMul(layout->position(i), channelSize) - QnGeometry::cwiseMul(zoomRect.topLeft(), totalSize),
                 images[i]
             );
         }
@@ -2815,7 +2812,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
     Q_UNUSED(fileName)
     if (m_exportedMediaRes) 
     {
-        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->numberOfChannels();
+        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->channelCount();
         for (int i = 0; i < numberOfChannels; ++i)
         {
             if (m_motionFileBuffer[i])
@@ -2856,7 +2853,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         m_exportedMediaRes = m_layoutExportResources.dequeue();
         m_layoutExportCamera->setResource(m_exportedMediaRes);
-        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->numberOfChannels();
+        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->channelCount();
         for (int i = 0; i < numberOfChannels; ++i) {
             m_motionFileBuffer[i] = QSharedPointer<QBuffer>(new QBuffer());
             m_motionFileBuffer[i]->open(QIODevice::ReadWrite);
@@ -3028,7 +3025,7 @@ Do you want to continue?"),
             if (loader && archive) 
             {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(period);
-                if (periods.size() > 1 && archive->getDPAudioLayout()->numberOfChannels() > 0)
+                if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
                 {
                     int result = QMessageBox::warning(
                         this->widget(), 

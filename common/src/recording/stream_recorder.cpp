@@ -468,15 +468,16 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         m_formatCtx->start_time = mediaData->timestamp;
 
-        m_videoChannels = layout->numberOfChannels();
+        m_videoChannels = layout->channelCount();
         int bottomRightChannel = 0;
         int hPos = -1, vPos = -1;
         for (int i = 0; i < m_videoChannels; ++i) 
         {
-            if (layout->h_position(i) >= hPos && layout->v_position(i) >= vPos) {
+            QPoint position = layout->position(i);
+            if (position.x() >= hPos && position.y() >= vPos) {
                 bottomRightChannel = i;
-                hPos = layout->h_position(i);
-                vPos  = layout->v_position(i);
+                hPos = position.x();
+                vPos = position.y();
             }
         }
 
@@ -556,7 +557,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         m_isAudioPresent = false;
-        for (int i = 0; i < audioLayout->numberOfChannels(); ++i) 
+        for (int i = 0; i < audioLayout->channelCount(); ++i) 
         {
             m_isAudioPresent = true;
             // TODO: #vasilenko avoid using deprecated methods

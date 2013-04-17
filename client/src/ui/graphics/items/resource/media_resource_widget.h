@@ -124,6 +124,7 @@ protected:
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
 
+    // TODO: #Elric use QSize
     int motionGridWidth() const;
     int motionGridHeight() const;
 
