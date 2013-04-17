@@ -1,10 +1,9 @@
-#include "windows_process.h"
+#include "process_win.h"
 
-#ifdef Q_OS_WIN
+#include <Windows.h>
 
 #include <utils/common/warnings.h>
 
-#include <Windows.h>
 
 // -------------------------------------------------------------------------- //
 // QnWindowsProcessPrivate
@@ -155,4 +154,3 @@ void QnWindowsProcess::at_process_stateChanged() {
     d_func()->tryInitialize();
 }
 
-#endif // Q_OS_WIN

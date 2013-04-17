@@ -1,7 +1,7 @@
 #include "platform_process.h"
 
-#include "windows_process.h"
-#include "linux_process.h"
+#include "process_win.h"
+#include "process_unix.h"
 
 QnPlatformProcess *QnPlatformProcess::newInstance(QProcess *process, QObject *parent) {
 #if defined(Q_OS_WIN)
