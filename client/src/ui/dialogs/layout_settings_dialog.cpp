@@ -17,8 +17,8 @@
 
 namespace {
     //limits
-    const int widthLimit = 20;      // in cells
-    const int heightLimit = 20;     // in cells
+    const int widthLimit = 64;      // in cells
+    const int heightLimit = 64;     // in cells
     const int areaLimit = 100;      // in cells
 
     const int labelFrameWidth = 4;  // in pixels
@@ -315,12 +315,12 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
 
     int w, h;
-    qreal targetAspectRatio = aspectRatio / m_cellAspectRatio; // targetAspectRatio = w/h;
+    qreal targetAspectRatio = aspectRatio / m_cellAspectRatio;
     if (targetAspectRatio >= 1.0) { // width is greater than height
-        w = ui->widthSpinBox->maximum();
+        w = widthLimit;
         h = qRound((qreal)w / targetAspectRatio);
     } else {
-        h = ui->heightSpinBox->maximum();
+        h = heightLimit;
         w = qRound((qreal)h * targetAspectRatio);
     }
 
