@@ -206,7 +206,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));
     connect(m_widgetActivityInstrument,     SIGNAL(activityStopped()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument,     SIGNAL(activityResumed()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStarted()));
-    connect(m_instrumentManager,            SIGNAL(sceneChanged()),                                     this,                   SLOT(at_instrumentManager_sceneChanged()));
 
     /* Create zoomed toggle. */
     m_zoomedToggle = new QnToggle(false, this);
@@ -1683,11 +1682,6 @@ void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
          * Therefore the widget's item must be destroyed. */
         removeItemInternal(widget->item(), false, true);
     }
-}
-
-void QnWorkbenchDisplay::at_instrumentManager_sceneChanged() {
-    if(!m_instrumentManager->scene())
-        setScene(NULL);
 }
 
 void QnWorkbenchDisplay::at_scene_destroyed() {
