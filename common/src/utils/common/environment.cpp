@@ -74,7 +74,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     Q_UNUSED(parent)
     Q_UNUSED(path)
     /* We cannot select a file here, because no file browser really supports it... */
-    // TODO: implement as in Qt Creator.
+    // TODO: #Elric implement as in Qt Creator.
 #endif
 }
 

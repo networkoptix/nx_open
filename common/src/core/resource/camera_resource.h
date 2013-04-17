@@ -19,18 +19,18 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
 
@@ -39,11 +39,11 @@ public:
     void lockDTSFactory();
     void unLockDTSFactory();
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     QString getModel() const;
     void setModel(QString model);
 
-    // TODO: move to QnSecurityCamResource
+    // TODO: #Elric move to QnSecurityCamResource
     QString getFirmware() const;
     void setFirmware(QString firmware);
 

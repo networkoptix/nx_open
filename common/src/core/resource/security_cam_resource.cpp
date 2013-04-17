@@ -479,7 +479,7 @@ void QnSecurityCamResource::at_disabledChanged()
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
-    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: const_cast? get rid of it!
+    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
     return Qn::undeprecate(static_cast<Qn::CameraCapabilities>(mediaVariant.toInt()));
 }
 

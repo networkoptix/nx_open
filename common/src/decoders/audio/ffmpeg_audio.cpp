@@ -9,7 +9,7 @@ struct AVCodecContext;
 
 #define INBUF_SIZE 4096
 
-extern int MAX_AUDIO_FRAME_SIZE; // TODO: this is totally evil.
+extern int MAX_AUDIO_FRAME_SIZE; // TODO: #Elric this is totally evil.
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 

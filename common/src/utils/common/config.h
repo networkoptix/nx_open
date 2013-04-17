@@ -131,10 +131,10 @@ namespace Qn {
 }
 #endif // __cplusplus
 
-// TODO: move to client_globals
+// TODO: #Elric move to client_globals
 #define InvalidUtcOffset _id(INT64_MAX)
 
-// TODO: move out
+// TODO: #Elric move out
 #ifdef __cplusplus
 #include <QtCore/QString>
 

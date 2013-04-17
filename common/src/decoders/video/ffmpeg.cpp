@@ -207,7 +207,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
-    // TODO: check return value
+    // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
         m_codec = 0;

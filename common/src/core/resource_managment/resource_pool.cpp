@@ -234,7 +234,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: this is way beyond what one may call 'suboptimal'.
+            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
                 foreach(const QnLayoutItemData &data, layoutResource->getItems())
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
@@ -407,8 +407,7 @@ QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
 
-    // TODO:
-    // cache it, but remember that id and parentId of a resource may change
+    // TODO: #Elrik cache it, but remember that id and parentId of a resource may change
     // while it's in the pool.
 
     QnResourceList result;
