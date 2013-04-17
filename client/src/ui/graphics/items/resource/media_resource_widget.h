@@ -124,10 +124,7 @@ protected:
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
 
-    // TODO: #Elric use QSize
-    int motionGridWidth() const;
-    int motionGridHeight() const;
-
+    QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
 
     Q_SIGNAL void updateInfoTextLater();

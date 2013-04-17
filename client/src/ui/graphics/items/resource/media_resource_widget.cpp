@@ -158,23 +158,19 @@ void QnMediaResourceWidget::setZoomRect(const QRectF &zoomRect) {
     emit zoomRectChanged();
 }
 
-int QnMediaResourceWidget::motionGridWidth() const {
-    return MD_WIDTH * channelLayout()->size().width();
-}
-
-int QnMediaResourceWidget::motionGridHeight() const {
-    return MD_HEIGHT * channelLayout()->size().height();
-}
-
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
-    QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
+    QPointF gridPosF(cwiseDiv(itemPos, cwiseDiv(size(), motionGridSize())));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
-    return bounded(gridPos, QRect(0, 0, motionGridWidth(), motionGridHeight()));
+    return bounded(gridPos, QRect(QPoint(0, 0), motionGridSize()));
 }
 
 QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
-    return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight()))));
+    return cwiseMul(gridPos, cwiseDiv(size(), motionGridSize()));
+}
+
+QSize QnMediaResourceWidget::motionGridSize() const {
+    return cwiseMul(channelLayout()->size(), QSize(MD_WIDTH, MD_HEIGHT));
 }
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
