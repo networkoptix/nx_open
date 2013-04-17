@@ -21,6 +21,7 @@ public slots:
     void setAspectRatioMode(const Qt::AspectRatioMode mode);
     void setTransformationMode(const Qt::TransformationMode mode);
     void setDownScaleOnly(const bool value);
+    void setCropToMonitorAspectRatio(const bool value);
 
     void setInput(const QImage &input);
     void setInput(const QString &filename);
@@ -39,6 +40,7 @@ private:
     QImage m_input;
     QString m_inputFilename;
     QString m_outputFilename;
+    bool m_cropToMonitorAspectRatio;
 };
 
 
@@ -78,6 +80,12 @@ public slots:
      * @param value                 Bool value
      */
     void setDownScaleOnly(const bool value);
+
+    /**
+     * @brief setCropToMonitorAspectRatio   Set crop flag. If set image will be cropped to current monitor aspect ratio.
+     * @param value                 Bool value
+     */
+    void setCropToMonitorAspectRatio(const bool value);
 
     /**
      * @brief setInput              Input image file. Have lower priority than setInput(QString)

@@ -60,6 +60,9 @@ private:
 
     qreal m_cellAspectRatio;
     bool m_estimatePending;
+
+    /** Should image be cropped to current monitor AR */
+    bool m_cropImage;
 };
 
 #endif // LAYOUT_SETTINGS_DIALOG_H

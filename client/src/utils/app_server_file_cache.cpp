@@ -103,13 +103,14 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
 
 // -------------- Uploading image methods ----------------
 
-void QnAppServerFileCache::storeImage(const QString &filePath) {
+void QnAppServerFileCache::storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio) {
     QString uuid =  QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(filePath);
     loader->setSize(getMaxImageSize());
+    loader->setCropToMonitorAspectRatio(cropImageToMonitorAspectRatio);
     loader->setOutput(getFullPath(newFilename));
     connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
     loader->start();

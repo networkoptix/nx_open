@@ -1,6 +1,8 @@
 #include "threaded_image_loader.h"
 
 #include <QtCore/QFileInfo>
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
 
 
 QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
@@ -31,6 +33,10 @@ void QnThreadedImageLoaderPrivate::setDownScaleOnly(const bool value) {
     m_downScaleOnly = value;
 }
 
+void QnThreadedImageLoaderPrivate::setCropToMonitorAspectRatio(const bool value) {
+    m_cropToMonitorAspectRatio = value;
+}
+
 void QnThreadedImageLoaderPrivate::setInput(const QImage &input) {
     m_input = input;
 }
@@ -49,6 +55,24 @@ void QnThreadedImageLoaderPrivate::start() {
     }
 
     QImage output = m_input;
+    if (!output.isNull() && m_cropToMonitorAspectRatio) {
+        qreal aspectRatio = (qreal)output.width() / (qreal)output.height();
+
+        QRect screen = qApp->desktop()->screenGeometry();
+        qreal targetAspectRatio = (qreal)screen.width() / (qreal)screen.height();
+        if (!qFuzzyCompare(aspectRatio, targetAspectRatio)) {
+            if (targetAspectRatio > aspectRatio) {
+                int targetHeight = qRound((qreal)output.width() / targetAspectRatio);
+                int offset = (output.height() - targetHeight) / 2;
+                output = output.copy(0, offset, output.width(), targetHeight);
+            } else {
+                int targetWidth = qRound((qreal)output.height() * targetAspectRatio);
+                int offset = (output.width() - targetWidth / 2);
+                output = output.copy(offset, 0, targetWidth, output.height());
+            }
+        }
+    }
+
     if (!output.isNull() && m_size.isValid() && !m_size.isNull()) {
         if (m_downScaleOnly)
             m_size = m_size.boundedTo(output.size());
@@ -95,6 +119,10 @@ void QnThreadedImageLoader::setTransformationMode(const Qt::TransformationMode m
 
 void QnThreadedImageLoader::setDownScaleOnly(const bool value) {
     m_loader->setDownScaleOnly(value);
+}
+
+void QnThreadedImageLoader::setCropToMonitorAspectRatio(const bool value) {
+    m_loader->setCropToMonitorAspectRatio(value);
 }
 
 void QnThreadedImageLoader::setInput(const QImage &input) {

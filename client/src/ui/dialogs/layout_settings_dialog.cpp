@@ -3,7 +3,6 @@
 
 #include <QtCore/qmath.h>
 
-#include <QtGui/QFileDialog>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
@@ -12,6 +11,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/dialogs/image_preview_dialog.h>
+#include <ui/dialogs/custom_file_dialog.h>
 
 #include <utils/threaded_image_loader.h>
 
@@ -82,7 +82,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(new QnAppServerFileCache(this)),
     m_cellAspectRatio((qreal)16/9),
-    m_estimatePending(false)
+    m_estimatePending(false),
+    m_cropImage(false)
 {
     ui->setupUi(this);
 
@@ -214,7 +215,7 @@ void QnLayoutSettingsDialog::at_accepted() {
         return;
     }
 
-    m_cache->storeImage(m_newFilePath);
+    m_cache->storeImage(m_newFilePath, m_cropImage);
     setProgress(true);
     ui->generalGroupBox->setEnabled(false);
     ui->buttonBox->setEnabled(false);
@@ -263,6 +264,7 @@ void QnLayoutSettingsDialog::loadPreview() {
     loader->setInput(m_newFilePath);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(imageLabel->size());
+    loader->setCropToMonitorAspectRatio(m_cropImage);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
     setProgress(true);
@@ -279,8 +281,7 @@ void QnLayoutSettingsDialog::viewFile() {
 }
 
 void QnLayoutSettingsDialog::selectFile() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     QString nameFilter;
@@ -292,6 +293,11 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
+    QCheckBox* cropCheckbox = new QCheckBox(dialog.data());
+    cropCheckbox->setText(tr("Crop to current monitor AR"));
+    cropCheckbox->setChecked(m_cropImage);
+    dialog->addWidget(cropCheckbox);
+
     if(!dialog->exec())
         return;
 
@@ -302,6 +308,7 @@ void QnLayoutSettingsDialog::selectFile() {
     m_newFilePath = files[0];
     m_cachedFilename = QString();
     m_estimatePending = true;
+    m_cropImage = cropCheckbox->isChecked();
 
     loadPreview();
     updateControls();
