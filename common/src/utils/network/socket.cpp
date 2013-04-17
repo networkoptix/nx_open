@@ -507,6 +507,16 @@ bool CommunicatingSocket::setWriteTimeOut( unsigned int ms )
     return true;
 }
 
+bool CommunicatingSocket::setSendBufferSize(int buff_size)
+{
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
+}
+
+bool CommunicatingSocket::setReadBufferSize(int buff_size)
+{
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
+}
+
 int CommunicatingSocket::send(const QnByteArray& data)
 {
     return send(data.data(), data.size());
@@ -523,7 +533,7 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
         int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
     }
     else if (sended == 0)
@@ -533,7 +543,7 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
     int sended = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
         m_writeTimeoutMS );
-    if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+    if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
         mConnected = false;
     else if (sended == 0)
         mConnected = false;
@@ -731,11 +741,12 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // UDPSocket Code
 
-UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
-                                              IPPROTO_UDP)
+UDPSocket::UDPSocket()
+:
+    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
+    memset( &m_destAddr, 0, sizeof(m_destAddr) );
     setBroadcast();
-    m_destAddr = new sockaddr_in();
     int buff_size = 1024*512;
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
     {
@@ -743,21 +754,13 @@ UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     }
 }
 
-bool CommunicatingSocket::setSendBufferSize(int buff_size)
+UDPSocket::UDPSocket(unsigned short localPort)
+:
+    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
-    return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
-}
-
-bool CommunicatingSocket::setReadBufferSize(int buff_size)
-{
-    return ::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
-}
-
-UDPSocket::UDPSocket(unsigned short localPort)   :
-    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
+    memset( &m_destAddr, 0, sizeof(m_destAddr) );
     setLocalPort(localPort);
     setBroadcast();
-    m_destAddr = new sockaddr_in();
 
     int buff_size = 1024*512;
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
@@ -767,30 +770,26 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP),
-      m_destAddr( NULL )
+:
+    CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
+    memset( &m_destAddr, 0, sizeof(m_destAddr) );
+
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
         saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
-        qWarning()<<"Can't create UDP socket: "<<m_lastError;
+        setStatusBit(Socket::sbFailed);
+        qWarning() << "Can't create UDP socket: " << m_lastError;
         return;
     }
 
     setBroadcast();
-    m_destAddr = new sockaddr_in();
     int buff_size = 1024*512;
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
     {
         saveErrorInfo();
         setStatusBit( Socket::sbFailed );
     }
-}
-
-UDPSocket::~UDPSocket()
-{
-    delete m_destAddr;
 }
 
 void UDPSocket::setBroadcast() {
@@ -821,12 +820,12 @@ void UDPSocket::disconnect()  {
 
 void UDPSocket::setDestPort(unsigned short foreignPort)
 {
-    m_destAddr->sin_port = htons(foreignPort);
+    m_destAddr.sin_port = htons(foreignPort);
 }
 
 bool UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreignPort)
 {
-    return fillAddr(foreignAddress, foreignPort, *m_destAddr);
+    return fillAddr(foreignAddress, foreignPort, m_destAddr);
 }
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen, const QString &foreignAddress, unsigned short foreignPort)
@@ -842,10 +841,10 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 
 #ifdef _WIN32
     return sendto(sockDesc, (raw_type *) buffer, bufferLen, 0,
-               (sockaddr *) m_destAddr, sizeof(sockaddr_in)) == bufferLen;
+               (sockaddr *) &m_destAddr, sizeof(m_destAddr)) == bufferLen;
 #else
     return doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const    sockaddr *) m_destAddr, (socklen_t)sizeof(sockaddr_in)),
+        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
         m_writeTimeoutMS ) == bufferLen;
 #endif
 }
