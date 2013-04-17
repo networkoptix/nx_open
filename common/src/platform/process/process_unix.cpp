@@ -4,6 +4,8 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
+#include <utils/common/warnings.h>
+
 namespace {
     enum {
         InvalidNiceValue = 0xDEADBEEF
@@ -74,7 +76,7 @@ private:
         case 19: case 18: case 17: case 16:
             return QnPlatformProcess::IdlePriority;
         case 15: case 14: case 13: case 12: case 11: case 10:
-            return QnPlatformProcess::LowestPriority:
+            return QnPlatformProcess::LowestPriority;
         case 9: case 8: case 7: case 6: case 5: case 4: case 3:
             return QnPlatformProcess::LowPriority;
         case 2: case 1: case 0: case -1: case -2: case -3:
