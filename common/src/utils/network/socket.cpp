@@ -773,8 +773,11 @@ UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
         saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
-        qWarning()<<"Can't create UDP socket: "<<m_lastError;
+        setStatusBit(Socket::sbFailed);
+        qWarning() << "Can't create UDP socket: " << m_lastError;
+
+        m_destAddr = new sockaddr_in(); // TODO: #AK remove this line and client crashes.
+
         return;
     }
 
