@@ -4,7 +4,7 @@
 
 #include <utils/common/warnings.h>
 
-#define INVALID_PRIORITY_CLASS 0xDEADFOOD
+#define INVALID_PRIORITY_CLASS 0xDEADF00D
 
 
 // -------------------------------------------------------------------------- //
