@@ -146,7 +146,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
         m_cache->loadImage(m_cachedFilename);
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
-        ui->opacitySpinBox->setValue(layout->backgroundOpacity());
+        ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);
     }
     ui->lockedCheckBox->setChecked(layout->locked());
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
@@ -166,7 +166,7 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     layout->setLocked(ui->lockedCheckBox->isChecked());
     layout->setBackgroundImageFilename(m_cachedFilename);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
-    layout->setBackgroundOpacity(ui->opacitySpinBox->value());
+    layout->setBackgroundOpacity((qreal)ui->opacitySpinBox->value() * 0.01);
     // TODO: #GDM remove unused image if any
     return true;
 }
@@ -176,7 +176,7 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
     if (
             (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit()) ||
             (ui->lockedCheckBox->isChecked() != layout->locked()) ||
-            (ui->opacitySpinBox->value() != layout->backgroundOpacity()) ||
+            (ui->opacitySpinBox->value() != int(layout->backgroundOpacity() * 100)) ||
             (m_cachedFilename != layout->backgroundImageFilename())
             )
         return true;
@@ -282,7 +282,15 @@ void QnLayoutSettingsDialog::selectFile() {
     QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open file")));
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setNameFilter(tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)"));
+
+    QString nameFilter;
+    foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
+        if (!nameFilter.isEmpty())
+            nameFilter += QLatin1Char(' ');
+        nameFilter += QLatin1String("*.") + QLatin1String(format);
+    }
+    nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
+    dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
     if(!dialog->exec())
         return;

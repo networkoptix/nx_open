@@ -99,6 +99,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/license_usage_helper.h>
+#include <utils/app_server_file_cache.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -287,6 +288,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
     connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
+    connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
@@ -3280,6 +3282,48 @@ void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
     QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget()));
     dialog->setCamera(camera);
     dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
+    if (!context()->user() || !workbench()->currentLayout()->resource())
+        return; // action should not be triggered while we are not connected
+
+    if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
+        return;
+
+    QnAppServerFileCache *cache = new QnAppServerFileCache(this);
+    connect(cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_backgroundImageStored(QString, bool)));
+    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
+
+    QnProgressDialog *progressDialog = new QnProgressDialog(this->widget());
+    progressDialog->setWindowTitle(tr("Updating background"));
+    progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
+    progressDialog->setRange(0, 0);
+    progressDialog->setCancelButton(NULL);
+
+    connect(progressDialog,   SIGNAL(canceled()),                   progressDialog,     SLOT(deleteLater()));
+    connect(cache,            SIGNAL(imageStored(QString, bool)),   progressDialog,     SLOT(deleteLater()));
+    connect(cache,            SIGNAL(imageStored(QString, bool)),   cache,              SLOT(deleteLater()));
+    progressDialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename, bool success) {
+    if (!context()->user() || !workbench()->currentLayout()->resource())
+        return; // action should not be triggered while we are not connected
+
+    if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
+        return;
+
+    if (!success) {
+        QMessageBox::warning(widget(), tr("Error"), tr("Image cannot be uploaded"));
+        return;
+    }
+
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    layout->setBackgroundImageFilename(filename);
+    if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
+        layout->setBackgroundOpacity(0.7);
+    connection()->saveAsync(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
