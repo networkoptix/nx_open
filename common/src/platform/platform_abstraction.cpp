@@ -15,6 +15,7 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
     m_notifier = QnPlatformNotifier::newInstance(this);
     m_images = QnPlatformImages::newInstance(this);
+    m_process = QnPlatformProcess::newInstance(NULL, this);
 
     if(s_instance) {
         qnWarning("QnPlatformAbstraction instance already exists.");
@@ -26,4 +27,18 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
 QnPlatformAbstraction::~QnPlatformAbstraction() {
     if(s_instance == this)
         s_instance = NULL;
+}
+
+QnPlatformProcess *QnPlatformAbstraction::process(QProcess *source) const {
+    if(source == NULL)
+        return m_process;
+
+    static const char *qn_platformProcessPropertyName = "_qn_platformProcess";
+    QnPlatformProcess *result = source->property(qn_platformProcessPropertyName).value<QnPlatformProcess *>();
+    if(!result) {
+        result = QnPlatformProcess::newInstance(source, source);
+        result->setProperty(qn_platformProcessPropertyName, QVariant::fromValue<QnPlatformProcess *>(result));
+    }
+
+    return result;
 }

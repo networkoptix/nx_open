@@ -127,8 +127,11 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     else if (time == LATEST_IMAGE)
     {
         // get latest data
-        if (camera)
+        if (camera) {
             video = camera->getLastVideoFrame(useHQ);
+            if (!video)
+                video = camera->getLastVideoFrame(!useHQ);
+        }
         if (!video) {
             serverDelegate.open(res);
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
