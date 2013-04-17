@@ -366,10 +366,7 @@ public:
      *   @param localPort local port
      *   @exception SocketException thrown if unable to create UDP socket
      */
-    UDPSocket(const QString &localAddress, unsigned short localPort)
-    ;
-
-    ~UDPSocket();
+    UDPSocket(const QString &localAddress, unsigned short localPort);
 
     bool setDestAddr(const QString &foreignAddress, unsigned short foreignPort);
 
@@ -440,7 +437,7 @@ private:
     void setBroadcast();
 
 private:
-    sockaddr_in* m_destAddr;
+    sockaddr_in m_destAddr;
 };
 
 #endif
