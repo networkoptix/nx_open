@@ -77,8 +77,7 @@ Qn::ActionParameterType QnActionParameters::type(const QString &key) const {
 }
 
 int QnActionParameters::size(const QString &key) const {
-    Q_UNUSED(key)
-    return QnActionParameterTypes::size(items());
+    return QnActionParameterTypes::size(argument(key));
 }
 
 QnResourceList QnActionParameters::resources(const QString &key) const {
@@ -86,8 +85,7 @@ QnResourceList QnActionParameters::resources(const QString &key) const {
 }
 
 QnResourcePtr QnActionParameters::resource(const QString &key) const {
-    Q_UNUSED(key)
-    QnResourceList resources = this->resources();
+    QnResourceList resources = this->resources(key);
 
     if(resources.size() != 1)
         qnWarning("Invalid number of target resources: expected %2, got %3.", 1, resources.size());
@@ -104,8 +102,7 @@ QnWorkbenchLayoutList QnActionParameters::layouts(const QString &key) const {
 }
 
 QnResourceWidget *QnActionParameters::widget(const QString &key) const {
-    Q_UNUSED(key)
-    QnResourceWidgetList widgets = this->widgets();
+    QnResourceWidgetList widgets = this->widgets(key);
 
     if(widgets.size() != 1)
         qnWarning("Invalid number of target widgets: expected %2, got %3.", 1, widgets.size());
