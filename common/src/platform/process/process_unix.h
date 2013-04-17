@@ -3,14 +3,26 @@
 
 #include "platform_process.h"
 
+class QnLinuxProcessPrivate;
+
 class QnLinuxProcess: public QnPlatformProcess {
     Q_OBJECT;
-public:
-    QnLinuxProcess(QProcess *process, QObject *parent = NULL): QnPlatformProcess(parent) {}
+    typedef QnPlatformProcess base_type;
 
-    virtual qint64 pid() const override { return -1; }
-    virtual Priority priority() const override { return InvalidPriority; }
-    virtual void setPriority(Priority priority) override { return; }
+public:
+    QnLinuxProcess(QProcess *process, QObject *parent = NULL);
+    virtual ~QnLinuxProcess();
+
+    virtual qint64 pid() const override;
+    virtual Priority priority() const override;
+    virtual void setPriority(Priority priority) override;
+
+private slots:
+    void at_process_stateChanged();
+
+protected:
+    Q_DECLARE_PRIVATE(QnLinuxProcess);
+    QScopedPointer<QnLinuxProcessPrivate> d_ptr;
 };
 
 #endif // QN_LINUX_PROCESS_H
