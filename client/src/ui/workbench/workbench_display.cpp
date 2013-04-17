@@ -1355,7 +1355,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     const QnResourceVideoLayout *videoLayout = widget->channelLayout();
-    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    const qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (4.0 / 3.0);
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
 

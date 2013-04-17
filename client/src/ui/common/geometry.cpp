@@ -9,6 +9,10 @@ QPointF QnGeometry::cwiseMul(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() * r.x(), l.y() * r.y());
 }
 
+QPoint QnGeometry::cwiseMul(const QPoint &l, const QPoint &r) {
+    return QPoint(l.x() * r.x(), l.y() * r.y());
+}
+
 QPointF QnGeometry::cwiseDiv(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() / r.x(), l.y() / r.y());
 }
@@ -17,12 +21,20 @@ QPointF QnGeometry::cwiseMul(const QPointF &l, const QSizeF &r) {
     return QPointF(l.x() * r.width(), l.y() * r.height());
 }
 
+QPoint QnGeometry::cwiseMul(const QPoint &l, const QSize &r) {
+    return QPoint(l.x() * r.width(), l.y() * r.height());
+}
+
 QPointF QnGeometry::cwiseDiv(const QPointF &l, const QSizeF &r) {
     return QPointF(l.x() / r.width(), l.y() / r.height());
 }
 
 QSizeF QnGeometry::cwiseMul(const QSizeF &l, const QSizeF &r) {
     return QSizeF(l.width() * r.width(), l.height() * r.height());
+}
+
+QSize QnGeometry::cwiseMul(const QSize &l, const QSize &r) {
+    return QSize(l.width() * r.width(), l.height() * r.height());
 }
 
 QSizeF QnGeometry::cwiseDiv(const QSizeF &l, const QSizeF &r) {

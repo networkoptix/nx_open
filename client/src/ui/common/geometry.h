@@ -19,10 +19,13 @@ class QnGeometry {
 public:
     /* Some coefficient-wise arithmetic functions follow. */
     static QPointF cwiseMul(const QPointF &l, const QPointF &r);
+    static QPoint cwiseMul(const QPoint &l, const QPoint &r);
     static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
     static QPointF cwiseMul(const QPointF &l, const QSizeF &r);
+    static QPoint cwiseMul(const QPoint &l, const QSize &r);
     static QPointF cwiseDiv(const QPointF &l, const QSizeF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
+    static QSize cwiseMul(const QSize &l, const QSize &r);
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
     static QSizeF cwiseMin(const QSizeF &l, const QSizeF &r);
     static QSizeF cwiseMax(const QSizeF &l, const QSizeF &r);

@@ -454,18 +454,13 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_channelsLayout->numberOfChannels() == 1)
+    if (m_channelsLayout->channelCount() == 1)
         return QRectF(QPointF(0.0, 0.0), size());
 
-    QSizeF size = this->size();
-    qreal w = size.width() / m_channelsLayout->width();
-    qreal h = size.height() / m_channelsLayout->height();
-
+    QSizeF channelSize = cwiseDiv(this->size(), m_channelsLayout->size());
     return QRectF(
-        w * m_channelsLayout->h_position(channel),
-        h * m_channelsLayout->v_position(channel),
-        w,
-        h
+        cwiseMul(m_channelsLayout->position(channel), channelSize),
+        channelSize
     );
 }
 
@@ -623,12 +618,12 @@ void QnResourceWidget::setChannelLayout(const QnResourceVideoLayout *channelLayo
 
     m_channelsLayout = channelLayout;
 
-    m_channelState.resize(m_channelsLayout->numberOfChannels());
+    m_channelState.resize(m_channelsLayout->channelCount());
     channelLayoutChangedNotify();
 }
 
 int QnResourceWidget::channelCount() const {
-    return m_channelsLayout->numberOfChannels();
+    return m_channelsLayout->channelCount();
 }
 
 void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport) {

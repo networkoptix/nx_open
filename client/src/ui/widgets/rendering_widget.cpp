@@ -55,7 +55,7 @@ void QnRenderingWidget::updateChannelScreenSize() {
     if(!m_renderer) {
         m_channelScreenSize = QSize();
     } else {
-        QSize channelScreenSize = QSizeF(width() / m_display->videoLayout()->width(), height() / m_display->videoLayout()->height()).toSize();
+        QSize channelScreenSize = QnGeometry::cwiseDiv(size(), m_display->videoLayout()->size()).toSize();
         if(channelScreenSize != m_channelScreenSize) {
             m_channelScreenSize = channelScreenSize;
             m_renderer->setChannelScreenSize(m_channelScreenSize);

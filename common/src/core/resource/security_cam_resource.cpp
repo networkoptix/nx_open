@@ -32,7 +32,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     {
 
         const QnResourceVideoLayout* layout = getVideoLayout();
-        int numChannels = layout->numberOfChannels();
+        int numChannels = layout->channelCount();
 
         m_motionType = other_casted->m_motionType;
 
@@ -225,7 +225,7 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         }
         else 
         {
-            for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+            for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
                 setMotionMaskPhysical(i);
         }
     }

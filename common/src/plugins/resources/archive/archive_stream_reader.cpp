@@ -182,10 +182,9 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
 {
     QString rez;
     QTextStream ost(&rez);
-    ost << layout->width() << ',' << layout->height();
-    for (int i = 0; i < layout->numberOfChannels(); ++i) {
-        ost << ';' << layout->h_position(i) << ',' << layout->v_position(i);
-    }
+    ost << layout->size().width() << ',' << layout->size().height();
+    for (int i = 0; i < layout->channelCount(); ++i)
+        ost << ';' << layout->position(i).x() << ',' << layout->position(i).y();
     ost.flush();
     return rez;
 }
@@ -387,7 +386,7 @@ begin_label:
         m_prevSendMotion = sendMotion;
     }
 
-    int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
+    int channelCount = m_delegate->getVideoLayout()->channelCount();
 
     m_jumpMtx.lock();
     bool reverseMode = m_reverseMode;
@@ -889,7 +888,7 @@ unsigned int QnArchiveStreamReader::getCurrentAudioChannel() const
 QStringList QnArchiveStreamReader::getAudioTracksInfo() const
 {
     QStringList rez;
-    for (int i = 0; i < m_delegate->getAudioLayout()->numberOfChannels(); ++i)
+    for (int i = 0; i < m_delegate->getAudioLayout()->channelCount(); ++i)
         rez << m_delegate->getAudioLayout()->getAudioTrackInfo(i).description;
     return rez;
 }
@@ -920,7 +919,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
 
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
-    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
+    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->channelCount() == 1;
 }
 
 bool QnArchiveStreamReader::isSingleShotMode() const

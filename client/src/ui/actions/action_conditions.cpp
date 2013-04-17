@@ -389,7 +389,7 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
     if(display()->zoomTargetWidget(widget))
         return Qn::InvisibleAction;
 
-    if(widget->display()->videoLayout() && widget->display()->videoLayout()->numberOfChannels() > 1)
+    if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
         return Qn::InvisibleAction;
     
     return Qn::EnabledAction;

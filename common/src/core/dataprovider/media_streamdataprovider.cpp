@@ -33,7 +33,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
     QMutexLocker mtx(&m_mutex);
 
     if (m_numberOfchannels==0)
-        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->numberOfChannels();
+        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->channelCount();
 
     
     for (int i = 0; i < m_numberOfchannels; ++i)
@@ -51,7 +51,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
     QMutexLocker mtx(&m_mutex);
 
     if (m_numberOfchannels==0)
-        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->numberOfChannels();
+        m_numberOfchannels = m_mediaResource->getVideoLayout(this)->channelCount();
 
    
     for (int i = 0; i < m_numberOfchannels; ++i)

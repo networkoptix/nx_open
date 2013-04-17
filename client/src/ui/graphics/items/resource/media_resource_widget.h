@@ -124,9 +124,7 @@ protected:
     void ensureMotionSelectionCache();
     void invalidateMotionSelectionCache();
 
-    int motionGridWidth() const;
-    int motionGridHeight() const;
-
+    QSize motionGridSize() const;
     QPoint channelGridOffset(int channel) const;
 
     Q_SIGNAL void updateInfoTextLater();
