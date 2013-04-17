@@ -58,6 +58,7 @@ private:
 
     void updateLegend();
 private:
+    //TODO: #GDM move all required fields to inner class
     friend class StatisticsOverlayWidget;
 
     QnMediaServerStatisticsManager *m_manager;
