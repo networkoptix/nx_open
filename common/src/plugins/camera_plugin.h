@@ -20,7 +20,8 @@ namespace nxcip
     //!Error codes. Interface implementation MUST use these error codes when appropriate
     static const int NX_NO_ERROR = 0;
     static const int NX_NOT_AUTHORIZED = -1;
-    static const int NX_INVALID_ENCODER_NUMBER = 2;
+    static const int NX_INVALID_ENCODER_NUMBER = -2;
+    static const int NX_UNKNOWN_PORT_NAME = -3;
     static const int NX_UNSUPPORTED_RESOLUTION = -9;
     static const int NX_UNDEFINED_BEHAVOUR = -20;
     static const int NX_NOT_IMPLEMENTED = -21;
@@ -297,10 +298,19 @@ namespace nxcip
         virtual int setAudioEnabled( int audioEnabled ) = 0;
 
         //!MUST return not-NULL if \a ptzCapability is present
+        /*!
+            \note Increases \a CameraPTZManager instance reference counter
+        */
         virtual CameraPTZManager* getPTZManager() const = 0;
         //!MUST return not-NULL if \a hardwareMotionCapability is present
+        /*!
+            \note Increases \a CameraMotionDataProvider instance reference counter
+        */
         virtual CameraMotionDataProvider* getCameraMotionDataProvider() const = 0;
         //!MUST return not-NULL if \a relayInputCapability is present
+        /*!
+            \note Increases \a CameraRelayIOManager instance reference counter
+        */
         virtual CameraRelayIOManager* getCameraRelayIOManager() const = 0;
 
         //!Returns text description of last error
@@ -436,7 +446,7 @@ namespace nxcip
 
     //!Relay input/output management
     /*!
-        It is implementation defined which thread event (\a CameraInputEventHandler::inputPortStateChanged) will be delivered to
+        It is implementation defined within which thread event (\a CameraInputEventHandler::inputPortStateChanged) will be delivered to
     */
     class CameraRelayIOManager
     :
@@ -467,22 +477,25 @@ namespace nxcip
             \return 0 on success, otherwise - error code
         */
         virtual int setRelayOutputState(
-            const char* ouputID,
+            const char* outputID,
             bool activate,
             unsigned int autoResetTimeoutMS ) = 0;
 
-        //!
+        //!Starts relay input monitoring or increments internal counter, if already started
         /*!
-            \return 0 on success, otherwise - error code
+            \return 0 on success (or input is already monitored), otherwise - error code
+            \note Multiple \a startInputPortMonitoring() require multiple \a stopInputPortMonitoring() call.
+                E.g., if input is already monitored, increases internal counter
         */
         virtual int startInputPortMonitoring() = 0;
 
-        //!Stop monitoring input port
+        //!Stops input port monitoring if internal monitoring counter has reached zero
         /*!
             Implementation MUST guarantee:\n
                 - no \a CameraInputEventHandler::inputPortStateChanged method MUST be called after this method have returned
                 - if \a CameraInputEventHandler::inputPortStateChanged is currently running in different thread, 
                     this method MUST block until \a CameraInputEventHandler::inputPortStateChanged has returned
+            \note Multiple \a startInputPortMonitoring() require multiple \a stopInputPortMonitoring() call.
         */
         virtual void stopInputPortMonitoring() = 0;
 

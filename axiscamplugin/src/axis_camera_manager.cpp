@@ -7,17 +7,22 @@
 
 #include <cstddef>
 
-#include <utils/network/simple_http_client.h>
-
-#include "axis_media_encoder.h"
+#include "axis_camera_plugin.h"
 #include "axis_cam_params.h"
+#include "axis_media_encoder.h"
+#include "axis_relayio_manager.h"
 
 
 AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
 :
-    m_refCount( 1 ),
+    m_pluginRef( AxisCameraPlugin::instance() ),
     m_info( info ),
-    m_audioEnabled( false )
+    m_audioEnabled( false ),
+    m_relayIOInfoRead( false ),
+    m_relayIOManager( NULL ) ,
+    m_cameraCapabilities( 0 ),
+    m_inputPortCount( 0 ),
+    m_outputPortCount( 0 )
 {
     m_credentials.setUser( QString::fromUtf8(m_info.defaultLogin) );
     m_credentials.setPassword( QString::fromUtf8(m_info.defaultPassword) );
@@ -47,19 +52,6 @@ void* AxisCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
         return this;
     }
     return NULL;
-}
-
-unsigned int AxisCameraManager::addRef()
-{
-    return m_refCount.fetchAndAddOrdered(1) + 1;
-}
-
-unsigned int AxisCameraManager::releaseRef()
-{
-    unsigned int newRefCounter = m_refCount.fetchAndAddOrdered(-1) - 1;
-    if( newRefCounter == 0 )
-        delete this;
-    return newRefCounter;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
@@ -99,7 +91,7 @@ int AxisCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) c
     if( result )
         return result;
 
-    *capabilitiesMask = nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
+    *capabilitiesMask = m_cameraCapabilities;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -136,14 +128,37 @@ nxcip::CameraMotionDataProvider* AxisCameraManager::getCameraMotionDataProvider(
 //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
 nxcip::CameraRelayIOManager* AxisCameraManager::getCameraRelayIOManager() const
 {
-    //TODO/IMPL
-    return NULL;
+    //updating info, if needed
+    int result = updateCameraInfo();
+    if( result )
+        return NULL;
+
+    if( !((m_cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
+          (m_cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)) )
+    {
+        return NULL;
+    }
+
+    //TODO/IMPL m_relayIOManager MUST be a weak pointer
+    //AxisRelayIOManager* ref = m_relayIOManager.takeStrongRef();
+    //if( ref )
+    //    return ref;
+
+    //m_relayIOManager.reset( new AxisRelayIOManager(const_cast<AxisCameraManager*>(this), m_inputPortCount, m_outputPortCount) );
+    //return m_relayIOManager.get();
+
+    if( m_relayIOManager )
+        m_relayIOManager->addRef();
+    else
+        m_relayIOManager = new AxisRelayIOManager(const_cast<AxisCameraManager*>(this), m_inputPortCount, m_outputPortCount);
+    return m_relayIOManager;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getErrorString
 void AxisCameraManager::getLastErrorString( char* errorString ) const
 {
     //TODO/IMPL
+    errorString[0] = '\0';
 }
 
 const nxcip::CameraInfo& AxisCameraManager::cameraInfo() const
@@ -168,22 +183,107 @@ bool AxisCameraManager::isAudioEnabled() const
 
 int AxisCameraManager::updateCameraInfo() const
 {
+    m_cameraCapabilities |= nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
+
+    std::auto_ptr<CLSimpleHTTPClient> httpClient;
+
     if( std::strlen(m_info.firmware) == 0 )
     {
-        CLSimpleHTTPClient http( m_info.url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_credentials );
-        CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version") );
+        //reading firmware, since it is unavailable via MDNS
+        if( !httpClient.get() )
+            httpClient.reset( new CLSimpleHTTPClient( m_info.url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_credentials ) );
+
+        QByteArray firmware;
+        CLHttpStatus status = readAxisParameter( httpClient.get(), "root.Properties.Firmware.Version", &firmware );
         if( status != CL_HTTP_SUCCESS )
             return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
-        QByteArray firmware;
-        http.readAll( firmware );
         firmware = firmware.mid(firmware.indexOf('=')+1);
         const int firmwareLen = std::min<int>(sizeof(m_info.firmware)-1, firmware.size());
         strncpy( m_info.firmware, firmware.data(), firmwareLen );
         m_info.firmware[firmwareLen] = 0;
     }
 
-    //TODO/IMPL requesting I/O port information (if needed)
+    if( !m_relayIOInfoRead )
+    {
+        if( !httpClient.get() )
+            httpClient.reset( new CLSimpleHTTPClient( m_info.url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_credentials ) );
+
+        //requesting I/O port information (if needed)
+        CLHttpStatus status = readAxisParameter( httpClient.get(), "Input.NbrOfInputs", &m_inputPortCount );
+        if( status != CL_HTTP_SUCCESS )
+            return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+        if( m_inputPortCount > 0 )
+            m_cameraCapabilities |= BaseCameraManager::relayInputCapability;
+
+        status = readAxisParameter( httpClient.get(), "Output.NbrOfOutputs", &m_outputPortCount );
+        if( status != CL_HTTP_SUCCESS )
+            return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+        if( m_outputPortCount > 0 )
+            m_cameraCapabilities |= BaseCameraManager::relayOutputCapability;
+
+        m_relayIOInfoRead = true;
+    }
 
     return nxcip::NX_NO_ERROR;
+}
+
+CLHttpStatus AxisCameraManager::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QByteArray& paramName,
+    QVariant* paramValue )
+{
+    CLHttpStatus status = httpClient->doGET( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() );
+    if( status == CL_HTTP_SUCCESS )
+    {
+        QByteArray body;
+        httpClient->readAll( body );
+        const QList<QByteArray>& paramItems = body.split('=');
+        if( paramItems.size() == 2 && paramItems[0] == paramName )
+        {
+            *paramValue = QString::fromLatin1(paramItems[1]);   //have to convert to QString to enable auto conversion to int
+            return CL_HTTP_SUCCESS;
+        }
+        else
+        {
+            return CL_HTTP_BAD_REQUEST;
+        }
+    }
+    else
+    {
+        return status;
+    }
+}
+
+CLHttpStatus AxisCameraManager::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QByteArray& paramName,
+    QByteArray* paramValue )
+{
+    QVariant val;
+    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    *paramValue = val.toByteArray().trimmed();
+    return status;
+}
+
+CLHttpStatus AxisCameraManager::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QByteArray& paramName,
+    QString* paramValue )
+{
+    QVariant val;
+    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    *paramValue = val.toString().trimmed();
+    return status;
+}
+
+CLHttpStatus AxisCameraManager::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QByteArray& paramName,
+    unsigned int* paramValue )
+{
+    QVariant val;
+    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    *paramValue = val.toUInt();
+    return status;
 }

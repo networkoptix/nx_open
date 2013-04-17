@@ -102,6 +102,7 @@ private:
     QVector<EncoderData> m_encoderData;
     std::auto_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
     QAtomicInt m_refCounter;
+    QString m_defaultOutputID;
 
     bool initializeIOPorts();
 };

@@ -21,7 +21,6 @@ static const float MIN_AXIS_CAMERA_FPS = 8.0;
 
 AxisMediaEncoder::AxisMediaEncoder( AxisCameraManager* const cameraManager )
 :
-    m_refCount( 1 ),
     m_cameraManager( cameraManager ),
     m_currentFps( 15 ),
     m_currentBitrateKbps( 0 ),
@@ -45,19 +44,6 @@ void* AxisMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
         return this;
     }
     return NULL;
-}
-
-unsigned int AxisMediaEncoder::addRef()
-{
-    return m_refCount.fetchAndAddOrdered(1) + 1;
-}
-
-unsigned int AxisMediaEncoder::releaseRef()
-{
-    unsigned int newRefCounter = m_refCount.fetchAndAddOrdered(-1) - 1;
-    if( newRefCounter == 0 )
-        delete this;
-    return newRefCounter;
 }
 
 int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const

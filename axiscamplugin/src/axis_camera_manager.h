@@ -8,26 +8,29 @@
 
 #include <vector>
 
-#include <QAtomicInt>
 #include <QAuthenticator>
 #include <QString>
 
+#include <utils/network/simple_http_client.h>
 #include <plugins/camera_plugin.h>
 
+#include "common_ref_manager.h"
 
+
+class AxisCameraPlugin;
 class AxisMediaEncoder;
+class AxisRelayIOManager;
 
 class AxisCameraManager
 :
-    public nxcip::BaseCameraManager
+    public nxcip::BaseCameraManager,
+    public CommonRefManager
 {
 public:
     AxisCameraManager( const nxcip::CameraInfo& info );
     virtual ~AxisCameraManager();
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
     virtual int getEncoderCount( int* encoderCount ) const override;
@@ -56,13 +59,41 @@ public:
 
     bool isAudioEnabled() const;
 
+    //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
+    static CLHttpStatus readAxisParameter(
+        CLSimpleHTTPClient* const httpClient,
+        const QByteArray& paramName,
+        QVariant* paramValue );
+    static CLHttpStatus readAxisParameter(
+        CLSimpleHTTPClient* const httpClient,
+        const QByteArray& paramName,
+        QByteArray* paramValue );
+    static CLHttpStatus readAxisParameter(
+        CLSimpleHTTPClient* const httpClient,
+        const QByteArray& paramName,
+        QString* paramValue );
+    static CLHttpStatus readAxisParameter(
+        CLSimpleHTTPClient* const httpClient,
+        const QByteArray& paramName,
+        unsigned int* paramValue );
+
 private:
-    QAtomicInt m_refCount;
+    /*!
+        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
+        since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
+    */
+    nxpl::ScopedStrongRef<AxisCameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
     mutable std::vector<AxisMediaEncoder*> m_encoders;
     bool m_audioEnabled;
+    mutable bool m_relayIOInfoRead;
+    //!TODO/IMPL this MUST be weak pointer to AxisRelayIOManager
+    mutable AxisRelayIOManager* m_relayIOManager;
+    mutable unsigned int m_cameraCapabilities;
+    mutable unsigned int m_inputPortCount;
+    mutable unsigned int m_outputPortCount;
 
     int updateCameraInfo() const;
 };

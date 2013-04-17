@@ -8,23 +8,22 @@
 
 #include <vector>
 
-#include <QAtomicInt>
-
 #include <plugins/camera_plugin.h>
+
+#include "common_ref_manager.h"
 
 
 class AxisCameraManager;
 
 class AxisMediaEncoder
 :
-    public nxcip::CameraMediaEncoder
+    public nxcip::CameraMediaEncoder,
+    public CommonRefManager
 {
 public:
     AxisMediaEncoder( AxisCameraManager* const cameraManager );
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    virtual unsigned int addRef() override;
-    virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
     virtual int getMediaUrl( char* urlBuf ) const override;
@@ -42,8 +41,7 @@ public:
     //virtual nxcip::BaseCameraManager* getBaseCameraManager();
 
 private:
-    QAtomicInt m_refCount;
-    AxisCameraManager* m_cameraManager;
+    nxpl::ScopedStrongRef<AxisCameraManager> m_cameraManager;
     mutable std::vector<nxcip::ResolutionInfo> m_supportedResolutions;
     nxcip::ResolutionInfo m_currentResolutionInfo;
     float m_currentFps;

@@ -58,6 +58,73 @@ namespace nxpl
         virtual unsigned int releaseRef() = 0;
     };
 
+    template<class T>
+    class ScopedStrongRef
+    {
+    public:
+        ScopedStrongRef( T* ptr = 0 )
+        :
+            m_ptr( 0 )
+        {
+            take( ptr );
+        }
+
+        ~ScopedStrongRef()
+        {
+            release();
+        }
+
+        T* get()
+        {
+            return m_ptr;
+        }
+
+        T* operator->()
+        {
+            return m_ptr;
+        }
+
+        const T* operator->() const
+        {
+            return m_ptr;
+        }
+
+        T* release()
+        {
+            if( !m_ptr )
+                return 0;
+            T* ptrBak = m_ptr;
+            m_ptr->releaseRef();
+            m_ptr = 0;
+            return ptrBak;
+        }
+
+        void reset( T* ptr = 0 )
+        {
+            release();
+            take( ptr );
+        }
+
+    private:
+        T* m_ptr;
+
+        void take( T* ptr )
+        {
+            m_ptr = ptr;
+            if( m_ptr )
+                m_ptr->addRef();
+        }
+
+        ScopedStrongRef( const ScopedStrongRef& );
+        ScopedStrongRef& operator=( const ScopedStrongRef& );
+    };
+
+    template<class T>
+    class ScopedWeakRef
+    {
+        //TODO/IMPL
+    };
+
     //!Type of plugin entry-point function
     typedef NXPluginInterface* (*CreateNXPluginInstanceProc)();
 }

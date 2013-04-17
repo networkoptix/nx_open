@@ -8,6 +8,8 @@
 #include <functional>
 #include <memory>
 
+#include <QStringList>
+
 #include <business/business_event_connector.h>
 
 #include "api/app_server_connection.h"
@@ -120,7 +122,11 @@ bool QnThirdPartyResource::setRelayOutputState(
     if( !m_relayIOManager.get() )
         return false;
 
-    return m_relayIOManager->setRelayOutputState( outputID, activate, autoResetTimeoutMS ) == nxcip::NX_NO_ERROR;
+    //if outputID is empty, activating first port in the port list
+    return m_relayIOManager->setRelayOutputState(
+        outputID.isEmpty() ? m_defaultOutputID : outputID,
+        activate,
+        autoResetTimeoutMS ) == nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxpl::NXPluginInterface::queryInterface
@@ -321,5 +327,13 @@ bool QnThirdPartyResource::initializeIOPorts()
     }
 
     m_relayIOManager.reset( new nxcip_qt::CameraRelayIOManager( camIOManager ) );
+
+    QStringList outputPortList;
+    int result = m_relayIOManager->getRelayOutputList( &outputPortList );
+    if( result )
+        return result;
+    if( !outputPortList.isEmpty() )
+        m_defaultOutputID = outputPortList[0];
+
     return true;
 }

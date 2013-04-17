@@ -13,13 +13,14 @@
 
 #include <utils/network/simple_http_client.h>
 
-#include "axis_camera_manager.h"
 #include "axis_cam_params.h"
+#include "axis_camera_manager.h"
+#include "axis_camera_plugin.h"
 
 
 AxisCameraDiscoveryManager::AxisCameraDiscoveryManager()
-//:
-//    m_refCount( 1 )
+:
+    m_pluginRef( AxisCameraPlugin::instance() )
 {
 }
 
@@ -32,19 +33,6 @@ void* AxisCameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interface
     }
     return NULL;
 }
-
-//unsigned int AxisCameraDiscoveryManager::addRef()
-//{
-//    return m_refCount.fetchAndAddOrdered(1) + 1;
-//}
-//
-//unsigned int AxisCameraDiscoveryManager::releaseRef()
-//{
-//    unsigned int newRefCounter = m_refCount.fetchAndAddOrdered(-1) - 1;
-//    if( newRefCounter == 0 )
-//        delete this;
-//    return newRefCounter;
-//}
 
 static const char* VENDOR_NAME = "AXIS";
 
