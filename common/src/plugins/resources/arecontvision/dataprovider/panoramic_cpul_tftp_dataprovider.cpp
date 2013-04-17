@@ -32,7 +32,7 @@ QnPlAVClinetPullStreamReader(res)
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();
-    m_name = avRes->getName();
+    m_model = avRes->getModel();
     m_tftp_client = 0;
 
     m_motionData = 0;
@@ -336,7 +336,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     {
 
         // writes JPEG header at very beginning
-        AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_name.toLatin1().data());
+        AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_model.toLatin1().data());
     }
 
     QnCompressedVideoDataPtr videoData( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
