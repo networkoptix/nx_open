@@ -117,7 +117,7 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QString& guid); // TODO: UUID! 
+    void setGuid(const QString& guid); // TODO: #Elric UUID!
     QString getGuid() const;
 
     // device unique identifier

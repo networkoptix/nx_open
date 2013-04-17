@@ -57,7 +57,7 @@ QT_MODULE(Multimedia)
 
 class QnAudioFormatPrivate;
 
-// TODO: move to contrib?
+// TODO: #Elric move to contrib?
 
 class QnAudioFormat
 {

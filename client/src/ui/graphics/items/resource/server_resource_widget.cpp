@@ -305,8 +305,10 @@ protected:
         qreal width = rect.width();
         qreal height = rect.height();
 
-        qreal offsetX = painter->fontMetrics().width(QLatin1String("100%"));
-        qreal offsetTop = painter->fontMetrics().height() + itemSpacing;
+        bool isEmpty = m_widget->m_sortedKeys.isEmpty();
+
+        qreal offsetX = isEmpty ? itemSpacing : painter->fontMetrics().width(QLatin1String("100%"));
+        qreal offsetTop = isEmpty? itemSpacing : painter->fontMetrics().height() + itemSpacing;
         qreal offsetBottom = itemSpacing;
 
         qreal pen_width = 1.0;

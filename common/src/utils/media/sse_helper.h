@@ -125,7 +125,7 @@ static inline bool useSSE42()
 #endif
 }
 
-// TODO: function too large for inlining. Move to cpp file.
+// TODO: #vasilenko function too large for inlining. Move to cpp file.
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40]; 

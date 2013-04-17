@@ -263,7 +263,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
             onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
 
             if (conf->DHCP && conf->FromDHCP) {
-                //TODO:UTF unuse std::string
+                //TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(conf->FromDHCP->Address)) {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
@@ -277,7 +277,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
 
             while (addrPtrIter != addresses.end()) {
                 onvifXsd__PrefixedIPv4Address* addrPtr = *addrPtrIter;
-                //TODO:UTF unuse std::string
+                //TODO: #vasilenko UTF unuse std::string
                 if (senderIpAddress == QString::fromStdString(addrPtr->Address)) {
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
@@ -676,7 +676,7 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 {
     QAuthenticator auth(getAuth());
-    //TODO:UTF unuse StdString
+    //TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
 
     QString user = auth.user();
@@ -737,7 +737,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 
         if (response.Capabilities) 
         {
-            //TODO:UTF unuse std::string
+            //TODO: #vasilenko UTF unuse std::string
             if (response.Capabilities->Events)
                 m_eventCapabilities = new onvifXsd__EventCapabilities( *response.Capabilities->Events );
 
@@ -1673,7 +1673,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
-            //TODO:UTF unuse std::string
+            //TODO: #vasilenko UTF unuse std::string
             m_audioEncoderId = QString::fromStdString(conf->token);
         }
     }
@@ -1902,7 +1902,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
         onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(getChannel());
         if (conf) {
             QMutexLocker lock(&m_mutex);
-            //TODO:UTF unuse std::string
+            //TODO: #vasilenko UTF unuse std::string
             m_audioSourceId = QString::fromStdString(conf->token);
             return true;
         }

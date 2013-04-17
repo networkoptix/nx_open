@@ -187,8 +187,7 @@ private:
 
 private:
     // By now this is used only by synchronous api.
-    // TODO: Make use for asynch API as well
-    // TODO: #Ivan 
+    // TODO: #Ivan Make use for asynch API as well
     QByteArray m_lastError;
 
     QUrl m_url;

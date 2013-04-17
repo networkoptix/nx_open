@@ -286,7 +286,7 @@ class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 
 public:
 
-    //TODO:UTF unuse std::string
+    //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper(
         const std::string& endpoint,
         const std::string& login,
