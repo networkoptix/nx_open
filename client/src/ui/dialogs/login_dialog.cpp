@@ -51,17 +51,14 @@ namespace {
 } // anonymous namespace
 
 
-LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
+QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     QDialog(parent),
+    QnWorkbenchContextAware(parent, context),
     ui(new Ui::LoginDialog),
-    m_context(context),
     m_requestHandle(-1),
     m_renderingWidget(NULL),
     m_restartPending(false)
 {
-    if(!context)
-        qnNullWarning(context);
-
     ui->setupUi(this);
 
     setHelpTopic(this, Qn::Login_Help);
@@ -121,17 +118,17 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     m_entCtrlFinder->start();
 }
 
-LoginDialog::~LoginDialog() {
+QnLoginDialog::~QnLoginDialog() {
     delete m_entCtrlFinder;
     return;
 }
 
-void LoginDialog::updateFocus() 
+void QnLoginDialog::updateFocus() 
 {
     ui->passwordLineEdit->setFocus();
 }
 
-QUrl LoginDialog::currentUrl() const {
+QUrl QnLoginDialog::currentUrl() const {
     QUrl url;
     url.setScheme(QLatin1String("https"));
     url.setHost(ui->hostnameLineEdit->text().trimmed());
@@ -141,22 +138,22 @@ QUrl LoginDialog::currentUrl() const {
     return url;
 }
 
-QString LoginDialog::currentName() const {
+QString QnLoginDialog::currentName() const {
     QString itemText = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
     if (itemText.startsWith(space))
         return itemText.remove(0, space.length());
     return itemText;
 }
 
-QnConnectInfoPtr LoginDialog::currentInfo() const {
+QnConnectInfoPtr QnLoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
-bool LoginDialog::restartPending() const {
+bool QnLoginDialog::restartPending() const {
     return m_restartPending;
 }
 
-void LoginDialog::accept() {
+void QnLoginDialog::accept() {
     QUrl url = currentUrl();
     if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
@@ -169,7 +166,7 @@ void LoginDialog::accept() {
     updateUsability();
 }
 
-void LoginDialog::reject() {
+void QnLoginDialog::reject() {
     if(m_requestHandle == -1) {
         QDialog::reject();
         return;
@@ -179,7 +176,7 @@ void LoginDialog::reject() {
     updateUsability();
 }
 
-void LoginDialog::changeEvent(QEvent *event) {
+void QnLoginDialog::changeEvent(QEvent *event) {
     QDialog::changeEvent(event);
 
     switch (event->type()) {
@@ -191,7 +188,7 @@ void LoginDialog::changeEvent(QEvent *event) {
     }
 }
 
-void LoginDialog::resetConnectionsModel() {
+void QnLoginDialog::resetConnectionsModel() {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     QnConnectionDataList connections = qnSettings->customConnections();
@@ -238,7 +235,7 @@ void LoginDialog::resetConnectionsModel() {
 
 }
 
-void LoginDialog::resetAutoFoundConnectionsModel() {
+void QnLoginDialog::resetAutoFoundConnectionsModel() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     int baseCount = qMax(connections.size(), 1); //1 for default auto-created connection
@@ -265,7 +262,7 @@ void LoginDialog::resetAutoFoundConnectionsModel() {
 
 }
 
-bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
+bool QnLoginDialog::sendCommandToLauncher(const QString &version, const QStringList &arguments) {
     QLocalSocket sock;
     sock.connectToServer( launcherPipeName );
     if( !sock.waitForConnected( -1 ) )
@@ -290,7 +287,7 @@ bool LoginDialog::sendCommandToLauncher(const QString &version, const QStringLis
     return true;
 }
 
-bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
+bool QnLoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
 
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
@@ -309,7 +306,7 @@ bool LoginDialog::restartInCompatibilityMode(QnConnectInfoPtr connectInfo) {
     return result;
 }
 
-void LoginDialog::updateAcceptibility() {
+void QnLoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
@@ -320,7 +317,7 @@ void LoginDialog::updateAcceptibility() {
     ui->testButton->setEnabled(acceptable);
 }
 
-void LoginDialog::updateUsability() {
+void QnLoginDialog::updateUsability() {
     if(m_requestHandle == -1) {
         ::setEnabled(children(), ui->buttonBox, true);
         ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), true);
@@ -341,7 +338,7 @@ void LoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
+void QnLoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
         return;
     m_requestHandle = -1;
@@ -409,14 +406,14 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
     QDialog::accept();
 }
 
-void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
+void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     QModelIndex idx = m_connectionsModel->index(index, 0);
     m_dataWidgetMapper->setCurrentModelIndex(idx);
     ui->passwordLineEdit->clear();
     updateFocus();
 }
 
-void LoginDialog::at_testButton_clicked() {
+void QnLoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
@@ -431,7 +428,7 @@ void LoginDialog::at_testButton_clicked() {
     updateFocus();
 }
 
-void LoginDialog::at_saveButton_clicked() {
+void QnLoginDialog::at_saveButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
@@ -492,7 +489,7 @@ void LoginDialog::at_saveButton_clicked() {
 
 }
 
-void LoginDialog::at_deleteButton_clicked() {
+void QnLoginDialog::at_deleteButton_clicked() {
     QString name = currentName();
 
     if (QMessageBox::warning(this, tr("Delete connections"),
@@ -506,7 +503,7 @@ void LoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
+void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
     const QString& remoteHostAddress, bool isLocal, const QString& seed) {
     Q_UNUSED(moduleVersion)
     Q_UNUSED(localInterfaceAddress)
@@ -534,7 +531,7 @@ void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, co
     resetAutoFoundConnectionsModel();
 }
 
-void LoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed ) {
+void QnLoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed ) {
     Q_UNUSED(moduleParameters)
     Q_UNUSED(remoteHostAddress)
     Q_UNUSED(isLocal)
