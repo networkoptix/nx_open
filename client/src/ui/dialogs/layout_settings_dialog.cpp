@@ -282,7 +282,15 @@ void QnLayoutSettingsDialog::selectFile() {
     QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open file")));
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setNameFilter(tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)"));
+
+    QString nameFilter;
+    foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
+        if (!nameFilter.isEmpty())
+            nameFilter += QLatin1Char(' ');
+        nameFilter += QLatin1String("*.") + QLatin1String(format);
+    }
+    nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
+    dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
     if(!dialog->exec())
         return;
