@@ -1,23 +1,26 @@
 
+COCOAPODS: 0.16.4
+
 PODS: 
 - AFNetworking (1.1.0)
 - FXImageView (1.2.3)
 - NSData+Base64 (1.0.0)
 - PSTCollectionView (0.0.1)
+- SVProgressHUD (HEAD based on 0.9)
 - SocketRocket (0.2.0)
 
-COCOAPODS: 0.16.4
+SPEC CHECKSUMS: 
+  NSData+Base64: 36c4e5b6479259c1a68866ccd2a8dd385c9744f7
+  PSTCollectionView: 5461a4fbe17eb1e2d2fa7388105e708deb6dd1e7
+  AFNetworking: 761a418233d280c1e0580bcb76ff9cb4c3073d17
+  SocketRocket: bca43a94bd9aac3a629df42c06843402399ee67b
+  SVProgressHUD: 03d4845ec8e64591726428a08236c6a5489d45f8
+  FXImageView: 326359d30084919c14367f3753d7236a871c962a
 
 DEPENDENCIES: 
 - AFNetworking (= 1.1)
 - FXImageView (= 1.2.3)
 - NSData+Base64 (= 1.0.0)
 - PSTCollectionView (= 0.0.1)
+- SVProgressHUD (HEAD)
 - SocketRocket (= 0.2.0)
-
-SPEC CHECKSUMS: 
-  NSData+Base64: 36c4e5b6479259c1a68866ccd2a8dd385c9744f7
-  PSTCollectionView: 5461a4fbe17eb1e2d2fa7388105e708deb6dd1e7
-  AFNetworking: 761a418233d280c1e0580bcb76ff9cb4c3073d17
-  FXImageView: 326359d30084919c14367f3753d7236a871c962a
-  SocketRocket: bca43a94bd9aac3a629df42c06843402399ee67b

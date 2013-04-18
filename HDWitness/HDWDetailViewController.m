@@ -13,6 +13,7 @@
 
 #import "AFJSONRequestOperation.h"
 #import "AFHTTPClient.h"
+#import "SVProgressHUD.h"
 
 enum CameraStatus {
     Offline,
@@ -39,9 +40,26 @@ enum MessageType {
     BroadcastBusinessAction = 10
 };
 
-@interface HDWDetailViewController ()
+enum State {
+    State_Initial,
+    State_Connecting,
+    State_Connected,
+    State_RequestingResources,
+    State_GotResources,
+    
+    State_IncompatibleEcsVersion,
+    State_NetworkFailed
+};
+
+@interface HDWDetailViewController () {
+    NSURL *_baseUrl;
+    AFJSONRequestOperation *_requestOperation;
+    enum State _state;
+    SVProgressHUD *_progressHUD;
+}
+
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
-- (void)configureView;
+
 @end
 
 @interface Header : PSUICollectionReusableView
@@ -90,8 +108,7 @@ enum MessageType {
     
 }
 
-- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)rawMessage
-{
+- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)rawMessage {
     NSString *messageString = (NSString*)rawMessage;
     NSData *messageData = [messageString dataUsingEncoding:NSUTF8StringEncoding];
     
@@ -186,10 +203,7 @@ enum MessageType {
 - (void)setEcsConfig:(id)newEcsConfig {
     if (_ecsConfig != newEcsConfig) {
         _ecsConfig = newEcsConfig;
-        
         _ecsModel = [[HDWECSModel alloc] initWithECSConfig:newEcsConfig];
-        // Update the view.
-//        [self configureView];
     }
 
     if (self.masterPopoverController != nil) {
@@ -197,11 +211,7 @@ enum MessageType {
     }        
 }
 
-- (void) onGotResultsFromEcs {
-    [self.collectionView reloadData];
-}
-
--(void) requestFinished: (id) JSON {
+- (void)_loadResourcesFromJSON:(id)JSON toModel:(HDWECSModel*)model {
     NSMutableDictionary* serversDict = [[NSMutableDictionary alloc] init];
     
     NSArray *jsonServers = JSON[@"servers"];
@@ -210,7 +220,7 @@ enum MessageType {
         
         [serversDict setObject:server forKey:server.serverId];
     }
-
+    
     NSArray *jsonCameras = JSON[@"cameras"];
     for (NSDictionary *jsonCamera in jsonCameras) {
         HDWServerModel *server = [serversDict objectForKey: jsonCamera[@"parentId"]];
@@ -219,31 +229,147 @@ enum MessageType {
         [server addOrReplaceCamera:camera];
     }
     
-    [_ecsModel addServers: [serversDict allValues]];
-    
-    [self onGotResultsFromEcs];
+    [model addServers: [serversDict allValues]];
 }
 
-- (void)configureView
-{
+- (void)connectRequestFinished: (id)JSON {
+    NSString *ecsVersion = JSON[@"version"];
+    if ([ecsVersion hasPrefix:@"1.5."]) {
+        _state = State_Connected;
+    } else {
+        _state = State_IncompatibleEcsVersion;
+    }
+    
+    [self performNextStepWithObject:nil];
+}
+
+- (void)resourceRequestFinished: (id)JSON {
+    [self _loadResourcesFromJSON:JSON toModel:_ecsModel];
+    [self.collectionView reloadData];
+
+    _state = State_GotResources;
+    [self performNextStepWithObject:nil];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+- (void)increaseProgress: (NSMutableArray*)arguments {
+    NSNumber *progress = arguments[0];
+    NSString *statusMessage = arguments[1];
+    id requestOperation = arguments[2];
+    
+    if (requestOperation != _requestOperation || (!_requestOperation.isExecuting && !_requestOperation.isReady)) {
+//        [SVProgressHUD dismiss];
+        return;
+    }
+    
+    double progressValue = progress.doubleValue;
+    [SVProgressHUD showProgress:progressValue status:statusMessage];
+    
+    progress = [NSNumber numberWithDouble:progressValue + 0.02];
+    
+    if (progress.doubleValue < 1)
+        [self performSelector:@selector(increaseProgress:) withObject:@[progress, statusMessage, requestOperation] afterDelay:0.2];
+}
+
+- (void)requestEntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
+    NSString *path = [NSString stringWithFormat:@"api/%@/", resourceKind];
+    NSURL *resourceUrl = [NSURL URLWithString:path relativeToURL:_baseUrl];
+    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
+    
+    _requestOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        [SVProgressHUD dismiss];
+        [self performSelector:onSuccess withObject:JSON];
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        [SVProgressHUD dismiss];
+        if (error.code == NSURLErrorCancelled)
+            return;
+        
+        _state = State_NetworkFailed;
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:errorMessage delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+    }];
+    
+    [self increaseProgress:[NSMutableArray arrayWithObjects:@0, statusMessage, _requestOperation, nil]];
+    [_requestOperation start];
+}
+
+- (void)performNextStepWithObject: (id)object {
+    switch (_state) {
+        case State_NetworkFailed: {
+            break;
+        }
+            
+        case State_Initial: {
+            [self requestEntityForResourceKind:@"connect" success:@selector(connectRequestFinished:) statusMessage:@"Connecting to Enterprise Controller..."errorMessage:@"Can't connect to the System."];
+            break;
+        }
+            
+        case State_Connected: {
+            [self requestEntityForResourceKind:@"resource" success:@selector(resourceRequestFinished:) statusMessage:@"Requesting Enterprise Controller resources..." errorMessage:@"Can't get resources."];
+            break;
+        }
+            
+        case State_IncompatibleEcsVersion: {
+            [[[UIAlertView alloc] initWithTitle:@"Error" message:@"This version of ECS is incompatible with this software" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+            break;
+        }
+            
+        default:
+            break;
+    }
+}
+
+- (void)configureView {
     if (!_ecsConfig)
         return;
     
+    
+    _progressHUD = [[SVProgressHUD alloc] init];
+
     NSString* urlString = [NSString stringWithFormat:@"https://%@:%@@%@:%@/", _ecsConfig.login, _ecsConfig.password, _ecsConfig.host, _ecsConfig.port];
-    NSURL *baseUrl = [NSURL URLWithString:urlString];
+    _baseUrl = [NSURL URLWithString:urlString];
     
-    NSURL *resourceUrl = [NSURL URLWithString:@"api/resource/" relativeToURL:baseUrl];
-    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl];
-    
-    AFJSONRequestOperation *resourceOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        [self requestFinished: JSON];
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-        NSLog(@"Error: %@", error);
-    }];
-    [resourceOperation start];
+    _state = State_Initial;
+    [self performNextStepWithObject:nil];
     
     
-    NSURL *messageUrl = [NSURL URLWithString:@"/websocket/" relativeToURL:baseUrl];
+//    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+//    spinner.center = self.view.center;
+//    spinner.hidesWhenStopped = YES;
+    
+//    [self.view addSubview:spinner];
+//    [spinner startAnimating];
+//
+//    [SVProgressHUD showSuccessWithStatus:@"Connected"];
+    
+//    __block float progress = 0.0;
+//    dispatch_queue_t concurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+//    dispatch_async(concurrentQueue, ^{
+//
+//        if (_resourcesRequestOperation.isExecuting) {
+//            dispatch_async(concurrentQueue, )
+//        }
+//        self.picker = [[UIImagePickerController alloc] init];
+//        self.picker.delegate = self;
+//        self.picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+//        self.picker.allowsEditing = NO;
+        
+        // 4) Present picker in main thread
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [SVProgressHUD showProgress:progress];
+//            progress += 0.001;
+////            [self.navigationController presentModalViewController:_picker animated:YES];
+//            if (progress >= 1)
+//                [SVProgressHUD dismiss];
+//        });
+    
+//    });
+//    [_resourcesRequestOperation start];
+    
+    
+    NSURL *messageUrl = [NSURL URLWithString:@"/websocket/" relativeToURL:_baseUrl];
     NSMutableURLRequest *messageRequest = [NSMutableURLRequest requestWithURL:messageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:0];
     
     NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
@@ -258,8 +384,7 @@ enum MessageType {
     }
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     [[FXImageView processingQueue] setMaxConcurrentOperationCount:100];
@@ -283,31 +408,35 @@ enum MessageType {
 //    self.navigationController.navigationBar
 };
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if (_requestOperation) {
+        [_requestOperation cancel];
+    }
+}
+
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     [_socket setDelegate:nil];
     [_socket close];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
--(NSInteger)numberOfSectionsInCollectionView:(PSUICollectionView *)collectionView
-{
+-(NSInteger)numberOfSectionsInCollectionView:(PSUICollectionView *)collectionView {
     return _ecsModel.count;
 }
 
--(NSInteger)collectionView:(PSUICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
+-(NSInteger)collectionView:(PSUICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     HDWServerModel* server = [_ecsModel serverAtIndex: section];
     
     return server.cameraCount;
 }
 
--(PSUICollectionViewCell *)collectionView:(PSUICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
+-(PSUICollectionViewCell *)collectionView:(PSUICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     HDWCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"MyCell" forIndexPath:indexPath];
 
     cell.imageView.asynchronous = YES;
@@ -378,15 +507,13 @@ enum MessageType {
 
 #pragma mark - Split view
 
-- (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
-{
+- (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController {
     barButtonItem.title = NSLocalizedString(@"Systems", @"Systems");
     [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
     self.masterPopoverController = popoverController;
 }
 
-- (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
-{
+- (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem {
     // Called when the view is shown again in the split view, invalidating the button and popover controller.
     [self.navigationItem setLeftBarButtonItem:nil animated:YES];
     self.masterPopoverController = nil;

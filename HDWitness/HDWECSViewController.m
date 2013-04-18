@@ -20,45 +20,32 @@
     return [UIColor colorWithRed:0x28/255.0f green:0x42/255.0f blue:0x75/255.0f alpha:1];
 }
 
-- (void)onCancel: (id)sender {
+- (IBAction)onCancel:(id)sender {
     _config = nil;
     
     [self dismissModalViewControllerAnimated:YES];
 }
 
-- (void)onSave: (id)sender {
+- (IBAction)onSave:(id)sender {
     // Add validation stuff here
     
+    [[self delegate] addOrReplaceECSConfig:_config atIndex:_index.intValue];
+    
     [self dismissModalViewControllerAnimated:YES];
-    [[self delegate] addECSConfig:_config];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     [self.tableView setEditing:YES];
-    
-    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(onSave:)];
-    self.navigationItem.rightBarButtonItem = saveButton;
-    
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(onCancel:)];
-    self.navigationItem.leftBarButtonItem = cancelButton;
-}
-
-- (id)initWithConfig: (HDWECSConfig*)config {
-    self = [super init];
-    if (self) {
-        [self setConfig:config];
-    }
-    
-    return self;
+    _saveButtonItem.enabled = [_config isFilled];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-    self.dataSourceArray = @[
+    _dataSourceArray = @[
         @{
             @"Title" : @"Name",
             @"Placeholder": @"Name",
@@ -108,7 +95,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.dataSourceArray.count;
+    return _dataSourceArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -120,7 +107,7 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] init];
         
-        cell.textLabel.text = self.dataSourceArray[indexPath.row][@"Title"];
+        cell.textLabel.text = _dataSourceArray[indexPath.row][@"Title"];
         cell.textLabel.textColor = [UIColor blackColor];
         cell.textLabel.font = [UIFont boldSystemFontOfSize:12.0];
         cell.editing = YES;
@@ -139,9 +126,9 @@
         textField.tag = indexPath.row;
         textField.delegate = self;
         
-        textField.placeholder = self.dataSourceArray[indexPath.row][@"Placeholder"];
+        textField.placeholder = _dataSourceArray[indexPath.row][@"Placeholder"];
         
-        NSString *property = self.dataSourceArray[indexPath.row][@"Property"];
+        NSString *property = _dataSourceArray[indexPath.row][@"Property"];
         textField.text = [_config valueForKey:property];
         
         if ([property isEqualToString:@"password"]) {
@@ -156,10 +143,10 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     int currentTag = textField.tag;
-    if (currentTag < self.dataSourceArray.count - 1) {
+    if (currentTag < _dataSourceArray.count - 1) {
         UITextField *nextField = (UITextField *)[self.view viewWithTag:currentTag + 1];
         [nextField becomeFirstResponder];
-    } else if (currentTag == self.dataSourceArray.count - 1) {
+    } else if (currentTag == _dataSourceArray.count - 1) {
         [self onSave:textField];
         return NO;
     }
@@ -220,8 +207,13 @@
 - (IBAction)valueChanged:(UITextField *)sender {
     UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-    
-    [_config setValue:sender.text forKey:self.dataSourceArray[indexPath.row][@"Property"]];
+
+    [_config setValue:sender.text forKey:_dataSourceArray[indexPath.row][@"Property"]];
+    _saveButtonItem.enabled = [_config isFilled];
 }
 
+- (void)viewDidUnload {
+    [self setSaveButtonItem:nil];
+    [super viewDidUnload];
+}
 @end

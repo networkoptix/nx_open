@@ -12,7 +12,7 @@
 #import "HDWVideoViewController.h"
 #import "SRWebSocket.h"
 
-@interface HDWDetailViewController : PSUICollectionViewController <UISplitViewControllerDelegate, SRWebSocketDelegate>
+@interface HDWDetailViewController : PSUICollectionViewController <UISplitViewControllerDelegate, SRWebSocketDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) HDWECSConfig *ecsConfig;
 @property (strong, nonatomic) HDWECSModel *ecsModel;

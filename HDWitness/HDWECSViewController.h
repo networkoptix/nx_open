@@ -11,12 +11,14 @@
 @class HDWECSConfig;
 
 @interface HDWECSViewController : UITableViewController<UITextFieldDelegate> {
+    NSArray *_dataSourceArray;
 }
 
--(id) initWithConfig: (HDWECSConfig*)config;
-
 @property (copy) HDWECSConfig *config;
-@property (nonatomic, retain) NSArray *dataSourceArray;
+@property (copy) NSNumber *index;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *saveButtonItem;
+
+// TODO: what is it for?
 @property (nonatomic, assign) id delegate;
 
 @end

@@ -25,3 +25,4 @@ install_resource()
       ;;
   esac
 }
+install_resource 'SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle'

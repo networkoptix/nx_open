@@ -7,6 +7,7 @@
 //
 
 #import "HDWCameraModel.h"
+#import "NSString+OptixAdditions.h"
 
 @implementation HDWECSConfig
 + (HDWECSConfig*) defaultConfig {
@@ -21,7 +22,6 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    
     HDWECSConfig *newConfig = [[HDWECSConfig allocWithZone:zone] init];
     
     if (newConfig) {
@@ -33,6 +33,10 @@
     }
     
     return newConfig;
+}
+
+- (BOOL)isFilled {
+    return !([_name isEmpty] || [_host isEmpty] || [_port isEmpty] || [_login isEmpty] || [_password isEmpty]);
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder {

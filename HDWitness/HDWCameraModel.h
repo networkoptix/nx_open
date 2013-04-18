@@ -22,6 +22,7 @@
 + (HDWECSConfig*) defaultConfig;
 
 - (id)copyWithZone:(NSZone *)zone;
+- (BOOL)isFilled;
 
 @end
 

@@ -27,6 +27,7 @@
 		C734CB321705F714003450BF /* server_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C734CB311705F714003450BF /* server_offline.png */; };
 		C73910DE170B2346004C80DA /* NSString+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = C73910DD170B2346004C80DA /* NSString+Base64.m */; };
 		C73B13BC16B6C53C007528C0 /* HDWCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */; };
+		C742E95A171EE96700855EE8 /* NSString+OptixAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C742E959171EE96700855EE8 /* NSString+OptixAdditions.m */; };
 		C744D1EB170090E900AC48C4 /* camera_offline.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1EA170090E900AC48C4 /* camera_offline.png */; };
 		C744D1F11704B4B700AC48C4 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C744D1F01704B4B700AC48C4 /* Default-568h@2x.png */; };
 		C7484C45170F11D800A589CE /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7484C44170F11D800A589CE /* QuartzCore.framework */; };
@@ -91,6 +92,8 @@
 		C73910DD170B2346004C80DA /* NSString+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Base64.m"; sourceTree = "<group>"; };
 		C73B13BA16B6C53C007528C0 /* HDWCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWCameraModel.h; sourceTree = "<group>"; };
 		C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWCameraModel.m; sourceTree = "<group>"; };
+		C742E958171EE96700855EE8 /* NSString+OptixAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+OptixAdditions.h"; sourceTree = "<group>"; };
+		C742E959171EE96700855EE8 /* NSString+OptixAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+OptixAdditions.m"; sourceTree = "<group>"; };
 		C744D1EA170090E900AC48C4 /* camera_offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = camera_offline.png; path = ../camera_offline.png; sourceTree = "<group>"; };
 		C744D1EC1704B4B100AC48C4 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../Default.png; sourceTree = "<group>"; };
 		C744D1EE1704B4B400AC48C4 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
@@ -204,6 +207,8 @@
 				C73B13BB16B6C53C007528C0 /* HDWCameraModel.m */,
 				C73910DC170B2346004C80DA /* NSString+Base64.h */,
 				C73910DD170B2346004C80DA /* NSString+Base64.m */,
+				C742E958171EE96700855EE8 /* NSString+OptixAdditions.h */,
+				C742E959171EE96700855EE8 /* NSString+OptixAdditions.m */,
 				C71D5AFB16ADBB9600C764B5 /* Supporting Files */,
 			);
 			path = HDWitness;
@@ -421,6 +426,7 @@
 				C7CAEBD416F9795200824E4B /* HDWVideoViewController.m in Sources */,
 				C73910DE170B2346004C80DA /* NSString+Base64.m in Sources */,
 				C7FEBFFE171C480800F808F9 /* HDWCalendarViewController.m in Sources */,
+				C742E95A171EE96700855EE8 /* NSString+OptixAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

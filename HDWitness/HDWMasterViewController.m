@@ -34,16 +34,17 @@
     [self loadSettings];
     
 	// Do any additional setup after loading the view, typically from a nib.
+    
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
-    self.navigationItem.rightBarButtonItem = addButton;
     self.detailViewController = (HDWDetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
-- (void)addECSConfig: (HDWECSConfig*)ecsConfig {
-    NSUInteger newIndex = _objects.count;
-    [_objects insertObject:ecsConfig atIndex:newIndex];
+- (void)addOrReplaceECSConfig: (HDWECSConfig*)ecsConfig atIndex:(NSUInteger)index {
+    if (index < _objects.count)
+        [_objects replaceObjectAtIndex:index withObject:ecsConfig];
+    else
+        [_objects insertObject:ecsConfig atIndex:index];
+    
     [self saveSettings];
     [self.tableView reloadData];
 }
@@ -72,38 +73,17 @@
     [defaults synchronize];
 }
 
-- (void)insertNewObject:(id)sender
-{
-    [self performSegueWithIdentifier:@"showConfig" sender:self];
-    
-//    NSUInteger newIndex = _objects.count;
-//    HDWECSConfig *ecsConfig = [HDWECSConfig defaultConfig];
-//    [_objects insertObject:ecsConfig atIndex:newIndex];
-//    [self saveSettings];
-//    
-//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:newIndex inSection:0];
-//    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-//    
-//    HDWECSViewController *ecsViewController = [[HDWECSViewController alloc] initWithConfig:ecsConfig];
-//    [self performSegueWithIdentifier:@"showConfig" sender:self];
-    
-//    [self.navigationController pushViewController:ecsViewController animated:YES];
-}
-
 #pragma mark - Table View
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return _objects.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 #else
@@ -116,14 +96,12 @@
     return cell;
 }
 
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
     return YES;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [_objects removeObjectAtIndex:indexPath.row];
         [self saveSettings];
@@ -133,24 +111,23 @@
     }
 }
 
-/*
 // Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    [_objects exchangeObjectAtIndex:fromIndexPath.row withObjectAtIndex:toIndexPath.row];
 }
-*/
 
-/*
 // Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the item to be re-orderable.
     return YES;
 }
-*/
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.editing) {
+        [self performSegueWithIdentifier:@"showConfig" sender:[tableView cellForRowAtIndexPath:indexPath]];
+        return;
+    }
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         HDWECSConfig *object = _objects[indexPath.row];
         self.detailViewController.ecsConfig = object;
@@ -161,15 +138,24 @@
     [self performSegueWithIdentifier: @"showConfig" sender: [tableView cellForRowAtIndexPath: indexPath]];
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+    if ([identifier isEqualToString:@"showDetail"]) {
+        if (self.editing) {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         HDWECSConfig *object = _objects[indexPath.row];
     
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             [[segue destinationViewController] setEcsConfig:object];
-        } else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad){
+        } else if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             UINavigationController* navigationViewController = [segue destinationViewController];
             HDWDetailViewController* detailViewController = (HDWDetailViewController*) navigationViewController.topViewController;
             detailViewController.title = object.name;
@@ -182,16 +168,17 @@
         
         if (indexPath) {
             ecsViewController.config = _objects[indexPath.row];
+            ecsViewController.index = [NSNumber numberWithInteger:indexPath.row];
         } else {
             ecsViewController.config = [HDWECSConfig defaultConfig];
+            ecsViewController.index = [NSNumber numberWithInteger:_objects.count];
         }
     }
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
+    
     [self saveSettings];
     [self.tableView reloadData];
 }
