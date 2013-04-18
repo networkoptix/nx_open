@@ -422,9 +422,6 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int serverMain(int argc, char *argv[])
 {
-    Q_UNUSED(argc)
-    Q_UNUSED(argv)
-
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
@@ -439,7 +436,7 @@ int serverMain(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     QString dataLocation = getDataDirectory();
-    QDir::setCurrent(QFileInfo(QFile::decodeName(qApp->argv()[0])).absolutePath());
+    QDir::setCurrent(qApp->applicationDirPath());
 
     QDir dataDirectory;
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
@@ -1178,7 +1175,7 @@ protected:
             return;
         }
 
-        serverMain(application->argc(), application->argv());
+        serverMain(m_argc, m_argv);
         m_main.start();
     }
 
