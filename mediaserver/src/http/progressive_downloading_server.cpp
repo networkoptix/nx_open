@@ -39,23 +39,43 @@ QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor
 
 // -------------------------- QnProgressiveDownloadingDataConsumer ---------------------
 
+static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
+
 class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 {
 public:
-    QnProgressiveDownloadingDataConsumer (QnProgressiveDownloadingConsumer* owner):
+    QnProgressiveDownloadingDataConsumer(
+        QnProgressiveDownloadingConsumer* owner,
+        bool standFrameDuration,
+        bool dropLateFrames,
+        unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP )
+    :
         QnAbstractDataConsumer(50),
         m_owner(owner),
+        m_standFrameDuration( standFrameDuration ),
         m_lastMediaTime(AV_NOPTS_VALUE),
-        m_utcShift(0)
+        m_utcShift(0),
+        m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
+        m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),    //TODO/IMPL
+        m_rtStartTime( AV_NOPTS_VALUE ),
+        m_lastRtTime( 0 )
     {
-        m_dataOutput.reset( new CachedOutputStream(owner) );
-        m_dataOutput->start();
+        if( dropLateFrames )
+        {
+            m_dataOutput.reset( new CachedOutputStream(owner) );
+            m_dataOutput->start();
+        }
+
+        setObjectName( "QnProgressiveDownloadingDataConsumer" );
     }
 
     ~QnProgressiveDownloadingDataConsumer()
     {
+        pleaseStop();
+        m_adaptiveSleep.breakSleep();
         stop();
-        m_dataOutput->stop();
+        if( m_dataOutput.get() )
+            m_dataOutput->stop();
     }
 
     void copyLastGopFromCamera(QnVideoCamera* camera)
@@ -79,9 +99,13 @@ public:
 
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
+
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data) override
     {
+        if( m_standFrameDuration )
+            doRealtimeDelay( data );
+
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
@@ -95,7 +119,8 @@ protected:
         }
 
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
-        QnByteArray* const resultPtr = m_dataOutput->packetsInQueue() > 1 ? NULL : &result;
+
+        QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
         if( !resultPtr )
         {
             NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1:%2. Skipping frame...").
@@ -104,24 +129,44 @@ protected:
         int errCode = m_owner->getTranscoder()->transcodePacket(
             media,
             resultPtr );   //if previous frame dispatch not even started, skipping current frame
-        if (errCode == 0) {
-            if (resultPtr && result.size() > 0) {
-                //if (!m_owner->sendChunk(result))
-                //    m_needStop = true;
-                m_dataOutput->postPacket(toHttpChunk(result.data(), result.size()));
-                if( m_dataOutput->failed() )
-                    m_needStop = true;
+        if( errCode == 0 )
+        {
+            if( resultPtr && result.size() > 0 )
+            {
+                //sending frame
+                if( m_dataOutput.get() )
+                {
+                    m_dataOutput->postPacket(toHttpChunk(result.data(), result.size()));
+                    if( m_dataOutput->failed() )
+                        m_needStop = true;
+                }
+                else
+                {
+                    if (!m_owner->sendChunk(result))
+                        m_needStop = true;
+                }
             }
         }
         else
+        {
+            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2:%3 due to transcode error (%4)").
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
+        }
+
         return true;
     }
+
 private:
     QnProgressiveDownloadingConsumer* m_owner;
+    bool m_standFrameDuration;
     qint64 m_lastMediaTime;
     qint64 m_utcShift;
     std::auto_ptr<CachedOutputStream> m_dataOutput;
+    const unsigned int m_maxFramesToCacheBeforeDrop;
+    QnAdaptiveSleep m_adaptiveSleep;
+    qint64 m_rtStartTime;
+    qint64 m_lastRtTime;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -130,6 +175,21 @@ private:
         chunk.append(data, size);
         chunk.append("\r\n");
         return chunk;
+    }
+
+    void doRealtimeDelay( const QnAbstractDataPacketPtr& media )
+    {
+        if( m_rtStartTime == (qint64)AV_NOPTS_VALUE )
+        {
+            m_rtStartTime = media->timestamp;
+        }
+        else
+        {
+            qint64 timeDiff = media->timestamp - m_lastRtTime;
+            if( timeDiff <= MAX_FRAME_DURATION*1000 )
+                m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+        }
+        m_lastRtTime = media->timestamp;
     }
 };
 
@@ -161,7 +221,9 @@ public:
 
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
-static int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
+static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
+static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
+static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
@@ -181,9 +243,13 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    d->killTimerID = TimerManager::instance()->addTimer(
-        this,
-        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt()*MS_PER_SEC );
+    const int sessionLiveTimeoutSec = qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    if( sessionLiveTimeoutSec > 0 )
+        d->killTimerID = TimerManager::instance()->addTimer(
+            this,
+            sessionLiveTimeoutSec*MS_PER_SEC );
+
+    setObjectName( "QnProgressiveDownloadingConsumer" );
 }
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
@@ -328,7 +394,22 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        QnProgressiveDownloadingDataConsumer dataConsumer(this);
+        //taking max send queue size from url
+        bool dropLateFrames = d->streamingFormat == "mpjpeg";
+        unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
+        if( getDecodedUrl().hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
+        {
+            maxFramesToCacheBeforeDrop = getDecodedUrl().queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
+            dropLateFrames = true;
+        }
+
+        const bool standFrameDuration = getDecodedUrl().hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
+
+        QnProgressiveDownloadingDataConsumer dataConsumer(
+            this,
+            standFrameDuration,
+            dropLateFrames,
+            maxFramesToCacheBeforeDrop );
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
         bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
@@ -433,8 +514,15 @@ void QnProgressiveDownloadingConsumer::run()
 
         //dataConsumer.sendResponse();
         dataConsumer.start();
-        while (dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated)
+        while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
+
+        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2:%3. Reason: %4").
+            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress()).arg(socket()->getForeignPort()).
+            arg((!dataConsumer.isRunning() ? QString::fromLatin1("Data consumer stopped") : 
+                (!d->socket->isConnected() ? QString::fromLatin1("Connection has been closed") :
+                 QString::fromLatin1("Terminated")))), cl_logDEBUG1 );
+
         dataConsumer.pleaseStop();
 
         QnByteArray emptyChunk((unsigned)0,0);

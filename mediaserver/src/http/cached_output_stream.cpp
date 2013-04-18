@@ -14,6 +14,7 @@ CachedOutputStream::CachedOutputStream( QnTCPConnectionProcessor* const tcpOutpu
     m_tcpOutput( tcpOutput ),
     m_failed( false )
 {
+    setObjectName( "CachedOutputStream" );
 }
 
 CachedOutputStream::~CachedOutputStream()

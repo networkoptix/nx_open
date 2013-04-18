@@ -33,6 +33,10 @@ public:
     //!Returns SSL*. including ssl.h here causes numerous compilation problems
     void* ssl() const;
     TCPSocket* socket() const;
+    QUrl getDecodedUrl() const;
+
+    bool sendBuffer(const QnByteArray& sendBuffer);
+    bool sendBuffer(const QByteArray& sendBuffer);
 
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
@@ -52,7 +56,6 @@ protected:
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
     bool readRequest();
-    QUrl getDecodedUrl() const;
 
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
 private:
