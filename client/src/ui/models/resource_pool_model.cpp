@@ -764,11 +764,8 @@ QModelIndex QnResourcePoolModel::buddy(const QModelIndex &index) const {
 }
 
 QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
-    if(!index.isValid())
+    if (!index.isValid() || index.model() != this)
         return QModelIndex();
-
-    // TODO: #Elric check that the node actually exists.
-
     return node(index)->parent()->index(Qn::NameColumn);
 }
 
@@ -794,7 +791,7 @@ Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
 }
 
 QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {
-    if(!index.isValid())
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
     return node(index)->data(role, index.column());

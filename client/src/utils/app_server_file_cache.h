@@ -12,7 +12,7 @@ public:
     ~QnAppServerFileCache();
 
     void loadImage(const QString &filename);
-    void storeImage(const QString &filePath);
+    void storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio = false);
 
     /** Get full path to cached file with fixed filename */
     QString getFullPath(const QString &filename) const;

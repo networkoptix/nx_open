@@ -52,7 +52,7 @@ public:
 
     QHash<int, QVariant> data() const;
 
-    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: hack
+    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
 
     QnTimePeriod getLocalRange() const;
     void setLocalRange(const QnTimePeriod& value);
@@ -72,9 +72,9 @@ public:
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);
 
-    /** Background image opacity in percents */
-    int backgroundOpacity() const;
-    void setBackgroundOpacity(int percent);
+    /** Background image opacity in range [0.0 .. 1.0] */
+    qreal backgroundOpacity() const;
+    void setBackgroundOpacity(qreal value);
 
     /** Locked state - locked layout cannot be modified in any way */
     bool locked() const;
@@ -110,7 +110,7 @@ private:
     bool m_userCanEdit;
     QSize m_backgroundSize;
     QString m_backgroundImageFilename;
-    int m_backgroundOpacity;
+    qreal m_backgroundOpacity;
     bool m_locked;
 };
 

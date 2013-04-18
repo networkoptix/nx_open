@@ -74,11 +74,18 @@ public:
     static QString prefixForRole(QnResource::ConnectionRole role);
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
+    static void setRebuildArchive(bool value);
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
+    void rewriteCatalog();
+
+    void doRebuildArchive();
+    void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks);
+    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks);
+    Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
 private:
     mutable QMutex m_mutex;
     QFile m_file;
@@ -103,7 +110,7 @@ private:
     QnResource::ConnectionRole m_role;
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
-
+    static bool m_rebuildArchive;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

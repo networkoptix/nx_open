@@ -149,7 +149,7 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); // TODO: evil!
+    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); //TODO: #Elric evil!
     return result;
 }
 
@@ -208,9 +208,9 @@ bool QnNetworkResource::shoudResolveConflicts() const
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
-    if (source->getHostAddress() != getHostAddress())
+    if (source->getUrl() != getUrl())
     {
-        setHostAddress(source->getHostAddress());
+        setUrl(source->getUrl());
         return true;
     }
 

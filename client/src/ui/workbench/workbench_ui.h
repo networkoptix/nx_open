@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <utils/common/disconnective.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <ui/common/geometry.h>
@@ -44,11 +46,11 @@ class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 class QnGraphicsMessageBoxItem;
 
-class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
+class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
     Q_ENUMS(Flags Flag)
 
-    typedef QObject base_type;
+    typedef Disconnective<QObject> base_type;
 
 public:
     enum Flag {

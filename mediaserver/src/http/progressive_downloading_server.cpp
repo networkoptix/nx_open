@@ -46,14 +46,19 @@ class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 public:
     QnProgressiveDownloadingDataConsumer(
         QnProgressiveDownloadingConsumer* owner,
+        bool standFrameDuration,
         bool dropLateFrames,
         unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP )
     :
         QnAbstractDataConsumer(50),
         m_owner(owner),
+        m_standFrameDuration( standFrameDuration ),
         m_lastMediaTime(AV_NOPTS_VALUE),
         m_utcShift(0),
-        m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop )
+        m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
+        m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),    //TODO/IMPL
+        m_rtStartTime( AV_NOPTS_VALUE ),
+        m_lastRtTime( 0 )
     {
         if( dropLateFrames )
         {
@@ -66,6 +71,8 @@ public:
 
     ~QnProgressiveDownloadingDataConsumer()
     {
+        pleaseStop();
+        m_adaptiveSleep.breakSleep();
         stop();
         if( m_dataOutput.get() )
             m_dataOutput->stop();
@@ -96,6 +103,9 @@ public:
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data) override
     {
+        if( m_standFrameDuration )
+            doRealtimeDelay( data );
+
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
@@ -149,10 +159,14 @@ protected:
 
 private:
     QnProgressiveDownloadingConsumer* m_owner;
+    bool m_standFrameDuration;
     qint64 m_lastMediaTime;
     qint64 m_utcShift;
     std::auto_ptr<CachedOutputStream> m_dataOutput;
     const unsigned int m_maxFramesToCacheBeforeDrop;
+    QnAdaptiveSleep m_adaptiveSleep;
+    qint64 m_rtStartTime;
+    qint64 m_lastRtTime;
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
@@ -161,6 +175,21 @@ private:
         chunk.append(data, size);
         chunk.append("\r\n");
         return chunk;
+    }
+
+    void doRealtimeDelay( const QnAbstractDataPacketPtr& media )
+    {
+        if( m_rtStartTime == (qint64)AV_NOPTS_VALUE )
+        {
+            m_rtStartTime = media->timestamp;
+        }
+        else
+        {
+            qint64 timeDiff = media->timestamp - m_lastRtTime;
+            if( timeDiff <= MAX_FRAME_DURATION*1000 )
+                m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+        }
+        m_lastRtTime = media->timestamp;
     }
 };
 
@@ -193,7 +222,8 @@ public:
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
-static int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
+static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
+static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
@@ -213,9 +243,11 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    d->killTimerID = TimerManager::instance()->addTimer(
-        this,
-        qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt()*MS_PER_SEC );
+    const int sessionLiveTimeoutSec = qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    if( sessionLiveTimeoutSec > 0 )
+        d->killTimerID = TimerManager::instance()->addTimer(
+            this,
+            sessionLiveTimeoutSec*MS_PER_SEC );
 
     setObjectName( "QnProgressiveDownloadingConsumer" );
 }
@@ -370,8 +402,12 @@ void QnProgressiveDownloadingConsumer::run()
             maxFramesToCacheBeforeDrop = getDecodedUrl().queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
             dropLateFrames = true;
         }
+
+        const bool standFrameDuration = getDecodedUrl().hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
+
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,
+            standFrameDuration,
             dropLateFrames,
             maxFramesToCacheBeforeDrop );
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();

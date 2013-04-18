@@ -3,8 +3,6 @@
 
 #include "platform_images.h"
 
-#include <QtGui/QPixmap>
-
 /**
  * @brief The QnGenericImages class is dummy for platforms that are not Windows and not X11-based
  */

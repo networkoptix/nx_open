@@ -17,7 +17,7 @@ public:
 
 private:
     AVCodec *codec;
-    AVCodecContext *c; // TODO: #VASILENKO please name these members properly
+    AVCodecContext *c; // TODO: #vasilenko please name these members properly
 
     static bool m_first_instance;
     CodecID m_codec;

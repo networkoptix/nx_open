@@ -12,6 +12,7 @@
 #include <QtGui/QWhatsThis>
 #include <QtGui/QInputDialog>
 #include <QtGui/QLineEdit>
+#include <QtGui/QCheckBox>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -65,6 +66,7 @@
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
+#include <ui/dialogs/custom_file_dialog.h>
 
 #include <youtube/youtubeuploaddialog.h>
 
@@ -99,6 +101,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/license_usage_helper.h>
+#include <utils/app_server_file_cache.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -114,6 +117,7 @@
 #endif
 
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource/resource_directory_browser.h"
 
 // -------------------------------------------------------------------------- //
@@ -286,6 +290,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
     connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
     connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
+    connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::CheckSystemHealthAction),                SIGNAL(triggered()),    this,   SLOT(at_checkSystemHealthAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
@@ -1498,7 +1503,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
 
-    QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));
+    QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(widget(), context()));
     dialog->setModal(true);
     while(true) {
         if(!dialog->exec())
@@ -2208,29 +2213,32 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(widgets.size() != 1)
-        return;
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: #Elric check
-    if (!widget) //e.g. server item
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(menu()->currentParameters(sender()).widget());
+    if (!widget)
         return;
 
     QnResourceDisplay *display = widget->display();
     const QnResourceVideoLayout *layout = display->videoLayout();
 
     QImage screenshot;
-    if (layout->numberOfChannels() > 0) {
+    if (layout->channelCount() > 0) {
         QList<QImage> images;
-        for (int i = 0; i < layout->numberOfChannels(); ++i)
+        for (int i = 0; i < layout->channelCount(); ++i)
             images.push_back(display->camDisplay()->getScreenshot(i));
-        QSize size = images[0].size();
-        screenshot = QImage(size.width() * layout->width(), size.height() * layout->height(), QImage::Format_ARGB32);
-        screenshot.fill(0);
-        
+        QSize channelSize = images[0].size();
+        QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
+        QRectF zoomRect = widget->zoomRect();
+
+        screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
+        screenshot.fill(qRgba(0, 0, 0, 0));
         QPainter p(&screenshot);
         p.setCompositionMode(QPainter::CompositionMode_Source);
-        for (int i = 0; i < layout->numberOfChannels(); ++i)
-            p.drawImage(QPoint(layout->h_position(i) * size.width(), layout->v_position(i) * size.height()), images[i]);
+        for (int i = 0; i < layout->channelCount(); ++i) {
+            p.drawImage(
+                QnGeometry::cwiseMul(layout->position(i), channelSize) - QnGeometry::cwiseMul(zoomRect.topLeft(), totalSize),
+                images[i]
+            );
+        }
     } else {
         qnWarning("No channels in resource '%1' of type '%2'.", widget->resource()->getName(), widget->resource()->metaObject()->className());
         return;
@@ -2247,13 +2255,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
 
-    QSettings settings; // TODO: #Elric replace with QnSettings
-    settings.beginGroup(QLatin1String("screenshots"));
-
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    if (!previousDir.length()){
+    QString previousDir = qnSettings->lastScreenshotDir();
+    if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    }
 
     QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(
@@ -2274,10 +2278,8 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             addToResourcePool(filePath);
         }
         
-        settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+        qnSettings->setLastScreenshotDir(QFileInfo(filePath).absolutePath());
     }
-
-    settings.endGroup();
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
@@ -2814,7 +2816,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
     Q_UNUSED(fileName)
     if (m_exportedMediaRes) 
     {
-        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->numberOfChannels();
+        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->channelCount();
         for (int i = 0; i < numberOfChannels; ++i)
         {
             if (m_motionFileBuffer[i])
@@ -2855,7 +2857,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         m_exportedMediaRes = m_layoutExportResources.dequeue();
         m_layoutExportCamera->setResource(m_exportedMediaRes);
-        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->numberOfChannels();
+        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->channelCount();
         for (int i = 0; i < numberOfChannels; ++i) {
             m_motionFileBuffer[i] = QSharedPointer<QBuffer>(new QBuffer());
             m_motionFileBuffer[i]->open(QIODevice::ReadWrite);
@@ -2968,18 +2970,12 @@ Do you want to continue?"),
 
     QString filterSeparator(QLatin1String(";;"));
     QString aviFileFilter = tr("AVI (*.avi)");
-    QString aviTsFileFilter = tr("AVI with Timestamps (Requires Transcoding)(*.avi)");
     QString mkvFileFilter = tr("Matroska (*.mkv)");
-    QString mkvTsFileFilter = tr("Matroska  with Timestamps (Requires Transcoding)(*.mkv)");
 
     QString allowedFormatFilter =
             aviFileFilter
             + filterSeparator
             + mkvFileFilter
-            + filterSeparator
-            + aviTsFileFilter
-            + filterSeparator
-            + mkvTsFileFilter
         #ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName(false)
@@ -2988,18 +2984,27 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString selectedFilter;
+    bool withTimestamps;
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
-        fileName = QFileDialog::getSaveFileName(
-            this->widget(), 
-            tr("Export Video As..."),
-            previousDir + QDir::separator() + suggestion,
-            allowedFormatFilter,
-            &selectedFilter,
-            QFileDialog::DontUseNativeDialog
-        );
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this->widget(),
+                                                                         tr("Export Video As..."),
+                                                                         previousDir + QDir::separator() + suggestion,
+                                                                         allowedFormatFilter));
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        QCheckBox* tsCheckbox = new QCheckBox(dialog.data());
+        tsCheckbox->setText(tr("Include Timestamps (Requires Transcoding)"));
+        tsCheckbox->setChecked(false);
+        dialog->addWidget(tsCheckbox);
+        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+            return;
+
+        fileName = dialog->selectedFiles().value(0);
+        selectedExtension = dialog->selectedFilter().mid(dialog->selectedFilter().lastIndexOf(QLatin1Char('.')), 4);
+        withTimestamps = tsCheckbox->isChecked();
 
         if (fileName.isEmpty())
             return;
@@ -3020,14 +3025,14 @@ Do you want to continue?"),
             }
         }
 
-        if (selectedFilter.contains(aviFileFilter) || selectedFilter.contains(aviTsFileFilter))
+        if (dialog->selectedFilter().contains(aviFileFilter))
         {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) 
             {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(period);
-                if (periods.size() > 1 && archive->getDPAudioLayout()->numberOfChannels() > 0)
+                if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
                 {
                     int result = QMessageBox::warning(
                         this->widget(), 
@@ -3057,7 +3062,7 @@ Do you want to continue?"),
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (selectedFilter.contains(binaryFilterName(false)))
+    if (dialog->selectedFilter().contains(binaryFilterName(false)))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -3093,7 +3098,7 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (selectedFilter.contains(tr("with Timestamps")))
+        if (withTimestamps)
             role = QnStreamRecorder::Role_FileExportWithTime;
         QnMediaResourcePtr mediaRes = m_exportedCamera->getDevice().dynamicCast<QnMediaResource>();
         int timeOffset = 0;
@@ -3282,6 +3287,48 @@ void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
     QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget()));
     dialog->setCamera(camera);
     dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
+    if (!context()->user() || !workbench()->currentLayout()->resource())
+        return; // action should not be triggered while we are not connected
+
+    if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
+        return;
+
+    QnAppServerFileCache *cache = new QnAppServerFileCache(this);
+    connect(cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_backgroundImageStored(QString, bool)));
+    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
+
+    QnProgressDialog *progressDialog = new QnProgressDialog(this->widget());
+    progressDialog->setWindowTitle(tr("Updating background"));
+    progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
+    progressDialog->setRange(0, 0);
+    progressDialog->setCancelButton(NULL);
+
+    connect(progressDialog,   SIGNAL(canceled()),                   progressDialog,     SLOT(deleteLater()));
+    connect(cache,            SIGNAL(imageStored(QString, bool)),   progressDialog,     SLOT(deleteLater()));
+    connect(cache,            SIGNAL(imageStored(QString, bool)),   cache,              SLOT(deleteLater()));
+    progressDialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename, bool success) {
+    if (!context()->user() || !workbench()->currentLayout()->resource())
+        return; // action should not be triggered while we are not connected
+
+    if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
+        return;
+
+    if (!success) {
+        QMessageBox::warning(widget(), tr("Error"), tr("Image cannot be uploaded"));
+        return;
+    }
+
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    layout->setBackgroundImageFilename(filename);
+    if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
+        layout->setBackgroundOpacity(0.7);
+    connection()->saveAsync(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

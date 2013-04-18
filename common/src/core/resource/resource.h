@@ -117,7 +117,7 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QString& guid); // TODO: UUID! 
+    void setGuid(const QString& guid); // TODO: #Elric UUID!
     QString getGuid() const;
 
     // device unique identifier
@@ -223,7 +223,7 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController(); // TODO: #VASILENKO: OMG what is THIS doing here???
+    virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
 
     static void stopAsyncTasks();
 signals:
@@ -378,7 +378,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: replace with staticCast once we deal with virtual inheritance
+        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: #Elric replace with staticCast once we deal with virtual inheritance
     }
 }
 

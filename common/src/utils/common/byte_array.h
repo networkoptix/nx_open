@@ -149,7 +149,7 @@ public:
 
     /* Deprecated functions follow. */
 
-    // TODO: this function breaks data alignment.
+    // TODO: #Elric this function breaks data alignment.
     void ignore_first_bytes(int bytes_to_ignore);
 
     int getAlignment() const;

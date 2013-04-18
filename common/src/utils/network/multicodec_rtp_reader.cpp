@@ -33,7 +33,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     else
         m_RtpSession.setTCPTimeout(1000 * 5);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
-    m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
+    m_numberOfVideoChannels = mr->getVideoLayout()->channelCount();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
     connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),

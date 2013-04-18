@@ -92,3 +92,8 @@ void OnvifNotificationConsumer::removeResourceRegistration( QnPlOnvifResource* c
             ++it;
     }
 }
+
+SOAP_SOCKET OnvifNotificationConsumer::accept()
+{
+    return TCPServerSocket::accept(soap->master);
+}

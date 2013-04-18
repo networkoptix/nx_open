@@ -317,6 +317,9 @@ protected slots:
     void at_ptzGoToPresetAction_triggered();
     void at_ptzManagePresetsAction_triggered();
 
+    void at_setAsBackgroundAction_triggered();
+    void at_backgroundImageStored(const QString &filename, bool success);
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);

@@ -37,8 +37,9 @@ public:
     QSize imageSize() const;
     void setImageSize(const QSize &imageSize);
 
-    int imageOpacity() const;
-    void setImageOpacity(int percent);
+    /** Image opacity value in range [0.0 .. 1.0] */
+    qreal imageOpacity() const;
+    void setImageOpacity(qreal value);
 
     QRect sceneBoundingRect() const;
 
@@ -63,7 +64,7 @@ private:
     QImage m_image;
     QString m_imageFilename;
     QSize m_imageSize;
-    int m_imageOpacity;
+    qreal m_imageOpacity;
     QRect m_sceneBoundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
     QnAppServerFileCache *m_cache;

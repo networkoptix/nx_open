@@ -19,7 +19,7 @@ QnLocalMediaServerResource::QnLocalMediaServerResource():
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
-    removeFlags(QnResource::media); // TODO: is this call needed here?
+    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
 
     setName(QLatin1String("Local"));
     setStatus(Online);
@@ -38,7 +38,7 @@ QnMediaServerResource::QnMediaServerResource():
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
-    removeFlags(QnResource::media); // TODO: is this call needed here?
+    removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
@@ -229,7 +229,7 @@ void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
 
     m_panicMode = panicMode;
 
-    emit panicModeChanged(::toSharedPointer(this)); // TODO: emit it AFTER mutex unlock.
+    emit panicModeChanged(::toSharedPointer(this)); // TODO: #Elric emit it AFTER mutex unlock.
 }
 
 void QnMediaServerResource::determineOptimalNetIF()

@@ -161,7 +161,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_frameOpacityAnimator(NULL),
-    m_dummyScene(new QGraphicsScene(this)),
     m_loader(NULL)
 {
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
@@ -245,13 +244,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
-
-    setScene(m_dummyScene);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
-    m_dummyScene = NULL;
-
     setScene(NULL);
 }
 
@@ -262,15 +257,8 @@ void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene && m_view)
         deinitSceneView();
 
-    /* Prepare new scene. */
     m_scene = scene;
-    if(!m_scene && m_dummyScene) {
-        m_dummyScene->clear();
-        m_scene = m_dummyScene;
-    }
 
-    /* Set up new scene.
-     * It may be NULL only when this function is called from destructor. */
     if(m_scene && m_view)
         initSceneView();
 }
@@ -1367,7 +1355,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     const QnResourceVideoLayout *videoLayout = widget->channelLayout();
-    const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
+    const qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (4.0 / 3.0);
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
 
@@ -1553,7 +1541,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(paused) {
             if(widget->display()->archiveReader()) {
                 widget->display()->archiveReader()->pauseMedia();
-                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #vasilenko check that this call doesn't break anything
             }
         }
 

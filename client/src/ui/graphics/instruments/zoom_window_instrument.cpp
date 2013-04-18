@@ -6,7 +6,6 @@
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/style/globals.h>
-#include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/clickable_widget.h>
@@ -30,8 +29,8 @@ class ZoomOverlayWidget;
 // -------------------------------------------------------------------------- //
 // ZoomWindowWidget
 // -------------------------------------------------------------------------- //
-class ZoomWindowWidget: public Instrumented<QnClickableWidget>, public ConstrainedGeometrically {
-    typedef Instrumented<QnClickableWidget> base_type;
+class ZoomWindowWidget: public QnClickableWidget, public ConstrainedGeometrically {
+    typedef QnClickableWidget base_type;
 public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags)

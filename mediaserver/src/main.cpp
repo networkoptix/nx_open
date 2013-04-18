@@ -431,6 +431,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
+	//signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -456,12 +457,17 @@ int serverMain(int argc, char *argv[])
     }
 
     QString logLevel;
+    QString rebuildArchive;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "1");
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
+    if (rebuildArchive.toInt())
+        DeviceFileCatalog::setRebuildArchive(true);
+    
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
@@ -469,6 +475,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
+    // TODO: #Elric use QnPlatformProcess here.
 #ifdef Q_OS_WIN
     int priority = REALTIME_PRIORITY_CLASS;
     int hrez = SetPriorityClass(GetCurrentProcess(), priority);
@@ -561,6 +568,23 @@ QnMain::~QnMain()
     stop();
     stopObjects();
 }
+
+void QnMain::stopSync()
+{
+    if (serviceMainInstance) {
+        serviceMainInstance->pleaseStop();
+        serviceMainInstance->exit();
+        serviceMainInstance->wait();
+        serviceMainInstance = 0;
+    }
+    qApp->quit();
+}
+
+void QnMain::stopAsync()
+{
+    QTimer::singleShot(0, this, SLOT(stopSync()));
+}
+
 
 void QnMain::stopObjects()
 {
@@ -1176,7 +1200,8 @@ protected:
 
     virtual void stop() override
     {
-        stopServer(0);
+        if (serviceMainInstance)
+            serviceMainInstance->stopSync();
     }
 
 private:
@@ -1188,18 +1213,10 @@ private:
 
 void stopServer(int signal)
 {
-    Q_UNUSED(signal)
-
-    qWarning() << "stopServer called. signal=" << signal;
-
     if (serviceMainInstance) {
-        serviceMainInstance->pleaseStop();
-        serviceMainInstance->exit();
-        serviceMainInstance->wait();
-        serviceMainInstance = 0;
+        qWarning() << "got signal" << signal << "stop server!";
+        serviceMainInstance->stopAsync();
     }
-
-    qApp->quit();
 }
 
 int main(int argc, char* argv[])

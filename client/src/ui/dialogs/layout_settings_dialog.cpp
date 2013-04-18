@@ -3,7 +3,6 @@
 
 #include <QtCore/qmath.h>
 
-#include <QtGui/QFileDialog>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
@@ -12,13 +11,14 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/dialogs/image_preview_dialog.h>
+#include <ui/dialogs/custom_file_dialog.h>
 
 #include <utils/threaded_image_loader.h>
 
 namespace {
     //limits
-    const int widthLimit = 20;      // in cells
-    const int heightLimit = 20;     // in cells
+    const int widthLimit = 64;      // in cells
+    const int heightLimit = 64;     // in cells
     const int areaLimit = 100;      // in cells
 
     const int labelFrameWidth = 4;  // in pixels
@@ -82,7 +82,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(new QnAppServerFileCache(this)),
     m_cellAspectRatio((qreal)16/9),
-    m_estimatePending(false)
+    m_estimatePending(false),
+    m_cropImage(false)
 {
     ui->setupUi(this);
 
@@ -146,7 +147,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
         m_cache->loadImage(m_cachedFilename);
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
-        ui->opacitySpinBox->setValue(layout->backgroundOpacity());
+        ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);
     }
     ui->lockedCheckBox->setChecked(layout->locked());
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
@@ -166,7 +167,7 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     layout->setLocked(ui->lockedCheckBox->isChecked());
     layout->setBackgroundImageFilename(m_cachedFilename);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
-    layout->setBackgroundOpacity(ui->opacitySpinBox->value());
+    layout->setBackgroundOpacity((qreal)ui->opacitySpinBox->value() * 0.01);
     // TODO: #GDM remove unused image if any
     return true;
 }
@@ -176,7 +177,7 @@ bool QnLayoutSettingsDialog::hasChanges(const QnLayoutResourcePtr &layout) {
     if (
             (ui->userCanEditCheckBox->isChecked() != layout->userCanEdit()) ||
             (ui->lockedCheckBox->isChecked() != layout->locked()) ||
-            (ui->opacitySpinBox->value() != layout->backgroundOpacity()) ||
+            (ui->opacitySpinBox->value() != int(layout->backgroundOpacity() * 100)) ||
             (m_cachedFilename != layout->backgroundImageFilename())
             )
         return true;
@@ -214,7 +215,7 @@ void QnLayoutSettingsDialog::at_accepted() {
         return;
     }
 
-    m_cache->storeImage(m_newFilePath);
+    m_cache->storeImage(m_newFilePath, m_cropImage);
     setProgress(true);
     ui->generalGroupBox->setEnabled(false);
     ui->buttonBox->setEnabled(false);
@@ -263,6 +264,7 @@ void QnLayoutSettingsDialog::loadPreview() {
     loader->setInput(m_newFilePath);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(imageLabel->size());
+    loader->setCropToMonitorAspectRatio(m_cropImage);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
     setProgress(true);
@@ -279,10 +281,22 @@ void QnLayoutSettingsDialog::viewFile() {
 }
 
 void QnLayoutSettingsDialog::selectFile() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setNameFilter(tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)"));
+
+    QString nameFilter;
+    foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
+        if (!nameFilter.isEmpty())
+            nameFilter += QLatin1Char(' ');
+        nameFilter += QLatin1String("*.") + QLatin1String(format);
+    }
+    nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
+    dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
+
+    QCheckBox* cropCheckbox = new QCheckBox(dialog.data());
+    cropCheckbox->setText(tr("Crop to current monitor AR"));
+    cropCheckbox->setChecked(m_cropImage);
+    dialog->addWidget(cropCheckbox);
 
     if(!dialog->exec())
         return;
@@ -294,6 +308,7 @@ void QnLayoutSettingsDialog::selectFile() {
     m_newFilePath = files[0];
     m_cachedFilename = QString();
     m_estimatePending = true;
+    m_cropImage = cropCheckbox->isChecked();
 
     loadPreview();
     updateControls();
@@ -315,12 +330,12 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     qreal aspectRatio = (qreal)image.width() / (qreal)image.height();
 
     int w, h;
-    qreal targetAspectRatio = aspectRatio / m_cellAspectRatio; // targetAspectRatio = w/h;
+    qreal targetAspectRatio = aspectRatio / m_cellAspectRatio;
     if (targetAspectRatio >= 1.0) { // width is greater than height
-        w = ui->widthSpinBox->maximum();
+        w = widthLimit;
         h = qRound((qreal)w / targetAspectRatio);
     } else {
-        h = ui->heightSpinBox->maximum();
+        h = heightLimit;
         w = qRound((qreal)h * targetAspectRatio);
     }
 

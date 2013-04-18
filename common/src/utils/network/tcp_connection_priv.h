@@ -19,7 +19,7 @@ static const QByteArray STATIC_UNAUTHORIZED_HTML("\
 );
 
 
-// TODO: #VASILENKO these are part of a public interface and are used throughout the codebase.
+// TODO: #vasilenko these are part of a public interface and are used throughout the codebase.
 // Whey they are in a private header???
 static const int CODE_OK = 200;
 static const int CODE_AUTH_REQUIRED = 401;

@@ -11,6 +11,7 @@ QnLayoutResource::QnLayoutResource():
     m_cellSpacing(-1.0, -1.0),
     m_userCanEdit(false),
     m_backgroundSize(1, 1),
+    m_backgroundOpacity(0.7),
     m_locked(false)
 {
     setStatus(Online, true);
@@ -290,17 +291,18 @@ void QnLayoutResource::setBackgroundImageFilename(const QString &filename) {
 }
 
 /********* Background opacity property **********/
-int QnLayoutResource::backgroundOpacity() const {
+qreal QnLayoutResource::backgroundOpacity() const {
     QMutexLocker locker(&m_mutex);
     return m_backgroundOpacity;
 }
 
-void QnLayoutResource::setBackgroundOpacity(int percent) {
+void QnLayoutResource::setBackgroundOpacity(qreal value) {
     {
+        qreal bound = qBound(0.0, value, 1.0);
         QMutexLocker locker(&m_mutex);
-        if (m_backgroundOpacity == percent)
+        if (qFuzzyCompare(m_backgroundOpacity, bound))
             return;
-        m_backgroundOpacity = percent;
+        m_backgroundOpacity = bound;
     }
     emit backgroundOpacityChanged(::toSharedPointer(this));
 }

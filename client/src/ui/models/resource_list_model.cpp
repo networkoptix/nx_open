@@ -86,10 +86,7 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const {
 
 
 QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
-    if(!index.isValid())
-        return QVariant();
-
-    if(!hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
     const QnResourcePtr &resource = m_resources[index.row()];

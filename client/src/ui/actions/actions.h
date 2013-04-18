@@ -537,6 +537,12 @@ namespace Qn {
         PtzManagePresetsAction,
 
 
+        /**
+         * Sets the current picture as a layout background.
+         */
+        SetAsBackgroundAction,
+
+
 
         /* Layout actions. */
 

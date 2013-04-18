@@ -25,7 +25,7 @@ public:
 
     }
 
-    virtual int numberOfChannels() const override
+    virtual int channelCount() const override
     {
         int audioNum = 0;
         int lastStreamID = -1;
@@ -338,7 +338,7 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
 
     if (m_videoLayout == 0)
     {
-        m_videoLayout = new QnCustomResourceVideoLayout(1, 1);
+        m_videoLayout = new QnCustomResourceVideoLayout(QSize(1, 1));
 
 
         // prevent standart tag name parsing in 'avi' format
@@ -532,9 +532,8 @@ bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout
             return false;
         }
         if (i == 0) {
-            layout->setWidth(params[0].toInt());
-            layout->setHeight(params[1].toInt());
-        }
+            layout->setSize(QSize(params[0].toInt(), params[1].toInt()));
+        } 
         else {
             layout->setChannel(params[0].toInt(), params[1].toInt(), i-1);
         }

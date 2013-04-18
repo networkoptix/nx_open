@@ -445,6 +445,7 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
+        // here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         qApp->setStyle(qnSkin->style());
 
         /* Create workbench context. */

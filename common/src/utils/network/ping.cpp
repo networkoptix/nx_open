@@ -1,17 +1,18 @@
 #include "ping.h"
-#include "../common/log.h"
-
 
 #ifdef Q_OS_WIN
-#include <icmpapi.h>
-#include <stdio.h>
+#   include <icmpapi.h>
+#   include <stdio.h>
 #else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/ip.h>
-#include <netinet/ip_icmp.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
+#   include <arpa/inet.h>
+#   include <netinet/ip.h>
+#   include <netinet/ip_icmp.h>
 #endif
+
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 
 
 CLPing::CLPing()
@@ -95,23 +96,7 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
     }
     else
     {
-        QString errStr;
-        dwError = GetLastError();
-
-        switch (dwError) {
-        case IP_BUF_TOO_SMALL:
-            errStr = lit("ReplyBufferSize to small");
-            break;
-        case IP_REQ_TIMED_OUT:
-            errStr = lit("Request timed out");
-            break;
-        default:
-            errStr = lit("Extended error returned");
-            break;
-        }
-        
-        qWarning() << "Failed to ping camera" << ip << "error:" << errStr;
-
+        qWarning() << "Failed to ping camera" << ip << "error:" << SystemError::getLastOSErrorText();
         return false;
     }
 }
@@ -199,54 +184,40 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 
     memset(&packet, 0, sizeof(packet));
 
-    fd_set rset;
-
-    FD_ZERO(&rset);
-    FD_SET(fd, &rset);
-
     struct timeval tv;
-
-    int res = 0;
-    for(int i = 0; i < retry; i++)
+    long usecs = timeoutPerRetry * 1000;
+    tv.tv_usec = usecs % 1000000;
+    tv.tv_sec = usecs / 1000000;
+    if( ::setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (const void*)&tv, sizeof(tv)) < 0 )
     {
-        long usecs = timeoutPerRetry * 1000;
-        tv.tv_usec = usecs % 1000000;
-        tv.tv_sec = usecs / 1000000;
+        close(fd);
+        return false;
+    }
 
-        res = select(fd+1, &rset, NULL, NULL, &tv);
+    for( int i = 0; i < retry; i++ )
+    {
+        int res = recvfrom( fd, &packet, sizeof(packet), 0, (struct sockaddr *)&faddr, &len );
 
-        if (res < 0)
+        if( res < 0 )
         {
-            // cl_log
+            if( errno == EAGAIN || errno == EWOULDBLOCK )
+                continue;   //timed out
             close(fd);
             return false;
         }
 
-        // Timeout
-        if (res == 0)
+        if (res == sizeof(packet) &&
+                saddr.sin_addr.s_addr == faddr.sin_addr.s_addr &&
+                packet.icmp.icmp_type == ICMP_ECHOREPLY &&
+                packet.icmp.icmp_seq == 0 &&
+                packet.icmp.icmp_id == id)
         {
-            continue;
-        }
-
-        // Have data to read
-        if (FD_ISSET(fd, &rset))
-        {
-            res = recvfrom(fd, &packet, sizeof(packet), 0, (struct sockaddr *)&faddr, &len);
-
-            if (res == sizeof(packet) &&
-                    saddr.sin_addr.s_addr == faddr.sin_addr.s_addr &&
-                    packet.icmp.icmp_type == ICMP_ECHOREPLY &&
-                    packet.icmp.icmp_seq == 0 &&
-                    packet.icmp.icmp_id == id)
-            {
-                close(fd);
-                return true;
-            }
+            close(fd);
+            return true;
         }
     }
 
     close(fd);
-
     return false;
 }
 
