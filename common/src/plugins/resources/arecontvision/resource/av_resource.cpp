@@ -25,13 +25,13 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 
 bool QnPlAreconVisionResource::isPanoramic() const
 {
-    return QnPlAreconVisionResource::isPanoramic(getName());
+    return QnPlAreconVisionResource::isPanoramic(getModel());
 }
 
 bool QnPlAreconVisionResource::isDualSensor() const
 {
-    const QString name = getName();
-    return name.contains(QLatin1String("3130")) || name.contains(QLatin1String("3135"));
+    const QString model = getModel();
+    return model.contains(QLatin1String("3130")) || model.contains(QLatin1String("3135"));
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
