@@ -16,7 +16,20 @@ public:
                          const QString &filter = QString());
     ~QnCustomFileDialog();
 
-//    void addCheckbox(const QString &id, const QString &caption, const bool defaultValue);
+    // TODO: #GDM this actually was a good idea so that callee doesn't mess with 
+    // allocation of UI elements
+    /**
+     * Adds a checkbox to this file dialog.
+     * 
+     * \param text                      Checkbox text.
+     * \param value                     Pointer to the initial value of the checkbox.
+     *                                  This pointer will be saved and when the dialog
+     *                                  closes, resulting checkbox value will be written into it.
+     *                                  It is the callee's responsibility to make sure
+     *                                  that pointed-to value still exists at that point.
+     */
+    void addCheckbox(const QString &text, bool *value);
+
     void addWidget(QWidget* widget);
 };
 

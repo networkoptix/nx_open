@@ -2976,14 +2976,15 @@ Do you want to continue?"),
             aviFileFilter
             + filterSeparator
             + mkvFileFilter
-        #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName(false)
-        #endif
+#endif
             ;
 
     QString fileName;
     QString selectedExtension;
+    QString selectedFilter;
     bool withTimestamps;
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
@@ -3003,7 +3004,8 @@ Do you want to continue?"),
             return;
 
         fileName = dialog->selectedFiles().value(0);
-        selectedExtension = dialog->selectedFilter().mid(dialog->selectedFilter().lastIndexOf(QLatin1Char('.')), 4);
+        selectedFilter = dialog->selectedFilter();
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         withTimestamps = tsCheckbox->isChecked();
 
         if (fileName.isEmpty())
@@ -3025,7 +3027,7 @@ Do you want to continue?"),
             }
         }
 
-        if (dialog->selectedFilter().contains(aviFileFilter))
+        if (selectedFilter.contains(aviFileFilter))
         {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
@@ -3062,7 +3064,7 @@ Do you want to continue?"),
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (dialog->selectedFilter().contains(binaryFilterName(false)))
+    if (selectedFilter.contains(binaryFilterName(false)))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
