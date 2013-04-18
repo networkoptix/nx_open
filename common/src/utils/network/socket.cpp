@@ -704,8 +704,6 @@ int TCPServerSocket::acceptWithTimeout( int sockDesc )
     static const int ACCEPT_TIMEOUT_MSEC = 250;
 
     int result = 0;
-#ifdef _WIN32
-    static const int ACCEPT_TIMEOUT_MSEC = 250;
 
 #ifdef _WIN32
     fd_set read_set;
@@ -1066,7 +1064,6 @@ bool Socket::failed() const
 }
 
 void Socket::setStatusBit( StatusBit _status )
-void Socket::setStatus( StatusBit _status )
 {
     m_status |= _status;
 }

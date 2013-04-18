@@ -38,9 +38,6 @@ public:
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
 
-    bool sendBuffer(const QnByteArray& sendBuffer);
-    bool sendBuffer(const QByteArray& sendBuffer);
-
 protected:
     virtual void parseRequest();
     QString extractPath() const;

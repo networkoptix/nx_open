@@ -329,8 +329,6 @@ public:
     static int accept(int sockDesc);
     TCPSocket* accept() ;
 
-    static int accept(int sockDesc);
-
 private:
     /*! 
         \return fd (>=0) on success, <0 on error (-2 if timed out)
