@@ -126,6 +126,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
 
+    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(updateButtonsVisibility()));
+
     updateButtonsVisibility();
     at_camDisplay_liveChanged();
     updateIconButton();
@@ -689,6 +691,9 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
             result |= PtzButton;
         }
     }
+
+    if(!qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)))
+        result &= ~(PtzButton | MotionSearchButton);
 
     return result;
 }

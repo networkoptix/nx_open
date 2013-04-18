@@ -179,7 +179,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
 bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
-    while( !needToStop() && size > 0 && d->socket->isConnected() )
+    while (!needToStop() && size > 0 && d->socket->isConnected())
     {
         int sended = 0;
         if (d->ssl)
