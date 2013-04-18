@@ -2985,7 +2985,7 @@ Do you want to continue?"),
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
-    bool withTimestamps;
+    bool withTimestamps = false;
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
@@ -2996,17 +2996,13 @@ Do you want to continue?"),
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        QCheckBox* tsCheckbox = new QCheckBox(dialog.data());
-        tsCheckbox->setText(tr("Include Timestamps (Requires Transcoding)"));
-        tsCheckbox->setChecked(false);
-        dialog->addWidget(tsCheckbox);
+        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
         fileName = dialog->selectedFiles().value(0);
         selectedFilter = dialog->selectedNameFilter();
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        withTimestamps = tsCheckbox->isChecked();
 
         if (fileName.isEmpty())
             return;
