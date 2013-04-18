@@ -3004,7 +3004,7 @@ Do you want to continue?"),
             return;
 
         fileName = dialog->selectedFiles().value(0);
-        selectedFilter = dialog->selectedFilter();
+        selectedFilter = dialog->selectedNameFilter();
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         withTimestamps = tsCheckbox->isChecked();
 
