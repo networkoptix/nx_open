@@ -700,8 +700,11 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         }
     }
 
-    if(!qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)))
+    if(!qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0))) {
         result &= ~(PtzButton | MotionSearchButton);
+    } else {
+        result |= ZoomWindowButton;
+    }
 
     return result;
 }
