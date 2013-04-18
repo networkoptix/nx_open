@@ -1127,18 +1127,24 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         items[i].uuid = QUuid::createUuid();
     newLayout->setItems(items);
 
-    /* If it is current layout, then roll it back and open the new one instead. */
-    if(layout == workbench()->currentLayout()->resource()) {
+    bool isCurrent = (layout == workbench()->currentLayout()->resource());
+    bool shouldDelete = snapshotManager()->isLocal(layout) &&
+            (name == layout->getName() || isCurrent);
+
+    /* If it is current layout, close it and open the new one instead. */
+    if(isCurrent) {
         int index = workbench()->currentLayoutIndex();
         workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
         workbench()->setCurrentLayoutIndex(index);
         workbench()->removeLayout(index + 1);
 
-        snapshotManager()->restore(layout);
+        // If current layout should not be deleted then roll it back
+        if (!shouldDelete)
+            snapshotManager()->restore(layout);
     }
 
     snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
-    if (name == layout->getName() && snapshotManager()->isLocal(layout))
+    if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }
 
