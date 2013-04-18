@@ -9,10 +9,20 @@ QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
     base_type(parent, caption, directory, filter)
 {
     setOption(QFileDialog::DontUseNativeDialog);
+    connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
+
 }
 
 
 QnCustomFileDialog::~QnCustomFileDialog() {
+}
+
+void QnCustomFileDialog::addCheckbox(const QString &text, bool *value) {
+    QCheckBox* checkbox = new QCheckBox(this);
+    checkbox->setText(text);
+    checkbox->setChecked(*value);
+    m_checkboxes.insert(checkbox, value);
+    addWidget(checkbox);
 }
 
 void QnCustomFileDialog::addWidget(QWidget *widget) {
@@ -22,5 +32,11 @@ void QnCustomFileDialog::addWidget(QWidget *widget) {
         int r = gl->rowCount();
         gl->addWidget(widget, r, 0, 1, gl->columnCount());
         gl->setRowStretch(r, 0);
+    }
+}
+
+void QnCustomFileDialog::at_accepted() {
+    foreach(QCheckBox* key, m_checkboxes.keys()) {
+        *m_checkboxes[key] = key->isChecked();
     }
 }
