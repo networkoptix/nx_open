@@ -16,6 +16,13 @@ class DeviceFileCatalog: public QObject
 signals:
     void firstDataRemoved(int n);
 public:
+    enum RebuildMethod {
+        Rebuild_None,    // do not rebuild chunk's database
+        Rebuild_LQ,      // rebuild LQ chunks only
+        Rebuild_HQ,      // rebuild HQ chunks only
+        Rebuild_All      // rebuild whole chunks
+    };
+
     struct Chunk
     {
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1) {}
@@ -74,7 +81,7 @@ public:
     static QString prefixForRole(QnResource::ConnectionRole role);
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
-    static void setRebuildArchive(bool value);
+    static void setRebuildArchive(RebuildMethod value);
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
@@ -110,7 +117,7 @@ private:
     QnResource::ConnectionRole m_role;
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
-    static bool m_rebuildArchive;
+    static RebuildMethod m_rebuildArchive;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
