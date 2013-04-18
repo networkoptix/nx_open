@@ -1,0 +1,13 @@
+package pb;
+
+import "compatibility.proto";
+
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "ConnectInfoProtos";
+
+message ConnectInfo {
+    optional string version = 1;
+    optional CompatibilityItems compatibilityItems = 2;
+    optional int32 proxyPort = 3;
+    optional string ecsGuid = 4;
+}
