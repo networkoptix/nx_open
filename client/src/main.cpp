@@ -319,7 +319,8 @@ int main(int argc, char **argv)
         /* Set authentication parameters from command line. */
         QUrl authentication = QUrl::fromUserInput(authenticationString);
         if(authentication.isValid()) {
-            out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
+            // do not print password in plaintext
+            //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
             qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
         }
 
@@ -491,7 +492,7 @@ int main(int argc, char **argv)
 
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */
-            if(!authentication.isValid()) {
+            if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
                 context->menu()->trigger(Qn::ConnectToServerAction);
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);

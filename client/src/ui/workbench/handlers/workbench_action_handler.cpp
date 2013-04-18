@@ -616,8 +616,11 @@ void QnWorkbenchActionHandler::openResourcesInNewWindow(const QnResourceList &re
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+
+    if (context()->user()) {
+        arguments << QLatin1String("--auth");
+        arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+    }
 
     /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
     if(widget()) {
