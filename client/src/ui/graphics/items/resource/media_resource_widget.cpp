@@ -111,8 +111,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
 
-    buttonBar()->addButton(MotionSearchButton, searchButton);
-    buttonBar()->addButton(PtzButton, ptzButton);
+    QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
+    zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+    zoomWindowButton->setCheckable(true);
+    zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
+    zoomWindowButton->setToolTip(tr("Create Zoom Window"));
+    connect(zoomWindowButton, SIGNAL(toggled(bool)), this, SLOT(at_zoomWindowButton_toggled(bool)));
+
+    buttonBar()->addButton(MotionSearchButton,  searchButton);
+    buttonBar()->addButton(PtzButton,           ptzButton);
+    buttonBar()->addButton(ZoomWindowButton,    zoomWindowButton);
     
     if(m_camera) {
         QTimer *timer = new QTimer(this);
@@ -692,8 +700,11 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         }
     }
 
-    if(!qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0)))
+    if(!qFuzzyCompare(zoomRect(), QRectF(0.0, 0.0, 1.0, 1.0))) {
         result &= ~(PtzButton | MotionSearchButton);
+    } else {
+        result |= ZoomWindowButton;
+    }
 
     return result;
 }
