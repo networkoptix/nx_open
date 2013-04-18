@@ -15,6 +15,8 @@
 #import "AFHTTPClient.h"
 #import "SVProgressHUD.h"
 
+#import "connectinfo.pb.h"
+
 enum CameraStatus {
     Offline,
     Unauthorized,
@@ -23,21 +25,21 @@ enum CameraStatus {
 };
 
 enum MessageType {
-    Initial                 = 0,
-    Ping                    = 1,
+    MessageType_Initial                 = 0,
+    MessageType_Ping                    = 1,
     
-    ResourceChange          = 2,
-    ResourceDelete          = 3,
-    ResourceStatusChange    = 4,
-    ResourceDisabledChange  = 5,
+    MessageType_ResourceChange          = 2,
+    MessageType_ResourceDelete          = 3,
+    MessageType_ResourceStatusChange    = 4,
+    MessageType_ResourceDisabledChange  = 5,
     
-    License                 = 6,
-    CameraServerItem        = 7,
+    MessageType_License                 = 6,
+    MessageType_CameraServerItem        = 7,
     
-    BusinessRuleChange      = 8,
-    BusinessRuleDelete      = 9,
+    MessageType_BusinessRuleChange      = 8,
+    MessageType_BusinessRuleDelete      = 9,
     
-    BroadcastBusinessAction = 10
+    MessageType_BroadcastBusinessAction = 10
 };
 
 enum State {
@@ -53,7 +55,7 @@ enum State {
 
 @interface HDWDetailViewController () {
     NSURL *_baseUrl;
-    AFJSONRequestOperation *_requestOperation;
+    AFHTTPRequestOperation *_requestOperation;
     enum State _state;
     SVProgressHUD *_progressHUD;
 }
@@ -124,7 +126,7 @@ enum State {
     NSMutableArray *removedCameras = [NSMutableArray array];
     NSMutableIndexSet *removedServers = [NSMutableIndexSet indexSet];
 
-    if (messageType == ResourceChange) {
+    if (messageType == MessageType_ResourceChange) {
         NSDictionary *resource = message[@"resource"];
         
         // resource changed
@@ -143,7 +145,7 @@ enum State {
                 [newCameras addObject:indexPath];
             }
         }
-    } else if (messageType == ResourceDelete) {
+    } else if (messageType == MessageType_ResourceDelete) {
         NSNumber *resourceId = message[@"resourceId"];
         NSNumber *parentId = message[@"parentId"];
         
@@ -161,7 +163,7 @@ enum State {
                 [_ecsModel removeCameraById:resourceId andServerId:parentId];
             }
         }
-    } else if (messageType == ResourceStatusChange) {
+    } else if (messageType == MessageType_ResourceStatusChange) {
         if ([message objectForKey:@"parentId"]) {
             HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
             [camera setStatus:message[@"status"]];
@@ -169,7 +171,7 @@ enum State {
             HDWServerModel *server = [_ecsModel findServerById:message[@"resourceId"]];
             [server setStatus:message[@"status"]];
         }
-    } else if (messageType == ResourceDisabledChange) {
+    } else if (messageType == MessageType_ResourceDisabledChange) {
         HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
         int disabled = ((NSString*)message[@"disabled"]).intValue;
         if (disabled) {
@@ -232,9 +234,9 @@ enum State {
     [model addServers: [serversDict allValues]];
 }
 
-- (void)connectRequestFinished: (id)JSON {
-    NSString *ecsVersion = JSON[@"version"];
-    if ([ecsVersion hasPrefix:@"1.5."]) {
+- (void)connectRequestFinished: (id)data {
+    ConnectInfo *connectInfo = [ConnectInfo parseFromData:data];
+    if ([connectInfo.version hasPrefix:@"1.5."]) {
         _state = State_Connected;
     } else {
         _state = State_IncompatibleEcsVersion;
@@ -274,7 +276,8 @@ enum State {
         [self performSelector:@selector(increaseProgress:) withObject:@[progress, statusMessage, requestOperation] afterDelay:0.2];
 }
 
-- (void)requestEntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
+
+- (void)requestJSONEntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
     NSString *path = [NSString stringWithFormat:@"api/%@/?format=json", resourceKind];
     NSURL *resourceUrl = [NSURL URLWithString:path relativeToURL:_baseUrl];
     NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
@@ -295,6 +298,29 @@ enum State {
     [_requestOperation start];
 }
 
+- (void)requestPB2EntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
+    NSString *path = [NSString stringWithFormat:@"api/%@/?format=pb", resourceKind];
+    NSURL *resourceUrl = [NSURL URLWithString:path relativeToURL:_baseUrl];
+    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
+    
+    _requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:resourceRequest];
+    [_requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [SVProgressHUD dismiss];
+        [self performSelector:onSuccess withObject:responseObject];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        [SVProgressHUD dismiss];
+        if (error.code == NSURLErrorCancelled)
+            return;
+        
+        _state = State_NetworkFailed;
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:errorMessage delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+    }];
+    
+    
+    [self increaseProgress:[NSMutableArray arrayWithObjects:@0, statusMessage, _requestOperation, nil]];
+    [_requestOperation start];
+}
+
 - (void)performNextStepWithObject: (id)object {
     switch (_state) {
         case State_NetworkFailed: {
@@ -302,12 +328,12 @@ enum State {
         }
             
         case State_Initial: {
-            [self requestEntityForResourceKind:@"connect" success:@selector(connectRequestFinished:) statusMessage:@"Connecting to Enterprise Controller..."errorMessage:@"Can't connect to the System."];
+            [self requestPB2EntityForResourceKind:@"connect" success:@selector(connectRequestFinished:) statusMessage:@"Connecting to Enterprise Controller..."errorMessage:@"Can't connect to the System."];
             break;
         }
             
         case State_Connected: {
-            [self requestEntityForResourceKind:@"resource" success:@selector(resourceRequestFinished:) statusMessage:@"Requesting Enterprise Controller resources..." errorMessage:@"Can't get resources."];
+            [self requestJSONEntityForResourceKind:@"resource" success:@selector(resourceRequestFinished:) statusMessage:@"Requesting Enterprise Controller resources..." errorMessage:@"Can't get resources."];
             break;
         }
             
