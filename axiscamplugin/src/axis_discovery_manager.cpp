@@ -11,11 +11,10 @@
 #include <QAuthenticator>
 #include <QLatin1String>
 
-#include <utils/network/simple_http_client.h>
-
 #include "axis_cam_params.h"
 #include "axis_camera_manager.h"
 #include "axis_camera_plugin.h"
+#include "sync_http_client.h"
 
 
 AxisCameraDiscoveryManager::AxisCameraDiscoveryManager()
@@ -70,12 +69,16 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
     credentials.setUser( QString::fromUtf8(loginToUse) );
     credentials.setPassword( QString::fromUtf8(passwordToUse) );
 
-    CLSimpleHTTPClient http( host, port, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, credentials );
-    CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") );
-    if( status != CL_HTTP_SUCCESS )
-        return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
-    QByteArray responseBody;
-    http.readAll( responseBody );
+    SyncHttpClient http(
+        AxisCameraPlugin::instance()->networkAccessManager(),
+        host,
+        port,
+        credentials );
+    if( http.get( QLatin1String("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") ) != QNetworkReply::NoError )
+        return nxcip::NX_NETWORK_ERROR;
+    if( http.statusCode() != SyncHttpClient::HTTP_OK )
+        return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    const QByteArray& responseBody = http.readWholeMessageBody();
     if( responseBody.isEmpty() )
         return 0;
     const QList<QByteArray>& lines = responseBody.split( '\n' );

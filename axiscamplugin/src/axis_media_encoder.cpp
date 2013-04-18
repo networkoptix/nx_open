@@ -10,10 +10,10 @@
 
 #include <QAuthenticator>
 
-#include <utils/network/simple_http_client.h>
-
 #include "axis_camera_manager.h"
+#include "axis_camera_plugin.h"
 #include "axis_cam_params.h"
+#include "sync_http_client.h"
 
 
 //min known fps of axis camera (in case we do not know model)
@@ -140,20 +140,21 @@ int AxisMediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 int AxisMediaEncoder::fetchCameraResolutionList() const
 {
     // determin camera max resolution
-    CLSimpleHTTPClient http( m_cameraManager->cameraInfo().url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_cameraManager->credentials() );
-    CLHttpStatus status = http.doGET( QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") );
-    if( status != CL_HTTP_SUCCESS )
-        return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    SyncHttpClient http(
+        AxisCameraPlugin::instance()->networkAccessManager(),
+        m_cameraManager->cameraInfo().url,
+        DEFAULT_AXIS_API_PORT,
+        m_cameraManager->credentials() );
+    if( http.get( QLatin1String("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") ) != QNetworkReply::NoError )
+        return nxcip::NX_NETWORK_ERROR;
+    if( http.statusCode() != SyncHttpClient::HTTP_OK )
+        return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
-    QByteArray body;
-    http.readAll( body );
+    const QByteArray& body = http.readWholeMessageBody();
 
     int paramValuePos = body.indexOf('=');
     if( paramValuePos == -1 )
-    {
-        qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
         return nxcip::NX_OTHER_ERROR;
-    }
 
     const QList<QByteArray>& resolutionNameList = body.mid(paramValuePos+1).split(',');
     m_supportedResolutions.reserve( resolutionNameList.size() );

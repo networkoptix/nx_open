@@ -11,7 +11,6 @@
 #include <QAuthenticator>
 #include <QString>
 
-#include <utils/network/simple_http_client.h>
 #include <plugins/camera_plugin.h>
 
 #include "common_ref_manager.h"
@@ -20,6 +19,7 @@
 class AxisCameraPlugin;
 class AxisMediaEncoder;
 class AxisRelayIOManager;
+class SyncHttpClient;
 
 class AxisCameraManager
 :
@@ -60,20 +60,20 @@ public:
     bool isAudioEnabled() const;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
-    static CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+    static int readAxisParameter(
+        SyncHttpClient* const httpClient,
         const QByteArray& paramName,
         QVariant* paramValue );
-    static CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+    static int readAxisParameter(
+        SyncHttpClient* const httpClient,
         const QByteArray& paramName,
         QByteArray* paramValue );
-    static CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+    static int readAxisParameter(
+        SyncHttpClient* const httpClient,
         const QByteArray& paramName,
         QString* paramValue );
-    static CLHttpStatus readAxisParameter(
-        CLSimpleHTTPClient* const httpClient,
+    static int readAxisParameter(
+        SyncHttpClient* const httpClient,
         const QByteArray& paramName,
         unsigned int* paramValue );
 

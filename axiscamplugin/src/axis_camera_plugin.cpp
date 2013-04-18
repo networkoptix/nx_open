@@ -33,9 +33,6 @@ AxisCameraPlugin::AxisCameraPlugin()
     m_networkEventLoopThread.setObjectName( "AxisCameraPlugin" );
     m_networkEventLoopThread.start();
     m_networkAccessManager.moveToThread( &m_networkEventLoopThread );
-
-    QThread* x = m_networkAccessManager.thread();
-    QThread* y = &m_networkEventLoopThread;
 }
 
 AxisCameraPlugin::~AxisCameraPlugin()
@@ -68,11 +65,6 @@ void* AxisCameraPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 QNetworkAccessManager* AxisCameraPlugin::networkAccessManager()
 {
     return &m_networkAccessManager;
-}
-
-QThread* AxisCameraPlugin::networkEventLoopThread()
-{
-    return &m_networkEventLoopThread;
 }
 
 AxisCameraPlugin* AxisCameraPlugin::instance()

@@ -11,6 +11,7 @@
 #include "axis_cam_params.h"
 #include "axis_media_encoder.h"
 #include "axis_relayio_manager.h"
+#include "sync_http_client.h"
 
 
 AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
@@ -185,18 +186,21 @@ int AxisCameraManager::updateCameraInfo() const
 {
     m_cameraCapabilities |= nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
 
-    std::auto_ptr<CLSimpleHTTPClient> httpClient;
-
+    std::auto_ptr<SyncHttpClient> httpClient;
     if( std::strlen(m_info.firmware) == 0 )
     {
         //reading firmware, since it is unavailable via MDNS
         if( !httpClient.get() )
-            httpClient.reset( new CLSimpleHTTPClient( m_info.url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_credentials ) );
+            httpClient.reset( new SyncHttpClient(
+                AxisCameraPlugin::instance()->networkAccessManager(),
+                m_info.url,
+                DEFAULT_AXIS_API_PORT,
+                m_credentials ) );
 
         QByteArray firmware;
-        CLHttpStatus status = readAxisParameter( httpClient.get(), "root.Properties.Firmware.Version", &firmware );
-        if( status != CL_HTTP_SUCCESS )
-            return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+        int status = readAxisParameter( httpClient.get(), "root.Properties.Firmware.Version", &firmware );
+        if( status != SyncHttpClient::HTTP_OK )
+            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
         firmware = firmware.mid(firmware.indexOf('=')+1);
         const int firmwareLen = std::min<int>(sizeof(m_info.firmware)-1, firmware.size());
@@ -207,18 +211,22 @@ int AxisCameraManager::updateCameraInfo() const
     if( !m_relayIOInfoRead )
     {
         if( !httpClient.get() )
-            httpClient.reset( new CLSimpleHTTPClient( m_info.url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_credentials ) );
+            httpClient.reset( new SyncHttpClient(
+                AxisCameraPlugin::instance()->networkAccessManager(),
+                m_info.url,
+                DEFAULT_AXIS_API_PORT,
+                m_credentials ) );
 
         //requesting I/O port information (if needed)
-        CLHttpStatus status = readAxisParameter( httpClient.get(), "Input.NbrOfInputs", &m_inputPortCount );
-        if( status != CL_HTTP_SUCCESS )
-            return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+        int status = readAxisParameter( httpClient.get(), "Input.NbrOfInputs", &m_inputPortCount );
+        if( status != SyncHttpClient::HTTP_OK )
+            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
         if( m_inputPortCount > 0 )
             m_cameraCapabilities |= BaseCameraManager::relayInputCapability;
 
         status = readAxisParameter( httpClient.get(), "Output.NbrOfOutputs", &m_outputPortCount );
-        if( status != CL_HTTP_SUCCESS )
-            return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+        if( status != SyncHttpClient::HTTP_OK )
+            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
         if( m_outputPortCount > 0 )
             m_cameraCapabilities |= BaseCameraManager::relayOutputCapability;
 
@@ -228,62 +236,63 @@ int AxisCameraManager::updateCameraInfo() const
     return nxcip::NX_NO_ERROR;
 }
 
-CLHttpStatus AxisCameraManager::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int AxisCameraManager::readAxisParameter(
+    SyncHttpClient* const httpClient,
     const QByteArray& paramName,
     QVariant* paramValue )
 {
-    CLHttpStatus status = httpClient->doGET( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() );
-    if( status == CL_HTTP_SUCCESS )
+    if( httpClient->get( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() ) != QNetworkReply::NoError )
+        return nxcip::NX_NETWORK_ERROR;
+
+    if( httpClient->statusCode() == SyncHttpClient::HTTP_OK )
     {
-        QByteArray body;
-        httpClient->readAll( body );
+        const QByteArray& body = httpClient->readWholeMessageBody();
         const QList<QByteArray>& paramItems = body.split('=');
         if( paramItems.size() == 2 && paramItems[0] == paramName )
         {
             *paramValue = QString::fromLatin1(paramItems[1]);   //have to convert to QString to enable auto conversion to int
-            return CL_HTTP_SUCCESS;
+            return SyncHttpClient::HTTP_OK;
         }
         else
         {
-            return CL_HTTP_BAD_REQUEST;
+            return SyncHttpClient::HTTP_BAD_REQUEST;
         }
     }
     else
     {
-        return status;
+        return httpClient->statusCode();
     }
 }
 
-CLHttpStatus AxisCameraManager::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int AxisCameraManager::readAxisParameter(
+    SyncHttpClient* const httpClient,
     const QByteArray& paramName,
     QByteArray* paramValue )
 {
     QVariant val;
-    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    int status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toByteArray().trimmed();
     return status;
 }
 
-CLHttpStatus AxisCameraManager::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int AxisCameraManager::readAxisParameter(
+    SyncHttpClient* const httpClient,
     const QByteArray& paramName,
     QString* paramValue )
 {
     QVariant val;
-    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    int status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toString().trimmed();
     return status;
 }
 
-CLHttpStatus AxisCameraManager::readAxisParameter(
-    CLSimpleHTTPClient* const httpClient,
+int AxisCameraManager::readAxisParameter(
+    SyncHttpClient* const httpClient,
     const QByteArray& paramName,
     unsigned int* paramValue )
 {
     QVariant val;
-    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    int status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toUInt();
     return status;
 }

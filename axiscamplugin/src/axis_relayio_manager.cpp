@@ -13,6 +13,7 @@
 #include "axis_camera_manager.h"
 #include "axis_cam_params.h"
 #include "axis_camera_plugin.h"
+#include "sync_http_client.h"
 
 
 AxisRelayIOManager::AxisRelayIOManager(
@@ -25,19 +26,23 @@ AxisRelayIOManager::AxisRelayIOManager(
     m_outputPortCount( outputPortCount ),
     m_multipartedParsingState( waitingDelimiter )
 {
-    std::auto_ptr<CLSimpleHTTPClient> httpClient;
+    std::auto_ptr<SyncHttpClient> httpClient;
     if( !httpClient.get() )
-        httpClient.reset( new CLSimpleHTTPClient( m_cameraManager->cameraInfo().url, DEFAULT_AXIS_API_PORT, DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS, m_cameraManager->credentials() ) );
+        httpClient.reset( new SyncHttpClient(
+            AxisCameraPlugin::instance()->networkAccessManager(),
+            m_cameraManager->cameraInfo().url,
+            DEFAULT_AXIS_API_PORT,
+            m_cameraManager->credentials() ) );
 
     //reading port direction and names
     for( unsigned int i = 0; i < m_inputPortCount+m_outputPortCount; ++i )
     {
         QByteArray portDirection;
-        CLHttpStatus status = AxisCameraManager::readAxisParameter(
+        int status = AxisCameraManager::readAxisParameter(
             httpClient.get(),
             QString::fromLatin1("IOPort.I%1.Direction").arg(i).toLatin1(),
             &portDirection );
-        if( status != CL_HTTP_SUCCESS )
+        if( status != SyncHttpClient::HTTP_OK )
             continue;
 
         QString portName;
@@ -45,7 +50,7 @@ AxisRelayIOManager::AxisRelayIOManager(
             httpClient.get(),
             QString::fromLatin1("IOPort.I%1.%2.Name").arg(i).arg(QString::fromUtf8(portDirection)).toLatin1(),
             &portName );
-        if( status != CL_HTTP_SUCCESS )
+        if( status != SyncHttpClient::HTTP_OK )
             continue;
 
         if( portDirection == "input" )
@@ -55,7 +60,7 @@ AxisRelayIOManager::AxisRelayIOManager(
     }
 
     //moving to networkAccessManager thread
-    moveToThread( AxisCameraPlugin::instance()->networkEventLoopThread() );
+    moveToThread( AxisCameraPlugin::instance()->networkAccessManager()->thread() );
 }
 
 void* AxisRelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -96,15 +101,15 @@ int AxisRelayIOManager::setRelayOutputState(
         cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "/");
     }
 
-    CLSimpleHTTPClient httpClient(
+    SyncHttpClient httpClient(
+        AxisCameraPlugin::instance()->networkAccessManager(),
         m_cameraManager->cameraInfo().url,
         DEFAULT_AXIS_API_PORT,
-        DEFAULT_SOCKET_READ_WRITE_TIMEOUT_MS,
         m_cameraManager->credentials() );
-
-    CLHttpStatus status = httpClient.doGET( cmd );
-    if( status != CL_HTTP_SUCCESS )
-        return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    if( httpClient.get( QUrl(cmd) ) != QNetworkReply::NoError )
+        return nxcip::NX_NETWORK_ERROR;
+    if( httpClient.statusCode() != SyncHttpClient::HTTP_OK )
+        return httpClient.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR; 
 
     return nxcip::NX_NO_ERROR;
 }

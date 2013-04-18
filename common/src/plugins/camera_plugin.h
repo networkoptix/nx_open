@@ -25,6 +25,7 @@ namespace nxcip
     static const int NX_UNSUPPORTED_RESOLUTION = -9;
     static const int NX_UNDEFINED_BEHAVOUR = -20;
     static const int NX_NOT_IMPLEMENTED = -21;
+    static const int NX_NETWORK_ERROR = -22;
     static const int NX_OTHER_ERROR = -100;
 
 

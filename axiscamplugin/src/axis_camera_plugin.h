@@ -42,7 +42,6 @@ public:
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
     QNetworkAccessManager* networkAccessManager();
-    QThread* networkEventLoopThread();
 
     static AxisCameraPlugin* instance();
 
