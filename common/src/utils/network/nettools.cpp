@@ -60,9 +60,8 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 static QList<QHostAddress> allowedInterfaces;
                 if (!allowedInterfaceReady)
                 {
-                    for (int j = 1; j < qApp->argc(); ++j)
+                    foreach(QString arg, qApp->arguments()) // TODO: #Elric totally evil! This is NOT a place to access application arguments
                     {
-                        QString arg = QLatin1String(qApp->argv()[j]);
                         arg = arg.toLower();
                         while (arg.startsWith(QLatin1Char('-')))
                             arg = arg.mid(1);
