@@ -81,8 +81,14 @@ namespace Qn {
 } // namespace Qn
 
 
+template<class Base, bool baseIsConnective>
+class Connective;
+
+
 class ConnectiveBase {
-public:
+private:
+    ConnectiveBase() {}
+
     template<class T1, class T2>
     static bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection, Connection *connection = NULL) {
         using Qn::connect; /* Let ADL kick in. */
@@ -96,7 +102,11 @@ public:
 
         return disconnect(sender, signal, receiver, method, connection);
     }
+    
+    template<class Base, bool baseIsConnective>
+    friend class ::Connective; /* So that only this class can access our methods. */
 };
+
 
 template<class Base, bool baseIsConnective = boost::is_base_of<ConnectiveBase, Base>::value>
 class Connective: public Base, public ConnectiveBase {
@@ -106,6 +116,7 @@ public:
     using ConnectiveBase::connect;
     using ConnectiveBase::disconnect;
 };
+
 
 template<class Base>
 class Connective<Base, true>: public Base {

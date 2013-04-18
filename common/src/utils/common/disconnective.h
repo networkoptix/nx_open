@@ -1,12 +1,30 @@
-#ifndef QN_CONNECTION_LIST_H
-#define QN_CONNECTION_LIST_H
+#ifndef QN_DISCONNECTIVE_H
+#define QN_DISCONNECTIVE_H
+
+#include <boost/type_traits/is_base_of.hpp>
 
 #include <QtCore/QList>
 
 #include "connective.h"
 
-template<class Base>
-class Disconnective: public Connective<Base> {
+template<class Base, bool baseIsDisconnective>
+class Disconnective;
+
+
+class DisconnectiveBase {
+private:
+    DisconnectiveBase() {}
+
+    template<class Base, bool baseIsDisconnective>
+    friend class ::Disconnective; /* So that only this class can access our methods. */
+
+private:
+    QList<Connection> m_connections;
+};
+
+
+template<class Base, bool baseIsDisconnective = boost::is_base_of<DisconnectiveBase, Base>::value>
+class Disconnective: public Connective<Base>, public DisconnectiveBase {
     typedef Connective<Base> base_type;
 public:
     QN_FORWARD_CONSTRUCTOR(Disconnective, base_type, {});
@@ -33,9 +51,14 @@ public:
                 disconnect(connection.sender, connection.signal, connection.receiver, connection.method);
         m_connections.clear();
     }
-
-private:
-    QList<Connection> m_connections;
 };
 
-#endif // QN_CONNECTION_LIST_H
+
+template<class Base>
+class Disconnective<Base, true>: public Base {
+public:
+    QN_FORWARD_CONSTRUCTOR(Disconnective, Base, {});
+};
+
+
+#endif // QN_DISCONNECTIVE_H
