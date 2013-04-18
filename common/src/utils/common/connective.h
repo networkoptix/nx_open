@@ -86,9 +86,7 @@ class Connective;
 
 
 class ConnectiveBase {
-private:
-    ConnectiveBase() {}
-
+public:
     template<class T1, class T2>
     static bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection, Connection *connection = NULL) {
         using Qn::connect; /* Let ADL kick in. */
@@ -102,12 +100,21 @@ private:
 
         return disconnect(sender, signal, receiver, method, connection);
     }
-    
+
+private:
+    ConnectiveBase() {}
+
     template<class Base, bool baseIsConnective>
     friend class ::Connective; /* So that only this class can access our methods. */
 };
 
 
+/**
+ * Convenience base class for objects that want to use extensible ADL-based connections.
+ * 
+ * It replaces <tt>QObject</tt>'s <tt>connect</tt> and <tt>disconnect</tt>
+ * methods with drop-in replacements that call into ADL-based implementation.
+ */
 template<class Base, bool baseIsConnective = boost::is_base_of<ConnectiveBase, Base>::value>
 class Connective: public Base, public ConnectiveBase {
 public:

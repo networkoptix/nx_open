@@ -12,27 +12,13 @@ class Disconnective;
 
 
 class DisconnectiveBase {
-private:
-    DisconnectiveBase() {}
-
-    template<class Base, bool baseIsDisconnective>
-    friend class ::Disconnective; /* So that only this class can access our methods. */
-
-private:
-    QList<Connection> m_connections;
-};
-
-
-template<class Base, bool baseIsDisconnective = boost::is_base_of<DisconnectiveBase, Base>::value>
-class Disconnective: public Connective<Base>, public DisconnectiveBase {
-    typedef Connective<Base> base_type;
 public:
-    QN_FORWARD_CONSTRUCTOR(Disconnective, base_type, {});
+    DisconnectiveBase() {}
 
     template<class T1, class T2>
     bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection) {
         Connection connection;
-        if(base_type::connect(sender, signal, receiver, method, type, &connection)) {
+        if(ConnectiveBase::connect(sender, signal, receiver, method, type, &connection)) {
             m_connections.push_back(connection);
             return true;
         } else {
@@ -42,7 +28,7 @@ public:
 
     template<class T1, class T2>
     bool disconnect(const T1 &sender, const char *signal, const T2 &receiver, const char *method) {
-        return base_type::disconnect(sender, signal, receiver, method, NULL);
+        return ConnectiveBase::disconnect(sender, signal, receiver, method, NULL);
     }
 
     void disconnectAll() {
@@ -51,6 +37,28 @@ public:
                 disconnect(connection.sender, connection.signal, connection.receiver, connection.method);
         m_connections.clear();
     }
+
+private:
+    QList<Connection> m_connections;
+};
+
+
+/**
+ * Convenience class that makes it possible to record all connections made
+ * inside a class and then break them all at once.
+ * 
+ * The connections should be made with a call to <tt>connect</tt> instance method,
+ * and can then be broken all at once with a call to <tt>disconnectAll</tt>.
+ */
+template<class Base, bool baseIsDisconnective = boost::is_base_of<DisconnectiveBase, Base>::value>
+class Disconnective: public Connective<Base>, public DisconnectiveBase {
+    typedef Connective<Base> base_type;
+public:
+    QN_FORWARD_CONSTRUCTOR(Disconnective, base_type, {});
+    
+    using DisconnectiveBase::connect;
+    using DisconnectiveBase::disconnect;
+    using DisconnectiveBase::disconnectAll;
 };
 
 
