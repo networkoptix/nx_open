@@ -23,8 +23,10 @@ class QnMediaResourceWidget: public QnResourceWidget {
 public:
     static const Button MotionSearchButton = static_cast<Button>(0x08);
     static const Button PtzButton = static_cast<Button>(0x10);
+    static const Button ZoomWindowButton = static_cast<Button>(0x20);
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
+#define ZoomWindowButton ZoomWindowButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
