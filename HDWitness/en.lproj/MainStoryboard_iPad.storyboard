@@ -158,10 +158,13 @@
                             <outlet property="delegate" destination="19" id="21"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Systems" id="40"/>
-                    <connections>
-                        <segue destination="6xO-ez-0CL" kind="push" identifier="showConfig" id="yJ0-sb-aws"/>
-                    </connections>
+                    <navigationItem key="navigationItem" title="Systems" id="40">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="dbD-9O-0C7">
+                            <connections>
+                                <segue destination="AY7-d1-hhV" kind="modal" identifier="showConfig" modalPresentationStyle="currentContext" id="bVN-q2-gwG"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="23" sceneMemberID="firstResponder"/>
             </objects>
@@ -172,7 +175,6 @@
             <objects>
                 <navigationController wantsFullScreenLayout="YES" id="42" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="wZs-1y-H0P"/>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
                     <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" barStyle="blackOpaque" id="43">
                         <rect key="frame" x="0.0" y="-44" width="0.0" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -194,7 +196,7 @@
             <objects>
                 <tableViewController id="6xO-ez-0CL" customClass="HDWECSViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="singleLineEtched" sectionIndexMinimumDisplayRowCount="1" allowsSelection="NO" showsSelectionImmediatelyOnTouchBegin="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="qhB-mm-MgD">
-                        <rect key="frame" x="0.0" y="64" width="320" height="704"/>
+                        <rect key="frame" x="0.0" y="64" width="1024" height="704"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -202,10 +204,10 @@
                             <tableViewSection id="VIX-a8-XUK">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SourceCell_ID" textLabel="elH-OJ-DK7" detailTextLabel="tKQ-RK-Dh8" style="IBUITableViewCellStyleValue2" id="7PA-5E-QmS">
-                                        <rect key="frame" x="0.0" y="10" width="320" height="45"/>
+                                        <rect key="frame" x="0.0" y="30" width="1024" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="10" y="1" width="300" height="43"/>
+                                            <rect key="frame" x="45" y="1" width="934" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="elH-OJ-DK7">
@@ -227,10 +229,10 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="HgF-w9-Dwc" detailTextLabel="Ug8-qL-Efz" style="IBUITableViewCellStyleValue2" id="ApH-S7-dht">
-                                        <rect key="frame" x="0.0" y="55" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="75" width="1024" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="10" y="0.0" width="300" height="43"/>
+                                            <rect key="frame" x="45" y="0.0" width="934" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Address" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="HgF-w9-Dwc">
@@ -252,10 +254,10 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="hSH-p2-2Pq" detailTextLabel="ojy-Ug-oj5" style="IBUITableViewCellStyleValue2" id="GRy-Ta-6Q5">
-                                        <rect key="frame" x="0.0" y="99" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="119" width="1024" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="10" y="0.0" width="300" height="43"/>
+                                            <rect key="frame" x="45" y="0.0" width="934" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Port" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="hSH-p2-2Pq">
@@ -277,10 +279,10 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="nvX-GQ-WS8" detailTextLabel="Mt5-be-86Z" style="IBUITableViewCellStyleValue2" id="7KJ-bb-IDO">
-                                        <rect key="frame" x="0.0" y="143" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="163" width="1024" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="10" y="0.0" width="300" height="43"/>
+                                            <rect key="frame" x="45" y="0.0" width="934" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="User Name" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="nvX-GQ-WS8">
@@ -302,10 +304,10 @@
                                         </view>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="MU0-Ce-VVF" detailTextLabel="o1k-CD-xDn" style="IBUITableViewCellStyleValue2" id="NiI-1o-hbZ">
-                                        <rect key="frame" x="0.0" y="187" width="320" height="45"/>
+                                        <rect key="frame" x="0.0" y="207" width="1024" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="10" y="0.0" width="300" height="43"/>
+                                            <rect key="frame" x="45" y="0.0" width="934" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Password" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="MU0-Ce-VVF">
@@ -334,12 +336,23 @@
                             <outlet property="delegate" destination="6xO-ez-0CL" id="4Ve-0o-rOk"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="vEd-PT-88f"/>
+                    <navigationItem key="navigationItem" id="vEd-PT-88f">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="LE9-aM-sIb">
+                            <connections>
+                                <action selector="onCancel:" destination="6xO-ez-0CL" id="sFL-Yu-4Sv"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="Up1-7m-oht">
+                            <connections>
+                                <action selector="onSave:" destination="6xO-ez-0CL" id="fQe-sP-lnj"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8gQ-el-kdb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1772" y="-617"/>
+            <point key="canvasLocation" x="3066" y="-725"/>
         </scene>
         <!--Video View Controller-->
         <scene sceneID="hsZ-zm-YKo">
@@ -359,7 +372,6 @@
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <navigationItem key="navigationItem" id="abA-SN-XVU"/>
-                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                     <connections>
                         <outlet property="imageView" destination="I6k-5V-bDZ" id="ZLO-bh-zPk"/>
                         <outlet property="scrollView" destination="pDb-QM-ziA" id="wVx-Sm-Uo9"/>
@@ -420,6 +432,25 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             </objects>
             <point key="canvasLocation" x="3866" y="756"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="QCo-3r-yJy">
+            <objects>
+                <navigationController modalPresentationStyle="currentContext" id="AY7-d1-hhV" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="ex1-Ps-xy4"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="DOu-Jx-CO6">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="6xO-ez-0CL" kind="relationship" relationship="rootViewController" id="emi-GQ-EpO"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T2K-gR-acY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1690" y="-533"/>
+        </scene>
     </scenes>
     <resources>
         <image name="camera_offline.png" width="128" height="128"/>
@@ -451,7 +482,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <class className="HDWECSViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWECSViewController.h"/>
             <relationships>
-                <relationship kind="action" name="valueChanged:" candidateClass="UITextField"/>
+                <relationship kind="outlet" name="saveButtonItem" candidateClass="UIBarButtonItem"/>
             </relationships>
         </class>
         <class className="HDWMasterViewController" superclassName="UITableViewController">
@@ -464,7 +495,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
             </relationships>
         </class>
-        <class className="Header" superclassName="PSUICollectionReusableView_">
+        <class className="Header" superclassName="PSUICollectionReusableView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/Header.h"/>
             <relationships>
                 <relationship kind="outlet" name="image" candidateClass="UIImageView"/>
@@ -475,17 +506,14 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <class className="MotionJpegImageView" superclassName="UIImageView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/MotionJpegImageView.h"/>
         </class>
-        <class className="PSTCollectionReusableView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionReusableView.h"/>
+        <class className="PSTCollectionViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionViewController.h"/>
         </class>
-        <class className="PSUICollectionReusableView_" superclassName="PSTCollectionReusableView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionReusableView_.h"/>
+        <class className="PSUICollectionViewController_" superclassName="PSTCollectionViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionViewController_.h"/>
         </class>
         <class className="UICollectionViewFlowLayout" superclassName="UICollectionViewLayout">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewFlowLayout.h"/>
-        </class>
-        <class className="UICollectionViewLayout" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewLayout.h"/>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
@@ -494,6 +522,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="51"/>
+        <segue reference="Qa3-fe-Cge"/>
     </inferredMetricsTieBreakers>
 </document>

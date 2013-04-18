@@ -164,6 +164,7 @@
     } else if ([[segue identifier] isEqualToString:@"showConfig"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:sender];
         HDWECSViewController *ecsViewController = (HDWECSViewController *)[[segue destinationViewController] topViewController];
+
         ecsViewController.delegate = self;
         
         if (indexPath) {

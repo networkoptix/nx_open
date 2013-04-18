@@ -275,7 +275,7 @@ enum State {
 }
 
 - (void)requestEntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
-    NSString *path = [NSString stringWithFormat:@"api/%@/", resourceKind];
+    NSString *path = [NSString stringWithFormat:@"api/%@/?format=json", resourceKind];
     NSURL *resourceUrl = [NSURL URLWithString:path relativeToURL:_baseUrl];
     NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
     
@@ -517,6 +517,13 @@ enum State {
     // Called when the view is shown again in the split view, invalidating the button and popover controller.
     [self.navigationItem setLeftBarButtonItem:nil animated:YES];
     self.masterPopoverController = nil;
+}
+
+- (BOOL)splitViewController:(UISplitViewController*)svc
+   shouldHideViewController:(UIViewController *)vc
+              inOrientation:(UIInterfaceOrientation)orientation
+{
+    return YES;
 }
 
 @end
