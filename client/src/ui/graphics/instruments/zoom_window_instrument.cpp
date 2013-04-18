@@ -2,6 +2,7 @@
 
 #include <utils/math/color_transformations.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
@@ -15,15 +16,45 @@
 
 namespace {
     const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
+    const QColor zoomDraggerColor = toTransparent(qnGlobals->zoomWindowColor().lighter(), 0.5);
     const QColor zoomFrameColor = toTransparent(zoomWindowColor, 0.75);
 
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
+    const qreal zoomDraggerSize = qnGlobals->workbenchUnitSize() * 0.05;
 
     const qreal zoomWindowMinSize = 0.1;
 
 } // anonymous namespace
 
 class ZoomOverlayWidget;
+
+
+// -------------------------------------------------------------------------- //
+// ZoomManipulatorWidget
+// -------------------------------------------------------------------------- //
+class ZoomManipulatorWidget: public QGraphicsWidget {
+    typedef QGraphicsWidget base_type;
+
+public:
+    ZoomManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+        base_type(parent, windowFlags) 
+    {}
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
+        QRectF rect = this->rect();
+        qreal penWidth = qMin(rect.width(), rect.height()) / 16;
+        QPointF center = rect.center();
+        QPointF centralStep = QPointF(penWidth, penWidth);
+
+        QnScopedPainterPenRollback penRollback(painter, QPen(zoomFrameColor, penWidth));
+        Q_UNUSED(penRollback)
+        QnScopedPainterBrushRollback brushRollback(painter, zoomDraggerColor);
+        Q_UNUSED(brushRollback)
+
+        painter->drawEllipse(rect);
+        painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
+    }
+};
 
 
 // -------------------------------------------------------------------------- //
@@ -44,8 +75,12 @@ public:
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
-        
-        setFlag(ItemIsMovable, true);
+        //setFlag(ItemIsMovable, true);
+
+        m_manipulator = new ZoomManipulatorWidget(this);
+        m_manipulator->setAcceptedMouseButtons(0);
+        m_manipulator->setCursor(Qt::SizeAllCursor);
+        updateLayout();
     }
 
     virtual ~ZoomWindowWidget();
@@ -66,6 +101,15 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
+    virtual void setGeometry(const QRectF &rect) {
+        QSizeF oldSize = size();
+
+        base_type::setGeometry(rect);
+
+        if(!qFuzzyCompare(oldSize, size()))
+            updateLayout();
+    }
+
 protected:
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
@@ -80,8 +124,8 @@ protected:
 
         painter->fillRect(QRectF(-l,      -t,      w + l + r,   t), color);
         painter->fillRect(QRectF(-l,      h,       w + l + r,   b), color);
-        painter->fillRect(QRectF(-l,      0,       l,           h),  color);
-        painter->fillRect(QRectF(w,       0,       r,           h),  color);
+        painter->fillRect(QRectF(-l,      0,       l,           h), color);
+        painter->fillRect(QRectF(w,       0,       r,           h), color);
     }
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
@@ -91,13 +135,19 @@ protected:
             result &= ~Qn::SideSections;
             result |= Qn::TitleBarArea;
         } else if(result == Qn::NoSection) {
-            result = Qn::TitleBarArea;
+            if(m_manipulator->geometry().intersects(region))
+                result = Qn::TitleBarArea;
         }
 
         return result;
     }
 
+    void updateLayout() {
+        m_manipulator->setGeometry(QRectF(rect().center() - QPointF(zoomDraggerSize, zoomDraggerSize) / 2.0, QSizeF(zoomDraggerSize, zoomDraggerSize)));
+    }
+
 private:
+    ZoomManipulatorWidget *m_manipulator;
     QWeakPointer<ZoomOverlayWidget> m_overlay;
     QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
 };
