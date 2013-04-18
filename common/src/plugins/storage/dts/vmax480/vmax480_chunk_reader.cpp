@@ -15,9 +15,9 @@ QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
     m_state(State_Started),
     m_firstRange(true),
     m_streamFetcher(0),
-    m_res(res)
+    m_res(res.data())
 {
-    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, res, false);
+    m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
 }
 
 QnVMax480ChunkReader::~QnVMax480ChunkReader()
@@ -28,6 +28,7 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 
 void QnVMax480ChunkReader::run()
 {
+    saveSysThreadID();
     bool registered = false;
     while (!needToStop() && !registered)
         registered = m_streamFetcher->registerConsumer(this);

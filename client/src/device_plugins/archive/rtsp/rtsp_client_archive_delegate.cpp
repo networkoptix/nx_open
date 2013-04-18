@@ -14,6 +14,8 @@
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
+static const int REOPEN_TIMEOUT = 1000;
+
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
     QnAbstractArchiveDelegate(),
     m_rtpData(0),
@@ -194,7 +196,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
     bool rez = openInternal(resource);
     if (!rez) {
-        for (int i = 0; i < 50 && !m_closing; ++i)
+        for (int i = 0; i < REOPEN_TIMEOUT/10 && !m_closing; ++i)
             QnSleep::msleep(10);
     }
     return rez;
@@ -334,7 +336,7 @@ void QnRtspClientArchiveDelegate::reopen()
     if (m_blockReopening)
         return;
 
-    for (int i = 0; i < 50 && !m_closing; ++i)
+    for (int i = 0; i < REOPEN_TIMEOUT/10 && !m_closing; ++i)
         QnSleep::msleep(10);
 
     if (m_resource)

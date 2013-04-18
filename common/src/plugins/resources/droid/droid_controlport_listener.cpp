@@ -35,6 +35,7 @@ QnDroidControlPortProcessor::QnDroidControlPortProcessor(TCPSocket* socket, QnTc
 void QnDroidControlPortProcessor::run()
 {
     Q_D(QnDroidControlPortProcessor);
+    saveSysThreadID();
     while (!needToStop())
     {
         quint8 recvBuffer[1024*4];

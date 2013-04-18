@@ -97,10 +97,10 @@ UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
         m_receiveSocket = new UDPSocket();
         m_receiveSocket->setReuseAddrFlag(true);
         m_receiveSocket->setLocalPort(GROUP_PORT);
-    }
-
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
-        m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+        
+        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
+            m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+        }
     }
 
 
@@ -150,8 +150,8 @@ QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidSt
     QByteArray result;
     if (status == CL_HTTP_SUCCESS) {
         http.readAll(result);
-        m_deviceXmlCache[uuidStr] = result;
     }
+    m_deviceXmlCache[uuidStr] = result; // cache anyway for errors as well
 
     return result;
 }
@@ -172,10 +172,14 @@ QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
     return QHostAddress(result);
 }
 
-void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result)
+void QnUpnpResourceSearcher::readDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result)
 {
     QByteArray foundDeviceDescription = getDeviceDescription(uuidStr, descritionUrl);
+    processDeviceXml(foundDeviceDescription, descritionUrl.host(), sender, result);
+}
 
+void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& foundDeviceDescription, const QString& host, const QString& sender, QnResourceList& result)
+{
     //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
 
     //parsing description xml
@@ -189,7 +193,7 @@ void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& uuidStr, const Q
     if( !xmlReader.parse( &input ) )
         return;
 
-    processPacket(findBestIface(sender), descritionUrl.host(), xmlHandler.deviceInfo(), result);
+    processPacket(findBestIface(sender), host, xmlHandler.deviceInfo(), result);
 }
 
 void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
@@ -229,7 +233,7 @@ void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& 
             continue;
         processedUuid << uuidStr;
 
-        processDeviceXml(uuidStr, descritionUrl, sender, result);
+        readDeviceXml(uuidStr, descritionUrl, sender, result);
 
     }
 }
@@ -249,7 +253,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
+        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append("\r\n");
         data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");

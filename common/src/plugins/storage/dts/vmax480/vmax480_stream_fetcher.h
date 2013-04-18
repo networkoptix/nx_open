@@ -34,15 +34,15 @@ public:
     bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0, bool keepAllChannels = false, bool checkPlaybackMask = false);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
-    static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
+    static VMaxStreamFetcher* getInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive);
 
-    static void freeInstance(const QByteArray& clientGroupID, QnResourcePtr res, bool isLive);
+    static void freeInstance(const QByteArray& clientGroupID, QnResource* res, bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
 
     void reconnect();
 public:
-    VMaxStreamFetcher(QnResourcePtr dev, bool isLive);
+    VMaxStreamFetcher(QnResource* dev, bool isLive);
     virtual ~VMaxStreamFetcher();
 
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) override;
@@ -79,7 +79,7 @@ private:
 private:
     static const int OPEN_ALL = 0xffff;
 
-    QnNetworkResourcePtr m_res;
+    QnNetworkResource* m_res;
     typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
 
     mutable QMutex m_mutex;

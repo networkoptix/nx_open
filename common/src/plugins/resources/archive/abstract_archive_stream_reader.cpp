@@ -77,6 +77,8 @@ quint64 QnAbstractArchiveReader::lengthUsec() const
 
 void QnAbstractArchiveReader::run()
 {
+    saveSysThreadID();
+
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnArchiveStreamReader started."), cl_logINFO);
 
     beforeRun();

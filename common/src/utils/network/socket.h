@@ -163,8 +163,10 @@ protected:
     Socket(int type, int protocol) ;
     Socket(int sockDesc);
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
-    void createSocket(int type, int protocol);
-    void setStatus( StatusBit _status );
+    bool createSocket(int type, int protocol);
+    void setStatusBit( StatusBit _status );
+    void clearStatusBit( StatusBit _status );
+    void saveErrorInfo();
 
 private:
     bool m_nonBlockingMode;
@@ -325,10 +327,15 @@ public:
      *   @exception SocketException thrown if attempt to accept a new connection fails
      */
     static int accept(int sockDesc);
-    TCPSocket *accept() ;
+    TCPSocket* accept() ;
 
 private:
-    void setListen(int queueLen) ;
+    /*! 
+        \return fd (>=0) on success, <0 on error (-2 if timed out)
+    */
+    static int acceptWithTimeout( int sockDesc );
+
+    bool setListen(int queueLen) ;
 };
 
 /**
@@ -358,10 +365,7 @@ public:
      *   @param localPort local port
      *   @exception SocketException thrown if unable to create UDP socket
      */
-    UDPSocket(const QString &localAddress, unsigned short localPort)
-    ;
-
-    ~UDPSocket();
+    UDPSocket(const QString &localAddress, unsigned short localPort);
 
     bool setDestAddr(const QString &foreignAddress, unsigned short foreignPort);
 
@@ -432,7 +436,7 @@ private:
     void setBroadcast();
 
 private:
-    sockaddr_in* m_destAddr;
+    sockaddr_in m_destAddr;
 };
 
 #endif

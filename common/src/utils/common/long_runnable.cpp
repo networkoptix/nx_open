@@ -7,6 +7,13 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
+#ifndef _WIN32
+#include <sys/types.h>
+#include <linux/unistd.h>
+
+static pid_t gettid(void) { return syscall(__NR_gettid); }
+#endif
+
 
 // -------------------------------------------------------------------------- //
 // QnLongRunnablePoolPrivate
@@ -100,7 +107,8 @@ void QnLongRunnablePool::waitAll() {
 // -------------------------------------------------------------------------- //
 QnLongRunnable::QnLongRunnable(): 
     m_needStop(false),
-    m_onPause(false)
+    m_onPause(false),
+    m_sysThreadID(0)
 {
     DEBUG_CODE(m_type = NULL);
 
@@ -145,6 +153,11 @@ bool QnLongRunnable::isPaused() const {
 void QnLongRunnable::pauseDelay() {
     while(m_onPause && !needToStop())
         m_semaphore.tryAcquire(1, 50);
+}
+
+int QnLongRunnable::sysThreadID() const
+{
+    return m_sysThreadID;
 }
 
 void QnLongRunnable::smartSleep(int ms) {
@@ -199,14 +212,11 @@ void QnLongRunnable::at_finished() {
         m_pool->finishedNotify(this);
 }
 
-
-
-
-
-
-
-
-
-
-
-
+void QnLongRunnable::saveSysThreadID()
+{
+#ifdef _WIN32
+    //TODO
+#else
+    m_sysThreadID = gettid();
+#endif
+}

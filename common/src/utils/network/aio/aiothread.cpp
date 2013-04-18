@@ -272,6 +272,7 @@ namespace aio
 
     void AIOThread::run()
     {
+        saveSysThreadID();
         cl_log.log( QLatin1String("AIO thread started"), cl_logDEBUG1 );
 
         while( !needToStop() )

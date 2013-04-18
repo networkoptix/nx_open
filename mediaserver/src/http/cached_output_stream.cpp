@@ -46,6 +46,7 @@ void CachedOutputStream::pleaseStop()
 
 void CachedOutputStream::run()
 {
+    saveSysThreadID();
     while( !needToStop() )
     {
         QByteArray packetToSend;

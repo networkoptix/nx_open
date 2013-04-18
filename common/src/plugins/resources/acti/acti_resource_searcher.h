@@ -1,13 +1,17 @@
 #ifndef _ACTI_RESOURCE_SEARCHER_H__
 #define _ACTI_RESOURCE_SEARCHER_H__
 
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QElapsedTimer>
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
 
 
-class QnActiResourceSearcher : public QnUpnpResourceSearcher
+class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcher
 {
-    QnActiResourceSearcher();
+    Q_OBJECT
 
+    QnActiResourceSearcher();
 public:
     static QnActiResourceSearcher& instance();
     
@@ -23,6 +27,21 @@ public:
     virtual QnResourceList findResources(void) override;
 protected:
     virtual void processPacket(const QHostAddress& discoveryAddr, const QString& host, const UpnpDeviceInfo& devInfo, QnResourceList& result) override;
+private slots:
+    void at_replyReceived(QNetworkReply* reply);
+private:
+    QByteArray getDeviceXml(const QUrl& url);
+private:
+    struct CasheInfo
+    {
+        QElapsedTimer timer;
+        QByteArray xml;
+    };
+
+    QMap<QString, CasheInfo> m_cachedXml;
+    QSet<QString >m_httpInProgress;
+    QNetworkAccessManager *m_manager;
+    QMutex m_mutex;
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

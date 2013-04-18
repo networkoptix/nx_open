@@ -23,7 +23,9 @@ public:
 
     void stopObjects();
     void run();
-
+public slots:
+    void stopAsync();
+    void stopSync();
 private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
@@ -46,7 +48,6 @@ private:
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QTimer m_timer;
 };
 
 #endif // MAIN_H

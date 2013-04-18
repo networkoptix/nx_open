@@ -429,7 +429,7 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-    signal(SIGABRT, stopServer);
+    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -455,12 +455,17 @@ int serverMain(int argc, char *argv[])
     }
 
     QString logLevel;
+    QString rebuildArchive;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "1");
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
+    if (rebuildArchive.toInt())
+        DeviceFileCatalog::setRebuildArchive(true);
+    
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
@@ -561,8 +566,27 @@ QnMain::~QnMain()
     stopObjects();
 }
 
+void QnMain::stopSync()
+{
+    if (serviceMainInstance) {
+        serviceMainInstance->pleaseStop();
+        serviceMainInstance->exit();
+        serviceMainInstance->wait();
+        serviceMainInstance = 0;
+    }
+    qApp->quit();
+}
+
+void QnMain::stopAsync()
+{
+    QTimer::singleShot(0, this, SLOT(stopSync()));
+}
+
+
 void QnMain::stopObjects()
 {
+    qWarning() << "QnMain::stopObjects() called";
+
     if (m_restServer)
         m_restServer->pleaseStop();
     if (m_progressiveDownloadingServer)
@@ -1061,8 +1085,9 @@ void QnMain::run()
                                                    QnBusiness::MServerIssueStarted);
 
     at_timer();
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    m_timer.start(60 * 1000);
+    QTimer timer;
+    connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    timer.start(60 * 1000);
 
 
     exec();
@@ -1158,7 +1183,8 @@ protected:
 
     virtual void stop() override
     {
-        stopServer(0);
+        if (serviceMainInstance)
+            serviceMainInstance->stopSync();
     }
 
 private:
@@ -1170,16 +1196,10 @@ private:
 
 void stopServer(int signal)
 {
-    Q_UNUSED(signal)
-
     if (serviceMainInstance) {
-        serviceMainInstance->pleaseStop();
-        serviceMainInstance->exit();
-        serviceMainInstance->wait();
-        serviceMainInstance = 0;
+        qWarning() << "got signal" << signal << "stop server!";
+        serviceMainInstance->stopAsync();
     }
-
-    qApp->quit();
 }
 
 int main(int argc, char* argv[])

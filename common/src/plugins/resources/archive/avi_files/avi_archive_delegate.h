@@ -44,10 +44,10 @@ public:
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
     
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
+    virtual bool findStreams();
 protected:
     void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
-    virtual bool findStreams();
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
 private:

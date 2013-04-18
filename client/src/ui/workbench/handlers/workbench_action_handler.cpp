@@ -179,6 +179,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
+    m_exportRetryCount(0),
     m_exportedCamera(0),
     m_healthRequestHandle(0),
     m_tourTimer(new QTimer())
@@ -2711,6 +2712,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     m_layoutExportCamera->setExportProgressOffset(-100);
     m_exportPeriod = exportPeriod;
     m_exportLayout = layout;
+    m_exportRetryCount = 0;
     at_layoutCamera_exportFinished(fileName);
 }
 
@@ -2770,6 +2772,11 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     }
 }
 
+void QnWorkbenchActionHandler::at_layoutCamera_exportFinished2()
+{
+    at_layoutCamera_exportFinished(m_exportTmpFileName);
+}
+
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
     Q_UNUSED(fileName)
@@ -2786,13 +2793,28 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                 uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
                 QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
+
+                if (!device)
+                {
+                    // It is happends sometimes if export to exe file. Antivirus may block recenty created exe file and motionFile can't be opened.
+                    // Just waiting
+                    if (i == 0 && m_exportRetryCount++ < 3) {
+                        m_exportTmpFileName = fileName;
+                        QTimer::singleShot(500, this, SLOT(at_layoutCamera_exportFinished2()));
+                    }
+                    else {
+                        at_layoutCamera_exportFailed(fileName);
+                    }
+                    return;
+                }
+
                 device->write(m_motionFileBuffer[i]->buffer());
                 device->close();
             }
             m_motionFileBuffer[i].clear();
         }
     }
-
+    m_exportRetryCount = 0;
     m_exportedMediaRes.clear();
 
     if (m_layoutExportResources.isEmpty()) {

@@ -4,9 +4,24 @@
 #include "utils/common/sleep.h"
 #include "testcamera_const.h"
 
-QnTestCameraResourceSearcher::QnTestCameraResourceSearcher()
+static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
+
+QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(): m_sockUpdateTime(0)
 {
 }
+
+QnTestCameraResourceSearcher::~QnTestCameraResourceSearcher()
+{
+    clearSocketList();
+}
+
+void QnTestCameraResourceSearcher::clearSocketList()
+{
+    foreach(const DiscoveryInfo& info, m_sockList)
+        delete info.sock;
+    m_sockList.clear();
+}
+
 
 QnTestCameraResourceSearcher& QnTestCameraResourceSearcher::instance()
 {
@@ -14,29 +29,56 @@ QnTestCameraResourceSearcher& QnTestCameraResourceSearcher::instance()
     return inst;
 }
 
+bool QnTestCameraResourceSearcher::updateSocketList()
+{
+    qint64 curretTime = getUsecTimer();
+    if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
+    {
+        clearSocketList();
+        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+        {
+            DiscoveryInfo info(new QUdpSocket(), iface.address);
+            if (info.sock->bind(iface.address, 0))
+                m_sockList << info;
+            else
+                delete info.sock;
+        }
+        m_sockUpdateTime = curretTime;
+        return true;
+    }
+    return false;
+}
+
+void QnTestCameraResourceSearcher::sendBroadcast()
+{
+    foreach (const DiscoveryInfo& info, m_sockList)
+        info.sock->writeDatagram(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), QHostAddress::Broadcast, TestCamConst::DISCOVERY_PORT);
+}
+
 QnResourceList QnTestCameraResourceSearcher::findResources(void)
 {
+    if (updateSocketList()) {
+        sendBroadcast();
+        QnSleep::msleep(1000);
+    }
+
 
     QSet<QHostAddress> foundDevSet; // to avoid duplicates
     QMap<QString, QnResourcePtr> resources;
+    QSet<QString> processedMac;
 
-    QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
-    for (int i = 0; i < ipaddrs.size();++i)
+    foreach(const DiscoveryInfo& info, m_sockList)
     {
-        QUdpSocket sock;
-        if (!sock.bind(ipaddrs.at(i).address, 0))
-            continue;
-        sock.writeDatagram(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), QHostAddress::Broadcast, TestCamConst::DISCOVERY_PORT);
-        QnSleep::msleep(150);
-        while (sock.hasPendingDatagrams())
+        QUdpSocket* sock = info.sock;
+        while (sock->hasPendingDatagrams())
         {
             QByteArray responseData;
-            responseData.resize(sock.pendingDatagramSize());
+            responseData.resize(sock->pendingDatagramSize());
 
 
             QHostAddress sender;
             quint16 senderPort;
-            sock.readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
+            sock->readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
 
             QList<QByteArray> params = responseData.split(';');
             if (params[0] != TestCamConst::TEST_CAMERA_ID_MSG || params.size() < 3)
@@ -58,8 +100,12 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 resource->setName(resName);
                 resource->setModel(resName);
                 QString mac(s);
+                if (processedMac.contains(mac))
+                    continue;
+                processedMac << mac;
+
                 resource->setMAC(mac);
-                resource->setDiscoveryAddr(ipaddrs.at(i).address);
+                resource->setDiscoveryAddr(info.ifAddr);
                 resource->setUrl(QLatin1String("tcp://") + sender.toString() + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
                 resources.insert(mac, resource);
             }
@@ -68,6 +114,9 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     QnResourceList rez;
     foreach(QnResourcePtr res, resources.values())
         rez << res;
+
+    sendBroadcast();
+
     return rez;
 }
 
