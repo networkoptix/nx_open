@@ -86,9 +86,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    UIBarButtonItem *liveButton =
+        [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
+    
     UIBarButtonItem *archiveButton =
         [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
-    self.navigationItem.rightBarButtonItem = archiveButton;
+    
+    self.navigationItem.rightBarButtonItems = @[liveButton, archiveButton];
 
     self.imageView.allowSelfSignedCertificates = YES;
     self.imageView.allowClearTextCredentials = YES;

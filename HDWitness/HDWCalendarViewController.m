@@ -23,6 +23,14 @@
     return _liveSelected;
 }
 
+- (IBAction)onDone:(id)sender {
+    [self dismissModalViewControllerAnimated:YES];
+}
+
+- (IBAction)onCancel:(id)sender {
+    [self dismissModalViewControllerAnimated:YES];
+}
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -45,9 +53,9 @@
 
     _liveSelected = NO;
     
-    UIBarButtonItem *archiveButton =
-        [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
-    self.navigationItem.rightBarButtonItem = archiveButton;
+//    UIBarButtonItem *archiveButton =
+//        [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
+//    self.navigationItem.rightBarButtonItem = archiveButton;
 }
 
 - (void)didReceiveMemoryWarning

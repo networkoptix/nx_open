@@ -421,7 +421,6 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
 }
 
 - (BOOL)isExecuting {
-    NSLog(@"%d", self.state);
     return self.state == AFOperationExecutingState;
 }
 

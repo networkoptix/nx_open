@@ -110,6 +110,24 @@ enum State {
     
 }
 
+- (void)webSocketDidOpen:(SRWebSocket *)webSocket {
+    NSLog(@"webSocketDidOpen");
+    _state = State_NetworkFailed;
+    [self performNextStep];
+}
+
+- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error {
+     NSLog(@"didFailWithError");
+    _state = State_NetworkFailed;
+    [self performNextStep];
+}
+
+- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
+     NSLog(@"didCloseWithCode");
+    _state = State_NetworkFailed;
+    [self performNextStep];
+}
+
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)rawMessage {
     NSString *messageString = (NSString*)rawMessage;
     NSData *messageData = [messageString dataUsingEncoding:NSUTF8StringEncoding];
@@ -242,7 +260,7 @@ enum State {
         _state = State_IncompatibleEcsVersion;
     }
     
-    [self performNextStepWithObject:nil];
+    [self performNextStep];
 }
 
 - (void)resourceRequestFinished: (id)JSON {
@@ -250,7 +268,7 @@ enum State {
     [self.collectionView reloadData];
 
     _state = State_GotResources;
-    [self performNextStepWithObject:nil];
+    [self performNextStep];
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
@@ -321,7 +339,19 @@ enum State {
     [_requestOperation start];
 }
 
-- (void)performNextStepWithObject: (id)object {
+- (void)connectMessagesChannel {
+    NSURL *messageUrl = [NSURL URLWithString:@"/websocket/" relativeToURL:_baseUrl];
+    NSMutableURLRequest *messageRequest = [NSMutableURLRequest requestWithURL:messageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:0];
+    
+    NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
+    [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
+    
+    _socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
+    [_socket setDelegate:self];
+    [_socket open];
+}
+
+- (void)performNextStep {
     switch (_state) {
         case State_NetworkFailed: {
             break;
@@ -336,9 +366,14 @@ enum State {
             [self requestJSONEntityForResourceKind:@"resource" success:@selector(resourceRequestFinished:) statusMessage:@"Requesting Enterprise Controller resources..." errorMessage:@"Can't get resources."];
             break;
         }
+         
+        case State_GotResources: {
+            [self connectMessagesChannel];
+            break;
+        }
             
         case State_IncompatibleEcsVersion: {
-            [[[UIAlertView alloc] initWithTitle:@"Error" message:@"This version of ECS is incompatible with this software" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+            [[[UIAlertView alloc] initWithTitle:@"Error" message:@"This ECS is incompatible with the app" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
             break;
         }
             
@@ -358,56 +393,13 @@ enum State {
     _baseUrl = [NSURL URLWithString:urlString];
     
     _state = State_Initial;
-    [self performNextStepWithObject:nil];
+    [self performNextStep];
     
+    self.detailDescriptionLabel.text = [_ecsConfig description];
     
-//    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-//    spinner.center = self.view.center;
-//    spinner.hidesWhenStopped = YES;
-    
-//    [self.view addSubview:spinner];
-//    [spinner startAnimating];
-//
-//    [SVProgressHUD showSuccessWithStatus:@"Connected"];
-    
-//    __block float progress = 0.0;
-//    dispatch_queue_t concurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-//    dispatch_async(concurrentQueue, ^{
-//
-//        if (_resourcesRequestOperation.isExecuting) {
-//            dispatch_async(concurrentQueue, )
-//        }
-//        self.picker = [[UIImagePickerController alloc] init];
-//        self.picker.delegate = self;
-//        self.picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-//        self.picker.allowsEditing = NO;
-        
-        // 4) Present picker in main thread
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            [SVProgressHUD showProgress:progress];
-//            progress += 0.001;
-////            [self.navigationController presentModalViewController:_picker animated:YES];
-//            if (progress >= 1)
-//                [SVProgressHUD dismiss];
-//        });
-    
-//    });
-//    [_resourcesRequestOperation start];
-    
-    
-    NSURL *messageUrl = [NSURL URLWithString:@"/websocket/" relativeToURL:_baseUrl];
-    NSMutableURLRequest *messageRequest = [NSMutableURLRequest requestWithURL:messageUrl cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:0];
-    
-    NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
-    [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
-    
-    _socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
-    [_socket setDelegate:self];
-    [_socket open];
-    
-    if (self.ecsConfig) {
-        self.detailDescriptionLabel.text = [self.ecsConfig description];
-    }
+//    if (self.ecsConfig) {
+//        self.detailDescriptionLabel.text = [_ecsConfig description];
+//    }
 }
 
 - (void)viewDidLoad {

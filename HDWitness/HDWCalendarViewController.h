@@ -17,4 +17,7 @@
 
 - (BOOL)liveSelected;
 
+- (IBAction)onDone:(id)sender;
+- (IBAction)onCancel:(id)sender;
+
 @end
