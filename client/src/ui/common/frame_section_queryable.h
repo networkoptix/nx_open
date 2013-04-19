@@ -33,7 +33,7 @@ public:
      * \param section                   Frame section to get cursor for.
      * \returns                         Cursor to use for the given section.
      */
-    virtual QCursor windowCursorAt(Qt::WindowFrameSection section) const {
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const {
         return Qn::calculateHoverCursorShape(section);
     }
 
@@ -47,6 +47,16 @@ public:
      */
     Qt::WindowFrameSection windowFrameSectionAt(const QRectF &region) const {
         return toNaturalQtFrameSection(windowFrameSectionsAt(region));
+    }
+
+    /**
+     * Helper overload for Qt frame sections.
+     *
+     * \param section                   Frame section to get cursor for.
+     * \returns                         Cursor to use for the given section.
+     */
+    QCursor windowCursorAt(Qt::WindowFrameSection section) const {
+        return windowCursorAt(Qn::toQnFrameSection(section));
     }
 
 };

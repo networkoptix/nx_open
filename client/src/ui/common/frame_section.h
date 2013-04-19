@@ -26,6 +26,7 @@ namespace Qn {
 
         CornerSections =        TopLeftSection | TopRightSection | BottomLeftSection | BottomRightSection,
         SideSections =          TopSection | BottomSection | LeftSection | RightSection,
+        ResizeSections =        CornerSections | SideSections,
     };
 
     Q_DECLARE_FLAGS(WindowFrameSections, WindowFrameSection);
@@ -40,6 +41,8 @@ namespace Qn {
 
     Qn::WindowFrameSections calculateRectangularFrameSections(const QRect &frameRect, const QRect &rect, const QRect &query);
 
+    Qt::CursorShape calculateHoverCursorShape(Qn::WindowFrameSection section);
+    
     Qt::CursorShape calculateHoverCursorShape(Qt::WindowFrameSection section);
 
 

@@ -139,8 +139,8 @@ protected:
         return result;
     }
 
-    virtual QCursor windowCursorAt(Qt::WindowFrameSection section) const override {
-        if(section == Qt::TitleBarArea) {
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override {
+        if(section == Qn::TitleBarArea) {
             return Qt::SizeAllCursor;
         } else {
             return base_type::windowCursorAt(section);
