@@ -24,9 +24,9 @@ protected:
     virtual void closeStream() = 0;
 	void pleaseReOpen();
     virtual void afterUpdate() override;
+    virtual void beforeRun() override;
 private:
 	void run(); // in a loop: takes data from device and puts into queue
-    virtual void beforeRun() override;
     bool canChangeStatus() const;
 private:
     bool m_needReopen;
