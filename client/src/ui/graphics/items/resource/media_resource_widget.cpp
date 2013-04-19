@@ -772,3 +772,6 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     }
 }
 
+void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
+    setOption(ControlZoomWindow, checked);
+}
