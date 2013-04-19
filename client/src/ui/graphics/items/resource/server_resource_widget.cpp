@@ -249,8 +249,8 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
-    const int legendImgSize = 24;
-    const int legendFontSize = 22;
+    const int legendImgSize = 18;
+    const int legendFontSize = 18;
     const int itemSpacing = 2;
 } // anonymous namespace
 
@@ -370,7 +370,7 @@ protected:
 
         bool isEmpty = m_widget->m_sortedKeys.isEmpty();
 
-        qreal offsetX = isEmpty ? itemSpacing : painter->fontMetrics().width(QLatin1String("100%"));
+        qreal offsetX = isEmpty ? itemSpacing : itemSpacing * 2 + painter->fontMetrics().width(QLatin1String("100%"));
         qreal offsetTop = isEmpty? itemSpacing : painter->fontMetrics().height() + itemSpacing;
         qreal offsetBottom = itemSpacing;
 
@@ -473,8 +473,8 @@ protected:
                 qreal opacity = painter->opacity();
                 painter->setOpacity(opacity * m_widget->m_infoOpacity);
 
-                qreal xRight = (offsetX + ow + pen_width*2);
-                qreal xLeft = 0;
+                qreal xRight = offsetX + ow + itemSpacing*2;
+                qreal xLeft  = itemSpacing;
                 foreach(QString key, m_widget->m_sortedKeys) {
                     if (!m_widget->m_checkedFlagByKey.value(key, true))
                         continue;
