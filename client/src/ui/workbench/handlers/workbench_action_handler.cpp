@@ -2327,7 +2327,14 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         }
 
         if (withTimestamp) {
-            QString timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
+
+            QString timeStamp;
+            qint64 time = display->camDisplay()->getCurrentTime() / 1000;
+            if(widget->resource()->flags() & QnResource::utc) {
+                timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
+            } else {
+                timeStamp = QTime().addMSecs(time).toString(lit("hh:mmSss"));
+            }
 
             QFont font;
             font.setPixelSize(screenshot.height() / 20);
