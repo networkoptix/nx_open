@@ -4,10 +4,10 @@
 #include "config.h" 
 
 #include <QtCore/QThread>
-#include <QtCore/QSemaphore>
 #include <QtCore/QSharedPointer>
 
 #include "singleton.h"
+#include "qnsemaphore.h"
 
 class QnLongRunnablePoolPrivate;
 
@@ -41,7 +41,7 @@ private slots:
 protected:
     volatile bool m_needStop;
     volatile bool m_onPause;
-    QSemaphore m_semaphore;
+    QnSemaphore m_semaphore;
     int m_sysThreadID;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     DEBUG_CODE(const std::type_info *m_type;)
