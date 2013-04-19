@@ -358,6 +358,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->analogGroupBox->setVisible(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
+        QUrl url = QUrl::fromUserInput(m_camera->getUrl());
+        if (url.isValid() && url.port() != 80)
+            webPageAddress += QLatin1Char(':') + QString::number(url.port());
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
