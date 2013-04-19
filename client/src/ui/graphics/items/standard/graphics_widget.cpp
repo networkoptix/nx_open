@@ -621,22 +621,20 @@ bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
 
         windowData->closeButtonRect = mapFromFrame(q->style()->subControlRect(QStyle::CC_TitleBar, &option, QStyle::SC_TitleBarCloseButton, q));
         windowData->closeButtonHovered = windowData->closeButtonRect.contains(event->pos());
-    } else if(section == Qt::NoSection) {
-        return false;
     }
     windowData->hoveredSection = section;
 
     /* Update cursor. */
     if(handlingFlags & GraphicsWidget::ItemHandlesResizing) {
-        Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(section);
-        if(q->cursor().shape() != cursorShape)
-            q->setCursor(cursorShape);
+        QCursor cursor = q->windowCursorAt(section);
+        if(q->cursor().shape() != cursor.shape() || cursor.shape() == Qt::BitmapCursor)
+            q->setCursor(cursor);
     }
 
     if (windowData->closeButtonHovered != oldCloseButtonHovered)
         q->update(windowData->closeButtonRect);
 
-    return true;
+    return section != Qt::NoSection;
 }
 
 bool GraphicsWidgetPrivate::windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent *event) {

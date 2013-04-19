@@ -16,7 +16,7 @@
 
 namespace {
     const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
-    const QColor zoomDraggerColor = toTransparent(qnGlobals->zoomWindowColor().lighter(), 0.5);
+    const QColor zoomDraggerColor = toTransparent(qnGlobals->zoomWindowColor().lighter(50), 0.5);
     const QColor zoomFrameColor = toTransparent(zoomWindowColor, 0.75);
 
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
@@ -75,11 +75,9 @@ public:
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
-        //setFlag(ItemIsMovable, true);
 
         m_manipulator = new ZoomManipulatorWidget(this);
         m_manipulator->setAcceptedMouseButtons(0);
-        m_manipulator->setCursor(Qt::SizeAllCursor);
         updateLayout();
     }
 
@@ -133,13 +131,20 @@ protected:
 
         if(result & Qn::SideSections) {
             result &= ~Qn::SideSections;
-            result |= Qn::TitleBarArea;
         } else if(result == Qn::NoSection) {
             if(m_manipulator->geometry().intersects(region))
                 result = Qn::TitleBarArea;
         }
 
         return result;
+    }
+
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override {
+        if(section == Qn::TitleBarArea) {
+            return Qt::SizeAllCursor;
+        } else {
+            return base_type::windowCursorAt(section);
+        }
     }
 
     void updateLayout() {

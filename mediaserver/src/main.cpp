@@ -456,12 +456,16 @@ int serverMain(int argc, char *argv[])
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "1");
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
-    if (rebuildArchive.toInt())
-        DeviceFileCatalog::setRebuildArchive(true);
+    if (rebuildArchive == "all")
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
+    else if (rebuildArchive == "hq")
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
+    else if (rebuildArchive == "lq")
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);

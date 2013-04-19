@@ -10,13 +10,14 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
+#include <utils/math/color_transformations.h>
 
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <utils/math/color_transformations.h>
+#include <ui/common/cursor_cache.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
@@ -514,8 +515,15 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
     return result;
 }
 
-int QnResourceWidget::helpTopicAt(const QPointF &pos) const {
-    Q_UNUSED(pos)
+QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
+    if(section & Qn::ResizeSections) {
+        return QnCursorCache::instance()->cursor(Qn::calculateHoverCursorShape(section), rotation(), 5.0);
+    } else {
+        return base_type::windowCursorAt(section);
+    }
+}
+
+int QnResourceWidget::helpTopicAt(const QPointF &) const {
     return -1;
 }
 

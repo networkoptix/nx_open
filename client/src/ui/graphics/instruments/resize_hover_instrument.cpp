@@ -56,17 +56,19 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
         return false; /* Has no decorations and not queryable for frame sections. */
 
     Qt::WindowFrameSection section;
+    QCursor cursor;
     if(queryable == NULL) {
         section = open(widget)->getWindowFrameSectionAt(event->pos());
+        cursor = Qn::calculateHoverCursorShape(section);
     } else {
         QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectRadius, m_effectRadius);
         qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
         section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
+        cursor = queryable->windowCursorAt(section);
     }
 
-    Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(section);
-    if(widget->cursor().shape() != cursorShape)
-        widget->setCursor(cursorShape);
+    if(cursor.shape() != widget->cursor().shape() || cursor.shape() == Qt::BitmapCursor)
+        widget->setCursor(cursor);
     m_affectedItems.insert(widget);
 
     return false;

@@ -571,10 +571,6 @@ int QnMediaResourceWidget::currentRecordingMode() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    return base_type::windowFrameSectionsAt(region);
-}
-
 int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
     Q_UNUSED(pos)
     if(calculateChannelOverlay(0) == AnalogWithoutLicenseOverlay) {
