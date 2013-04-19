@@ -1,4 +1,5 @@
 #include "workbench_controller.h"
+
 #include <cassert>
 #include <cmath> /* For std::floor. */
 #include <limits>
