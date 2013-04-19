@@ -51,9 +51,9 @@ namespace {
         case HDD:
             return colors.hddByKey(key);
         case NETWORK_IN:
-            return QColor(Qt::green);
+            return colors.networkInByKey(key);
         case NETWORK_OUT:
-            return QColor(Qt::red);
+            return colors.networkOutByKey(key);
         default:
             break;
         }
@@ -227,16 +227,17 @@ namespace {
         return path;
     }
 
+    /** Backward sorting because buttonBar inserts buttons in reversed order */
     bool statisticsDataLess(const QnStatisticsData &first, const QnStatisticsData &second) {
         if (
                 (first.deviceType == NETWORK_IN || first.deviceType == NETWORK_OUT) &&
                 (second.deviceType == NETWORK_IN || second.deviceType == NETWORK_OUT)
             )
-            return first.description.toLower() < second.description.toLower();
+            return first.description.toLower() > second.description.toLower();
 
         if (first.deviceType != second.deviceType)
-            return first.deviceType < second.deviceType;
-        return first.description.toLower() < second.description.toLower();
+            return first.deviceType > second.deviceType;
+        return first.description.toLower() > second.description.toLower();
     }
 
     class QnBackgroundGradientPainterFactory {
@@ -249,8 +250,8 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
-    const int legendImgSize = 18;
-    const int legendFontSize = 18;
+    const int legendImgSize = 20;
+    const int legendFontSize = 20;
     const int itemSpacing = 2;
 } // anonymous namespace
 
@@ -496,7 +497,7 @@ protected:
                 }
 
                 if (networkUpperBound > 0) {
-                    main_pen.setColor(QColor(Qt::white));
+                    main_pen.setColor(qnGlobals->statisticsColors().networkLimit);
                     painter->setPen(main_pen);
                     painter->drawText(xLeft, offsetTop*1.5, networkLoadText(1.0, networkUpperBound));
                 }

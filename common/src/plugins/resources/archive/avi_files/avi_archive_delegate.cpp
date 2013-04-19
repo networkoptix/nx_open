@@ -1,6 +1,5 @@
 #include "avi_archive_delegate.h"
 
-#include <QtCore/QSemaphore>
 #include <QtCore/QSharedPointer>
 
 #include "stdint.h"

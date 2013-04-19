@@ -135,8 +135,11 @@ int VMaxStreamFetcher::getCurrentChannelMask() const
 
 void VMaxStreamFetcher::reconnect()
 {
+    QMutexLocker lock(&m_mutex);
     vmaxDisconnect();
     vmaxConnect();
+    if (!m_isLive && m_lastMediaTime != (qint64)AV_NOPTS_VALUE)
+        m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);
 }
 
 bool VMaxStreamFetcher::vmaxConnect()
