@@ -424,9 +424,6 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int serverMain(int argc, char *argv[])
 {
-    Q_UNUSED(argc)
-    Q_UNUSED(argv)
-
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
@@ -441,7 +438,7 @@ int serverMain(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     QString dataLocation = getDataDirectory();
-    QDir::setCurrent(QFileInfo(QFile::decodeName(qApp->argv()[0])).absolutePath());
+    QDir::setCurrent(qApp->applicationDirPath());
 
     QDir dataDirectory;
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
@@ -461,12 +458,16 @@ int serverMain(int argc, char *argv[])
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "1");
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
-    if (rebuildArchive.toInt())
-        DeviceFileCatalog::setRebuildArchive(true);
+    if (rebuildArchive == "all")
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
+    else if (rebuildArchive == "hq")
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
+    else if (rebuildArchive == "lq")
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
@@ -1194,7 +1195,7 @@ protected:
             return;
         }
 
-        serverMain(application->argc(), application->argv());
+        serverMain(m_argc, m_argv);
         m_main.start();
     }
 

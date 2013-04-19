@@ -8,7 +8,6 @@
 #include "workbench_layout_snapshot_storage.h"
 #include "workbench_layout_synchronizer.h"
 #include "workbench_layout.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
@@ -204,36 +203,6 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
     if(!layoutResource)
         return;
-
-    //todo #Sasha: moved from resourcePool. check it
-    foreach(QnLayoutItemData data, layoutResource->getItems()) 
-    {
-        if(!data.resource.id.isValid()) {
-            QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
-            if(!resource) {
-                if(data.resource.path.isEmpty()) {
-                    qnWarning("Invalid item with empty id and path in layout '%1'.", layoutResource->getName());
-                } else {
-                    resource = QnResourcePtr(new QnAviResource(data.resource.path));
-                    qnResPool->addResource(resource);
-                }
-            }
-
-            if(resource) {
-                data.resource.id = resource->getId();
-                layoutResource->updateItem(data.uuid, data);
-            }
-        } else if(data.resource.path.isEmpty()) {
-            QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
-            if(!resource) {
-                qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
-            } else {
-                data.resource.path = resource->getUniqueId();
-                layoutResource->updateItem(data.uuid, data);
-            }
-        }
-    }
-
 
     /* Consider it saved by default. */
     m_storage->store(layoutResource);

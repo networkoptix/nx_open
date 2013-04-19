@@ -704,6 +704,7 @@ int TCPServerSocket::acceptWithTimeout( int sockDesc )
     static const int ACCEPT_TIMEOUT_MSEC = 250;
 
     int result = 0;
+
 #ifdef _WIN32
     fd_set read_set;
     struct timeval timeout;
@@ -730,7 +731,6 @@ int TCPServerSocket::acceptWithTimeout( int sockDesc )
         return -2;  //timed out
     else if( result < 0 )
         return -1;
-
     return ::accept(sockDesc, NULL, NULL);
 }
 

@@ -99,38 +99,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             }
         }
 
-        /* Fix up items that are stored in layout. */
-        /*
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-            foreach(QnLayoutItemData data, layout->getItems()) {
-                if(!data.resource.id.isValid()) {
-                    QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
-                    if(!resource) {
-                        if(data.resource.path.isEmpty()) {
-                            qnWarning("Invalid item with empty id and path in layout '%1'.", layout->getName());
-                        } else {
-                            resource = QnResourcePtr(new QnAviResource(data.resource.path));
-                            qnResPool->addResource(resource);
-                        }
-                    }
-
-                    if(resource) {
-                        data.resource.id = resource->getId();
-                        layout->updateItem(data.uuid, data);
-                    }
-                } else if(data.resource.path.isEmpty()) {
-                    QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
-                    if(!resource) {
-                        qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
-                    } else {
-                        data.resource.path = resource->getUniqueId();
-                        layout->updateItem(data.uuid, data);
-                    }
-                }
-            }
-        }
-        */
-
         resource->setResourcePool(this);
     }
 
@@ -148,6 +116,9 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     m_resourcesMtx.unlock();
 
+    QnResourceList layouts;
+    QnResourceList otherResources;
+
     foreach (const QnResourcePtr &resource, newResources.values())
     {
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
@@ -161,9 +132,25 @@ void QnResourcePool::addResources(const QnResourceList &resources)
                 resource->init();
         }
 
+        if (resource.dynamicCast<QnLayoutResource>())
+            layouts << resource;
+        else
+            otherResources << resource;
+    }
+
+    // Layouts should be notified first because their children should be instantiated before
+    // 'UserChanged' event occurs
+    foreach (const QnResourcePtr &resource, layouts) {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
+
+    foreach (const QnResourcePtr &resource, otherResources) {
+        TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
+        emit resourceAdded(resource);
+    }
+
+
 }
 
 namespace

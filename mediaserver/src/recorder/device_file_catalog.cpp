@@ -12,7 +12,7 @@
 #include "recording_manager.h"
 #include "serverutil.h"
 
-bool DeviceFileCatalog::m_rebuildArchive = false;
+DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
 
 QString DeviceFileCatalog::prefixForRole(QnResource::ConnectionRole role)
 {
@@ -90,7 +90,10 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
         str.flush();
 
     }
-    else if (m_rebuildArchive) {
+    else if (m_rebuildArchive == Rebuild_All || 
+             m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo ||
+             m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
+    {
         doRebuildArchive();
     }
     else {
@@ -702,7 +705,7 @@ qint64 DeviceFileCatalog::firstTime() const
         return m_chunks[m_firstDeleteCount].startTimeMs;
 }
 
-void DeviceFileCatalog::setRebuildArchive(bool value)
+void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
 {
     m_rebuildArchive = value;
 }

@@ -326,9 +326,8 @@ public:
      *   @return new connection socket
      *   @exception SocketException thrown if attempt to accept a new connection fails
      */
-    TCPSocket* accept() ;
-
     static int accept(int sockDesc);
+    TCPSocket* accept() ;
 
 private:
     /*! 

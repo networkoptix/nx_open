@@ -81,6 +81,10 @@ namespace Qn {
 } // namespace Qn
 
 
+template<class Base, bool baseIsConnective>
+class Connective;
+
+
 class ConnectiveBase {
 public:
     template<class T1, class T2>
@@ -96,8 +100,21 @@ public:
 
         return disconnect(sender, signal, receiver, method, connection);
     }
+
+private:
+    ConnectiveBase() {}
+
+    template<class Base, bool baseIsConnective>
+    friend class ::Connective; /* So that only this class can access our methods. */
 };
 
+
+/**
+ * Convenience base class for objects that want to use extensible ADL-based connections.
+ * 
+ * It replaces <tt>QObject</tt>'s <tt>connect</tt> and <tt>disconnect</tt>
+ * methods with drop-in replacements that call into ADL-based implementation.
+ */
 template<class Base, bool baseIsConnective = boost::is_base_of<ConnectiveBase, Base>::value>
 class Connective: public Base, public ConnectiveBase {
 public:
@@ -106,6 +123,7 @@ public:
     using ConnectiveBase::connect;
     using ConnectiveBase::disconnect;
 };
+
 
 template<class Base>
 class Connective<Base, true>: public Base {

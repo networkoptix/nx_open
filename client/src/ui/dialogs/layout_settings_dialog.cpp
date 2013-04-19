@@ -293,11 +293,7 @@ void QnLayoutSettingsDialog::selectFile() {
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
     dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    QCheckBox* cropCheckbox = new QCheckBox(dialog.data());
-    cropCheckbox->setText(tr("Crop to current monitor AR"));
-    cropCheckbox->setChecked(m_cropImage);
-    dialog->addWidget(cropCheckbox);
-
+    dialog->addCheckbox(tr("Crop to current monitor AR"), &m_cropImage);
     if(!dialog->exec())
         return;
 
@@ -308,7 +304,6 @@ void QnLayoutSettingsDialog::selectFile() {
     m_newFilePath = files[0];
     m_cachedFilename = QString();
     m_estimatePending = true;
-    m_cropImage = cropCheckbox->isChecked();
 
     loadPreview();
     updateControls();

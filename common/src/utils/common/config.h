@@ -41,6 +41,10 @@
 //#define QT_USE_FAST_OPERATOR_PLUS
 
 
+/* Don't use deprecated Qt functions. */
+#define QT_NO_DEPRECATED
+
+
 /* Define override specifier. */
 #ifdef _MSC_VER
 #   define override override

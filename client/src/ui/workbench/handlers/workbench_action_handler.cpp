@@ -616,8 +616,11 @@ void QnWorkbenchActionHandler::openResourcesInNewWindow(const QnResourceList &re
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+
+    if (context()->user()) {
+        arguments << QLatin1String("--auth");
+        arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+    }
 
     /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
     if(widget()) {
@@ -1127,18 +1130,24 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         items[i].uuid = QUuid::createUuid();
     newLayout->setItems(items);
 
-    /* If it is current layout, then roll it back and open the new one instead. */
-    if(layout == workbench()->currentLayout()->resource()) {
+    bool isCurrent = (layout == workbench()->currentLayout()->resource());
+    bool shouldDelete = snapshotManager()->isLocal(layout) &&
+            (name == layout->getName() || isCurrent);
+
+    /* If it is current layout, close it and open the new one instead. */
+    if(isCurrent) {
         int index = workbench()->currentLayoutIndex();
         workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
         workbench()->setCurrentLayoutIndex(index);
         workbench()->removeLayout(index + 1);
 
-        snapshotManager()->restore(layout);
+        // If current layout should not be deleted then roll it back
+        if (!shouldDelete)
+            snapshotManager()->restore(layout);
     }
 
     snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
-    if (name == layout->getName() && snapshotManager()->isLocal(layout))
+    if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }
 
@@ -2976,15 +2985,16 @@ Do you want to continue?"),
             aviFileFilter
             + filterSeparator
             + mkvFileFilter
-        #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName(false)
-        #endif
+#endif
             ;
 
     QString fileName;
     QString selectedExtension;
-    bool withTimestamps;
+    QString selectedFilter;
+    bool withTimestamps = false;
     while (true) {
         QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
@@ -2995,16 +3005,13 @@ Do you want to continue?"),
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        QCheckBox* tsCheckbox = new QCheckBox(dialog.data());
-        tsCheckbox->setText(tr("Include Timestamps (Requires Transcoding)"));
-        tsCheckbox->setChecked(false);
-        dialog->addWidget(tsCheckbox);
+        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
         fileName = dialog->selectedFiles().value(0);
-        selectedExtension = dialog->selectedFilter().mid(dialog->selectedFilter().lastIndexOf(QLatin1Char('.')), 4);
-        withTimestamps = tsCheckbox->isChecked();
+        selectedFilter = dialog->selectedNameFilter();
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
         if (fileName.isEmpty())
             return;
@@ -3025,7 +3032,7 @@ Do you want to continue?"),
             }
         }
 
-        if (dialog->selectedFilter().contains(aviFileFilter))
+        if (selectedFilter.contains(aviFileFilter))
         {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
@@ -3062,7 +3069,7 @@ Do you want to continue?"),
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
 #ifdef Q_OS_WIN
-    if (dialog->selectedFilter().contains(binaryFilterName(false)))
+    if (selectedFilter.contains(binaryFilterName(false)))
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
