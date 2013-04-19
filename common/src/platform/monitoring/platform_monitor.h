@@ -85,7 +85,7 @@ public:
         NetworkLoad(): bytesPerSecIn(0), bytesPerSecOut(0) {}
 
         /** Network interface name */
-        QString interface;
+        QString interfaceName;
 
         /** Current download speed in bytes per second */
         quint64 bytesPerSecIn;

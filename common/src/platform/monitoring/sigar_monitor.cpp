@@ -91,7 +91,7 @@ public:
 
     QnPlatformMonitor::NetworkLoad networkLoad(const QString &interfaceName) {
         QnPlatformMonitor::NetworkLoad result;
-        result.interface = interfaceName;
+        result.interfaceName = interfaceName;
 
         if(!sigar)
             return result;
