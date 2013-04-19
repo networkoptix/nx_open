@@ -9,7 +9,8 @@ QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
     QObject(),
     m_aspectMode(Qt::KeepAspectRatio),
     m_transformationMode(Qt::SmoothTransformation),
-    m_downScaleOnly(true)
+    m_downScaleOnly(true),
+    m_cropToMonitorAspectRatio(false)
 {
 }
 
