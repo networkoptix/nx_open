@@ -239,18 +239,39 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                 RAM
             ));
 
-            QByteArray storagesBlock = extractXmlBody(data, "storages"), storageBlock;
-            int from = 0;
-            do {
-                storageBlock = extractXmlBody(storagesBlock, "storage", &from);
-                if (storageBlock.length() == 0)
-                    break;
-                reply.append(QnStatisticsDataItem(
-                    QLatin1String(extractXmlBody(storageBlock, "url")), 
-                    extractXmlBody(storageBlock, "usage").toDouble(), 
-                    HDD
-                ));
-            } while (storageBlock.length() > 0);
+            QByteArray storagesBlock = extractXmlBody(data, "storages"), storageBlock; {
+                int from = 0;
+                do {
+                    storageBlock = extractXmlBody(storagesBlock, "storage", &from);
+                    if (storageBlock.length() == 0)
+                        break;
+                    reply.append(QnStatisticsDataItem(
+                        QLatin1String(extractXmlBody(storageBlock, "url")),
+                        extractXmlBody(storageBlock, "usage").toDouble(),
+                        HDD
+                    ));
+                } while (storageBlock.length() > 0);
+            }
+
+            QByteArray networkBlock = extractXmlBody(data, "network"), interfaceBlock; {
+                int from = 0;
+                do {
+                    interfaceBlock = extractXmlBody(networkBlock, "interface", &from);
+                    if (interfaceBlock.length() == 0)
+                        break;
+                    QString interfaceName = QLatin1String(extractXmlBody(interfaceBlock, "name"));
+                    reply.append(QnStatisticsDataItem(
+                        interfaceName + QChar(0x21e9),
+                        extractXmlBody(interfaceBlock, "in").toDouble(),
+                        NETWORK_IN
+                    ));
+                    reply.append(QnStatisticsDataItem(
+                        interfaceName + QChar(0x21e7),
+                        extractXmlBody(interfaceBlock, "out").toDouble(),
+                        NETWORK_OUT
+                    ));
+                } while (networkBlock.length() > 0);
+            }
         }
         
         emitFinished(status, reply, handle); 
