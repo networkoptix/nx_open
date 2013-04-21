@@ -59,6 +59,10 @@
     [self performSegueWithIdentifier:@"setTime" sender:self];
 }
 
+- (void)gotoLive:(id)sender {
+    [self setUrlAndPlay];
+}
+
 - (void)onCalendarDispose: (HDWCalendarViewController *)calendarView {
     NSURL *url;
     

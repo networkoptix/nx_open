@@ -13,7 +13,20 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "239"
          endingLineNumber = "239"
-         landmarkName = "-connectRequestFinished:"
+         landmarkName = "-_loadResourcesFromJSON:toModel:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "HDWitness/HDWVideoViewController.m"
+         timestampString = "388252130.278382"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "69"
+         endingLineNumber = "69"
+         landmarkName = "-onCalendarDispose:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

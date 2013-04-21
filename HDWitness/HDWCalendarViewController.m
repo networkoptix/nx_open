@@ -76,6 +76,7 @@
         // back button was pressed.  We know this is true because self is no longer
         // in the navigation stack.
     }
+    
     [super viewWillDisappear:animated];
 }
 @end
