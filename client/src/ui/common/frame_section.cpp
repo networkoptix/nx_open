@@ -45,6 +45,9 @@ Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections secti
 }
 
 Qn::WindowFrameSection Qn::toQnFrameSection(Qt::WindowFrameSection section) {
+    if(section == Qt::NoSection)
+        return Qn::NoSection;
+    
     return static_cast<Qn::WindowFrameSection>(1 << section);
 }
 

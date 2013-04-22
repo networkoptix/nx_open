@@ -23,6 +23,8 @@ namespace Qn {
 #define TimePeriodsParameter                fromLatin1("_qn_timePeriodsParameter")
 #define AllTimePeriodsParameter             fromLatin1("_qn_allTimePeriodsParameter")
 #define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
+#define ZoomWindowArgument                  fromLatin1("_qn_zoomWindowArgument")
+#define FocusElementArgument                fromLatin1("_qn_focusElementArgument")
 
     /**
      * Enum of all menu actions.

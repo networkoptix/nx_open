@@ -62,79 +62,6 @@ namespace {
 
 
 // -------------------------------------------------------------------------- //
-// PtzSelectionItem
-// -------------------------------------------------------------------------- //
-class PtzSelectionItem: public SelectionItem {
-    typedef SelectionItem base_type;
-
-public:
-    PtzSelectionItem(QGraphicsItem *parent = NULL): 
-        base_type(parent),
-        m_elementSize(0.0)
-    {
-        setPen(ptzItemBorderColor);
-        setBrush(ptzItemBaseColor);
-    }
-
-    virtual QRectF boundingRect() const override {
-        return QnGeometry::dilated(base_type::boundingRect(), m_elementSize / 2.0);
-    }
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
-        base_type::paint(painter, option, widget);
-
-        QRectF rect = base_type::rect();
-        QPointF center = rect.center();
-        if(rect.isEmpty())
-            return;
-
-        QPainterPath path;
-        qreal elementHalfSize = qMin(m_elementSize, qMin(rect.width(), rect.height()) / 2.0) / 2.0;
-        path.addEllipse(center, elementHalfSize, elementHalfSize);
-
-        foreach(const QPointF &sidePoint, m_sidePoints) {
-            QPointF v = sidePoint - center;
-            qreal l = QnGeometry::length(v);
-            qreal a = -QnGeometry::atan2(v) / M_PI * 180;
-            qreal da = 60.0;
-
-            QPointF c = sidePoint - v / l * (elementHalfSize * 1.5);
-            QPointF r = QPointF(elementHalfSize, elementHalfSize) * 1.5;
-            QRectF rect(c - r, c + r);
-
-            path.arcMoveTo(rect, a - da);
-            path.arcTo(rect, a - da, 2 * da);
-        }
-
-        QnScopedPainterPenRollback penRollback(painter, QPen(pen().color().lighter(120), elementHalfSize / 2.0));
-        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
-        painter->drawPath(path);
-    }
-
-    qreal elementSize() const {
-        return m_elementSize;
-    }
-
-    void setElementSize(qreal elementSize) {
-        m_elementSize = elementSize;
-    }
-
-    const QVector<QPointF> &sidePoints() const {
-        return m_sidePoints;
-    }
-
-    void setSidePoints(const QVector<QPointF> &sidePoints) {
-        m_sidePoints = sidePoints;
-    }
-
-private:
-    qreal m_elementSize;
-    QVector<QPointF> m_sidePoints;
-};
-
-
-
-// -------------------------------------------------------------------------- //
 // PtzSplashItem
 // -------------------------------------------------------------------------- //
 class PtzSplashItem: public QGraphicsObject {
@@ -696,8 +623,10 @@ void PtzInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
 
-    m_selectionItem = new PtzSelectionItem();
+    m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
+    selectionItem()->setPen(ptzItemBorderColor);
+    selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
     if(scene())
@@ -1070,24 +999,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
     if(!manipulator()) {
         ensureSelectionItem();
-
-        QPointF origin = info->mousePressItemPos();
-        QPointF corner = bounded(info->mouseItemPos(), target()->rect());
-        QRectF rect = QnGeometry::movedInto(
-            QnGeometry::expanded(
-                QnGeometry::aspectRatio(target()->size()),
-                QRectF(origin, corner).normalized(),
-                Qt::KeepAspectRatioByExpanding,
-                Qt::AlignCenter
-            ),
-            target()->rect()
-        );
-
-        QVector<QPointF> sidePoints;
-        sidePoints << origin << corner;
-
-        selectionItem()->setRect(rect);
-        selectionItem()->setSidePoints(sidePoints);
+        selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
     } else {
         QPointF delta = info->mouseItemPos() - target()->rect().center();
         QSizeF size = target()->size();
