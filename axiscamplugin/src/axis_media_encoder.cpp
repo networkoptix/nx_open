@@ -65,6 +65,7 @@ int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const
     //    paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
     paramsStr.append("&audio=").append( m_cameraManager->isAudioEnabled() ? "1" : "0");
 
+    //m_cameraManager->cameraInfo().url stores only host name
     sprintf( urlBuf, "rtsp://%s/axis-media/media.amp?%s", m_cameraManager->cameraInfo().url, paramsStr.data() );
     return nxcip::NX_NO_ERROR;
 }
@@ -87,7 +88,7 @@ int AxisMediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* i
         infoList,
         &m_supportedResolutions[0],
         sizeof(nxcip::ResolutionInfo) * *infoListCount );
- 
+
     return nxcip::NX_NO_ERROR;
 }
 

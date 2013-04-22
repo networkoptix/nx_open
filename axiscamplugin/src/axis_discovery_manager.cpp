@@ -37,11 +37,6 @@ void* AxisCameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interface
     return NULL;
 }
 
-unsigned int AxisCameraDiscoveryManager::releaseRef()
-{
-    return CommonRefManager::releaseRef();
-}
-
 static const char* VENDOR_NAME = "AXIS";
 
 void AxisCameraDiscoveryManager::getVendorName( char* buf ) const

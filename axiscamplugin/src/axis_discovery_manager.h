@@ -28,8 +28,6 @@ public:
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
-    virtual unsigned int releaseRef() override;
-
     virtual void getVendorName( char* buf ) const override;
     virtual int findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr ) override;
     virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;

@@ -45,11 +45,6 @@ AxisCameraPlugin::~AxisCameraPlugin()
     axisCameraPluginInstance = NULL;
 }
 
-unsigned int AxisCameraPlugin::releaseRef()
-{
-    return CommonRefManager::releaseRef();
-}
-
 //!Implementation of nxpl::NXPluginInterface::queryInterface
 /*!
     Supports cast to nxcip::CameraDiscoveryManager interface

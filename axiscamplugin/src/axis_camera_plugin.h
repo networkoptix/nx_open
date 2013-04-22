@@ -39,8 +39,6 @@ public:
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
-    unsigned int releaseRef();
-
     QNetworkAccessManager* networkAccessManager();
 
     static AxisCameraPlugin* instance();
