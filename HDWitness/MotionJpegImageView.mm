@@ -183,6 +183,7 @@ static NSData *_endMarkerData = nil;
     }
     else if (_url) {
         NSLog(@"Playing %@", [_url absoluteString]);
+        _firstFrameReceived = NO;
         
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:_url];
 
@@ -253,6 +254,11 @@ static NSData *_endMarkerData = nil;
         UIImage *receivedImage = [UIImage imageWithData:imageData];
         if (receivedImage) {
             [_fpsCounter postDisplay];
+            if (!_firstFrameReceived) {
+                [_delegate onFirstFrameReceived];
+                _firstFrameReceived = YES;
+            }
+            
             self.image = [self drawTextOnPic:[NSString stringWithFormat:@"FPS: %d", [_fpsCounter currentFps]] inImage:receivedImage];
         }
     }

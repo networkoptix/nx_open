@@ -12,7 +12,7 @@
 #import "HDWCameraModel.h"
 #import "MotionJpegImageView.h"
 
-@interface HDWVideoViewController : UIViewController {
+@interface HDWVideoViewController : UIViewController <MotionJpegViewDelegate> {
     BOOL _playingLive;
     NSDate *_lastSelectedDate;
 

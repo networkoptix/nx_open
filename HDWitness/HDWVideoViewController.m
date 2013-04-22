@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Ivan Vigasin. All rights reserved.
 //
 
+#import "SVProgressHud.h"
 #import "HDWVideoViewController.h"
 
 #define NOW_INTERVAL 10.0 // 10 seconds
@@ -15,6 +16,10 @@
 @end
 
 @implementation HDWVideoViewController
+
+- (void)onFirstFrameReceived {
+    [SVProgressHUD dismiss];
+}
 
 - (BOOL)shouldAutorotate {
     return YES;
@@ -65,6 +70,7 @@
     self.imageView.password = url.password;
     self.imageView.url = url;
     [self.imageView play];
+    [SVProgressHUD showWithStatus:@"Loading..."];
 }
 
 - (void)gotoLive:(id)sender {
@@ -111,6 +117,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.imageView.delegate = self;
     _liveButton = [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
 //    _archiveButton = [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
     _archiveButton = self.navigationItem.rightBarButtonItem;

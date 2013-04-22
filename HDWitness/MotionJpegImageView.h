@@ -25,6 +25,12 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol MotionJpegViewDelegate <NSObject>
+
+- (void)onFirstFrameReceived;
+
+@end
+
 @interface FpsCounter : NSObject  {
     NSUInteger _interval;
     NSMutableArray *_timestampQueue;
@@ -51,6 +57,7 @@
     BOOL _allowClearTextCredentials;
     FpsCounter *_fpsCounter;
     BOOL _needReconnect;
+    BOOL _firstFrameReceived;
 }
 
 @property (nonatomic, readwrite, copy) NSURL *url;
@@ -59,6 +66,7 @@
 @property (nonatomic, readwrite, copy) NSString *password;
 @property (nonatomic, readwrite, assign) BOOL allowSelfSignedCertificates;
 @property (nonatomic, readwrite, assign) BOOL allowClearTextCredentials;
+@property id<MotionJpegViewDelegate> delegate;
 
 - (void)play;
 - (void)pause;
