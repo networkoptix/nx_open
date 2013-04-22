@@ -187,6 +187,7 @@ namespace nxcip
             \param infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
             \param infoListCount Returned number of supported resolutions
             \return 0 on success, otherwise - error code
+            \note Plugin is can return empty resolution list
         */
         virtual int getResolutionList( ResolutionInfo* infoList, int* infoListCount ) const = 0;
 
@@ -258,6 +259,8 @@ namespace nxcip
 
         //!Returns encoder by index
         /*!
+            Most likely will return same pointer on multiple requests with same \a encoderIndex
+
             \return \a NX_NO_ERROR on success, otherwise - error code:\n
                 - \a NX_INVALID_ENCODER_NUMBER wrong \a encoderIndex value
             \note BaseCameraManager holds reference to \a CameraMediaEncoder
@@ -301,16 +304,19 @@ namespace nxcip
         //!MUST return not-NULL if \a ptzCapability is present
         /*!
             \note Increases \a CameraPTZManager instance reference counter
+            \note Most likely will return same pointer on multiple requests
         */
         virtual CameraPTZManager* getPTZManager() const = 0;
         //!MUST return not-NULL if \a hardwareMotionCapability is present
         /*!
             \note Increases \a CameraMotionDataProvider instance reference counter
+            \note Most likely will return same pointer on multiple requests
         */
         virtual CameraMotionDataProvider* getCameraMotionDataProvider() const = 0;
         //!MUST return not-NULL if \a relayInputCapability is present
         /*!
             \note Increases \a CameraRelayIOManager instance reference counter
+            \note Most likely will return same pointer on multiple requests
         */
         virtual CameraRelayIOManager* getCameraRelayIOManager() const = 0;
 
