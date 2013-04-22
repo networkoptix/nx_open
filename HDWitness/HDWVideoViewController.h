@@ -12,7 +12,15 @@
 #import "HDWCameraModel.h"
 #import "MotionJpegImageView.h"
 
-@interface HDWVideoViewController : UIViewController
+@interface HDWVideoViewController : UIViewController {
+    BOOL _playingLive;
+    NSDate *_lastSelectedDate;
+
+    UIBarButtonItem *_liveButton;
+    UIBarButtonItem *_archiveButton;
+    
+    __weak UIPopoverController *calendarPopover;
+}
 
 @property HDWCameraModel *camera;
 

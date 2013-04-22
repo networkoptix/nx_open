@@ -337,7 +337,13 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" id="2dz-mj-ajT"/>
+                    <navigationItem key="navigationItem" id="2dz-mj-ajT">
+                        <barButtonItem key="rightBarButtonItem" title="Archive" id="vwG-2k-5S7">
+                            <connections>
+                                <action selector="showPopover:" destination="aeR-Nu-8rE" id="Fyf-gu-aB9"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="imageView" destination="X8A-Qr-Dyi" id="WbH-bk-FkN"/>
                         <outlet property="scrollView" destination="ZKh-Uk-Cqj" id="Lvf-ND-Yvf"/>
@@ -471,7 +477,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 <relationship kind="outlet" name="labelView" candidateClass="UILabel"/>
             </relationships>
         </class>
-        <class className="HDWDetailViewController" superclassName="PSUICollectionViewController">
+        <class className="HDWDetailViewController" superclassName="PSUICollectionViewController_">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWDetailViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="detailDescriptionLabel" candidateClass="UILabel"/>
@@ -489,6 +495,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <class className="HDWVideoViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWVideoViewController.h"/>
             <relationships>
+                <relationship kind="action" name="showPopover:"/>
                 <relationship kind="outlet" name="imageView" candidateClass="MotionJpegImageView"/>
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
             </relationships>
@@ -503,6 +510,12 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         </class>
         <class className="MotionJpegImageView" superclassName="UIImageView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/MotionJpegImageView.h"/>
+        </class>
+        <class className="PSTCollectionViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSTCollectionViewController.h"/>
+        </class>
+        <class className="PSUICollectionViewController_" superclassName="PSTCollectionViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/PSUICollectionViewController_.h"/>
         </class>
         <class className="UICollectionViewFlowLayout" superclassName="UICollectionViewLayout">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/UICollectionViewFlowLayout.h"/>

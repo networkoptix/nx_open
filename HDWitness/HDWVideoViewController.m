@@ -48,55 +48,74 @@
     return self;
 }
 
-//- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
-//{
-//    return self.imageView;
-//}
-
 - (void)showTimeSelector: (id)sender {
     [self.imageView stop];
     
     [self performSegueWithIdentifier:@"setTime" sender:self];
 }
 
-- (void)gotoLive:(id)sender {
-    [self setUrlAndPlay];
+- (void)updateControls {
+    [_liveButton setEnabled:!_playingLive];
 }
 
-- (void)onCalendarDispose: (HDWCalendarViewController *)calendarView {
-    NSURL *url;
+- (void)gotoURL:(NSURL*)url {
+    [self updateControls];
     
-    if ([calendarView liveSelected])
-        url = [_camera liveUrl];
-    else {
-        if (fabs([calendarView.selectedDate timeIntervalSinceNow]) < NOW_INTERVAL)
-            url = [_camera liveUrl];
-        else
-            url = [_camera archiveUrlForDate:calendarView.selectedDate];
-    }
-    
+    self.imageView.username = url.user;
+    self.imageView.password = url.password;
     self.imageView.url = url;
     [self.imageView play];
 }
 
-- (void)setUrlAndPlay {
-    NSURL *liveUrl = [_camera liveUrl];
-    self.imageView.username = liveUrl.user;
-    self.imageView.password = liveUrl.password;
-    self.imageView.url = liveUrl;
-    [self.imageView play];
+- (void)gotoLive:(id)sender {
+    _playingLive = YES;
+    [self gotoURL:[_camera liveUrl]];
+}
+
+- (void)gotoDate:(NSDate*)date {
+    NSTimeInterval timeSinceNow = [date timeIntervalSinceNow];
+    if (timeSinceNow > 0 || -timeSinceNow < NOW_INTERVAL) {
+        [self gotoLive:self];
+    } else {
+        _playingLive = NO;
+        [self gotoURL:[_camera archiveUrlForDate:date]];
+    }
+}
+
+- (IBAction)showPopover:(id)sender {
+    if (calendarPopover)
+        [calendarPopover dismissPopoverAnimated:YES];
+    else
+        [self performSegueWithIdentifier:@"setTime" sender:sender];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"setTime"]) {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+            calendarPopover = [(UIStoryboardPopoverSegue*)segue popoverController];
+        
+        UINavigationController *navigationViewController = segue.destinationViewController;
+        HDWCalendarViewController *calendarViewController = (HDWCalendarViewController *)navigationViewController.topViewController;
+        if (_lastSelectedDate) {
+            [calendarViewController setSelectedDate:_lastSelectedDate];
+        }
+        [calendarViewController setVideoView: self];
+    }
+}
+
+- (void)onCalendarDispose: (HDWCalendarViewController *)calendarView {
+    _lastSelectedDate = calendarView.selectedDate;
+    [self gotoDate:_lastSelectedDate];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    UIBarButtonItem *liveButton =
-        [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
-    
-    UIBarButtonItem *archiveButton =
-        [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
-    
-    self.navigationItem.rightBarButtonItems = @[liveButton, archiveButton];
+    _liveButton = [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
+//    _archiveButton = [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
+    _archiveButton = self.navigationItem.rightBarButtonItem;
+   
+    self.navigationItem.rightBarButtonItems = @[_liveButton, _archiveButton];
 
     self.imageView.allowSelfSignedCertificates = YES;
     self.imageView.allowClearTextCredentials = YES;
@@ -110,14 +129,8 @@
                                              selector:@selector(onAppWillEnterForeground:)
                                                  name:UIApplicationWillEnterForegroundNotification
                                                object:nil];
-    [self setUrlAndPlay];
-//    self.scrollView.minimumZoomScale=0.5;
-//    self.scrollView.maximumZoomScale=6.0;
-//    self.scrollView.contentSize=CGSizeMake(1280, 720);
-//    self.scrollView.delegate=self;
     
-    
-	// Do any additional setup after loading the view.
+    [self gotoLive:self];
 }
 
 - (void)dealloc {
@@ -135,6 +148,6 @@
 }
 
 - (void)onAppWillEnterForeground:(NSNotification *)notification {
-    [self setUrlAndPlay];
+    [self.imageView play];
 }
 @end

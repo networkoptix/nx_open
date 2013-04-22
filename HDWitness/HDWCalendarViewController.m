@@ -15,8 +15,8 @@
 
 @implementation HDWCalendarViewController
 
-- (NSDate*)selectedDate {
-    return [self.datePicker date];
+- (void)setVideoView:(id)videoView {
+    _videoView = videoView;
 }
 
 - (BOOL)liveSelected {
@@ -24,6 +24,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
+    _selectedDate = [self.datePicker date];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -44,7 +45,6 @@
     _liveSelected = YES;
     
     [self.navigationController popViewControllerAnimated:YES];
-//    [self performSegueWithIdentifier:@"unwindCalendar" sender:self];
 }
 
 - (void)viewDidLoad
@@ -52,10 +52,6 @@
     [super viewDidLoad];
 
     _liveSelected = NO;
-    
-//    UIBarButtonItem *archiveButton =
-//        [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
-//    self.navigationItem.rightBarButtonItem = archiveButton;
 }
 
 - (void)didReceiveMemoryWarning
@@ -69,13 +65,16 @@
     [super viewDidUnload];
 }
 
--(void) viewWillDisappear:(BOOL)animated {
-    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) {
-        HDWVideoViewController* videoViewController = [self.navigationController.viewControllers lastObject];
-        [videoViewController onCalendarDispose:self];
-        // back button was pressed.  We know this is true because self is no longer
-        // in the navigation stack.
-    }
+- (void)viewWillAppear:(BOOL)animated {
+    if (self.selectedDate)
+        self.datePicker.date = _selectedDate;
+    [super viewWillAppear:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    _selectedDate = self.datePicker.date;
+    
+    [(HDWVideoViewController*)_videoView onCalendarDispose:self];
     
     [super viewWillDisappear:animated];
 }

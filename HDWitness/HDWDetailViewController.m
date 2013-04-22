@@ -128,6 +128,18 @@ enum State {
     [self performNextStep];
 }
 
+- (void)handleDisableChange:(HDWCameraModel*)camera withDisabled:(BOOL)disabled newCameras:(NSMutableArray*)newCameras andRemovedCameras:(NSMutableArray*)removedCameras {
+    if (disabled) {
+        NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:camera.cameraId andServerId:camera.server.serverId];
+        [camera setDisabled:YES];
+        [removedCameras addObject:indexPath];
+    } else {
+        [camera setDisabled:NO];
+        NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:camera.cameraId andServerId:camera.server.serverId];
+        [newCameras addObject:indexPath];
+    }
+}
+
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)rawMessage {
     NSString *messageString = (NSString*)rawMessage;
     NSData *messageData = [messageString dataUsingEncoding:NSUTF8StringEncoding];
@@ -138,83 +150,101 @@ enum State {
     int messageType = [message[@"type"] intValue];
     NSString *objectName = message[@"objectName"];
 
+    NSLog(@"Message: %d, Object:%@", messageType, objectName);
+    
     NSMutableIndexSet *newServers = [NSMutableIndexSet indexSet];
     NSMutableArray *newCameras = [NSMutableArray array];
     
     NSMutableArray *removedCameras = [NSMutableArray array];
     NSMutableIndexSet *removedServers = [NSMutableIndexSet indexSet];
 
-    if (messageType == MessageType_ResourceChange) {
-        NSDictionary *resource = message[@"resource"];
-        
-        // resource changed
-        if ([objectName isEqual: @"Server"]) {
-            HDWServerModel* server = [[HDWServerModel alloc] initWithDict:resource andECS:_ecsModel];
-            
-            NSUInteger index = [_ecsModel addOrUpdateServer:server];
-            if (index != NSNotFound) {
-                [newServers addIndex:index];
-            }
-        } else if ([objectName isEqual: @"Camera"]) {
-            HDWCameraModel* camera = [[HDWCameraModel alloc] initWithDict:resource andServer:[_ecsModel findServerById:resource[@"parentId"]]];
-            
-            NSIndexPath* indexPath = [_ecsModel addOrReplaceCamera:camera];
-            if (indexPath) {
-                [newCameras addObject:indexPath];
-            }
-        }
-    } else if (messageType == MessageType_ResourceDelete) {
-        NSNumber *resourceId = message[@"resourceId"];
-        NSNumber *parentId = message[@"parentId"];
-        
-        if ([_ecsModel findServerById:resourceId]) {
-            NSUInteger serverIndex = [_ecsModel indexOfServerWithId:resourceId];
-            
-            if (serverIndex != NSNotFound) {
-                [removedServers addIndex:serverIndex];
-                [_ecsModel removeServerById:resourceId];
-            }
-        } else if ([_ecsModel findCameraById:resourceId atServer:parentId]) {
-            NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:resourceId andServerId:parentId];
-            if (indexPath) {
-                [removedCameras addObject:indexPath];
-                [_ecsModel removeCameraById:resourceId andServerId:parentId];
-            }
-        }
-    } else if (messageType == MessageType_ResourceStatusChange) {
-        if ([message objectForKey:@"parentId"]) {
-            HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
-            [camera setStatus:message[@"status"]];
-        } else {
-            HDWServerModel *server = [_ecsModel findServerById:message[@"resourceId"]];
-            [server setStatus:message[@"status"]];
-        }
-    } else if (messageType == MessageType_ResourceDisabledChange) {
-        HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
-        int disabled = ((NSString*)message[@"disabled"]).intValue;
-        if (disabled) {
-            NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:message[@"resourceId"] andServerId:message[@"parentId"]];
-            [camera setDisabled:YES];
-            
-            [removedCameras addObject:indexPath];
-        } else {
-            [camera setDisabled:NO];
-            NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:message[@"resourceId"] andServerId:message[@"parentId"]];
-            
-            [newCameras addObject:indexPath];
-        }
-        
-    }
-
     [self.collectionView performBatchUpdates:^{
-        [self.collectionView deleteItemsAtIndexPaths:removedCameras];
-        [self.collectionView deleteSections:removedServers];
-        
-        [self.collectionView insertSections:newServers];
-        [self.collectionView insertItemsAtIndexPaths:newCameras];
 
-//        [self.collectionView reloadItemsAtIndexPaths:indexPaths];
+        if (messageType == MessageType_ResourceChange) {
+            NSDictionary *resource = message[@"resource"];
+            
+            // resource changed
+            if ([objectName isEqual: @"Server"]) {
+                HDWServerModel* server = [[HDWServerModel alloc] initWithDict:resource andECS:_ecsModel];
+                
+                NSUInteger index = [_ecsModel addOrUpdateServer:server];
+                if (index != NSNotFound) {
+                    [newServers addIndex:index];
+                }
+            } else if ([objectName isEqual: @"Camera"]) {
+                NSNumber *cameraId = resource[@"id"];
+                NSNumber *serverId = resource[@"parentId"];
+                
+                HDWCameraModel* existing = [_ecsModel findCameraById:cameraId atServer:serverId];
+                HDWServerModel *server = [_ecsModel findServerById:serverId];
+                
+                HDWCameraModel* camera = [[HDWCameraModel alloc] initWithDict:resource andServer:server];
+
+                NSLog(@"Before: %d", server.enabledCameras.count);
+                NSIndexPath* indexPath = [_ecsModel addOrReplaceCamera:camera];
+                if (indexPath) { // Camera is added
+                    [newCameras addObject:indexPath];
+                } else if (camera.disabled != existing.disabled) {
+                    camera.disabled = existing.disabled;
+                    [self handleDisableChange:camera withDisabled:!camera.disabled newCameras:newCameras andRemovedCameras:removedCameras];
+                }
+                NSLog(@"After: %d", server.enabledCameras.count);
+            }
+        } else if (messageType == MessageType_ResourceDelete) {
+            NSNumber *resourceId = message[@"resourceId"];
+            NSNumber *parentId = message[@"parentId"];
+            
+            if ([_ecsModel findServerById:resourceId]) {
+                NSUInteger serverIndex = [_ecsModel indexOfServerWithId:resourceId];
+                
+                if (serverIndex != NSNotFound) {
+                    [removedServers addIndex:serverIndex];
+                    [_ecsModel removeServerById:resourceId];
+                }
+            } else if ([_ecsModel findCameraById:resourceId atServer:parentId]) {
+                NSIndexPath *indexPath = [_ecsModel indexPathOfCameraWithId:resourceId andServerId:parentId];
+                if (indexPath) {
+                    [removedCameras addObject:indexPath];
+                    [_ecsModel removeCameraById:resourceId andServerId:parentId];
+                }
+            }
+        } else if (messageType == MessageType_ResourceStatusChange) {
+            if ([message objectForKey:@"parentId"]) {
+                HDWCameraModel *camera = [_ecsModel findCameraById:message[@"resourceId"] atServer:message[@"parentId"]];
+                [camera setStatus:message[@"status"]];
+            } else {
+                HDWServerModel *server = [_ecsModel findServerById:message[@"resourceId"]];
+                [server setStatus:message[@"status"]];
+            }
+        } else if (messageType == MessageType_ResourceDisabledChange) {
+            NSNumber *cameraId = message[@"resourceId"];
+            NSNumber *serverId = message[@"parentId"];
+            
+            HDWCameraModel *camera = [_ecsModel findCameraById:cameraId atServer:serverId];
+            int disabled = ((NSString*)message[@"disabled"]).intValue;
+            if (camera.disabled != disabled)
+                [self handleDisableChange:camera withDisabled:disabled newCameras:newCameras andRemovedCameras:removedCameras];
+        }
+
+        if (removedCameras.count != 0) {
+            [self.collectionView deleteItemsAtIndexPaths:removedCameras];
+        }
+        if (removedServers.count != 0) {
+            [self.collectionView deleteSections:removedServers];
+        }
+        
+        if (newServers.count != 0) {
+            NSLog(@"Inserting servers");
+            [self.collectionView insertSections:newServers];
+        }
+        
+        if (newCameras.count != 0) {
+            NSLog(@"Inserting cameras");
+            [self.collectionView insertItemsAtIndexPaths:newCameras];
+        }
+        
         [self.collectionView reloadData];
+//        [self.collectionView reloadItemsAtIndexPaths:indexPaths];
     } completion:nil];
 }
 
@@ -451,7 +481,7 @@ enum State {
 -(NSInteger)collectionView:(PSUICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     HDWServerModel* server = [_ecsModel serverAtIndex: section];
     
-    return server.cameraCount;
+    return server.enabledCameras.count;
 }
 
 -(PSUICollectionViewCell *)collectionView:(PSUICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {

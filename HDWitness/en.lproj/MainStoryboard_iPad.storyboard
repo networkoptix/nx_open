@@ -371,11 +371,19 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
-                    <navigationItem key="navigationItem" id="abA-SN-XVU"/>
+                    <navigationItem key="navigationItem" id="abA-SN-XVU">
+                        <barButtonItem key="rightBarButtonItem" title="Archive" id="F5t-Iu-ZRK">
+                            <connections>
+                                <action selector="showPopover:" destination="goE-Yp-YX7" id="J6T-ze-Du4"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="imageView" destination="I6k-5V-bDZ" id="ZLO-bh-zPk"/>
                         <outlet property="scrollView" destination="pDb-QM-ziA" id="wVx-Sm-Uo9"/>
-                        <segue destination="Lf8-fT-f5B" kind="push" identifier="setTime" id="kIR-7Q-wfd"/>
+                        <segue destination="X27-OC-Yo7" kind="popover" identifier="setTime" popoverAnchorBarButtonItem="F5t-Iu-ZRK" id="tsa-4e-H0e">
+                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                        </segue>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1MR-9f-OTy" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -387,11 +395,11 @@
             <objects>
                 <viewController id="Lf8-fT-f5B" customClass="HDWCalendarViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="j27-39-GdW">
-                        <rect key="frame" x="0.0" y="64" width="703" height="704"/>
+                        <rect key="frame" x="0.0" y="64" width="1024" height="704"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" id="Kjb-mh-one">
-                                <rect key="frame" x="0.0" y="0.0" width="703" height="216"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="216"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <date key="date" timeIntervalSinceReferenceDate="387728201.57793599">
                                     <!--2013-04-15 14:16:41 +0000-->
@@ -423,6 +431,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <navigationItem key="navigationItem" id="559-0J-REn"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="320" height="180"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                     <connections>
                         <outlet property="datePicker" destination="Kjb-mh-one" id="vYl-gq-Dpw"/>
@@ -430,7 +439,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GcB-RN-rK2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3866" y="756"/>
+            <point key="canvasLocation" x="5032" y="756"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="QCo-3r-yJy">
@@ -451,6 +460,24 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
             </objects>
             <point key="canvasLocation" x="1690" y="-533"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="qWk-lW-fmO">
+            <objects>
+                <navigationController id="X27-OC-Yo7" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Iun-C1-S4T">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Lf8-fT-f5B" kind="relationship" relationship="rootViewController" id="oCo-a3-239"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="quv-Dm-vUx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3866" y="756"/>
+        </scene>
     </scenes>
     <resources>
         <image name="camera_offline.png" width="128" height="128"/>
@@ -463,6 +490,8 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <class className="HDWCalendarViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWCalendarViewController.h"/>
             <relationships>
+                <relationship kind="action" name="onCancel:"/>
+                <relationship kind="action" name="onDone:"/>
                 <relationship kind="outlet" name="datePicker" candidateClass="UIDatePicker"/>
             </relationships>
         </class>
@@ -473,7 +502,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
                 <relationship kind="outlet" name="labelView" candidateClass="UILabel"/>
             </relationships>
         </class>
-        <class className="HDWDetailViewController" superclassName="PSUICollectionViewController">
+        <class className="HDWDetailViewController" superclassName="PSUICollectionViewController_">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWDetailViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="detailDescriptionLabel" candidateClass="UILabel"/>
@@ -491,6 +520,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <class className="HDWVideoViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/HDWVideoViewController.h"/>
             <relationships>
+                <relationship kind="action" name="showPopover:"/>
                 <relationship kind="outlet" name="imageView" candidateClass="MotionJpegImageView"/>
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
             </relationships>
@@ -522,6 +552,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="Qa3-fe-Cge"/>
+        <segue reference="51"/>
     </inferredMetricsTieBreakers>
 </document>

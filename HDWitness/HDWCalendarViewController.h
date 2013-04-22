@@ -10,10 +10,13 @@
 
 @interface HDWCalendarViewController : UIViewController {
     BOOL _liveSelected;
+    id _videoView;
 }
 
 @property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
-@property (readonly) NSDate* selectedDate;
+@property NSDate* selectedDate;
+
+- (void)setVideoView:(id)videoView;
 
 - (BOOL)liveSelected;
 
