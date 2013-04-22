@@ -17,12 +17,17 @@ QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
 QnCustomFileDialog::~QnCustomFileDialog() {
 }
 
-void QnCustomFileDialog::addCheckbox(const QString &text, bool *value) {
+void QnCustomFileDialog::addCheckbox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate) {
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);
     checkbox->setChecked(*value);
     m_checkboxes.insert(checkbox, value);
     addWidget(checkbox);
+
+    if (delegate) {
+        delegate->setCheckbox(checkbox);
+        connect(this, SIGNAL(filterSelected(QString)), delegate, SLOT(at_filterSelected(QString)));
+    }
 }
 
 void QnCustomFileDialog::addWidget(QWidget *widget) {
