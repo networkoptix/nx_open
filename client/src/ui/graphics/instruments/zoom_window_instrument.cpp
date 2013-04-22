@@ -452,6 +452,9 @@ bool ZoomWindowInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
 }
 
 bool ZoomWindowInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if(event->button() != Qt::LeftButton)
+        return false;
+
     QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
     if(!(target->options() & QnResourceWidget::ControlZoomWindow))
         return false;

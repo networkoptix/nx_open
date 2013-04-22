@@ -3264,11 +3264,20 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 }
 
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
-    QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
     if(!widget)
         return;
 
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), QRectF(0.25, 0.25, 0.5, 0.5), widget->item()->uuid());
+    QRectF rect;
+    if(params.hasArgument(Qn::ZoomWindowArgument)) {
+        rect = params.argument<QRectF>(Qn::ZoomWindowArgument);
+    } else {
+        rect = QRectF(0.25, 0.25, 0.5, 0.5);
+    }
+
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), rect, widget->item()->uuid());
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
