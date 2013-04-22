@@ -189,6 +189,7 @@ protected slots:
     void at_tourModeLabel_finished();
 
     void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
+
 private:
     /* Global state. */
 

@@ -99,37 +99,6 @@
 #endif
 
 namespace {
-    QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
-        QAction *result = new QAction(text, parent);
-        result->setShortcut(shortcut);
-        return result;
-    }
-
-    QRegion createRoundRegion(int rSmall, int rLarge, const QRect &rect) {
-        QRegion region;
-
-        int circleX = rLarge;
-
-        int circleY = rSmall-1;
-        for (int y = 0; y < qMin(rect.height(), rSmall); ++y)
-        {
-            // calculate circle Point
-            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
-            region += QRect(x,y, rect.width()-x*2,1);
-        }
-        for (int y = qMin(rect.height(), rSmall); y < rect.height() - rSmall; ++y)
-            region += QRect(0,y, rect.width(),1);
-
-        circleY = rect.height() - rSmall;
-        for (int y = rect.height() - rSmall; y < rect.height(); ++y)
-        {
-            // calculate circle Point
-            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
-            region += QRect(x,y, rect.width()-x*2,1);
-        }
-        return region;
-    }
-
     QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
