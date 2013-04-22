@@ -2333,7 +2333,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             if(widget->resource()->flags() & QnResource::utc) {
                 timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
             } else {
-                timeStamp = QTime().addMSecs(time).toString(lit("hh:mmSss"));
+                timeStamp = QTime().addMSecs(time).toString(lit("hh:mm:ss"));
             }
 
             QFont font;
@@ -2348,7 +2348,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
 
             QPainterPath path;
-            path.addText(screenshot.width() - tsWidht - spacing, screenshot.height() - tsDescent - spacing, font, timeStamp);
+            path.addText(screenshot.width() - tsWidht - spacing*2, screenshot.height() - tsDescent - spacing, font, timeStamp);
 
             p.drawPath(path);
         }
