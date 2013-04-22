@@ -41,17 +41,70 @@ namespace {
     }
 
     /** Get corresponding color from config */
-    QColor getColorByKey(const QString &key) {
+    QColor getDeviceColor(QnStatisticsDeviceType deviceType, const QString &key) {
         QnStatisticsColors colors = qnGlobals->statisticsColors();
-        if (key == QLatin1String("CPU"))
+        switch (deviceType) {
+        case CPU:
             return colors.cpu;
-        if (key == QLatin1String("RAM"))
+        case RAM:
             return colors.ram;
-        return colors.hddByKey(key);
+        case HDD:
+            return colors.hddByKey(key);
+        case NETWORK_IN:
+            return colors.networkInByKey(key);
+        case NETWORK_OUT:
+            return colors.networkOutByKey(key);
+        default:
+            break;
+        }
+        return QColor(Qt::white);
+    }
+
+    qreal maxValue(const QLinkedList<qreal> &values) {
+        qreal result = 0;
+        for(QLinkedList<qreal>::const_iterator pos = values.begin(); pos != values.end(); pos++) {
+            if (*pos > result)
+                result = *pos;
+        }
+        return result;
+    }
+
+    QLinkedList<qreal> scaledNetworkValues(const QLinkedList<qreal> &values, const qreal upperBound) {
+        if (qFuzzyCompare(upperBound, 0.0))
+            return values;
+
+        QLinkedList<qreal> result;
+        for(QLinkedList<qreal>::const_iterator pos = values.begin(); pos != values.end(); pos++) {
+            result << *pos/upperBound;
+        }
+        return result;
+    }
+
+    QList<QString> initNetworkSuffixes() {
+        QList<QString> result;
+        result << QObject::tr("b/s");
+        result << QObject::tr("Kb/s");
+        result << QObject::tr("Mb/s");
+        result << QObject::tr("Gb/s");
+        result << QObject::tr("Tb/s");
+        return result;
+    }
+    const QList<QString> networkSuffixes = initNetworkSuffixes();
+
+    QString networkLoadText(const qreal value, qreal upperBound) {
+        int idx = 0;
+        qreal upper = upperBound / 1024;
+        while (upper >= 1.0) {
+            upperBound = upper;
+            upper = upperBound / 1024;
+            idx++;
+        }
+        idx = qMin(idx, networkSuffixes.size() - 1);
+        return QString(QLatin1String("%1 %2")).arg(QString::number(value*upperBound, 'f', 2)).arg(networkSuffixes.at(idx));
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
+    QPainterPath createChartPath(const QLinkedList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
         QPainterPath path;
         qreal maxValue = -1;
         //qreal value;
@@ -69,10 +122,10 @@ namespace {
         bool last = false;
         *currentValue = -1;
         
-        QLinkedList<qreal>::const_iterator backPos = values.values.end();
+        QLinkedList<qreal>::const_iterator backPos = values.end();
         backPos--;
 
-        for(QLinkedList<qreal>::const_iterator pos = values.values.begin(); pos != values.values.end(); pos++) {
+        for(QLinkedList<qreal>::const_iterator pos = values.begin(); pos != values.end(); pos++) {
             qreal value = qMin(*pos, 1.0);
             value = qMax(value, 0.0);
             last = pos == backPos;
@@ -174,10 +227,17 @@ namespace {
         return path;
     }
 
+    /** Backward sorting because buttonBar inserts buttons in reversed order */
     bool statisticsDataLess(const QnStatisticsData &first, const QnStatisticsData &second) {
+        if (
+                (first.deviceType == NETWORK_IN || first.deviceType == NETWORK_OUT) &&
+                (second.deviceType == NETWORK_IN || second.deviceType == NETWORK_OUT)
+            )
+            return first.description.toLower() > second.description.toLower();
+
         if (first.deviceType != second.deviceType)
-            return first.deviceType < second.deviceType;
-        return first.description.toLower() < second.description.toLower();
+            return first.deviceType > second.deviceType;
+        return first.description.toLower() > second.description.toLower();
     }
 
     class QnBackgroundGradientPainterFactory {
@@ -190,10 +250,9 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
-    const int legendImgSize = 24;
-    const int legendFontSize = 22;
+    const int legendImgSize = 20;
+    const int legendFontSize = 20;
     const int itemSpacing = 2;
-    const int legendMaxSize = 100;
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
@@ -203,8 +262,9 @@ class LegendButtonWidget: public QnImageButtonWidget {
     typedef QnImageButtonWidget base_type;
 
 public:
-    LegendButtonWidget(const QString &key):
+    LegendButtonWidget(QnStatisticsDeviceType deviceType, const QString &key):
         base_type(NULL, 0),
+        m_deviceType(deviceType),
         m_key(key)
     {
         setCheckable(true);
@@ -230,7 +290,10 @@ protected:
                 return QSizeF(legendImgSize + QFontMetrics(font).width(m_key) + itemSpacing*2, legendImgSize + itemSpacing);
             }
         case Qt::MaximumSize:
-            return QSizeF(legendMaxSize, legendImgSize + itemSpacing);
+            {
+                QSizeF hint = base_type::sizeHint(which, constraint);
+                return QSizeF(hint.width(), legendImgSize + itemSpacing);
+            }
         default:
             break;
         }
@@ -252,7 +315,7 @@ protected:
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
-            QColor keyColor = getColorByKey(m_key);
+            QColor keyColor = getDeviceColor(m_deviceType, m_key);
             painter->setBrush(keyColor);
             painter->drawRoundedRect(imgRect, 4, 4);
 
@@ -266,6 +329,7 @@ protected:
         painter->setOpacity(opacity);
     }
 private:
+    QnStatisticsDeviceType m_deviceType;
     QString m_key;
 };
 
@@ -307,7 +371,7 @@ protected:
 
         bool isEmpty = m_widget->m_sortedKeys.isEmpty();
 
-        qreal offsetX = isEmpty ? itemSpacing : painter->fontMetrics().width(QLatin1String("100%"));
+        qreal offsetX = isEmpty ? itemSpacing : itemSpacing * 2 + painter->fontMetrics().width(QLatin1String("100%"));
         qreal offsetTop = isEmpty? itemSpacing : painter->fontMetrics().height() + itemSpacing;
         qreal offsetBottom = itemSpacing;
 
@@ -347,6 +411,18 @@ protected:
         }
 
         QMap<QString, qreal> displayValues;
+        qreal maxNetworkValue = 0.0;
+        foreach(QString key, m_widget->m_sortedKeys) {
+            if (!m_widget->m_checkedFlagByKey.value(key, true))
+                continue;
+
+            QnStatisticsData &stats = m_widget->m_history[key];
+            if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
+                maxNetworkValue = qMax(maxNetworkValue, maxValue(stats.values));
+        }
+        qreal networkUpperBound = qFuzzyCompare(maxNetworkValue, 0.0) ? 0.0 : 1.0;
+        while (maxNetworkValue > networkUpperBound)
+            networkUpperBound *= 2;
 
         /** Draw graph lines */
         {
@@ -368,10 +444,14 @@ protected:
                     continue;
 
                 QnStatisticsData &stats = m_widget->m_history[key];
+                QLinkedList<qreal> values = stats.values;
+                if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
+                    values = scaledNetworkValues(values, networkUpperBound);
+
                 qreal currentValue = 0;
-                QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - 2*space_offset) , elapsed_step, &currentValue);
+                QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset) , elapsed_step, &currentValue);
                 displayValues[key] = currentValue;
-                graphPen.setColor(getColorByKey(key));
+                graphPen.setColor(getDeviceColor(stats.deviceType, key));
                 painter->strokePath(path, graphPen);
             }
         }
@@ -394,18 +474,34 @@ protected:
                 qreal opacity = painter->opacity();
                 painter->setOpacity(opacity * m_widget->m_infoOpacity);
 
-                qreal x = (offsetX * 1.1 + ow);
+                qreal xRight = offsetX + ow + itemSpacing*2;
+                qreal xLeft  = itemSpacing;
                 foreach(QString key, m_widget->m_sortedKeys) {
                     if (!m_widget->m_checkedFlagByKey.value(key, true))
                         continue;
 
                     qreal interValue = displayValues[key];
-                    main_pen.setColor(getColorByKey(key));
-                    painter->setPen(main_pen);
+                    if (interValue < 0)
+                        continue;
                     qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
-                    if (interValue >= 0)
-                        painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
+
+                    QnStatisticsData &stats = m_widget->m_history[key];
+                    main_pen.setColor(getDeviceColor(stats.deviceType, key));
+                    painter->setPen(main_pen);
+
+                    if (stats.deviceType == NETWORK_OUT || stats.deviceType == NETWORK_IN) {
+                        painter->drawText(xLeft, y, networkLoadText(interValue, networkUpperBound));
+                    } else {
+                        painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
+                    }
                 }
+
+                if (networkUpperBound > 0) {
+                    main_pen.setColor(qnGlobals->statisticsColors().networkLimit);
+                    painter->setPen(main_pen);
+                    painter->drawText(xLeft, offsetTop*1.5, networkLoadText(1.0, networkUpperBound));
+                }
+
                 painter->setOpacity(opacity);
             }
         }
@@ -612,7 +708,8 @@ void QnServerResourceWidget::updateLegend() {
         visibleMask |= mask;
 
         if (!m_legendButtonBar->button(mask)) {
-            m_legendButtonBar->addButton(mask, new LegendButtonWidget(key));
+            QnStatisticsData &stats = m_history[key];
+            m_legendButtonBar->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
         }
 
         bool checked =  m_checkedFlagByKey.value(key, true);

@@ -47,14 +47,16 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
 
 public:
     enum Option {
-        DisplayActivityOverlay      = 0x1,  /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelectionOverlay     = 0x2,  /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x4,  /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        DisplayButtons              = 0x8,  /**< Whether item buttons are to be displayed. */
-        DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x20, // TODO
-        ControlPtz                  = 0x40, // TODO
-        DisplayInfo                 = 0x80  /** Whether info panel is to be displayed. */
+        DisplayActivityOverlay      = 0x001,    /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelectionOverlay     = 0x002,    /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        DisplayButtons              = 0x008,    /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x020,    /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x040,    /** Whether info panel is to be displayed. */
+
+        ControlPtz                  = 0x100,    /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x200,    /**< Whether zoom windows can be created by dragging the mouse. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -280,6 +282,7 @@ protected:
     };
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;

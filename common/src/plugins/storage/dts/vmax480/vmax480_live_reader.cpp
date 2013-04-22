@@ -88,6 +88,7 @@ bool QnVMax480LiveProvider::isStreamOpened() const
 
 void QnVMax480LiveProvider::beforeRun()
 {
+    CLServerPushStreamreader::beforeRun();
     //msleep(300);
 }
 

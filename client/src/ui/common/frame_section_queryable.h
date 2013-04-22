@@ -30,6 +30,14 @@ public:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const = 0;
 
     /**
+     * \param section                   Frame section to get cursor for.
+     * \returns                         Cursor to use for the given section.
+     */
+    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const {
+        return Qn::calculateHoverCursorShape(section);
+    }
+
+    /**
      * This function calculates frame section with the highest priority that
      * intersects the given region. Section are prioritized in "natural" order,
      * e.g. corner sections are prioritized over side ones.
@@ -39,6 +47,16 @@ public:
      */
     Qt::WindowFrameSection windowFrameSectionAt(const QRectF &region) const {
         return toNaturalQtFrameSection(windowFrameSectionsAt(region));
+    }
+
+    /**
+     * Helper overload for Qt frame sections.
+     *
+     * \param section                   Frame section to get cursor for.
+     * \returns                         Cursor to use for the given section.
+     */
+    QCursor windowCursorAt(Qt::WindowFrameSection section) const {
+        return windowCursorAt(Qn::toQnFrameSection(section));
     }
 
 };

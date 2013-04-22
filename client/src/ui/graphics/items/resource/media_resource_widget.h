@@ -98,7 +98,6 @@ signals:
     void zoomRectChanged();
 
 protected:
-    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void channelLayoutChangedNotify() override;
@@ -136,6 +135,7 @@ private slots:
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
+    void at_zoomWindowButton_toggled(bool checked);
 
     void at_camDisplay_liveChanged();
 

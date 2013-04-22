@@ -9,7 +9,9 @@
 enum  QnStatisticsDeviceType {
     CPU,
     RAM,
-    HDD
+    HDD,
+    NETWORK_IN,
+    NETWORK_OUT
 };
 
 struct QnStatisticsDataItem {

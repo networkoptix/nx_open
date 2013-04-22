@@ -312,18 +312,19 @@ int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList& headers, co
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
 {
     QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList params;
-    params.append(QnRequestParam("ping", "1"));
+    QnRequestParamList requestParams(m_requestParams);
 
-    return connectAsync_i(requestHeaders, params, target, slot);
+    requestParams.append(QnRequestParam("ping", "1"));
+
+    return connectAsync_i(requestHeaders, requestParams, target, slot);
 }
 
 int QnAppServerConnection::connectAsync(QObject* target, const char *slot)
 {
     QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList params;
+    QnRequestParamList requestParams(m_requestParams);
 
-    return connectAsync_i(requestHeaders, params, target, slot);
+    return connectAsync_i(requestHeaders, requestParams, target, slot);
 }
 
 int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo)
@@ -331,10 +332,10 @@ int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo)
     m_lastError.clear();
 
     QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList params;
+    QnRequestParamList requestParams(m_requestParams);
 
     QnHTTPRawResponse response;
-    int status = QnSessionManager::instance()->sendPostRequest(m_url, m_objectNameMapper->name(ConnectObject), requestHeaders, params, QByteArray(), response);
+    int status = QnSessionManager::instance()->sendPostRequest(m_url, m_objectNameMapper->name(ConnectObject), requestHeaders, requestParams, QByteArray(), response);
     if (status == 0)
     {
         try {

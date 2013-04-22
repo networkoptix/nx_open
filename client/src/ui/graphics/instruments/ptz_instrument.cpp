@@ -36,7 +36,6 @@
 #include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 
 #include "selection_item.h"
-#include "utils/settings.h"
 
 //#define QN_PTZ_INSTRUMENT_DEBUG
 #ifdef QN_PTZ_INSTRUMENT_DEBUG
@@ -999,10 +998,6 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
         return false;
     }
 
-    QGraphicsObject *object = item->toGraphicsObject();
-    if(!object)
-        return false;
-
     QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
     if(!(target->options() & QnResourceWidget::ControlPtz))
         return false;
@@ -1041,9 +1036,9 @@ void PtzInstrument::startDrag(DragInfo *) {
     m_isClick = false;
     m_ptzStartedEmitted = false;
 
-    if(target() == NULL) {
+    if(!target()) {
         /* Whoops, already destroyed. */
-        dragProcessor()->reset();
+        reset();
         return;
     }
 
@@ -1068,8 +1063,8 @@ void PtzInstrument::startDrag(DragInfo *) {
 }
 
 void PtzInstrument::dragMove(DragInfo *info) {
-    if(target() == NULL) {
-        dragProcessor()->reset();
+    if(!target()) {
+        reset();
         return;
     }
 

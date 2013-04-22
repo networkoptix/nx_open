@@ -133,27 +133,31 @@ Qn::WindowFrameSections Qn::calculateRectangularFrameSections(const QRect &frame
     return calculateRectangularFrameSectionsInternal<int, QRect>(frameRect, rect, query);
 }
 
-Qt::CursorShape Qn::calculateHoverCursorShape(Qt::WindowFrameSection section) {
+Qt::CursorShape Qn::calculateHoverCursorShape(Qn::WindowFrameSection section) {
     switch (section) {
-    case Qt::TopLeftSection:
-    case Qt::BottomRightSection:
+    case Qn::TopLeftSection:
+    case Qn::BottomRightSection:
         return Qt::SizeFDiagCursor;
-    case Qt::TopRightSection:
-    case Qt::BottomLeftSection:
+    case Qn::TopRightSection:
+    case Qn::BottomLeftSection:
         return Qt::SizeBDiagCursor;
-    case Qt::LeftSection:
-    case Qt::RightSection:
+    case Qn::LeftSection:
+    case Qn::RightSection:
         return Qt::SizeHorCursor;
-    case Qt::TopSection:
-    case Qt::BottomSection:
+    case Qn::TopSection:
+    case Qn::BottomSection:
         return Qt::SizeVerCursor;
-    case Qt::NoSection:
-    case Qt::TitleBarArea:
+    case Qn::NoSection:
+    case Qn::TitleBarArea:
         return Qt::ArrowCursor;
     default:
         qnWarning("Invalid window frame section '%1'.", section);
         return Qt::ArrowCursor;
     }
+}
+
+Qt::CursorShape Qn::calculateHoverCursorShape(Qt::WindowFrameSection section) {
+    return calculateHoverCursorShape(toQnFrameSection(section));
 }
 
 

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtCore/QElapsedTimer>
+
 #include <utils/common/warnings.h>
 
 #include <sigar.h>
@@ -87,16 +89,58 @@ public:
         return result;
     }
 
+    QnPlatformMonitor::NetworkLoad networkLoad(const QString &interfaceName) {
+        QnPlatformMonitor::NetworkLoad result;
+        result.interfaceName = interfaceName;
+
+        if(!sigar)
+            return result;
+
+        sigar_net_interface_stat_t current;
+        if (INVOKE(sigar_net_interface_stat_get(sigar, interfaceName.toLatin1().constData(), &current) != SIGAR_OK))
+            return result;
+
+
+        if(!lastNetworkStatByInterfaceName.contains(interfaceName)) { /* Is this the first call? */
+            NetworkStat stat;
+            stat.stat = current;
+            stat.timer.start();
+            lastNetworkStatByInterfaceName[interfaceName] = stat;
+            return result;
+        }
+
+        NetworkStat &last = lastNetworkStatByInterfaceName[interfaceName];
+        quint64 elapsed = last.timer.isValid()
+                ? last.timer.elapsed()
+                : 0;
+        result.bytesPerSecIn = elapsed > 0
+                ? qMax(current.rx_bytes - last.stat.rx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
+                : 0;
+        result.bytesPerSecOut = elapsed > 0
+                ? qMax(current.tx_bytes - last.stat.tx_bytes, sigar_uint64_t(0)) * 1000 / elapsed
+                : 0;
+        last.stat = current;
+        last.timer.restart();
+        return result;
+    }
+
+
 private:
     const QnSigarMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
+
+    struct NetworkStat {
+        QElapsedTimer timer;
+        sigar_net_interface_stat_t stat;
+    };
 
 private:
     sigar_t *sigar;
     sigar_cpu_t cpu;
     QHash<QString, sigar_disk_usage_t> lastUsageByHddName;
+    QHash<QString, NetworkStat> lastNetworkStatByInterfaceName;
 
 private:
-    Q_DECLARE_PUBLIC(QnSigarMonitor);
+    Q_DECLARE_PUBLIC(QnSigarMonitor)
     QnSigarMonitor *q_ptr;
 };
 
@@ -205,5 +249,24 @@ QList<QnPlatformMonitor::PartitionSpace> QnSigarMonitor::totalPartitionSpaceInfo
     }
 
     INVOKE(sigar_file_system_list_destroy(d->sigar, &fileSystems));
+    return result;
+}
+
+QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
+    Q_D(QnSigarMonitor);
+
+    QList<NetworkLoad> result;
+
+    sigar_net_interface_list_t networkInterfaces;
+
+    if(INVOKE(sigar_net_interface_list_get(d->sigar, &networkInterfaces)) != SIGAR_OK)
+        return result;
+
+    for(uint i = 0; i < networkInterfaces.number; i++) {
+        QString interfaceName = QLatin1String(networkInterfaces.data[i]);
+        result.push_back(d->networkLoad(interfaceName));
+    }
+
+    INVOKE(sigar_net_interface_list_destroy(d->sigar, &networkInterfaces));
     return result;
 }
