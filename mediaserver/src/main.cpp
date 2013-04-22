@@ -548,7 +548,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, settings.value("proxyAuthKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
