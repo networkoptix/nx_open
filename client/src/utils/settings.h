@@ -67,6 +67,11 @@ public:
         POPUP_BUSINESS_EVENTS,
         POPUP_SYSTEM_HEALTH,
 
+        TREE_PINNED,
+        TREE_OPENED,
+        SLIDER_OPENED,
+        TITLE_OPENED,
+
         VARIABLE_COUNT
     };
     
@@ -125,6 +130,10 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isDevMode,              setDevMode,                 DEV_MODE,                   false)
         QN_DECLARE_RW_PROPERTY(quint64,                     popupBusinessEvents,    setPopupBusinessEvents,     POPUP_BUSINESS_EVENTS,      0xFFFFFFFFFFFFFFFFull)
         QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
+        QN_DECLARE_RW_PROPERTY(bool,                        isTreePinned,           setTreePinned,              TREE_PINNED,                true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
     QN_END_PROPERTY_STORAGE()
 
 private:
