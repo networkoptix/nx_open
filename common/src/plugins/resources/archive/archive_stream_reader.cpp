@@ -239,7 +239,7 @@ bool QnArchiveStreamReader::init()
     }
 
     if (!m_delegate->open(m_resource)) {
-        if (requiredJumpTime != AV_NOPTS_VALUE)
+        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(requiredJumpTime); 
         return false;
     }
