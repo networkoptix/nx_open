@@ -15,14 +15,12 @@
 
 
 /*! \main
-    - all classes, implementing \a nxcip interfaces, hold reference to factory class instance 
-        (e.g., \a AxisCameraManager is a factory for \a AxisRelayIOManager, \a AxisMediaEncoder, etc.)
-    - all factory classes (except for \a AxisCameraDiscoveryManager) hold weak reference to child class object (e.g., \a AxisRelayIOManager is a child for \a AxisCameraManager)
-    - if factory have to hold reference to some instance, it uses weak reference to avoid reference loop.
-        E.g., \a AxisCameraManager holds weak reference to \a AxisRelayIOManager
-    - all classes, implementing \a nxcip interfaces, hold reference to \a AxisCameraPlugin instance
+    Object life-time management:\n
+    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
+        to factory class instance (e.g., \a AxisCameraManager is a factory for \a AxisRelayIOManager, \a AxisMediaEncoder, etc.)
+    - all factory classes (except for \a AxisCameraDiscoveryManager) hold pointer to child class object (e.g., \a AxisRelayIOManager is a child for \a AxisCameraManager)
+        and delete all children on destruction
 */
-
 
 class AxisCameraDiscoveryManager;
 
@@ -41,13 +39,14 @@ public:
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
+    unsigned int releaseRef();
+
     QNetworkAccessManager* networkAccessManager();
 
     static AxisCameraPlugin* instance();
 
 private:
-    //!TODO/IMPL this MUST be weak pointer
-    AxisCameraDiscoveryManager* m_discoveryManager;
+    std::auto_ptr<AxisCameraDiscoveryManager> m_discoveryManager;
     //!Used with QNetworkAccessManager
     QThread m_networkEventLoopThread;
     QNetworkAccessManager m_networkAccessManager;

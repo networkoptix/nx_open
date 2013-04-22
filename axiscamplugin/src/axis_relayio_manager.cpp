@@ -21,6 +21,7 @@ AxisRelayIOManager::AxisRelayIOManager(
     unsigned int inputPortCount,
     unsigned int outputPortCount )
 :
+    CommonRefManager( cameraManager ),
     m_cameraManager( cameraManager ),
     m_inputPortCount( inputPortCount ),
     m_outputPortCount( outputPortCount ),
@@ -61,6 +62,10 @@ AxisRelayIOManager::AxisRelayIOManager(
 
     //moving to networkAccessManager thread
     moveToThread( AxisCameraPlugin::instance()->networkAccessManager()->thread() );
+}
+
+AxisRelayIOManager::~AxisRelayIOManager()
+{
 }
 
 void* AxisRelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )

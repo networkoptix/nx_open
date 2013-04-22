@@ -15,6 +15,9 @@
 
 class AxisCameraManager;
 
+/*!
+    \note Delegates reference counting to \a AxisCameraManager instance
+*/
 class AxisMediaEncoder
 :
     public nxcip::CameraMediaEncoder,
@@ -22,6 +25,7 @@ class AxisMediaEncoder
 {
 public:
     AxisMediaEncoder( AxisCameraManager* const cameraManager );
+    virtual ~AxisMediaEncoder();
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
@@ -41,7 +45,7 @@ public:
     //virtual nxcip::BaseCameraManager* getBaseCameraManager();
 
 private:
-    nxpl::ScopedStrongRef<AxisCameraManager> m_cameraManager;
+    AxisCameraManager* m_cameraManager;
     mutable std::vector<nxcip::ResolutionInfo> m_supportedResolutions;
     nxcip::ResolutionInfo m_currentResolutionInfo;
     float m_currentFps;

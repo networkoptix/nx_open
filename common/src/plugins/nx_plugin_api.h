@@ -58,18 +58,23 @@ namespace nxpl
         virtual unsigned int releaseRef() = 0;
     };
 
+    /*!
+        Increments object's reference counter (\a NXPluginInterface::addRef) at construction, decrements at destruction (\a NXPluginInterface::releaseRef)
+        \param T MUST inherit \a NXPluginInterface
+        \note Class is reentrant, not thread-safe
+    */
     template<class T>
-    class ScopedStrongRef
+    class ScopedRef
     {
     public:
-        ScopedStrongRef( T* ptr = 0 )
+        ScopedRef( T* ptr = 0 )
         :
             m_ptr( 0 )
         {
             take( ptr );
         }
 
-        ~ScopedStrongRef()
+        ~ScopedRef()
         {
             release();
         }
@@ -93,6 +98,7 @@ namespace nxpl
         {
             if( !m_ptr )
                 return 0;
+
             T* ptrBak = m_ptr;
             m_ptr->releaseRef();
             m_ptr = 0;
@@ -115,14 +121,8 @@ namespace nxpl
                 m_ptr->addRef();
         }
 
-        ScopedStrongRef( const ScopedStrongRef& );
-        ScopedStrongRef& operator=( const ScopedStrongRef& );
-    };
-
-    template<class T>
-    class ScopedWeakRef
-    {
-        //TODO/IMPL
+        ScopedRef( const ScopedRef& );
+        ScopedRef& operator=( const ScopedRef& );
     };
 
     //!Type of plugin entry-point function

@@ -11,11 +11,11 @@
 #include "common_ref_manager.h"
 
 
-class AxisCameraPlugin;
-
 //
 /*!
     Implements only MDNS search method (\a nxcip::CameraDiscoveryManager::fromMDNSData method)
+
+    \note Delegates reference counting to \a AxisCameraPlugin instance
 */
 class AxisCameraDiscoveryManager
 :
@@ -24,8 +24,11 @@ class AxisCameraDiscoveryManager
 {
 public:
     AxisCameraDiscoveryManager();
+    virtual ~AxisCameraDiscoveryManager();
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+
+    virtual unsigned int releaseRef() override;
 
     virtual void getVendorName( char* buf ) const override;
     virtual int findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr ) override;
@@ -37,9 +40,6 @@ public:
         nxcip::CameraInfo* cameraInfo ) override;
     virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, nxcip::CameraInfo* cameraInfo ) override;
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
-
-private:
-    nxpl::ScopedStrongRef<AxisCameraPlugin> m_pluginRef;
 };
 
 #endif  //AXIS_DISCOVERY_MANAGER_H

@@ -25,6 +25,7 @@ class AxisCameraManager;
 
 /*!
     \note Holds reference to \a AxisCameraManager
+    \note Delegates reference counting to \a AxisCameraManager instance
 */
 class AxisRelayIOManager
 :
@@ -42,6 +43,7 @@ public:
         AxisCameraManager* cameraManager,
         unsigned int inputPortCount,
         unsigned int outputPortCount );
+    virtual ~AxisRelayIOManager();
 
     //!Implementation of nxcip::CameraRelayIOManager::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -87,7 +89,7 @@ private:
         readingData
     };
 
-    nxpl::ScopedStrongRef<AxisCameraManager> m_cameraManager;
+    AxisCameraManager* m_cameraManager;
     unsigned int m_inputPortCount;
     unsigned int m_outputPortCount;
     std::map<QString, unsigned int> m_inputPortNameToIndex;

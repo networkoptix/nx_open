@@ -6,6 +6,7 @@
 #ifndef AXIS_CAMERA_MANAGER_H
 #define AXIS_CAMERA_MANAGER_H
 
+#include <memory>
 #include <vector>
 
 #include <QAuthenticator>
@@ -82,15 +83,14 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpl::ScopedStrongRef<AxisCameraPlugin> m_pluginRef;
+    nxpl::ScopedRef<AxisCameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
     mutable std::vector<AxisMediaEncoder*> m_encoders;
     bool m_audioEnabled;
     mutable bool m_relayIOInfoRead;
-    //!TODO/IMPL this MUST be weak pointer to AxisRelayIOManager
-    mutable AxisRelayIOManager* m_relayIOManager;
+    mutable std::auto_ptr<AxisRelayIOManager> m_relayIOManager;
     mutable unsigned int m_cameraCapabilities;
     mutable unsigned int m_inputPortCount;
     mutable unsigned int m_outputPortCount;

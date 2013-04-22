@@ -20,7 +20,6 @@ AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
     m_info( info ),
     m_audioEnabled( false ),
     m_relayIOInfoRead( false ),
-    m_relayIOManager( NULL ) ,
     m_cameraCapabilities( 0 ),
     m_inputPortCount( 0 ),
     m_outputPortCount( 0 )
@@ -140,19 +139,10 @@ nxcip::CameraRelayIOManager* AxisCameraManager::getCameraRelayIOManager() const
         return NULL;
     }
 
-    //TODO/IMPL m_relayIOManager MUST be a weak pointer
-    //AxisRelayIOManager* ref = m_relayIOManager.takeStrongRef();
-    //if( ref )
-    //    return ref;
-
-    //m_relayIOManager.reset( new AxisRelayIOManager(const_cast<AxisCameraManager*>(this), m_inputPortCount, m_outputPortCount) );
-    //return m_relayIOManager.get();
-
-    if( m_relayIOManager )
-        m_relayIOManager->addRef();
-    else
-        m_relayIOManager = new AxisRelayIOManager(const_cast<AxisCameraManager*>(this), m_inputPortCount, m_outputPortCount);
-    return m_relayIOManager;
+    if( !m_relayIOManager.get() )
+        m_relayIOManager.reset( new AxisRelayIOManager(const_cast<AxisCameraManager*>(this), m_inputPortCount, m_outputPortCount) );
+    m_relayIOManager->addRef();
+    return m_relayIOManager.get();
 }
 
 //!Implementation of nxcip::BaseCameraManager::getErrorString

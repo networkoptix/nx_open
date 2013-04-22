@@ -21,6 +21,7 @@ static const float MIN_AXIS_CAMERA_FPS = 8.0;
 
 AxisMediaEncoder::AxisMediaEncoder( AxisCameraManager* const cameraManager )
 :
+    CommonRefManager( cameraManager ),
     m_cameraManager( cameraManager ),
     m_currentFps( 15 ),
     m_currentBitrateKbps( 0 ),
@@ -34,6 +35,10 @@ AxisMediaEncoder::AxisMediaEncoder( AxisCameraManager* const cameraManager )
             m_maxAllowedFps = cameraFpsLimitArray[i].fps;
             break;
         }
+}
+
+AxisMediaEncoder::~AxisMediaEncoder()
+{
 }
 
 void* AxisMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
