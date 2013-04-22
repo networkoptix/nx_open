@@ -999,7 +999,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
     if(!manipulator()) {
         ensureSelectionItem();
-        selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), QnGeometry::aspectRatio(target()->size()), target()->rect());
+        selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
     } else {
         QPointF delta = info->mouseItemPos() - target()->rect().center();
         QSizeF size = target()->size();
