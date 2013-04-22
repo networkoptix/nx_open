@@ -30,34 +30,6 @@ class ZoomOverlayWidget;
 
 
 // -------------------------------------------------------------------------- //
-// ZoomManipulatorWidget
-// -------------------------------------------------------------------------- //
-class ZoomManipulatorWidget: public QGraphicsWidget {
-    typedef QGraphicsWidget base_type;
-
-public:
-    ZoomManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        base_type(parent, windowFlags) 
-    {}
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
-        QRectF rect = this->rect();
-        qreal penWidth = qMin(rect.width(), rect.height()) / 16;
-        QPointF center = rect.center();
-        QPointF centralStep = QPointF(penWidth, penWidth);
-
-        QnScopedPainterPenRollback penRollback(painter, QPen(zoomFrameColor, penWidth));
-        Q_UNUSED(penRollback)
-        QnScopedPainterBrushRollback brushRollback(painter, zoomDraggerColor);
-        Q_UNUSED(brushRollback)
-
-        painter->drawEllipse(rect);
-        painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
-    }
-};
-
-
-// -------------------------------------------------------------------------- //
 // ZoomWindowWidget
 // -------------------------------------------------------------------------- //
 class ZoomWindowWidget: public QnClickableWidget, public ConstrainedGeometrically {
@@ -75,10 +47,6 @@ public:
 
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
-
-        m_manipulator = new ZoomManipulatorWidget(this);
-        m_manipulator->setAcceptedMouseButtons(0);
-        updateLayout();
     }
 
     virtual ~ZoomWindowWidget();
@@ -99,15 +67,6 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
-    virtual void setGeometry(const QRectF &rect) {
-        QSizeF oldSize = size();
-
-        base_type::setGeometry(rect);
-
-        if(!qFuzzyCompare(oldSize, size()))
-            updateLayout();
-    }
-
 protected:
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
@@ -126,13 +85,28 @@ protected:
         painter->fillRect(QRectF(w,       0,       r,           h), color);
     }
 
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
+        QRectF rect = manipulatorRect();
+        qreal penWidth = qMin(rect.width(), rect.height()) / 16;
+        QPointF center = rect.center();
+        QPointF centralStep = QPointF(penWidth, penWidth);
+
+        QnScopedPainterPenRollback penRollback(painter, QPen(zoomFrameColor, penWidth));
+        Q_UNUSED(penRollback)
+        QnScopedPainterBrushRollback brushRollback(painter, zoomDraggerColor);
+        Q_UNUSED(brushRollback)
+
+        painter->drawEllipse(rect);
+        painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
+    }
+
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
         Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
 
         if(result & Qn::SideSections) {
             result &= ~Qn::SideSections;
         } else if(result == Qn::NoSection) {
-            if(m_manipulator->geometry().intersects(region))
+            if(manipulatorRect().intersects(region))
                 result = Qn::TitleBarArea;
         }
 
@@ -147,12 +121,12 @@ protected:
         }
     }
 
-    void updateLayout() {
-        m_manipulator->setGeometry(QRectF(rect().center() - QPointF(zoomDraggerSize, zoomDraggerSize) / 2.0, QSizeF(zoomDraggerSize, zoomDraggerSize)));
+private:
+    QRectF manipulatorRect() const {
+        return QRectF(rect().center() - QPointF(zoomDraggerSize, zoomDraggerSize) / 2.0, QSizeF(zoomDraggerSize, zoomDraggerSize));
     }
 
 private:
-    ZoomManipulatorWidget *m_manipulator;
     QWeakPointer<ZoomOverlayWidget> m_overlay;
     QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
 };
