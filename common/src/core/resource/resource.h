@@ -252,8 +252,6 @@ signals:
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
 
-    void parameterValueChangedQueued(const QnResourcePtr &resource, const QnParam &param);
-
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();

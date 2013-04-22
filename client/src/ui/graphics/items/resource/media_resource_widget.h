@@ -135,6 +135,7 @@ private slots:
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
+    void at_zoomWindowButton_toggled(bool checked);
 
     void at_camDisplay_liveChanged();
 
