@@ -509,7 +509,7 @@ void ZoomWindowInstrument::finishDrag(DragInfo *) {
         ensureSelectionItem();
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
-        QRectF zoomRect = cwiseDiv(selectionItem()->boundingRect(), target()->size());
+        QRectF zoomRect = cwiseDiv(selectionItem()->rect(), target()->size());
         if(zoomRect.width() >= zoomWindowMinSize && zoomRect.height() >= zoomWindowMinSize)
             emit zoomRectCreated(target(), zoomRect);
     }
