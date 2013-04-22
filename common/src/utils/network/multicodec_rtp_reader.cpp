@@ -391,11 +391,11 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
     }
 }
 
-void QnMulticodecRtpReader::openStream()
+bool QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
     if (isStreamOpened())
-        return;
+        return true;
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
     QString transport;
@@ -464,6 +464,11 @@ void QnMulticodecRtpReader::openStream()
         if (!m_videoIO && !m_audioIO)
             m_RtpSession.stop();
         m_rtcpReportTimer.restart();
+        return m_videoIO || m_audioIO;
+    }
+    else
+    {
+        return false;
     }
 }
 

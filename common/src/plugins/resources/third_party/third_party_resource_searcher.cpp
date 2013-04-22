@@ -44,7 +44,8 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     }
 
     nxcip::CameraInfo cameraInfo;
-    //TODO/IMPL analyzing parameters, getting discoveryManager and filling in cameraInfo
+    //analyzing parameters, getting discoveryManager and filling in cameraInfo
+    QString resourceName;
     for( QnResourceParameters::const_iterator
         it = parameters.begin();
         it != parameters.end();
@@ -56,20 +57,39 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
         else if( it.key() == QLatin1String("url") )
             strcpy( cameraInfo.url, valLatin1.data() );
         else if( it.key() == QLatin1String("name") )
-            strcpy( cameraInfo.modelName, valLatin1.data() );
+            resourceName = it.value();
     }
-    nxcip_qt::CameraDiscoveryManager discoveryManager = m_thirdPartyCamPlugins[0];  //TODO/IMPL choose correct plugin
-    Q_ASSERT( discoveryManager.getRef() );
+    nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
+    //discoveryManager = &m_thirdPartyCamPlugins[0];
+    //choosing correct plugin
+    for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
+        it = m_thirdPartyCamPlugins.begin();
+        it != m_thirdPartyCamPlugins.end();
+        ++it )
+    {
+        if( resourceName.startsWith(it->getVendorName()) )
+        {
+            discoveryManager = &*it;
+            break;
+        }
+    }
+    if( !discoveryManager )
+        return QnThirdPartyResourcePtr();
 
-    nxcip::BaseCameraManager* camManager = discoveryManager.createCameraManager( cameraInfo );
+    Q_ASSERT( discoveryManager->getRef() );
+
+    const QByteArray& resourceNameLatin1 = resourceName.toLatin1();
+    strcpy( cameraInfo.modelName, resourceNameLatin1.data() + discoveryManager->getVendorName().size() + 1 );   //skipping vendor name and '-'
+
+    nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
         return QnThirdPartyResourcePtr();
 
-    result = QnVirtualCameraResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, discoveryManager ) );
+    result = QnVirtualCameraResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
 
     NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
-        arg(discoveryManager.getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
+        arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
     result->deserialize( parameters );
     return result;
@@ -232,7 +252,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
-    resource->setName( QString::fromUtf8(cameraInfo.modelName) );
+    resource->setName( QString::fromUtf8("%1-%2").arg(discoveryManager->getVendorName()).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
     resource->setMAC( QString::fromUtf8(cameraInfo.uid) );
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );

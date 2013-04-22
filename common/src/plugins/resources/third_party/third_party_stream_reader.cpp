@@ -78,6 +78,11 @@ bool ThirdPartyStreamReader::isStreamOpened() const
     return m_rtpStreamParser.isStreamOpened();
 }
 
+int ThirdPartyStreamReader::getLastResponseCode() const
+{
+    return m_rtpStreamParser.getLastResponseCode();
+}
+
 QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 {
     //TODO/IMPL
@@ -159,7 +164,8 @@ static bool resolutionLess( const nxcip::Resolution& left, const nxcip::Resoluti
 nxcip::Resolution ThirdPartyStreamReader::getMaxResolution( int encoderNumber ) const
 {
     const QList<nxcip::Resolution>& resolutionList = m_thirdPartyRes->getEncoderResolutionList( encoderNumber );
-    return *std::max_element( resolutionList.begin(), resolutionList.end(), resolutionLess );
+    QList<nxcip::Resolution>::const_iterator maxResIter = std::max_element( resolutionList.constBegin(), resolutionList.constEnd(), resolutionLess );
+    return maxResIter != resolutionList.constEnd() ? *maxResIter : nxcip::Resolution();
 }
 
 nxcip::Resolution ThirdPartyStreamReader::getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const

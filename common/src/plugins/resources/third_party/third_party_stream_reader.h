@@ -29,6 +29,7 @@ protected:
     virtual void openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
+    virtual int getLastResponseCode() const override;
 
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
