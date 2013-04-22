@@ -136,7 +136,9 @@ protected:
 
 private:
     QRectF manipulatorRect() const {
-        return QRectF(rect().center() - QPointF(zoomDraggerSize, zoomDraggerSize) / 2.0, QSizeF(zoomDraggerSize, zoomDraggerSize));
+        QRectF rect = this->rect();
+        qreal draggerSize = qMin(zoomDraggerSize, qMin(rect.width(), rect.height()));
+        return QRectF(rect.center() - QPointF(draggerSize, draggerSize) / 2.0, QSizeF(draggerSize, draggerSize));
     }
 
 private:
