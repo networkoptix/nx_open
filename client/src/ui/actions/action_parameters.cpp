@@ -17,8 +17,6 @@ namespace {
         return true;
     }
 
-    QLatin1String focusElementKey("focus");
-
 } // anonymous namespace
 
 QnActionParameters::QnActionParameters(const QVariantMap &arguments) {
