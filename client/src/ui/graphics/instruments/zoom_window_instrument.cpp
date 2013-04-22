@@ -1,9 +1,12 @@
 #include "zoom_window_instrument.h"
 
+#include <cassert>
+
 #include <utils/math/color_transformations.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/style/globals.h>
@@ -13,6 +16,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
+
+#include "selection_item.h"
 
 namespace {
     const QColor zoomWindowColor = qnGlobals->zoomWindowColor();
@@ -260,7 +265,13 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner 
 // ZoomWindowInstrument
 // -------------------------------------------------------------------------- //
 ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
-    base_type(Item, makeSet(), parent),
+    base_type(
+      makeSet(QEvent::MouseButtonPress),
+      makeSet(),
+      makeSet(),
+      makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+      parent
+    ),
     QnWorkbenchContextAware(parent)
 {
     connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
@@ -269,7 +280,7 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
-    return;
+    ensureUninstalled();
 }
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
@@ -294,6 +305,17 @@ ZoomOverlayWidget *ZoomWindowInstrument::ensureOverlayWidget(QnMediaResourceWidg
 
 ZoomWindowWidget *ZoomWindowInstrument::windowWidget(QnMediaResourceWidget *widget) const {
     return m_dataByWidget[widget].windowWidget;
+}
+
+void ZoomWindowInstrument::ensureSelectionItem() {
+    if(selectionItem())
+        return;
+
+    m_selectionItem = new SelectionItem();
+    selectionItem()->setOpacity(0.0);
+
+    if(scene())
+        scene()->addItem(selectionItem());
 }
 
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
@@ -385,6 +407,19 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void ZoomWindowInstrument::installedNotify() {
+    assert(selectionItem() == NULL);
+
+    base_type::installedNotify();
+}
+
+void ZoomWindowInstrument::aboutToBeUninstalledNotify() {
+    base_type::aboutToBeUninstalledNotify();
+
+    if(selectionItem())
+        delete selectionItem();
+}
+
 bool ZoomWindowInstrument::registeredNotify(QGraphicsItem *item) {
     if(!base_type::registeredNotify(item))
         return false;
@@ -405,6 +440,93 @@ void ZoomWindowInstrument::unregisteredNotify(QGraphicsItem *item) {
      * be unregistered in aboutToBeDestroyed handler. */
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item))
         unregisterWidget(widget);
+}
+
+bool ZoomWindowInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
+    m_viewport = viewport;
+
+    return false;
+}
+
+bool ZoomWindowInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
+    if(!(target->options() & QnResourceWidget::ControlZoomWindow))
+        return false;
+
+    if(!target->rect().contains(event->pos()))
+        return false; /* Ignore clicks on widget frame. */
+
+    m_target = target;
+
+    dragProcessor()->mousePressEvent(target, event);
+
+    event->accept();
+    return false;
+}
+
+void ZoomWindowInstrument::startDragProcess(DragInfo *) {
+    emit zoomWindowProcessStarted(target());
+}
+
+void ZoomWindowInstrument::startDrag(DragInfo *) {
+    m_zoomWindowStartedEmitted = false;
+
+    if(!target()) {
+        /* Whoops, already destroyed. */
+        reset();
+        return;
+    }
+
+    ensureSelectionItem();
+    selectionItem()->setParentItem(target());
+    selectionItem()->setViewport(m_viewport.data());
+    opacityAnimator(selectionItem())->stop();
+    selectionItem()->setOpacity(1.0);
+    /* Everything else will be initialized in the first call to drag(). */
+
+    emit zoomWindowStarted(target());
+    m_zoomWindowStartedEmitted = true;
+}
+
+void ZoomWindowInstrument::dragMove(DragInfo *info) {
+    if(!target()) {
+        reset();
+        return;
+    }
+
+    ensureSelectionItem();
+
+    QPointF origin = info->mousePressItemPos();
+    QPointF corner = bounded(info->mouseItemPos(), target()->rect());
+    QRectF rect = QnGeometry::movedInto(
+        QnGeometry::expanded(
+            QnGeometry::aspectRatio(target()->size()),
+            QRectF(origin, corner).normalized(),
+            Qt::KeepAspectRatioByExpanding,
+            Qt::AlignCenter
+        ),
+        target()->rect()
+    );
+
+    selectionItem()->setRect(rect);
+}
+
+void ZoomWindowInstrument::finishDrag(DragInfo *) {
+    if(target()) {
+        ensureSelectionItem();
+        opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
+
+        QRectF zoomRect = cwiseDiv(selectionItem()->boundingRect(), target()->size());
+        if(zoomRect.width() >= zoomWindowMinSize && zoomRect.height() >= zoomWindowMinSize)
+            emit zoomRectCreated(target(), zoomRect);
+    }
+
+    if(m_zoomWindowStartedEmitted)
+        emit zoomWindowFinished(target());
+}
+
+void ZoomWindowInstrument::finishDragProcess(DragInfo *) {
+    emit zoomWindowProcessFinished(target());
 }
 
 void ZoomWindowInstrument::at_display_widgetChanged(Qn::ItemRole role) {
