@@ -95,7 +95,7 @@ void QnSystemHealthPopupWidget::at_fixButton_clicked() {
     case QnSystemHealth::EmailIsEmpty:
         {
             QnActionParameters params(context()->user());
-            params.setFocusElement(QLatin1String("email"));
+            params.setArgument<QString>(Qn::FocusElementArgument, lit("email"));
             menu()->trigger(Qn::UserSettingsAction, params);
         }
         break;
@@ -123,7 +123,7 @@ void QnSystemHealthPopupWidget::at_fixUserLabel_linkActivated(const QString &anc
     if (!user)
         return;
     QnActionParameters params(user);
-    params.setFocusElement(QLatin1String("email"));
+    params.setArgument<QString>(Qn::FocusElementArgument, lit("email"));
     menu()->trigger(Qn::UserSettingsAction, params);
 
     QWidget* p = dynamic_cast<QWidget *>(sender()->parent());

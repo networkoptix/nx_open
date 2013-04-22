@@ -2399,7 +2399,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
-    dialog->setFocusedElement(params.focusElement());
+    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementArgument));
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
