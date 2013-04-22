@@ -17,6 +17,7 @@
 
 class QnTCPConnectionProcessor;
 
+//!Sends input data asynchronously using QnTCPConnectionProcessor::sendBuffer
 class CachedOutputStream
 :
     public QnLongRunnable

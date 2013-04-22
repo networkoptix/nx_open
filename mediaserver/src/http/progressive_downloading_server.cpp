@@ -56,7 +56,7 @@ public:
         m_lastMediaTime(AV_NOPTS_VALUE),
         m_utcShift(0),
         m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
-        m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),    //TODO/IMPL
+        m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
         m_rtStartTime( AV_NOPTS_VALUE ),
         m_lastRtTime( 0 )
     {
@@ -133,16 +133,56 @@ protected:
         {
             if( resultPtr && result.size() > 0 )
             {
+                //Preparing output packet. Have to do everything right here to avoid additional frame copying
+                    //TODO shared chunked buffer and socket::writev is wanted very much here
+                QByteArray outPacket;
+                if( m_owner->getTranscoder()->getVideoCodecContext()->codec_id == CODEC_ID_MJPEG )
+                {
+                    //preparing timestamp header
+                    QByteArray timestampHeader;
+                    timestampHeader.append( "x-Content-Timestamp: " );
+                    timestampHeader.append( QByteArray::number(media->timestamp,10) );
+                    timestampHeader.append( "\r\n" );
+
+                    //composing http chunk
+                    outPacket.reserve(result.size() + 12 + timestampHeader.size());    //12 - http chunk overhead
+                    outPacket.append(QByteArray::number((int)(result.size()+timestampHeader.size()),16)); //http chunk
+                    outPacket.append("\r\n");                           //http chunk
+                    //skipping delimiter
+                    const char* delimiterEndPos = (const char*)memchr( result.data(), '\n', result.size() );
+                    if( delimiterEndPos == NULL )
+                    {
+                        outPacket.append(result.data(), result.size());
+                    }
+                    else
+                    {
+                        outPacket.append( result.data(), delimiterEndPos-result.data()+1 );
+                        outPacket.append( timestampHeader );
+                        outPacket.append( delimiterEndPos+1, result.size() - (delimiterEndPos-result.data()+1) );
+                    }
+                    outPacket.append("\r\n");       //http chunk
+                }
+                else
+                {
+                    outPacket.reserve(result.size() + 12);    //12 - http chunk overhead
+                    outPacket.append(QByteArray::number((int)result.size(),16)); //http chunk
+                    outPacket.append("\r\n");                           //http chunk
+                    outPacket.append(result.data(), result.size());
+                    outPacket.append("\r\n");       //http chunk
+                }
+
                 //sending frame
                 if( m_dataOutput.get() )
                 {
-                    m_dataOutput->postPacket(toHttpChunk(result.data(), result.size()));
+                    //m_dataOutput->postPacket(toHttpChunk(result.data(), result.size()));
+                    m_dataOutput->postPacket(outPacket);
                     if( m_dataOutput->failed() )
                         m_needStop = true;
                 }
                 else
                 {
-                    if (!m_owner->sendChunk(result))
+                    //if (!m_owner->sendChunk(result))
+                    if( !m_owner->sendBuffer(outPacket) )
                         m_needStop = true;
                 }
             }
@@ -170,7 +210,9 @@ private:
 
     QByteArray toHttpChunk( const char* data, size_t size )
     {
-        QByteArray chunk = QByteArray::number((int)size,16);
+        QByteArray chunk;
+        chunk.reserve( size + 12 );
+        chunk.append(QByteArray::number((int)size,16));
         chunk.append("\r\n");
         chunk.append(data, size);
         chunk.append("\r\n");
