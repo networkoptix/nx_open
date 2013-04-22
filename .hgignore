@@ -189,3 +189,6 @@ android-client/android-dw/**
 axiscamplugin/x86
 axiscamplugin/x64
 appserver/hostedfiles/*
+
+genericrtspplugin/x86
+genericrtspplugin/x64
