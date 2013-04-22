@@ -6,6 +6,27 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QCheckBox>
 
+class QnCheckboxControlAbstractDelegate: public QObject
+{
+    Q_OBJECT
+
+public:
+    QnCheckboxControlAbstractDelegate(QObject *parent = 0): QObject(parent) {}
+    ~QnCheckboxControlAbstractDelegate() {}
+
+    QCheckBox* checkbox() const {
+        return m_checkBox;
+    }
+
+    void setCheckbox(QCheckBox *value) {
+        m_checkBox = value;
+    }
+public slots:
+    virtual void at_filterSelected(const QString &value) = 0;
+private:
+    QCheckBox* m_checkBox;
+};
+
 class QnCustomFileDialog : public QFileDialog
 {
     Q_OBJECT
@@ -28,8 +49,9 @@ public:
      *                                  closes, resulting checkbox value will be written into it.
      *                                  It is the callee's responsibility to make sure
      *                                  that pointed-to value still exists at that point.
+     * @param delegate                  Delegate that will control state of the checkbox.
      */
-    void addCheckbox(const QString &text, bool *value);
+    void addCheckbox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate = NULL);
 
 
     /**

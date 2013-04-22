@@ -75,7 +75,10 @@ namespace {
 
         QLinkedList<qreal> result;
         for(QLinkedList<qreal>::const_iterator pos = values.begin(); pos != values.end(); pos++) {
-            result << *pos/upperBound;
+            if (qFuzzyCompare(*pos, -1))
+                result << *pos;
+            else
+                result << *pos/upperBound;
         }
         return result;
     }
@@ -449,7 +452,7 @@ protected:
                     values = scaledNetworkValues(values, networkUpperBound);
 
                 qreal currentValue = 0;
-                QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset) , elapsed_step, &currentValue);
+                QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset), elapsed_step, &currentValue);
                 displayValues[key] = currentValue;
                 graphPen.setColor(getDeviceColor(stats.deviceType, key));
                 painter->strokePath(path, graphPen);

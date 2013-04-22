@@ -19,6 +19,7 @@ CachedOutputStream::CachedOutputStream( QnTCPConnectionProcessor* const tcpOutpu
 
 CachedOutputStream::~CachedOutputStream()
 {
+    stop();
 }
 
 void CachedOutputStream::postPacket( const QByteArray& data )

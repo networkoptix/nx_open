@@ -99,37 +99,6 @@
 #endif
 
 namespace {
-    QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
-        QAction *result = new QAction(text, parent);
-        result->setShortcut(shortcut);
-        return result;
-    }
-
-    QRegion createRoundRegion(int rSmall, int rLarge, const QRect &rect) {
-        QRegion region;
-
-        int circleX = rLarge;
-
-        int circleY = rSmall-1;
-        for (int y = 0; y < qMin(rect.height(), rSmall); ++y)
-        {
-            // calculate circle Point
-            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
-            region += QRect(x,y, rect.width()-x*2,1);
-        }
-        for (int y = qMin(rect.height(), rSmall); y < rect.height() - rSmall; ++y)
-            region += QRect(0,y, rect.width(),1);
-
-        circleY = rect.height() - rSmall;
-        for (int y = rect.height() - rSmall; y < rect.height(); ++y)
-        {
-            // calculate circle Point
-            int x = circleX - std::sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
-            region += QRect(x,y, rect.width()-x*2,1);
-        }
-        return region;
-    }
-
     QPoint invalidDragDelta() {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
@@ -310,6 +279,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
     connect(sceneFocusSignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                           this,                           SLOT(at_scene_focusIn(QGraphicsScene *, QEvent *)));
     connect(zoomWindowInstrument,       SIGNAL(zoomRectChanged(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectChanged(QnMediaResourceWidget *, const QRectF &)));
+    connect(zoomWindowInstrument,       SIGNAL(zoomRectCreated(QnMediaResourceWidget *, const QRectF &)),                           this,                           SLOT(at_zoomRectCreated(QnMediaResourceWidget *, const QRectF &)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -1040,6 +1010,11 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
 
 void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
     widget->item()->setZoomRect(zoomRect);
+}
+
+void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
+    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ZoomWindowArgument, zoomRect));
+    widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {

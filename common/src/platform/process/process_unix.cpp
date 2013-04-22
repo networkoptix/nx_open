@@ -41,7 +41,7 @@ private:
         if(process->state() == QProcess::NotRunning)
             return; /* Cannot initialize yet. */
 
-        if(pid = process->pid()) {
+        if((pid = process->pid())) {
             initialized = true;
             valid = true;
         } else {
@@ -150,7 +150,7 @@ void QnLinuxProcess::setPriority(Priority priority) override {
     }
 
     int systemPriority = d->qnToSystemPriority(priority);
-    if(systemPriority == InvalidNiceValue) {
+    if(systemPriority == (int)InvalidNiceValue) {
         qnWarning("Invalid process priority value '%1'.", static_cast<int>(priority));
         return;
     }

@@ -72,6 +72,14 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
+    virtual void setGeometry(const QRectF &rect) override {
+        if(qIsNaN(rect.width()) || qIsNaN(rect.left())) {
+            int a = 10;
+        }
+
+        base_type::setGeometry(rect);
+    }
+
 protected:
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
@@ -128,7 +136,9 @@ protected:
 
 private:
     QRectF manipulatorRect() const {
-        return QRectF(rect().center() - QPointF(zoomDraggerSize, zoomDraggerSize) / 2.0, QSizeF(zoomDraggerSize, zoomDraggerSize));
+        QRectF rect = this->rect();
+        qreal draggerSize = qMin(zoomDraggerSize, qMin(rect.width(), rect.height()));
+        return QRectF(rect.center() - QPointF(draggerSize, draggerSize) / 2.0, QSizeF(draggerSize, draggerSize));
     }
 
 private:
@@ -311,8 +321,11 @@ void ZoomWindowInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
 
-    m_selectionItem = new SelectionItem();
+    m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
+    selectionItem()->setPen(QPen(zoomFrameColor, zoomFrameWidth));
+    selectionItem()->setBrush(Qt::NoBrush);
+    selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
     if(scene())
         scene()->addItem(selectionItem());
@@ -394,8 +407,8 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
         return;
     m_processingWidgets.insert(zoomWidget);
 
-    if(overlayWidget && zoomWidget) {
-        QRectF zoomRect = QnGeometry::cwiseDiv(windowWidget->geometry(), overlayWidget->size());
+    if(overlayWidget && zoomWidget && !qFuzzyIsNull(overlayWidget->size())) {
+        QRectF zoomRect = cwiseDiv(windowWidget->geometry(), overlayWidget->size());
         overlayWidget->setWidgetRect(windowWidget, zoomRect);
         emit zoomRectChanged(zoomWidget, zoomRect);
     }
@@ -449,6 +462,9 @@ bool ZoomWindowInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
 }
 
 bool ZoomWindowInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if(event->button() != Qt::LeftButton)
+        return false;
+
     QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
     if(!(target->options() & QnResourceWidget::ControlZoomWindow))
         return false;
@@ -495,20 +511,7 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
     }
 
     ensureSelectionItem();
-
-    QPointF origin = info->mousePressItemPos();
-    QPointF corner = bounded(info->mouseItemPos(), target()->rect());
-    QRectF rect = QnGeometry::movedInto(
-        QnGeometry::expanded(
-            QnGeometry::aspectRatio(target()->size()),
-            QRectF(origin, corner).normalized(),
-            Qt::KeepAspectRatioByExpanding,
-            Qt::AlignCenter
-        ),
-        target()->rect()
-    );
-
-    selectionItem()->setRect(rect);
+    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
 }
 
 void ZoomWindowInstrument::finishDrag(DragInfo *) {
@@ -516,7 +519,7 @@ void ZoomWindowInstrument::finishDrag(DragInfo *) {
         ensureSelectionItem();
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
-        QRectF zoomRect = cwiseDiv(selectionItem()->boundingRect(), target()->size());
+        QRectF zoomRect = cwiseDiv(selectionItem()->rect(), target()->size());
         if(zoomRect.width() >= zoomWindowMinSize && zoomRect.height() >= zoomWindowMinSize)
             emit zoomRectCreated(target(), zoomRect);
     }

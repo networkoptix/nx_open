@@ -51,4 +51,43 @@ private:
     QWidget *m_viewport;
 };
 
+
+class FixedArSelectionItem: public SelectionItem {
+    Q_OBJECT;
+    typedef SelectionItem base_type;
+
+public:
+    FixedArSelectionItem(QGraphicsItem *parent = NULL): 
+        base_type(parent),
+        m_elementSize(0.0)
+    {}
+
+    virtual QRectF boundingRect() const override;
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    qreal elementSize() const {
+        return m_elementSize;
+    }
+
+    void setElementSize(qreal elementSize) {
+        m_elementSize = elementSize;
+    }
+
+    const QVector<QPointF> &sidePoints() const {
+        return m_sidePoints;
+    }
+
+    void setSidePoints(const QVector<QPointF> &sidePoints) {
+        m_sidePoints = sidePoints;
+    }
+
+    void setGeometry(const QPointF &origin, const QPointF &corner, const qreal aspectRatio, const QRectF &boundingRect);
+
+private:
+    qreal m_elementSize;
+    QVector<QPointF> m_sidePoints;
+};
+
+
 #endif // QN_SELECTION_ITEM_H

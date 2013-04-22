@@ -179,6 +179,26 @@ void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QByteAr
     emit finished(status, errorString, connectInfo, handle);
 }
 
+// -------------------------------------------------------------------------- //
+// QnTimestampsCheckboxControlDelegate
+// -------------------------------------------------------------------------- //
+class QnTimestampsCheckboxControlDelegate: public QnCheckboxControlAbstractDelegate {
+public:
+    QnTimestampsCheckboxControlDelegate(const QString &target, QObject *parent = NULL):
+        QnCheckboxControlAbstractDelegate(parent),
+        m_target(target){ }
+
+    ~QnTimestampsCheckboxControlDelegate() {}
+
+
+    void at_filterSelected(const QString &value) override {
+        checkbox()->setEnabled(value != m_target);
+    }
+private:
+    QString m_target;
+};
+
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -2333,7 +2353,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             if(widget->resource()->flags() & QnResource::utc) {
                 timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
             } else {
-                timeStamp = QTime().addMSecs(time).toString(lit("hh:mmSss"));
+                timeStamp = QTime().addMSecs(time).toString(lit("hh:mm:ss"));
             }
 
             QFont font;
@@ -2348,7 +2368,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
 
             QPainterPath path;
-            path.addText(screenshot.width() - tsWidht - spacing, screenshot.height() - tsDescent - spacing, font, timeStamp);
+            path.addText(screenshot.width() - tsWidht - spacing*2, screenshot.height() - tsDescent - spacing, font, timeStamp);
 
             p.drawPath(path);
         }
@@ -2379,7 +2399,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
-    dialog->setFocusedElement(params.focusElement());
+    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementArgument));
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -3078,7 +3098,11 @@ Do you want to continue?"),
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps);
+        QnCheckboxControlAbstractDelegate* delegate = NULL;
+#ifdef Q_OS_WIN
+        delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(false), this);
+#endif
+        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
@@ -3264,11 +3288,20 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 }
 
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
-    QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
     if(!widget)
         return;
 
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), QRectF(0.25, 0.25, 0.5, 0.5), widget->item()->uuid());
+    QRectF rect;
+    if(params.hasArgument(Qn::ZoomWindowArgument)) {
+        rect = params.argument<QRectF>(Qn::ZoomWindowArgument);
+    } else {
+        rect = QRectF(0.25, 0.25, 0.5, 0.5);
+    }
+
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), rect, widget->item()->uuid());
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){

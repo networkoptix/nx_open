@@ -9,7 +9,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class SelectionItem;
+class FixedArSelectionItem;
 class ZoomOverlayWidget;
 class ZoomWindowWidget;
 
@@ -67,7 +67,7 @@ private:
         return m_target.data();
     }
 
-    SelectionItem *selectionItem() const {
+    FixedArSelectionItem *selectionItem() const {
         return m_selectionItem.data();
     }
     void ensureSelectionItem();
@@ -90,7 +90,7 @@ private:
     };
 
     bool m_zoomWindowStartedEmitted;
-    QWeakPointer<SelectionItem> m_selectionItem;
+    QWeakPointer<FixedArSelectionItem> m_selectionItem;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
     QHash<QObject *, ZoomData> m_dataByWidget;
