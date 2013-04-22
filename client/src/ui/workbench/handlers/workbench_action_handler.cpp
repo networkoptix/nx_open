@@ -179,6 +179,26 @@ void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QByteAr
     emit finished(status, errorString, connectInfo, handle);
 }
 
+// -------------------------------------------------------------------------- //
+// QnTimestampsCheckboxControlDelegate
+// -------------------------------------------------------------------------- //
+class QnTimestampsCheckboxControlDelegate: public QnCheckboxControlAbstractDelegate {
+public:
+    QnTimestampsCheckboxControlDelegate(const QString &target, QObject *parent = NULL):
+        QnCheckboxControlAbstractDelegate(parent),
+        m_target(target){ }
+
+    ~QnTimestampsCheckboxControlDelegate() {}
+
+
+    void at_filterSelected(const QString &value) override {
+        checkbox()->setEnabled(value != m_target);
+    }
+private:
+    QString m_target;
+};
+
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -3078,7 +3098,11 @@ Do you want to continue?"),
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps);
+        QnCheckboxControlAbstractDelegate* delegate = NULL;
+#ifdef Q_OS_WIN
+        delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(false), this);
+#endif
+        dialog->addCheckbox(tr("Include Timestamps (Requires Transcoding)"), &withTimestamps, delegate);
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
