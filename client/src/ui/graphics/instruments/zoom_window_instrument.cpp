@@ -72,6 +72,14 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
+    virtual void setGeometry(const QRectF &rect) override {
+        if(qIsNaN(rect.width()) || qIsNaN(rect.left())) {
+            int a = 10;
+        }
+
+        base_type::setGeometry(rect);
+    }
+
 protected:
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
@@ -397,7 +405,7 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
         return;
     m_processingWidgets.insert(zoomWidget);
 
-    if(overlayWidget && zoomWidget) {
+    if(overlayWidget && zoomWidget && !qFuzzyIsNull(overlayWidget->size())) {
         QRectF zoomRect = cwiseDiv(windowWidget->geometry(), overlayWidget->size());
         overlayWidget->setWidgetRect(windowWidget, zoomRect);
         emit zoomRectChanged(zoomWidget, zoomRect);
