@@ -7,6 +7,7 @@
 //
 
 #import "SVProgressHud.h"
+#import "HDWCameraModel.h"
 #import "HDWVideoViewController.h"
 
 #define NOW_INTERVAL 10.0 // 10 seconds
@@ -75,7 +76,13 @@
 
 - (void)gotoLive:(id)sender {
     _playingLive = YES;
-    [self gotoURL:[_camera liveUrl]];
+    if (_camera.status.intValue == Status_Offline) {
+        [SVProgressHUD showWithStatus:@"No Signal..."];
+    } else if (_camera.status.intValue == Status_Unauthorized) {
+        [SVProgressHUD showWithStatus:@"Invalid Camera Credentials..."];
+    } else {
+        [self gotoURL:[_camera liveUrl]];
+    }
 }
 
 - (void)gotoDate:(NSDate*)date {
@@ -156,5 +163,11 @@
 
 - (void)onAppWillEnterForeground:(NSNotification *)notification {
     [self.imageView play];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [SVProgressHUD dismiss];
 }
 @end

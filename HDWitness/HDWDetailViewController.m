@@ -17,13 +17,6 @@
 
 #import "connectinfo.pb.h"
 
-enum CameraStatus {
-    Offline,
-    Unauthorized,
-    Online,
-    Recording
-};
-
 enum MessageType {
     MessageType_Initial                 = 0,
     MessageType_Ping                    = 1,
@@ -75,7 +68,7 @@ enum State {
 - (void)loadFromServer:(HDWServerModel*)server {
     self.label.text = server.name;
     self.summaryLabel.text = [NSString stringWithFormat:@"Address: %@", server.streamingUrl.host];
-    if (server.status.intValue == Online) {
+    if (server.status.intValue == Status_Online) {
         self.image.image = [UIImage imageNamed:@"server.png"];
     } else {
         self.image.image = [UIImage imageNamed:@"server_offline.png"];
@@ -498,24 +491,24 @@ enum State {
     HDWCameraModel *camera = [_ecsModel cameraAtIndexPath:indexPath];
 
     switch (camera.status.intValue) {
-        case Offline: {
+        case Status_Offline: {
             [cell.imageView setImageWithContentsOfFile:@"camera_offline.png"];
             break;
         }
             
-        case Unauthorized: {
+        case Status_Unauthorized: {
             [cell.imageView setImageWithContentsOfFile:@"camera_unauthorized.png"];
             break;
         }
             
-        case Online:
-        case Recording: {
+        case Status_Online:
+        case Status_Recording: {
             [cell.imageView setImageWithContentsOfFile:@"camera.png"];
             break;
         }	
     }
     
-    if (camera.status.intValue == Online || camera.status.intValue == Recording) {
+    if (camera.status.intValue == Status_Online || camera.status.intValue == Status_Recording) {
         NSLog(@"Thumbnail URL: %@", [camera.thumbnailUrl absoluteString]);
         [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
     }

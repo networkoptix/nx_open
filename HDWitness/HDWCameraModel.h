@@ -8,6 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+enum CameraStatus {
+    Status_Offline,
+    Status_Unauthorized,
+    Status_Online,
+    Status_Recording
+};
+
+
 @interface HDWECSConfig : NSObject<NSCopying> {
 }
 

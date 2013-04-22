@@ -58,6 +58,9 @@
     FpsCounter *_fpsCounter;
     BOOL _needReconnect;
     BOOL _firstFrameReceived;
+    
+    NSDateFormatter *_dateFomatter;
+    NSDate *_lastTimestamp;
 }
 
 @property (nonatomic, readwrite, copy) NSURL *url;

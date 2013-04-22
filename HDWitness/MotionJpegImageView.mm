@@ -116,6 +116,10 @@ static NSData *_endMarkerData = nil;
     _password = nil;
     _allowSelfSignedCertificates = NO;
     _needReconnect = NO;
+    
+    _dateFomatter = [[NSDateFormatter alloc] init];
+    [_dateFomatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+
     if (_fpsCounter == nil)
         _fpsCounter = [FpsCounter fpsCounterWithInterval:FPS_MEASURE_SECONDS];
     
@@ -216,9 +220,9 @@ static NSData *_endMarkerData = nil;
 #pragma mark - NSURLConnection Delegate Methods
 
 -(UIImage*) drawTextOnPic:(NSString*) bottomText
+                 withTime:(NSDate*)time
                   inImage:(UIImage*)  image
 {
-    
     UIFont *font = [UIFont boldSystemFontOfSize:12];
     UIGraphicsBeginImageContext(image.size);
     [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
@@ -231,6 +235,13 @@ static NSData *_endMarkerData = nil;
     
     [[UIColor redColor] set];
     [bottomText drawInRect:CGRectIntegral(rect) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentRight];
+    
+    if (time) {
+        rect = CGRectMake(5.0f, image.size.height - 15.0f, image.size.width-20.0f, image.size.height);
+        NSString *timestampString = [_dateFomatter stringFromDate:time];
+        [timestampString drawInRect:CGRectIntegral(rect) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentRight];
+    }
+    
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
@@ -238,6 +249,9 @@ static NSData *_endMarkerData = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+    double timeSinceEpoch = [httpResponse.allHeaderFields[@"x-Content-Timestamp"] longLongValue] / 1e+6;
+    _lastTimestamp = [NSDate dateWithTimeIntervalSince1970:timeSinceEpoch];
     _receivedData = [[NSMutableData alloc] init];
 }
 
@@ -259,7 +273,7 @@ static NSData *_endMarkerData = nil;
                 _firstFrameReceived = YES;
             }
             
-            self.image = [self drawTextOnPic:[NSString stringWithFormat:@"FPS: %d", [_fpsCounter currentFps]] inImage:receivedImage];
+            self.image = [self drawTextOnPic:[NSString stringWithFormat:@"FPS: %d", [_fpsCounter currentFps]] withTime:_lastTimestamp inImage:receivedImage];
         }
     }
 }
@@ -281,7 +295,7 @@ canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
     return allow;
 }
 
--                (void)connection:(NSURLConnection *)connection
+- (void)connection:(NSURLConnection *)connection
 didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     if ([challenge previousFailureCount] == 0 &&
         _username && _username.length > 0 &&
