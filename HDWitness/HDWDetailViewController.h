@@ -12,7 +12,9 @@
 #import "HDWVideoViewController.h"
 #import "SRWebSocket.h"
 
-@interface HDWDetailViewController : PSUICollectionViewController <UISplitViewControllerDelegate, SRWebSocketDelegate, UIAlertViewDelegate>
+@interface HDWDetailViewController : PSUICollectionViewController <UISplitViewControllerDelegate, SRWebSocketDelegate, UIAlertViewDelegate> {
+    BOOL _presentedPopoverOnStart;
+}
 
 @property (strong, nonatomic) HDWECSConfig *ecsConfig;
 @property (strong, nonatomic) HDWECSModel *ecsModel;

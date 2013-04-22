@@ -419,15 +419,12 @@ enum State {
     [self performNextStep];
     
     self.detailDescriptionLabel.text = [_ecsConfig description];
-    
-//    if (self.ecsConfig) {
-//        self.detailDescriptionLabel.text = [_ecsConfig description];
-//    }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    _presentedPopoverOnStart = NO;
     [[FXImageView processingQueue] setMaxConcurrentOperationCount:100];
     
 	// Do any additional setup after loading the view, typically from a nib.
@@ -443,10 +440,13 @@ enum State {
         UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithTitle:@"Systems" style:UIBarButtonItemStylePlain target:self.splitViewController action:@selector(toggleMasterVisible:)];
         
         self.navigationItem.leftBarButtonItem = menuButton;
+        
+        if (self.masterPopoverController && !_presentedPopoverOnStart) {
+            _presentedPopoverOnStart = YES;
+            [self.navigationItem.leftBarButtonItem.target performSelector:self.navigationItem.leftBarButtonItem.action withObject:self.navigationItem];
+        }
+
     }
-    
-//    self.splitViewController toggleM
-//    self.navigationController.navigationBar
 };
 
 - (void)viewWillDisappear:(BOOL)animated {
