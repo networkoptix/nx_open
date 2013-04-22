@@ -140,6 +140,7 @@ void QnMessageSource::httpFinished()
 
         /** Operation was cancelled intentionally */
         if (m_timeoutFlag) {
+            m_seqNumber = -1;
             m_reply->deleteLater();
             startRequest();
             return;
