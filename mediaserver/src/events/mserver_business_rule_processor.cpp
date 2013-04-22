@@ -7,27 +7,73 @@
 #include "api/app_server_connection.h"
 #include "core/resource_managment/resource_pool.h"
 
+void QnMServerBusinessRuleProcessor::saveActionToDB(QnAbstractBusinessActionPtr action)
+{
+    if (!my_InsQuery)
+        return;
+
+    qint64 timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
+
+    my_InsQuery->bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
+    my_InsQuery->bindValue(":action_type", (int) action->actionType());
+    my_InsQuery->bindValue(":action_params", serializeBusinessParams(action->getParams()));
+    my_InsQuery->bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
+    my_InsQuery->bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
+    my_InsQuery->bindValue(":toggle_state", (int) action->getToggleState());
+    my_InsQuery->bindValue(":aggregation_count", action->getAggregationCount());
+
+    bool insOK = my_InsQuery->exec();
+    insOK = insOK;
+}
+
+QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
+    QnBusinessRuleProcessor(),
+    my_InsQuery(0)
+{
+    m_sdb = QSqlDatabase::addDatabase("QSQLITE");
+    m_sdb.setDatabaseName(closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")));
+
+    if (m_sdb.open())
+    {
+        my_InsQuery = new QSqlQuery(m_sdb);
+        my_InsQuery->prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count) "
+            "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count);");
+    }
+    else {
+        qWarning() << "can't initialize mySQL database! Actions log is not created!";
+    }
+}
+
+QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
+{
+    delete my_InsQuery;
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (QnBusinessRuleProcessor::executeActionInternal(action, res))
-        return true;
-
-    switch(action->actionType())
-    {
-    case BusinessActionType::Bookmark:
-        // TODO: implement me
-        break;
-    case BusinessActionType::CameraOutput:
-        return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
-        break;
-    case BusinessActionType::CameraRecording:
-        return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
-    case BusinessActionType::PanicRecording:
-        return executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
-    default:
-        break;
+    bool rez = QnBusinessRuleProcessor::executeActionInternal(action, res);
+    if (!rez) {
+        switch(action->actionType())
+        {
+        case BusinessActionType::Bookmark:
+            // TODO: implement me
+            break;
+        case BusinessActionType::CameraOutput:
+            rez = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
+            break;
+        case BusinessActionType::CameraRecording:
+            rez = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+        case BusinessActionType::PanicRecording:
+            rez = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
+        default:
+            break;
+        }
     }
-    return false;
+
+    if (rez)
+        saveActionToDB(action);
+
+    return rez;
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
