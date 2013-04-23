@@ -98,6 +98,8 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
     } 
     else {
         ownResource->update(resource);
+        if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>())
+            determineOptimalIF(mediaServer.data());
         result = true;
     }
 
