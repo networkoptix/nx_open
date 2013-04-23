@@ -1,4 +1,8 @@
+
 #include "camera_pool.h"
+
+#include <memory>
+
 #include "test_camera_processor.h"
 #include "plugins/resources/test_camera/testcamera_const.h"
 
