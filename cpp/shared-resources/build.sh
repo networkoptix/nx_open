@@ -19,7 +19,7 @@ case `uname -s` in
         ;;
 esac
 
-make --no-p -f Makefile.$CONFIG -j $[NPROCESSORS+1] || exit 1
+make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] || exit 1
 
 if [[ -z $buildlib ]]; then
   echo "export LD_LIBRARY_PATH=${libdir}/build/bin/$CONFIG:/usr/lib" > ${libdir}/bin/$CONFIG/env.sh
