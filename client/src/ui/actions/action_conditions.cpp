@@ -394,3 +394,8 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
     
     return Qn::EnabledAction;
 }
+
+Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters) {
+    int nodeType = parameters.argument(Qn::SelectedNodeTypeArgument).toInt();
+    return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
+}

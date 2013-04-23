@@ -1232,12 +1232,14 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::PinTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("Pin Tree")).
-        toggledText(tr("Unpin Tree"));
+        toggledText(tr("Unpin Tree")).
+        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("Show Tree")).
-        toggledText(tr("Hide Tree"));
+        toggledText(tr("Hide Tree")).
+        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleSliderAction).
         flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).

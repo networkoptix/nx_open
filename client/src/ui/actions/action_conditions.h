@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource_managment/resource_criterion.h>
 
@@ -335,6 +337,15 @@ public:
     QnCreateZoomWindowActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+class QnTreeNodeTypeCondition: public QnActionCondition {
+public:
+    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent = NULL): QnActionCondition(parent), m_nodeType(nodeType) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+private:
+    Qn::NodeType m_nodeType;
 };
 
 #endif // QN_ACTION_CONDITIONS_H
