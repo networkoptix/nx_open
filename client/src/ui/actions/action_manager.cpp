@@ -445,7 +445,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::TogglePanicModeAction).
-        flags(Qn::Main).
+        flags(Qn::NoTarget).
         text(tr("Start Panic Recording")).
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
