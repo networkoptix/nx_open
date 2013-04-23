@@ -2326,20 +2326,6 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        if (user == context()->user()                           // if we
-                && user->isAdmin()                              // are owner
-                && !user->getPassword().isEmpty()               // and have changed our password
-                && currentPassword != user->getPassword()       // to another password
-                )
-        {
-            QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
-            int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
-                                 QMessageBox::Ok, QMessageBox::Discard);
-            if (button == QMessageBox::Discard) {
-                user->setPassword(QString());
-            }
-        }
-
         connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
