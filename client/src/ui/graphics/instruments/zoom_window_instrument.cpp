@@ -25,7 +25,6 @@ namespace {
     const QColor zoomFrameColor = toTransparent(zoomWindowColor, 0.75);
 
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
-    const qreal zoomDraggerSize = qnGlobals->workbenchUnitSize() * 0.05;
 
     const qreal zoomWindowMinSize = 0.1;
 
@@ -72,14 +71,6 @@ public:
         m_zoomWidget = zoomWidget;
     }
 
-    virtual void setGeometry(const QRectF &rect) override {
-        if(qIsNaN(rect.width()) || qIsNaN(rect.left())) {
-            int a = 10;
-        }
-
-        base_type::setGeometry(rect);
-    }
-
 protected:
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
@@ -98,47 +89,16 @@ protected:
         painter->fillRect(QRectF(w,       0,       r,           h), color);
     }
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
-        QRectF rect = manipulatorRect();
-        qreal penWidth = qMin(rect.width(), rect.height()) / 16;
-        QPointF center = rect.center();
-        QPointF centralStep = QPointF(penWidth, penWidth);
-
-        QnScopedPainterPenRollback penRollback(painter, QPen(zoomFrameColor, penWidth));
-        Q_UNUSED(penRollback)
-        QnScopedPainterBrushRollback brushRollback(painter, zoomDraggerColor);
-        Q_UNUSED(brushRollback)
-
-        painter->drawEllipse(rect);
-        painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
-    }
-
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
         Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
 
         if(result & Qn::SideSections) {
             result &= ~Qn::SideSections;
         } else if(result == Qn::NoSection) {
-            if(manipulatorRect().intersects(region))
-                result = Qn::TitleBarArea;
+            result = Qn::TitleBarArea;
         }
 
         return result;
-    }
-
-    virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override {
-        if(section == Qn::TitleBarArea) {
-            return Qt::SizeAllCursor;
-        } else {
-            return base_type::windowCursorAt(section);
-        }
-    }
-
-private:
-    QRectF manipulatorRect() const {
-        QRectF rect = this->rect();
-        qreal draggerSize = qMin(zoomDraggerSize, qMin(rect.width(), rect.height()));
-        return QRectF(rect.center() - QPointF(draggerSize, draggerSize) / 2.0, QSizeF(draggerSize, draggerSize));
     }
 
 private:
@@ -323,9 +283,10 @@ void ZoomWindowInstrument::ensureSelectionItem() {
 
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(QPen(zoomFrameColor, zoomFrameWidth));
+    selectionItem()->setPen(QPen(zoomFrameColor, zoomFrameWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     selectionItem()->setBrush(Qt::NoBrush);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
+    selectionItem()->setOptions(FixedArSelectionItem::DrawSideElements);
 
     if(scene())
         scene()->addItem(selectionItem());

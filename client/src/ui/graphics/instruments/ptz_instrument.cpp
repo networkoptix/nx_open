@@ -628,6 +628,7 @@ void PtzInstrument::ensureSelectionItem() {
     selectionItem()->setPen(ptzItemBorderColor);
     selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
+    selectionItem()->setOptions(FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);
 
     if(scene())
         scene()->addItem(selectionItem());
