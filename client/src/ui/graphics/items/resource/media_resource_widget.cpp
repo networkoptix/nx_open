@@ -711,8 +711,9 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
     if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
         if (resource->getStatus() == QnResource::Offline)
             return NoDataOverlay;
-        else
-            return EmptyOverlay;
+        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
+            return NoDataOverlay;
+        return EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return NoDataOverlay;
     } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
