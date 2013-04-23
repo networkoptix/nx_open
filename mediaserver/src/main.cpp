@@ -546,7 +546,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, settings.value("proxyAuthKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -988,11 +988,6 @@ void QnMain::run()
         status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online);
     } while (status != 0);
 
-    initAppServerEventConnection(qSettings, m_mediaServer);
-    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->run();
-
-    m_processor = new QnAppserverResourceProcessor(m_mediaServer->getId());
 
     foreach (QnAbstractStorageResourcePtr storage, m_mediaServer->getStorages())
     {
@@ -1002,6 +997,12 @@ void QnMain::run()
             qnStorageMan->addStorage(physicalStorage);
     }
     qnStorageMan->loadFullFileCatalog();
+
+    initAppServerEventConnection(qSettings, m_mediaServer);
+    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
+    eventManager->run();
+
+    m_processor = new QnAppserverResourceProcessor(m_mediaServer->getId());
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
