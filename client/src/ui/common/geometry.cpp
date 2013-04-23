@@ -271,6 +271,11 @@ QRectF QnGeometry::expanded(qreal aspectRatio, const QRectF &minRect, Qt::Aspect
     return aligned(expanded(aspectRatio, minRect.size(), mode), minRect, alignment);
 }
 
+QRectF QnGeometry::expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode) {
+    return expanded(aspectRatio, QRectF(center - toPoint(minSize) / 2, minSize), mode, Qt::AlignCenter);
+}
+
+
 namespace {
     template<class Size, class Rect>
     Rect alignedInternal(const Size &size, const Rect &rect, Qt::Alignment alignment) {

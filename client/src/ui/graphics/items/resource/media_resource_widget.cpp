@@ -758,7 +758,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -768,11 +768,14 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     setOption(DisplayCrosshair, ptzEnabled);
 
     if(checked) {
-        buttonBar()->setButtonsChecked(MotionSearchButton, false);
+        buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
+
+    if(checked)
+        buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }

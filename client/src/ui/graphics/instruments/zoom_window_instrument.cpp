@@ -520,8 +520,14 @@ void ZoomWindowInstrument::finishDrag(DragInfo *) {
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
         QRectF zoomRect = cwiseDiv(selectionItem()->rect(), target()->size());
-        if(zoomRect.width() >= zoomWindowMinSize && zoomRect.height() >= zoomWindowMinSize)
-            emit zoomRectCreated(target(), zoomRect);
+        if(zoomRect.width() <= zoomWindowMinSize || zoomRect.height() <= zoomWindowMinSize) {
+            zoomRect = movedInto(
+                expanded(aspectRatio(zoomRect), QSizeF(zoomWindowMinSize, zoomWindowMinSize), zoomRect.center(), Qt::KeepAspectRatioByExpanding),
+                QRectF(0.0, 0.0, 1.0, 1.0)
+            );
+        }
+        
+        emit zoomRectCreated(target(), zoomRect);
     }
 
     if(m_zoomWindowStartedEmitted)

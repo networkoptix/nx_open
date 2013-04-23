@@ -867,13 +867,13 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTakeScreenshotActionCondition(this));
 
     factory(Qn::CreateZoomWindowAction).
-        flags(Qn::Scene | Qn::SingleTarget).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Create Zoom Window")).
         condition(new QnCreateZoomWindowActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-         text(tr("Rotate to..."));
+        text(tr("Rotate to..."));
 
     factory.beginSubMenu();{
         factory(Qn::Rotate0Action).
