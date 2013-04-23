@@ -215,11 +215,11 @@ bool QnAction::event(QEvent *event) {
         QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
         if(targetProvider != NULL) {
             if(flags() & Qn::ScopelessHotkey) {
-                parameters.setItems(targetProvider->currentTarget(static_cast<Qn::ActionScope>(static_cast<int>(scope()))));
+                parameters = targetProvider->currentParameters(static_cast<Qn::ActionScope>(static_cast<int>(scope())));
             } else {
                 Qn::ActionScope scope = targetProvider->currentScope();
                 if(this->scope() & scope)
-                    parameters.setItems(targetProvider->currentTarget(scope));
+                    parameters = targetProvider->currentParameters(scope);
             }
         }
 

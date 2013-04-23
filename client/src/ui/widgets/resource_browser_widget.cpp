@@ -196,7 +196,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     }
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, ignoreSelection ? QnActionParameters() : QnActionParameters(currentTarget(Qn::TreeScope))));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
 
     /* Add tree-local actions to the menu. */
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
@@ -240,18 +240,32 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        if (index.data(Qn::NodeTypeRole) == Qn::RecorderNode) {
-            for (int i = 0; i < index.model()->rowCount(index); i++) {
-                QModelIndex subIndex = index.model()->index(i, 0, index);
-                QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+        int nodeType = index.data(Qn::NodeTypeRole).toInt();
+
+        switch (nodeType) {
+        case Qn::RecorderNode: {
+                for (int i = 0; i < index.model()->rowCount(index); i++) {
+                    QModelIndex subIndex = index.model()->index(i, 0, index);
+                    QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    if(resource && !result.contains(resource))
+                        result.append(resource);
+                }
+            }
+        case Qn::ResourceNode: {
+                QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if(resource && !result.contains(resource))
                     result.append(resource);
             }
+        case Qn::LocalNode:
+        case Qn::ServersNode:
+        case Qn::UsersNode:
+        case Qn::ItemNode:
+        case Qn::BastardNode:
+        case Qn::RootNode:
+            continue;
+        default:
+            break;
         }
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource && !result.contains(resource))
-            result.append(resource);
     }
 
     return result;
@@ -290,6 +304,12 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     } else {
         return QVariant::fromValue(selectedResources());
     }
+}
+
+QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
+    QItemSelectionModel *selectionModel = currentSelectionModel();
+    int nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).toInt();
+    return QnActionParameters(currentTarget(scope)).withArgument(Qn::SelectedNodeTypeArgument, nodeType);
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force) {

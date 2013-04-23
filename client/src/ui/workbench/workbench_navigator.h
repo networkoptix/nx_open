@@ -77,7 +77,6 @@ public:
     Q_SLOT void stepForward();
 
     virtual Qn::ActionScope currentScope() const override;
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -94,6 +93,8 @@ signals:
     void speedRangeChanged();
 
 protected:
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+
     enum SliderLine {
         CurrentLine,
         SyncedLine,

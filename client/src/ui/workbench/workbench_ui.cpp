@@ -744,13 +744,21 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const {
     }
 }
 
+QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const {
+    /* Get items. */
+    switch(scope) {
+    case Qn::TitleBarScope:
+        return m_tabBarWidget->currentParameters(scope);
+    case Qn::TreeScope:
+        return m_treeWidget->currentParameters(scope);
+    default:
+        return QnActionParameters(currentTarget(scope));
+    }
+}
+
 QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     /* Get items. */
     switch(scope) {
-    case Qn::TitleBarScope: 
-        return m_tabBarWidget->currentTarget(scope);
-    case Qn::TreeScope:
-        return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope:
         return QVariant::fromValue(navigator()->currentWidget());
     case Qn::SceneScope:

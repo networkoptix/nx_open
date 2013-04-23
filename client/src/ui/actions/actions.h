@@ -9,6 +9,8 @@ namespace Qn {
         return QLatin1String(s);
     }
 
+    //TODO: #Elric refactor QnActionParameters: use QMap<int, QVariant> instead of QVariantMap
+    // and ItemDataRole instead of this magic consts
 #define GridPositionParameter               fromLatin1("_qn_gridPosition")
 #define UserParameter                       fromLatin1("_qn_user")
 #define NameParameter                       fromLatin1("_qn_name")
@@ -26,6 +28,7 @@ namespace Qn {
 #define ZoomWindowArgument                  fromLatin1("_qn_zoomWindowArgument")
 #define FocusElementArgument                fromLatin1("_qn_focusElementArgument")
 #define AutoLoginArgument                   fromLatin1("_qn_AutoLoginArgument")
+#define SelectedNodeTypeArgument            fromLatin1("_qn_SelectedNodeTypeArgument")
 
     /**
      * Enum of all menu actions.

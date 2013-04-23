@@ -782,7 +782,7 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
         m_selectionScope = scope;
     }
 
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(provider->currentTarget(scope)));
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentParameters(scope));
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
@@ -3016,7 +3016,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     QnActionTargetProvider *provider = menu()->targetProvider();
     if(!provider)
         return;
-    parameters.setItems(provider->currentTarget(Qn::SceneScope));
+    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
 
     QnMediaResourceWidget *widget = NULL;
 
