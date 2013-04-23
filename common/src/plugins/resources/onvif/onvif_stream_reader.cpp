@@ -641,6 +641,9 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
         case QnPlOnvifResource::AAC:
             encoder.Encoding = onvifXsd__AudioEncoding__AAC;
             break;
+        case QnPlOnvifResource::AMR:
+            encoder.Encoding = onvifXsd__AudioEncoding__AMR;
+            break;
         default:
             qWarning() << "QnOnvifStreamReader::updateAudioEncoder: codec type is unknown: " << codec
                 << ". UniqueId: " << m_onvifRes->getUniqueId();
