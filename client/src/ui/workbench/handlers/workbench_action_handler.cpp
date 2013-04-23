@@ -1533,7 +1533,9 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QUrl url(QnAppServerConnectionFactory::defaultUrl());
-    url.setPath(QLatin1String("/web/"));
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setPath(QLatin1String("web"));
     QDesktopServices::openUrl(url);
 }
 
