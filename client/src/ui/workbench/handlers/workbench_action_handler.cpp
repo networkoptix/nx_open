@@ -3290,13 +3290,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     if(!widget)
         return;
 
-    QRectF rect;
-    if(params.hasArgument(Qn::ZoomWindowArgument)) {
-        rect = params.argument<QRectF>(Qn::ZoomWindowArgument);
-    } else {
-        rect = QRectF(0.25, 0.25, 0.5, 0.5);
-    }
-
+    QRectF rect = params.argument<QRectF>(Qn::ZoomWindowArgument, QRectF(0.25, 0.25, 0.5, 0.5));
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), rect, widget->item()->uuid());
 }
 
