@@ -3,6 +3,7 @@
 #include <QEvent>
 #include <QSysInfo>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/common/geometry.h>
@@ -23,7 +24,7 @@ namespace {
 
 CachingProxyWidget::CachingProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
-    m_maxTextureSize(maxTextureSize()),
+    m_maxTextureSize(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)),
     m_texture(0),
     m_wholeTextureDirty(true)
 {}
@@ -113,12 +114,6 @@ bool CachingProxyWidget::eventFilter(QObject *object, QEvent *event) {
     }
     
     return base_type::eventFilter(object, event);
-}
-
-int CachingProxyWidget::maxTextureSize() {
-    GLint result;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
-    return result;
 }
 
 void CachingProxyWidget::ensureCurrentWidgetSynchronized() {

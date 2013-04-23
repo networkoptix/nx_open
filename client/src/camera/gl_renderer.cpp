@@ -56,13 +56,6 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnGLRenderer
 // -------------------------------------------------------------------------- //
-static int maxTextureSizeVal = 0;
-
-int QnGLRenderer::maxTextureSize() 
-{
-    return maxTextureSizeVal;
-}
-
 bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
 {
     switch( pixfmt )
@@ -103,8 +96,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     m_yv12ToRgbaShaderProgram.reset( new QnYv12ToRgbaShaderProgram(context) );
     //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
-    glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxTextureSizeVal );
-    cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSizeVal), cl_logINFO );
+    cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)), cl_logINFO );
 }
 
 QnGLRenderer::~QnGLRenderer()
@@ -141,8 +133,9 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
     m_lastDisplayedFlags = picLock->flags();
 
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     Qn::RenderStatus result = picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
-    const bool draw = picLock->width() <= maxTextureSize() && picLock->height() <= maxTextureSize();
+    const bool draw = picLock->width() <= maxTextureSize && picLock->height() <= maxTextureSize;
     if( !draw )
     {
         result = Qn::CannotRender;
