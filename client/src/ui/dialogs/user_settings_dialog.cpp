@@ -67,6 +67,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     setWarningStyle(ui->hintLabel);
 
     updateAll();
+    updateSizeLimits();
 }
 
 QnUserSettingsDialog::~QnUserSettingsDialog() {
@@ -370,6 +371,12 @@ void QnUserSettingsDialog::updateAll() {
     updateElement(Login);
 }
 
+void QnUserSettingsDialog::updateSizeLimits() {
+    QSize hint = sizeHint();
+    setMinimumSize(hint);
+    setMaximumSize(600, hint.height());
+}
+
 void QnUserSettingsDialog::updateDependantPermissions() {
     m_inUpdateDependensies = true;
 
@@ -523,6 +530,7 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         
         widget = widget->parentWidget();
     }
+    updateSizeLimits();
 }
 
 // Utility functions

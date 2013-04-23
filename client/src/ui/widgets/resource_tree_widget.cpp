@@ -3,6 +3,7 @@
 
 #include <QtGui/QStyledItemDelegate>
 #include <QtGui/QScrollBar>
+#include <QtGui/QContextMenuEvent>
 
 #include <common/common_meta_types.h>
 
@@ -260,6 +261,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     connect(ui->clearFilterButton,      SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
 
+    ui->resourcesTreeView->installEventFilter(this);
     ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
 }
 
@@ -445,8 +447,13 @@ void QnResourceTreeWidget::updateFilter() {
 // -------------------------------------------------------------------------- //
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
     if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-        (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
+        (event->type() == QEvent::Show || event->type() == QEvent::Hide)) {
             emit viewportSizeChanged();
+    } else if (obj == ui->resourcesTreeView && event->type() == QEvent::ContextMenu) {
+        QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
+        if (me->reason() == QContextMenuEvent::Mouse
+                && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
+            selectionModel()->clear();
     }
     return base_type::eventFilter(obj, event);
 }
@@ -454,6 +461,10 @@ bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
 void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
     emit viewportSizeChanged();
     base_type::resizeEvent(event);
+}
+
+void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
+    base_type::mousePressEvent(event);
 }
 
 void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
