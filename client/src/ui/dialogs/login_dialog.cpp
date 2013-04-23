@@ -52,7 +52,7 @@ namespace {
 
 
 QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
-    QDialog(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
@@ -166,9 +166,18 @@ void QnLoginDialog::accept() {
     updateUsability();
 }
 
+bool QnLoginDialog::rememberPassword() const {
+    return ui->rememberPasswordCheckBox->isChecked();
+}
+
+void QnLoginDialog::setStoredPassword(const QString &password) {
+    ui->passwordLineEdit->setText(password);
+    ui->rememberPasswordCheckBox->setChecked(!password.isEmpty());
+}
+
 void QnLoginDialog::reject() {
     if(m_requestHandle == -1) {
-        QDialog::reject();
+        base_type::reject();
         return;
     }
 
@@ -177,7 +186,7 @@ void QnLoginDialog::reject() {
 }
 
 void QnLoginDialog::changeEvent(QEvent *event) {
-    QDialog::changeEvent(event);
+    base_type::changeEvent(event);
 
     switch (event->type()) {
     case QEvent::LanguageChange:
@@ -186,6 +195,14 @@ void QnLoginDialog::changeEvent(QEvent *event) {
     default:
         break;
     }
+}
+
+void QnLoginDialog::showEvent(QShowEvent *event) {
+    base_type::showEvent(event);
+    if (ui->rememberPasswordCheckBox->isChecked()
+            && !ui->passwordLineEdit->text().isEmpty()
+            && currentUrl().isValid())
+        accept();
 }
 
 void QnLoginDialog::resetConnectionsModel() {
@@ -403,7 +420,7 @@ void QnLoginDialog::at_connectFinished(int status, const QByteArray &/*errorStri
     }
 
     m_connectInfo = connectInfo;
-    QDialog::accept();
+    base_type::accept();
 }
 
 void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {

@@ -5,6 +5,7 @@
 #include <utils/common/util.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
+#include <utils/common/string.h>
 
 #include <ui/style/globals.h>
 
@@ -33,6 +34,8 @@ namespace {
         settings->setValue(QLatin1String("url"), url.toString());
         settings->setValue(QLatin1String("readOnly"), connection.readOnly);
     }
+
+    const QString xorKey = QLatin1String("ItIsAGoodDayToDie");
 
 } // anonymous namespace
 
@@ -142,6 +145,10 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
         } else {
             return defaultValue;
         }
+    case AUTO_LOGIN: {
+            QString result = xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
+            return result;
+        }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
     case DEV_MODE:
@@ -187,6 +194,10 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
         settings->endGroup();
         break;
     }
+    case AUTO_LOGIN: {
+            base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
+            break;
+        }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:

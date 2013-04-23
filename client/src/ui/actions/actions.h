@@ -25,6 +25,7 @@ namespace Qn {
 #define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
 #define ZoomWindowArgument                  fromLatin1("_qn_zoomWindowArgument")
 #define FocusElementArgument                fromLatin1("_qn_focusElementArgument")
+#define AutoLoginArgument                   fromLatin1("_qn_AutoLoginArgument")
 
     /**
      * Enum of all menu actions.
