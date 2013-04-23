@@ -244,11 +244,6 @@ namespace Qn {
         SystemSettingsAction,
 
         /**
-         * Opens business events editing dialog.
-         */
-        BusinessEventsAction,
-
-        /**
          * Opens about dialog.
          */
         AboutAction,
@@ -263,6 +258,20 @@ namespace Qn {
          */
         ExitAction,
 
+
+        /* Tree Root Nodes actions */
+
+        /**
+         * Opens web client in the default browser.
+         */
+        WebClientAction,
+
+        /**
+         * Opens business events editing dialog.
+         */
+        BusinessEventsAction,
+
+        //ShowMediaServerLogs,
 
 
         /* Tab bar actions. */
@@ -438,6 +447,11 @@ namespace Qn {
          * Opens server settings dialog.
          */
         ServerSettingsAction,
+
+        /**
+         * Opens server logs in the default web browser.
+         */
+        ServerLogsAction,
 
         /**
          * Opens manual camera addition dialog.

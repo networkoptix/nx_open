@@ -81,7 +81,7 @@ public:
             m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
             break;
         case Qn::ServersNode:
-            m_displayName = m_name = tr("Servers");
+            m_displayName = m_name = tr("System");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
             break;
         case Qn::UsersNode:
