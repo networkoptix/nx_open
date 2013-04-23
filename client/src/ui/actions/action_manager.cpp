@@ -589,14 +589,6 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: #Elric icon?
 
-
-    factory(Qn::BusinessEventsAction).
-        flags(Qn::Main).
-        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Rules...")).
-        shortcut(tr("Ctrl+E")).
-        autoRepeat(false);
-
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
@@ -632,6 +624,22 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/exit.png"));
 
+
+    /* Tree Root Nodes actions */
+
+    factory(Qn::BusinessEventsAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Rules...")).
+        shortcut(tr("Ctrl+E")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory(Qn::WebClientAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Open Web Client")).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     /* Tab bar actions. */
     factory().
@@ -867,13 +875,13 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTakeScreenshotActionCondition(this));
 
     factory(Qn::CreateZoomWindowAction).
-        flags(Qn::Scene | Qn::SingleTarget).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Create Zoom Window")).
         condition(new QnCreateZoomWindowActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-         text(tr("Rotate to..."));
+        text(tr("Rotate to..."));
 
     factory.beginSubMenu();{
         factory(Qn::Rotate0Action).
@@ -989,6 +997,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
         requiredPermissions(Qn::WritePermission).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+
+    factory(Qn::ServerLogsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Logs")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory().

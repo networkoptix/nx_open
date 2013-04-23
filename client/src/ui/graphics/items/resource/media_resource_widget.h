@@ -16,8 +16,7 @@ class QnResourceWidgetRenderer;
 
 
 class QnMediaResourceWidget: public QnResourceWidget {
-    Q_OBJECT;
-
+    Q_OBJECT
     typedef QnResourceWidget base_type;
 
 public:

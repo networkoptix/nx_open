@@ -72,13 +72,21 @@ public:
         return m_arguments;
     }
 
-    QVariant argument(const QString &key) const {
-        return m_arguments.value(key);
+    QVariant argument(const QString &key, const QVariant &defaultValue = QVariant()) const {
+        return m_arguments.value(key, defaultValue);
     }
 
     template<class T>
-    T argument(const QString &key) const {
-        return argument(key).value<T>();
+    T argument(const QString &key, const T &defaultValue = T()) const {
+        QVariantMap::const_iterator pos = m_arguments.find(key);
+        if(pos == m_arguments.end())
+            return defaultValue;
+
+        QVariant result = *pos;
+        if(!result.convert(static_cast<QVariant::Type>(qMetaTypeId<T>())))
+            return defaultValue;
+
+        return result.value<T>();
     }
 
     bool hasArgument(const QString &key) const {
