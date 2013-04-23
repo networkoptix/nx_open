@@ -493,7 +493,8 @@ int main(int argc, char **argv)
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */
             if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
-                context->menu()->trigger(Qn::ConnectToServerAction);
+                context->menu()->trigger(Qn::ConnectToServerAction,
+                                         QnActionParameters().withArgument(Qn::AutoLoginArgument, qnSettings->autoLogin()));
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);
             }

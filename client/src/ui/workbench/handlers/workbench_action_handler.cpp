@@ -1536,6 +1536,9 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(widget(), context()));
     dialog->setModal(true);
     while(true) {
+        QnActionParameters parameters = menu()->currentParameters(sender());
+        dialog->setStoredPassword(parameters.argument(Qn::AutoLoginArgument).toString());
+
         if(!dialog->exec())
             return;
 
@@ -1560,6 +1563,11 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QnConnectionData connectionData;
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
+
+    qnSettings->setAutoLogin(dialog->rememberPassword()
+                ? connectionData.url.password()
+                : QString()
+                  );
 
     // remove previous "Last used connection"
     connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
@@ -1690,6 +1698,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     if (popupCollectionWidget())
         popupCollectionWidget()->clear();
+
+    qnSettings->setAutoLogin(QString());
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {

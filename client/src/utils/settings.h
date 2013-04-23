@@ -72,6 +72,8 @@ public:
         SLIDER_OPENED,
         TITLE_OPENED,
 
+        AUTO_LOGIN,
+
         VARIABLE_COUNT
     };
     
@@ -134,6 +136,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
         QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
         QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
+        QN_DECLARE_RW_PROPERTY(QString,                     autoLogin,              setAutoLogin,               AUTO_LOGIN,                 QString())
     QN_END_PROPERTY_STORAGE()
 
 private:
