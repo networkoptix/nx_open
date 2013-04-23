@@ -15,6 +15,8 @@
 @interface HDWVideoViewController : UIViewController <MotionJpegViewDelegate> {
     BOOL _playingLive;
     NSDate *_lastSelectedDate;
+    
+    NSDateFormatter *_dateFomatter;
 
     UIBarButtonItem *_liveButton;
     UIBarButtonItem *_archiveButton;
@@ -26,6 +28,9 @@
 
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet MotionJpegImageView *imageView;
+
+@property (weak, nonatomic) IBOutlet UILabel *fpsLabel;
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 
 - (void)onCalendarDispose: (HDWCalendarViewController *)calendarView;
 

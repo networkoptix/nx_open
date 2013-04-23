@@ -1,4 +1,4 @@
-platform :ios, '5.0'
+platform :ios, '5.1'
 pod 'AFNetworking', '1.1'
 pod 'SocketRocket', '0.2.0'
 pod 'FXImageView', '1.2.3'

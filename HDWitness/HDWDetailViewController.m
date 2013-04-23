@@ -509,7 +509,7 @@ enum State {
     }
     
     if (camera.status.intValue == Status_Online || camera.status.intValue == Status_Recording) {
-        NSLog(@"Thumbnail URL: %@", [camera.thumbnailUrl absoluteString]);
+//        NSLog(@"Thumbnail URL: %@", [camera.thumbnailUrl absoluteString]);
         [cell.imageView setImageWithContentsOfURL:camera.thumbnailUrl];
     }
     

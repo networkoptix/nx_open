@@ -117,9 +117,6 @@ static NSData *_endMarkerData = nil;
     _allowSelfSignedCertificates = NO;
     _needReconnect = NO;
     
-    _dateFomatter = [[NSDateFormatter alloc] init];
-    [_dateFomatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-
     if (_fpsCounter == nil)
         _fpsCounter = [FpsCounter fpsCounterWithInterval:FPS_MEASURE_SECONDS];
     
@@ -219,35 +216,6 @@ static NSData *_endMarkerData = nil;
 
 #pragma mark - NSURLConnection Delegate Methods
 
--(UIImage*) drawTextOnPic:(NSString*) bottomText
-                 withTime:(NSDate*)time
-                  inImage:(UIImage*)  image
-{
-    UIFont *font = [UIFont boldSystemFontOfSize:12];
-    UIGraphicsBeginImageContext(image.size);
-    [image drawInRect:CGRectMake(0,0,image.size.width,image.size.height)];
-    
-    CGRect rect = CGRectMake(5.0f,5.0f,image.size.width-20.0f, image.size.height);
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetShadow(context, CGSizeMake(2.5f, 2.5f), 5.0f);
-    
-    
-    [[UIColor redColor] set];
-    [bottomText drawInRect:CGRectIntegral(rect) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentRight];
-    
-    if (time) {
-        rect = CGRectMake(5.0f, image.size.height - 15.0f, image.size.width-20.0f, image.size.height);
-        NSString *timestampString = [_dateFomatter stringFromDate:time];
-        [timestampString drawInRect:CGRectIntegral(rect) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentRight];
-    }
-    
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return newImage;
-}
-
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
     double timeSinceEpoch = [httpResponse.allHeaderFields[@"x-Content-Timestamp"] longLongValue] / 1e+6;
@@ -273,7 +241,10 @@ static NSData *_endMarkerData = nil;
                 _firstFrameReceived = YES;
             }
             
-            self.image = [self drawTextOnPic:[NSString stringWithFormat:@"FPS: %d", [_fpsCounter currentFps]] withTime:_lastTimestamp inImage:receivedImage];
+            self.image = receivedImage;
+            [_delegate onFrameReceived:_lastTimestamp andFps:[_fpsCounter currentFps]];
+//            NSLog(@"Show Image");
+//            self.image = [self drawTextOnPic:[NSString stringWithFormat:@"FPS: %d", [_fpsCounter currentFps]] withTime:_lastTimestamp inImage:receivedImage];
         }
     }
 }

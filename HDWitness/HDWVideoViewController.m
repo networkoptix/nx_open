@@ -22,6 +22,11 @@
     [SVProgressHUD dismiss];
 }
 
+- (void)onFrameReceived:(NSDate*)timestamp andFps:(NSInteger)currentFps {
+    self.fpsLabel.text = [NSString stringWithFormat:@"FPS: %d", currentFps];
+    self.timeLabel.text = [_dateFomatter stringFromDate:timestamp];
+}
+
 - (BOOL)shouldAutorotate {
     return YES;
 }
@@ -124,6 +129,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    _dateFomatter = [[NSDateFormatter alloc] init];
+    [_dateFomatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+
     self.imageView.delegate = self;
     _liveButton = [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
 //    _archiveButton = [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
@@ -168,6 +176,12 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [self.imageView stop];
     [SVProgressHUD dismiss];
+}
+- (void)viewDidUnload {
+    [self setFpsLabel:nil];
+    [self setTimeLabel:nil];
+    [super viewDidUnload];
 }
 @end

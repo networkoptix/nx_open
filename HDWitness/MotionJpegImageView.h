@@ -28,6 +28,7 @@
 @protocol MotionJpegViewDelegate <NSObject>
 
 - (void)onFirstFrameReceived;
+- (void)onFrameReceived:(NSDate*)timestamp andFps:(NSInteger)currentFps;
 
 @end
 
@@ -59,7 +60,6 @@
     BOOL _needReconnect;
     BOOL _firstFrameReceived;
     
-    NSDateFormatter *_dateFomatter;
     NSDate *_lastTimestamp;
 }
 
