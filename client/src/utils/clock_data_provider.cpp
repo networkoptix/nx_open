@@ -2,7 +2,7 @@
 
 #include <QDateTime>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 QnClockDataProvider::QnClockDataProvider(QObject *parent) :
     QObject(parent),
