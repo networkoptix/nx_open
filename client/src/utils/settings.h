@@ -1,5 +1,5 @@
-#ifndef QN_SETTINGS_H
-#define QN_SETTINGS_H
+#ifndef QN_CLIENT_SETTINGS_H
+#define QN_CLIENT_SETTINGS_H
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -17,7 +17,7 @@
 
 class QSettings;
 
-class QnSettings: public QnPropertyStorage {
+class QnClientSettings: public QnPropertyStorage {
     Q_OBJECT
 
     typedef QnPropertyStorage base_type;
@@ -77,17 +77,17 @@ public:
         VARIABLE_COUNT
     };
     
-    QnSettings();
-    virtual ~QnSettings();
+    QnClientSettings();
+    virtual ~QnClientSettings();
 
-    static QnSettings *instance();
+    static QnClientSettings *instance();
 
     void load();
     void save();
 
     /**
      * @brief isWritable    Check if settings storage is available for writing.
-     * @return              True if settings can be saved.
+     * @returns             True if settings can be saved.
      */
     bool isWritable() const;
 
@@ -146,6 +146,6 @@ private:
 };
 
 
-#define qnSettings QnSettings::instance()
+#define qnSettings QnClientSettings::instance()
 
-#endif // QN_SETTINGS_H
+#endif // QN_CLIENT_SETTINGS_H

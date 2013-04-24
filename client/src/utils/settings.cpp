@@ -40,14 +40,12 @@ namespace {
 } // anonymous namespace
 
 QSettings qSettings;	//TODO: #Elric remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
-Q_GLOBAL_STATIC(QnSettings, qn_settings)
+Q_GLOBAL_STATIC(QnClientSettings, qn_settings)
 
-QnSettings::QnSettings():
+QnClientSettings::QnClientSettings():
     m_settings(new QSettings(this)),
     m_loading(true)
 {
-    QnClientMetaTypes::initialize(); // TODO: #Elric remove
-
     init();
 
     /* Set default values. */
@@ -86,15 +84,15 @@ QnSettings::QnSettings():
     m_loading = false;
 }
 
-QnSettings::~QnSettings() {
+QnClientSettings::~QnClientSettings() {
     return;
 }
 
-QnSettings *QnSettings::instance() {
+QnClientSettings *QnClientSettings::instance() {
     return qn_settings();
 }
 
-QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
@@ -159,7 +157,7 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
     }
 }
 
-void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
+void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
     switch(id) {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
@@ -209,13 +207,13 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
     }
 }
 
-void QnSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
+void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
     QnScopedValueRollback<bool> guard(&m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }
 
-QnPropertyStorage::UpdateStatus QnSettings::updateValue(int id, const QVariant &value) {
+QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVariant &value) {
     UpdateStatus status = base_type::updateValue(id, value);
 
     /* Settings are to be written out right away. */
@@ -225,14 +223,14 @@ QnPropertyStorage::UpdateStatus QnSettings::updateValue(int id, const QVariant &
     return status;
 }
 
-void QnSettings::load() {
+void QnClientSettings::load() {
     updateFromSettings(m_settings);
 }
 
-void QnSettings::save() {
+void QnClientSettings::save() {
     submitToSettings(m_settings);
 }
 
-bool QnSettings::isWritable() const {
+bool QnClientSettings::isWritable() const {
     return m_settings->isWritable();
 }

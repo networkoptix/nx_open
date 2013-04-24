@@ -39,7 +39,7 @@ QnPopupSettingsWidget::~QnPopupSettingsWidget()
 {
 }
 
-void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
+void QnPopupSettingsWidget::updateFromSettings(QnClientSettings *settings) {
     bool all = true;
 
     quint64 eventsShown = settings->popupBusinessEvents();
@@ -63,7 +63,7 @@ void QnPopupSettingsWidget::updateFromSettings(QnSettings *settings) {
     ui->showAllCheckBox->setChecked(all);
 }
 
-void QnPopupSettingsWidget::submitToSettings(QnSettings *settings) {
+void QnPopupSettingsWidget::submitToSettings(QnClientSettings *settings) {
     quint64 eventsShown = settings->popupBusinessEvents();
     quint64 eventsFlag = 1;
     for (int i = 0; i < BusinessEventType::Count; i++) {

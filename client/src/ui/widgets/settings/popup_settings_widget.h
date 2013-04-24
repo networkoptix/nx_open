@@ -8,7 +8,7 @@ namespace Ui {
     class QnPopupSettingsWidget;
 }
 
-class QnSettings;
+class QnClientSettings;
 
 class QnPopupSettingsWidget : public QWidget
 {
@@ -18,8 +18,8 @@ public:
     explicit QnPopupSettingsWidget(QWidget *parent = 0);
     ~QnPopupSettingsWidget();
 
-    void updateFromSettings(QnSettings* settings);
-    void submitToSettings(QnSettings* settings);
+    void updateFromSettings(QnClientSettings* settings);
+    void submitToSettings(QnClientSettings* settings);
 
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
