@@ -39,7 +39,7 @@ public:
 
 private slots:
     void at_context_userChanged();
-    void at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle);
+    void at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle);
 
     void loadPresets();
     void savePresets();

@@ -160,7 +160,9 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         break;
     }
     case KvPairObject: {
-        QnKvPairList kvPairs;
+
+
+        QnKvPairs kvPairs;
 
         if(status == 0) {
             try {
@@ -505,13 +507,13 @@ int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses,
     return addObjectAsync(LicenseObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
-int QnAppServerConnection::saveAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
+int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, const QnKvPairList &kvPairs, QObject *target, const char *slot)
 {
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, KvPairObject);
-    QObject::connect(processor, SIGNAL(finishedKvPair(int, const QByteArray&, const QnKvPairList&, int)), target, slot);
+    QObject::connect(processor, SIGNAL(finishedKvPair(int, const QByteArray&, const QnKvPairs&, int)), target, slot);
 
     QByteArray data;
-    m_serializer.serializeKvPairs(kvPairs, data);
+    m_serializer.serializeKvPairs(resource, kvPairs, data);
 
     return addObjectAsync(KvPairObject, data, processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
@@ -555,7 +557,7 @@ int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *sl
 int QnAppServerConnection::getKvPairsAsync(QObject* target, const char* slot) 
 {
     QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, KvPairObject);
-    QObject::connect(processor, SIGNAL(finishedKvPair(int, QByteArray, QnKvPairList, int)), target, slot);
+    QObject::connect(processor, SIGNAL(finishedKvPair(int, QByteArray, QnKvPairs, int)), target, slot);
 
     return getObjectsAsync(KvPairObject, QString(), processor, SLOT(processReply(QnHTTPRawResponse, int)));
 }
