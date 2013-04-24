@@ -36,10 +36,14 @@ void GenericRTSPDiscoveryManager::getVendorName( char* buf ) const
 
 int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
 {
+#if 0
     strcpy( cameras[0].url, "rtsp://192.168.0.31:554/axis-media/media.amp" );
     strcpy( cameras[0].uid, "HUY" );
     strcpy( cameras[0].modelName, "rtsp://192.168.0.31:554/axis-media/media.amp" );
     return 1;
+#else
+    return 0;
+#endif
 }
 
 int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
@@ -71,4 +75,12 @@ nxcip::BaseCameraManager* GenericRTSPDiscoveryManager::createCameraManager( cons
         //TODO/IMPL checking, if audio is present at info.url
     }
     return new GenericRTSPCameraManager( infoCopy );
+}
+
+void GenericRTSPDiscoveryManager::getReservedModelListFirst( char** /*modelList*/, int* /*count*/ )
+{
+}
+
+void GenericRTSPDiscoveryManager::getReservedModelListNext( char** /*modelList*/, int* /*count*/ )
+{
 }

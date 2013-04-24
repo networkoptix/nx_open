@@ -196,3 +196,11 @@ nxcip::BaseCameraManager* AxisCameraDiscoveryManager::createCameraManager( const
     strcpy( obj->cameraInfo().defaultPassword, AXIS_DEFAULT_PASSWORD );
     return obj;
 }
+
+void AxisCameraDiscoveryManager::getReservedModelListFirst( char** /*modelList*/, int* /*count*/ )
+{
+}
+
+void AxisCameraDiscoveryManager::getReservedModelListNext( char** /*modelList*/, int* /*count*/ )
+{
+}

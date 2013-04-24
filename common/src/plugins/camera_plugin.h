@@ -67,6 +67,11 @@ namespace nxcip
     /*!
         Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a fromUpnpData or \a fromMDNSData method.
         If camera do support neither UPNP nor MDNS, plugin can provide its own search method by implementing \a findCameras
+
+        In case camera is supported by multiple drivers, driver to use is selected under following rules:\n
+        - each received MDNS and UPNP response packet is first processed by plugins, then by built-in drivers. Plugins are iterated in vendor name ascending order
+        - it is undefined when \a CameraDiscoveryManager::findCameras is called (with regard to mdns and upnp search)
+        - plugin can reserve model name(s) so that built-in drivers do not process cameras with that name TODO api
     */
     class CameraDiscoveryManager
     :
@@ -130,6 +135,23 @@ namespace nxcip
 
         //!Creates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
+
+        static const int CAMERA_MODEL_ARRAY_SIZE = 64;
+        static const int MAX_MODEL_NAME_SIZE = 256;
+        //!Start listing model names
+        /*!
+            \param modelList Array of size \a CAMERA_MODEL_ARRAY_SIZE of char* buffers of size \a MAX_MODEL_NAME_SIZE
+            \param count Number of returned model names is placed here
+        */
+        virtual void getReservedModelListFirst( char** modelList, int* count ) = 0;
+        //!Continue listing model names
+        /*!
+            Listing ends with this method setting \a *count to zero
+            \param modelList Array of size \a CAMERA_MODEL_ARRAY_SIZE of char* buffers of size \a MAX_MODEL_NAME_SIZE
+            \param count Number of returned model names is placed here
+            \note If \a getReservedModelListFirst has not been called yet, this method MUST start listing
+        */
+        virtual void getReservedModelListNext( char** modelList, int* count ) = 0;
     };
 
 
