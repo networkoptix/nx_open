@@ -47,7 +47,7 @@ public:
             return geometry;
 
         if(pinCorner == Qn::NoCorner)
-            return QRectF(geometry.topLeft(), constrainedSize);
+            return QRectF(geometry.center() - QnGeometry::toPoint(constrainedSize) / 2.0, constrainedSize);
 
         QPointF pinPoint = QnGeometry::corner(geometry, pinCorner);
         QRectF result(
