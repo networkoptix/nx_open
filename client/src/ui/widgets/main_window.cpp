@@ -5,6 +5,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QFileDialog>
 #include <QtGui/QToolButton>
+#include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMessageBox>
 #include <QtGui/QFileOpenEvent>
@@ -46,6 +47,7 @@
 
 #include "file_processor.h"
 #include "utils/settings.h"
+#include <utils/clock_data_provider.h>
 
 #include "resource_browser_widget.h"
 #include "dwm.h"
@@ -86,6 +88,13 @@ namespace {
 
 
         return button;
+    }
+
+    QLabel *newClockLabel() {
+        QLabel* label = new QLabel();
+        QnClockDataProvider* dp = new QnClockDataProvider(label);
+        QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
+        return label;
     }
 
     void setVisibleRecursively(QLayout *layout, bool visible) {
@@ -251,6 +260,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(newClockLabel());
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
