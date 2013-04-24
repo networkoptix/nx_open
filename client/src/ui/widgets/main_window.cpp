@@ -46,7 +46,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include <utils/clock_data_provider.h>
 
 #include "resource_browser_widget.h"

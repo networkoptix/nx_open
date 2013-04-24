@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
 

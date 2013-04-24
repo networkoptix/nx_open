@@ -1,5 +1,5 @@
-#ifndef QN_SETTINGS_H
-#define QN_SETTINGS_H
+#ifndef QN_CLIENT_SETTINGS_H
+#define QN_CLIENT_SETTINGS_H
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -17,7 +17,7 @@
 
 class QSettings;
 
-class QnSettings: public QnPropertyStorage {
+class QnClientSettings: public QnPropertyStorage {
     Q_OBJECT
 
     typedef QnPropertyStorage base_type;
@@ -82,17 +82,17 @@ public:
         VARIABLE_COUNT
     };
     
-    QnSettings();
-    virtual ~QnSettings();
+    QnClientSettings();
+    virtual ~QnClientSettings();
 
-    static QnSettings *instance();
+    static QnClientSettings *instance();
 
     void load();
     void save();
 
     /**
      * @brief isWritable    Check if settings storage is available for writing.
-     * @return              True if settings can be saved.
+     * @returns             True if settings can be saved.
      */
     bool isWritable() const;
 
@@ -141,7 +141,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
         QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
         QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
-        QN_DECLARE_RW_PROPERTY(QString,                     autoLogin,              setAutoLogin,               AUTO_LOGIN,                 QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     autoLogin,              setAutoLogin,               AUTO_LOGIN,                 QString()) 
+        // TODO: #GDM autoLogin is a bad name. It implies bool type, but the data that is actually stored is encrypted password.
         QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
@@ -154,6 +155,6 @@ private:
 };
 
 
-#define qnSettings QnSettings::instance()
+#define qnSettings QnClientSettings::instance()
 
-#endif // QN_SETTINGS_H
+#endif // QN_CLIENT_SETTINGS_H

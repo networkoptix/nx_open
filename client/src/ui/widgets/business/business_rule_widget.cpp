@@ -24,7 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
 // TODO: #GDM 

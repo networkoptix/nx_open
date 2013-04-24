@@ -13,7 +13,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/event_processors.h>
 
 QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):

@@ -9,7 +9,7 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "../utils/settings.h"
+#include "../client/client_settings.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -375,7 +375,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL,
-                QnSettings::instance()->isHardwareDecodingUsed() );
+                QnClientSettings::instance()->isHardwareDecodingUsed() );
         dec->setSpeed( m_speed );
         if (dec == 0) {
             cl_log.log(QString::fromAscii("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);

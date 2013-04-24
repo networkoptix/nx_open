@@ -18,7 +18,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/email.h>
 
 namespace {

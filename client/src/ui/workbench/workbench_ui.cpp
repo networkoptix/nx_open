@@ -64,7 +64,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/clock_data_provider.h>
 
 #include "openal/qtvaudiodevice.h"

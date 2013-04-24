@@ -3,33 +3,9 @@
 
 #include "action_fwd.h"
 
+#include <client/client_globals.h>
+
 namespace Qn {
-
-    inline QLatin1String fromLatin1(const char *s) {
-        return QLatin1String(s);
-    }
-
-    //TODO: #Elric refactor QnActionParameters: use QMap<int, QVariant> instead of QVariantMap
-    // and ItemDataRole instead of this magic consts
-#define GridPositionParameter               fromLatin1("_qn_gridPosition")
-#define UserParameter                       fromLatin1("_qn_user")
-#define NameParameter                       fromLatin1("_qn_name")
-#define ServerParameter                     fromLatin1("_qn_server")
-#define LayoutParameter                     fromLatin1("_qn_layoutParameter")
-#define CurrentLayoutParameter              fromLatin1("_qn_currentLayoutParameter")
-#define CurrentLayoutMediaItemsParameter    fromLatin1("_qn_currentLayoutMediaItemsParameter")
-#define CurrentUserParameter                fromLatin1("_qn_currentUserParameter")
-#define AllMediaServersParameter            fromLatin1("_qn_allMediaServers")
-#define SerializedResourcesParameter        fromLatin1("_qn_serializedResourcesParameter")
-#define TimePeriodParameter                 fromLatin1("_qn_timePeriodParameter")
-#define TimePeriodsParameter                fromLatin1("_qn_timePeriodsParameter")
-#define AllTimePeriodsParameter             fromLatin1("_qn_allTimePeriodsParameter")
-#define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
-#define ZoomWindowArgument                  fromLatin1("_qn_zoomWindowArgument")
-#define FocusElementArgument                fromLatin1("_qn_focusElementArgument")
-#define AutoLoginArgument                   fromLatin1("_qn_AutoLoginArgument")
-#define SelectedNodeTypeArgument            fromLatin1("_qn_SelectedNodeTypeArgument")
-
     /**
      * Enum of all menu actions.
      */
@@ -62,7 +38,7 @@ namespace Qn {
          * set in <tt>QnSettings</tt>.
          * 
          * Parameters.
-         * <tt>QnConnectInfoPtr ConnectInfoParameter</tt> --- a connection info
+         * <tt>QnConnectInfoPtr ConnectionInfoRole</tt> --- a connection info
          * to use. If not provided, action handler will try to send a connect
          * request first.
          */
@@ -95,7 +71,7 @@ namespace Qn {
          * 
          * Parameters:
          * 
-         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         * <tt>QByteArray SerializedDataRole</tt> --- a serialized
          * QnMimeData representation of a set of resources.
          */ 
         DelayedDropResourcesAction,
@@ -105,7 +81,7 @@ namespace Qn {
          *
          * Parameters:
          *
-         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         * <tt>QByteArray SerializedDataRole</tt> --- a serialized
          * QnMimeData representation of a set of resources.
          */
         InstantDropResourcesAction,
@@ -115,7 +91,7 @@ namespace Qn {
          * 
          * Parameters.
          * 
-         * <tt>QnMediaServerResourcePtr ServerParameter</tt> --- video server to
+         * <tt>QnMediaServerResourcePtr MediaServerResourceRole</tt> --- video server to
          * move cameras to.
          */
         MoveCameraAction,
@@ -294,9 +270,9 @@ namespace Qn {
          * 
          * Parameters:
          * 
-         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates. 
          * If not provided, Items will be dropped at the center of the layout.
-         * <tt>QnLayoutResourcePtr LayoutParameter</tt> --- layout to drop at.
+         * <tt>QnLayoutResourcePtr LayoutResourceRole</tt> --- layout to drop at.
          */ 
         OpenInLayoutAction,
 
@@ -305,7 +281,7 @@ namespace Qn {
          * 
          * Parameters:
          * 
-         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         * <tt>QPointF ItemPositionRole</tt> --- drop position, in grid coordinates. 
          * If not provided, Items will be dropped at the center of the layout.
          */ 
         OpenInCurrentLayoutAction,
@@ -355,8 +331,8 @@ namespace Qn {
          * 
          * Parameters:
          * 
-         * <tt>QnUserResourcePtr UserParameter</tt> --- user to assign layout to.
-         * <tt>QString NameParameter</tt> --- name for the new layout.
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to assign layout to.
+         * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
         SaveLayoutAsAction,
 
@@ -364,7 +340,7 @@ namespace Qn {
          * Saves selected layout under another name in current user's layouts list.
          * 
          * Parameters:
-         * <tt>QString NameParameter</tt> --- name for the new layout.
+         * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
         SaveLayoutForCurrentUserAsAction,
 
@@ -547,7 +523,7 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          * 
          * Parameters:
-         * <tt>QString NameParameter</tt> --- name of the PTZ preset.
+         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -586,7 +562,7 @@ namespace Qn {
          * 
          * Parameters:
          * 
-         * <tt>QString NameParameter</tt> --- new name for the resource. If not
+         * <tt>QString ResourceNameRole</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
         RenameAction,
@@ -678,7 +654,7 @@ namespace Qn {
          * 
          * Parameters:
          * 
-         * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
+         * <tt>QnTimePeriod TimePeriodRole</tt> --- time period for quick search.
          */
         ThumbnailsSearchAction,
 

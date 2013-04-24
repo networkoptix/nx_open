@@ -29,7 +29,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "connection_testing_dialog.h"
 
