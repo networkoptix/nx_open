@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include <api/model/kvpair.h>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 
@@ -16,6 +18,7 @@ namespace Ui {
 
 class QnBusinessEventPopupWidget;
 class QnSystemHealthPopupWidget;
+class QnKvPairUsageHelper;
 
 class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -45,7 +48,12 @@ private slots:
 
     void at_postponeAllButton_clicked();
     void at_minimizeButton_clicked();
+
+    void at_context_userChanged();
 private:
+    QnKvPairUsageHelper* m_showBusinessEventsHelper;
+    QnKvPairUsageHelper* m_showSystemHealthHelper;
+
     QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 
     QMap<BusinessEventType::Value, QnBusinessEventPopupWidget *> m_businessEventWidgets;
