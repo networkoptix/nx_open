@@ -19,8 +19,8 @@ class QnCalendarWidget: public QCalendarWidget {
 
 public: 
     QnCalendarWidget();
-    void setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods);
-    void setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods);
+    void setCurrentTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods);
+    void setSyncedTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods);
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
     // TODO: #GDM function/accessor name should convey what it does/modifies,

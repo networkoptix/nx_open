@@ -309,7 +309,7 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
     QItemSelectionModel *selectionModel = currentSelectionModel();
     int nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).toInt();
-    return QnActionParameters(currentTarget(scope)).withArgument(Qn::SelectedNodeTypeArgument, nodeType);
+    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, nodeType); // TODO: #Elric just pass all the data through?
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force) {

@@ -442,7 +442,7 @@ public:
         if(role != Qt::EditRole)
             return false;
 
-        m_model->context()->menu()->trigger(Qn::RenameAction, QnActionParameters(m_resource).withArgument(Qn::NameParameter, value.toString()));
+        m_model->context()->menu()->trigger(Qn::RenameAction, QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString()));
         return true;
     }
 
@@ -880,7 +880,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         QnMediaResourceList medias = resources.filtered<QnMediaResource>();
 
-        menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutParameter, layout));
+        menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -893,8 +893,8 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             menu()->trigger(
                 Qn::SaveLayoutAsAction, 
                 QnActionParameters(layout).
-                    withArgument(Qn::UserParameter, user).
-                    withArgument(Qn::NameParameter, layout->getName())
+                    withArgument(Qn::UserResourceRole, user).
+                    withArgument(Qn::ResourceNameRole, layout->getName())
             );
         }
     } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
@@ -903,7 +903,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
             QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
             if(!cameras.empty())
-                menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::ServerParameter, server));
+                menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
         }
     }
     

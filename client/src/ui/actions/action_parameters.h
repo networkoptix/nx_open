@@ -14,71 +14,73 @@ class QGraphicsItem;
  * Parameter pack for an action.
  * 
  * It always contains a 'default' parameter, accessible via <tt>items()</tt>
- * or <tt>argument(QString())</tt>. This parameter is expected to be of one of
+ * or <tt>argument(-1)</tt>. This parameter is expected to be of one of
  * the types convertible to <tt>Qn::ResourceType</tt>. It is normally passed
  * as the first argument to the <tt>QnActionParameters</tt>'s constructor.
  */
 class QnActionParameters {
 public:
-    QnActionParameters(const QVariantMap &arguments = QVariantMap());
+    typedef QHash<int, QVariant> ArgumentHash;
 
-    explicit QnActionParameters(const QVariant &items, const QVariantMap &arguments = QVariantMap());
+    QnActionParameters(const ArgumentHash &arguments = ArgumentHash());
+
+    explicit QnActionParameters(const QVariant &items, const ArgumentHash &arguments = ArgumentHash());
 
     template<class Resource>
-    QnActionParameters(const QnSharedResourcePointer<Resource> &resource, const QVariantMap &arguments = QVariantMap()) {
+    QnActionParameters(const QnSharedResourcePointer<Resource> &resource, const ArgumentHash &arguments = ArgumentHash()) {
         setArguments(arguments);
         setItems(QVariant::fromValue<QnResourcePtr>(resource));
     }
 
     template<class Resource>
-    QnActionParameters(const QnSharedResourcePointerList<Resource> &resources, const QVariantMap &arguments = QVariantMap()) {
+    QnActionParameters(const QnSharedResourcePointerList<Resource> &resources, const ArgumentHash &arguments = ArgumentHash()) {
         setArguments(arguments);
         setItems(QVariant::fromValue<QnResourceList>(resources));
     }
 
-    QnActionParameters(const QList<QGraphicsItem *> &items, const QVariantMap &arguments = QVariantMap());
+    QnActionParameters(const QList<QGraphicsItem *> &items, const ArgumentHash &arguments = ArgumentHash());
 
-    QnActionParameters(QnResourceWidget *widget, const QVariantMap &arguments = QVariantMap());
+    QnActionParameters(QnResourceWidget *widget, const ArgumentHash &arguments = ArgumentHash());
 
-    QnActionParameters(const QnResourceWidgetList &widgets, const QVariantMap &arguments = QVariantMap());
+    QnActionParameters(const QnResourceWidgetList &widgets, const ArgumentHash &arguments = ArgumentHash());
 
-    QnActionParameters(const QnWorkbenchLayoutList &layouts, const QVariantMap &arguments = QVariantMap());
+    QnActionParameters(const QnWorkbenchLayoutList &layouts, const ArgumentHash &arguments = ArgumentHash());
 
-    QnActionParameters(const QnLayoutItemIndexList &layoutItems, const QVariantMap &arguments = QVariantMap());
+    QnActionParameters(const QnLayoutItemIndexList &layoutItems, const ArgumentHash &arguments = ArgumentHash());
 
     QVariant items() const {
-        return argument(QString());
+        return argument(-1);
     }
 
     void setItems(const QVariant &items);
 
-    Qn::ActionParameterType type(const QString &key = QString()) const;
+    Qn::ActionParameterType type(int key = -1) const;
 
-    int size(const QString &key = QString()) const;
+    int size(int key = -1) const;
     
-    QnResourceList resources(const QString &key = QString()) const;
+    QnResourceList resources(int key = -1) const;
 
-    QnResourcePtr resource(const QString &key = QString()) const;
+    QnResourcePtr resource(int key = -1) const;
 
-    QnLayoutItemIndexList layoutItems(const QString &key = QString()) const;
+    QnLayoutItemIndexList layoutItems(int key = -1) const;
 
-    QnWorkbenchLayoutList layouts(const QString &key = QString()) const;
+    QnWorkbenchLayoutList layouts(int key = -1) const;
 
-    QnResourceWidget *widget(const QString &key = QString()) const;
+    QnResourceWidget *widget(int key = -1) const;
 
-    QnResourceWidgetList widgets(const QString &key = QString()) const;
+    QnResourceWidgetList widgets(int key = -1) const;
 
-    const QVariantMap &arguments() const {
+    const ArgumentHash &arguments() const {
         return m_arguments;
     }
 
-    QVariant argument(const QString &key, const QVariant &defaultValue = QVariant()) const {
+    QVariant argument(int key, const QVariant &defaultValue = QVariant()) const {
         return m_arguments.value(key, defaultValue);
     }
 
     template<class T>
-    T argument(const QString &key, const T &defaultValue = T()) const {
-        QVariantMap::const_iterator pos = m_arguments.find(key);
+    T argument(int key, const T &defaultValue = T()) const {
+        ArgumentHash::const_iterator pos = m_arguments.find(key);
         if(pos == m_arguments.end())
             return defaultValue;
 
@@ -89,34 +91,34 @@ public:
         return result.value<T>();
     }
 
-    bool hasArgument(const QString &key) const {
+    bool hasArgument(int key) const {
         return m_arguments.contains(key);
     }
 
-    void setArguments(const QVariantMap &arguments);
+    void setArguments(const ArgumentHash &arguments);
 
-    void setArgument(const QString &key, const QVariant &value);
+    void setArgument(int key, const QVariant &value);
 
     template<class T>
-    void setArgument(const QString &key, const T &value) {
+    void setArgument(int key, const T &value) {
         setArgument(key, QVariant::fromValue<T>(value));
     }
 
-    QnActionParameters &withArgument(const QString &key, const QVariant &value) {
+    QnActionParameters &withArgument(int key, const QVariant &value) {
         setArgument(key, value);
 
         return *this;
     }
 
     template<class T>
-    QnActionParameters &withArgument(const QString &key, const T &value) {
+    QnActionParameters &withArgument(int key, const T &value) {
         setArgument(key, value);
 
         return *this;
     }
 
 private:
-    QVariantMap m_arguments;
+    ArgumentHash m_arguments;
 };
 
 #endif // QN_ACTION_PARAMETERS_H

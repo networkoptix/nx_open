@@ -728,7 +728,7 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         if (m_display->camDisplay()->isEOFReached())
             return NoDataOverlay;
         QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
-        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime() / 1000))
+        if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateChannelOverlay(channel, QnResource::Online);
         else
             return NoDataOverlay;

@@ -271,13 +271,13 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
 }
 
 Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters &parameters) {
-    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+    if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
     if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return m_nonMatchingVisibility;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
     } else {
@@ -286,10 +286,10 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
 }
 
 Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &parameters) {
-    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+    if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
@@ -300,14 +300,14 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if (m_centralItemRequired) {
         QnResourcePtr resource = parameters.resource();
         if(resource->flags() & QnResource::sync) {
-            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
             if(!periods.intersects(period))
                 return Qn::DisabledAction;
         }
     }
     // Export layout
     else {
-        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::AllTimePeriodsParameter);
+        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
         if(!periods.intersects(period))
             return Qn::DisabledAction;
     }
@@ -396,6 +396,6 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
 }
 
 Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters) {
-    int nodeType = parameters.argument(Qn::SelectedNodeTypeArgument).toInt();
+    int nodeType = parameters.argument(Qn::NodeTypeRole).toInt();
     return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
 }

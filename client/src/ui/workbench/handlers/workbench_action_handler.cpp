@@ -964,13 +964,13 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutParameter);
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
     if(!layout) {
         qnWarning("No layout provided.");
         return;
     }
 
-    QPointF position = parameters.argument<QPointF>(Qn::GridPositionParameter);
+    QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
@@ -992,7 +992,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
+    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
     menu()->trigger(Qn::OpenInLayoutAction, parameters);
 }
 
@@ -1086,7 +1086,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         return;
     }
 
-    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString().trimmed();
+    QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Save Layout As"));
@@ -1187,7 +1187,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
 
     at_saveLayoutAsAction_triggered(
         parameters.resource().dynamicCast<QnLayoutResource>(), 
-        parameters.argument<QnUserResourcePtr>(Qn::UserParameter)
+        parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole)
     );
 }
 
@@ -1218,7 +1218,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();
-    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::ServerParameter);
+    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::MediaServerResourceRole);
     if(!server)
         return;
     QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
@@ -1317,7 +1317,7 @@ void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
@@ -1330,7 +1330,7 @@ void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
@@ -1548,7 +1548,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     dialog->setModal(true);
     while(true) {
         QnActionParameters parameters = menu()->currentParameters(sender());
-        dialog->setStoredPassword(parameters.argument(Qn::AutoLoginArgument).toString());
+        dialog->setStoredPassword(parameters.argument(Qn::AutoLoginRole).toString());
 
         if(!dialog->exec())
             return;
@@ -1603,7 +1603,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (dialog->restartPending())
         QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
     else
-        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
+        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, dialog->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
@@ -1613,7 +1613,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connectionData.isValid()) 
         return;
     
-    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectInfoParameter);
+    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
         
@@ -1730,11 +1730,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(!resource)
         return;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(period.isEmpty())
         return;
 
-    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
@@ -2100,7 +2100,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(!resource)
         return;
 
-    QString name = parameters.argument(Qn::NameParameter).toString().trimmed();
+    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Rename"));
@@ -2429,7 +2429,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
-    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementArgument));
+    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -2511,7 +2511,7 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
     if (!layout)
         return;
 
-    QnTimePeriod exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
@@ -2851,7 +2851,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]);
         if (loader) {
             QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
-            QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(exportPeriod);
+            QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(exportPeriod);
             QByteArray data;
             periods.encode(data);
             device->write(data);
@@ -3061,7 +3061,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     if(!widget)
         return;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     if(period.durationMs > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
@@ -3151,7 +3151,7 @@ Do you want to continue?"),
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) 
             {
-                QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(period);
+                QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
                 if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
                 {
                     int result = QMessageBox::warning(
@@ -3310,7 +3310,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     if(!widget)
         return;
 
-    QRectF rect = params.argument<QRectF>(Qn::ZoomWindowArgument, QRectF(0.25, 0.25, 0.5, 0.5));
+    QRectF rect = params.argument<QRectF>(Qn::ItemZoomRectRole, QRectF(0.25, 0.25, 0.5, 0.5));
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), rect, widget->item()->uuid());
 }
 
@@ -3381,7 +3381,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     if(!camera)
         return;
 
-    QString name = parameters.argument<QString>(Qn::NameParameter);
+    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty())
         return;
 

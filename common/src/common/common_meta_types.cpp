@@ -83,7 +83,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnPtzSpaceMapper>();
 
-    qRegisterMetaType<Qn::TimePeriodRole>();
+    qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();
 
     qRegisterMetaType<QnSoftwareVersion>();

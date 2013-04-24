@@ -494,7 +494,7 @@ int main(int argc, char **argv)
             /* If no input files were supplied --- open connection settings dialog. */
             if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
                 context->menu()->trigger(Qn::ConnectToServerAction,
-                                         QnActionParameters().withArgument(Qn::AutoLoginArgument, qnSettings->autoLogin()));
+                                         QnActionParameters().withArgument(Qn::AutoLoginRole, qnSettings->autoLogin()));
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);
             }
@@ -505,14 +505,14 @@ int main(int argc, char **argv)
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
         if (!instantDrop.isEmpty()){
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
 #ifdef _DEBUG

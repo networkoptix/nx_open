@@ -101,8 +101,8 @@ public:
     void setLineComment(int line, const QString &comment);
     QString lineComment(int line);
 
-    QnTimePeriodList timePeriods(int line, Qn::TimePeriodRole type) const;
-    void setTimePeriods(int line, Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods);
+    QnTimePeriodList timePeriods(int line, Qn::TimePeriodContent type) const;
+    void setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
 
     Options options() const;
     void setOptions(Options options);

@@ -89,5 +89,5 @@ void QnPtzGoToPresetActionFactory::at_action_triggered() {
     if(!camera)
         return;
 
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::NameParameter, action->text()));
+    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, action->text()));
 }

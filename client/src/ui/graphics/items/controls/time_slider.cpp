@@ -216,11 +216,11 @@ namespace {
         }
     }
 
-    bool checkLinePeriod(int line, Qn::TimePeriodRole type) {
+    bool checkLinePeriod(int line, Qn::TimePeriodContent type) {
         if(!checkLine(line))
             return false;
 
-        if(type < 0 || type >= Qn::TimePeriodRoleCount) {
+        if(type < 0 || type >= Qn::TimePeriodContentCount) {
             qnWarning("Invalid time period type '%1'.", static_cast<int>(type));
             return false;
         } else {
@@ -496,14 +496,14 @@ QString QnTimeSlider::lineComment(int line) {
     return m_lineData[line].comment;
 }
 
-QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodRole type) const {
+QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodContent type) const {
     if(!checkLinePeriod(line, type))
         return QnTimePeriodList();
     
     return m_lineData[line].timeStorage.periods(type);
 }
 
-void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods) {
+void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods) {
     if(!checkLinePeriod(line, type))
         return;
 
@@ -1309,8 +1309,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
             drawPeriodsBar(
                 painter, 
-                m_lineData[line].timeStorage.aggregated(Qn::RecordingRole),  
-                m_lineData[line].timeStorage.aggregated(Qn::MotionRole), 
+                m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),  
+                m_lineData[line].timeStorage.aggregated(Qn::MotionContent), 
                 lineRect
             );
 
@@ -1433,13 +1433,13 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
-    const QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
-    const QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
+    const QColor pastColor[Qn::TimePeriodContentCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
+    const QColor futureColor[Qn::TimePeriodContentCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
 
-    QnTimePeriodList::const_iterator pos[Qn::TimePeriodRoleCount];
-    QnTimePeriodList::const_iterator end[Qn::TimePeriodRoleCount];
-    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+    QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
+    QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
+    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
          pos[i] = periods[i].findNearestPeriod(minimumValue, false);
          end[i] = periods[i].findNearestPeriod(maximumValue, true);
          if(end[i] != periods[i].end() && end[i]->contains(maximumValue))
@@ -1448,13 +1448,13 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     qint64 value = minimumValue;
 
-    bool inside[Qn::TimePeriodRoleCount];
-    for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
+    bool inside[Qn::TimePeriodContentCount];
+    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
         inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
     while(value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodRoleCount] = {maximumValue, maximumValue};
-        for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
+        for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(pos[i] == end[i]) 
                 continue;
             
@@ -1470,12 +1470,12 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
         qint64 bestValue = qMin(nextValue[0], nextValue[1]);
         
         int bestIndex;
-        if(inside[Qn::MotionRole]) {
-            bestIndex = Qn::MotionRole;
-        } else if(inside[Qn::RecordingRole]) {
-            bestIndex = Qn::RecordingRole;
+        if(inside[Qn::MotionContent]) {
+            bestIndex = Qn::MotionContent;
+        } else if(inside[Qn::RecordingContent]) {
+            bestIndex = Qn::RecordingContent;
         } else {
-            bestIndex = Qn::TimePeriodRoleCount;
+            bestIndex = Qn::TimePeriodContentCount;
         }
 
         qreal leftPos = quickPositionFromValue(value);
@@ -1489,7 +1489,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
             painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureColor[bestIndex]);
         }
         
-        for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+        for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(bestValue != nextValue[i])
                 continue;
 
