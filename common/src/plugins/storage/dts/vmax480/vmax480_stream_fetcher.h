@@ -40,7 +40,6 @@ public:
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
 
-    void reconnect();
 public:
     VMaxStreamFetcher(QnResource* dev, bool isLive);
     virtual ~VMaxStreamFetcher();
