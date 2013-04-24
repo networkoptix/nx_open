@@ -14,7 +14,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <common/common_meta_types.h>
 

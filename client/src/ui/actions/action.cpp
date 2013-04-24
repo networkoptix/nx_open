@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "action_manager.h"
 #include "action_target_provider.h"

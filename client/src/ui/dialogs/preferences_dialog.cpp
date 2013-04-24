@@ -12,7 +12,7 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"

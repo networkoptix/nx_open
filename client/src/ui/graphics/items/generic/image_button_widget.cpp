@@ -11,7 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>

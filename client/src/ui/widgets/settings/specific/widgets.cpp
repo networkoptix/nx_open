@@ -6,7 +6,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 
-#include "utils/settings.h"
+#include "client/client_settings.h"
 #include "ui/style/globals.h"
 
 SettingsSlider::SettingsSlider(Qt::Orientation orientation, QWidget *parent)

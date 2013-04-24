@@ -9,7 +9,7 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "../utils/settings.h"
+#include "../client/client_settings.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes

@@ -10,7 +10,7 @@
 
 #include "version.h"
 #include "ui/widgets/main_window.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>

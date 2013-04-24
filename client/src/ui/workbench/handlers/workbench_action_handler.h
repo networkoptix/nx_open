@@ -11,7 +11,7 @@
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 class QAction;
 class QMenu;

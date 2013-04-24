@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):

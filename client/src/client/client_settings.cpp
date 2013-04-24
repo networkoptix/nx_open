@@ -1,4 +1,4 @@
-#include "settings.h"
+#include "client_settings.h"
 
 #include <QtCore/QSettings>
 
