@@ -86,7 +86,30 @@
                     "physicalMultiplier": 32.0
                 }
             }
+        },
+        {
+            "models": [
+                "SD83X3"
+            ],
+            "fromCamera": {
+                "x": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [  -1,   1],
+                    "physical": [-180, 180]
+                },
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [ -1,  1],
+                    "physical": [  0, 90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [0, 1],
+                    "physical": [32.6, 1213.2],
+                }
+            }
         }
+
     ]
 }
 

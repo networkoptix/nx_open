@@ -15,7 +15,6 @@
 #include <ui/workbench/workbench_context.h>
 
 //#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
-
 #ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
 #else
