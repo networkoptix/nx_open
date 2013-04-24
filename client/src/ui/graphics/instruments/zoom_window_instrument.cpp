@@ -72,6 +72,25 @@ public:
     }
 
 protected:
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override {
+        qreal scale = std::pow(2.0, (event->delta() / 8.0) / 180.0);
+
+        QRectF geometry = this->geometry();
+        geometry = constrainedGeometry(
+            QnGeometry::expanded(
+                QnGeometry::aspectRatio(geometry),
+                geometry.size() * scale,
+                geometry.center(),
+                Qt::KeepAspectRatioByExpanding
+            ),
+            Qn::NoCorner
+        );
+
+        setGeometry(geometry);
+        
+        event->accept();
+    }
+
     virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const override;
 
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
