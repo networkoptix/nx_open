@@ -143,7 +143,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         } else {
             return defaultValue;
         }
-    case AUTO_LOGIN: {
+    case STORED_PASSWORD: {
             QString result = xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
             return result;
         }
@@ -192,7 +192,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
-    case AUTO_LOGIN: {
+    case STORED_PASSWORD: {
             base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
             break;
         }
