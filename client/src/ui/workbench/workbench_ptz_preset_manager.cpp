@@ -203,17 +203,27 @@ void QnWorkbenchPtzPresetManager::removePtzPreset(const QnVirtualCameraResourceP
 }
 
 void QnWorkbenchPtzPresetManager::loadPresets() {
-    d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(this, SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairList &, int)));
+    d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(
+                this,
+                SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairs &, int)));
 }
 
 void QnWorkbenchPtzPresetManager::savePresets() {
+    if(!context()->user())
+        return;
+
     QByteArray data;
     QJson::serialize(d->presets, &data);
 
     QnKvPairList kvPairs;
     kvPairs.push_back(QnKvPair(lit("ptzPresets"), QString::fromUtf8(data)));
 
-    d->saveHandle = QnAppServerConnectionFactory::createConnection()->saveAsync(kvPairs, this, SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairList &, int)));
+    //TODO: #Elric provide correct resource
+    d->saveHandle = QnAppServerConnectionFactory::createConnection()->saveAsync(
+                context()->user(),
+                kvPairs,
+                this,
+                SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairs &, int)));
 }
 
 void QnWorkbenchPtzPresetManager::at_context_userChanged() {
@@ -225,9 +235,12 @@ void QnWorkbenchPtzPresetManager::at_context_userChanged() {
     loadPresets();
 }
 
-void QnWorkbenchPtzPresetManager::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle) {
+void QnWorkbenchPtzPresetManager::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle) {
     Q_UNUSED(errorString)
     // TODO: #Elric check status
+
+    if (!context()->user())
+        return;
 
     if(status != 0) {
         qnWarning("Failed to save/load ptz presets.");
@@ -235,8 +248,11 @@ void QnWorkbenchPtzPresetManager::at_connection_replyReceived(int status, const 
     }
 
     if(handle == d->loadHandle) {
+        //TODO: #Elric provide correct resource
+        QnKvPairList pairs = kvPairs[context()->user()->getId()];
+
         QByteArray data;
-        foreach(const QnKvPair &pair, kvPairs)
+        foreach(const QnKvPair &pair, pairs)
             if(pair.name() == lit("ptzPresets"))
                 data = pair.value().toUtf8();
         

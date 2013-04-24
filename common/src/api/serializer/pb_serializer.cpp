@@ -359,7 +359,7 @@ void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
     }
 }
 
-void parseKvPairs(QnKvPairList& kvPairs, const PbKvPairList& pb_kvPairs)
+void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs)
 {
     for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
     {
@@ -367,7 +367,7 @@ void parseKvPairs(QnKvPairList& kvPairs, const PbKvPairList& pb_kvPairs)
         kvPair.setName(QString::fromUtf8(ci->name().c_str()));
         kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
 
-        kvPairs.append(kvPair);
+        kvPairs[ci->resourceid()].append(kvPair);
     }
 }
 
@@ -521,9 +521,9 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_schedule(businessRulePtr->schedule().toUtf8());
 }
 
-void serializeKvPair_i(pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
+void serializeKvPair_i(int resourceId, pb::KvPair& pb_kvPair, const QnKvPair& kvPair)
 {
-    pb_kvPair.set_resourceid(1); // TODO: #Elric EVIL!!!!!!!!!!!11111111111
+    pb_kvPair.set_resourceid(resourceId);
     pb_kvPair.set_name(kvPair.name().toUtf8());
     pb_kvPair.set_value(kvPair.value().toUtf8());
 }
@@ -741,7 +741,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
 
-void QnApiPbSerializer::deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data)
+void QnApiPbSerializer::deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
 
@@ -1019,22 +1019,22 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeKvPair(const QnKvPair& kvPair, QByteArray& data)
+void QnApiPbSerializer::serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
-    serializeKvPair_i(*pb_kvPairs.add_kvpair(), kvPair);
+    serializeKvPair_i(resource->getId(), *pb_kvPairs.add_kvpair(), kvPair);
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data)
+void QnApiPbSerializer::serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
 
     foreach(const QnKvPair &kvPair, kvPairs)
-        serializeKvPair_i(*pb_kvPairs.add_kvpair(), kvPair);
+        serializeKvPair_i(resource->getId(), *pb_kvPairs.add_kvpair(), kvPair);
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);
