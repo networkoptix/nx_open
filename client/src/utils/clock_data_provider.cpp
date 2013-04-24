@@ -12,10 +12,10 @@ QnClockDataProvider::QnClockDataProvider(QObject *parent) :
     m_showSeconds(qnSettings->isClockSecondsOn()),
     m_timer(new QTimer(this))
 {
-    connect(qnSettings->notifier(QnSettings::CLOCK_24HOUR),     SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
-    connect(qnSettings->notifier(QnSettings::CLOCK_WEEKDAY),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
-    connect(qnSettings->notifier(QnSettings::CLOCK_DATE),       SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
-    connect(qnSettings->notifier(QnSettings::CLOCK_SECONDS),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+    connect(qnSettings->notifier(QnClientSettings::CLOCK_24HOUR),     SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+    connect(qnSettings->notifier(QnClientSettings::CLOCK_WEEKDAY),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+    connect(qnSettings->notifier(QnClientSettings::CLOCK_DATE),       SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+    connect(qnSettings->notifier(QnClientSettings::CLOCK_SECONDS),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
 
     updateFormatString();
 
