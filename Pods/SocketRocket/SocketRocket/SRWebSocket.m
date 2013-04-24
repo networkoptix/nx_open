@@ -323,6 +323,8 @@ static __strong NSData *CRLFCRLF;
 
 - (void)dealloc
 {
+    NSLog(@"Deallocating SOCKET");
+    
     _inputStream.delegate = nil;
     _outputStream.delegate = nil;
 

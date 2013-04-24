@@ -92,7 +92,9 @@
 }
 
 -(NSURL*) videoUrlForDate: (NSDate*)date andQuality: (NSUInteger)quality {
-    NSInteger resolution = [[[NSUserDefaults standardUserDefaults] objectForKey:@"resolution_preference"] integerValue];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults synchronize];
+    NSInteger resolution = [[defaults objectForKey:@"resolution_preference"] integerValue];
     NSLog(@"Resolution: %d", resolution);
 
     NSString *position;
@@ -109,8 +111,6 @@
 
 -(NSURL*) liveUrl {
     return [self videoUrlForDate:nil andQuality:10];
-//    NSString *path = [NSString stringWithFormat:@"/media/%@.mpjpeg?resolution=240p&qmin=10&qmax=10", _physicalId];
-//    return [NSURL URLWithString:path relativeToURL:_server.streamingUrl];
 }
 
 -(NSURL*) archiveUrlForDate: (NSDate*)date {

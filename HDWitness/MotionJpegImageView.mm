@@ -28,6 +28,7 @@
 
 #pragma mark - Constants
 
+#define RETRY_DELAY 5.0
 #define FPS_MEASURE_SECONDS 5
 #define END_MARKER_BYTES { 0xFF, 0xD9 }
 
@@ -183,7 +184,7 @@ static NSData *_endMarkerData = nil;
         // continue
     }
     else if (_url) {
-        NSLog(@"Playing %@", [_url absoluteString]);
+        NSLog(@"Playing %@ %@", [_url absoluteString], id(self));
         _firstFrameReceived = NO;
         
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:_url];
@@ -250,6 +251,7 @@ static NSData *_endMarkerData = nil;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    [_delegate onConnectionClosed];
     NSLog(@"connectionDidFinishLoading");
 }
 
@@ -292,7 +294,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     NSLog(@"didFailWithError: %@", error);
     [self stop];
     _connection = nil;
-    [self play];
+    [self performSelector:@selector(play) withObject:nil afterDelay:RETRY_DELAY];
 }
 
 #pragma mark - CredentialAlertView Delegate Methods

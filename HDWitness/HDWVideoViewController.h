@@ -12,8 +12,11 @@
 #import "HDWCameraModel.h"
 #import "MotionJpegImageView.h"
 
-@interface HDWVideoViewController : UIViewController <MotionJpegViewDelegate> {
+@interface HDWVideoViewController : UIViewController <MotionJpegViewDelegate, HDWCalendarViewDelegate> {
     BOOL _playingLive;
+    BOOL _firstFrameReceived;
+    
+    NSDate *_lastFrameTimestamp;
     NSDate *_lastSelectedDate;
     
     NSDateFormatter *_dateFomatter;
@@ -32,6 +35,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *fpsLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 
-- (void)onCalendarDispose: (HDWCalendarViewController *)calendarView;
+- (void)onCalendarDispose: (NSDate *)selectedDate;
 
 @end

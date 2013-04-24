@@ -79,6 +79,13 @@ enum State {
 
 @implementation HDWDetailViewController
 
+- (void) dealloc {
+    _socket.delegate = nil;
+    [_socket close];
+    _socket = nil;
+    NSLog(@"Deallocating DETA");
+}
+
 - (BOOL)shouldAutorotate {
     return YES;
 }
@@ -173,7 +180,6 @@ enum State {
                 
                 HDWCameraModel* camera = [[HDWCameraModel alloc] initWithDict:resource andServer:server];
 
-                NSLog(@"Before: %d", server.enabledCameras.count);
                 NSIndexPath* indexPath = [_ecsModel addOrReplaceCamera:camera];
                 if (indexPath) { // Camera is added
                     [newCameras addObject:indexPath];
@@ -181,7 +187,6 @@ enum State {
                     camera.disabled = existing.disabled;
                     [self handleDisableChange:camera withDisabled:!camera.disabled newCameras:newCameras andRemovedCameras:removedCameras];
                 }
-                NSLog(@"After: %d", server.enabledCameras.count);
             }
         } else if (messageType == MessageType_ResourceDelete) {
             NSNumber *resourceId = message[@"resourceId"];
@@ -227,12 +232,10 @@ enum State {
         }
         
         if (newServers.count != 0) {
-            NSLog(@"Inserting servers");
             [self.collectionView insertSections:newServers];
         }
         
         if (newCameras.count != 0) {
-            NSLog(@"Inserting cameras");
             [self.collectionView insertItemsAtIndexPaths:newCameras];
         }
         
@@ -321,8 +324,11 @@ enum State {
 - (void)requestJSONEntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
     NSString *path = [NSString stringWithFormat:@"api/%@/?format=json", resourceKind];
     NSURL *resourceUrl = [NSURL URLWithString:path relativeToURL:_baseUrl];
-    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
+    NSMutableURLRequest *resourceRequest = [NSMutableURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
     
+    NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", resourceUrl.user, resourceUrl.password];
+    [resourceRequest addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
+
     _requestOperation = [AFJSONRequestOperation JSONRequestOperationWithRequest:resourceRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
         [SVProgressHUD dismiss];
         [self performSelector:onSuccess withObject:JSON];
@@ -342,21 +348,26 @@ enum State {
 - (void)requestPB2EntityForResourceKind:(NSString*)resourceKind success:(SEL)onSuccess statusMessage:(NSString*)statusMessage errorMessage:(NSString*)errorMessage {
     NSString *path = [NSString stringWithFormat:@"api/%@/?format=pb", resourceKind];
     NSURL *resourceUrl = [NSURL URLWithString:path relativeToURL:_baseUrl];
-    NSURLRequest *resourceRequest = [NSURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
+    NSMutableURLRequest *resourceRequest = [NSMutableURLRequest requestWithURL:resourceUrl cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:10.0];
+    
+    NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", resourceUrl.user, resourceUrl.password];
+    [resourceRequest addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
+
+
+    __weak typeof(self) weakSelf = self;
     
     _requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:resourceRequest];
     [_requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         [SVProgressHUD dismiss];
-        [self performSelector:onSuccess withObject:responseObject];
+        [weakSelf performSelector:onSuccess withObject:responseObject];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [SVProgressHUD dismiss];
         if (error.code == NSURLErrorCancelled)
             return;
         
         _state = State_NetworkFailed;
-        [[[UIAlertView alloc] initWithTitle:@"Error" message:errorMessage delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:errorMessage delegate:weakSelf cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
     }];
-    
     
     [self increaseProgress:[NSMutableArray arrayWithObjects:@0, statusMessage, _requestOperation, nil]];
     [_requestOperation start];
@@ -369,9 +380,12 @@ enum State {
     NSString *basicAuthCredentials = [NSString stringWithFormat:@"%@:%@", messageUrl.user, messageUrl.password];
     [messageRequest addValue:[NSString stringWithFormat:@"Basic %@", [basicAuthCredentials base64Encode]] forHTTPHeaderField: @"Authorization"];
     
+    
     _socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
     [_socket setDelegate:self];
     [_socket open];
+    
+    NSLog(@"Opened SOCKET: %@ From: %@", _socket, self);
 }
 
 - (void)performNextStep {
@@ -430,7 +444,7 @@ enum State {
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
     
-    self.videoViewController = (HDWVideoViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+//    self.videoViewController = (HDWVideoViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
 - (void) viewDidAppear:(BOOL)animated {

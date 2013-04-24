@@ -15,10 +15,6 @@
 
 @implementation HDWCalendarViewController
 
-- (void)setVideoView:(id)videoView {
-    _videoView = videoView;
-}
-
 - (BOOL)liveSelected {
     return _liveSelected;
 }
@@ -74,7 +70,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     _selectedDate = self.datePicker.date;
     
-    [(HDWVideoViewController*)_videoView onCalendarDispose:self];
+    [_delegate onCalendarDispose:_selectedDate];
     
     [super viewWillDisappear:animated];
 }

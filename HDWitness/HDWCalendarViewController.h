@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol HDWCalendarViewDelegate <NSObject>
+
+- (void)onCalendarDispose:(NSDate *)selectedDate;
+
+@end
+
 @interface HDWCalendarViewController : UIViewController {
     BOOL _liveSelected;
     id _videoView;
@@ -15,8 +21,7 @@
 
 @property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
 @property NSDate* selectedDate;
-
-- (void)setVideoView:(id)videoView;
+@property (nonatomic, assign) id<HDWCalendarViewDelegate> delegate;
 
 - (BOOL)liveSelected;
 

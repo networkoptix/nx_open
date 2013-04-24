@@ -21,5 +21,5 @@
 
 @property (strong, nonatomic) SRWebSocket* socket;
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
-@property (strong, nonatomic) HDWVideoViewController *videoViewController;
+// @property (strong, nonatomic) HDWVideoViewController *videoViewController;
 @end

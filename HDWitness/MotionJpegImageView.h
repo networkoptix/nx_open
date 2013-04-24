@@ -29,6 +29,7 @@
 
 - (void)onFirstFrameReceived;
 - (void)onFrameReceived:(NSDate*)timestamp andFps:(NSInteger)currentFps;
+- (void)onConnectionClosed;
 
 @end
 
@@ -69,7 +70,7 @@
 @property (nonatomic, readwrite, copy) NSString *password;
 @property (nonatomic, readwrite, assign) BOOL allowSelfSignedCertificates;
 @property (nonatomic, readwrite, assign) BOOL allowClearTextCredentials;
-@property id<MotionJpegViewDelegate> delegate;
+@property (nonatomic, assign) id<MotionJpegViewDelegate> delegate;
 
 - (void)play;
 - (void)pause;

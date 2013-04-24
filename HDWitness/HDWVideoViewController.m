@@ -19,12 +19,20 @@
 @implementation HDWVideoViewController
 
 - (void)onFirstFrameReceived {
+    _firstFrameReceived = YES;
     [SVProgressHUD dismiss];
 }
 
 - (void)onFrameReceived:(NSDate*)timestamp andFps:(NSInteger)currentFps {
+    _lastFrameTimestamp = timestamp;
+    
     self.fpsLabel.text = [NSString stringWithFormat:@"FPS: %d", currentFps];
     self.timeLabel.text = [_dateFomatter stringFromDate:timestamp];
+}
+
+- (void)onConnectionClosed {
+    if (!_playingLive && !_firstFrameReceived)
+        [self gotoLive:self];
 }
 
 - (BOOL)shouldAutorotate {
@@ -70,6 +78,7 @@
 }
 
 - (void)gotoURL:(NSURL*)url {
+    _firstFrameReceived = NO;
     [self updateControls];
     
     self.imageView.username = url.user;
@@ -117,12 +126,12 @@
         if (_lastSelectedDate) {
             [calendarViewController setSelectedDate:_lastSelectedDate];
         }
-        [calendarViewController setVideoView: self];
+        calendarViewController.delegate = self;
     }
 }
 
-- (void)onCalendarDispose: (HDWCalendarViewController *)calendarView {
-    _lastSelectedDate = calendarView.selectedDate;
+- (void)onCalendarDispose: (NSDate *)selectedDate {
+    _lastSelectedDate = selectedDate;
     [self gotoDate:_lastSelectedDate];
 }
 
@@ -134,7 +143,6 @@
 
     self.imageView.delegate = self;
     _liveButton = [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
-//    _archiveButton = [[UIBarButtonItem alloc] initWithTitle:@"Archive" style:UIBarButtonItemStylePlain target:self action:@selector(showTimeSelector:)];
     _archiveButton = self.navigationItem.rightBarButtonItem;
    
     self.navigationItem.rightBarButtonItems = @[_liveButton, _archiveButton];
@@ -142,7 +150,7 @@
     self.imageView.allowSelfSignedCertificates = YES;
     self.imageView.allowClearTextCredentials = YES;
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
+    [[NSNotificationCenter defaultCenter] addObserver:self	
                                              selector:@selector(onAppDidEnterBackground:)
                                                  name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
@@ -162,26 +170,33 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+ 
+}    // Dispose of any resources that can be recreated.
 
 - (void)onAppDidEnterBackground:(NSNotification *)notification {
     [self.imageView pause];
 }
 
 - (void)onAppWillEnterForeground:(NSNotification *)notification {
-    [self.imageView play];
+    if (_playingLive)
+        [self gotoLive:self];
+    else
+        [self gotoDate:_lastFrameTimestamp];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    [self setFpsLabel:nil];
+    [self setTimeLabel:nil];
     [self.imageView stop];
     [SVProgressHUD dismiss];
 }
-- (void)viewDidUnload {
-    [self setFpsLabel:nil];
-    [self setTimeLabel:nil];
-    [super viewDidUnload];
-}
+
 @end
