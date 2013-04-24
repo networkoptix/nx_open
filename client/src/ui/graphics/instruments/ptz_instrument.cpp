@@ -201,8 +201,6 @@ public:
         if(qFuzzyCompare(size, m_size))
             return;
 
-        qDebug() << size;
-
         m_size = size;
 
         invalidatePath();
