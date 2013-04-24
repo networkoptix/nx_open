@@ -8,6 +8,7 @@
 static const int PROCESS_TIMEOUT = 1000;
 static const int MAX_QUEUE_SIZE = 150;
 static const qint64 EMPTY_PACKET_REPEAT_INTERVAL = 1000ll * 400;
+static const qint64 RECONNECT_TIMEOUT_USEC = 1500 * 1000;
 
 QMutex VMaxStreamFetcher::m_instMutex;
 QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
@@ -29,7 +30,8 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResource* dev, bool isLive):
     m_streamPaused(false),
     m_lastSpeed(1),
     m_lastSeekPos(AV_NOPTS_VALUE),
-    m_keepAllChannels(false)
+    m_keepAllChannels(false),
+    m_lastConnectTimeUsec(0)
 {
     m_res = dynamic_cast<QnNetworkResource*>(dev);
     initPacketTime();
@@ -471,10 +473,14 @@ void VMaxStreamFetcher::freeInstance(const QByteArray& clientGroupID, QnResource
 bool VMaxStreamFetcher::safeOpen()
 {
     QMutexLocker lock(&m_mutex);
-    if (!isOpened()) {
+    if (!isOpened()) 
+    {
+        qint64 timeoutUsec = getUsecTimer() - m_lastConnectTimeUsec;
+        if (timeoutUsec < RECONNECT_TIMEOUT_USEC)
+            QnSleep::msleep((RECONNECT_TIMEOUT_USEC - timeoutUsec)/1000); // prevent reconnect flood
+        m_lastConnectTimeUsec = getUsecTimer();
         if (!vmaxConnect()) {
-            QnSleep::msleep(1000);
-            return false; // prevent reconnect flood
+            return false; 
         }
         if (!m_isLive && m_lastMediaTime != (qint64)AV_NOPTS_VALUE)
             m_vmaxConnection->vMaxArchivePlay(m_lastMediaTime, m_sequence, m_lastSpeed);

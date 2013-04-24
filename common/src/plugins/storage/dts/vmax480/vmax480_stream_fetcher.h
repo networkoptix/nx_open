@@ -106,6 +106,7 @@ private:
     bool m_isPlaying;
     bool m_keepAllChannels;
     QnPlaybackMaskHelper m_playbackMaskHelper;
+    qint64 m_lastConnectTimeUsec;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__
