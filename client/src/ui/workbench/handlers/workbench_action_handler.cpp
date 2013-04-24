@@ -1548,7 +1548,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     dialog->setModal(true);
     while(true) {
         QnActionParameters parameters = menu()->currentParameters(sender());
-        dialog->setStoredPassword(parameters.argument(Qn::AutoLoginRole).toString());
+        dialog->setStoredPassword(parameters.argument(Qn::StoredPasswordRole).toString());
 
         if(!dialog->exec())
             return;
@@ -1575,7 +1575,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
-    qnSettings->setAutoLogin(dialog->rememberPassword()
+    qnSettings->setStoredPassword(dialog->rememberPassword()
                 ? connectionData.url.password()
                 : QString()
                   );
@@ -1710,7 +1710,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     if (popupCollectionWidget())
         popupCollectionWidget()->clear();
 
-    qnSettings->setAutoLogin(QString());
+    qnSettings->setStoredPassword(QString());
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {

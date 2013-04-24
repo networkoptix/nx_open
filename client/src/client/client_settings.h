@@ -72,12 +72,12 @@ public:
         SLIDER_OPENED,
         TITLE_OPENED,
 
+        STORED_PASSWORD,
+
         CLOCK_24HOUR,
         CLOCK_WEEKDAY,
         CLOCK_DATE,
         CLOCK_SECONDS,
-
-        AUTO_LOGIN,
 
         VARIABLE_COUNT
     };
@@ -141,8 +141,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
         QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
         QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
-        QN_DECLARE_RW_PROPERTY(QString,                     autoLogin,              setAutoLogin,               AUTO_LOGIN,                 QString()) 
-        // TODO: #GDM autoLogin is a bad name. It implies bool type, but the data that is actually stored is encrypted password.
+        QN_DECLARE_RW_PROPERTY(QString,                     storedPassword,         setStoredPassword,          STORED_PASSWORD,            QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)

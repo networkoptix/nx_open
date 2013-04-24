@@ -81,7 +81,7 @@ namespace Qn {
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,
-        AutoLoginRole, // TODO: #GDM rename, see comment in qnSettings
+        StoredPasswordRole,
 
         /* Others. */
         HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
