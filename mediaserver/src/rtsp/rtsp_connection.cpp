@@ -884,8 +884,8 @@ void QnRtspConnectionProcessor::createDataProvider()
     }
     if (!d->archiveDP) {
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive)));
-        if (d->archiveDP)
-            d->archiveDP->setGroupId(d->clientGuid);
+        //if (d->archiveDP)
+        //    d->archiveDP->setGroupId(d->clientGuid);
     }
 
     if (!d->thumbnailsDP && d->liveMode == Mode_ThumbNails) {

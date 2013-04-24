@@ -3,6 +3,8 @@
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 
+static const QByteArray FIXED_GROUP_ID("{6A7E6407-73A9-4042-B599-0B82CD726CF4}");
+
 static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
 
 QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
@@ -17,6 +19,7 @@ QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
     m_lastMediaTime(0),
     m_noDataCounter(0)
 {
+    m_groupId = FIXED_GROUP_ID; 
     m_res = res.dynamicCast<QnPlVmax480Resource>();
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
