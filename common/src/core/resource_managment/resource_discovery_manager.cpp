@@ -1,3 +1,6 @@
+
+#include <set>
+
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "resource_discovery_manager.h"
@@ -10,9 +13,11 @@
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
+#include "plugins/resources/upnp/upnp_device_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
+
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
 
@@ -177,6 +182,8 @@ static int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
+    UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
+
     ResourceSearcherList searchersList;
     {
         QMutexLocker locker(&m_searchersListMutex);
@@ -259,6 +266,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     time.start();
 
     QnResourceList resources;
+    std::set<QString> resourcePhysicalIDs;    //used to detect duplicate resources (same resource found by multiple drivers)
     m_searchersListMutex.lock();
     ResourceSearcherList searchersList = m_searchersList;
     m_searchersListMutex.unlock();
@@ -272,10 +280,26 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             // resources can be searched by client in or server.
             // if this client in stand alone => lets add QnResource::local 
             // server does not care about flags 
-            foreach (const QnResourcePtr &res, lst)
+            for( QnResourceList::iterator
+                it = lst.begin();
+                it != lst.end();
+                 )
             {
-                if (searcher->isLocal())
-                    res->addFlags(QnResource::local);
+                QnNetworkResourcePtr networkRes = it->dynamicCast<QnNetworkResource>();
+                if( networkRes )
+                {
+                    //checking that resource do not duplicate already found ones
+                    if( !resourcePhysicalIDs.insert( networkRes->getPhysicalId() ).second )
+                    {
+                        it = lst.erase( it );
+                        continue;   //resource with such unique id is already present
+                    }
+                }
+
+                if( searcher->isLocal() )
+                    (*it)->addFlags( QnResource::local );
+
+                ++it;
             }
 
             resources.append(lst);

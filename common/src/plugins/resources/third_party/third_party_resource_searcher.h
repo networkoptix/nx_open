@@ -12,6 +12,7 @@
 #include "third_party_resource.h"
 #include "../mdns/mdns_device_searcher.h"
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
+#include "plugins/resources/upnp/upnp_device_searcher.h"
 #include "../../camera_plugin.h"
 #include "../../camera_plugin_qt_wrapper.h"
 
@@ -22,7 +23,7 @@
 class ThirdPartyResourceSearcher
 :
     public QnMdnsResourceSearcher,
-    public QnUpnpResourceSearcher
+    public QnUpnpResourceSearcherAsync
 {
 public:
     /*!
@@ -50,10 +51,10 @@ public:
 protected:
     //!Implementation of QnMdnsResourceSearcher::processPacket
     virtual QList<QnNetworkResourcePtr> processPacket(
-        QnResourceList& result,
+        QnResourceList& /*result*/,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress ) override;
-    //!Implementation of QnUpnpResourceSearcher::processPacket
+    //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const QString& host,

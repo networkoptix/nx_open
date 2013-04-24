@@ -60,7 +60,6 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
             resourceName = it.value();
     }
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
-    //discoveryManager = &m_thirdPartyCamPlugins[0];
     //choosing correct plugin
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
         it = m_thirdPartyCamPlugins.begin();
@@ -87,6 +86,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
 
     result = QnVirtualCameraResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
+    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid));
 
     NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
@@ -199,7 +199,7 @@ void ThirdPartyResourceSearcher::processPacket(
 QnResourceList ThirdPartyResourceSearcher::findResources()
 {
     const QnResourceList& mdnsFoundResList = QnMdnsResourceSearcher::findResources();
-    const QnResourceList& upnpFoundResList = QnUpnpResourceSearcher::findResources();
+    const QnResourceList& upnpFoundResList = QnUpnpResourceSearcherAsync::findResources();
     const QnResourceList& customFoundResList = doCustomSearch();
     return mdnsFoundResList + upnpFoundResList + customFoundResList;
 }
@@ -257,5 +257,6 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setMAC( QString::fromUtf8(cameraInfo.uid) );
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
+    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
     return resource;
 }

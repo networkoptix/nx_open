@@ -8,11 +8,12 @@
 #include "core/resource_managment/resource_pool.h"
 #include "utils/network/nettools.h"
 
+
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
-QHostAddress groupAddress(QLatin1String("239.255.255.250"));
+static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 
 static const int TCP_TIMEOUT = 3000;
@@ -234,7 +235,6 @@ void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& 
         processedUuid << uuidStr;
 
         readDeviceXml(uuidStr, descritionUrl, sender, result);
-
     }
 }
 
@@ -272,4 +272,43 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         processSocket(m_receiveSocket, processedUuid, result);
 
     return result;
+}
+
+
+
+////////////////////////////////////////////////////////////
+//// class QnUpnpResourceSearcherAsync
+////////////////////////////////////////////////////////////
+
+QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync()
+{
+    UPNPDeviceSearcher::instance()->registerHandler( this );
+}
+
+QnUpnpResourceSearcherAsync::~QnUpnpResourceSearcherAsync()
+{
+    UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
+}
+
+QnResourceList QnUpnpResourceSearcherAsync::findResources()
+{
+    m_resList.clear();
+    UPNPDeviceSearcher::instance()->processDiscoveredDevices( this );
+    return m_resList;
+}
+
+bool QnUpnpResourceSearcherAsync::processPacket(
+    const QHostAddress& localInterfaceAddress,
+    const QString& discoveredDevAddress,
+    const UpnpDeviceInfo& devInfo,
+    const QByteArray& xmlDevInfo )
+{
+    const int resListSizeBak = m_resList.size();
+    processPacket(
+        localInterfaceAddress,
+        discoveredDevAddress,
+        devInfo,
+        xmlDevInfo,
+        m_resList );
+    return resListSizeBak > m_resList.size();   //device recognized, no need to process this upnp data futher
 }

@@ -5,7 +5,7 @@
 
 class CLSimpleHTTPClient;
 
-class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcher
+class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcherAsync
 {
     QnPlVmax480ResourceSearcher();
 

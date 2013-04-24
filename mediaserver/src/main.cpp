@@ -1019,21 +1019,23 @@ void QnMain::run()
     //IPPH264Decoder::dll.init();
 
     //============================
+    UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
+
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor);
 
     QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+
+    //NOTE plugins have higher priority than built-in drivers
+    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher() );
+    QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
+
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnTestCameraResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
-#if 1  //Native AXIS disabled for AXIS plugin testring purpose
-    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher() );
-    QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
-#else
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
-#endif
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
@@ -1120,6 +1122,9 @@ void QnMain::run()
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+
+    delete UPNPDeviceSearcher::instance();
+    UPNPDeviceSearcher::initGlobalInstance( NULL );
 
 #ifdef _DEBUG
     delete ThirdPartyResourceSearcher::instance();
