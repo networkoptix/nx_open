@@ -1,5 +1,6 @@
 ----------------------------------------------- 1.5.1 -----------------------------------------------
 
+ - More D-Link cameras are supported
  - Live view is smoother
  - Arecont Vision AV3256PM 
  - Second stream quality is improved for some onvif cameras 
