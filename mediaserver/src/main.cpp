@@ -42,6 +42,7 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/acti/acti_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "plugins/resources/third_party/third_party_resource_searcher.h"
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
