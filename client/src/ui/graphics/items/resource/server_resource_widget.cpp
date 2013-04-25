@@ -154,68 +154,53 @@ namespace {
             //            I'm sure we can do the same with a code that is at least three times shorter.
 
             /* Drawing only second part of the arc, cut at the beginning */
-            if (x1 + x_step2 < 0.0) {
-                if (y2 > y1) {
-                    path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle, 90 - angle);
-                } else if (y2 < y1) {
-                    path.arcMoveTo(x1 + x_step2, y2, x_step, (y1 - y2), 180 - angle);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180 - angle, -90 + angle);
-                } else { // y2 == y1
-                    path.moveTo(0.0, y1);
-                    path.lineTo(x1 + x_step, y2);
-                }
-            }
+            bool c1 = x1 + x_step2 < 0.0;
+
             /* Drawing both parts of the arc, cut at the beginning */
-            else if (x1 < 0.0) {
-                if (y2 > y1) {
-                    path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), angle, -angle);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
-                } else if (y2 < y1) {
-                    path.arcMoveTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle);
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle, angle);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
-                } else { // y2 == y1
-                    path.moveTo(0.0, y1);
-                    path.lineTo(x1 + x_step, y2);
-                }
-            }
+            bool c2 = !c1 && x1 < 0.0;
+
             /* Drawing both parts of the arc as usual */
-            else if (!last) { 
-                if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
-                } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
-                } else { // y2 == y1
-                    path.lineTo(x1 + x_step, y2);
-                }
-            }
+            bool c3 = !c1 && !c2 && !last;
+
             /* Drawing both parts of the arc, cut at the end */
-            else if (elapsedStep >= 0.5) {
-                if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, angle);
-                } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -angle);
-                } else { // y2 == y1
-                    path.lineTo(x1 + x_step * elapsedStep, y2);
-                }
-            } 
+            bool c4 = !c1 && !c2 && !c3 && elapsedStep >= 0.5;
+
             /* Drawing only first part of the arc, cut at the end */
-            else {
-                if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90 + angle);
-                } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90 - angle);
-                } else { // y2 == y1
+            bool c5 = !c1 && !c2 && !c3 && !c4;
+
+            qreal h = qAbs(y2 - y1);
+
+            if (y2 > y1) {
+                if (c1)
+                    path.arcMoveTo(x1 + x_step2, y1, x_step, h, 180 + angle);
+                else if (c2)
+                    path.arcMoveTo(x1 - x_step2, y1, x_step, h, angle);
+                if (c2 || c3 || c4)
+                    path.arcTo(x1 - x_step2, y1, x_step, h, c2 ? angle : 90, c2 ? -angle : -89);
+                if (c5)
+                    path.arcTo(x1 - x_step2, y1, x_step, h, 90, -90 + angle);
+                else
+                    path.arcTo(x1 + x_step2, y1, x_step, h, c1 ? 180 + angle : 180, c1 ? 90 - angle : c4 ? angle : 89);
+            } else if (y2 < y1) {
+                if (c1)
+                    path.arcMoveTo(x1 + x_step2, y2, x_step, h, 180 - angle);
+                else if (c2)
+                    path.arcMoveTo(x1 - x_step2, y2, x_step, h, -angle);
+                if (c2 || c3 || c4)
+                    path.arcTo(x1 - x_step2, y2, x_step, h, c2 ? -angle : -90, c2 ? angle : 89);
+                if (c5)
+                    path.arcTo(x1 - x_step2, y2, x_step, h, -90, 90 - angle);
+                else
+                    path.arcTo(x1 + x_step2, y2, x_step, h, c1 ? 180 - angle : 180, c1 ? -90 + angle : c4 ? -angle : -89);
+            } else {
+                if (c1 || c2)
+                    path.moveTo(0.0, y1);
+                if (c4 || c5)
                     path.lineTo(x1 + x_step * elapsedStep, y2);
-                }
+                else
+                    path.lineTo(x1 + x_step, y2);
             }
-            
+
             if(last) {
                 /* Value that will be shown */
                 *currentValue = (lastValue * (1.0 - elapsedStep) + value * elapsedStep);
