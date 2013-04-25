@@ -24,7 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
 // TODO: #GDM 
@@ -391,7 +391,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
         dialog.setDelegate(new QnRecordingEnabledDelegate(this));
-    else if (actionType == BusinessActionType::CameraOutput)
+    else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
         dialog.setDelegate(new QnOutputEnabledDelegate(this));
     else if (actionType == BusinessActionType::SendMail)
         dialog.setDelegate(new QnEmailValidDelegate(this));

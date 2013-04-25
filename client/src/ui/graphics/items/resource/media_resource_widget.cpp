@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -711,8 +711,9 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
     if (resource->hasFlags(QnResource::SINGLE_SHOT)) {
         if (resource->getStatus() == QnResource::Offline)
             return NoDataOverlay;
-        else
-            return EmptyOverlay;
+        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
+            return NoDataOverlay;
+        return EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return NoDataOverlay;
     } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
@@ -727,7 +728,7 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         if (m_display->camDisplay()->isEOFReached())
             return NoDataOverlay;
         QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource);
-        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime() / 1000))
+        if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateChannelOverlay(channel, QnResource::Online);
         else
             return NoDataOverlay;
@@ -757,7 +758,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -767,11 +768,14 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     setOption(DisplayCrosshair, ptzEnabled);
 
     if(checked) {
-        buttonBar()->setButtonsChecked(MotionSearchButton, false);
+        buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
+
+    if(checked)
+        buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
 }

@@ -12,7 +12,7 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
@@ -68,7 +68,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
-    m_popupSettingsWidget = new QnPopupSettingsWidget(this);
+    m_popupSettingsWidget = new QnPopupSettingsWidget(context, this);
     m_popupSettingsTabIndex = ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
 
 #if 0
@@ -210,7 +210,7 @@ void QnPreferencesDialog::submitToSettings() {
     if (m_serverSettingsWidget)
         m_serverSettingsWidget->submit();
     if (m_popupSettingsWidget)
-        m_popupSettingsWidget->submitToSettings(m_settings);
+        m_popupSettingsWidget->submit();
 
     m_settings->save();
 }
@@ -236,9 +236,6 @@ void QnPreferencesDialog::updateFromSettings() {
 
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
-
-    if (m_popupSettingsWidget)
-        m_popupSettingsWidget->updateFromSettings(m_settings);
 
     int id = ui->languageComboBox->findData(m_settings->translationPath());
     if (id >= 0)

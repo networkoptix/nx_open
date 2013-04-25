@@ -86,6 +86,30 @@
                     "physicalMultiplier": 32.0
                 }
             }
+        },
+        {
+            "models": [
+                "SD83X3"
+            ],
+            "fromCamera": {
+                "x": {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [ -1,    1],
+                    "physical": [180, -180]
+                },
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [ -1,   1],
+                    "physical": [  0, -90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "comment": "L = t, P = (1/SQRT(1-t*36/37)-1)*6.9+1, this is not accurate",
+                    "logical":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
+                    "physical": [1, 1.17, 1.36, 1.57, 1.79, 2.03,  2.3,  2.6, 2.93,  3.3, 3.73, 4.22, 4.8, 5.48, 6.32, 7.37, 8.76, 10.69, 13.67, 19.18, 36],
+                    "physicalMultiplier": 35.0
+                }
+            }
         }
     ]
 }

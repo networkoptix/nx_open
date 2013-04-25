@@ -10,6 +10,7 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(Busi
                                                                             QnWorkbenchContext *context) {
     switch (actionType) {
         case BusinessActionType::CameraOutput:
+        case BusinessActionType::CameraOutputInstant:
             return new QnCameraOutputBusinessActionWidget(parent);
         case BusinessActionType::CameraRecording:
             return new QnRecordingBusinessActionWidget(parent);

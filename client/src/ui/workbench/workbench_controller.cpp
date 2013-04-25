@@ -1013,7 +1013,7 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 }
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QRectF &zoomRect) {
-    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ZoomWindowArgument, zoomRect));
+    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect));
     widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
 }
 

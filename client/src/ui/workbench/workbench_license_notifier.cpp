@@ -2,7 +2,7 @@
 
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 #include <utils/common/synctime.h>
 
 #include <ui/workbench/workbench_context.h>

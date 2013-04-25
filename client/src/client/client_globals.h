@@ -13,19 +13,10 @@ namespace Qn {
         LocalNode,
         ServersNode,
         UsersNode,
-
-        /** Node that represents a resource. */
-        ResourceNode,
-
-        /** Node that represents a layout item. */
-        ItemNode,
-
-        /** Node that contains hidden resources. */
-        BastardNode,
-
-        /** Node that represents a recorder (VMAX, etc). */
-        RecorderNode,
-
+        ResourceNode,   /**< Node that represents a resource. */
+        ItemNode,       /**< Node that represents a layout item. */
+        BastardNode,    /**< Node that contains hidden resources. */
+        RecorderNode,   /**< Node that represents a recorder (VMAX, etc). */
         NodeTypeCount
     };
 
@@ -41,6 +32,9 @@ namespace Qn {
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
+        UserResourceRole,                           /**< Role for QnUserResourcePtr. */
+        LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
+        MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
@@ -62,6 +56,7 @@ namespace Qn {
         ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
         ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
+        ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
@@ -72,6 +67,23 @@ namespace Qn {
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+
+        /* Context-based. */
+        CurrentLayoutResourceRole,
+        CurrentUserResourceRole,
+        CurrentLayoutMediaItemsRole,
+        CurrentMediaServerResourcesRole,
+
+        /* Arguments. */
+        SerializedDataRole,
+        ConnectionInfoRole,
+        FocusElementRole,
+        TimePeriodRole,
+        TimePeriodsRole,
+        MergedTimePeriodsRole,
+        StoredPasswordRole,
+        FileNameRole,
+
 
         /* Others. */
         HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */

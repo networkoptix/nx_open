@@ -9,7 +9,7 @@
 #include <api/session_manager.h>
 #include <utils/common/warnings.h>
 
-//#include "utils/settings.h"
+//#include "client/client_settings.h"
 #include "version.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *parent) :

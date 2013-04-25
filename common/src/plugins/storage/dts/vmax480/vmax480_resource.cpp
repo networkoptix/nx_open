@@ -178,10 +178,16 @@ void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
 
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
-    QString suffix = QString(QLatin1String("channel=%1")).arg(channel+1);
-    QString url = getUrl();
-    url = url.left(url.indexOf(L'?')+1) + suffix;
-    return qnResPool->getResourceByUrl(url).dynamicCast<QnPhysicalCameraResource>();
+    QUrl url(getUrl());
+    QList<QPair<QString, QString> > items = url.queryItems();
+    for (int i = 0; i < items.size(); ++i)
+    {
+        if (items[i].first == lit("channel"))
+            items[i].second = QString::number(channel+1);
+    }
+    url.setQueryItems(items);
+    QString urlStr = url.toString();
+    return qnResPool->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

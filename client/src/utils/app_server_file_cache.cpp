@@ -12,15 +12,6 @@
 
 #include <utils/threaded_image_loader.h>
 
-namespace {
-    const int maxImageSize = 4096;
-//    const int maxImageSize = 6144;
-//    const int maxImageSize = 7168;
-//    const int maxImageSize = 7680;
-//    const int maxImageSize = 7936;
-//    const int maxImageSize = 8192;
-}
-
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
     QObject(parent)
 {}
@@ -41,11 +32,7 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
 }
 
 QSize QnAppServerFileCache::getMaxImageSize() const {
-#ifdef _WIN32
     int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-#else
-    int value = qMin(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE), maxImageSize);
-#endif
     return QSize(value, value);
 }
 

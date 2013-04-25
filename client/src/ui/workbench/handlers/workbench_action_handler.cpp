@@ -7,6 +7,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QDesktopServices>
 #include <QtGui/QFileDialog>
 #include <QtGui/QImage>
 #include <QtGui/QWhatsThis>
@@ -237,7 +238,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
-    connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
@@ -247,6 +247,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenPopupSettingsAction),                SIGNAL(triggered()),    this,   SLOT(at_openPopupSettingsAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
+    connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
+    connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -275,6 +277,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
     connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
@@ -782,7 +785,7 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
         m_selectionScope = scope;
     }
 
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(provider->currentTarget(scope)));
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentParameters(scope));
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
@@ -961,13 +964,13 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutParameter);
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
     if(!layout) {
         qnWarning("No layout provided.");
         return;
     }
 
-    QPointF position = parameters.argument<QPointF>(Qn::GridPositionParameter);
+    QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
@@ -989,7 +992,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
+    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
     menu()->trigger(Qn::OpenInLayoutAction, parameters);
 }
 
@@ -1083,7 +1086,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         return;
     }
 
-    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString().trimmed();
+    QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Save Layout As"));
@@ -1184,7 +1187,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
 
     at_saveLayoutAsAction_triggered(
         parameters.resource().dynamicCast<QnLayoutResource>(), 
-        parameters.argument<QnUserResourcePtr>(Qn::UserParameter)
+        parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole)
     );
 }
 
@@ -1215,7 +1218,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();
-    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::ServerParameter);
+    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::MediaServerResourceRole);
     if(!server)
         return;
     QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
@@ -1314,7 +1317,7 @@ void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
@@ -1327,7 +1330,7 @@ void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
@@ -1528,6 +1531,14 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
         businessRulesDialog()->setGeometry(oldGeometry);
 }
 
+void QnWorkbenchActionHandler::at_webClientAction_triggered() {
+    QUrl url(QnAppServerConnectionFactory::defaultUrl());
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setPath(QLatin1String("web"));
+    QDesktopServices::openUrl(url);
+}
+
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
@@ -1536,6 +1547,9 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QScopedPointer<QnLoginDialog> dialog(new QnLoginDialog(widget(), context()));
     dialog->setModal(true);
     while(true) {
+        QnActionParameters parameters = menu()->currentParameters(sender());
+        dialog->setStoredPassword(parameters.argument(Qn::StoredPasswordRole).toString());
+
         if(!dialog->exec())
             return;
 
@@ -1561,6 +1575,11 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
+    qnSettings->setStoredPassword(dialog->rememberPassword()
+                ? connectionData.url.password()
+                : QString()
+                  );
+
     // remove previous "Last used connection"
     connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
@@ -1584,7 +1603,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (dialog->restartPending())
         QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
     else
-        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
+        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, dialog->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
@@ -1594,7 +1613,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connectionData.isValid()) 
         return;
     
-    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectInfoParameter);
+    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
         
@@ -1690,6 +1709,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     if (popupCollectionWidget())
         popupCollectionWidget()->clear();
+
+    qnSettings->setStoredPassword(QString());
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -1709,11 +1730,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(!resource)
         return;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(period.isEmpty())
         return;
 
-    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
@@ -1990,6 +2011,15 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
+void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
+    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
+    if(!server)
+        return;
+
+    QUrl url(server->apiConnection()->getUrl() + QLatin1String("/api/showLog"));
+    QDesktopServices::openUrl(url);
+}
+
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
     /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
@@ -2070,7 +2100,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(!resource)
         return;
 
-    QString name = parameters.argument(Qn::NameParameter).toString().trimmed();
+    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Rename"));
@@ -2243,7 +2273,8 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(menu()->currentParameters(sender()).widget());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
     if (!widget)
         return;
 
@@ -2264,66 +2295,70 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
+    QString fileName = parameters.argument<QString>(Qn::FileNameRole);
+    bool withTimestamps = true;
+    if(fileName.isEmpty()) {
+        QString suggestion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
 
-    QString suggestion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
-    bool withTimestamp = true;
+        QString previousDir = qnSettings->lastScreenshotDir();
+        if (previousDir.isEmpty())
+            previousDir = qnSettings->mediaFolder();
 
-    QString previousDir = qnSettings->lastScreenshotDir();
-    if (previousDir.isEmpty())
-        previousDir = qnSettings->mediaFolder();
+        QString filterSeparator(QLatin1String(";;"));
+        QString pngFileFilter = tr("PNG Image (*.png)");
+        QString jpegFileFilter = tr("JPEG Image(*.jpg)");
 
-    QString filterSeparator(QLatin1String(";;"));
-    QString pngFileFilter = tr("PNG Image (*.png)");
-    QString jpegFileFilter = tr("JPEG Image(*.jpg)");
-
-    QString allowedFormatFilter =
+        QString allowedFormatFilter =
             pngFileFilter;
 
-    if (QImageWriter::supportedImageFormats().contains("jpg") ) {
-        allowedFormatFilter += filterSeparator;
-        allowedFormatFilter += jpegFileFilter;
-    }
+        if (QImageWriter::supportedImageFormats().contains("jpg") ) {
+            allowedFormatFilter += filterSeparator;
+            allowedFormatFilter += jpegFileFilter;
+        }
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this->widget(),
-                                                                     tr("Save Screenshot As..."),
-                                                                     previousDir + QDir::separator() + suggestion,
-                                                                     allowedFormatFilter));
-    dialog->setFileMode(QFileDialog::AnyFile);
-    dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-    dialog->addCheckbox(tr("Include Timestamp"), &withTimestamp);
-    if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-        return;
-
-    QString fileName = dialog->selectedFiles().value(0);
-    QString selectedFilter = dialog->selectedNameFilter();
-    QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
-    if (fileName.isEmpty())
-        return;
-
-    if (!fileName.toLower().endsWith(selectedExtension))
-        fileName += selectedExtension;
-
-    if (QFile::exists(fileName)) {
-        QMessageBox::StandardButton button = QMessageBox::information(
-                    this->widget(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
-
-        if(button == QMessageBox::Cancel || button == QMessageBox::No)
-            return;
-    }
-
-    if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-        QMessageBox::critical(
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             this->widget(),
-            tr("Could not overwrite file"),
-            tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
-            QMessageBox::Ok
-        );
+            tr("Save Screenshot As..."),
+            previousDir + QDir::separator() + suggestion,
+            allowedFormatFilter
+        ));
+
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        dialog->addCheckbox(tr("Include Timestamp"), &withTimestamps);
+        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+            return;
+
+        fileName = dialog->selectedFiles().value(0);
+        if (fileName.isEmpty())
+            return;
+
+        QString selectedFilter = dialog->selectedNameFilter();
+        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        if (!fileName.toLower().endsWith(selectedExtension))
+            fileName += selectedExtension;
+
+        if (QFile::exists(fileName)) {
+            QMessageBox::StandardButton button = QMessageBox::information(
+                this->widget(),
+                tr("Save As"),
+                tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+            );
+            if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                return;
+        }
+
+        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+            QMessageBox::critical(
+                this->widget(),
+                tr("Could not overwrite file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                QMessageBox::Ok
+            );
+            return;
+        }
     }
 
     QImage screenshot;
@@ -2346,8 +2381,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             );
         }
 
-        if (withTimestamp) {
-
+        if (withTimestamps) {
             QString timeStamp;
             qint64 time = display->camDisplay()->getCurrentTime() / 1000;
             if(widget->resource()->flags() & QnResource::utc) {
@@ -2375,12 +2409,15 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     }
 
     if (!screenshot.save(fileName)) {
-        QMessageBox::critical(this->widget(),
-                              tr("Could not save screenshot"),
-                              tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(fileName).baseName()));
+        QMessageBox::critical(
+            this->widget(),
+            tr("Could not save screenshot"),
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(fileName).baseName())
+        );
         return;
     }
     addToResourcePool(fileName);
+    
     qnSettings->setLastScreenshotDir(QFileInfo(fileName).absolutePath());
 }
 
@@ -2399,7 +2436,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowTitle(tr("User Settings"));
     setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
-    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementArgument));
+    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -2449,20 +2486,6 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        if (user == context()->user()                           // if we
-                && user->isAdmin()                              // are owner
-                && !user->getPassword().isEmpty()               // and have changed our password
-                && currentPassword != user->getPassword()       // to another password
-                )
-        {
-            QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
-            int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
-                                 QMessageBox::Ok, QMessageBox::Discard);
-            if (button == QMessageBox::Discard) {
-                user->setPassword(QString());
-            }
-        }
-
         connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
@@ -2495,7 +2518,7 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
     if (!layout)
         return;
 
-    QnTimePeriod exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
@@ -2835,7 +2858,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]);
         if (loader) {
             QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
-            QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(exportPeriod);
+            QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(exportPeriod);
             QByteArray data;
             periods.encode(data);
             device->write(data);
@@ -3020,7 +3043,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     QnActionTargetProvider *provider = menu()->targetProvider();
     if(!provider)
         return;
-    parameters.setItems(provider->currentTarget(Qn::SceneScope));
+    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
 
     QnMediaResourceWidget *widget = NULL;
 
@@ -3045,7 +3068,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     if(!widget)
         return;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     if(period.durationMs > 1000 * 60 * 30) { // TODO: #Elric implement more precise estimation
         int button = QMessageBox::question(
@@ -3135,7 +3158,7 @@ Do you want to continue?"),
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) 
             {
-                QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(period);
+                QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
                 if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
                 {
                     int result = QMessageBox::warning(
@@ -3294,13 +3317,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     if(!widget)
         return;
 
-    QRectF rect;
-    if(params.hasArgument(Qn::ZoomWindowArgument)) {
-        rect = params.argument<QRectF>(Qn::ZoomWindowArgument);
-    } else {
-        rect = QRectF(0.25, 0.25, 0.5, 0.5);
-    }
-
+    QRectF rect = params.argument<QRectF>(Qn::ItemZoomRectRole, QRectF(0.25, 0.25, 0.5, 0.5));
     addToLayout(workbench()->currentLayout()->resource(), widget->resource(), true, widget->item()->combinedGeometry().center(), rect, widget->item()->uuid());
 }
 
@@ -3371,7 +3388,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     if(!camera)
         return;
 
-    QString name = parameters.argument<QString>(Qn::NameParameter);
+    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty())
         return;
 

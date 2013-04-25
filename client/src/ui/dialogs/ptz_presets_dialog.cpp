@@ -128,7 +128,7 @@ void QnPtzPresetsDialog::at_activateButton_clicked() {
     if(!item)
         return;
 
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(m_camera).withArgument(Qn::NameParameter, item->text()));
+    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(m_camera).withArgument(Qn::ResourceNameRole, item->text()));
 }
 
 

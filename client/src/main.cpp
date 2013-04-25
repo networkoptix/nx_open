@@ -10,7 +10,7 @@
 
 #include "version.h"
 #include "ui/widgets/main_window.h"
-#include "utils/settings.h"
+#include "client/client_settings.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -493,7 +493,8 @@ int main(int argc, char **argv)
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */
             if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
-                context->menu()->trigger(Qn::ConnectToServerAction);
+                context->menu()->trigger(Qn::ConnectToServerAction,
+                                         QnActionParameters().withArgument(Qn::StoredPasswordRole, qnSettings->storedPassword()));
             } else {
                 context->menu()->trigger(Qn::ReconnectAction);
             }
@@ -504,14 +505,14 @@ int main(int argc, char **argv)
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
         if (!instantDrop.isEmpty()){
             qnSettings->setLayoutsOpenedOnLogin(false);
 
             QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
 
 #ifdef _DEBUG

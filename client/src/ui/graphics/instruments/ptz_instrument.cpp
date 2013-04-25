@@ -201,8 +201,6 @@ public:
         if(qFuzzyCompare(size, m_size))
             return;
 
-        qDebug() << size;
-
         m_size = size;
 
         invalidatePath();
@@ -628,6 +626,7 @@ void PtzInstrument::ensureSelectionItem() {
     selectionItem()->setPen(ptzItemBorderColor);
     selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
+    selectionItem()->setOptions(FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);
 
     if(scene())
         scene()->addItem(selectionItem());

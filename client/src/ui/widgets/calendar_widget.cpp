@@ -70,14 +70,14 @@ QnCalendarWidget::QnCalendarWidget():
     navBarBackground->setBackgroundRole(QPalette::Window);
 }
 
-void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods)
+void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods)
 {
     m_currentTimeStorage.setPeriods(type, periods);
     updateEmpty();
     update();
 }
 
-void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods) {
+void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodContent type, QnTimePeriodList periods) {
     m_syncedTimeStorage.setPeriods(type, periods);
     updateEmpty();
     update();
@@ -132,8 +132,8 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     {
         QBrush brush = painter->brush();
 
-        bool containsMotion = m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::MotionRole).intersects(period);
-        bool containsRecording = containsMotion || (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period));
+        bool containsMotion = m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::MotionContent).intersects(period);
+        bool containsRecording = containsMotion || (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::RecordingContent).intersects(period));
 
         QColor bgcolor;
         if (containsMotion) {
@@ -147,11 +147,11 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         brush.setStyle(Qt::SolidPattern);
         painter->fillRect(rect, brush);
 
-        if (!containsMotion && m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
+        if (!containsMotion && m_syncedTimeStorage.periods(Qn::MotionContent).intersects(period)) {
             brush.setColor(denseMotionColor);
             brush.setStyle(Qt::Dense6Pattern);
             painter->fillRect(rect, brush);
-        } else if (!containsRecording && m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
+        } else if (!containsRecording && m_syncedTimeStorage.periods(Qn::RecordingContent).intersects(period)) {
             brush.setColor(denseRecordingColor);
             brush.setStyle(Qt::Dense6Pattern);
             painter->fillRect(rect, brush);
@@ -198,9 +198,9 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
 
 void QnCalendarWidget::updateEmpty() {
     bool value = true;
-    for(int type = 0; type < Qn::TimePeriodRoleCount; type++) {
-        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty() ||
-            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
+    for(int type = 0; type < Qn::TimePeriodContentCount; type++) {
+        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodContent>(type)).empty() ||
+            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodContent>(type)).empty())
         {
             value = false;
             break;

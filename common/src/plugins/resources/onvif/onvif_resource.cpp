@@ -1525,6 +1525,12 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
                         options = curOpts;
                     }
                     break;
+                case onvifXsd__AudioEncoding__AMR:
+                    if (codec < AMR) {
+                        codec = AMR;
+                        options = curOpts;
+                    }
+                    break;
                 default:
                     qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: got unknown codec type: " 
                         << curOpts->Encoding << " (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()

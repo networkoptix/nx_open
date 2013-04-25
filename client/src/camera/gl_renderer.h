@@ -105,8 +105,6 @@ private:
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
-    
-    static int maxTextureSize();
 };
 
 #endif //QN_GL_RENDERER_H

@@ -42,7 +42,7 @@ public slots:
 signals:
     void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
     void finishedLicense(int status, const QByteArray &errorString, const QnLicenseList &licenses, int handle);
-    void finishedKvPair(int status, const QByteArray &errorString, const QnKvPairList &kvPairs, int handle);
+    void finishedKvPair(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle);
     void finishedConnect(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
     void finishedBusinessRule(int status, const QByteArray &errorString, const QnBusinessEventRules &businessRules, int handle);
     void finishedSetting(int status, const QByteArray &errorString, const QnKvPairList &settings, int handle);
@@ -156,7 +156,7 @@ public:
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
     int addLicensesAsync(const QList<QnLicensePtr>& licenses, QObject* target, const char* slot);
 
-    int saveAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
+    int saveAsync(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QObject* target, const char* slot);
     int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);
 
     int deleteAsync(const QnMediaServerResourcePtr&, QObject*, const char*);

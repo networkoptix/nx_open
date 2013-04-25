@@ -48,7 +48,8 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const Business
     switch(actionType)
     {
         case BusinessActionType::NotDefined:         return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
-        case BusinessActionType::CameraOutput:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(runtimeParams));
+        case BusinessActionType::CameraOutput:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
+        case BusinessActionType::CameraOutputInstant:return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
         case BusinessActionType::Bookmark:           return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
         case BusinessActionType::CameraRecording:    return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
         case BusinessActionType::PanicRecording:     return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));

@@ -11,7 +11,7 @@
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 class QAction;
 class QMenu;
@@ -261,6 +261,7 @@ protected slots:
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
     void at_businessEventsAction_triggered();
+    void at_webClientAction_triggered();
     void at_getMoreLicensesAction_triggered();
     void at_openServerSettingsAction_triggered();
     void at_openPopupSettingsAction_triggered();
@@ -279,6 +280,7 @@ protected slots:
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
+    void at_serverLogsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
     void at_thumbnailsSearchAction_triggered();

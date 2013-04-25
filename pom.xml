@@ -39,7 +39,7 @@
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
-		<onvif.version>2.1.1-io-SNAPSHOT</onvif.version>
+		<onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
 		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<sigar.version>1.6-SNAPSHOT</sigar.version>
 		<boost.version>1.51.0</boost.version>
@@ -58,7 +58,7 @@
 		<qtlib9/>
 		<!--QT plugins used-->      
 		<qtplugin1>imageformats</qtplugin1>
-		<qtplugin2>enter its name here...</qtplugin2>
+		<qtplugin2>sqldrivers</qtplugin2>
 		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>

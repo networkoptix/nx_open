@@ -79,6 +79,7 @@ public:
         G726,
         G711,
         AAC,
+        AMR,
         SIZE_OF_AUDIO_CODECS
     };
 

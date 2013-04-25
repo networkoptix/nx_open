@@ -57,14 +57,29 @@ class FixedArSelectionItem: public SelectionItem {
     typedef SelectionItem base_type;
 
 public:
+    enum Option {
+        DrawCentralElement,
+        DrawSideElements
+    };
+    Q_DECLARE_FLAGS(Options, Option)
+
     FixedArSelectionItem(QGraphicsItem *parent = NULL): 
         base_type(parent),
-        m_elementSize(0.0)
+        m_elementSize(0.0),
+        m_options(0)
     {}
 
     virtual QRectF boundingRect() const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    Options options() const {
+        return m_options;
+    }
+
+    void setOptions(Options options) {
+        m_options = options;
+    }
 
     qreal elementSize() const {
         return m_elementSize;
@@ -86,8 +101,10 @@ public:
 
 private:
     qreal m_elementSize;
+    Options m_options;
     QVector<QPointF> m_sidePoints;
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(FixedArSelectionItem::Options)
 
 #endif // QN_SELECTION_ITEM_H

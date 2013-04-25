@@ -3,27 +3,34 @@
 
 #include <business/actions/popup_business_action.h>
 
+#include <client/client_settings.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/widgets/popups/business_event_popup_widget.h>
 #include <ui/widgets/popups/system_health_popup_widget.h>
-
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <utils/settings.h>
 #include <utils/common/event_processors.h>
+#include <utils/kvpair_usage_helper.h>
 
-QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
+QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
 
     this->setAutoFillBackground(true);
+
+    m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
+                context()->user(),
+                QLatin1String("showBusinessEvents"),            //TODO: #GDM move out common consts
+                0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
+                this);
 
     // TODO: #GDM Evil! Layout code does not belong here.
     // Layout must be done by widget's parent, not the widget itself.
@@ -34,6 +41,7 @@ QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchCon
 
     connect(ui->postponeAllButton,  SIGNAL(clicked()), this, SLOT(at_postponeAllButton_clicked()));
     connect(ui->minimizeButton,     SIGNAL(clicked()), this, SLOT(at_minimizeButton_clicked()));
+    connect(this->context(),        SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
 }
 
 QnPopupCollectionWidget::~QnPopupCollectionWidget()
@@ -70,7 +78,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resources);
     }
 
-    if (!(qnSettings->popupBusinessEvents() & (1 << eventType))) {
+    if (!(m_showBusinessEventsHelper->value() & (1 << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return false;
     }
@@ -161,7 +169,7 @@ void QnPopupCollectionWidget::updatePosition() {
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {
     if (ignore)
-        qnSettings->setPopupBusinessEvents(qnSettings->popupBusinessEvents() & ~(1 << eventType));
+        m_showBusinessEventsHelper->setValue(m_showBusinessEventsHelper->value() & ~(1 << eventType));
 
     if (!m_businessEventWidgets.contains(eventType))
         return;
@@ -202,4 +210,7 @@ void QnPopupCollectionWidget::at_minimizeButton_clicked() {
     hide();
 }
 
+void QnPopupCollectionWidget::at_context_userChanged() {
+    m_showBusinessEventsHelper->setResource(context()->user());
+}
 

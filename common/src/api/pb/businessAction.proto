@@ -18,6 +18,8 @@ enum BusinessActionType
     SendMail         = 5;
     Alert            = 6;
     ShowPopup        = 7;
+
+    CameraOutputInstant = 8;    //same as Camera Output but has not toggle state
 }
 
 message BusinessAction {

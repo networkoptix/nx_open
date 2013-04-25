@@ -32,6 +32,16 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
+    if (fields & QnBusiness::ActionTypeField) {
+        bool instant = (model->actionType() == BusinessActionType::CameraOutputInstant);
+        if (instant) {
+            ui->autoResetCheckBox->setEnabled(false);
+            ui->autoResetCheckBox->setChecked(true);
+            ui->autoResetSpinBox->setValue(30);
+            ui->autoResetSpinBox->setEnabled(false);
+        }
+    }
+
     if (fields & QnBusiness::ActionResourcesField) {
         QSet<QString> totalRelays;
         bool inited = false;
@@ -60,10 +70,14 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
         QString text = BusinessActionParameters::getRelayOutputId(params);
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
-        int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params) / 1000;
-        ui->autoResetCheckBox->setChecked(autoReset > 0);
-        if (autoReset > 0)
-            ui->autoResetSpinBox->setValue(autoReset);
+
+        bool instant = (model->actionType() == BusinessActionType::CameraOutputInstant);
+        if (!instant) {
+            int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params) / 1000;
+            ui->autoResetCheckBox->setChecked(autoReset > 0);
+            if (autoReset > 0)
+                ui->autoResetSpinBox->setValue(autoReset);
+        }
     }
 }
 

@@ -22,8 +22,6 @@ public:
     virtual ~QnLayoutTabBar();
 
     virtual Qn::ActionScope currentScope() const override;
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
 
@@ -37,6 +35,8 @@ protected:
 
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     QString layoutText(QnWorkbenchLayout *layout) const;
     QIcon layoutIcon(QnWorkbenchLayout *layout) const;

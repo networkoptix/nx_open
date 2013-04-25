@@ -17,3 +17,4 @@ To add some more interfaces:
 - find line "#define SOAP_NAMESPACE_OF_ns1 "" and remove corresponding block of text
 - run soapcpp2 with parameters found in get_onvif_stub.bat
 - add new files to project file and rebuild project
+- I add non standart AMR audio codec. to sources. You MUST add AMR audio codec to WSDL if you going to update sources!!!

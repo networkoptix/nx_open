@@ -79,8 +79,7 @@ public:
     virtual ~QnWorkbenchUi();
 
     virtual Qn::ActionScope currentScope() const override;
-
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
     Flags flags() const {
         return m_flags;
@@ -180,6 +179,8 @@ protected:
     virtual bool event(QEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
+
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
     void updateViewportMargins();

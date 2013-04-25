@@ -128,8 +128,6 @@ class DecodedPictureToOpenGLUploaderPrivate
     Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate);
 
 public:
-    static int getMaxTextureSize() { return maxTextureSize; }
-
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
         QnGlFunctions(context),
         supportsNonPower2Textures(false)
@@ -140,7 +138,7 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 
         /* Maximal texture size. */
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+        int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
         NX_LOG(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
 
         /* Clamp constant. */
@@ -185,8 +183,6 @@ public:
 public:
     GLint clampConstant;
     bool supportsNonPower2Textures;
-    static int maxTextureSize;
-
 private:
     struct Filler
     {
@@ -207,8 +203,6 @@ private:
     QMutex m_fillerMutex;
     Filler m_fillers[FILLER_COUNT];
 };
-
-int DecodedPictureToOpenGLUploaderPrivate::maxTextureSize = 0;
 
 // -------------------------------------------------------------------------- //
 // QnGlRendererTexture

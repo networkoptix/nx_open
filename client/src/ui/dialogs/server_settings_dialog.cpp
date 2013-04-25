@@ -22,7 +22,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <client/client_model_types.h>
-#include <utils/settings.h>
+#include <client/client_settings.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

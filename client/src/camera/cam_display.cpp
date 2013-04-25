@@ -542,6 +542,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
 
             m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
+            if (m_isStillImage && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Skipped)
+                m_eofSignalSended = true;
         }
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
