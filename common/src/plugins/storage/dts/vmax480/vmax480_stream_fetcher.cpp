@@ -308,7 +308,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
             return;
         mediaData->opaque = 0;
 
-#if 1
+#if 0
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);
         if (newTime != mediaData->timestamp && newTime != DATETIME_NOW && newTime != -1) 
         {
