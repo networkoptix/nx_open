@@ -93,7 +93,7 @@
             ],
             "fromCamera": {
                 "x": {
-                    "extrapolationMode": "ConstantExtrapolation",
+                    "extrapolationMode": "PeriodicExtrapolation",
                     "logical":  [  -1,   1],
                     "physical": [-180, 180]
                 },
@@ -105,11 +105,10 @@
                 "z": {
                     "extrapolationMode": "ConstantExtrapolation",
                     "logical":  [0, 1],
-                    "physical": [32.6, 1213.2],
+                    "physical": [32.6, 1213.2]
                 }
             }
         }
-
     ]
 }
 
