@@ -58,9 +58,10 @@ bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
     {
         unauth = true;
         setStatus(Unauthorized);
+        return false;
     }
-
-    return false;
+    
+    return true; // ignore other error (for cameras with non standart HTTP port)
 }
 
 bool QnPlWatchDogResource::initInternal() 
