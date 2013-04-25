@@ -496,32 +496,41 @@ void QnProgressiveDownloadingConsumer::run()
 
             if (isUTCRequest)
             {
-                QnServerArchiveDelegate serverArchive;
-                serverArchive.open(resource);
-                serverArchive.seek(timeMs, true);
-                qint64 timestamp = AV_NOPTS_VALUE;
-                for (int i = 0; i < 20; ++i) 
-                {
-                    QnAbstractMediaDataPtr data = serverArchive.getNextData();
-                    if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
+                QnAbstractArchiveDelegate* archive = 0;
+                QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+                if (camRes)
+                    archive = camRes->createArchiveDelegate();
+                if (archive) {
+                    archive->open(resource);
+                    archive->seek(timeMs, true);
+                    qint64 timestamp = AV_NOPTS_VALUE;
+                    for (int i = 0; i < 20; ++i) 
                     {
-                        timestamp = data->timestamp;
-                        break;
+                        QnAbstractMediaDataPtr data = archive->getNextData();
+                        if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
+                        {
+                            timestamp = data->timestamp;
+                            break;
+                        }
                     }
-                }
 
-                QByteArray ts("\"now\"");
-                QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
-                if (timestamp != (qint64)AV_NOPTS_VALUE)
-                {
-                    if (utcFormatOK)
-                        ts = QByteArray::number(timestamp/1000);
-                    else
-                        ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit() + QByteArray("\"");
+                    QByteArray ts("\"now\"");
+                    QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                    if (timestamp != (qint64)AV_NOPTS_VALUE)
+                    {
+                        if (utcFormatOK)
+                            ts = QByteArray::number(timestamp/1000);
+                        else
+                            ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit() + QByteArray("\"");
+                    }
+                    d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
+                    sendResponse("HTTP", CODE_OK, "application/json");
                 }
-                d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
-                sendResponse("HTTP", CODE_OK, "application/json");
+                else {
+                    sendResponse("HTTP", CODE_INTERNAL_ERROR, "application/json");
 
+                }
+                delete archive;
                 return;
             }
 
