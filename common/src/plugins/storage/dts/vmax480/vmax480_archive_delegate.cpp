@@ -274,3 +274,8 @@ void QnVMax480ArchiveDelegate::beforeSeek(qint64 time)
     Q_UNUSED(time)
     m_beforeSeek = true;
 }
+
+bool QnVMax480ArchiveDelegate::isStopping() const
+{
+    return m_needStop;
+}
