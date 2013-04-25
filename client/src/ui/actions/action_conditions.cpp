@@ -312,6 +312,17 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return Qn::InvisibleAction;
+
+    if(camera->isGroupPlayOnly())
+        return Qn::InvisibleAction;
+
+    return QnExportActionCondition::check(parameters);
+}
+
 Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
