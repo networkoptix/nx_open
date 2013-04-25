@@ -352,6 +352,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
         }
         else {
             loadIndexFile(m_index, m_indexHeader, m_detailedIndexFile);
+            m_firstTime = m_indexHeader.startTime;
             if (m_index.size() > 0) {
                 m_lastRecordedTime = m_maxMotionTime = m_index.last().start + m_indexHeader.startTime;
             }
