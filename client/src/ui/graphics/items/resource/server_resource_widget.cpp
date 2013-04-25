@@ -110,14 +110,13 @@ namespace {
     QPainterPath createChartPath(const QLinkedList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
         QPainterPath path;
         qreal maxValue = -1;
-        //qreal value;
         qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
         
         qreal x1, y1;
         x1 = -x_step * elapsedStep;
 
-        qreal angle = elapsedStep >= 0.5 
+        qreal baseAngle = elapsedStep >= 0.5
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
@@ -140,19 +139,6 @@ namespace {
                 continue;
             }
 
-            qreal y2 = value * scale;
-
-
-            /* Note that we're using 89 degrees for arc length for a reason.
-             * When using full 90 degrees, arcs are connected, but Qt still
-             * inserts an empty line segment to join consecutive arcs. 
-             * Path triangulator then chokes when trying to calculate a normal
-             * for this line segment, producing NaNs in its output.
-             * These NaNs are then fed to GPU, resulting in artifacts. */
-
-            // TODO: #GDM This logic seems overly complicated to me.
-            //            I'm sure we can do the same with a code that is at least three times shorter.
-
             /* Drawing only second part of the arc, cut at the beginning */
             bool c1 = x1 + x_step2 < 0.0;
 
@@ -168,37 +154,38 @@ namespace {
             /* Drawing only first part of the arc, cut at the end */
             bool c5 = !c1 && !c2 && !c3 && !c4;
 
-            qreal h = qAbs(y2 - y1);
+            qreal y2 = value * scale;
+            if (y2 != y1) {
+                qreal h = qAbs(y2 - y1);
+                qreal angle = (y2 > y1) ? baseAngle : -baseAngle;
 
-            if (y2 > y1) {
+                /* Note that we're using 89 degrees for arc length for a reason.
+                 * When using full 90 degrees, arcs are connected, but Qt still
+                 * inserts an empty line segment to join consecutive arcs.
+                 * Path triangulator then chokes when trying to calculate a normal
+                 * for this line segment, producing NaNs in its output.
+                 * These NaNs are then fed to GPU, resulting in artifacts. */
+                qreal a89 = (y2 > y1) ? 89 : -89;
+                qreal a90 = (y2 > y1) ? 90 : -90;
+                qreal y = qMin(y1, y2);
+
                 if (c1)
-                    path.arcMoveTo(x1 + x_step2, y1, x_step, h, 180 + angle);
-                else if (c2)
-                    path.arcMoveTo(x1 - x_step2, y1, x_step, h, angle);
+                    path.arcMoveTo(x1 + x_step2, y, x_step, h, 180 + angle);
+                if (c2)
+                    path.arcMoveTo(x1 - x_step2, y, x_step, h, angle);
                 if (c2 || c3 || c4)
-                    path.arcTo(x1 - x_step2, y1, x_step, h, c2 ? angle : 90, c2 ? -angle : -89);
+                    path.arcTo(x1 - x_step2, y, x_step, h, c2 ? angle : a90, c2 ? -angle : -a89);
+                if (c1 || c2 || c3 || c4)
+                    path.arcTo(x1 + x_step2, y, x_step, h, c1 ? 180 + angle : 180, c1 ? a90 - angle : c4 ? angle : a89);
                 if (c5)
-                    path.arcTo(x1 - x_step2, y1, x_step, h, 90, -90 + angle);
-                else
-                    path.arcTo(x1 + x_step2, y1, x_step, h, c1 ? 180 + angle : 180, c1 ? 90 - angle : c4 ? angle : 89);
-            } else if (y2 < y1) {
-                if (c1)
-                    path.arcMoveTo(x1 + x_step2, y2, x_step, h, 180 - angle);
-                else if (c2)
-                    path.arcMoveTo(x1 - x_step2, y2, x_step, h, -angle);
-                if (c2 || c3 || c4)
-                    path.arcTo(x1 - x_step2, y2, x_step, h, c2 ? -angle : -90, c2 ? angle : 89);
-                if (c5)
-                    path.arcTo(x1 - x_step2, y2, x_step, h, -90, 90 - angle);
-                else
-                    path.arcTo(x1 + x_step2, y2, x_step, h, c1 ? 180 - angle : 180, c1 ? -90 + angle : c4 ? -angle : -89);
+                    path.arcTo(x1 - x_step2, y, x_step, h, a90, angle - a90);
             } else {
                 if (c1 || c2)
                     path.moveTo(0.0, y1);
+                if (c1 || c2 || c3)
+                    path.lineTo(x1 + x_step, y2);
                 if (c4 || c5)
                     path.lineTo(x1 + x_step * elapsedStep, y2);
-                else
-                    path.lineTo(x1 + x_step, y2);
             }
 
             if(last) {
@@ -300,6 +287,7 @@ protected:
         int textOffset = legendImgSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
+            //TODO: #GDM Text drawing is very slow. #Elric sais it is fast in Qt5
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 

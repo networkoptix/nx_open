@@ -104,6 +104,8 @@ public:
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
+    bool isGroupPlayOnly() const;
+
 // -------------------------------------------------------------------------- //
 // Begin QnSecurityCamResource signals/slots
 // -------------------------------------------------------------------------- //

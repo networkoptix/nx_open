@@ -235,6 +235,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
     connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
+    connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
@@ -951,6 +952,32 @@ void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
     QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
     dialog->setResources(resourcePool()->getResources());
     dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
+    QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
+    if(!widget)
+        return;
+
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    if(!camera)
+        return;
+
+    QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
+    QVector3D position = ptzController->position(camera);
+
+    for(int i = 0; i <= 20; i++) {
+        qreal zoom = i / 20.0;
+
+        position.setZ(zoom);
+        ptzController->setPosition(camera, position);
+
+        QEventLoop loop;
+        QTimer::singleShot(5000, &loop, SLOT(quit()));
+        loop.exec();
+
+        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {

@@ -1128,7 +1128,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Preview Search...")).
-        condition(new QnExportActionCondition(true, this));
+        condition(new QnPreviewActionCondition(this));
 
 
 
@@ -1146,6 +1146,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::DevMode).
         shortcut(tr("Ctrl+Alt+Shift+R")).
         text(tr("Show Resource Pool"));
+
+    factory(Qn::DebugCalibratePtzAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
+        text(tr("Calibrate PTZ"));
 
 
     factory(Qn::PlayPauseAction).
