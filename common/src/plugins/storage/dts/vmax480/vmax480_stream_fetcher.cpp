@@ -8,7 +8,7 @@
 static const int PROCESS_TIMEOUT = 1000;
 static const int MAX_QUEUE_SIZE = 150;
 static const qint64 EMPTY_PACKET_REPEAT_INTERVAL = 1000ll * 400;
-static const qint64 RECONNECT_TIMEOUT_USEC = 1500 * 1000;
+static const qint64 RECONNECT_TIMEOUT_USEC = 4000 * 1000;
 
 QMutex VMaxStreamFetcher::m_instMutex;
 QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
