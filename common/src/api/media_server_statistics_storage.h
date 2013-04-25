@@ -21,7 +21,7 @@ public:
      * \param apiConnection     Api connection of the server that will provide the statistics.
      * \param parent            Parent of the object
      */
-    QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int storageLimit, QObject *parent);
+    QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent);
 
     // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
@@ -42,11 +42,8 @@ public:
     QnStatisticsHistory history() const;
     qint64 historyId() const;
 
-    /**
-     *  Send update request to the server.
-     */
-    void update();
-
+    /** Data update period. Is taken from the server's response. */
+    int updatePeriod() const;
 signals:
     /**
      * Signal emitted when new data is received.
@@ -54,21 +51,27 @@ signals:
     void statisticsChanged();
 
 private slots:
+    /**
+     *  Send update request to the server.
+     */
+    void update();
 
     /**
      * Private slot for the handling data received from the server.
      */
-    void at_statisticsReceived(int status, const QnStatisticsDataList &data, int handle);
+    void at_statisticsReceived(int status, const QnStatisticsDataList &data, int updatePeriod, int handle);
 
 private:
     bool m_alreadyUpdating;
     qint64 m_lastId;
     qint64 m_timeStamp;
     uint m_listeners;
-    int m_storageLimit;
+    int m_pointsLimit;
+    int m_updatePeriod;
 
     QnStatisticsHistory m_history;
     QnMediaServerConnectionPtr m_apiConnection;
+    QTimer* m_timer;
 };
 
 #endif // QN_MEDIA_SERVER_STATISTICS_STORAGE
