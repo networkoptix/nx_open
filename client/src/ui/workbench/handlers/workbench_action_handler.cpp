@@ -2273,7 +2273,8 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(menu()->currentParameters(sender()).widget());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
     if (!widget)
         return;
 
@@ -2294,66 +2295,70 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
+    QString fileName = parameters.argument<QString>(Qn::FileNameRole);
+    bool withTimestamps = true;
+    if(fileName.isEmpty()) {
+        QString suggestion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
 
-    QString suggestion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
-    bool withTimestamp = true;
+        QString previousDir = qnSettings->lastScreenshotDir();
+        if (previousDir.isEmpty())
+            previousDir = qnSettings->mediaFolder();
 
-    QString previousDir = qnSettings->lastScreenshotDir();
-    if (previousDir.isEmpty())
-        previousDir = qnSettings->mediaFolder();
+        QString filterSeparator(QLatin1String(";;"));
+        QString pngFileFilter = tr("PNG Image (*.png)");
+        QString jpegFileFilter = tr("JPEG Image(*.jpg)");
 
-    QString filterSeparator(QLatin1String(";;"));
-    QString pngFileFilter = tr("PNG Image (*.png)");
-    QString jpegFileFilter = tr("JPEG Image(*.jpg)");
-
-    QString allowedFormatFilter =
+        QString allowedFormatFilter =
             pngFileFilter;
 
-    if (QImageWriter::supportedImageFormats().contains("jpg") ) {
-        allowedFormatFilter += filterSeparator;
-        allowedFormatFilter += jpegFileFilter;
-    }
+        if (QImageWriter::supportedImageFormats().contains("jpg") ) {
+            allowedFormatFilter += filterSeparator;
+            allowedFormatFilter += jpegFileFilter;
+        }
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this->widget(),
-                                                                     tr("Save Screenshot As..."),
-                                                                     previousDir + QDir::separator() + suggestion,
-                                                                     allowedFormatFilter));
-    dialog->setFileMode(QFileDialog::AnyFile);
-    dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-    dialog->addCheckbox(tr("Include Timestamp"), &withTimestamp);
-    if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-        return;
-
-    QString fileName = dialog->selectedFiles().value(0);
-    QString selectedFilter = dialog->selectedNameFilter();
-    QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
-    if (fileName.isEmpty())
-        return;
-
-    if (!fileName.toLower().endsWith(selectedExtension))
-        fileName += selectedExtension;
-
-    if (QFile::exists(fileName)) {
-        QMessageBox::StandardButton button = QMessageBox::information(
-                    this->widget(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
-
-        if(button == QMessageBox::Cancel || button == QMessageBox::No)
-            return;
-    }
-
-    if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-        QMessageBox::critical(
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             this->widget(),
-            tr("Could not overwrite file"),
-            tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
-            QMessageBox::Ok
-        );
+            tr("Save Screenshot As..."),
+            previousDir + QDir::separator() + suggestion,
+            allowedFormatFilter
+        ));
+
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        dialog->addCheckbox(tr("Include Timestamp"), &withTimestamps);
+        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+            return;
+
+        fileName = dialog->selectedFiles().value(0);
+        if (fileName.isEmpty())
+            return;
+
+        QString selectedFilter = dialog->selectedNameFilter();
+        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        if (!fileName.toLower().endsWith(selectedExtension))
+            fileName += selectedExtension;
+
+        if (QFile::exists(fileName)) {
+            QMessageBox::StandardButton button = QMessageBox::information(
+                this->widget(),
+                tr("Save As"),
+                tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+            );
+            if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                return;
+        }
+
+        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+            QMessageBox::critical(
+                this->widget(),
+                tr("Could not overwrite file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                QMessageBox::Ok
+            );
+            return;
+        }
     }
 
     QImage screenshot;
@@ -2376,8 +2381,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
             );
         }
 
-        if (withTimestamp) {
-
+        if (withTimestamps) {
             QString timeStamp;
             qint64 time = display->camDisplay()->getCurrentTime() / 1000;
             if(widget->resource()->flags() & QnResource::utc) {
@@ -2405,12 +2409,15 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     }
 
     if (!screenshot.save(fileName)) {
-        QMessageBox::critical(this->widget(),
-                              tr("Could not save screenshot"),
-                              tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(fileName).baseName()));
+        QMessageBox::critical(
+            this->widget(),
+            tr("Could not save screenshot"),
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(fileName).baseName())
+        );
         return;
     }
     addToResourcePool(fileName);
+    
     qnSettings->setLastScreenshotDir(QFileInfo(fileName).absolutePath());
 }
 

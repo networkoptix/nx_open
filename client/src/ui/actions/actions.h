@@ -330,7 +330,6 @@ namespace Qn {
          * Saves selected layout under another name.
          * 
          * Parameters:
-         * 
          * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to assign layout to.
          * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
@@ -386,6 +385,10 @@ namespace Qn {
 
         /**
          * Takes screenshot of an item.
+         * 
+         * Parameters:
+         * <tt>QString FileNameRole</tt> --- name for the screenshot. If not provided,
+         * a file selection dialog will pop up.
          */
         TakeScreenshotAction,
 
