@@ -554,7 +554,6 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
-    m_processor(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -618,12 +617,6 @@ void QnMain::stopObjects()
     {
         delete m_rtspListener;
         m_rtspListener = 0;
-    }
-
-    if (m_processor)
-    {
-        delete m_processor;
-        m_processor = 0;
     }
 }
 
@@ -997,7 +990,7 @@ void QnMain::run()
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->run();
 
-    m_processor = new QnAppserverResourceProcessor(m_mediaServer->getId());
+    std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
 
     foreach (QnAbstractStorageResourcePtr storage, m_mediaServer->getStorages())
     {
@@ -1021,7 +1014,7 @@ void QnMain::run()
     //============================
     UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
 
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor);
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
     QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
 
@@ -1123,13 +1116,13 @@ void QnMain::run()
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
 
-    delete UPNPDeviceSearcher::instance();
-    UPNPDeviceSearcher::initGlobalInstance( NULL );
+    m_processor.reset();
 
-#ifdef _DEBUG
     delete ThirdPartyResourceSearcher::instance();
     ThirdPartyResourceSearcher::initStaticInstance( NULL );
-#endif
+
+    delete UPNPDeviceSearcher::instance();
+    UPNPDeviceSearcher::initGlobalInstance( NULL );
 
     connectorThread->quit();
     connectorThread->wait();
