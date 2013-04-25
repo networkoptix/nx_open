@@ -27,6 +27,16 @@ void* GenericRTSPDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfac
     return NULL;
 }
 
+unsigned int GenericRTSPDiscoveryManager::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int GenericRTSPDiscoveryManager::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 static const char* VENDOR_NAME = "GENERIC_RTSP";
 
 void GenericRTSPDiscoveryManager::getVendorName( char* buf ) const

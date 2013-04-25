@@ -51,6 +51,16 @@ void* GenericRTSPPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
+unsigned int GenericRTSPPlugin::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int GenericRTSPPlugin::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 GenericRTSPPlugin* GenericRTSPPlugin::instance()
 {
     return genericRTSPPluginInstance;

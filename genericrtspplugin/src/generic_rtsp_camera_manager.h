@@ -27,6 +27,10 @@ public:
 
     //!Implementation of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    //!Implementaion of nxpl::NXPluginInterface::addRef
+    virtual unsigned int addRef() override;
+    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
     virtual int getEncoderCount( int* encoderCount ) const override;

@@ -54,6 +54,16 @@ void* AxisCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
+unsigned int AxisCameraManager::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int AxisCameraManager::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int AxisCameraManager::getEncoderCount( int* encoderCount ) const
 {

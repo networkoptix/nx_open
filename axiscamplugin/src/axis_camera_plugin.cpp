@@ -60,6 +60,16 @@ void* AxisCameraPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
+unsigned int AxisCameraPlugin::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int AxisCameraPlugin::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 QNetworkAccessManager* AxisCameraPlugin::networkAccessManager()
 {
     return &m_networkAccessManager;

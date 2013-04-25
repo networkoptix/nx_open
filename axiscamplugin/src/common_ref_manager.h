@@ -8,13 +8,12 @@
 
 #include <QAtomicInt>
 
-#include <plugins/nx_plugin_api.h>
-
 
 //!Implements \a nxpl::NXPluginInterface reference counting. Can delegate reference counting to another \a CommonRefManager instance
+/*!
+    This class does not inherit nxpl::NXPluginInterface because it would require virtual inheritance
+*/
 class CommonRefManager
-:
-    virtual public nxpl::NXPluginInterface
 {
 public:
     //!Use this constructor to store reference counter in constructed object
@@ -24,9 +23,12 @@ public:
     virtual ~CommonRefManager();
 
     //!Implementaion of nxpl::NXPluginInterface::addRef
-    virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::NXPluginInterface::addRef
-    virtual unsigned int releaseRef() override;
+    unsigned int addRef();
+    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    /*!
+        Calls delete this if reference counter reached zero
+    */
+    unsigned int releaseRef();
 
 private:
     QAtomicInt m_refCount;

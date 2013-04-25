@@ -51,6 +51,16 @@ void* AxisMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
+unsigned int AxisMediaEncoder::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int AxisMediaEncoder::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const
 {
     QByteArray paramsStr;

@@ -26,7 +26,12 @@ public:
     AxisCameraDiscoveryManager();
     virtual ~AxisCameraDiscoveryManager();
 
+    //!Implementaion of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    //!Implementaion of nxpl::NXPluginInterface::addRef
+    virtual unsigned int addRef() override;
+    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::CameraDiscoveryManager::getVendorName
     virtual void getVendorName( char* buf ) const override;

@@ -40,6 +40,16 @@ void* GenericRTSPCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID
     return NULL;
 }
 
+unsigned int GenericRTSPCameraManager::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int GenericRTSPCameraManager::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int GenericRTSPCameraManager::getEncoderCount( int* encoderCount ) const
 {

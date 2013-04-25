@@ -47,6 +47,10 @@ public:
 
     //!Implementation of nxcip::CameraRelayIOManager::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    //!Implementaion of nxpl::NXPluginInterface::addRef
+    virtual unsigned int addRef() override;
+    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::CameraRelayIOManager::getRelayOutputList
     virtual int getRelayOutputList( char** idList, int* idNum ) const override;

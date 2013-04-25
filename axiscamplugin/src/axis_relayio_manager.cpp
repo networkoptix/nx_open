@@ -78,6 +78,16 @@ void* AxisRelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     return NULL;
 }
 
+unsigned int AxisRelayIOManager::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int AxisRelayIOManager::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 int AxisRelayIOManager::getRelayOutputList( char** idList, int* idNum ) const
 {
     copyPortList( idList, idNum, m_outputPortNameToIndex );

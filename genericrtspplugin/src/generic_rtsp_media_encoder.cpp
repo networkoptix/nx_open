@@ -31,6 +31,16 @@ void* GenericRTSPMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID 
     return NULL;
 }
 
+unsigned int GenericRTSPMediaEncoder::addRef()
+{
+    return CommonRefManager::addRef();
+}
+
+unsigned int GenericRTSPMediaEncoder::releaseRef()
+{
+    return CommonRefManager::releaseRef();
+}
+
 int GenericRTSPMediaEncoder::getMediaUrl( char* urlBuf ) const
 {
     strcpy( urlBuf, m_cameraManager->info().url );

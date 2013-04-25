@@ -10,6 +10,8 @@
 
 #include <memory>
 
+#include <plugins/nx_plugin_api.h>
+
 
 /*! \main
     Object life-time management:\n
@@ -24,6 +26,7 @@ class GenericRTSPDiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class GenericRTSPPlugin
 :
+    public nxpl::NXPluginInterface,
     public CommonRefManager
 {
 public:
@@ -35,6 +38,10 @@ public:
         Supports cast to nxcip::CameraDiscoveryManager interface
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    //!Implementaion of nxpl::NXPluginInterface::addRef
+    virtual unsigned int addRef() override;
+    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    virtual unsigned int releaseRef() override;
 
     static GenericRTSPPlugin* instance();
 

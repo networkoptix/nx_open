@@ -75,7 +75,7 @@ namespace nxcip
     */
     class CameraDiscoveryManager
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraDiscoveryManager() {}
@@ -185,7 +185,7 @@ namespace nxcip
     //!Provides encoder parameter configuration and media stream access (by providing media stream url)
     class CameraMediaEncoder
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraMediaEncoder() {}
@@ -262,7 +262,7 @@ namespace nxcip
     */
     class BaseCameraManager
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         virtual ~BaseCameraManager() {}
@@ -356,7 +356,7 @@ namespace nxcip
     //!Pan–tilt–zoom management
     class CameraPTZManager
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraPTZManager() {}
@@ -458,7 +458,7 @@ namespace nxcip
     //!Provides access to motion detection support, implemented on camera
     class CameraMotionDataProvider
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         //TODO for later use
@@ -479,7 +479,7 @@ namespace nxcip
     */
     class CameraRelayIOManager
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         //!Returns list of IDs of available relay output ports
@@ -562,7 +562,7 @@ namespace nxcip
     //!Receives events on input port state change
     class CameraInputEventHandler
     :
-        virtual public nxpl::NXPluginInterface
+        public nxpl::NXPluginInterface
     {
     public:
         virtual ~CameraInputEventHandler() {}

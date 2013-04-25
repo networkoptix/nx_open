@@ -13,6 +13,8 @@
 #include <QNetworkAccessManager>
 #include <QThread>
 
+#include <plugins/nx_plugin_api.h>
+
 
 /*! \main
     Object life-time management:\n
@@ -27,6 +29,7 @@ class AxisCameraDiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class AxisCameraPlugin
 :
+    public nxpl::NXPluginInterface,
     public CommonRefManager
 {
 public:
@@ -38,6 +41,10 @@ public:
         Supports cast to nxcip::CameraDiscoveryManager interface
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    //!Implementaion of nxpl::NXPluginInterface::addRef
+    virtual unsigned int addRef() override;
+    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    virtual unsigned int releaseRef() override;
 
     QNetworkAccessManager* networkAccessManager();
 
