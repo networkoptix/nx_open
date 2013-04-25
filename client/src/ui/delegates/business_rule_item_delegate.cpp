@@ -134,7 +134,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 if (actionType == BusinessActionType::CameraRecording) {
                     btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
                 }
-                else if (actionType == BusinessActionType::CameraOutput) {
+                else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant) {
                     btn->setDialogDelegate(new QnOutputEnabledDelegate(btn));
                 }
                 else if (actionType == BusinessActionType::SendMail) {

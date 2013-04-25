@@ -4,6 +4,10 @@
 
 #include <core/resource/resource.h>
 
+//---------------------------------------------------------------------------//
+//------------------QnKvPairUsageHelperPrivate-------------------------------//
+//---------------------------------------------------------------------------//
+
 struct QnKvPairUsageHelperPrivate {
     QnKvPairUsageHelperPrivate(): loadHandle(-1), saveHandle(-1) {}
 
@@ -19,8 +23,11 @@ struct QnKvPairUsageHelperPrivate {
     int saveHandle;
 };
 
+//---------------------------------------------------------------------------//
+//------------------QnAbstractKvPairUsageHelper------------------------------//
+//---------------------------------------------------------------------------//
 
-QnKvPairUsageHelper::QnKvPairUsageHelper(const QnResourcePtr &resource,
+QnAbstractKvPairUsageHelper::QnAbstractKvPairUsageHelper(const QnResourcePtr &resource,
                                          const QString &key,
                                          const QString &defaultValue,
                                          QObject *parent) :
@@ -35,30 +42,15 @@ QnKvPairUsageHelper::QnKvPairUsageHelper(const QnResourcePtr &resource,
         load();
 }
 
-QnKvPairUsageHelper::QnKvPairUsageHelper(const QnResourcePtr &resource,
-                                         const QString &key,
-                                         const quint64 &defaultValue,
-                                         QObject *parent) :
-    QObject(parent),
-    d(new QnKvPairUsageHelperPrivate())
-{
-    d->resource = resource;
-    d->key = key;
-    d->defaultValue = QString::number(defaultValue, 16);
-    d->value = d->defaultValue;
-    if (d->isValid())
-        load();
-}
-
-QnKvPairUsageHelper::~QnKvPairUsageHelper() {
+QnAbstractKvPairUsageHelper::~QnAbstractKvPairUsageHelper() {
 
 }
 
-QnResourcePtr QnKvPairUsageHelper::resource() const {
+QnResourcePtr QnAbstractKvPairUsageHelper::resource() const {
     return d->resource;
 }
 
-void QnKvPairUsageHelper::setResource(const QnResourcePtr &resource) {
+void QnAbstractKvPairUsageHelper::setResource(const QnResourcePtr &resource) {
     if (d->resource == resource)
         return;
 
@@ -68,11 +60,11 @@ void QnKvPairUsageHelper::setResource(const QnResourcePtr &resource) {
         load();
 }
 
-QString QnKvPairUsageHelper::key() const {
+QString QnAbstractKvPairUsageHelper::key() const {
     return d->key;
 }
 
-void QnKvPairUsageHelper::setKey(const QString &key) {
+void QnAbstractKvPairUsageHelper::setKey(const QString &key) {
     if (d->key == key)
         return;
 
@@ -82,11 +74,11 @@ void QnKvPairUsageHelper::setKey(const QString &key) {
         load();
 }
 
-QString QnKvPairUsageHelper::value() const {
+QString QnAbstractKvPairUsageHelper::innerValue() const {
     return d->value;
 }
 
-void QnKvPairUsageHelper::setValue(const QString &value) {
+void QnAbstractKvPairUsageHelper::setInnerValue(const QString &value) {
     if (d->value == value)
         return;
 
@@ -95,26 +87,13 @@ void QnKvPairUsageHelper::setValue(const QString &value) {
         save();
 }
 
-quint64 QnKvPairUsageHelper::valueAsFlags() const {
-    return d->value.toULongLong(0, 16);
-}
-
-void QnKvPairUsageHelper::setFlagsValue(quint64 value) {
-    if (valueAsFlags() == value)
-        return;
-
-    d->value = QString::number(value, 16);
-    if (d->isValid())
-        save();
-}
-
-void QnKvPairUsageHelper::load() {
+void QnAbstractKvPairUsageHelper::load() {
     d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(
                 this,
                 SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairs &, int)));
 }
 
-void QnKvPairUsageHelper::save() {
+void QnAbstractKvPairUsageHelper::save() {
     QnKvPairList kvPairs;
     kvPairs.push_back(QnKvPair(d->key, d->value));
 
@@ -125,7 +104,7 @@ void QnKvPairUsageHelper::save() {
                 SLOT(at_connection_replyReceived(int, const QByteArray &, const QnKvPairs &, int)));
 }
 
-void QnKvPairUsageHelper::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle) {
+void QnAbstractKvPairUsageHelper::at_connection_replyReceived(int status, const QByteArray &errorString, const QnKvPairs &kvPairs, int handle) {
     if(status != 0) {
         qnWarning("Failed to save/load kvPairs cause of %1.", errorString);
         return;
@@ -139,10 +118,60 @@ void QnKvPairUsageHelper::at_connection_replyReceived(int status, const QByteArr
         foreach(const QnKvPair &pair, pairs)
             if(pair.name() == d->key && d->value != pair.value()) {
                 d->value = pair.value();
-                emit valueChanged(d->value);
+                innerValueChanged(d->value);
             }
         d->loadHandle = -1;
     } else if(handle == d->saveHandle) {
         d->saveHandle = -1;
     }
+}
+
+//---------------------------------------------------------------------------//
+//------------------QnStringKvPairUsageHelper-------------------------------//
+//---------------------------------------------------------------------------//
+
+QnStringKvPairUsageHelper::QnStringKvPairUsageHelper(
+        const QnResourcePtr &resource,
+        const QString &key,
+        const QString &defaultValue,
+        QObject *parent) :
+    base_type(resource, key, defaultValue, parent){}
+
+QnStringKvPairUsageHelper::~QnStringKvPairUsageHelper(){}
+
+QString QnStringKvPairUsageHelper::value() const {
+    return innerValue();
+}
+
+void QnStringKvPairUsageHelper::setValue(const QString &value) {
+    setInnerValue(value);
+}
+
+void QnStringKvPairUsageHelper::innerValueChanged(const QString &value) {
+    emit valueChanged(value);
+}
+
+//---------------------------------------------------------------------------//
+//------------------QnUint64KvPairUsageHelper--------------------------------//
+//---------------------------------------------------------------------------//
+
+QnUint64KvPairUsageHelper::QnUint64KvPairUsageHelper(
+        const QnResourcePtr &resource,
+        const QString &key,
+        quint64 defaultValue,
+        QObject *parent) :
+    base_type(resource, key, QString::number(defaultValue, 16), parent){}
+
+QnUint64KvPairUsageHelper::~QnUint64KvPairUsageHelper(){}
+
+quint64 QnUint64KvPairUsageHelper::value() const {
+    return innerValue().toULongLong(0, 16);
+}
+
+void QnUint64KvPairUsageHelper::setValue(quint64 value) {
+    setInnerValue(QString::number(value, 16));
+}
+
+void QnUint64KvPairUsageHelper::innerValueChanged(const QString &value) {
+    emit valueChanged(value.toULongLong(0, 16));
 }

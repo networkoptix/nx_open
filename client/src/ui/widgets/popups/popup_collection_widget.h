@@ -18,7 +18,7 @@ namespace Ui {
 
 class QnBusinessEventPopupWidget;
 class QnSystemHealthPopupWidget;
-class QnKvPairUsageHelper;
+class QnUint64KvPairUsageHelper;
 
 class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -26,7 +26,7 @@ class QnPopupCollectionWidget : public QWidget, public QnWorkbenchContextAware
     typedef QWidget base_type;
     
 public:
-    explicit QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context = NULL);
+    explicit QnPopupCollectionWidget(QWidget *parent);
     virtual ~QnPopupCollectionWidget();
 
     bool addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
@@ -51,8 +51,7 @@ private slots:
 
     void at_context_userChanged();
 private:
-    QnKvPairUsageHelper* m_showBusinessEventsHelper;
-    QnKvPairUsageHelper* m_showSystemHealthHelper;
+    QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;
 
     QScopedPointer<Ui::QnPopupCollectionWidget> ui;
 

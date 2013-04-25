@@ -11,6 +11,7 @@ namespace BusinessActionType {
         switch(val) {
             case NotDefined:         return QObject::tr("---");
             case CameraOutput:       return QObject::tr("Camera output");
+            case CameraOutputInstant:return QObject::tr("Camera output for 30 sec");
             case Bookmark:           return QObject::tr("Bookmark");
             case CameraRecording:    return QObject::tr("Camera recording");
             case PanicRecording:     return QObject::tr("Panic recording");
@@ -25,6 +26,7 @@ namespace BusinessActionType {
         switch(val) {
             case NotDefined:         return false;
             case CameraOutput:       return true;
+            case CameraOutputInstant:return true;
             case Bookmark:           return true;
             case CameraRecording:    return true;
             case PanicRecording:     return false;
@@ -48,6 +50,7 @@ namespace BusinessActionType {
         switch(val) {
             case NotDefined:         return false;
             case CameraOutput:       return true;
+            case CameraOutputInstant:return false;
             case Bookmark:           return false;
             case CameraRecording:    return true;
             case PanicRecording:     return true;

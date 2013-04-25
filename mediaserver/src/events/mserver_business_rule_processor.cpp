@@ -18,6 +18,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
         // TODO: implement me
         break;
     case BusinessActionType::CameraOutput:
+    case BusinessActionType::CameraOutputInstant:
         return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
         break;
     case BusinessActionType::CameraRecording:
@@ -91,10 +92,18 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     //    return false;
     //}
 
-    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+
+    int autoResetTimeout = instant
+            ? 30*1000
+            : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
+    bool on = instant
+            ? true
+            : action->getToggleState() == ToggleState::On;
+
     return securityCam->setRelayOutputState(
-        relayOutputId,
-        action->getToggleState() == ToggleState::On,
-        autoResetTimeout );
+                relayOutputId,
+                on,
+                autoResetTimeout );
 }
 
