@@ -228,6 +228,7 @@ protected slots:
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
     void at_debugShowResourcePoolAction_triggered();
+    void at_debugCalibratePtzAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();

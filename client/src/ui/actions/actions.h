@@ -720,9 +720,14 @@ namespace Qn {
         DebugDecrementCounterAction,
 
         /**
-         * Show resource pool.
+         * Shows resource pool.
          */
         DebugShowResourcePoolAction,
+
+        /**
+         * Generates PTZ calibration screenshots.
+         */
+        DebugCalibratePtzAction,
 
 
         ActionCount,
