@@ -12,7 +12,7 @@
 
 GenericRTSPMediaEncoder::GenericRTSPMediaEncoder( GenericRTSPCameraManager* const cameraManager )
 :
-    CommonRefManager( cameraManager ),
+    m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager )
 {
 }
@@ -33,12 +33,12 @@ void* GenericRTSPMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID 
 
 unsigned int GenericRTSPMediaEncoder::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int GenericRTSPMediaEncoder::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 int GenericRTSPMediaEncoder::getMediaUrl( char* urlBuf ) const

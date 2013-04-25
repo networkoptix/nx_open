@@ -20,8 +20,7 @@ class AxisCameraManager;
 */
 class AxisMediaEncoder
 :
-    public nxcip::CameraMediaEncoder,
-    public CommonRefManager
+    public nxcip::CameraMediaEncoder
 {
 public:
     AxisMediaEncoder( AxisCameraManager* const cameraManager );
@@ -50,6 +49,7 @@ public:
     //virtual nxcip::BaseCameraManager* getBaseCameraManager();
 
 private:
+    CommonRefManager m_refManager;
     AxisCameraManager* m_cameraManager;
     mutable std::vector<nxcip::ResolutionInfo> m_supportedResolutions;
     nxcip::ResolutionInfo m_currentResolutionInfo;

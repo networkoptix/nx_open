@@ -25,6 +25,8 @@ extern "C"
 static AxisCameraPlugin* axisCameraPluginInstance = NULL;
 
 AxisCameraPlugin::AxisCameraPlugin()
+:
+    m_refManager( this )
 {
     axisCameraPluginInstance = this;
 
@@ -62,12 +64,17 @@ void* AxisCameraPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 
 unsigned int AxisCameraPlugin::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int AxisCameraPlugin::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
+}
+
+CommonRefManager* AxisCameraPlugin::refManager()
+{
+    return &m_refManager;
 }
 
 QNetworkAccessManager* AxisCameraPlugin::networkAccessManager()

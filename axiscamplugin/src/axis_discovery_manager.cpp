@@ -19,7 +19,7 @@
 
 AxisCameraDiscoveryManager::AxisCameraDiscoveryManager()
 :
-    CommonRefManager( AxisCameraPlugin::instance() )
+    m_refManager( AxisCameraPlugin::instance()->refManager() )
 {
 }
 
@@ -39,12 +39,12 @@ void* AxisCameraDiscoveryManager::queryInterface( const nxpl::NX_GUID& interface
 
 unsigned int AxisCameraDiscoveryManager::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int AxisCameraDiscoveryManager::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 static const char* VENDOR_NAME = "AXIS";

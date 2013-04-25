@@ -29,8 +29,7 @@ class AxisCameraDiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class AxisCameraPlugin
 :
-    public nxpl::NXPluginInterface,
-    public CommonRefManager
+    public nxpl::NXPluginInterface
 {
 public:
     AxisCameraPlugin();
@@ -46,11 +45,13 @@ public:
     //!Implementaion of nxpl::NXPluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
+    CommonRefManager* refManager();
     QNetworkAccessManager* networkAccessManager();
 
     static AxisCameraPlugin* instance();
 
 private:
+    CommonRefManager m_refManager;
     std::auto_ptr<AxisCameraDiscoveryManager> m_discoveryManager;
     //!Used with QNetworkAccessManager
     QThread m_networkEventLoopThread;

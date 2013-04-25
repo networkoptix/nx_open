@@ -24,8 +24,7 @@ class SyncHttpClient;
 
 class AxisCameraManager
 :
-    public nxcip::BaseCameraManager,
-    public CommonRefManager
+    public nxcip::BaseCameraManager
 {
 public:
     AxisCameraManager( const nxcip::CameraInfo& info );
@@ -83,7 +82,10 @@ public:
         const QByteArray& paramName,
         unsigned int* paramValue );
 
+    CommonRefManager* refManager();
+
 private:
+    CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object

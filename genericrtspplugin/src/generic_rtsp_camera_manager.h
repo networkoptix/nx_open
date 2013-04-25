@@ -18,8 +18,7 @@ class GenericRTSPMediaEncoder;
 
 class GenericRTSPCameraManager
 :
-    public nxcip::BaseCameraManager,
-    public CommonRefManager
+    public nxcip::BaseCameraManager
 {
 public:
     GenericRTSPCameraManager( const nxcip::CameraInfo& info );
@@ -54,8 +53,10 @@ public:
     virtual void getLastErrorString( char* errorString ) const override;
 
     const nxcip::CameraInfo& info() const;
+    CommonRefManager* refManager();
 
 private:
+    CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object

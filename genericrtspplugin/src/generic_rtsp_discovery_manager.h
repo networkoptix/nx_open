@@ -16,7 +16,6 @@
 */
 class GenericRTSPDiscoveryManager
 :
-    public CommonRefManager,
     public nxcip::CameraDiscoveryManager
 {
 public:
@@ -55,6 +54,9 @@ public:
         Does nothing
     */
     virtual void getReservedModelListNext( char** modelList, int* count ) override;
+
+private:
+    CommonRefManager m_refManager;
 };
 
 #endif  //GENERIC_RTSP_DISCOVERY_MANAGER_H

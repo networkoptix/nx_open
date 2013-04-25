@@ -15,6 +15,7 @@
 
 GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& info )
 :
+    m_refManager( this ),
     m_pluginRef( GenericRTSPPlugin::instance() ),
     m_info( info ),
     m_capabilities( 0 )
@@ -42,12 +43,12 @@ void* GenericRTSPCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID
 
 unsigned int GenericRTSPCameraManager::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int GenericRTSPCameraManager::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
@@ -126,4 +127,9 @@ void GenericRTSPCameraManager::getLastErrorString( char* errorString ) const
 const nxcip::CameraInfo& GenericRTSPCameraManager::info() const
 {
     return m_info;
+}
+
+CommonRefManager* GenericRTSPCameraManager::refManager()
+{
+    return &m_refManager;
 }

@@ -26,8 +26,7 @@ class GenericRTSPDiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class GenericRTSPPlugin
 :
-    public nxpl::NXPluginInterface,
-    public CommonRefManager
+    public nxpl::NXPluginInterface
 {
 public:
     GenericRTSPPlugin();
@@ -43,9 +42,12 @@ public:
     //!Implementaion of nxpl::NXPluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
+    CommonRefManager* refManager();
+
     static GenericRTSPPlugin* instance();
 
 private:
+    CommonRefManager m_refManager;
     std::auto_ptr<GenericRTSPDiscoveryManager> m_discoveryManager;
 };
 

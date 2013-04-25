@@ -21,7 +21,7 @@ AxisRelayIOManager::AxisRelayIOManager(
     unsigned int inputPortCount,
     unsigned int outputPortCount )
 :
-    CommonRefManager( cameraManager ),
+    m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_inputPortCount( inputPortCount ),
     m_outputPortCount( outputPortCount ),
@@ -80,12 +80,12 @@ void* AxisRelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
 
 unsigned int AxisRelayIOManager::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int AxisRelayIOManager::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 int AxisRelayIOManager::getRelayOutputList( char** idList, int* idNum ) const

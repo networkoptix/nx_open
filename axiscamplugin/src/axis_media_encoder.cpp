@@ -21,7 +21,7 @@ static const float MIN_AXIS_CAMERA_FPS = 8.0;
 
 AxisMediaEncoder::AxisMediaEncoder( AxisCameraManager* const cameraManager )
 :
-    CommonRefManager( cameraManager ),
+    m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_currentFps( 15 ),
     m_currentBitrateKbps( 0 ),
@@ -53,12 +53,12 @@ void* AxisMediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
 
 unsigned int AxisMediaEncoder::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int AxisMediaEncoder::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 int AxisMediaEncoder::getMediaUrl( char* urlBuf ) const

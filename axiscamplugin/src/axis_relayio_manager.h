@@ -30,8 +30,7 @@ class AxisCameraManager;
 class AxisRelayIOManager
 :
     public QObject,
-    public nxcip::CameraRelayIOManager,
-    public CommonRefManager
+    public nxcip::CameraRelayIOManager
 {
     Q_OBJECT
 
@@ -93,6 +92,7 @@ private:
         readingData
     };
 
+    CommonRefManager m_refManager;
     AxisCameraManager* m_cameraManager;
     unsigned int m_inputPortCount;
     unsigned int m_outputPortCount;

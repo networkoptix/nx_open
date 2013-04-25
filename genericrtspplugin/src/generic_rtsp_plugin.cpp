@@ -25,6 +25,8 @@ extern "C"
 static GenericRTSPPlugin* genericRTSPPluginInstance = NULL;
 
 GenericRTSPPlugin::GenericRTSPPlugin()
+:
+    m_refManager( this )
 {
     genericRTSPPluginInstance = this;
 
@@ -53,12 +55,17 @@ void* GenericRTSPPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 
 unsigned int GenericRTSPPlugin::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int GenericRTSPPlugin::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
+}
+
+CommonRefManager* GenericRTSPPlugin::refManager()
+{
+    return &m_refManager;
 }
 
 GenericRTSPPlugin* GenericRTSPPlugin::instance()

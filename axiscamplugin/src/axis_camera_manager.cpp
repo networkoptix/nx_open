@@ -16,6 +16,7 @@
 
 AxisCameraManager::AxisCameraManager( const nxcip::CameraInfo& info )
 :
+    m_refManager( this ),
     m_pluginRef( AxisCameraPlugin::instance() ),
     m_info( info ),
     m_audioEnabled( false ),
@@ -56,12 +57,12 @@ void* AxisCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
 
 unsigned int AxisCameraManager::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int AxisCameraManager::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
@@ -180,6 +181,11 @@ const QAuthenticator& AxisCameraManager::credentials() const
 bool AxisCameraManager::isAudioEnabled() const
 {
     return m_audioEnabled;
+}
+
+CommonRefManager* AxisCameraManager::refManager()
+{
+    return &m_refManager;
 }
 
 int AxisCameraManager::updateCameraInfo() const

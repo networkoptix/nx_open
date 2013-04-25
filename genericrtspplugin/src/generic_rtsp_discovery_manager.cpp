@@ -13,7 +13,7 @@
 
 GenericRTSPDiscoveryManager::GenericRTSPDiscoveryManager()
 :
-    CommonRefManager( GenericRTSPPlugin::instance() )
+    m_refManager( GenericRTSPPlugin::instance()->refManager() )
 {
 }
 
@@ -29,12 +29,12 @@ void* GenericRTSPDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfac
 
 unsigned int GenericRTSPDiscoveryManager::addRef()
 {
-    return CommonRefManager::addRef();
+    return m_refManager.addRef();
 }
 
 unsigned int GenericRTSPDiscoveryManager::releaseRef()
 {
-    return CommonRefManager::releaseRef();
+    return m_refManager.releaseRef();
 }
 
 static const char* VENDOR_NAME = "GENERIC_RTSP";

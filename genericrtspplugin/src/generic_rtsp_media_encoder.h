@@ -18,8 +18,7 @@ class GenericRTSPCameraManager;
 */
 class GenericRTSPMediaEncoder
 :
-    public nxcip::CameraMediaEncoder,
-    public CommonRefManager
+    public nxcip::CameraMediaEncoder
 {
 public:
     GenericRTSPMediaEncoder( GenericRTSPCameraManager* const cameraManager );
@@ -46,6 +45,7 @@ public:
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
 private:
+    CommonRefManager m_refManager;
     GenericRTSPCameraManager* m_cameraManager;
 };
 

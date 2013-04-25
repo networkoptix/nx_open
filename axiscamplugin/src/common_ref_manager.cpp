@@ -6,9 +6,10 @@
 #include "common_ref_manager.h"
 
 
-CommonRefManager::CommonRefManager()
+CommonRefManager::CommonRefManager( nxpl::NXPluginInterface* objToWatch )
 :
     m_refCount( 1 ),
+    m_objToWatch( objToWatch ),
     m_refCountingDelegate( 0 )
 {
 }
@@ -39,6 +40,6 @@ unsigned int CommonRefManager::releaseRef()
 
     unsigned int newRefCounter = m_refCount.fetchAndAddOrdered(-1) - 1;
     if( newRefCounter == 0 )
-        delete this;
+        delete m_objToWatch;
     return newRefCounter;
 }
