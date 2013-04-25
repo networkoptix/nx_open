@@ -391,7 +391,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
         dialog.setDelegate(new QnRecordingEnabledDelegate(this));
-    else if (actionType == BusinessActionType::CameraOutput)
+    else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
         dialog.setDelegate(new QnOutputEnabledDelegate(this));
     else if (actionType == BusinessActionType::SendMail)
         dialog.setDelegate(new QnEmailValidDelegate(this));

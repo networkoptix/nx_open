@@ -7,7 +7,6 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
 
-// TODO: #Elric have  prefix => namespace not needed
 namespace BusinessActionType
 {
     enum Value
@@ -27,9 +26,10 @@ namespace BusinessActionType
         /*!
             parameters:\n
                 - relayOutputID (string, required)          - id of output to trigger
-                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
+                - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back
         */
         CameraOutput,
+        CameraOutputInstant,
 
         Alert,              // write a record to the server's log
         Bookmark,           // mark part of camera archive as undeleted
@@ -72,8 +72,8 @@ public:
 
     /*
     * Resource depend of action type.
-    * For actions: CameraOutput, Bookmark, CameraRecording, PanicRecording resource MUST be camera
-    * For actions: SendMail, Alert, ShowPopup resource is not used
+    * see: BusinessActionType::requiresCameraResource()
+    * see: BusinessActionType::requiresUserResource()
     */
     void setResources(const QnResourceList& resources);
 

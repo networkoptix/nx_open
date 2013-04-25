@@ -465,6 +465,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     switch(value) {
         case BusinessActionType::NotDefined:         return pb::NotDefinedAction;
         case BusinessActionType::CameraOutput:       return pb::CameraOutput;
+        case BusinessActionType::CameraOutputInstant:return pb::CameraOutputInstant;
         case BusinessActionType::Bookmark:           return pb::Bookmark;
         case BusinessActionType::CameraRecording:    return pb::CameraRecording;
         case BusinessActionType::PanicRecording:     return pb::PanicRecording;
@@ -616,14 +617,15 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
 
 BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     switch (pbValue) {
-        case pb::NotDefinedAction:  return BusinessActionType::NotDefined;
-        case pb::CameraOutput:      return BusinessActionType::CameraOutput;
-        case pb::Bookmark:          return BusinessActionType::Bookmark;
-        case pb::CameraRecording:   return BusinessActionType::CameraRecording;
-        case pb::PanicRecording:    return BusinessActionType::PanicRecording;
-        case pb::SendMail:          return BusinessActionType::SendMail;
-        case pb::Alert:             return BusinessActionType::Alert;
-        case pb::ShowPopup:         return BusinessActionType::ShowPopup;
+    case pb::NotDefinedAction:      return BusinessActionType::NotDefined;
+    case pb::CameraOutput:          return BusinessActionType::CameraOutput;
+    case pb::CameraOutputInstant:   return BusinessActionType::CameraOutputInstant;
+    case pb::Bookmark:              return BusinessActionType::Bookmark;
+    case pb::CameraRecording:       return BusinessActionType::CameraRecording;
+    case pb::PanicRecording:        return BusinessActionType::PanicRecording;
+    case pb::SendMail:              return BusinessActionType::SendMail;
+    case pb::Alert:                 return BusinessActionType::Alert;
+    case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     }
     return BusinessActionType::NotDefined;
 }
