@@ -9,16 +9,32 @@
 
 #include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
+#include "core/resource_managment/camera_driver_restriction_list.h"
 #include "../../pluginmanager.h"
 
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
+static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
+
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher( CameraDriverRestrictionList* cameraDriverRestrictionList )
+:
+    m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNXPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
         pluginList.begin(),
         pluginList.end(),
         std::back_inserter(m_thirdPartyCamPlugins) );
+
+    //reading and registering camera driver restrictions
+    for( QList<nxcip_qt::CameraDiscoveryManager>::const_iterator
+        it = m_thirdPartyCamPlugins.begin();
+        it != m_thirdPartyCamPlugins.end();
+        ++it )
+    {
+        const QList<QString>& modelList = it->getReservedModelList();
+        foreach( QString modelMask, modelList )
+            m_cameraDriverRestrictionList->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
+    }
 }
 
 ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
@@ -94,8 +110,6 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     result->deserialize( parameters );
     return result;
 }
-
-static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
 QString ThirdPartyResourceSearcher::manufacture() const
 {

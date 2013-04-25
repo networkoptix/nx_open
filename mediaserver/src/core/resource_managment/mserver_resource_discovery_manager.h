@@ -3,10 +3,11 @@
 
 #include "core/resource_managment/resource_discovery_manager.h"
 
+
 class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 {
 public:
-    QnMServerResourceDiscoveryManager();
+    QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList );
     virtual ~QnMServerResourceDiscoveryManager();
 
 protected:

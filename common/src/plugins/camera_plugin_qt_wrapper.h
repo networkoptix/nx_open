@@ -66,25 +66,24 @@ namespace nxcip_qt
 
         //!See nxcip::CameraDiscoveryManager::getVendorName
         QString getVendorName() const;
-
         //!See nxcip::CameraDiscoveryManager::findCameras
         int findCameras( QVector<nxcip::CameraInfo>* const cameras, const QString& localInterfaceIPAddr );
-
         //!See nxcip::CameraDiscoveryManager::checkHostAddress
         int checkHostAddress( QVector<nxcip::CameraInfo>* const cameras, const QString& url, const QString* login, const QString* password );
-
         //!See nxcip::CameraDiscoveryManager::fromMDNSData
         int fromMDNSData( const QByteArray& mdnsResponsePacket, const QHostAddress& discoveredAddress, nxcip::CameraInfo* cameraInfo );
-
         //!See nxcip::CameraDiscoveryManager::fromUpnpData
         bool fromUpnpData( const QByteArray& upnpXMLData, nxcip::CameraInfo* cameraInfo );
-
         //!See nxcip::CameraDiscoveryManager::createCameraManager
         nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info );
+        //!See \a nxcip::CameraDiscoveryManager::getReservedModelListFirst and \a nxcip::CameraDiscoveryManager::getReservedModelListNext
+        QList<QString> getReservedModelList() const;
 
     private:
         mutable QMutex m_mutex;
         char* m_texBuf;
+        //!Array of size \a CAMERA_MODEL_ARRAY_SIZE of char* buffers of size \a MAX_MODEL_NAME_SIZE
+        char** m_modelList;
     };
 
     class CameraMediaEncoder

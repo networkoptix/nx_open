@@ -207,10 +207,17 @@ nxcip::BaseCameraManager* AxisCameraDiscoveryManager::createCameraManager( const
     return obj;
 }
 
-void AxisCameraDiscoveryManager::getReservedModelListFirst( char** /*modelList*/, int* /*count*/ )
+void AxisCameraDiscoveryManager::getReservedModelListFirst( char** modelList, int* count )
 {
+#if 0
+    strcpy( modelList[0], "*1344*" );
+    *count = 1;
+#else
+    *count = 0;
+#endif
 }
 
-void AxisCameraDiscoveryManager::getReservedModelListNext( char** /*modelList*/, int* /*count*/ )
+void AxisCameraDiscoveryManager::getReservedModelListNext( char** /*modelList*/, int* count )
 {
+    *count = 0;
 }

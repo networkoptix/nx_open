@@ -89,6 +89,7 @@
 #include "common/customization.h"
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
 #include "plugins/pluginmanager.h"
+#include "core/resource_managment/camera_driver_restriction_list.h"
 
 
 #define USE_SINGLE_STREAMING_PORT
@@ -866,7 +867,9 @@ void QnMain::run()
     connectorThread->start();
     qnBusinessRuleConnector->moveToThread(connectorThread.get());
 
-    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
+    CameraDriverRestrictionList cameraDriverRestrictionList;
+
+    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
@@ -1020,7 +1023,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
 
     //NOTE plugins have higher priority than built-in drivers
-    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher() );
+    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
 
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());

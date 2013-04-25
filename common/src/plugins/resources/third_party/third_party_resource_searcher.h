@@ -17,8 +17,10 @@
 #include "../../camera_plugin_qt_wrapper.h"
 
 
+class CameraDriverRestrictionList;
+
 /*!
-    One object created for each loaded plugin
+    \note One object is created for all loaded plugin
 */
 class ThirdPartyResourceSearcher
 :
@@ -29,7 +31,7 @@ public:
     /*!
         Adds ref to \a plugin
     */
-    ThirdPartyResourceSearcher();
+    ThirdPartyResourceSearcher( CameraDriverRestrictionList* cameraDriverRestrictionList );
     /*!
         Releases ref to \a plugin
     */
@@ -67,6 +69,7 @@ protected:
 private:
     QList<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
     QVector<nxcip::CameraInfo> m_cameraInfoTempArray;
+    CameraDriverRestrictionList* m_cameraDriverRestrictionList;
 
     //!Searchers resources using custom search method
     QnResourceList doCustomSearch();

@@ -136,7 +136,7 @@ namespace nxcip
         //!Creates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
-        static const int CAMERA_MODEL_ARRAY_SIZE = 64;
+        static const int CAMERA_MODEL_ARRAY_SIZE = 32;
         static const int MAX_MODEL_NAME_SIZE = 256;
         //!Start listing model names
         /*!

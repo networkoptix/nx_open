@@ -17,6 +17,7 @@
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
+#include "camera_driver_restriction_list.h"
 
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
@@ -58,9 +59,11 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager():
-    m_ready(false),
-    m_state( initialSearch )
+QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestrictionList* cameraDriverRestrictionList )
+:
+    m_ready( false ),
+    m_state( initialSearch ),
+    m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
 }
@@ -286,6 +289,16 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 it != lst.end();
                  )
             {
+                QnVirtualCameraResourcePtr virtCamRes = it->dynamicCast<QnVirtualCameraResource>();
+                //checking, if found resource is reserved by some other searcher
+                if( virtCamRes &&
+                    m_cameraDriverRestrictionList &&
+                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), virtCamRes->manufacture(), virtCamRes->getModel() ) )
+                {
+                    it = lst.erase( it );
+                    continue;   //resource with such unique id is already present
+                }
+
                 QnNetworkResourcePtr networkRes = it->dynamicCast<QnNetworkResource>();
                 if( networkRes )
                 {
