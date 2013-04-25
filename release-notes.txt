@@ -22,6 +22,8 @@
  - Export multi-video. Exported file could not play if one item had no data. Fixed
  - ONVIF is slightly improved
  - Some analog encoders were discovered as digital cameras. Fixed
+ - Linux upgrade improved - libgl-mesa-dev is not needed if upgrading Media Server
+ 
 ----------------------------------------------- 1.5 -----------------------------------------------
 
 NEW CAMERAS AND RECORDERS SUPPORTED:
