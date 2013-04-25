@@ -19,7 +19,7 @@
     NSDate *_lastFrameTimestamp;
     NSDate *_lastSelectedDate;
     
-    NSDateFormatter *_dateFomatter;
+    NSDateFormatter *_dateFormatter;
 
     UIBarButtonItem *_liveButton;
     UIBarButtonItem *_archiveButton;

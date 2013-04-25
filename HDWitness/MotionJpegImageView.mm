@@ -221,6 +221,7 @@ static NSData *_endMarkerData = nil;
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
     double timeSinceEpoch = [httpResponse.allHeaderFields[@"x-Content-Timestamp"] longLongValue] / 1e+6;
     _lastTimestamp = [NSDate dateWithTimeIntervalSince1970:timeSinceEpoch];
+    NSLog(@"LAST: %@", _lastTimestamp);
     _receivedData = [[NSMutableData alloc] init];
 }
 

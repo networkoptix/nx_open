@@ -12,6 +12,8 @@
 
 #define NOW_INTERVAL 10.0 // 10 seconds
 
+int vCount = 0;
+
 @interface HDWVideoViewController ()
 
 @end
@@ -27,7 +29,8 @@
     _lastFrameTimestamp = timestamp;
     
     self.fpsLabel.text = [NSString stringWithFormat:@"FPS: %d", currentFps];
-    self.timeLabel.text = [_dateFomatter stringFromDate:timestamp];
+    self.timeLabel.text = [_dateFormatter stringFromDate:timestamp];
+    NSLog(@"TS: %@, %@", self.timeLabel.text, timestamp);
 }
 
 - (void)onConnectionClosed {
@@ -138,8 +141,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    _dateFomatter = [[NSDateFormatter alloc] init];
-    [_dateFomatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    _dateFormatter = [[NSDateFormatter alloc] init];
+    [_dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
 
     self.imageView.delegate = self;
     _liveButton = [[UIBarButtonItem alloc] initWithTitle:@"Live" style:UIBarButtonItemStylePlain target:self action:@selector(gotoLive:)];
@@ -187,14 +190,15 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    [calendarPopover dismissPopoverAnimated:YES];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
-    [self setFpsLabel:nil];
-    [self setTimeLabel:nil];
+//    [self setFpsLabel:nil];
+//    [self setTimeLabel:nil];
     [self.imageView stop];
     [SVProgressHUD dismiss];
 }

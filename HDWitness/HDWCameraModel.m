@@ -95,7 +95,6 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults synchronize];
     NSInteger resolution = [[defaults objectForKey:@"resolution_preference"] integerValue];
-    NSLog(@"Resolution: %d", resolution);
 
     NSString *position;
     if (date) {

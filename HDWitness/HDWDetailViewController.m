@@ -83,7 +83,6 @@ enum State {
     _socket.delegate = nil;
     [_socket close];
     _socket = nil;
-    NSLog(@"Deallocating DETA");
 }
 
 - (BOOL)shouldAutorotate {
@@ -150,7 +149,7 @@ enum State {
     int messageType = [message[@"type"] intValue];
     NSString *objectName = message[@"objectName"];
 
-    NSLog(@"Message: %d, Object:%@", messageType, objectName);
+//    NSLog(@"Message: %d, Object:%@", messageType, objectName);
     
     NSMutableIndexSet *newServers = [NSMutableIndexSet indexSet];
     NSMutableArray *newCameras = [NSMutableArray array];
@@ -384,8 +383,6 @@ enum State {
     _socket = [[SRWebSocket alloc] initWithURLRequest:messageRequest];
     [_socket setDelegate:self];
     [_socket open];
-    
-    NSLog(@"Opened SOCKET: %@ From: %@", _socket, self);
 }
 
 - (void)performNextStep {
