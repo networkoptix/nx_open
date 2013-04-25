@@ -17,23 +17,18 @@
 #include <utils/common/event_processors.h>
 #include <utils/kvpair_usage_helper.h>
 
-QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent, QnWorkbenchContext *context):
+QnPopupCollectionWidget::QnPopupCollectionWidget(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnPopupCollectionWidget)
 {
     ui->setupUi(this);
 
     this->setAutoFillBackground(true);
 
-    m_showBusinessEventsHelper = new QnKvPairUsageHelper(
-                QnResourcePtr(),
+    m_showBusinessEventsHelper = new QnUint64KvPairUsageHelper(
+                context()->user(),
                 QLatin1String("showBusinessEvents"),            //TODO: #GDM move out common consts
-                0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
-                this);
-    m_showSystemHealthHelper = new QnKvPairUsageHelper(
-                QnResourcePtr(),
-                QLatin1String("showSystemHealth"),              //TODO: #GDM move out common consts
                 0xFFFFFFFFFFFFFFFFull,                          //TODO: #GDM move out common consts
                 this);
 
@@ -83,7 +78,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resources);
     }
 
-    if (!(m_showBusinessEventsHelper->valueAsFlags() & (1 << eventType))) {
+    if (!(m_showBusinessEventsHelper->value() & (1 << eventType))) {
         qDebug() << "popup received, ignoring" << BusinessEventType::toString(eventType);
         return false;
     }
@@ -116,7 +111,7 @@ bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType m
 }
 
 bool QnPopupCollectionWidget::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourceList &resources) {
-    if (!(m_showSystemHealthHelper->valueAsFlags() & (1 << message)))
+    if (!(qnSettings->popupSystemHealth() & (1 << message)))
         return false;
 
     if (m_systemHealthWidgets.contains(message)) {
@@ -174,7 +169,7 @@ void QnPopupCollectionWidget::updatePosition() {
 
 void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::Value eventType, bool ignore) {
     if (ignore)
-        m_showBusinessEventsHelper->setFlagsValue(m_showBusinessEventsHelper->valueAsFlags() & ~(1 << eventType));
+        m_showBusinessEventsHelper->setValue(m_showBusinessEventsHelper->value() & ~(1 << eventType));
 
     if (!m_businessEventWidgets.contains(eventType))
         return;
@@ -191,7 +186,7 @@ void QnPopupCollectionWidget::at_businessEventWidget_closed(BusinessEventType::V
 
 void QnPopupCollectionWidget::at_systemHealthWidget_closed(QnSystemHealth::MessageType message, bool ignore) {
     if (ignore)
-        m_showSystemHealthHelper->setFlagsValue(m_showSystemHealthHelper->valueAsFlags() & ~(1 << message));
+        qnSettings->setPopupSystemHealth(qnSettings->popupSystemHealth() & ~(1 << message));
 
     if (!m_systemHealthWidgets.contains(message))
         return;
@@ -217,6 +212,5 @@ void QnPopupCollectionWidget::at_minimizeButton_clicked() {
 
 void QnPopupCollectionWidget::at_context_userChanged() {
     m_showBusinessEventsHelper->setResource(context()->user());
-    m_showSystemHealthHelper->setResource(context()->user());
 }
 

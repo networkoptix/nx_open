@@ -76,6 +76,8 @@ public:
         CLOCK_DATE,
         CLOCK_SECONDS,
 
+        POPUP_SYSTEM_HEALTH,
+
         VARIABLE_COUNT
     };
     
@@ -141,6 +143,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockSecondsOn,       setClockSecondsOn,          CLOCK_SECONDS,              true)
+        QN_DECLARE_RW_PROPERTY(quint64,                     popupSystemHealth,      setPopupSystemHealth,       POPUP_SYSTEM_HEALTH,        0xFFFFFFFFFFFFFFFFull)
     QN_END_PROPERTY_STORAGE()
 
 private:

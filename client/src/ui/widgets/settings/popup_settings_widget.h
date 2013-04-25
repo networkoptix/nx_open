@@ -10,7 +10,7 @@ namespace Ui {
     class QnPopupSettingsWidget;
 }
 
-class QnKvPairUsageHelper;
+class QnUint64KvPairUsageHelper;
 
 class QnPopupSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
@@ -24,8 +24,7 @@ public:
 
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
-    void at_showBusinessEvents_valueChanged(const QString &value);
-    void at_showSystemHealth_valueChanged(const QString &value);
+    void at_showBusinessEvents_valueChanged(quint64 value);
     void at_context_userChanged();
 
 private:
@@ -33,8 +32,7 @@ private:
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
 
-    QnKvPairUsageHelper* m_showBusinessEventsHelper;
-    QnKvPairUsageHelper* m_showSystemHealthHelper;
+    QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H
