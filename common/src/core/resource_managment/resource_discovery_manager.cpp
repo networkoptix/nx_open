@@ -182,7 +182,8 @@ static int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
-    UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
+    if( UPNPDeviceSearcher::instance() )
+        UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
 
     ResourceSearcherList searchersList;
     {
