@@ -23,6 +23,7 @@ public:
     virtual void onGotDayInfo(int dayNum, const QByteArray& data)  { Q_UNUSED(dayNum) Q_UNUSED(data) }
 
     virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
+    virtual bool isStopping() const { return false; }
 };
 
 
@@ -40,7 +41,6 @@ public:
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
 
-    void reconnect();
 public:
     VMaxStreamFetcher(QnResource* dev, bool isLive);
     virtual ~VMaxStreamFetcher();
@@ -107,6 +107,7 @@ private:
     bool m_isPlaying;
     bool m_keepAllChannels;
     QnPlaybackMaskHelper m_playbackMaskHelper;
+    qint64 m_lastConnectTimeUsec;
 };
 
 #endif // __VMAX480_STREAM_FETCHER_H__

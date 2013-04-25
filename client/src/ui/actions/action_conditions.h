@@ -274,6 +274,13 @@ private:
     bool m_centralItemRequired;
 };
 
+class QnPreviewActionCondition: public QnExportActionCondition {
+public:
+    QnPreviewActionCondition(QObject *parent = NULL): QnExportActionCondition(true, parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnPanicActionCondition: public QnActionCondition {
 public:
     QnPanicActionCondition(QObject *parent = NULL):
