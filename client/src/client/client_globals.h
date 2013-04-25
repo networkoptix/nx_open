@@ -82,6 +82,8 @@ namespace Qn {
         TimePeriodsRole,
         MergedTimePeriodsRole,
         StoredPasswordRole,
+        FileNameRole,
+
 
         /* Others. */
         HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
