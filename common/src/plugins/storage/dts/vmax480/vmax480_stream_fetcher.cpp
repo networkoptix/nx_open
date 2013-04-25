@@ -353,8 +353,14 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
 
     QMutexLocker lock(&m_mutex);
     m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
-    if (count)
-        *count = m_dataConsumers.size();
+    if (count) {
+        *count = 0;
+        foreach(QnVmax480DataConsumer* c, m_dataConsumers.keys())
+        {
+            if (!c->isStopping())
+                *count++;
+        }
+    }
 
     int channel = consumer->getChannel();
     if (openAllChannels) {

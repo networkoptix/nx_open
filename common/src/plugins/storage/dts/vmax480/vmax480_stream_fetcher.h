@@ -23,6 +23,7 @@ public:
     virtual void onGotDayInfo(int dayNum, const QByteArray& data)  { Q_UNUSED(dayNum) Q_UNUSED(data) }
 
     virtual QnTimePeriodList chunks() { return QnTimePeriodList(); }
+    virtual bool isStopping() const { return false; }
 };
 
 
