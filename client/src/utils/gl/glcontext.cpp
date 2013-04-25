@@ -17,7 +17,7 @@
 #include <X11/Xlib.h>
 #endif
 
-#include "../common/log.h"
+#include <utils/common/log.h>
 
 
 //!Creates context shared with \a contextToShareWith (if not NULL)
