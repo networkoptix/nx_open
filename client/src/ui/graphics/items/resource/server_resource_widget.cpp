@@ -287,6 +287,7 @@ protected:
         int textOffset = legendImgSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
+            //TODO: #GDM Text drawing is very slow. #Elric sais it is fast in Qt5
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
