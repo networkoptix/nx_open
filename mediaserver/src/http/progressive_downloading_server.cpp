@@ -106,7 +106,12 @@ protected:
         if( m_standFrameDuration )
             doRealtimeDelay( data );
 
+
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+
+        if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+            return true;
+
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
         {
             if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
