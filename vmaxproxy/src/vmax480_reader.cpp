@@ -435,7 +435,7 @@ void QnVMax480Provider::receiveVideoStream(S_ACS_VIDEO_STREAM* _stream)
 
         if (m_reqSequence != m_curSequence) {
             qDebug() << "m_reqSequence != m_curSequence" << m_reqSequence << "!=" << m_curSequence;
-            QnSleep::msleep(10);
+            QnSleep::msleep(20);
             return;
         }
 
