@@ -36,8 +36,8 @@ public:
     }
 
     /** Checks if user changed controls but not applied them to the schedule */
-    bool hasControlsChanges() const {
-        return m_hasControlsChanges;
+    bool hasScheduleControlsChanges() const {
+        return m_hasScheduleControlsChanges;
     }
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
@@ -87,7 +87,7 @@ private:
     bool m_hasScheduleEnabledChanges;
 
     /** Indicates that the user changed controls but not applied them to the schedule */
-    bool m_hasControlsChanges;
+    bool m_hasScheduleControlsChanges;
 
     bool m_readOnly;
     bool m_inUpdateMaxFps;

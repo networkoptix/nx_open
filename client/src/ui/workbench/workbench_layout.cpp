@@ -603,8 +603,9 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
     if(m_boundingRect == boundingRect)
         return;
 
+    QRect oldRect = m_boundingRect;
     m_boundingRect = boundingRect;
-    emit boundingRectChanged();
+    emit boundingRectChanged(oldRect, boundingRect);
     emit dataChanged(Qn::LayoutBoundingRectRole);
 }
 

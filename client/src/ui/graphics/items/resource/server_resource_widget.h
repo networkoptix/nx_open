@@ -85,7 +85,8 @@ private:
     /** Number of successfull responces received, required to smooth scroll. */
     int m_counter;
 
-    int m_storageLimit;
+    /** Number of data points displayed simultaneously. */
+    int m_pointsLimit;
 
     /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
@@ -102,6 +103,9 @@ private:
     QHash<QString, int> m_buttonMaskByKey;
     int m_maxMaskUsed;
     qreal m_infoOpacity;
+
+    /** Period of updating data from the server in milliseconds. */
+    qreal m_updatePeriod;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)

@@ -30,10 +30,6 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
-/** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
-//TODO: #GDM extract this one from server's response (updatePeriod element).
-#define REQUEST_TIME 2000
-
 namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
@@ -363,9 +359,9 @@ protected:
         QRectF inner(offsetX, offsetTop, ow, oh);
 
         qreal elapsed_step = m_widget->m_renderStatus == Qn::CannotRender ? 0 :
-                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
+                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), m_widget->m_updatePeriod) / m_widget->m_updatePeriod;
 
-        const qreal x_step = (qreal)ow*1.0/(m_widget->m_storageLimit - 2);
+        const qreal x_step = (qreal)ow*1.0/(m_widget->m_pointsLimit - 2); // one point is cut from the beginning and one from the end
         const qreal y_step = oh * 0.025;
 
         /** Draw grid */
@@ -503,8 +499,9 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    m_storageLimit = m_manager->storageLimit();
+    m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
+    m_updatePeriod = m_manager->updatePeriod(m_resource);
 
     /* Note that this slot is already connected to nameChanged signal in 
      * base class's constructor.*/
@@ -602,6 +599,8 @@ QVariant QnServerResourceWidget::itemChange(GraphicsItemChange change, const QVa
 }
 
 void QnServerResourceWidget::at_statistics_received() {
+    m_updatePeriod = m_manager->updatePeriod(m_resource);
+
     qint64 id = m_manager->historyId(m_resource);
     if (id < 0) {
         m_renderStatus = Qn::CannotRender;

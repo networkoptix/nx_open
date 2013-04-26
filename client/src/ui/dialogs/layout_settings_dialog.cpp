@@ -19,7 +19,7 @@ namespace {
     //limits
     const int widthLimit = 64;      // in cells
     const int heightLimit = 64;     // in cells
-    const int areaLimit = 100;      // in cells
+    const int areaLimit = 40*40;    // in cells
 
     const int labelFrameWidth = 4;  // in pixels
 }

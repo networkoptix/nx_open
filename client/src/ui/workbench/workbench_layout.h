@@ -318,7 +318,7 @@ signals:
     /**
      * This signal is emitted whenever bounding rectangle of this layout changes.
      */
-    void boundingRectChanged();
+    void boundingRectChanged(const QRect& oldRect, const QRect &newRect);
 
     /**
      * This signal is emitted whenever name of this layout changes. 
