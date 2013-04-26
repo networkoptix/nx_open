@@ -87,6 +87,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
         return true;
     m_lastSeekPos = timeUsec;
     m_seekTimer.restart();
+    m_eofReached = false;
 
     foreach(CLDataQueue* dataQueue, m_dataConsumers) {
         if (dataQueue)
@@ -97,10 +98,13 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
     qint64 time = findRoundTime(timeUsec, &dataFound);
     if (dataFound)
         timeUsec = time;
-
+    
     ++m_sequence;
     m_vmaxConnection->vMaxArchivePlay(timeUsec, m_sequence, speed);
     initPacketTime();
+
+    checkEOF(timeUsec);
+
     return true;
 }
 
@@ -188,6 +192,7 @@ void VMaxStreamFetcher::vmaxDisconnect()
     }
     QnVMax480Server::instance()->unregisterProvider(this);
     m_lastSeekPos = AV_NOPTS_VALUE;
+    m_eofReached = false;
 }
 
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
@@ -242,6 +247,11 @@ bool VMaxStreamFetcher::vmaxRequestRange()
     return true;
 }
 
+bool VMaxStreamFetcher::isEOF() const
+{
+    return m_eofReached;
+}
+
 QnAbstractMediaDataPtr VMaxStreamFetcher::createEmptyPacket(qint64 timestamp)
 {
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
@@ -266,6 +276,13 @@ int VMaxStreamFetcher::getMaxQueueSize() const
 int sign(int value)
 {
     return value >= 0 ? 1 : -1;
+}
+
+void VMaxStreamFetcher::checkEOF(qint64 timestamp)
+{
+    qint64 endTimeMs = m_playbackMaskHelper.endTimeMs();
+    if (!m_isLive && endTimeMs != AV_NOPTS_VALUE && timestamp > (endTimeMs - 60 * 1000) * 1000ll && m_lastSpeed >= 0)
+        m_eofReached = true;
 }
 
 void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
@@ -307,6 +324,8 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
         if (mediaData->opaque != m_sequence)
             return;
         mediaData->opaque = 0;
+
+        checkEOF(mediaData->timestamp);
 
 #if 0
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mediaData->timestamp, m_lastSpeed >= 0);

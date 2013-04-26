@@ -131,6 +131,11 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         open(m_res);
     }
 
+    if (m_maxStream->isEOF()) {
+        QnSleep::msleep(50);
+        return m_maxStream->createEmptyPacket(DATETIME_NOW);
+    }
+
     if (m_thumbnailsMode) {
         if (m_ThumbnailsSeekPoints.isEmpty()) {
             close();
