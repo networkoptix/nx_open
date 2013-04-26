@@ -5,6 +5,8 @@
 
 #include "generic_rtsp_plugin.h"
 
+#include <memory.h>
+
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_api.h>
 

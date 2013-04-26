@@ -116,6 +116,12 @@ namespace nxcip_qt
         return modelList;
     }
 
+    const CameraDiscoveryManager& CameraDiscoveryManager::operator=( const CameraDiscoveryManager& right )
+    {
+        CommonInterfaceRefManager<nxcip::CameraDiscoveryManager>::operator=( right );
+        return *this;
+    }
+
 
     ////////////////////////////////////////////////////////////
     //// CameraMediaEncoder class
@@ -271,7 +277,7 @@ namespace nxcip_qt
         m_textBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
         m_idsList = new char*[nxcip::MAX_RELAY_PORT_COUNT];
-        for( size_t i = 0; i < nxcip::MAX_RELAY_PORT_COUNT; ++i )
+        for( int i = 0; i < nxcip::MAX_RELAY_PORT_COUNT; ++i )
         {
             m_idsList[i] = new char[nxcip::MAX_ID_LEN];
             m_idsList[i][0] = 0;
@@ -280,7 +286,7 @@ namespace nxcip_qt
 
     CameraRelayIOManager::~CameraRelayIOManager()
     {
-        for( size_t i = 0; i < nxcip::MAX_RELAY_PORT_COUNT; ++i )
+        for( int i = 0; i < nxcip::MAX_RELAY_PORT_COUNT; ++i )
             delete[] m_idsList[i];
         delete[] m_idsList;
         m_idsList = NULL;

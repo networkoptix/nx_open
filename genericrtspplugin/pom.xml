@@ -28,6 +28,7 @@
 		<windows.oslibs>-lcommon -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lglu32 -lDxva2</windows.oslibs>
 		<!--Global defines-->
 		<global.defines/>
+		<linux.defines/>
 		<!--Specific os defines-->
 		<windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
 	</properties>  

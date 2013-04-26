@@ -55,7 +55,7 @@ public:
             \return Triggered event
         */
         PollSet::EventType eventType() const;
-        void* userData() const;
+        void* userData();
 
         bool operator==( const const_iterator& right ) const;
         bool operator!=( const const_iterator& right ) const;

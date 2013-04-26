@@ -45,11 +45,16 @@ namespace nxcip_qt
             m_intf->releaseRef();
         }
 
-    protected:
-        InterfaceType* const m_intf;
+        CommonInterfaceRefManager& operator=( const CommonInterfaceRefManager& right )
+        {
+            m_intf->releaseRef();
+            m_intf = right.m_intf;
+            m_intf->addRef();
+            return *this;
+        }
 
-    private:
-        CommonInterfaceRefManager& operator=( const CommonInterfaceRefManager& );
+    protected:
+        InterfaceType* m_intf;
     };
 
     //!Wrapper for \a nxcip::CameraDiscoveryManager
@@ -78,6 +83,8 @@ namespace nxcip_qt
         nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info );
         //!See \a nxcip::CameraDiscoveryManager::getReservedModelListFirst and \a nxcip::CameraDiscoveryManager::getReservedModelListNext
         QList<QString> getReservedModelList() const;
+
+        const CameraDiscoveryManager& operator=(const CameraDiscoveryManager& right);
 
     private:
         mutable QMutex m_mutex;
