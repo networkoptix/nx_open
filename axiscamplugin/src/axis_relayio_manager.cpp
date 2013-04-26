@@ -157,7 +157,9 @@ void AxisRelayIOManager::registerEventHandler( nxcip::CameraInputEventHandler* h
 void AxisRelayIOManager::unregisterEventHandler( nxcip::CameraInputEventHandler* handler )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventHandlers.erase( std::find( m_eventHandlers.begin(), m_eventHandlers.end(), handler ) );
+    std::list<nxcip::CameraInputEventHandler*>::iterator it = std::find( m_eventHandlers.begin(), m_eventHandlers.end(), handler );
+    if( it != m_eventHandlers.end() )
+        m_eventHandlers.erase( it );
 }
 
 void AxisRelayIOManager::getLastErrorString( char* errorString ) const
