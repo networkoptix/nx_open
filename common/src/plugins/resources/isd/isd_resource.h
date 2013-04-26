@@ -23,7 +23,7 @@ public:
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;
 
-    virtual QString manufacture() const;
+    virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 

@@ -107,7 +107,8 @@ public:
 
 
     virtual bool isResourceAccessible() override;
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
+    virtual QString getVendorName() const override;
 
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
@@ -193,6 +194,9 @@ public:
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+
+    void setVendorName( const QString& vendorName );
+
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -419,6 +423,7 @@ private:
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
+    QString m_vendorName;
 	
     bool createPullPointSubscription();
     bool pullMessages();

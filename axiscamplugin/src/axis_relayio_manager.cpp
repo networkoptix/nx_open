@@ -179,9 +179,8 @@ void AxisRelayIOManager::copyPortList(
         ++it, ++(*idNum) )
     {
         const QByteArray& nameUtf8 = it->first.toUtf8();
-        const int bytesToCopy = nameUtf8.size() < nxcip::MAX_ID_LEN ? nameUtf8.size() : nxcip::MAX_ID_LEN-1;
-        memcpy( idList[*idNum], nameUtf8.data(), bytesToCopy );
-        idList[*idNum][bytesToCopy] = '\0';
+        strncpy( idList[*idNum], nameUtf8.data(), nxcip::MAX_ID_LEN-1 );
+        idList[*idNum][nxcip::MAX_ID_LEN-1] = '\0';
     }
 }
 
@@ -367,7 +366,7 @@ void AxisRelayIOManager::readAxisRelayPortNotification( const QByteArray& notifi
 
                 (*it)->inputPortStateChanged(
                     this,
-                    portName.data(),
+                    portName.constData(),
                     eventType == '/' ? true : false,
                     QDateTime::currentMSecsSinceEpoch() );
             }

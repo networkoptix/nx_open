@@ -121,11 +121,11 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
         return 0;
 
     memset( cameras, 0, sizeof(*cameras) );
-    strncpy( cameras->uid, mac.data(), std::min<int>(sizeof(cameras->uid)-1, mac.size()) );
-    strncpy( cameras->modelName, modelName.data(), std::min<int>(sizeof(cameras->modelName)-1, modelName.size()) );
-    strncpy( cameras->firmware, firmware.data(), std::min<int>(sizeof(cameras->firmware)-1, firmware.size()) );
+    strncpy( cameras->uid, mac.constData(), sizeof(cameras->uid)-1 );
+    strncpy( cameras->modelName, modelName.constData(), sizeof(cameras->modelName)-1 );
+    strncpy( cameras->firmware, firmware.constData(), sizeof(cameras->firmware)-1 );
     const QByteArray& hostUtf8 = host.toUtf8();
-    strncpy( cameras->url, hostUtf8.data(), std::min<int>(sizeof(cameras->url)-1, hostUtf8.size()) );
+    strncpy( cameras->url, hostUtf8.constData(), sizeof(cameras->url)-1 );
     strcpy( cameras->defaultLogin, loginToUse );
     strcpy( cameras->defaultPassword, passwordToUse );
 
@@ -184,11 +184,11 @@ int AxisCameraDiscoveryManager::fromMDNSData(
     smac = smac.toUpper();
 
     memset( cameraInfo, 0, sizeof(*cameraInfo) );
-    strncpy( cameraInfo->uid, smac.data(), std::min<int>(sizeof(cameraInfo->uid)-1, smac.size()) );
-    strncpy( cameraInfo->modelName, name.data(), std::min<int>(sizeof(cameraInfo->modelName)-1, name.size()) );
-    strcpy( cameraInfo->defaultLogin, AXIS_DEFAULT_LOGIN );
-    strcpy( cameraInfo->defaultPassword, AXIS_DEFAULT_PASSWORD );
-    strcpy( cameraInfo->url, discoveredAddress );
+    strncpy( cameraInfo->uid, smac.constData(), sizeof(cameraInfo->uid)-1 );
+    strncpy( cameraInfo->modelName, name.constData(), sizeof(cameraInfo->modelName)-1 );
+    strncpy( cameraInfo->defaultLogin, AXIS_DEFAULT_LOGIN, sizeof(cameraInfo->defaultLogin)-1 );
+    strncpy( cameraInfo->defaultPassword, AXIS_DEFAULT_PASSWORD, sizeof(cameraInfo->defaultPassword)-1 );
+    strncpy( cameraInfo->url, discoveredAddress, sizeof(cameraInfo->url)-1 );
 
     return 1;
 }

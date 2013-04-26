@@ -34,7 +34,7 @@ public:
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
     //!Implementation of QnSecurityCamResource::manufacture
-    virtual QString manufacture() const override;
+    virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::setIframeDistance
     virtual void setIframeDistance( int frames, int timems ) override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider

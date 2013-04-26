@@ -209,9 +209,8 @@ int AxisCameraManager::updateCameraInfo() const
             return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
         firmware = firmware.mid(firmware.indexOf('=')+1);
-        const int firmwareLen = std::min<int>(sizeof(m_info.firmware)-1, firmware.size());
-        strncpy( m_info.firmware, firmware.data(), firmwareLen );
-        m_info.firmware[firmwareLen] = 0;
+        strncpy( m_info.firmware, firmware.constData(), sizeof(m_info.firmware)-1 );
+        m_info.firmware[sizeof(m_info.firmware)-1] = 0;
     }
 
     if( !m_relayIOInfoRead )

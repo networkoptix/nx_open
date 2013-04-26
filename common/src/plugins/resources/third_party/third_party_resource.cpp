@@ -50,7 +50,7 @@ bool QnThirdPartyResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnThirdPartyResource::manufacture() const
+QString QnThirdPartyResource::getDriverName() const
 {
     return m_discoveryManager.getVendorName();
 }

@@ -293,7 +293,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 //checking, if found resource is reserved by some other searcher
                 if( virtCamRes &&
                     m_cameraDriverRestrictionList &&
-                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), virtCamRes->manufacture(), virtCamRes->getModel() ) )
+                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), virtCamRes->getVendorName(), virtCamRes->getModel() ) )
                 {
                     it = lst.erase( it );
                     continue;   //resource with such unique id is already present
@@ -416,7 +416,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         stream << "Looking for cameras... StartAddr = " << startAddr << "  EndAddr = " << endAddr << "   login/pass = " << auth.user() << "/" << auth.password();
         cl_log.log(str, cl_logINFO);
     }
-    
+
     //=======================================
     QnIprangeChecker ip_cheker;
 
@@ -426,7 +426,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     if (endAddr.isNull())
         online << startAddr;
     else
-        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr));
+        online = ip_cheker.onlineHosts(QHostAddress(QUrl(startAddr).host()), QHostAddress(QUrl(endAddr).host()));
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
@@ -444,7 +444,10 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     foreach(const QString& addr, online)
     {
         ManualSearcherHelper t;
-        t.url.setHost(addr);
+        if( QUrl(addr).scheme().isEmpty() )
+            t.url.setHost(addr);
+        else
+            t.url.setUrl(addr);
         if (port)
             t.url.setPort(port);
         t.auth = auth;

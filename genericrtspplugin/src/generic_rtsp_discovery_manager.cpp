@@ -7,6 +7,8 @@
 
 #include <cstring>
 
+#include <QUrl>
+
 #include "generic_rtsp_camera_manager.h"
 #include "generic_rtsp_plugin.h"
 
@@ -58,9 +60,23 @@ int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const 
 
 int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
+    QUrl url( address );
+    if( url.scheme().toLower() != "rtsp" )
+        return 0;
+
     //TODO/IMPL trying to connect to \a address as RTSP url
         //if audio is present at url, remembering it in CameraInfo
-    return nxcip::NX_NO_ERROR;
+
+    //cameras[0].modelName[256];
+    //cameras[0].firmware[256];
+    memset( &cameras[0], 0, sizeof(cameras[0]) );
+    strncpy( cameras[0].uid, address, sizeof(cameras[0].uid)-1 );
+    strncpy( cameras[0].url, address, sizeof(cameras[0].url)-1 );
+    //cameras[0].auxiliaryData[256];
+    strncpy( cameras[0].defaultLogin, login, sizeof(cameras[0].defaultLogin)-1 );
+    strncpy( cameras[0].defaultPassword, password, sizeof(cameras[0].defaultPassword)-1 );
+
+    return 1;
 }
 
 int GenericRTSPDiscoveryManager::fromMDNSData(
