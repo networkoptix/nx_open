@@ -324,7 +324,7 @@ void AxisRelayIOManager::onConnectionFinished( QNetworkReply* reply )
 
 void AxisRelayIOManager::readAxisRelayPortNotification( const QByteArray& notification )
 {
-    //notification has format 1I:H, 1I:L, 1I:/, 1I:\
+    /* notification has format 1I:H, 1I:L, 1I:/, 1I:\  */
 
     int sepPos = notification.indexOf(':');
     if( sepPos == -1 || sepPos < 2 || sepPos+1 >= notification.size() )

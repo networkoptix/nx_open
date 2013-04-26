@@ -6,6 +6,7 @@
 #include "axis_camera_manager.h"
 
 #include <cstddef>
+#include <cstring>
 
 #include "axis_camera_plugin.h"
 #include "axis_cam_params.h"
@@ -74,7 +75,7 @@ int AxisCameraManager::getEncoderCount( int* encoderCount ) const
 
 int AxisCameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if( encoderIndex < 0 || encoderIndex >= m_encoders.size() )
+    if( encoderIndex < 0 || encoderIndex >= (int)m_encoders.size() )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
     if( !m_encoders[encoderIndex] )

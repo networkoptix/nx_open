@@ -193,7 +193,7 @@ int AxisCameraDiscoveryManager::fromMDNSData(
     return 1;
 }
 
-int AxisCameraDiscoveryManager::fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, nxcip::CameraInfo* cameraInfo )
+int AxisCameraDiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
 {
     //TODO/IMPL
     return 0;
