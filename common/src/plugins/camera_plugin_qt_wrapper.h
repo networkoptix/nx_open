@@ -82,8 +82,6 @@ namespace nxcip_qt
     private:
         mutable QMutex m_mutex;
         char* m_texBuf;
-        //!Array of size \a CAMERA_MODEL_ARRAY_SIZE of char* buffers of size \a MAX_MODEL_NAME_SIZE
-        char** m_modelList;
     };
 
     class CameraMediaEncoder

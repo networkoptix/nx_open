@@ -25,6 +25,7 @@ namespace nxcip
     static const int NX_UNDEFINED_BEHAVOUR = -20;
     static const int NX_NOT_IMPLEMENTED = -21;
     static const int NX_NETWORK_ERROR = -22;
+    static const int NX_MORE_DATA = -23;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -135,38 +136,18 @@ namespace nxcip
         //!Creates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
-        // TODO: #AK this API looks strange to me because implementing it will require introduction of
-        // iteration state member into derived class, which is not thread-safe (only one simultaneous iteration is supported).
-        // There may be no need for multiple simultaneous iterations, but this is still against the
-        // general design rules =).
-        // 
-        // I propose an API design similar to what we have in WinAPI:
-        // 
-        // \param[out] modelList        Array of char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
-        // \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
-        //                              When the function returns, this variable contains the number of model names copied to \a modelList.
-        //                              If the buffer specified by \a modelList parameter is not large enough to hold the data, 
-        //                              the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count. 
-        //                              In this case, the contents of the \a modelList array are undefined.
-        // 
-        // virtual void getReservedModelList(char** modelList, int* count)
-
-        static const int CAMERA_MODEL_ARRAY_SIZE = 32;
         static const int MAX_MODEL_NAME_SIZE = 256;
-        //!Start listing model names
+        //!Get model model names, reserved by the plugin
         /*!
-            \param modelList Array of size \a CAMERA_MODEL_ARRAY_SIZE of char* buffers of size \a MAX_MODEL_NAME_SIZE
-            \param count Number of returned model names is placed here
-        */
-        virtual void getReservedModelListFirst( char** modelList, int* count ) = 0;
-        //!Continue listing model names
-        /*!
-            Listing ends with this method setting \a *count to zero
-            \param modelList Array of size \a CAMERA_MODEL_ARRAY_SIZE of char* buffers of size \a MAX_MODEL_NAME_SIZE
-            \param count Number of returned model names is placed here
-            \note If \a getReservedModelListFirst has not been called yet, this method MUST start listing
-        */
-        virtual void getReservedModelListNext( char** modelList, int* count ) = 0;
+             \param[out] modelList        Array of char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
+             \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
+                                          When the function returns, this variable contains the number of model names copied to \a modelList.
+                                          If the buffer specified by \a modelList parameter is not large enough to hold the data, 
+                                          the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count. 
+                                          In this case, the contents of the \a modelList array are undefined.
+            \return \a NX_MORE_DATA if input buffer size is not sufficient
+        */         
+        virtual int getReservedModelList( char** modelList, int* count ) = 0;
     };
 
 

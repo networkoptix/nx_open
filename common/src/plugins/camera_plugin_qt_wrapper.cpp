@@ -13,32 +13,20 @@ namespace nxcip_qt
     CameraDiscoveryManager::CameraDiscoveryManager( nxcip::CameraDiscoveryManager* const intf )
     :
         CommonInterfaceRefManager<nxcip::CameraDiscoveryManager>( intf ),
-        m_texBuf( new char[nxcip::MAX_TEXT_LEN] ),
-        m_modelList( NULL )
+        m_texBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
-        m_modelList = new char*[nxcip::CameraDiscoveryManager::CAMERA_MODEL_ARRAY_SIZE];
-        for( int i = 0; i < nxcip::CameraDiscoveryManager::CAMERA_MODEL_ARRAY_SIZE; ++i )
-            m_modelList[i] = new char[nxcip::CameraDiscoveryManager::MAX_MODEL_NAME_SIZE];
     }
 
     CameraDiscoveryManager::CameraDiscoveryManager( const CameraDiscoveryManager& right )
     :
         CommonInterfaceRefManager<nxcip::CameraDiscoveryManager>( right ),
-        m_texBuf( new char[nxcip::MAX_TEXT_LEN] ),
-        m_modelList( NULL )
+        m_texBuf( new char[nxcip::MAX_TEXT_LEN] )
     {
-        m_modelList = new char*[nxcip::CameraDiscoveryManager::CAMERA_MODEL_ARRAY_SIZE];
-        for( int i = 0; i < nxcip::CameraDiscoveryManager::CAMERA_MODEL_ARRAY_SIZE; ++i )
-            m_modelList[i] = new char[nxcip::CameraDiscoveryManager::MAX_MODEL_NAME_SIZE];
     }
 
     CameraDiscoveryManager::~CameraDiscoveryManager()
     {
         delete[] m_texBuf;
-        for( int i = 0; i < nxcip::CameraDiscoveryManager::CAMERA_MODEL_ARRAY_SIZE; ++i )
-            delete[] m_modelList[i];
-        delete[] m_modelList;
-        m_modelList = NULL;
     }
 
     //!See nxcip::CameraDiscoveryManager::getVendorName
@@ -105,14 +93,26 @@ namespace nxcip_qt
     {
         QList<QString> modelList;
 
+        //requesting size of list
         int count = 0;
-        m_intf->getReservedModelListFirst( m_modelList, &count );
-        while( count > 0 )
-        {
-            for( int i = 0; i < count; ++i )
-                modelList.push_back( QString::fromUtf8(m_modelList[i]) );
-            m_intf->getReservedModelListNext( m_modelList, &count );
-        }
+        m_intf->getReservedModelList( NULL, &count );
+        if( !count )
+            return modelList;
+
+        //preparing temporary buffer
+        char** tempModelList = new char*[count];
+        for( int i = 0; i < count; ++i )
+            tempModelList[i] = new char[nxcip::CameraDiscoveryManager::MAX_MODEL_NAME_SIZE];
+
+        //requesting list
+        m_intf->getReservedModelList( tempModelList, &count );
+        for( int i = 0; i < count; ++i )
+            modelList.push_back( QString::fromUtf8(tempModelList[i]) );
+
+        for( int i = 0; i < count; ++i )
+            delete[] tempModelList[i];
+        delete[] tempModelList;
+
         return modelList;
     }
 

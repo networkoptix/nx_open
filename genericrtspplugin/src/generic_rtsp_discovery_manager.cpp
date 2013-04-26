@@ -103,10 +103,8 @@ nxcip::BaseCameraManager* GenericRTSPDiscoveryManager::createCameraManager( cons
     return new GenericRTSPCameraManager( infoCopy );
 }
 
-void GenericRTSPDiscoveryManager::getReservedModelListFirst( char** /*modelList*/, int* /*count*/ )
+int GenericRTSPDiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
 {
-}
-
-void GenericRTSPDiscoveryManager::getReservedModelListNext( char** /*modelList*/, int* /*count*/ )
-{
+    *count = 0;
+    return nxcip::NX_NO_ERROR;
 }

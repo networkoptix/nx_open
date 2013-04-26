@@ -48,16 +48,8 @@ public:
     virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, nxcip::CameraInfo* cameraInfo ) override;
     //!Implementation of nxcip::CameraDiscoveryManager::createCameraManager
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
-    //!Implementation of nxcip::CameraDiscoveryManager::getReservedModelListFirst
-    /*!
-        Does nothing
-    */
-    virtual void getReservedModelListFirst( char** modelList, int* count ) override;
-    //!Implementation of nxcip::CameraDiscoveryManager::getReservedModelListFirst
-    /*!
-        Does nothing
-    */
-    virtual void getReservedModelListNext( char** modelList, int* count ) override;
+    //!Implementation of nxcip::CameraDiscoveryManager::getReservedModelList
+    virtual int getReservedModelList( char** modelList, int* count ) override;
 
 private:
     CommonRefManager m_refManager;
