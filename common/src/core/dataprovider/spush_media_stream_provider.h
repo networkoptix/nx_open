@@ -18,6 +18,8 @@ public:
 	virtual ~CLServerPushStreamreader(){stop();}
 
     virtual bool isStreamOpened() const = 0;
+    //!Returns last HTTP response code (even if used media protocol is not http)
+    virtual int getLastResponseCode() const { return 0; };
 protected:
 	
     virtual void openStream() = 0;
@@ -25,6 +27,7 @@ protected:
 	void pleaseReOpen();
     virtual void afterUpdate() override;
     virtual void beforeRun() override;
+
 private:
 	void run(); // in a loop: takes data from device and puts into queue
     bool canChangeStatus() const;

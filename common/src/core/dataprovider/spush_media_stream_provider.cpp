@@ -3,6 +3,7 @@
 #include "spush_media_stream_provider.h"
 #include "../resource/camera_resource.h"
 #include "utils/common/util.h"
+#include "utils/network/simple_http_client.h"
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
 QnLiveStreamProvider(dev),
@@ -51,7 +52,7 @@ void CLServerPushStreamreader::run()
                 if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
                 {
                     if (canChangeStatus() && getResource()->getStatus() != QnResource::Unauthorized) // avoid offline->unauthorized->offline loop
-                        getResource()->setStatus(QnResource::Offline);
+                        getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? QnResource::Unauthorized : QnResource::Offline);
                     m_stat[0].onLostConnection();
                     mFramesLost = 0;
                 }

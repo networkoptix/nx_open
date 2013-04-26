@@ -42,6 +42,7 @@
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/acti/acti_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "plugins/resources/third_party/third_party_resource_searcher.h"
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
@@ -87,6 +88,8 @@
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
+#include "plugins/pluginmanager.h"
+#include "core/resource_managment/camera_driver_restriction_list.h"
 
 
 #define USE_SINGLE_STREAMING_PORT
@@ -552,7 +555,6 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
-    m_processor(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -616,12 +618,6 @@ void QnMain::stopObjects()
     {
         delete m_rtspListener;
         m_rtspListener = 0;
-    }
-
-    if (m_processor)
-    {
-        delete m_processor;
-        m_processor = 0;
     }
 }
 
@@ -871,7 +867,9 @@ void QnMain::run()
     connectorThread->start();
     qnBusinessRuleConnector->moveToThread(connectorThread.get());
 
-    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager);
+    CameraDriverRestrictionList cameraDriverRestrictionList;
+
+    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
     initAppServerConnection(qSettings);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
@@ -895,6 +893,9 @@ void QnMain::run()
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
+
+    //Initializing plugin manager
+    PluginManager::instance()->loadPlugins();
 
     if (needToStop())
         return;
@@ -1002,7 +1003,7 @@ void QnMain::run()
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->run();
 
-    m_processor = new QnAppserverResourceProcessor(m_mediaServer->getId());
+    std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
@@ -1015,9 +1016,16 @@ void QnMain::run()
     //IPPH264Decoder::dll.init();
 
     //============================
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor);
+    UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
+
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
     QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+
+    //NOTE plugins have higher priority than built-in drivers
+    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
+    QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
+
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
@@ -1028,6 +1036,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
 #ifdef Q_OS_WIN
@@ -1110,6 +1119,14 @@ void QnMain::run()
 
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+
+    m_processor.reset();
+
+    delete ThirdPartyResourceSearcher::instance();
+    ThirdPartyResourceSearcher::initStaticInstance( NULL );
+
+    delete UPNPDeviceSearcher::instance();
+    UPNPDeviceSearcher::initGlobalInstance( NULL );
 
     connectorThread->quit();
     connectorThread->wait();

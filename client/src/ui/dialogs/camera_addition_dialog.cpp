@@ -402,13 +402,15 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             return;
         }
     } else {
-        QUrl url = QUrl::fromUserInput(ui->cameraIpLineEdit->text());
+        const QString& userInput = ui->cameraIpLineEdit->text();
+        QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
             ui->validateLabelSearch->setText(tr("Camera address field must contain valid url or ip address"));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
-        startAddrStr = url.host();
+        //startAddrStr = url.host();
+        startAddrStr = userInput;
         endAddrStr = QString();
     }
 

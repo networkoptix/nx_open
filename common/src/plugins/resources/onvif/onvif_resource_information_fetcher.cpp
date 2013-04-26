@@ -320,6 +320,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
+    resource->setVendorName( manufacture );
+
     return resource;
 }
 
