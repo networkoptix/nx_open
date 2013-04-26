@@ -13,7 +13,7 @@
 #include <QNetworkAccessManager>
 #include <QThread>
 
-#include <plugins/nx_plugin_api.h>
+#include <plugins/plugin_api.h>
 
 
 /*! \main

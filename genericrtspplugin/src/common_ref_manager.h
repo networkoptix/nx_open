@@ -8,7 +8,7 @@
 
 #include <QAtomicInt>
 
-#include <plugins/nx_plugin_api.h>
+#include <plugins/plugin_api.h>
 
 
 //!Implements \a nxpl::NXPluginInterface reference counting. Can delegate reference counting to another \a CommonRefManager instance

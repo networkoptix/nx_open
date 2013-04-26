@@ -41,7 +41,7 @@ public:
     {
         //!Qt-based plugins
         ptQt = 1,
-        //!plugins, implementing on nx_plugin_api.h
+        //!plugins, implementing on plugin_api.h
         ptNX = 2,
 
         ptAll = ptQt | ptNX

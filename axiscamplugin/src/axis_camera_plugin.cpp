@@ -6,7 +6,7 @@
 #include "axis_camera_plugin.h"
 
 #include <plugins/camera_plugin.h>
-#include <plugins/nx_plugin_api.h>
+#include <plugins/plugin_api.h>
 
 #include "axis_discovery_manager.h"
 
