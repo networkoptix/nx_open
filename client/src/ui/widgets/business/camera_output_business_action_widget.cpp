@@ -1,9 +1,9 @@
 #include "camera_output_business_action_widget.h"
 #include "ui_camera_output_business_action_widget.h"
 
-#include <core/resource/camera_resource.h>
+#include <business/business_action_parameters.h>
 
-#include <business/actions/camera_output_business_action.h>
+#include <core/resource/camera_resource.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -67,13 +67,13 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     if (fields & QnBusiness::ActionParamsField) {
         QnBusinessParams params = model->actionParams();
 
-        QString text = BusinessActionParameters::getRelayOutputId(params);
+        QString text = QnBusinessActionParameters::getRelayOutputId(params);
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
 
         bool instant = (model->actionType() == BusinessActionType::CameraOutputInstant);
         if (!instant) {
-            int autoReset = BusinessActionParameters::getRelayAutoResetTimeout(params) / 1000;
+            int autoReset = QnBusinessActionParameters::getRelayAutoResetTimeout(params) / 1000;
             ui->autoResetCheckBox->setChecked(autoReset > 0);
             if (autoReset > 0)
                 ui->autoResetSpinBox->setValue(autoReset);
@@ -86,10 +86,10 @@ void QnCameraOutputBusinessActionWidget::paramsChanged() {
         return;
 
     QnBusinessParams params;
-    BusinessActionParameters::setRelayOutputId(&params, ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
-    BusinessActionParameters::setRelayAutoResetTimeout(&params, ui->autoResetCheckBox->isChecked()
-                                                       ? ui->autoResetSpinBox->value() * 1000
-                                                       : 0);
+    QnBusinessActionParameters::setRelayOutputId(&params, ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
+    QnBusinessActionParameters::setRelayAutoResetTimeout(&params, ui->autoResetCheckBox->isChecked()
+                                                         ? ui->autoResetSpinBox->value() * 1000
+                                                         : 0);
     model()->setActionParams(params);
 
 }

@@ -12,6 +12,7 @@
 #include <business/events/motion_business_event.h>
 
 #include <business/actions/abstract_business_action.h>
+#include <business/actions/recording_business_action.h>
 
 #include <ui/common/resource_name.h>
 #include <ui/style/resource_icon_cache.h>
