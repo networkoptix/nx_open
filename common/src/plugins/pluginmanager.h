@@ -56,7 +56,7 @@ public:
         QMutexLocker lk( &m_mutex );
 
         QList<T*> foundPlugins;
-        foreach( QSharedPointer<QPluginLoader> plugin, m_loadedPlugins )
+        foreach( QSharedPointer<QPluginLoader> plugin, m_qtPlugins )
         {
             T* foundPlugin = qobject_cast<T*>(plugin->instance());
             if( foundPlugin )
@@ -66,14 +66,14 @@ public:
         return foundPlugins;
     }
 
-    //!Searches for plugins of type \a T, derived from \a nxpl::NXPluginInterface among loaded plugins
+    //!Searches for plugins of type \a T, derived from \a nxpl::PluginInterface among loaded plugins
     /*!
         Increments (implicitly using queryInterface) reference counter for returned pointers
     */
-    template<class T> QList<T*> findNXPlugins( const nxpl::NX_GUID& guid ) const
+    template<class T> QList<T*> findNxPlugins( const nxpl::NX_GUID& guid ) const
     {
         QList<T*> foundPlugins;
-        foreach( nxpl::NXPluginInterface* plugin, m_nxPlugins )
+        foreach( nxpl::PluginInterface* plugin, m_nxPlugins )
         {
             void* ptr = plugin->queryInterface( guid );
             if( ptr )
@@ -97,14 +97,14 @@ signals:
 
 private:
     const QString m_pluginDir;
-    QList<QSharedPointer<QPluginLoader> > m_loadedPlugins;
-    QList<nxpl::NXPluginInterface*> m_nxPlugins;
+    QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
+    QList<nxpl::PluginInterface*> m_nxPlugins;
     mutable QMutex m_mutex;
 
     void loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad );
     bool loadQtPlugin( const QString& fullFilePath );
-    //!Loads \a nxpl::NXPluginInterface based plugin
-    bool loadNXPlugin( const QString& fullFilePath );
+    //!Loads \a nxpl::PluginInterface based plugin
+    bool loadNxPlugin( const QString& fullFilePath );
 };
 
 #endif /* PLUGINLOADER_H_ */

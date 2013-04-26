@@ -65,15 +65,15 @@ PluginManager::PluginManager( const QString& pluginDir )
 PluginManager::~PluginManager()
 {
     for( QList<QSharedPointer<QPluginLoader> >::iterator
-        it = m_loadedPlugins.begin();
-        it != m_loadedPlugins.end();
+        it = m_qtPlugins.begin();
+        it != m_qtPlugins.end();
         ++it )
     {
         (*it)->unload();
     }
 
     //releasing plugins
-    std::for_each( m_nxPlugins.begin(), m_nxPlugins.end(), std::mem_fun( &nxpl::NXPluginInterface::releaseRef ) );
+    std::for_each( m_nxPlugins.begin(), m_nxPlugins.end(), std::mem_fun( &nxpl::PluginInterface::releaseRef ) );
 }
 
 //!Guess what
@@ -125,7 +125,7 @@ void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType
             loadQtPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
 
         if( pluginsToLoad & ptNX )
-            loadNXPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
+            loadNxPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
     }
 }
 
@@ -150,13 +150,13 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     }
 
     cl_log.log( QString::fromAscii("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
-    m_loadedPlugins.push_back( plugin );
+    m_qtPlugins.push_back( plugin );
 
     emit pluginLoaded();
     return true;
 }
 
-bool PluginManager::loadNXPlugin( const QString& fullFilePath )
+bool PluginManager::loadNxPlugin( const QString& fullFilePath )
 {
     QLibrary lib( fullFilePath );
     if( !lib.load() )
@@ -166,7 +166,7 @@ bool PluginManager::loadNXPlugin( const QString& fullFilePath )
     if( entryProc == NULL )
         return false;
 
-    nxpl::NXPluginInterface* obj = entryProc();
+    nxpl::PluginInterface* obj = entryProc();
     if( !obj )
         return false;
 

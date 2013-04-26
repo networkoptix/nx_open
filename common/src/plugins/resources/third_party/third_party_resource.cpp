@@ -135,7 +135,7 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
     if( memcmp( &interfaceID, &nxcip::IID_CameraInputEventHandler, sizeof(nxcip::IID_CameraInputEventHandler) ) == 0 )
     {
         addRef();
-        return this;
+        return static_cast<nxcip::CameraInputEventHandler *>(this);
     }
     return NULL;
 }
