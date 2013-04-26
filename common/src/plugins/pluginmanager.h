@@ -16,7 +16,7 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include "nx_plugin_api.h"
+#include "plugin_api.h"
 
 
 //!Loads custom application plugins and provides plugin management methods
