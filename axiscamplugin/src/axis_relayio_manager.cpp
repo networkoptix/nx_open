@@ -73,7 +73,7 @@ void* AxisRelayIOManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     if( memcmp( &interfaceID, &nxcip::IID_CameraRelayIOManager, sizeof(nxcip::IID_CameraRelayIOManager) ) == 0 )
     {
         addRef();
-        return this;
+        return static_cast<nxcip::CameraRelayIOManager*>(this);
     }
     return NULL;
 }
