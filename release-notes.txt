@@ -1,27 +1,32 @@
 ----------------------------------------------- 1.5.1 -----------------------------------------------
 
- - More D-Link cameras are supported
+NEW CAMERAS AND RECORDERS SUPPORTED:
+ - More D-Link cameras
+ - Arecont AV3256PM
+ 
+IMPROVEMENTS: 
  - Live view is smoother
- - Arecont Vision AV3256PM 
  - Second stream quality is improved for some onvif cameras 
- - Full Ios Client support
- - Resolution was switching constantly sometimes. Fixed
- - Sometimes cameras were displaying displaying video and NO SIGNAL at the same time. Fixed
- - If change admin password camera statuses could not be changed. Fixed
- - Motion was displayed incorrectly during Smart Search if time zone had been changed. Fixed
- - VMAX foixes and improvements:
+ - IOs Client support improved on the server side
+ - DW cameras can have different HTTP port (had to be 80)   
+ - Linux Media Server is more stable if record  80+ cameras and view more than 60
+ - Camera discovery is much faster
+ - Linux: improved external storages (NAS) support
+ - ONVIF is slightly improved
+ - VMAX fixes and improvements:
    - Improved VMAX channels playback in Web-client and Android (fixed IE freezes as well)
    - VMAX playback improved 
    - VMAX could hang sometimes during navigation. Fixed
    - VMAX having HTTP port other than 80 is supported
    - VMAX channels now can go offline if cameras are not plugged into them
    - Preview Search is disabled for VMAX in order to save connection pool
- - DW cameras can have different HTTP port (had to be 80)   
- - Linux Media Server is much more stable
- - Camera discovery is much faster
- - Linux: improved external storages (NAS) support
- - Export multi-video. Exported file could not play if one item had no data. Fixed
- - ONVIF is slightly improved
+
+BUGS FIXED:   
+ - Multi-video Export. Exported file could not play if one item had no data. Fixed
+ - Resolution was switching constantly sometimes during playback if first and second streams from a camera had different aspect ratios. Fixed
+ - Sometimes cameras were displaying video and NO SIGNAL at the same time. Fixed
+ - If change admin password camera statuses could not be changed. Fixed
+ - Motion was displayed incorrectly during Smart Search if time zone had been changed. Fixed
  - Some analog encoders were discovered as digital cameras. Fixed
  - Linux upgrade improved - libgl-mesa-dev is not needed if upgrading Media Server
  
