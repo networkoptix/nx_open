@@ -25,9 +25,9 @@ protected:
 	void pleaseReOpen();
     virtual void afterUpdate() override;
     virtual void beforeRun() override;
+    virtual bool canChangeStatus() const;
 private:
 	void run(); // in a loop: takes data from device and puts into queue
-    virtual bool canChangeStatus() const;
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;
