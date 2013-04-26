@@ -15,35 +15,32 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QCheckBox>
 #include <QtGui/QImageWriter>
-
-#include <utils/common/environment.h>
-#include <utils/common/delete_later.h>
-#include <utils/common/mime_data.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/string.h>
-#include <utils/common/time.h>
-#include <utils/common/email.h>
-
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
+#include <QtGui/QSound>
 
 #include <api/session_manager.h>
 
-#include <device_plugins/server_camera/appserver.h>
-
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <business/business_action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>
+#include <camera/caching_time_period_loader.h>
 
 #include <client/client_connection_data.h>
 
-#include <recording/time_period_list.h>
-#include <redass/redass_controller.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/resource_directory_browser.h>
 
-#include <ui/style/globals.h>
-#include <ui/style/skin.h>
+#include <device_plugins/server_camera/appserver.h>
+
+#include <plugins/resources/archive/archive_stream_reader.h>
+#include <plugins/resources/archive/avi_files/avi_resource.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <recording/time_period_list.h>
+
+#include <redass/redass_controller.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -68,7 +65,7 @@
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 
-#include <youtube/youtubeuploaddialog.h>
+//#include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -78,6 +75,9 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <ui/style/globals.h>
+#include <ui/style/skin.h>
 
 #include <ui/widgets/popups/popup_collection_widget.h>
 
@@ -102,6 +102,14 @@
 
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_file_cache.h>
+#include <utils/common/environment.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/mime_data.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/string.h>
+#include <utils/common/time.h>
+#include <utils/common/email.h>
+#include <utils/common/synctime.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -109,16 +117,10 @@
 
 // TODO: #Elric remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
-#include "utils/common/synctime.h"
-#include "camera/caching_time_period_loader.h"
 
 #ifdef Q_OS_WIN
 #include "launcher_win/nov_launcher.h"
 #endif
-
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resource/resource_directory_browser.h"
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -930,7 +932,12 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::PlaySound: {
-            qDebug() << "play sound action received";
+            QString soundPath = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
+            qDebug() << "play sound action received" << soundPath;
+
+            if (!soundPath.isEmpty()) {
+                QSound::play(soundPath);
+            }
             break;
         }
     default:
