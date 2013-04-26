@@ -123,8 +123,18 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url,
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        QString addressStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
-        addressStr.remove( QLatin1Char('/') );
+        QString addressStr;
+        if( url.scheme().isEmpty() )
+        {
+            //url is a host
+            addressStr = url.toString(QUrl::RemoveScheme | QUrl::RemovePassword | QUrl::RemoveUserInfo | QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment);
+            addressStr.remove( QLatin1Char('/') );
+        }
+        else
+        {
+            //url is an URL!
+            addressStr = url.toString();
+        }
         const QString& userName = auth.user();
         const QString& password = auth.password();
         int result = it->checkHostAddress(
