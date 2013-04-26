@@ -6,12 +6,14 @@
 #include "vmax480_helper.h"
 
 
+static const int VMAX_CONNECTION_TIMEOUT = 1000 * 10;
+
 QnVMax480Provider* openVMaxConnection(TCPSocket* socket, const VMaxParamList& params, quint8 sequence, bool isLive)
 {
     QnVMax480Provider* result = new QnVMax480Provider(socket);
     result->connect(params, sequence, isLive);
 
-    if (!result->waitForConnected(1000 * 5))
+    if (!result->waitForConnected(VMAX_CONNECTION_TIMEOUT))
     {
         qDebug() << "can not connect to VMAX server!";
 
