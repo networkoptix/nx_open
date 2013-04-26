@@ -177,6 +177,9 @@ android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
 
+ios-client/build
+ios-client/dist
+
 launcher/x86
 launcher/x64
 android-client/android-main/target/**
