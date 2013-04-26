@@ -26,12 +26,13 @@
 		<client.name>${company.name} ${product.name} Client</client.name>
 		<client.mediafolder.name>${product.name} Media</client.mediafolder.name>
 		<applauncher.name>${company.name} Launcher</applauncher.name>
+                <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
+                <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
 		<mediaserver.name>${company.name} Media Server</mediaserver.name>
 		<mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
 		<testcamera.name>${company.name} Test Camera</testcamera.name>
 		<traytool.name>${product.name} Tray Assistant</traytool.name>
 		<vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
-		<applauncher.name>${company.name} Launcher</applauncher.name>
 		<license.environment>production</license.environment>
 
 		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
@@ -65,6 +66,8 @@
 		<module>appserver</module>
 		<module>common</module>
 		<module>applauncher</module>
+                <module>axiscamplugin</module>
+                <module>genericrtspplugin</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
 		<module>client</module>		
@@ -161,6 +164,8 @@
 			</activation>
 			<modules>
 				<module>quicksyncdecoder</module>	
+                                <module>axiscamplugin</module>
+                                <module>genericrtspplugin</module>
 				<module>traytool</module>
 				<module>vmaxproxy</module>	
 				<module>wixsetup</module>

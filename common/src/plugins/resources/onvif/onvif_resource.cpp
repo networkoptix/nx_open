@@ -328,9 +328,14 @@ bool QnPlOnvifResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QString QnPlOnvifResource::manufacture() const
+QString QnPlOnvifResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
+}
+
+QString QnPlOnvifResource::getVendorName() const
+{
+    return m_vendorName;
 }
 
 bool QnPlOnvifResource::hasDualStreaming() const
@@ -504,6 +509,11 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
 int QnPlOnvifResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
 {
     return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+}
+
+void QnPlOnvifResource::setVendorName( const QString& vendorName )
+{
+    m_vendorName = vendorName;
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate) const

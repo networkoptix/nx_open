@@ -36,7 +36,7 @@ QnActiResource::~QnActiResource()
 {
 }
 
-QString QnActiResource::manufacture() const
+QString QnActiResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }

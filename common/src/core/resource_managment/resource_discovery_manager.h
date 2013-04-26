@@ -10,6 +10,7 @@
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"
 
+
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
 
@@ -48,6 +49,8 @@ private:
     QnResourceDiscoveryManager* m_discoveryManager;
 };
 
+class CameraDriverRestrictionList;
+
 // this class just searches for new resources
 // it uses others plugins
 // it puts result into resource pool
@@ -59,7 +62,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager();
+    QnResourceDiscoveryManager( const CameraDriverRestrictionList* cameraDriverRestrictionList = NULL );
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager* instance();
@@ -138,6 +141,7 @@ private:
     std::auto_ptr<QTimer> m_timer;
     State m_state;
     QSet<QString> m_recentlyDeleted;
+    const CameraDriverRestrictionList* m_cameraDriverRestrictionList;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

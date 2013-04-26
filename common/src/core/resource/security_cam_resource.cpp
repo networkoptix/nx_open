@@ -50,9 +50,9 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     }
 }
 
-QString QnSecurityCamResource::oemName() const
+QString QnSecurityCamResource::getVendorName() const
 {
-    return manufacture();
+    return getDriverName();
 }
 
 int QnSecurityCamResource::getMaxFps()
