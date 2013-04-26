@@ -100,8 +100,8 @@ namespace nxcip
         //!Check host for camera presence
         /*!
             This method is used to add camera with known ip (e.g., if multicast is disabled in network)
+            \param cameras Array of size \a CAMERA_INFO_ARRAY_SIZE
             \param address String "host:port", port is optional
-            \param address
             \param login If NULL, default login is used
             \param password If NULL, default password is used
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
@@ -135,6 +135,22 @@ namespace nxcip
 
         //!Creates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
+
+        // TODO: #AK this API looks strange to me because implementing it will require introduction of
+        // iteration state member into derived class, which is not thread-safe (only one simultaneous iteration is supported).
+        // There may be no need for multiple simultaneous iterations, but this is still against the
+        // general design rules =).
+        // 
+        // I propose an API design similar to what we have in WinAPI:
+        // 
+        // \param[out] modelList        Array of char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
+        // \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
+        //                              When the function returns, this variable contains the number of model names copied to \a modelList.
+        //                              If the buffer specified by \a modelList parameter is not large enough to hold the data, 
+        //                              the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count. 
+        //                              In this case, the contents of the \a modelList array are undefined.
+        // 
+        // virtual void getReservedModelList(char** modelList, int* count)
 
         static const int CAMERA_MODEL_ARRAY_SIZE = 32;
         static const int MAX_MODEL_NAME_SIZE = 256;
@@ -232,7 +248,7 @@ namespace nxcip
             \param selectedFps *selectedFps MUST be set to actual fps implied
             \return 0 on success, otherwise - error code
         */
-        virtual int setFps( const float& fps, float* selectedFps ) = 0;
+        virtual int setFps( const float& fps, float* selectedFps ) = 0; // TODO: #AK passing float by const reference looks strange to me
 
         /*!
             Camera is allowed to select bitrate different from requested, but it should try to choose bitrate nearest to requested
@@ -298,13 +314,13 @@ namespace nxcip
 
         enum CameraCapability
         { 
-            hardwareMotionCapability    = 0x01, //!camera supports hardware motion. Plugin, returning this flag, MUST implement \a CameraMotionDataProvider interface
-            relayInputCapability        = 0x02, //!if this flag is enabled, \a CameraRelayIOManager MUST be implemented
-            relayOutputCapability       = 0x04, //!if this flag is enabled, \a CameraRelayIOManager MUST be implemented
-            ptzCapability               = 0x08, //!if this flag is enabled, \a CameraPTZManager MUST be implemented
-            audioCapability             = 0x10, //!if set, camera supports audio
-            shareFpsCapability          = 0x20, //!if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-            sharePixelsCapability       = 0x40  //!if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+            hardwareMotionCapability    = 0x01, //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a CameraMotionDataProvider interface
+            relayInputCapability        = 0x02, //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            relayOutputCapability       = 0x04, //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            ptzCapability               = 0x08, //!< if this flag is enabled, \a CameraPTZManager MUST be implemented
+            audioCapability             = 0x10, //!< if set, camera supports audio
+            shareFpsCapability          = 0x20, //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
+            sharePixelsCapability       = 0x40  //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
         };
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
@@ -342,7 +358,7 @@ namespace nxcip
         */
         virtual CameraRelayIOManager* getCameraRelayIOManager() const = 0;
 
-        //!Returns text description of last error
+        //!Returns text description of the last error
         /*!
             \param errorString Buffer of size \a MAX_TEXT_LEN
         */
@@ -354,6 +370,22 @@ namespace nxcip
     static const nxpl::NX_GUID IID_CameraPTZManager = { 0x8b, 0xab, 0x5b, 0xc7, 0xbe, 0xfc, 0x46, 0x29, 0x92, 0x1f, 0x83, 0x90, 0xa2, 0x9d, 0x8a, 0x16 };
 
     //!Pan–tilt–zoom management
+    /*!
+        VMS client has several PTZ support levels, and the more features are supported
+        by the camera's PTZ manager, the smoother will be the client's experience.
+
+        These levels are as follows:
+        - Basic PTZ. Manager must support continuous movement.
+        - Basic PTZ with saved positions. Manager must additionally support absolute positioning in physical space.
+        - Advanced PTZ. On this support level user can zoom in by selecting a region on an
+          image from camera and can center the camera on an object by clicking on it.
+          Manager must additionally support absolute positioning in logical space.
+
+        Logical space for absolute positioning is defined as follows:
+        - Pan is in degrees, from -180 to 180.
+        - Tilt is in degrees, from -90 to 90. -90 corresponds to camera pointing straight down, 90 - straight up.
+        - Zoom is set as width-based 35mm-equivalent focal lenght, see http://en.wikipedia.org/wiki/35_mm_equivalent_focal_length.
+    */
     class CameraPTZManager
     :
         public nxpl::PluginInterface
@@ -364,30 +396,31 @@ namespace nxcip
         // TODO: #Elric docz!
         enum Capability
         {
-            ContinuousPanCapability             = 0x001,
-            ContinuousTiltCapability            = 0x002,
-            ContinuousZoomCapability            = 0x004,
-            FullSpeedSpaceCapability            = 0x008,
+            ContinuousPanCapability             = 0x001,    //!< Camera supports continuous pan.
+            ContinuousTiltCapability            = 0x002,    //!< Camera supports continuous tilt.
+            ContinuousZoomCapability            = 0x004,    //!< Camera supports continuous zoom.
             
-            AbsolutePanCapability               = 0x010,
-            AbsoluteTiltCapability              = 0x020,
-            AbsoluteZoomCapability              = 0x040,
-            LogicalPositionSpaceCapability      = 0x080,
+            AbsolutePanCapability               = 0x010,    //!< Camera supports absolute pan.
+            AbsoluteTiltCapability              = 0x020,    //!< Camera supports absolute tilt.
+            AbsoluteZoomCapability              = 0x040,    //!< Camera supports absolute zoom.
+            LogicalPositionSpaceCapability      = 0x080,    //!< Camera supports absolute positioning in logical space ---
+                                                            //! degrees for pan and tilt and width-based 35mm-equivalent focal length for zoom.
 
-            AutomaticStateUpdateCapability      = 0x100,
+            AutomaticStateUpdateCapability      = 0x100,    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
+                                                            //! the user doesn't have to call \a updateState when it changes.
         };
 
         //!Returns bitset of \a Capability enumeration members
         virtual int getCapabilities() const = 0;
 
-        //!Start continuous moving
+        //!Start continuous movement
         /*!
             All velocities are in range [-1..1]
             \return 0 on success, otherwise - error code
         */
         virtual int startMove( double panSpeed, double tiltSpeed, double zoomSpeed ) = 0;
 
-        //!Stop moving
+        //!Stop continuous movement
         /*!
             \return 0 on success, otherwise - error code
         */
@@ -410,7 +443,7 @@ namespace nxcip
 
         //!Move to absolute logical position
         /*!
-            Pan and tilt values are in degrees, zoom is in 35mm equivalent. 
+            Pan and tilt values are in degrees, zoom is in width-based 35mm-equivalent focal length. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
@@ -424,13 +457,20 @@ namespace nxcip
         */
         virtual int getLogicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
 
-        // TODO: #Elric this one needs additional thought. And docs.
         struct LogicalPtzLimits {
-            double minPan, maxPan;
-            double minTilt, maxTilt;
-            double minZoom, maxZoom;
+            double minPan;
+            double maxPan;
+            double minTilt;
+            double maxTilt;
+            double minZoom;
+            double maxZoom;
         };
 
+        //!Get PTZ limits in logical space.
+        /*!
+            This function must be implemented if \a LogicalPositionSpaceCapability is present.
+            \return 0 on success, otherwise - error code
+        */
         virtual int getLogicalLimits(LogicalPtzLimits *limits) = 0;
         
         //!Updates stored camera state (e.g. flip & mirror) so that movement commands work properly.
@@ -444,7 +484,7 @@ namespace nxcip
         */
         virtual int updateState() = 0;
 
-        //!Returns text description of last error
+        //!Returns text description of the last error
         /*!
             \param errorString Buffer of size \a MAX_TEXT_LEN
         */
