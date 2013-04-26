@@ -6,7 +6,7 @@
 #include "axis_camera_plugin.h"
 
 #include <plugins/camera_plugin.h>
-#include <plugins/nx_plugin_api.h>
+#include <plugins/plugin_api.h>
 
 #include "axis_discovery_manager.h"
 
@@ -16,7 +16,7 @@ extern "C"
 #ifdef _WIN32
     __declspec(dllexport)
 #endif
-        nxpl::NXPluginInterface* createNXPluginInstance()
+        nxpl::PluginInterface* createNXPluginInstance()
     {
         return new AxisCameraPlugin();
     }
@@ -47,7 +47,7 @@ AxisCameraPlugin::~AxisCameraPlugin()
     axisCameraPluginInstance = NULL;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
+//!Implementation of nxpl::PluginInterface::queryInterface
 /*!
     Supports cast to nxcip::CameraDiscoveryManager interface
 */

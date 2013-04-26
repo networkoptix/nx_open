@@ -1,8 +1,7 @@
+#ifndef NX_CAMERA_PLUGIN_H
+#define NX_CAMERA_PLUGIN_H
 
-#ifndef CAMERA_PLUGIN_H
-#define CAMERA_PLUGIN_H
-
-#include "nx_plugin_api.h"
+#include "plugin_api.h"
 
 
 //!Network Optix Camera Integration Plugin API
@@ -623,4 +622,4 @@ namespace nxcip
     };
 }
 
-#endif  //CAMERA_PLUGIN_H
+#endif  //NX_CAMERA_PLUGIN_H
