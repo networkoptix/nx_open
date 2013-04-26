@@ -75,7 +75,7 @@ namespace nxcip
     */
     class CameraDiscoveryManager
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         virtual ~CameraDiscoveryManager() {}
@@ -185,7 +185,7 @@ namespace nxcip
     //!Provides encoder parameter configuration and media stream access (by providing media stream url)
     class CameraMediaEncoder
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         virtual ~CameraMediaEncoder() {}
@@ -262,7 +262,7 @@ namespace nxcip
     */
     class BaseCameraManager
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         virtual ~BaseCameraManager() {}
@@ -344,7 +344,7 @@ namespace nxcip
 
         //!Returns text description of last error
         /*!
-            \param errorString Buffer of \a MAX_TEXT_LEN_SIZE
+            \param errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
     };
@@ -356,7 +356,7 @@ namespace nxcip
     //!Pan–tilt–zoom management
     class CameraPTZManager
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         virtual ~CameraPTZManager() {}
@@ -446,7 +446,7 @@ namespace nxcip
 
         //!Returns text description of last error
         /*!
-            \param errorString Buffer of \a MAX_TEXT_LEN_SIZE
+            \param errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
     };
@@ -458,7 +458,7 @@ namespace nxcip
     //!Provides access to motion detection support, implemented on camera
     class CameraMotionDataProvider
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         //TODO for later use
@@ -479,7 +479,7 @@ namespace nxcip
     */
     class CameraRelayIOManager
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         //!Returns list of IDs of available relay output ports
@@ -550,7 +550,7 @@ namespace nxcip
         //!Returns text description of last error
         /*!
             \param errorCode Result code returned by any setter method
-            \param errorString Buffer of \a MAX_TEXT_LEN_SIZE
+            \param errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
     };
@@ -562,7 +562,7 @@ namespace nxcip
     //!Receives events on input port state change
     class CameraInputEventHandler
     :
-        public nxpl::NXPluginInterface
+        public nxpl::PluginInterface
     {
     public:
         virtual ~CameraInputEventHandler() {}

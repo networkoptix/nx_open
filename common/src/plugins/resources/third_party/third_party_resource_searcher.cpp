@@ -19,7 +19,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher( CameraDriverRestrictionL
 :
     m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
-    QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNXPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
+    QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
         pluginList.begin(),
         pluginList.end(),
