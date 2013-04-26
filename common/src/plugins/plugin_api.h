@@ -14,6 +14,7 @@
 */
 namespace nxpl
 {
+    // TODO: #Elric rename to Guid?
     struct NX_GUID
     {
         unsigned char bytes[16];
