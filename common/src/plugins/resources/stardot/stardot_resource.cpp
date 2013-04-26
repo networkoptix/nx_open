@@ -45,7 +45,7 @@ QnStardotResource::~QnStardotResource()
     qFreeAligned(m_motionMaskBinData);
 }
 
-QString QnStardotResource::manufacture() const
+QString QnStardotResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
 }
