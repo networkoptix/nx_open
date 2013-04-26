@@ -5,14 +5,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <business/business_action_parameters.h>
+
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
 
 #include <business/actions/abstract_business_action.h>
-#include <business/actions/sendmail_business_action.h>
-#include <business/actions/popup_business_action.h>
-#include <business/actions/recording_business_action.h>
 
 #include <ui/common/resource_name.h>
 #include <ui/style/resource_icon_cache.h>
@@ -161,9 +160,9 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return m_actionType;
             else if (column == QnBusiness::TargetColumn) {
                 if (m_actionType == BusinessActionType::SendMail)
-                    return BusinessActionParameters::getEmailAddress(m_actionParams);
+                    return QnBusinessActionParameters::getEmailAddress(m_actionParams);
                 if (m_actionType == BusinessActionType::ShowPopup)
-                    return BusinessActionParameters::getUserGroup(m_actionParams);
+                    return (int)QnBusinessActionParameters::getUserGroup(m_actionParams);
             }
             break;
 
@@ -229,13 +228,9 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             setEventResources(value.value<QnResourceList>());
             return true;
         case QnBusiness::TargetColumn:
-            /*if (m_actionType == BusinessActionType::SendMail) {
+            if (m_actionType == BusinessActionType::ShowPopup) {
                 QnBusinessParams params = m_actionParams;
-                BusinessActionParameters::setEmailAddress(&params, value.toString());
-                setActionParams(params);
-            } else */if (m_actionType == BusinessActionType::ShowPopup) {
-                QnBusinessParams params = m_actionParams;
-                BusinessActionParameters::setUserGroup(&params, value.toInt());
+                QnBusinessActionParameters::setUserGroup(&params, (QnBusinessActionParameters::UserGroup)value.toInt());
                 setActionParams(params);
             }
             else
@@ -620,7 +615,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                     return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::ShowPopup) {
-                    if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
+                    if (QnBusinessActionParameters::getUserGroup(m_actionParams) == QnBusinessActionParameters::AdminOnly)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else
                         return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -672,7 +667,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                         any = true;
                     }
 
-                    QStringList additional = BusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    QStringList additional = QnBusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
                     foreach(const QString &email, additional) {
                         if (email.trimmed().isEmpty())
                             continue;
@@ -758,7 +753,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
         }
 
-        QStringList additional = BusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+        QStringList additional = QnBusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
         foreach(const QString &email, additional) {
             QString trimmed = email.trimmed();
             if (trimmed.isEmpty())
@@ -778,7 +773,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         return tr("%1 users").arg(users.size());
 
     } else if (m_actionType == BusinessActionType::ShowPopup) {
-        if (BusinessActionParameters::getUserGroup(m_actionParams) > 0)
+        if (QnBusinessActionParameters::getUserGroup(m_actionParams) == QnBusinessActionParameters::AdminOnly)
             return tr("Administrators only");
         else
             return tr("All users");

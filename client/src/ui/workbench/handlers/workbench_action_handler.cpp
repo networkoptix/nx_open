@@ -29,8 +29,6 @@
 
 #include <api/session_manager.h>
 
-#include <business/actions/popup_business_action.h>
-
 #include <device_plugins/server_camera/appserver.h>
 
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -925,11 +923,19 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::ShowPopup)
-        return;
-
-    ensurePopupCollectionWidget();
-    popupCollectionWidget()->addBusinessAction(businessAction);
+    switch (businessAction->actionType()) {
+    case BusinessActionType::ShowPopup: {
+            ensurePopupCollectionWidget();
+            popupCollectionWidget()->addBusinessAction(businessAction);
+            break;
+        }
+    case BusinessActionType::PlaySound: {
+            qDebug() << "play sound action received";
+            break;
+        }
+    default:
+        break;
+    }
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1557,7 +1563,7 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
+        m_businessRulesDialog = new QnBusinessRulesDialog(widget());
         newlyCreated = true;
     }
     QRect oldGeometry = businessRulesDialog()->geometry();

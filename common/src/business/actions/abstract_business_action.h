@@ -31,6 +31,16 @@ namespace BusinessActionType
         CameraOutput,
         CameraOutputInstant,
 
+        /*!
+            parameters:\n
+                - soundSource (int, required)               - enumeration describing source of the sound (resources, EC, TTS)
+                - soundUrl (string, required)               - url of sound, can contain:
+                                                                * path to sound on the EC
+                                                                * path to the resource
+                                                                * text that will be provided to TTS engine
+        */
+        PlaySound,
+
         Alert,              // write a record to the server's log
         Bookmark,           // mark part of camera archive as undeleted
 
@@ -94,7 +104,7 @@ public:
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
 
-    // TODO: #GDM not clear what is this. Comments?
+    /** How much times action was instantiated during the aggregation period. */
     void setAggregationCount(int value);
     int getAggregationCount() const;
 
@@ -111,7 +121,7 @@ protected:
     QnResourceList m_resources;
     QnBusinessParams m_params;
     QnBusinessParams m_runtimeParams;
-    QnId m_businessRuleId; // business rule, that generated this action
+    QnId m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;
 };
 
