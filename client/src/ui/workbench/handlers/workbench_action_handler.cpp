@@ -666,8 +666,16 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
-    if (checkControls && cameraSettingsDialog()->widget()->hasControlsChanges()){
+    if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
         QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule. Press APPLY to save changes.");
+        int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
+                             QMessageBox::Retry, QMessageBox::Ignore);
+        if (button == QMessageBox::Retry){
+            cameraSettingsDialog()->ignoreAcceptOnce();
+            return;
+        }
+    } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
+        QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
         int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                              QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
