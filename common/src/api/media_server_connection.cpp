@@ -222,6 +222,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case StatisticsObject: {
         const QByteArray &data = response.data;
         int status = response.status;
+        int updatePeriod = -1;
         QnStatisticsDataList reply;
 
         if(status == 0) {
@@ -272,9 +273,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                     ));
                 } while (networkBlock.length() > 0);
             }
+
+            QByteArray paramsBlock = extractXmlBody(data, "params");
+            updatePeriod = extractXmlBody(paramsBlock, "updatePeriod").toInt();
         }
         
-        emitFinished(status, reply, handle); 
+        emit finished(status, reply, updatePeriod, handle);
         break;
     }
     case PtzSpaceMapperObject: {
@@ -729,7 +733,7 @@ int QnMediaServerConnection::asyncGetStorageStatus(const QString &storageUrl, QO
 
 int QnMediaServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     QnMediaServerReplyProcessor *processor = new QnMediaServerReplyProcessor(StatisticsObject);
-    connect(processor, SIGNAL(finished(int, const QnStatisticsDataList &, int)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(int, const QnStatisticsDataList &, int, int)), target, slot, Qt::QueuedConnection);
 
     return sendAsyncRequest(processor);
 }

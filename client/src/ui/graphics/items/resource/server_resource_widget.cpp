@@ -30,10 +30,6 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
-/** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
-//TODO: #GDM extract this one from server's response (updatePeriod element).
-#define REQUEST_TIME 2000
-
 namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
@@ -110,14 +106,13 @@ namespace {
     QPainterPath createChartPath(const QLinkedList<qreal> &values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
         QPainterPath path;
         qreal maxValue = -1;
-        //qreal value;
         qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
         
         qreal x1, y1;
         x1 = -x_step * elapsedStep;
 
-        qreal angle = elapsedStep >= 0.5 
+        qreal baseAngle = elapsedStep >= 0.5
             ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
             : radiansToDegrees(qAcos(2 * elapsedStep));
 
@@ -140,19 +135,6 @@ namespace {
                 continue;
             }
 
-            qreal y2 = value * scale;
-
-
-            /* Note that we're using 89 degrees for arc length for a reason.
-             * When using full 90 degrees, arcs are connected, but Qt still
-             * inserts an empty line segment to join consecutive arcs. 
-             * Path triangulator then chokes when trying to calculate a normal
-             * for this line segment, producing NaNs in its output.
-             * These NaNs are then fed to GPU, resulting in artifacts. */
-
-            // TODO: #GDM This logic seems overly complicated to me.
-            //            I'm sure we can do the same with a code that is at least three times shorter.
-
             /* Drawing only second part of the arc, cut at the beginning */
             bool c1 = x1 + x_step2 < 0.0;
 
@@ -168,37 +150,38 @@ namespace {
             /* Drawing only first part of the arc, cut at the end */
             bool c5 = !c1 && !c2 && !c3 && !c4;
 
-            qreal h = qAbs(y2 - y1);
+            qreal y2 = value * scale;
+            if (y2 != y1) {
+                qreal h = qAbs(y2 - y1);
+                qreal angle = (y2 > y1) ? baseAngle : -baseAngle;
 
-            if (y2 > y1) {
+                /* Note that we're using 89 degrees for arc length for a reason.
+                 * When using full 90 degrees, arcs are connected, but Qt still
+                 * inserts an empty line segment to join consecutive arcs.
+                 * Path triangulator then chokes when trying to calculate a normal
+                 * for this line segment, producing NaNs in its output.
+                 * These NaNs are then fed to GPU, resulting in artifacts. */
+                qreal a89 = (y2 > y1) ? 89 : -89;
+                qreal a90 = (y2 > y1) ? 90 : -90;
+                qreal y = qMin(y1, y2);
+
                 if (c1)
-                    path.arcMoveTo(x1 + x_step2, y1, x_step, h, 180 + angle);
-                else if (c2)
-                    path.arcMoveTo(x1 - x_step2, y1, x_step, h, angle);
+                    path.arcMoveTo(x1 + x_step2, y, x_step, h, 180 + angle);
+                if (c2)
+                    path.arcMoveTo(x1 - x_step2, y, x_step, h, angle);
                 if (c2 || c3 || c4)
-                    path.arcTo(x1 - x_step2, y1, x_step, h, c2 ? angle : 90, c2 ? -angle : -89);
+                    path.arcTo(x1 - x_step2, y, x_step, h, c2 ? angle : a90, c2 ? -angle : -a89);
+                if (c1 || c2 || c3 || c4)
+                    path.arcTo(x1 + x_step2, y, x_step, h, c1 ? 180 + angle : 180, c1 ? a90 - angle : c4 ? angle : a89);
                 if (c5)
-                    path.arcTo(x1 - x_step2, y1, x_step, h, 90, -90 + angle);
-                else
-                    path.arcTo(x1 + x_step2, y1, x_step, h, c1 ? 180 + angle : 180, c1 ? 90 - angle : c4 ? angle : 89);
-            } else if (y2 < y1) {
-                if (c1)
-                    path.arcMoveTo(x1 + x_step2, y2, x_step, h, 180 - angle);
-                else if (c2)
-                    path.arcMoveTo(x1 - x_step2, y2, x_step, h, -angle);
-                if (c2 || c3 || c4)
-                    path.arcTo(x1 - x_step2, y2, x_step, h, c2 ? -angle : -90, c2 ? angle : 89);
-                if (c5)
-                    path.arcTo(x1 - x_step2, y2, x_step, h, -90, 90 - angle);
-                else
-                    path.arcTo(x1 + x_step2, y2, x_step, h, c1 ? 180 - angle : 180, c1 ? -90 + angle : c4 ? -angle : -89);
+                    path.arcTo(x1 - x_step2, y, x_step, h, a90, angle - a90);
             } else {
                 if (c1 || c2)
                     path.moveTo(0.0, y1);
+                if (c1 || c2 || c3)
+                    path.lineTo(x1 + x_step, y2);
                 if (c4 || c5)
                     path.lineTo(x1 + x_step * elapsedStep, y2);
-                else
-                    path.lineTo(x1 + x_step, y2);
             }
 
             if(last) {
@@ -300,6 +283,7 @@ protected:
         int textOffset = legendImgSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
+            //TODO: #GDM Text drawing is very slow. #Elric sais it is fast in Qt5
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
@@ -375,9 +359,9 @@ protected:
         QRectF inner(offsetX, offsetTop, ow, oh);
 
         qreal elapsed_step = m_widget->m_renderStatus == Qn::CannotRender ? 0 :
-                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
+                (qreal)qBound((qreal)0, (qreal)m_widget->m_elapsedTimer.elapsed(), m_widget->m_updatePeriod) / m_widget->m_updatePeriod;
 
-        const qreal x_step = (qreal)ow*1.0/(m_widget->m_storageLimit - 2);
+        const qreal x_step = (qreal)ow*1.0/(m_widget->m_pointsLimit - 2); // one point is cut from the beginning and one from the end
         const qreal y_step = oh * 0.025;
 
         /** Draw grid */
@@ -515,8 +499,9 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    m_storageLimit = m_manager->storageLimit();
+    m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
+    m_updatePeriod = m_manager->updatePeriod(m_resource);
 
     /* Note that this slot is already connected to nameChanged signal in 
      * base class's constructor.*/
@@ -614,6 +599,8 @@ QVariant QnServerResourceWidget::itemChange(GraphicsItemChange change, const QVa
 }
 
 void QnServerResourceWidget::at_statistics_received() {
+    m_updatePeriod = m_manager->updatePeriod(m_resource);
+
     qint64 id = m_manager->historyId(m_resource);
     if (id < 0) {
         m_renderStatus = Qn::CannotRender;

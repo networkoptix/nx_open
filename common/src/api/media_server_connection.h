@@ -45,7 +45,7 @@ signals:
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);
-    void finished(int status, const QnStatisticsDataList &reply, int handle);
+    void finished(int status, const QnStatisticsDataList &reply, int updatePeriod, int handle);
     void finished(int status, const QnPtzSpaceMapper &reply, int handle);
     void finished(int status, const QVector3D &reply, int handle);
 

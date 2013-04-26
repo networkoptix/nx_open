@@ -15,7 +15,8 @@ QnVMax480ChunkReader::QnVMax480ChunkReader(QnResourcePtr res):
     m_state(State_Started),
     m_firstRange(true),
     m_streamFetcher(0),
-    m_res(res.data())
+    m_res(res.data()),
+    m_gotAllData(false)
 {
     m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
 }
@@ -57,11 +58,21 @@ void QnVMax480ChunkReader::run()
         if (m_waitingAnswer) 
         {
             if (m_waitTimer.elapsed() > 1000*30) {
-                m_state = State_Started;
+                if (m_gotAllData) {
+                    m_state = State_UpdateData;
+                }
+                else {
+                    m_state = State_Started;
+                    m_firstRange = true; // read all again
+                }
                 m_waitTimer.restart();
                 m_waitingAnswer = false;
-                m_firstRange = true;
-                m_streamFetcher->reconnect();
+
+                m_streamFetcher->unregisterConsumer(this);
+                m_streamFetcher->freeInstance(GROUP_ID, m_res, false);
+
+                m_streamFetcher = VMaxStreamFetcher::getInstance(GROUP_ID, m_res, false);
+                m_streamFetcher->registerConsumer(this);
             }
             msleep(1);
             continue;
@@ -114,7 +125,8 @@ void QnVMax480ChunkReader::run()
             m_state = State_UpdateData;
             break;
             
-        case State_UpdateData: 
+        case State_UpdateData:
+            m_gotAllData = true;
             if (m_updateTimer.elapsed() > 60*1000)
             {
                 QDate date = qnSyncTime->currentDateTime().date();

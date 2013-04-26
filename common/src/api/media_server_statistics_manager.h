@@ -9,8 +9,6 @@
 #include <api/media_server_statistics_data.h>
 #include <api/media_server_statistics_storage.h>
 
-#define STORAGE_LIMIT 60
-
 /**
   * Class that receives, parses and stores statistics data from all servers.
   * Also handles request sending through an inner timer.
@@ -45,9 +43,12 @@ public:
     QnStatisticsHistory history(const QnMediaServerResourcePtr &resource) const;
     qint64 historyId(const QnMediaServerResourcePtr &resource) const;
 
-    int storageLimit() const {return STORAGE_LIMIT; }
-private slots:
-    void at_timer_timeout();
+    /** Data update period in milliseconds. It is taken from the server's response. */
+    int updatePeriod(const QnMediaServerResourcePtr &resource) const;
+
+    /** Number of data points that are stored simultaneously. */
+    int pointsLimit() const;
+
 private:
     QHash<QString, QnMediaServerStatisticsStorage *> m_statistics;
 };
