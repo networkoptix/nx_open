@@ -30,11 +30,11 @@ public:
     AxisCameraManager( const nxcip::CameraInfo& info );
     virtual ~AxisCameraManager();
 
-    //!Implementaion of nxpl::NXPluginInterface::queryInterface
+    //!Implementaion of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::NXPluginInterface::addRef
+    //!Implementaion of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    //!Implementaion of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount

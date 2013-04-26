@@ -16,7 +16,7 @@ extern "C"
 #ifdef _WIN32
     __declspec(dllexport)
 #endif
-        nxpl::NXPluginInterface* createNXPluginInstance()
+        nxpl::PluginInterface* createNXPluginInstance()
     {
         return new AxisCameraPlugin();
     }
@@ -47,7 +47,7 @@ AxisCameraPlugin::~AxisCameraPlugin()
     axisCameraPluginInstance = NULL;
 }
 
-//!Implementation of nxpl::NXPluginInterface::queryInterface
+//!Implementation of nxpl::PluginInterface::queryInterface
 /*!
     Supports cast to nxcip::CameraDiscoveryManager interface
 */

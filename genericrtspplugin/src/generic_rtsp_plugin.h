@@ -26,20 +26,20 @@ class GenericRTSPDiscoveryManager;
 //!Main plugin class. Hosts and initializes necessary internal data
 class GenericRTSPPlugin
 :
-    public nxpl::NXPluginInterface
+    public nxpl::PluginInterface
 {
 public:
     GenericRTSPPlugin();
     virtual ~GenericRTSPPlugin();
 
-    //!Implementation of nxpl::NXPluginInterface::queryInterface
+    //!Implementation of nxpl::PluginInterface::queryInterface
     /*!
         Supports cast to nxcip::CameraDiscoveryManager interface
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::NXPluginInterface::addRef
+    //!Implementaion of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::NXPluginInterface::releaseRef
+    //!Implementaion of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     CommonRefManager* refManager();
