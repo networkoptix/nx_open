@@ -503,8 +503,11 @@ void QnProgressiveDownloadingConsumer::run()
             {
                 QnAbstractArchiveDelegate* archive = 0;
                 QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
-                if (camRes)
+                if (camRes) {
                     archive = camRes->createArchiveDelegate();
+                    if (!archive)
+                        archive = new QnServerArchiveDelegate(); // default value
+                }
                 if (archive) {
                     archive->open(resource);
                     archive->seek(timeMs, true);
