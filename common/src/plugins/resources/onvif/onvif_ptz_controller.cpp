@@ -88,19 +88,24 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     m_ptzMapper = qnCommon->ptzMapperPool()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable
-    if(m_resource->getModel() == lit("FW3471-PS-E")) {
+    QString model = m_resource->getModel();
+    if(model == lit("FW3471-PS-E")) {
         m_capabilities |= Qn::OctagonalPtzCapability;
         m_capabilities &= ~Qn::AbsolutePtzCapability;
     }
-    if(m_resource->getModel() == lit("FD8162")) {
+    if(model == lit("FD8162")) {
         m_capabilities = Qn::NoCapabilities;
     }
-    if(m_resource->getModel() == lit("IPC-HDB3200C")) {
+    if(model == lit("IPC-HDB3200C")) {
         m_capabilities = Qn::NoCapabilities;
     }
-    if(m_resource->getModel() == lit("DWC-MPTZ20X")) {
+    if(model == lit("DWC-MPTZ20X")) {
         m_capabilities |= Qn::OctagonalPtzCapability;
     }
+    if(model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
+        m_capabilities = Qn::NoCapabilities;
+    }
+
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
