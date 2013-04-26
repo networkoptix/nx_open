@@ -109,6 +109,29 @@
                     "physicalMultiplier": 35.0
                 }
             }
+        },
+        {
+            "models": [
+                "SD8362"
+            ],
+            "fromCamera": {
+                "x": {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [ -1,    1],
+                    "physical": [180, -180]
+                },
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [ -1,   1],
+                    "physical": [  0, -90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [0, 1],
+                    "physical": [1, 20.0],
+                    "physicalMultiplier": 35.0
+                }
+            }
         }
     ]
 }
