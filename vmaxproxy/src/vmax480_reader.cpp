@@ -1,6 +1,7 @@
 #include <QUrl>
 #include <qDebug>
 #include <QThread>
+#include <QElapsedTimer>
 
 #include "vmax480_reader.h"
 #include "socket.h"
@@ -149,7 +150,8 @@ QnVMax480Provider::QnVMax480Provider(TCPSocket* socket):
     m_archivePlayProcessing(false),
     m_pointsPlayMode(false),
     //m_pointsNeedFrame(false)
-    m_ppState(PP_None)
+    m_ppState(PP_None),
+    m_needStop(false)
 {
 }
 
@@ -221,6 +223,15 @@ void QnVMax480Provider::disconnect()
         return;
 
     QMutexLocker lock(&m_callbackMutex);
+    m_needStop = true;
+    QElapsedTimer t;
+    t.restart();
+    while (m_archivePlayProcessing && t.elapsed() < 1000 * 5)
+    {
+        qDebug() << "wait for play request finished...";
+        m_callbackCond.wait(&m_callbackMutex, 200);
+    }
+
 
     m_ACSStream->disconnect();
 
@@ -599,6 +610,10 @@ void QnVMax480Provider::receiveResult(S_ACS_RESULT* _result)
     case RESULT_SEARCH_PLAY:
         {
             m_archivePlayProcessing = false;
+            if (m_needStop) {
+                m_callbackCond.wakeOne();
+                return;
+            }
             //m_pointsNeedFrame = true;
             if (m_pointsPlayMode) {
                 m_curSequence = m_reqSequence;

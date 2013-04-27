@@ -97,7 +97,7 @@ private:
 
     static QMutex m_instMutex;
     static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
-    int m_sequence;
+    quint8 m_sequence;
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;
     qint64 m_emptyPacketTime;

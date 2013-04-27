@@ -5,7 +5,7 @@
 #include "vmax480_resource.h"
 #include "utils/common/synctime.h"
 
-static const int PROCESS_TIMEOUT = 1000;
+static const int PROCESS_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 150;
 static const qint64 EMPTY_PACKET_REPEAT_INTERVAL = 1000ll * 400;
 static const qint64 RECONNECT_TIMEOUT_USEC = 4000 * 1000;

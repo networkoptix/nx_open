@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
             int readed = mServerConnect.recv(buffer + bufferLen, sizeof(buffer) - bufferLen);
             if (readed < 1) 
             {
-                if (t.elapsed() < 10) {
+                if (!mServerConnect.isConnected()) {
                     shouldTerminate = true;
                     break;
                 }
