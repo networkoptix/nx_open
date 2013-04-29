@@ -123,6 +123,8 @@ bool QnPlVmax480Resource::initInternal()
             connect(m_chunkReader, SIGNAL(gotChunks(int, QnTimePeriodList)), this, SLOT(at_gotChunks(int, QnTimePeriodList)));
             m_chunkReader->start();
         }
+        if (!m_chunkReader->isRunning())
+            m_chunkReader->start();
     }
 
     return true;
