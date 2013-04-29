@@ -23,12 +23,25 @@ public:
 
     void getFileList();
 
-    void uploadFile(const QString &filename);
+    /**
+     * @brief downloadFile  Downloads the file to the cache directory.
+     *                      Emits fileDownloaded() when completed.
+     * @param filename      Name of the file (without path).
+     */
     void downloadFile(const QString &filename);
 signals:
     void fileDownloaded(const QString& filename, bool ok);
     void fileUploaded(const QString& filename, bool ok);
     void fileListReceived(const QStringList& filenames, bool ok);
+
+protected:
+    /**
+     * @brief uploadFile    Uploads file already located in cache directory to the server.
+     *                      Emits fileUploaded() when completed.
+     * @param filename      Filename in the cache directory.
+     */
+    void uploadFile(const QString &filename);
+
 private slots:
 
     void at_fileLoaded(int status, const QByteArray& data, int handle);

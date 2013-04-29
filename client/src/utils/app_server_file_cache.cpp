@@ -88,7 +88,7 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
     emit fileDownloaded(filename, true);
 }
 
-// -------------- Uploading image methods ----------------
+// -------------- Uploading methods ----------------
 
 
 void QnAppServerFileCache::uploadFile(const QString &filename) {

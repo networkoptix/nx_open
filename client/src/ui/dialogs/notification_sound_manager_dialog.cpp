@@ -1,6 +1,8 @@
 #include "notification_sound_manager_dialog.h"
 #include "ui_notification_sound_manager_dialog.h"
 
+#include <QtGui/QFileDialog>
+
 QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnNotificationSoundManagerDialog),
@@ -13,6 +15,9 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
 
     connect(m_cache, SIGNAL(fileListReceived(QStringList,bool)), this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(m_cache, SIGNAL(fileDownloaded(QString,bool)), this, SLOT(at_fileDownloaded(QString,bool)), Qt::QueuedConnection);
+    connect(m_cache, SIGNAL(fileUploaded(QString,bool)), this, SLOT(at_fileUploaded(QString, bool)));
+
+    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
 
     m_cache->getFileList();
     updateLoadingStatus();
@@ -28,6 +33,7 @@ void QnNotificationSoundManagerDialog::updateLoadingStatus() {
     ui->stackedWidget->setCurrentIndex(pageIndex);
 
     if (m_loadingCounter > 0) {
+        ui->statusLabel->setText(tr("Loading..."));
         ui->progressBar->setValue( (m_total - m_loadingCounter)*100 / m_total);
     }
 }
@@ -58,6 +64,30 @@ void QnNotificationSoundManagerDialog::at_fileDownloaded(const QString &filename
     //TODO: #GDM extractMetadata
     QString title = filename;
     ui->listWidget->addItem(new QListWidgetItem(title));
+}
 
+void QnNotificationSoundManagerDialog::at_fileUploaded(const QString &filename, bool ok) {
+    if (!ok)
+        return;
+
+    //TODO: #GDM extractMetadata
+    QString title = filename;
+    ui->listWidget->addItem(new QListWidgetItem(title));
+}
+
+void QnNotificationSoundManagerDialog::at_addButton_clicked() {
+
+    QString supportedFormats = tr("Sound files");
+    supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
+
+    QString filename = QFileDialog::getOpenFileName(
+                this,
+                //tr("Select file..."),
+                QString(),
+                QString(),
+                supportedFormats);
+    if (filename.isEmpty())
+        return;
+    m_cache->storeSound(filename);
 
 }

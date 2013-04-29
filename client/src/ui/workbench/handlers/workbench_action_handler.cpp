@@ -36,6 +36,7 @@
 
 #include <openal/qtvaudiodevice.h>
 #include <openal/qtvsound.h>
+#include <ui/dialogs/notification_sound_manager_dialog.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
@@ -994,6 +995,9 @@ void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
+
+    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog());
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {

@@ -19,6 +19,9 @@ public:
 private slots:
     void at_fileListReceived(const QStringList &filenames, bool ok);
     void at_fileDownloaded(const QString &filename, bool ok);
+    void at_fileUploaded(const QString &filename, bool ok);
+
+    void at_addButton_clicked();
 private:
     void updateLoadingStatus();
 

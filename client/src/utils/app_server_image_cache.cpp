@@ -34,6 +34,5 @@ void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageTo
 
 
 void QnAppServerImageCache::at_imageConverted(const QString &filePath) {
-    QString filename = QFileInfo(filePath).fileName();
-    uploadFile(filename);
+    uploadFile(QFileInfo(filePath).fileName());
 }
