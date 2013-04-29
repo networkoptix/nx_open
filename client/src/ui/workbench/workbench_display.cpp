@@ -48,6 +48,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
+#include <ui/graphics/items/grid/grid_raised_cone_item.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
@@ -313,6 +314,9 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     if (gridBackgroundItem())
         delete gridBackgroundItem();
+
+    if (gridRaisedConeItem())
+        delete gridRaisedConeItem();
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -410,6 +414,11 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setOpacity(0.0);
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
+    m_gridRaisedConeItem = new QnGridRaisedConeItem();
+    m_scene->addItem(gridRaisedConeItem());
+    setLayer(gridRaisedConeItem(), Qn::RaisedConeLayer);
+    gridRaisedConeItem()->setOpacity(0.8);
+
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
@@ -440,6 +449,10 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
+}
+
+QnGridRaisedConeItem* QnWorkbenchDisplay::gridRaisedConeItem() const {
+    return m_gridRaisedConeItem.data();
 }
 
 // -------------------------------------------------------------------------- //
@@ -531,13 +544,17 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     switch(role) {
     case Qn::RaisedRole: {
         /* Sync new & old geometry. */
-        if(oldWidget != NULL)
+        if(oldWidget != NULL) {
             synchronize(oldWidget, true);
+            oldWidget->setOpacity(1.0);
+        }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
             synchronize(newWidget, true);
-        }
+            newWidget->setOpacity(0.7);
+        } else
+            gridRaisedConeItem()->setRaisedWidget(NULL, QRectF());
 
         break;
     }
@@ -1189,12 +1206,14 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
+        gridRaisedConeItem()->setRaisedWidget(widget, itemGeometry(widget->item()));
+
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
         QSizeF maxWidgetSize;
         if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
-            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric
+            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric magic const
         } else {
             maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
         }
