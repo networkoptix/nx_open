@@ -4,7 +4,7 @@
 #include <utils/common/json.h>
 
 namespace {
-    Q_GLOBAL_STATIC_WITH_ARGS(QnEnumNameMapper, qn_extrapolationMode_enumNameMapper, (&QnCommonGlobals::staticMetaObject, "ExtrapolationMode"));
+    Q_GLOBAL_STATIC_WITH_ARGS(QnEnumNameMapper, qn_extrapolationMode_enumNameMapper, (&Qn::staticMetaObject, "ExtrapolationMode"));
 }
 
 // -------------------------------------------------------------------------- //
