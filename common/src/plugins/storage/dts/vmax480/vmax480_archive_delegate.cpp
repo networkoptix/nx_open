@@ -243,8 +243,8 @@ void QnVMax480ArchiveDelegate::calcSeekPoints(qint64 startTime, qint64 endTime, 
 
 void QnVMax480ArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
 {
-    if ((startTime-endTime)/frameStep > 60) {
-        qWarning() << "Too large thumbnails range. requested" << (startTime-endTime)/frameStep << "thumbnails. Ignoring";
+    if ((endTime-startTime)/frameStep > 60) {
+        qWarning() << "Too large thumbnails range. requested" << (endTime-endTime)/frameStep << "thumbnails. Ignoring";
     }
 
     qDebug() << "getThumbnails range" << startTime << endTime << frameStep;
