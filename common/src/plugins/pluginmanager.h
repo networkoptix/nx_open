@@ -5,8 +5,8 @@
  *      Author: a.kolesnikov
  */
 
-#ifndef PLUGINLOADER_H_
-#define PLUGINLOADER_H_
+#ifndef PLUGIN_MANAGER_H
+#define PLUGIN_MANAGER_H
 
 #include <QObject>
 #include <QList>
@@ -107,4 +107,4 @@ private:
     bool loadNxPlugin( const QString& fullFilePath );
 };
 
-#endif /* PLUGINLOADER_H_ */
+#endif /* PLUGIN_MANAGER_H */
