@@ -355,4 +355,12 @@ private:
     Qn::NodeType m_nodeType;
 };
 
+class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {
+public:
+    QnOpenInCurrentLayoutActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+
 #endif // QN_ACTION_CONDITIONS_H

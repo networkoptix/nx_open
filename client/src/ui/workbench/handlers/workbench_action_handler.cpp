@@ -428,6 +428,20 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position, const QRectF &zoomWindow, const QUuid &zoomUuid) const {
+
+    {
+        //TODO: #GDM refactor duplicated code
+        bool isServer = resource->hasFlags(QnResource::server);
+        bool isMediaResource = resource->hasFlags(QnResource::media);
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+
+        bool allowed = isServer || isMediaResource;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        if(!allowed || forbidden)
+            return;
+    }
+
     QnLayoutItemData data;
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
