@@ -8,17 +8,27 @@ class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
 public:
+    enum Category {
+        LayoutBackground,
+        NotificationSound,
+
+        CategoryCount
+    };
+
     explicit QnAppServerFileCache(QObject *parent = 0);
     ~QnAppServerFileCache();
 
     /** Get full path to cached file with fixed filename */
     QString getFullPath(const QString &filename) const;
 
+    void getFileList();
+
     void uploadFile(const QString &filename);
     void downloadFile(const QString &filename);
 signals:
     void fileDownloaded(const QString& filename, bool ok);
     void fileUploaded(const QString& filename, bool ok);
+    void fileListReceived(const QStringList& filenames, bool ok);
 private slots:
 
     void at_fileLoaded(int status, const QByteArray& data, int handle);

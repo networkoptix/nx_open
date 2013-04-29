@@ -28,29 +28,15 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
-void QnAppServerFileCache::uploadFile(const QString &filename) {
-    QFile file(filename);
-    if(!file.open(QIODevice::ReadOnly)) {
-        emit fileUploaded(filename, false);
-        return;
-    }
 
-    QByteArray data = file.readAll();
-    file.close();
+// -------------- Loading methods ----------------
 
-    if (m_uploading.values().contains(filename))
-        return;
-
-    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
-                filename,
-                data,
-                this,
-                SLOT(at_fileUploaded(int, int))
-                );
-    m_uploading.insert(handle, filename);
+void QnAppServerFileCache::getFileList() {
+    //TODO: #GDM replace with server code
+    QDir myDir(getFullPath(QString()));
+    QStringList list = myDir.entryList();
+    emit fileListReceived(list, true);
 }
-
-// -------------- Loading image methods ----------------
 
 void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (filename.isEmpty()) {
@@ -103,6 +89,29 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
 }
 
 // -------------- Uploading image methods ----------------
+
+
+void QnAppServerFileCache::uploadFile(const QString &filename) {
+    QFile file(getFullPath(filename));
+    if(!file.open(QIODevice::ReadOnly)) {
+        emit fileUploaded(filename, false);
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    if (m_uploading.values().contains(filename))
+        return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+                filename,
+                data,
+                this,
+                SLOT(at_fileUploaded(int, int))
+                );
+    m_uploading.insert(handle, filename);
+}
 
 
 void QnAppServerFileCache::at_fileUploaded(int status, int handle) {

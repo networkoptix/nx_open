@@ -27,7 +27,7 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
 {
     setAcceptedMouseButtons(0);
 
-    connect(m_cache, SIGNAL(imageLoaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }

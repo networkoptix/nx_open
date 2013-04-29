@@ -105,6 +105,7 @@
 
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
+#include <utils/app_server_notification_cache.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
@@ -935,23 +936,25 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::PlaySound: {
-            QString soundPath = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
-            qDebug() << "play sound action received" << soundPath;
+            QString filename = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
+            qDebug() << "play sound action received" << filename;
 
-//            if (!soundPath.isEmpty()) {
-//                Phonon::MediaObject *clickObject = new Phonon::MediaObject();
-//                clickObject->setCurrentSource(Phonon::MediaSource(soundPath));
-//                Phonon::AudioOutput *clickOutput = new Phonon::AudioOutput(Phonon::NotificationCategory, this);
-//                Phonon::createPath(clickObject, clickOutput);
-//                clickObject->play();
-
-////                QSound::play(soundPath);
-//            }
+            QnAppServerNotificationCache *cache = new QnAppServerNotificationCache(this);
+            connect(cache,  SIGNAL(fileDownloaded(QString,bool)),  this,  SLOT(at_notificationSoundDownloaded(QString, bool)));
+            connect(cache,  SIGNAL(fileDownloaded(QString,bool)),  cache, SLOT(deleteLater()));
+            cache->downloadFile(filename);
             break;
         }
     default:
         break;
     }
+}
+
+void QnWorkbenchActionHandler::at_notificationSoundDownloaded(const QString &filename, bool ok) {
+    if (!ok)
+        return;
+    qDebug() << "ready to play" << filename;
+    //TODO: #GDM play sound
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -3498,19 +3501,19 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
         return;
 
-    QnAppServerImageCache *cache = new QnAppServerImageCache(this);
-    connect(cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_backgroundImageStored(QString, bool)));
-    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
-
     QnProgressDialog *progressDialog = new QnProgressDialog(this->widget());
     progressDialog->setWindowTitle(tr("Updating background"));
     progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
     progressDialog->setRange(0, 0);
     progressDialog->setCancelButton(NULL);
-
     connect(progressDialog,   SIGNAL(canceled()),                   progressDialog,     SLOT(deleteLater()));
-    connect(cache,            SIGNAL(imageStored(QString, bool)),   progressDialog,     SLOT(deleteLater()));
-    connect(cache,            SIGNAL(imageStored(QString, bool)),   cache,              SLOT(deleteLater()));
+
+    QnAppServerImageCache *cache = new QnAppServerImageCache(this);
+    connect(cache,            SIGNAL(fileUploaded(QString, bool)),  this,               SLOT(at_backgroundImageStored(QString, bool)));
+    connect(cache,            SIGNAL(fileUploaded(QString,bool)),   progressDialog,     SLOT(deleteLater()));
+    connect(cache,            SIGNAL(fileUploaded(QString, bool)),  cache,              SLOT(deleteLater()));
+
+    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
     progressDialog->exec();
 }
 

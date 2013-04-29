@@ -3,6 +3,7 @@
 
 #include <business/business_action_parameters.h>
 
+#include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -14,7 +15,8 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    connect(ui->pathLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->pathComboBox, SIGNAL(editTextChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
 }
 
 QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()
@@ -31,8 +33,8 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
         QString path = QnBusinessActionParameters::getSoundUrl(model->actionParams());
-        if (ui->pathLineEdit->text() != path)
-            ui->pathLineEdit->setText(path);
+        if (ui->pathComboBox->currentText() != path)
+            ui->pathComboBox->setEditText(path);
     }
 }
 
@@ -41,6 +43,11 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
         return;
 
     QnBusinessParams params;
-    QnBusinessActionParameters::setSoundUrl(&params, ui->pathLineEdit->text());
+    QnBusinessActionParameters::setSoundUrl(&params, ui->pathComboBox->currentText());
     model()->setActionParams(params);
+}
+
+void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
+    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog());
+    dialog->exec();
 }

@@ -24,6 +24,7 @@ protected slots:
 
 private slots:
     void paramsChanged();
+    void at_manageButton_clicked();
 
 private:
     QScopedPointer<Ui::QnPlaySoundBusinessActionWidget> ui;
