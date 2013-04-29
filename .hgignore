@@ -179,6 +179,7 @@ android-client/**/gen/*
 
 ios-client/build
 ios-client/dist
+ios-client/target
 
 launcher/x86
 launcher/x64
