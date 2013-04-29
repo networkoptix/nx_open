@@ -249,7 +249,26 @@
 				<module>android-client/protobuf-classes</module>
 				<module>android-client/android-main</module>
 			</modules>
-		</profile>			
+		</profile>		
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os> 
+			</activation>
+			<modules>
+				<!--<module>xvbadecoder</module>-->
+				<module>ios-client</module>
+			</modules>
+			<!--<properties>
+				<environment.dir>${env.environment}</environment.dir>
+				<python.dir>/usr/bin/</python.dir>				
+				<qt.dir>${env.QTDIR}</qt.dir>				
+				<platform>linux</platform>
+				<compiler>gcc</compiler>
+			</properties> -->
+		</profile>	
 	</profiles>	
 </project>
 
