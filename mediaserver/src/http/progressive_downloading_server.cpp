@@ -512,14 +512,24 @@ void QnProgressiveDownloadingConsumer::run()
                     archive->open(resource);
                     archive->seek(timeMs, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
-                    for (int i = 0; i < 20; ++i) 
+					int counter = 0;
+                    while (counter < 20)
                     {
                         QnAbstractMediaDataPtr data = archive->getNextData();
-                        if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
+                        if (data)
                         {
-                            timestamp = data->timestamp;
-                            break;
+							if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
+							{
+								timestamp = data->timestamp;
+								break;
+							}
+							else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+								continue; // ignore filler packet
+							counter++;
                         }
+						else {
+							counter++;
+						}
                     }
 
                     QByteArray ts("\"now\"");
