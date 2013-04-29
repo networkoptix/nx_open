@@ -3,6 +3,8 @@
 
 #include <QtGui/QFileDialog>
 
+#include <utils/app_server_notification_cache.h>
+
 QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnNotificationSoundManagerDialog),

@@ -3,11 +3,11 @@
 
 #include <QDialog>
 
-#include <utils/app_server_notification_cache.h>
-
 namespace Ui {
     class QnNotificationSoundManagerDialog;
 }
+
+class QnAppServerNotificationCache;
 
 class QnNotificationSoundManagerDialog : public QDialog
 {

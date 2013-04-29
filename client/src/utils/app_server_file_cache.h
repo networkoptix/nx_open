@@ -44,6 +44,8 @@ protected:
 
 private slots:
 
+    void debugTimer();
+
     void at_fileLoaded(int status, const QByteArray& data, int handle);
     void at_fileUploaded(int status, int handle);
 private:

@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QUuid>
+#include <QtCore/QTimer>
 
 #include <QtGui/QDesktopServices>
 
@@ -33,8 +34,15 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
 
 void QnAppServerFileCache::getFileList() {
     //TODO: #GDM replace with server code
+    QTimer::singleShot(1000, this, SLOT(debugTimer()));
+}
+
+void QnAppServerFileCache::debugTimer() {
     QDir myDir(getFullPath(QString()));
-    QStringList list = myDir.entryList();
+    QStringList list = myDir.entryList(QStringList()
+                                       << QLatin1String("*.wav")
+                                       << QLatin1String("*.mp3")
+                                       << QLatin1String("*.ogg"));
     emit fileListReceived(list, true);
 }
 

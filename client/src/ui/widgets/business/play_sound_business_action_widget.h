@@ -10,6 +10,8 @@ namespace Ui {
     class QnPlaySoundBusinessActionWidget;
 }
 
+class QnAppServerNotificationCache;
+
 class QnPlaySoundBusinessActionWidget : public QnAbstractBusinessParamsWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -25,9 +27,17 @@ protected slots:
 private slots:
     void paramsChanged();
     void at_manageButton_clicked();
+    void at_fileListReceived(const QStringList &filenames, bool ok);
 
 private:
+    void updateSoundUrl();
+
     QScopedPointer<Ui::QnPlaySoundBusinessActionWidget> ui;
+
+    QnAppServerNotificationCache *m_cache;
+    bool m_loaded;
+
+    QString m_soundUrl;
 };
 
 #endif // PLAY_SOUND_BUSINESS_ACTION_WIDGET_H
