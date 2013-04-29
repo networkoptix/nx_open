@@ -251,7 +251,7 @@
 			</modules>
 		</profile>		
 		<profile>
-			<id>linux</id>
+			<id>macos</id>
 			<activation>
 				<os>
 					<family>mac</family>
