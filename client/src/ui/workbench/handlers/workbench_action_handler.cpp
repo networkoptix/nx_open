@@ -34,6 +34,9 @@
 
 #include <device_plugins/server_camera/appserver.h>
 
+#include <openal/qtvaudiodevice.h>
+#include <openal/qtvsound.h>
+
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -101,7 +104,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/app_server_file_cache.h>
+#include <utils/app_server_image_cache.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
@@ -935,9 +938,15 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             QString soundPath = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
             qDebug() << "play sound action received" << soundPath;
 
-            if (!soundPath.isEmpty()) {
-                QSound::play(soundPath);
-            }
+//            if (!soundPath.isEmpty()) {
+//                Phonon::MediaObject *clickObject = new Phonon::MediaObject();
+//                clickObject->setCurrentSource(Phonon::MediaSource(soundPath));
+//                Phonon::AudioOutput *clickOutput = new Phonon::AudioOutput(Phonon::NotificationCategory, this);
+//                Phonon::createPath(clickObject, clickOutput);
+//                clickObject->play();
+
+////                QSound::play(soundPath);
+//            }
             break;
         }
     default:
@@ -963,6 +972,21 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+
+    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/chimes.wav");
+    qDebug() << "play sound action received" << soundPath << QFileInfo(soundPath).exists();
+
+    QnByteArray decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    QnAudioFormat format;
+
+    QtvSound* sound = QtvAudioDevice::instance()->addSound(format);
+    if (!sound) {
+        qDebug() << "false check";
+        return;
+    }
+    sound->play((const quint8*) decodedAudioBuffer.data(), decodedAudioBuffer.size());
+
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -3474,7 +3498,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
         return;
 
-    QnAppServerFileCache *cache = new QnAppServerFileCache(this);
+    QnAppServerImageCache *cache = new QnAppServerImageCache(this);
     connect(cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_backgroundImageStored(QString, bool)));
     cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
 

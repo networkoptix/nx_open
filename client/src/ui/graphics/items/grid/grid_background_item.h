@@ -10,7 +10,7 @@
 
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
-#include <utils/app_server_file_cache.h>
+#include <utils/app_server_image_cache.h>
 
 class QnWorkbenchGridMapper;
 
@@ -67,7 +67,7 @@ private:
     qreal m_imageOpacity;
     QRect m_sceneBoundingRect;
     QWeakPointer<QnWorkbenchGridMapper> m_mapper;
-    QnAppServerFileCache *m_cache;
+    QnAppServerImageCache *m_cache;
     std::auto_ptr<DecodedPictureToOpenGLUploader> m_imgUploader;
     std::auto_ptr<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;

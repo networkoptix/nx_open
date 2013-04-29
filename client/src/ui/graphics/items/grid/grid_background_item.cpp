@@ -21,7 +21,7 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_imageSize(1, 1),
     m_imageOpacity(0.7),
-    m_cache(new QnAppServerFileCache(this)),
+    m_cache(new QnAppServerImageCache(this)),
     m_imgUploaded(false),
     m_imageStatus(None)
 {
@@ -53,7 +53,7 @@ void QnGridBackgroundItem::updateDisplay() {
     if (m_imageStatus != None)
         return;
     m_imageStatus = Loading;
-    m_cache->loadImage(m_imageFilename);
+    m_cache->downloadFile(m_imageFilename);
 }
 
 const QRectF& QnGridBackgroundItem::viewportRect() const {

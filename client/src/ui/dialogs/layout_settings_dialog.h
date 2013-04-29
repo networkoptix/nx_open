@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/app_server_file_cache.h>
+#include <utils/app_server_image_cache.h>
 
 namespace Ui {
     class QnLayoutSettingsDialog;
@@ -52,7 +52,7 @@ private:
     void loadPreview();
 private:
     QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
-    QnAppServerFileCache *m_cache;
+    QnAppServerImageCache *m_cache;
     QnFramedLabel* imageLabel;
 
     QString m_cachedFilename;

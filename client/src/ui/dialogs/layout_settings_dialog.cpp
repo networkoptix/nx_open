@@ -80,7 +80,7 @@ private:
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
-    m_cache(new QnAppServerFileCache(this)),
+    m_cache(new QnAppServerImageCache(this)),
     m_cellAspectRatio((qreal)16/9),
     m_estimatePending(false),
     m_cropImage(false)
@@ -144,7 +144,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     m_cachedFilename = layout->backgroundImageFilename();
     if (!m_cachedFilename.isEmpty()) {
         m_newFilePath = m_cache->getFullPath(m_cachedFilename);
-        m_cache->loadImage(m_cachedFilename);
+        m_cache->downloadFile(m_cachedFilename);
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
         ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);

@@ -1,8 +1,8 @@
 #ifndef APP_SERVER_FILE_CACHE_H
 #define APP_SERVER_FILE_CACHE_H
 
-#include <QObject>
-#include <QtGui/QImage>
+#include <QtCore/QObject>
+#include <QtCore/QHash>
 
 class QnAppServerFileCache : public QObject
 {
@@ -11,17 +11,16 @@ public:
     explicit QnAppServerFileCache(QObject *parent = 0);
     ~QnAppServerFileCache();
 
-    void loadImage(const QString &filename);
-    void storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio = false);
-
     /** Get full path to cached file with fixed filename */
     QString getFullPath(const QString &filename) const;
-    QSize getMaxImageSize() const;
+
+    void uploadFile(const QString &filename);
+    void downloadFile(const QString &filename);
 signals:
-    void imageLoaded(const QString& filename, bool ok);
-    void imageStored(const QString& filename, bool ok);
+    void fileDownloaded(const QString& filename, bool ok);
+    void fileUploaded(const QString& filename, bool ok);
 private slots:
-    void at_imageConverted(const QString &filePath);
+
     void at_fileLoaded(int status, const QByteArray& data, int handle);
     void at_fileUploaded(int status, int handle);
 private:

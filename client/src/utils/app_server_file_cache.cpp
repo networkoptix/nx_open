@@ -8,9 +8,6 @@
 
 #include <api/app_server_connection.h>
 
-#include <ui/graphics/opengl/gl_functions.h>
-
-#include <utils/threaded_image_loader.h>
 
 QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
     QObject(parent)
@@ -31,22 +28,39 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
-QSize QnAppServerFileCache::getMaxImageSize() const {
-    int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-    return QSize(value, value);
+void QnAppServerFileCache::uploadFile(const QString &filename) {
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly)) {
+        emit fileUploaded(filename, false);
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    if (m_uploading.values().contains(filename))
+        return;
+
+    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
+                filename,
+                data,
+                this,
+                SLOT(at_fileUploaded(int, int))
+                );
+    m_uploading.insert(handle, filename);
 }
 
 // -------------- Loading image methods ----------------
 
-void QnAppServerFileCache::loadImage(const QString &filename) {
+void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (filename.isEmpty()) {
-        emit imageLoaded(filename, false);
+        emit fileDownloaded(filename, false);
         return;
     }
 
     QFileInfo info(getFullPath(filename));
     if (info.exists()) {
-        emit imageLoaded(filename, true);
+        emit fileDownloaded(filename, true);
         return;
     }
 
@@ -69,7 +83,7 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
     m_loading.remove(handle);
 
     if (status != 0) {
-        emit imageLoaded(filename, false);
+        emit fileDownloaded(filename, false);
         return;
     }
 
@@ -78,54 +92,17 @@ void QnAppServerFileCache::at_fileLoaded(int status, const QByteArray& data, int
     QDir().mkpath(folder);
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        emit imageLoaded(filename, false);
+        emit fileDownloaded(filename, false);
         return;
     }
     QDataStream out(&file);
     out.writeRawData(data, data.size());
     file.close();
 
-    emit imageLoaded(filename, true);
+    emit fileDownloaded(filename, true);
 }
 
 // -------------- Uploading image methods ----------------
-
-void QnAppServerFileCache::storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio) {
-    QString uuid =  QUuid::createUuid().toString();
-    QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
-
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
-    loader->setInput(filePath);
-    loader->setSize(getMaxImageSize());
-    loader->setCropToMonitorAspectRatio(cropImageToMonitorAspectRatio);
-    loader->setOutput(getFullPath(newFilename));
-    connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
-    loader->start();
-}
-
-void QnAppServerFileCache::at_imageConverted(const QString &filePath) {
-    QString filename = QFileInfo(filePath).fileName();
-
-    QFile file(filePath);
-    if(!file.open(QIODevice::ReadOnly)) {
-        emit imageStored(filename, false);
-        return;
-    }
-
-    QByteArray data = file.readAll();
-    file.close();
-
-    if (m_uploading.values().contains(filename))
-        return;
-
-    int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
-                filename,
-                data,
-                this,
-                SLOT(at_fileUploaded(int, int))
-                );
-    m_uploading.insert(handle, filename);
-}
 
 
 void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
@@ -137,6 +114,6 @@ void QnAppServerFileCache::at_fileUploaded(int status, int handle) {
     bool ok = status == 0;
     if (!ok)
         QFile::remove(getFullPath(filename));
-    emit imageStored(filename, ok);
+    emit fileUploaded(filename, ok);
 }
 
