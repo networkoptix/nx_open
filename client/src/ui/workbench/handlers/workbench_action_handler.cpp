@@ -1010,6 +1010,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
     QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
     if(!widget)
         return;
+    QWeakPointer<QnResourceWidget> guard(widget);
 
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
@@ -1028,7 +1029,10 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
         QTimer::singleShot(10000, &loop, SLOT(quit()));
         loop.exec();
 
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom)));
+        if(!guard)
+            break;
+
+        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
     }
 }
 
