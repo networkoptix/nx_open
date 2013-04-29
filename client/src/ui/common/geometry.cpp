@@ -370,10 +370,26 @@ QRectF QnGeometry::movedInto(const QRectF &rect, const QRectF &target) {
     return rect.translated(dx, dy);
 }
 
-QRectF QnGeometry::transformed(const QRectF &transform, const QRectF &rect) {
+QRectF QnGeometry::subRect(const QRectF &rect, const QRectF &relativeSubRect) {
     return QRectF(
-        transform.topLeft() + cwiseMul(rect.topLeft(), transform.size()),
-        cwiseMul(rect.size(), transform.size())
+        rect.topLeft() + cwiseMul(relativeSubRect.topLeft(), rect.size()),
+        cwiseMul(relativeSubRect.size(), rect.size())
+    );
+}
+
+QRectF QnGeometry::unsubRect(const QRectF &rect, const QRectF &relativeSubRect) {
+    QSizeF size = cwiseDiv(rect.size(), relativeSubRect.size());
+
+    return QRectF(
+        rect.topLeft() - cwiseMul(relativeSubRect.topLeft(), size),
+        size
+    );
+}
+
+QRectF QnGeometry::toSubRect(const QRectF &rect, const QRectF &absoluteSubRect) {
+    return QRectF(
+        cwiseDiv(absoluteSubRect.topLeft() - rect.topLeft(), rect.size()),
+        cwiseDiv(absoluteSubRect.size(), rect.size())
     );
 }
 

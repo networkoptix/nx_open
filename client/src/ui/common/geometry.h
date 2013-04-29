@@ -311,8 +311,9 @@ public:
 
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
-    // TODO: #Elric rename into something more sane
-    static QRectF transformed(const QRectF &transform, const QRectF &rect);
+    static QRectF subRect(const QRectF &rect, const QRectF &relativeSubRect);
+    static QRectF unsubRect(const QRectF &rect, const QRectF &relativeSubRect);
+    static QRectF toSubRect(const QRectF &rect, const QRectF &absoluteSubRect);
 
     static QPointF corner(const QRectF &rect, Qn::Corner corner);
 

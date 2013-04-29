@@ -191,7 +191,7 @@ private:
     }
 
     void updateLayout(ZoomWindowWidget *widget) {
-        widget->setGeometry(QnGeometry::transformed(rect(), m_rectByWidget.value(widget)));
+        widget->setGeometry(QnGeometry::subRect(rect(), m_rectByWidget.value(widget)));
     }
 
 private:
@@ -491,7 +491,7 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
     }
 
     ensureSelectionItem();
-    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
+    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size()), target()->rect());
 }
 
 void ZoomWindowInstrument::finishDrag(DragInfo *) {
