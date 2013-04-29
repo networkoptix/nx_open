@@ -88,7 +88,7 @@
 #include "rest/handlers/storage_space_handler.h"
 #include "common/customization.h"
 #include "plugins/resources/stardot/stardot_resource_searcher.h"
-#include "plugins/pluginmanager.h"
+#include "plugins/plugin_manager.h"
 #include "core/resource_managment/camera_driver_restriction_list.h"
 
 
