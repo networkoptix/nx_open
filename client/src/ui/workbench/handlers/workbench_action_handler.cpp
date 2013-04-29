@@ -984,7 +984,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
         QTimer::singleShot(10000, &loop, SLOT(quit()));
         loop.exec();
 
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom)));
+        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
     }
 }
 
