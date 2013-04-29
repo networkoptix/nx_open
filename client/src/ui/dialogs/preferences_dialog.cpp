@@ -8,7 +8,7 @@
 
 #include <core/resource/resource_directory_browser.h>
 #include <decoders/abstractvideodecoderplugin.h>
-#include <plugins/pluginmanager.h>
+#include <plugins/plugin_manager.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>

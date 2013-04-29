@@ -10,7 +10,7 @@
 #include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_managment/camera_driver_restriction_list.h"
-#include "../../pluginmanager.h"
+#include "../../plugin_manager.h"
 
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
