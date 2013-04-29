@@ -375,10 +375,10 @@ void QnProgressiveDownloadingConsumer::run()
         d->responseBody.clear();
 
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
-        const QString& urlPath = getDecodedUrl().path();
-        const int nameFormatSepPos = urlPath.lastIndexOf( QLatin1Char('.') );
-        const QString& resUniqueID = urlPath.mid(0, nameFormatSepPos);
-        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : urlPath.mid( nameFormatSepPos+1 ).toLocal8Bit();
+        const QString& requestedResourcePath = QFileInfo(getDecodedUrl().path()).fileName();
+        const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
+        const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
+        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLocal8Bit();
         QByteArray mimeType = getMimeType(d->streamingFormat);
         if (mimeType.isEmpty())
         {
