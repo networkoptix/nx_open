@@ -410,3 +410,20 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
     int nodeType = parameters.argument(Qn::NodeTypeRole).toInt();
     return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+
+    foreach (const QnResourcePtr &resource, resources) {
+        //TODO: #GDM refactor duplicated code
+        bool isServer = resource->hasFlags(QnResource::server);
+        bool isMediaResource = resource->hasFlags(QnResource::media);
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool allowed = isServer || isMediaResource;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        if(allowed && !forbidden)
+            return Qn::EnabledAction;
+    }
+    return Qn::InvisibleAction;
+}
