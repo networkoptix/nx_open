@@ -192,7 +192,7 @@ namespace nx_http
                         && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
                     {
                         //trying authorization
-                        if( resendRequstWithAuthorization( *response ) )
+                        if( resendRequestWithAuthorization( *response ) )
                             return;
                     }
 
@@ -518,7 +518,7 @@ namespace nx_http
         return false;
     }
 
-    bool AsyncHttpClient::resendRequstWithAuthorization( const nx_http::HttpResponse& response )
+    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::HttpResponse& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
         Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
