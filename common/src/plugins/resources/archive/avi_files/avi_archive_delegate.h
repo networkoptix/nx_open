@@ -45,6 +45,9 @@ public:
     
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
     virtual bool findStreams();
+
+    const char* getTagValue( const char* tagName );
+
 protected:
     void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
@@ -79,7 +82,6 @@ private:
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
-
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

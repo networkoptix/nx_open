@@ -1,5 +1,5 @@
-#ifndef NX_PLUGIN_API_H
-#define NX_PLUGIN_API_H
+#ifndef PLUGIN_API_H
+#define PLUGIN_API_H
 
 
 //!Network Optix dynamic plugin API
@@ -129,4 +129,4 @@ namespace nxpl
     typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
 
-#endif  //NX_PLUGIN_API_H
+#endif  //PLUGIN_API_H

@@ -318,10 +318,10 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
         return Qn::InvisibleAction;
-
+#if 0
     if(camera->isGroupPlayOnly())
         return Qn::InvisibleAction;
-
+#endif
     return QnExportActionCondition::check(parameters);
 }
 
@@ -400,8 +400,8 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
     if(display()->zoomTargetWidget(widget))
         return Qn::InvisibleAction;
 
-    if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
-        return Qn::InvisibleAction;
+    /*if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
+        return Qn::InvisibleAction;*/
     
     return Qn::EnabledAction;
 }

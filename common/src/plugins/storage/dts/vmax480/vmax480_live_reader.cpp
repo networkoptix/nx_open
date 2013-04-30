@@ -45,8 +45,28 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
 
     if (!result)
         closeStream();
+
+    if (!m_needStop) 
+    {
+        QnAbstractMediaDataPtr media = result.dynamicCast<QnAbstractMediaData>();
+        if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
+            m_lastMediaTimer.restart();
+            if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
+                getResource()->setStatus(QnResource::Online);
+        }
+        else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION * 2) {
+            m_resource->setStatus(QnResource::Offline);
+        }
+    }
+
     return result.dynamicCast<QnAbstractMediaData>();
 }
+
+bool QnVMax480LiveProvider::canChangeStatus() const
+{
+    return false; // do not allow to ancessor update status
+}
+
 
 void QnVMax480LiveProvider::openStream()
 {
@@ -61,7 +81,7 @@ void QnVMax480LiveProvider::openStream()
     if (m_maxStream == 0)
         m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource.data(), true);
     m_opened = m_maxStream->registerConsumer(this); 
-
+    m_lastMediaTimer.restart();
     /*
     vmaxDisconnect();
     vmaxConnect(true, channel);

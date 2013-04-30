@@ -49,7 +49,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
-#include "plugins/pluginmanager.h"
+#include "plugins/plugin_manager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -470,7 +470,7 @@ int main(int argc, char **argv)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
 
         //initializing plugin manager. TODO supply plugin dir (from settings)
-        PluginManager::instance()->loadPlugins( PluginManager::ptQt );
+        PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
         /* Process input files. */
         for (int i = 1; i < argc; ++i)

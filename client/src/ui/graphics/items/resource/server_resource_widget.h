@@ -40,7 +40,7 @@ public:
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -57,6 +57,7 @@ private:
     void addOverlays();
 
     void updateLegend();
+
 private:
     //TODO: #GDM move all required fields to inner class
     friend class StatisticsOverlayWidget;

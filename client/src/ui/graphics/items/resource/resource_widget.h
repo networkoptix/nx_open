@@ -100,10 +100,16 @@ public:
         return m_item.data();
     }
 
+    /**
+     * \returns                         Layout of channels in this widget. Never returns NULL.
+     */
     const QnResourceVideoLayout *channelLayout() const {
         return m_channelsLayout;
     }
     
+    const QRectF &zoomRect() const;
+    void setZoomRect(const QRectF &zoomRect);
+
     /**
      * \returns                         Frame opacity of this widget.
      */
@@ -267,6 +273,7 @@ signals:
     void aspectRatioChanged();
     void aboutToBeDestroyed();
     void optionsChanged();
+    void zoomRectChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
@@ -293,7 +300,7 @@ protected:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
     virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
     
@@ -457,6 +464,8 @@ private:
 
     /** Fixed rotation angle in degrees. Used to rotate static text and images. */
     Qn::FixedRotation m_overlayRotation;
+
+    QRectF m_zoomRect;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

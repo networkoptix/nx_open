@@ -147,7 +147,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         {
             case PIX_FMT_RGBA:
                 drawVideoTextureDirectly(
-                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
+                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     v_array );
                 break;
@@ -156,7 +156,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 Q_ASSERT( isYV12ToRgbaShaderUsed() );
                 drawYVA12VideoTexture(
                     picLock,
-                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
+                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
@@ -168,7 +168,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
-                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
+                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
@@ -178,7 +178,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
             case PIX_FMT_NV12:
                 Q_ASSERT( isNV12ToRgbShaderUsed() );
                 drawNV12VideoTexture(
-                    QnGeometry::transformed(picLock->textureRect(), sourceRect),
+                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     v_array );
