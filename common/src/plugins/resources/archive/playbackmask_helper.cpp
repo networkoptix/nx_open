@@ -63,3 +63,11 @@ void QnPlaybackMaskHelper::setPlaybackMask(const QnTimePeriodList& playbackMask)
     }
     m_curPlaybackPeriod.clear();
 }
+
+qint64 QnPlaybackMaskHelper::endTimeMs() const
+{
+    if (m_playbackMask.isEmpty())
+        return AV_NOPTS_VALUE;
+    else
+        return m_playbackMask.last().endTimeMs();
+}

@@ -57,7 +57,7 @@ private:
 };
 
 
-
+//!\a QnUpnpResourceSearcher-compatible wrapper for \a UPNPSearchHandler
 class QnUpnpResourceSearcherAsync
 :
     virtual public QnAbstractNetworkResourceSearcher,

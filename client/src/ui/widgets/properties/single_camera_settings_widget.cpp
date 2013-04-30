@@ -359,7 +359,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80)
+        if (url.isValid() && url.port() != 80 && url.port() > 0)
             webPageAddress += QLatin1Char(':') + QString::number(url.port());
 
         ui->nameEdit->setText(m_camera->getName());
