@@ -68,7 +68,7 @@ NEW FEATURES:
 	 - EC Connection Lost (results in notifications only)
 	 - Licenses are not configured (results in notifications only for Admin)
 	 - E-mail is not set (results in notifications only). Admin gets notifications about all users that have not emails specified
-	 - Storages are not configure properly (results in notifications only for Admin)
+	 - Storages are not configured properly (results in notifications only for Admin)
    - Actions: 
      - Camera Recording (camera(s) must be specified). Camera(s) must have Recording enabled
      - Panic Recording
