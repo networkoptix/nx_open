@@ -25,6 +25,13 @@
 class QnPtzSpaceMapper;
 class QnEnumNameMapper;
 
+typedef QList<QPair<QString, bool> > QnStringBoolPairList;
+typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
+
+Q_DECLARE_METATYPE(QnStringBoolPairList);
+Q_DECLARE_METATYPE(QnStringVariantPairList);
+
+
 class QnMediaServerReplyProcessor: public QObject {
     Q_OBJECT
 
@@ -35,6 +42,11 @@ public:
     virtual ~QnMediaServerReplyProcessor();
 
     int object() const { return m_object; }
+
+    bool isFinished() const { return m_finished; }
+    int status() const { return m_status; }
+    int handle() const { return m_handle; }
+    QVariant reply() const { return m_reply; }
 
 public slots:
     void processReply(const QnHTTPRawResponse &response, int handle);
@@ -48,31 +60,39 @@ signals:
     void finished(int status, const QnStatisticsDataList &reply, int updatePeriod, int handle);
     void finished(int status, const QnPtzSpaceMapper &reply, int handle);
     void finished(int status, const QVector3D &reply, int handle);
-
-protected:
-    virtual void connectNotify(const char *signal) override;
+    void finished(int status, const QnStringVariantPairList &reply, int handle);
+    void finished(int status, const QnStringBoolPairList &reply, int handle);
 
 private:
     template<class T>
     void emitFinished(int status, const T &reply, int handle) {
-        if(m_emitDefault)
-            emit finished(status, reply, handle);
-        if(m_emitVariant)
-            emit finished(status, QVariant::fromValue<T>(reply), handle);
+        m_finished = true;
+        m_status = status;
+        m_handle = handle;
+        m_reply = QVariant::fromValue<T>(reply);
+
+        emit finished(status, reply, handle);
+        emit finished(status, m_reply, handle);
     }
 
     void emitFinished(int status, int handle) {
-        if(m_emitDefault)
-            emit finished(status, handle);
-        if(m_emitVariant)
-            emit finished(status, QVariant(), handle);
+        m_finished = true;
+        m_status = status;
+        m_handle = handle;
+        m_reply = QVariant();
+
+        emit finished(status, handle);
+        emit finished(status, m_reply, handle);
     }
 
 private:
     int m_object;
-    bool m_emitVariant, m_emitDefault;
+    
+    bool m_finished;
+    int m_status;
+    int m_handle;
+    QVariant m_reply;
 };
-
 
 class QnMediaServerRequestResult: public QObject {
     Q_OBJECT
@@ -98,7 +118,6 @@ private:
     int m_handle;
     QVariant m_reply;
 };
-
 
 namespace detail {
     class QnMediaServerManualCameraReplyProcessor: public QObject
@@ -137,7 +156,7 @@ namespace detail {
 
     public:
         //!Return value is actual only after response has been handled
-        const QList< QPair< QString, QVariant> > &receivedParams() const;
+        const QnStringVariantPairList &receivedParams() const;
 
         //!Parses response mesasge body and fills \a m_receivedParams
         void parseResponse(const QByteArray& responseMssageBody);
@@ -149,10 +168,10 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
 
     signals:
-        void finished(int status, const QList< QPair< QString, QVariant> > &params);
+        void finished(int status, const QnStringVariantPairList &params);
 
     private:
-        QList< QPair< QString, QVariant> > m_receivedParams;
+        QnStringVariantPairList m_receivedParams;
     };
 
     //!Handles response on SetParam request
@@ -162,7 +181,7 @@ namespace detail {
 
     public:
         //!QList<QPair<paramName, operation result> >. Return value is actual only after response has been handled
-        const QList<QPair<QString, bool> > &operationResult() const;
+        const QnStringBoolPairList &operationResult() const;
         //!Parses response mesasge body and fills \a m_receivedParams
         void parseResponse(const QByteArray &responseMssageBody);
 
@@ -173,20 +192,13 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
-        void finished(int status, const QList<QPair<QString, bool> > &operationResult);
+        void finished(int status, const QnStringBoolPairList &operationResult);
 
     private:
-         QList<QPair<QString, bool> > m_operationResult;
+         QnStringBoolPairList m_operationResult;
     };
 
 } // namespace detail
-
-typedef QList<QPair<QString, bool> > QnStringBoolPairList;
-typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
-
-Q_DECLARE_METATYPE(QnStringBoolPairList);
-Q_DECLARE_METATYPE(QnStringVariantPairList);
-
 
 class QN_EXPORT QnMediaServerConnection: public QObject
 {
@@ -215,12 +227,12 @@ public:
      * 
      * \returns                         Request handle.
 	 */
-    int asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QObject *target, const char *slot);
+    int asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
      */
-    int getParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QList<QPair<QString, QVariant> > *paramValues);
+    int getParamList(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
 
 	/** 
 	 * Set \a camera params.
@@ -231,7 +243,7 @@ public:
 	 * 
      * \returns                         Request handle.
 	 */
-    int asyncSetParam(const QnNetworkResourcePtr &camera, const QList<QPair<QString, QVariant> > &params, QObject *target, const char *slot);
+    int asyncSetParam(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
@@ -275,6 +287,7 @@ private:
     int asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot);
 
     int sendAsyncRequest(QnMediaServerReplyProcessor *processor, const QnRequestParamList &params = QnRequestParamList(), const QnRequestHeaderList &headers = QnRequestHeaderList());
+    int sendSyncRequest(QnMediaServerReplyProcessor *processor, QVariant *reply, const QnRequestParamList &params = QnRequestParamList(), const QnRequestHeaderList &headers = QnRequestHeaderList());
 
 private:
     QScopedPointer<QnEnumNameMapper> m_nameMapper;
