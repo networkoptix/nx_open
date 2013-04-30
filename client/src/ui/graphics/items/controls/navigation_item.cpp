@@ -12,12 +12,15 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
+#include <utils/clock_data_provider.h>
 
 #include <ui/style/skin.h>
+#include <ui/style/globals.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
@@ -36,6 +39,23 @@ namespace {
         button->setCached(true);
         return button;
     }
+
+    GraphicsLabel* newClockItem(QGraphicsItem *parent = NULL) {
+        GraphicsLabel* label = new GraphicsLabel(parent);
+
+        QFont font;
+        font.setPixelSize(30);
+        label->setFont(font);
+
+        QPalette palette = label->palette();
+        palette.setColor(QPalette::WindowText, qnGlobals->selectedFrameColor());
+        label->setPalette(palette);
+
+        QnClockDataProvider* dp = new QnClockDataProvider(label);
+        QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
+        return label;
+    }
+
 
 } // anonymous namespace
 
@@ -146,6 +166,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
+    leftLayoutV->addItem(newClockItem(this));
 
     QGraphicsWidget *leftWidget = new QGraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
