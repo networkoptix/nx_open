@@ -90,7 +90,7 @@ QString AudioPlayer::getTagValue( const QString& filePath, const QString& tagNam
 {
     std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
     if( !audioPlayer->open( filePath ) )
-        return false;
+        return QString();
     return audioPlayer->getTagValue( tagName );
 }
 
