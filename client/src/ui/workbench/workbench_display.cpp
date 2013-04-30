@@ -417,7 +417,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridRaisedConeItem = new QnGridRaisedConeItem();
     m_scene->addItem(gridRaisedConeItem());
     setLayer(gridRaisedConeItem(), Qn::RaisedConeLayer);
-    gridRaisedConeItem()->setOpacity(0.8);
+    gridRaisedConeItem()->setOpacity(0.3);
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));

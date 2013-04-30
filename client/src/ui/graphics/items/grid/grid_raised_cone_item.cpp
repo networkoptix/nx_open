@@ -2,6 +2,44 @@
 
 #include <QPainter>
 
+namespace {
+
+    QPainterPath createBeamPath(QPointF source,
+                                QPointF target,
+                                qreal offsetSource,     // absolute offset
+                                qreal offsetTarget,     // absolute offset
+                                int signX,
+                                int signY) {
+
+        QPainterPath path;
+
+        path.setFillRule(Qt::WindingFill);
+
+        path.moveTo(target);
+        path.lineTo(source);
+        path.lineTo(source);
+        path.lineTo(source.x() + signX * offsetSource, source.y());
+        path.lineTo(target.x() + signX * offsetTarget, target.y());
+        path.closeSubpath();
+
+        path.moveTo(target);
+        path.lineTo(source);
+        path.lineTo(source);
+        path.lineTo(source.x(), source.y() + signY * offsetSource);
+        path.lineTo(target.x(), target.y() + signY * offsetTarget);
+        path.closeSubpath();
+        return path;
+    }
+
+    QPainterPath createSourceRectPath(QRectF source, qreal offset) {
+        QPainterPath path;
+        path.addRect(source);
+        path.addRect(source.left() + offset, source.top() + offset, source.width()- offset*2, source.height() - offset*2);
+        return path;
+    }
+
+}
+
 QnGridRaisedConeItem::QnGridRaisedConeItem(QGraphicsItem *parent) :
     QGraphicsObject(parent),
     m_raisedWidget(NULL)
@@ -13,17 +51,9 @@ QnGridRaisedConeItem::~QnGridRaisedConeItem() {
 }
 
 QRectF QnGridRaisedConeItem::boundingRect() const {
-    return m_rect;
+    return m_sourceRect.united(m_targetRect);
 }
 
-const QRectF& QnGridRaisedConeItem::viewportRect() const {
-    return m_rect;
-}
-
-void QnGridRaisedConeItem::setViewportRect(const QRectF &rect) {
-    prepareGeometryChange();
-    m_rect = rect;
-}
 
 QGraphicsWidget* QnGridRaisedConeItem::raisedWidget() const {
     return m_raisedWidget;
@@ -34,6 +64,7 @@ void QnGridRaisedConeItem::setRaisedWidget(QGraphicsWidget *widget, QRectF oldGe
         disconnect(m_raisedWidget, 0, this, 0);
 
     m_raisedWidget = widget;
+    setVisible(m_raisedWidget != NULL);
     if(m_raisedWidget == NULL)
         return;
 
@@ -46,14 +77,53 @@ void QnGridRaisedConeItem::setRaisedWidget(QGraphicsWidget *widget, QRectF oldGe
 void QnGridRaisedConeItem::updateGeometry() {
     if(m_raisedWidget == NULL)
         return;
-    setViewportRect(m_raisedWidget->geometry());
+    prepareGeometryChange();
+    m_targetRect = m_raisedWidget->geometry();
 }
 
 void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
     if(m_raisedWidget == NULL)
         return;
 
-    painter->fillRect(m_rect, QColor(Qt::red));
-    painter->fillRect(m_sourceRect, QColor(Qt::green));
+    const qreal penWidthF = 200.0;
+    const qreal offsetSource = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.2;
+    const qreal offsetTarget = qMin(m_targetRect.height(), m_targetRect.width()) * 0.1;;
+
+
+//    QPainterPath path;
+//    path.addPath(createBeamPath(m_sourceRect.topLeft(), m_targetRect.topLeft()));
+//    path.addPath(createBeamPath(m_sourceRect.topRight(), m_targetRect.topRight()));
+//    path.addPath(createBeamPath(m_sourceRect.bottomLeft(), m_targetRect.bottomLeft()));
+//    path.addPath(createBeamPath(m_sourceRect.bottomRight(), m_targetRect.bottomRight()));
+
+    painter->fillPath(createBeamPath(m_sourceRect.topLeft(),
+                                     m_targetRect.topLeft(),
+                                     offsetSource,
+                                     offsetTarget,
+                                     1, 1), Qt::green);
+
+    painter->fillPath(createBeamPath(m_sourceRect.topRight(),
+                                     m_targetRect.topRight(),
+                                     offsetSource,
+                                     offsetTarget,
+                                     -1, 1), Qt::green);
+
+    painter->fillPath(createBeamPath(m_sourceRect.bottomLeft(),
+                                     m_targetRect.bottomLeft(),
+                                     offsetSource,
+                                     offsetTarget,
+                                     1, -1), Qt::green);
+
+    painter->fillPath(createBeamPath(m_sourceRect.bottomRight(),
+                                     m_targetRect.bottomRight(),
+                                     offsetSource,
+                                     offsetTarget,
+                                     -1, -1), Qt::green);
+
+    painter->fillPath(createSourceRectPath(m_sourceRect, offsetSource), Qt::green);
+
+
 }
 

@@ -152,9 +152,11 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     ui->lockedCheckBox->setChecked(layout->locked());
     ui->userCanEditCheckBox->setChecked(layout->userCanEdit());
 
-    qreal cellWidth = 1.0 + layout->cellSpacing().width();
-    qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
-    m_cellAspectRatio = cellWidth / cellHeight;
+    if (layout->cellAspectRatio() > 0) {
+        qreal cellWidth = 1.0 + layout->cellSpacing().width();
+        qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+        m_cellAspectRatio = cellWidth / cellHeight;
+    }
 
     updateControls();
 }
