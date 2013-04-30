@@ -4,10 +4,20 @@
 
 namespace {
 
+    /**
+     * @brief createBeamPath    Creates painter path for graphics beam from source corner to target corner.
+     * @param source            Source corner point.
+     * @param target            Target corner point.
+     * @param offsetSource      Absolute offset value that will be used on source rect.
+     * @param offsetTarget      Absolute offset value that will be used on target rect.
+     * @param signX             Correct sign of x-coord offset.
+     * @param signY             Correct sign of y-coord offset.
+     * @return                  Painter path.
+     */
     QPainterPath createBeamPath(QPointF source,
                                 QPointF target,
-                                qreal offsetSource,     // absolute offset
-                                qreal offsetTarget,     // absolute offset
+                                qreal offsetSource,
+                                qreal offsetTarget,
                                 int signX,
                                 int signY) {
 
@@ -87,16 +97,8 @@ void QnGridRaisedConeItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     if(m_raisedWidget == NULL)
         return;
 
-    const qreal penWidthF = 200.0;
     const qreal offsetSource = qMin(m_sourceRect.height(), m_sourceRect.width()) * 0.2;
     const qreal offsetTarget = qMin(m_targetRect.height(), m_targetRect.width()) * 0.1;;
-
-
-//    QPainterPath path;
-//    path.addPath(createBeamPath(m_sourceRect.topLeft(), m_targetRect.topLeft()));
-//    path.addPath(createBeamPath(m_sourceRect.topRight(), m_targetRect.topRight()));
-//    path.addPath(createBeamPath(m_sourceRect.bottomLeft(), m_targetRect.bottomLeft()));
-//    path.addPath(createBeamPath(m_sourceRect.bottomRight(), m_targetRect.bottomRight()));
 
     painter->fillPath(createBeamPath(m_sourceRect.topLeft(),
                                      m_targetRect.topLeft(),
