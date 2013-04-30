@@ -113,11 +113,10 @@ protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
         Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
 
-        if(result & Qn::SideSections) {
+        if(result & Qn::SideSections)
             result &= ~Qn::SideSections;
-        } else if(result == Qn::NoSection) {
+        if(result == Qn::NoSection)
             result = Qn::TitleBarArea;
-        }
 
         return result;
     }
