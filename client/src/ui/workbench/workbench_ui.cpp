@@ -65,7 +65,6 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <client/client_settings.h>
-#include <utils/clock_data_provider.h>
 
 #include "openal/qtvaudiodevice.h"
 #include "core/resource_managment/resource_pool.h"
@@ -110,13 +109,6 @@ namespace {
             setHelpTopic(button, helpTopicId);
 
         return button;
-    }
-
-    GraphicsLabel* newClockItem(QGraphicsItem *parent = NULL) {
-        GraphicsLabel* label = new GraphicsLabel(parent);
-        QnClockDataProvider* dp = new QnClockDataProvider(label);
-        QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
-        return label;
     }
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
@@ -420,7 +412,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
-    m_titleRightButtonsLayout->addItem(newClockItem());
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
