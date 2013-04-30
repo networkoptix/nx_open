@@ -46,9 +46,6 @@ public:
         return m_renderer;
     }
 
-    const QRectF &zoomRect() const;
-    void setZoomRect(const QRectF &zoomRect);
-
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
      * \returns                         Coordinates of the motion cell that the given point belongs to.
@@ -94,7 +91,6 @@ public:
 
 signals:
     void motionSelectionChanged();
-    void zoomRectChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -108,7 +104,7 @@ protected:
     virtual Overlay calculateChannelOverlay(int channel) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
@@ -130,7 +126,6 @@ protected:
     Q_SIGNAL void updateInfoTextLater();
 
 private slots:
-    void at_renderer_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
@@ -141,6 +136,7 @@ private slots:
 private:
     int currentRecordingMode();
 
+    Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
 
 private:
@@ -178,8 +174,6 @@ private:
     mutable bool m_motionSelectionCacheValid;
 
     QStaticText m_sensStaticText[10];
-
-    QRectF m_zoomRect;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

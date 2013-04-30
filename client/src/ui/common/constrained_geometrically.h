@@ -9,7 +9,7 @@ class ConstrainedGeometrically {
 public:
     virtual ~ConstrainedGeometrically() {}
 
-    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner) const = 0;
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint = QPointF()) const = 0;
 };
 
 

@@ -428,6 +428,20 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position, const QRectF &zoomWindow, const QUuid &zoomUuid) const {
+
+    {
+        //TODO: #GDM refactor duplicated code
+        bool isServer = resource->hasFlags(QnResource::server);
+        bool isMediaResource = resource->hasFlags(QnResource::media);
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+
+        bool allowed = isServer || isMediaResource;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        if(!allowed || forbidden)
+            return;
+    }
+
     QnLayoutItemData data;
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
@@ -966,6 +980,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
     QnResourceWidget *widget = menu()->currentParameters(sender()).widget();
     if(!widget)
         return;
+    QWeakPointer<QnResourceWidget> guard(widget);
 
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
@@ -983,6 +998,9 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
         loop.exec();
+
+        if(!guard)
+            break;
 
         menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
     }
