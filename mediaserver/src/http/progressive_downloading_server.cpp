@@ -373,8 +373,12 @@ void QnProgressiveDownloadingConsumer::run()
     {
         parseRequest();
         d->responseBody.clear();
-        QFileInfo fi(getDecodedUrl().path());
-        d->streamingFormat = fi.completeSuffix().toLocal8Bit();
+
+        //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
+        const QString& requestedResourcePath = QFileInfo(getDecodedUrl().path()).fileName();
+        const int nameFormatSepPos = requestedResourcePath.lastIndexOf( QLatin1Char('.') );
+        const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
+        d->streamingFormat = nameFormatSepPos == -1 ? QByteArray() : requestedResourcePath.mid( nameFormatSepPos+1 ).toLocal8Bit();
         QByteArray mimeType = getMimeType(d->streamingFormat);
         if (mimeType.isEmpty())
         {
@@ -433,10 +437,10 @@ void QnProgressiveDownloadingConsumer::run()
 
 
 
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(fi.baseName());
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(resUniqueID);
         if (resource == 0)
         {
-            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(fi.baseName().toLocal8Bit()) + QByteArray(" not found ");
+            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(resUniqueID.toLocal8Bit()) + QByteArray(" not found ");
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
@@ -503,20 +507,33 @@ void QnProgressiveDownloadingConsumer::run()
             {
                 QnAbstractArchiveDelegate* archive = 0;
                 QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
-                if (camRes)
+                if (camRes) {
                     archive = camRes->createArchiveDelegate();
+                    if (!archive)
+                        archive = new QnServerArchiveDelegate(); // default value
+                }
                 if (archive) {
                     archive->open(resource);
                     archive->seek(timeMs, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
-                    for (int i = 0; i < 20; ++i) 
+					int counter = 0;
+                    while (counter < 20)
                     {
                         QnAbstractMediaDataPtr data = archive->getNextData();
-                        if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
+                        if (data)
                         {
-                            timestamp = data->timestamp;
-                            break;
+							if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
+							{
+								timestamp = data->timestamp;
+								break;
+							}
+							else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+								continue; // ignore filler packet
+							counter++;
                         }
+						else {
+							counter++;
+						}
                     }
 
                     QByteArray ts("\"now\"");
