@@ -525,15 +525,15 @@ QnMediaServerResourcePtr QnServerResourceWidget::resource() const {
     return m_resource;
 }
 
-int QnServerResourceWidget::helpTopicAt(const QPointF &pos) const {
-    Q_UNUSED(pos)
+int QnServerResourceWidget::helpTopicAt(const QPointF &) const {
     return Qn::MainWindow_MonitoringItem_Help;
 }
 
-Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
-    Q_UNUSED(channel);
+Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
+    Q_UNUSED(channel)
+    Q_UNUSED(channelRect)
 
-    drawStatistics(rect, painter);
+    drawStatistics(paintRect, painter);
 
     return m_renderStatus;
 }

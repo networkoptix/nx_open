@@ -14,13 +14,10 @@
     extern const QMetaObject &getStaticMetaObject();                            \
 
 
-namespace QnCommonGlobals {}
-namespace Qn { using namespace QnCommonGlobals; }
-
 #ifdef Q_MOC_RUN
-class QnCommonGlobals
+class Qn
 #else
-namespace QnCommonGlobals
+namespace Qn
 #endif
 {
 #ifdef Q_MOC_RUN
@@ -138,7 +135,7 @@ public:
         TimePeriodContentCount
     };
 
-} // namespace QnCommonGlobals
+} // namespace Qn
 
 
 Q_DECLARE_METATYPE(Qn::TimePeriodTypes);

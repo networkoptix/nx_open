@@ -136,7 +136,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_overlayVisible(0),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_overlayRotation(Qn::Angle0)
+    m_overlayRotation(Qn::Angle0),
+    m_zoomRect(0.0, 0.0, 1.0, 1.0)
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
@@ -313,6 +314,19 @@ QnResourcePtr QnResourceWidget::resource() const {
     return m_resource;
 }
 
+const QRectF &QnResourceWidget::zoomRect() const {
+    return m_zoomRect;
+}
+
+void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
+    if(qFuzzyCompare(m_zoomRect, zoomRect))
+        return;
+
+    m_zoomRect = zoomRect;
+
+    emit zoomRectChanged();
+}
+
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     if(qFuzzyCompare(m_frameWidth, frameWidth))
         return;
@@ -455,12 +469,14 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_channelsLayout->channelCount() == 1)
-        return QRectF(QPointF(0.0, 0.0), size());
+    QRectF rect = unsubRect(this->rect(), zoomRect());
 
-    QSizeF channelSize = cwiseDiv(this->size(), m_channelsLayout->size());
+    if (m_channelsLayout->channelCount() == 1)
+        return rect;
+
+    QSizeF channelSize = cwiseDiv(rect.size(), m_channelsLayout->size());
     return QRectF(
-        cwiseMul(m_channelsLayout->position(channel), channelSize),
+        rect.topLeft() + cwiseMul(m_channelsLayout->position(channel), channelSize),
         channelSize
     );
 }
@@ -750,16 +766,6 @@ void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    if (painter->paintEngine() == NULL) {
-        qnWarning("No OpenGL-compatible paint engine was found.");
-        return;
-    }
-
-    if (painter->paintEngine()->type() != QPaintEngine::OpenGL2 && painter->paintEngine()->type() != QPaintEngine::OpenGL) {
-        qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
-        return;
-    }
-
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_resourceWidget_pausedPainterStorage()->get(QGLContext::currentContext());
         m_loadingProgressPainter = qn_resourceWidget_loadingProgressPainterStorage()->get(QGLContext::currentContext());
@@ -776,8 +782,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
-        QRectF rect = channelRect(i);
-        Qn::RenderStatus renderStatus = paintChannelBackground(painter, i, rect);
+        QRectF channelRect = this->channelRect(i);
+        QRectF paintRect = rect().intersected(channelRect);
+        if(paintRect.isEmpty())
+            continue;
+
+        Qn::RenderStatus renderStatus = paintChannelBackground(painter, i, channelRect, paintRect);
 
         /* Update channel state. */
         m_channelState[i].renderStatus = renderStatus;
@@ -792,14 +802,14 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * overlayOpacity);
-        paintOverlay(painter, rect, m_channelState[i].overlay);
+        paintOverlay(painter, paintRect, m_channelState[i].overlay);
         painter->setOpacity(opacity);
 
         /* Draw foreground. */
-        paintChannelForeground(painter, i, rect);
+        paintChannelForeground(painter, i, paintRect);
 
         /* Draw selected / not selected overlay. */
-        paintSelection(painter, rect);
+        paintSelection(painter, paintRect);
     }
 }
 

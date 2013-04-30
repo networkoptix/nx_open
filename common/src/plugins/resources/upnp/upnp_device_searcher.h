@@ -54,6 +54,7 @@ public:
 
 //!Discovers UPnP devices on network and passes found devices info to registered handlers
 /*!
+    Searches devices asynchronously
     \note sends discover packets from all local network interfaces
     \note Handlers are iterated in order they were registered
     \note Class methods are thread-safe with the only exception: \a saveDiscoveredDevicesSnapshot() and \a processDiscoveredDevices() calls MUST be serialized by calling entity

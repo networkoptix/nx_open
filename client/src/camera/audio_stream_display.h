@@ -16,8 +16,8 @@ public:
     QnAudioStreamDisplay(int buffMs, int prebufferMs);
     ~QnAudioStreamDisplay();
 
-    void putData(QnCompressedAudioDataPtr data, qint64 minTime);
-    void enqueueData(QnCompressedAudioDataPtr data, qint64 minTime);
+    void putData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
+    void enqueueData(QnCompressedAudioDataPtr data, qint64 minTime = 0);
     void suspend();
 
     void resume();
