@@ -158,7 +158,7 @@ QnCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame()
 
 void QnVideoCameraGopKeeper::updateCameraActivity()
 {
-    if (!m_lastKeyFrame || qnSyncTime->currentUSecsSinceEpoch() - m_lastKeyFrame->timestamp > CAMERA_UPDATE_INTERNVAL)
+    if (!m_resource->isDisabled() && (!m_lastKeyFrame || qnSyncTime->currentUSecsSinceEpoch() - m_lastKeyFrame->timestamp > CAMERA_UPDATE_INTERNVAL))
     {
         if (!m_activityStarted) {
             m_activityStarted = true;
