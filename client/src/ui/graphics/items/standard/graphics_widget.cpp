@@ -16,6 +16,7 @@
 #include <ui/common/frame_section.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/scene_transformations.h>
+#include <ui/common/geometry.h>
 
 class GraphicsWidgetSceneData: public QObject {
 public:
@@ -680,7 +681,15 @@ bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     switch(windowData->grabbedSection) {
     case Qt::TitleBarArea:
         if(handlingFlags & GraphicsWidget::ItemHandlesMovement) {
-            windowData->startPinPoint = q->pos() - q->mapToParent(event->pos());
+            QSizeF size = q->size();
+            windowData->startPinPoint = QnGeometry::cwiseDiv(event->pos(), size);
+            
+            /* Make sure we don't get NaNs in startPinPoint. */
+            if(qFuzzyIsNull(size.width()))
+                windowData->startPinPoint.setX(0.0);
+            if(qFuzzyIsNull(size.height()))
+                windowData->startPinPoint.setY(0.0);
+
             return true;
         } else {
             windowData->grabbedSection = Qt::NoSection;
@@ -725,21 +734,26 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         return false;
 
     if(windowData->grabbedSection != Qt::NoSection) {
-        QSizeF newSize = windowData->startSize + Qn::calculateSizeDelta(
-            event->pos() - q->mapFromScene(event->buttonDownScenePos(Qt::LeftButton)), 
-            windowData->grabbedSection
-        );
-        QSizeF minSize = q->effectiveSizeHint(Qt::MinimumSize);
-        QSizeF maxSize = q->effectiveSizeHint(Qt::MaximumSize);
-        newSize = QSizeF(
-            qBound(minSize.width(), newSize.width(), maxSize.width()),
-            qBound(minSize.height(), newSize.height(), maxSize.height())
-        );
-        /* We don't handle heightForWidth. */
+        QSizeF newSize;
+        if(windowData->grabbedSection == Qt::TitleBarArea) {
+            newSize = q->size();
+        } else {
+            newSize = windowData->startSize + Qn::calculateSizeDelta(
+                event->pos() - q->mapFromScene(event->buttonDownScenePos(Qt::LeftButton)), 
+                windowData->grabbedSection
+            );
+            QSizeF minSize = q->effectiveSizeHint(Qt::MinimumSize);
+            QSizeF maxSize = q->effectiveSizeHint(Qt::MaximumSize);
+            newSize = QSizeF(
+                qBound(minSize.width(), newSize.width(), maxSize.width()),
+                qBound(minSize.height(), newSize.height(), maxSize.height())
+            );
+            /* We don't handle heightForWidth. */
+        }
 
         QPointF newPos;
         if(windowData->grabbedSection == Qt::TitleBarArea) {
-            newPos = windowData->startPinPoint + q->mapToParent(event->pos());
+            newPos = q->mapToParent(event->pos() - QnGeometry::cwiseMul(windowData->startPinPoint, newSize));
         } else {
             newPos = q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), windowData->grabbedSection));
         }

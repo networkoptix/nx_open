@@ -5,7 +5,7 @@
  *      Author: ak
  */
 
-#include "pluginmanager.h"
+#include "plugin_manager.h"
 
 #include <set>
 
@@ -121,10 +121,10 @@ void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType
         if( !QLibrary::isLibrary( entry ) )
             continue;
 
-        if( pluginsToLoad & ptQt )
+        if( pluginsToLoad & QtPlugin )
             loadQtPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
 
-        if( pluginsToLoad & ptNX )
+        if( pluginsToLoad & NxPlugin )
             loadNxPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
     }
 }

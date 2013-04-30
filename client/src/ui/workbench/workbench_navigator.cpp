@@ -1026,8 +1026,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
 
     if (m_centralWidget) {
         aspectRatio = m_centralWidget->aspectRatio();
-        if(m_centralWidget->channelLayout())
-            aspectRatio /= QnGeometry::aspectRatio(m_centralWidget->channelLayout()->size());
+        aspectRatio /= QnGeometry::aspectRatio(m_centralWidget->channelLayout()->size());
 
         if(QnCachingTimePeriodLoader *loader = this->loader(m_centralWidget)) {
             if(!loader->periods(Qn::RecordingContent).isEmpty())

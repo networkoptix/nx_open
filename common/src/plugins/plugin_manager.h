@@ -1,12 +1,12 @@
 /*
- * pluginmanager.h
+ * plugin_manager.h
  *
  *  Created on: Sep 11, 2012
  *      Author: a.kolesnikov
  */
 
-#ifndef PLUGINLOADER_H_
-#define PLUGINLOADER_H_
+#ifndef PLUGIN_MANAGER_H
+#define PLUGIN_MANAGER_H
 
 #include <QObject>
 #include <QList>
@@ -39,12 +39,10 @@ class PluginManager
 public:
     enum PluginType
     {
-        //!Qt-based plugins
-        ptQt = 1,
-        //!plugins, implementing on plugin_api.h
-        ptNX = 2,
-
-        ptAll = ptQt | ptNX
+        QtPlugin = 1, //!< Qt-based plugins.
+        NxPlugin = 2, //!< Plugins, implementing plugin_api.h.
+        
+        AllPlugins = QtPlugin | NxPlugin
     };
 
     PluginManager( const QString& pluginDir = QString() );
@@ -86,7 +84,7 @@ public:
     /*!
         This method must be called implicitly
     */
-    void loadPlugins( PluginType pluginsToLoad = ptAll );
+    void loadPlugins( PluginType pluginsToLoad = AllPlugins );
 
     //!Guess what
     static PluginManager* instance( const QString& pluginDir = QString() );
@@ -107,4 +105,4 @@ private:
     bool loadNxPlugin( const QString& fullFilePath );
 };
 
-#endif /* PLUGINLOADER_H_ */
+#endif /* PLUGIN_MANAGER_H */

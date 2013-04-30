@@ -1571,8 +1571,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
     if(!dialog->exec() || !dialog->submitToResource(layout))
         return;
 
-    //TODO: #GDM make sure slot code should be executed this time
-    connection()->saveAsync(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -3555,7 +3554,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     layout->setBackgroundImageFilename(filename);
     if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
         layout->setBackgroundOpacity(0.7);
-    connection()->saveAsync(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
