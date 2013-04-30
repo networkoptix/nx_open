@@ -256,6 +256,11 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
     return 0;
 }
 
+bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
+{
+    return av_dict_set( &m_formatCtx->metadata, name.toUtf8().constData(), value.toUtf8().constData(), 0 ) >= 0;
+}
+
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result)
 {
     Q_UNUSED(result)
