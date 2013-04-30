@@ -275,6 +275,14 @@ QRectF QnGeometry::expanded(qreal aspectRatio, const QSizeF &minSize, const QPoi
     return expanded(aspectRatio, QRectF(center - toPoint(minSize) / 2, minSize), mode, Qt::AlignCenter);
 }
 
+QRectF QnGeometry::scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode) {
+    QSizeF newSize = expanded(aspectRatio(rect), size, mode);
+
+    return QRectF(
+        fixedPoint - cwiseMul(cwiseDiv(fixedPoint - rect.topLeft(), rect.size()), newSize),
+        newSize
+    );
+}
 
 namespace {
     template<class Size, class Rect>

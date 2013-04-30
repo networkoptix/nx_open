@@ -210,6 +210,8 @@ public:
 
     static QRectF expanded(qreal aspectRatio, const QSizeF &minSize, const QPointF &center, Qt::AspectRatioMode mode);
 
+    static QRectF scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode);
+
     static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
     static QRect aligned(const QSize &size, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter);
