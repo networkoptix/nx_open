@@ -290,7 +290,7 @@ ZoomOverlayWidget *ZoomWindowInstrument::ensureOverlayWidget(QnMediaResourceWidg
     overlayWidget->setTarget(widget);
     data.overlayWidget = overlayWidget;
 
-    widget->addOverlayWidget(overlayWidget, QnResourceWidget::AutoVisible, false, false);
+    widget->addOverlayWidget(overlayWidget, QnResourceWidget::AutoVisible, false, false, false);
     return overlayWidget;
 }
 

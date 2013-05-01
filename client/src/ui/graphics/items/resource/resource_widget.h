@@ -263,7 +263,7 @@ public:
     bool isOverlayVisible() const;
     Q_SLOT void setOverlayVisible(bool visible = true, bool animate = true);
 
-    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false);
+    void addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility = UserVisible, bool autoRotate = false, bool bindToViewport = false, bool placeOverControls = false);
     void removeOverlayWidget(QGraphicsWidget *widget);
     OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
     void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
@@ -327,6 +327,7 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
+    int overlayWidgetIndex(QGraphicsWidget *widget) const;
     void updateOverlayWidgetsGeometry();
     void updateOverlayWidgetsVisibility(bool animate = true);
 
@@ -385,6 +386,7 @@ private:
     struct OverlayWidget {
         OverlayVisibility visibility;
         QGraphicsWidget *widget;
+        QGraphicsWidget *childWidget;
         QnViewportBoundWidget *boundWidget;
         QnFixedRotationTransform *rotationTransform;
     };
