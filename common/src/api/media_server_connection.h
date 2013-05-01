@@ -67,6 +67,7 @@ signals:
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
+    void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
 
 private:
     template<class T>
@@ -110,16 +111,19 @@ private:
 
 private:
     int m_object;
-    
     bool m_finished;
     int m_status;
     int m_handle;
     QVariant m_reply;
 };
 
+
 class QnMediaServerRequestResult: public QObject {
     Q_OBJECT
 public:
+    QnMediaServerRequestResult(QObject *parent = NULL): QObject(parent), m_finished(false), m_status(0), m_handle(0) {}
+
+    bool isFinished() const { return m_finished; }
     int status() const { return m_status; }
     int handle() const { return m_handle; }
     const QVariant &reply() const { return m_reply; }
@@ -129,6 +133,7 @@ signals:
 
 public slots:
     void processReply(int status, const QVariant &reply, int handle) {
+        m_finished = true;
         m_status = status;
         m_reply = reply;
         m_handle = handle;
@@ -137,29 +142,12 @@ public slots:
     }
 
 private:
+    bool m_finished;
     int m_status;
     int m_handle;
     QVariant m_reply;
 };
 
-namespace detail {
-    class QnMediaServerManualCameraReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_searchReplyReceived(const QnHTTPRawResponse& response, int handle);
-        void at_addReplyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finishedSearch(const QnCamerasFoundInfoList &);
-        void searchError(int, const QString &);
-        void finishedAdd(int);
-    };
-
-} // namespace detail
 
 class QN_EXPORT QnMediaServerConnection: public QObject
 {
@@ -207,19 +195,15 @@ public:
     /**
      * \returns                         Http response status (200 in case of success).
      */
-    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
+    int setParamsSync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
 
     /** 
      * \returns                         Request handle. 
      */
     int getStatisticsAsync(QObject *target, const char *slot);
 
-    // TODO: #GDM consistency! All other methods accept a single SLOT with signature (status, DATA, handle). Use a single slot here too!
-    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
-                                   QObject *target, const char *slotSuccess, const char *slotError); 
-
-    int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
-                                QObject *target, const char *slot);
+    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot); 
+    int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
