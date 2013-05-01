@@ -230,7 +230,8 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
             break;
         }
     default:
-        ;// TODO: #Elric warning?
+        assert(false); /* We should never get here. */
+        break;
     }
 
     deleteLater();

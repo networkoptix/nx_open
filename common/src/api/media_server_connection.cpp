@@ -358,7 +358,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     default:
-        break; // TODO: #Elric warning?
+        assert(false); /* We should never get here. */
+        break;
     }
 
     deleteLater();
