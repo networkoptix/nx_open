@@ -676,13 +676,13 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Tab")).
         conditionalText(tr("Monitor in a New Tab"), hasFlags(QnResource::server), Qn::All).
-        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Window")).
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
-        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
+        condition(new QnOpenInNewEntityActionCondition(this));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

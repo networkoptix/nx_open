@@ -1027,11 +1027,25 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
+        QHash<QUuid, QnLayoutItemData> itemDataByUuid;
         foreach(const QnResourceWidget *widget, widgets) {
             QnLayoutItemData data = widget->item()->data();
-            data.uuid = QUuid::createUuid();
-            layout->addItem(data);
+            itemDataByUuid[data.uuid] = data;
         }
+
+        /* Generate new UUIDs. */
+        for(QHash<QUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+            pos->uuid = QUuid::createUuid();
+
+        /* Update cross-references. */
+        for(QHash<QUuid, QnLayoutItemData>::iterator pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
+            if(!pos->zoomTargetUuid.isNull())
+                pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
+
+        /* Add to layout. */
+        foreach(const QnLayoutItemData &data, itemDataByUuid)
+            layout->addItem(data);
+
         return;
     }
 
@@ -1352,9 +1366,8 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     }
 
 
-    if (!parameters.resources().empty()) {
+    if (!parameters.resources().empty())
         menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-    }
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
