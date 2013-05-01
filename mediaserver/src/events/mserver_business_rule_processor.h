@@ -27,7 +27,6 @@ private:
     void saveActionToDB(QnAbstractBusinessActionPtr action);
 private:
     QSqlDatabase m_sdb;
-    QSqlQuery* my_InsQuery;
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

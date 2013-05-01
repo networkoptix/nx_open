@@ -9,35 +9,36 @@
 
 void QnMServerBusinessRuleProcessor::saveActionToDB(QnAbstractBusinessActionPtr action)
 {
-    if (!my_InsQuery)
+    if (!m_sdb.isOpen())
         return;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count) "
+        "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count);");
 
     qint64 timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
 
-    my_InsQuery->bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
-    my_InsQuery->bindValue(":action_type", (int) action->actionType());
-    my_InsQuery->bindValue(":action_params", serializeBusinessParams(action->getParams()));
-    my_InsQuery->bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
-    my_InsQuery->bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
-    my_InsQuery->bindValue(":toggle_state", (int) action->getToggleState());
-    my_InsQuery->bindValue(":aggregation_count", action->getAggregationCount());
+    insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
+    insQuery.bindValue(":action_type", (int) action->actionType());
+    insQuery.bindValue(":action_params", serializeBusinessParams(action->getParams()));
+    insQuery.bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
+    insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
+    insQuery.bindValue(":toggle_state", (int) action->getToggleState());
+    insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
-    bool insOK = my_InsQuery->exec();
+    bool insOK = insQuery.exec();
     insOK = insOK;
 }
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
-    QnBusinessRuleProcessor(),
-    my_InsQuery(0)
+    QnBusinessRuleProcessor()
 {
     m_sdb = QSqlDatabase::addDatabase("QSQLITE");
     m_sdb.setDatabaseName(closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")));
 
     if (m_sdb.open())
     {
-        my_InsQuery = new QSqlQuery(m_sdb);
-        my_InsQuery->prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count) "
-            "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count);");
+        //
     }
     else {
         qWarning() << "can't initialize mySQL database! Actions log is not created!";
@@ -46,7 +47,6 @@ QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
 
 QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 {
-    delete my_InsQuery;
 }
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
