@@ -1,7 +1,10 @@
 #include "time_handler.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/common/synctime.h"
-#include "utils/common/util.h"
+
+#include <api/model/time_reply.h>
+
+#include <utils/network/tcp_connection_priv.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
 
 QnTimeHandler::QnTimeHandler() {}
 
