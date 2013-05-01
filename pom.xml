@@ -57,7 +57,7 @@
 		<qtlib9/>
 		<!--QT plugins used-->      
 		<qtplugin1>imageformats</qtplugin1>
-		<qtplugin2>enter its name here...</qtplugin2>
+		<qtplugin2>sqldrivers</qtplugin2>
 		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>

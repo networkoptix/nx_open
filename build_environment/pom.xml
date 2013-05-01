@@ -241,6 +241,25 @@
 										<exclude>**/*.lib</exclude>
 									</excludes>
 								</resource>
+								
+								<!-- for Linux -->
+								
+								<resource>
+									<targetPaths>
+										<targetPath>${project.build.directory}/bin/debug</targetPath>
+										<targetPath>${project.build.directory}/bin/release</targetPath>
+									</targetPaths>
+									<directory>${environment.dir}/qt/plugins</directory>
+									<preservePath>true</preservePath>
+									<includes>
+										<include>**/${qtplugin1}/**</include>
+										<include>**/${qtplugin2}/**</include>
+										<include>**/${qtplugin3}/**</include>
+									</includes>								
+								</resource>	
+								
+								<!-- for Windows -->
+																										
 								<resource>
 									<targetPath>${project.build.directory}/bin</targetPath>
 									<directory>${environment.dir}/qt/plugins/${arch}</directory>
@@ -250,7 +269,8 @@
 										<include>*/${qtplugin2}/**</include>
 										<include>*/${qtplugin3}/**</include>
 									</includes>										
-								</resource>																			
+								</resource>																		
+
 								<resource>
 									<targetPaths>
 										<targetPath>${project.build.directory}/bin/debug</targetPath>
@@ -427,6 +447,9 @@
 										</exec>
 										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
 											<arg line="-a -u *.zip *.a"/>
+										</exec>
+										<exec dir="${libdir}" executable="rm" failifexecutionfails="false">
+											<arg line="*.zip"/>
 										</exec>
 									</target>										
 								</configuration>
