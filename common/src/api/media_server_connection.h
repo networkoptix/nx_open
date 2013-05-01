@@ -163,13 +163,11 @@ public:
     QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
-    void setProxyAddr(const QUrl& apiUrl, const QString &addr, int port);
+    void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
 
-    QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
-
-    int asyncRecordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
+    int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
@@ -180,12 +178,12 @@ public:
      * 
      * \returns                         Request handle.
 	 */
-    int asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
+    int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
      */
-    int getParamList(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
+    int getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
 
 	/** 
 	 * Set \a camera params.
@@ -196,36 +194,36 @@ public:
 	 * 
      * \returns                         Request handle.
 	 */
-    int asyncSetParam(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
+    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
      * \returns                         Http response status (200 in case of success).
      */
-    int setParamList(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
+    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
 
     /** 
      * \returns                         Request handle. 
      */
-    int asyncGetStatistics(QObject *target, const char *slot);
+    int getStatisticsAsync(QObject *target, const char *slot);
 
     // TODO: #GDM consistency! All other methods accept a single SLOT with signature (status, DATA, handle). Use a single slot here too!
-    int asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
                                    QObject *target, const char *slotSuccess, const char *slotError); 
 
-    int asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+    int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
                                 QObject *target, const char *slot);
 
-    int asyncPtzMove(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int asyncPtzStop(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
-    int asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzMoveToAsync(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzGetPosAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
-    int asyncGetStorageSpace(QObject *target, const char *slot);
+    int getStorageSpaceAsync(QObject *target, const char *slot);
 
-    int asyncGetStorageStatus(const QString &storageUrl, QObject *target, const char *slot);
+    int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
-    int asyncGetTime(QObject *target, const char *slot);
+    int getTimeAsync(QObject *target, const char *slot);
 
     QString getUrl() const { return m_url.toString(); }
 
@@ -233,14 +231,11 @@ public:
     static bool connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 protected:
-    QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
+    static QnRequestParamList createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
     static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
     static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 
 private:
-    int recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &timePeriodList, QByteArray &errorString);
-    int asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot);
-
     int sendAsyncRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
     int sendSyncRequest(int object, const QnRequestParamList &params, QVariant *reply);
 

@@ -386,8 +386,7 @@ QnMediaServerConnection::~QnMediaServerConnection() {
     return;
 }
 
-QnRequestParamList QnMediaServerConnection::createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions)
-{
+QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions) {
     QnRequestParamList result;
 
     foreach(QnNetworkResourcePtr netResource, list)
@@ -404,17 +403,8 @@ QnRequestParamList QnMediaServerConnection::createParamList(const QnNetworkResou
     return result;
 }
 
-QnTimePeriodList QnMediaServerConnection::recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions)
-{
-    QnTimePeriodList result;
-    QByteArray errorString;
-    int status = recordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), result, errorString);
-    if (status)
-    {
-        qDebug() << errorString;
-    }
-
-    return result;
+int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot) {
+    return sendAsyncRequest(TimePeriodsObject, createTimePeriodsRequest(list, startTimeMs, endTimeMs, detail, motionRegions), QN_REPLY_TYPE(QnTimePeriodList), target, slot);
 }
 
 QnRequestParamList QnMediaServerConnection::createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params) {
@@ -425,11 +415,11 @@ QnRequestParamList QnMediaServerConnection::createGetParamsRequest(const QnNetwo
     return result;
 }
 
-int QnMediaServerConnection::asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot) {
+int QnMediaServerConnection::getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot) {
     return sendAsyncRequest(GetParamsObject, createGetParamsRequest(camera, keys), QN_REPLY_TYPE(QnStringVariantPairList), target, slot);
 }
 
-int QnMediaServerConnection::getParamList(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply) {
+int QnMediaServerConnection::getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply) {
     return sendSyncRequest(GetParamsObject, createGetParamsRequest(camera, keys), reply);
 }
 
@@ -441,15 +431,15 @@ QnRequestParamList QnMediaServerConnection::createSetParamsRequest(const QnNetwo
     return result;
 }
 
-int QnMediaServerConnection::asyncSetParam(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot) {
+int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot) {
     return sendAsyncRequest(SetParamsObject, createSetParamsRequest(camera, params), QN_REPLY_TYPE(QnStringBoolPairList), target, slot);
 }
 
-int QnMediaServerConnection::setParamList(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply) {
+int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply) {
     return sendSyncRequest(SetParamsObject, createSetParamsRequest(camera, params), reply);
 }
 
-int QnMediaServerConnection::asyncManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+int QnMediaServerConnection::searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
                                                         QObject *target, const char *slotSuccess, const char *slotError){
 
     QnRequestParamList params;
@@ -466,7 +456,7 @@ int QnMediaServerConnection::asyncManualCameraSearch(const QString &startAddr, c
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), QnRequestHeaderList(), params, processor, SLOT(at_searchReplyReceived(QnHTTPRawResponse, int)));
 }
 
-int QnMediaServerConnection::asyncManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
                                                      QObject *target, const char *slot){
     QnRequestParamList params;
 
@@ -483,27 +473,7 @@ int QnMediaServerConnection::asyncManualCameraAdd(const QStringList &urls, const
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/add"), QnRequestHeaderList(), params, processor, SLOT(at_addReplyReceived(QnHTTPRawResponse, int)));
 }
 
-int QnMediaServerConnection::recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &result, QByteArray &errorString)
-{
-    QnHTTPRawResponse response;
-
-    if(QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("RecordedTimePeriods"), QnRequestHeaderList(), params, response)) {
-        errorString = response.errorString;
-        return 1;
-    }
-
-    const QByteArray& reply = response.data;
-    if (reply.startsWith("BIN")) {
-        result.decode((const quint8*) reply.constData()+3, reply.size()-3);
-    } else {
-        qWarning() << "QnMediaServerConnection: unexpected message received.";
-        return -1;
-    }
-
-    return 0;
-}
-
-void QnMediaServerConnection::setProxyAddr(const QUrl& apiUrl, const QString& addr, int port)
+void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
@@ -547,7 +517,7 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_addReplyReceived(const 
     deleteLater();
 }
 
-int QnMediaServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  camera->getPhysicalId());
     params << QnRequestParam("xSpeed",  QString::number(speed.x()));
@@ -559,7 +529,7 @@ int QnMediaServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, co
     return sendAsyncRequest(PtzMoveObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  camera->getPhysicalId());
     params << QnRequestParam("seqId",   sequenceId.toString());
@@ -568,7 +538,7 @@ int QnMediaServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, co
     return sendAsyncRequest(PtzStopObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::asyncPtzMoveTo(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzMoveToAsync(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  camera->getPhysicalId());
     params << QnRequestParam("xPos",    QString::number(pos.x()));
@@ -580,14 +550,14 @@ int QnMediaServerConnection::asyncPtzMoveTo(const QnNetworkResourcePtr &camera, 
     return sendAsyncRequest(PtzSetPositionObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzGetPosAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  camera->getPhysicalId());
 
     return sendAsyncRequest(PtzPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
 }
 
-int QnMediaServerConnection::asyncGetTime(QObject *target, const char *slot) {
+int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     detail::QnMediaServerGetTimeReplyProcessor *processor = new detail::QnMediaServerGetTimeReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QDateTime &, int, int)), target, slot, Qt::QueuedConnection);
 
@@ -611,30 +581,22 @@ void detail::QnMediaServerGetTimeReplyProcessor::at_replyReceived(const QnHTTPRa
     deleteLater();
 }
 
-int QnMediaServerConnection::asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot) {
-    return sendAsyncRequest(TimePeriodsObject, params, QN_REPLY_TYPE(QnTimePeriodList), target, slot);
-}
-
-int QnMediaServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot) {
-    return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), target, slot);
-}
-
-int QnMediaServerConnection::asyncGetStorageSpace(QObject *target, const char *slot) {
+int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {
     return sendAsyncRequest(StorageSpaceObject, QnRequestParamList(), QN_REPLY_TYPE(QnStorageSpaceReply), target, slot);
 }
 
-int QnMediaServerConnection::asyncGetStorageStatus(const QString &storageUrl, QObject *target, const char *slot) {
+int QnMediaServerConnection::getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("path", storageUrl);
 
     return sendAsyncRequest(StorageStatusObject, params, QN_REPLY_TYPE(QnStorageStatusReply), target, slot);
 }
 
-int QnMediaServerConnection::asyncGetStatistics(QObject *target, const char *slot){
+int QnMediaServerConnection::getStatisticsAsync(QObject *target, const char *slot){
     return sendAsyncRequest(StatisticsObject, QnRequestParamList(), QN_REPLY_TYPE(QnStatisticsReply), target, slot);
 }
 
-int QnMediaServerConnection::asyncPtzGetSpaceMapper(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("res_id", camera->getPhysicalId());
 

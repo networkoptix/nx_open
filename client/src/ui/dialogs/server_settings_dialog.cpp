@@ -366,7 +366,7 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 }
 
 void QnServerSettingsDialog::updateFromResources() {
-    m_server->apiConnection()->asyncGetStorageSpace(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     setTableItems(QList<QnStorageSpaceData>());
     m_tableBottomLabel->setText(tr("Loading..."));
 

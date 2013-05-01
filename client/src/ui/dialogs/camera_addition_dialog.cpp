@@ -438,7 +438,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
 
     QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncManualCameraSearch(startAddrStr, endAddrStr, username, password, port,
+    serverConnection->searchCameraAsync(startAddrStr, endAddrStr, username, password, port,
                                                  processor.data(),
                                                  SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
                                                  SLOT(processSearchError(int, const QString &)));
@@ -531,7 +531,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
 
     QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncManualCameraAdd(urls, manufacturers, username, password,
+    serverConnection->addCameraAsync(urls, manufacturers, username, password,
                                               processor.data(), SLOT(processAddReply(int)));
     processor->start();
 

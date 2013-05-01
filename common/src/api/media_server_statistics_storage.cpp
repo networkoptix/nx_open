@@ -65,7 +65,7 @@ void QnMediaServerStatisticsStorage::update() {
             return;
     }
 
-    m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
+    m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
     m_alreadyUpdating = true;
 }
 
