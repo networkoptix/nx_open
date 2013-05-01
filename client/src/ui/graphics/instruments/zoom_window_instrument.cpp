@@ -362,7 +362,7 @@ void ZoomWindowInstrument::updateOverlayVisibility(QnMediaResourceWidget *widget
     } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity | QnResourceWidget::DisplayCrosshair)) {
         visibility = QnResourceWidget::Invisible;
     } else {
-        visibility = QnResourceWidget::AutoVisible;
+        visibility = QnResourceWidget::Visible;
     }
     widget->setOverlayWidgetVisibility(overlayWidget, visibility);
 }

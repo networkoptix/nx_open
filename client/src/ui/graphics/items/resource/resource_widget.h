@@ -70,8 +70,9 @@ public:
     // TODO: #Elric Refactoring needed.
     enum OverlayVisibility {
         Invisible,
-        UserVisible,
+        Visible,
         AutoVisible,
+        UserVisible,
     };
 
     /**

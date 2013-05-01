@@ -752,7 +752,15 @@ void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
         if(overlay.visibility == UserVisible)
             break;
 
-        qreal opacity = overlay.visibility == Invisible ? 0.0 : (m_overlayVisible ? 1.0 : 0.0);
+        qreal opacity;
+        if(overlay.visibility == Invisible) {
+            opacity = 0.0;
+        } else if(overlay.visibility == Visible) {
+            opacity = 1.0;
+        } else {
+            opacity = m_overlayVisible ? 1.0 : 0.0;
+        }
+
         if(animate) {
             opacityAnimator(overlay.widget, 1.0)->animateTo(opacity);
         } else {
