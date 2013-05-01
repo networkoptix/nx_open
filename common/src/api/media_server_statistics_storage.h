@@ -6,7 +6,7 @@
 
 #include <api/media_server_connection.h>
 #include <core/resource/resource_fwd.h>
-#include <api/media_server_statistics_data.h>
+#include <api/model/statistics_reply.h>
 #include <api/media_server_statistics_storage.h>
 
 /**
@@ -59,7 +59,7 @@ private slots:
     /**
      * Private slot for the handling data received from the server.
      */
-    void at_statisticsReceived(int status, const QnStatisticsDataList &data, int updatePeriod, int handle);
+    void at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle);
 
 private:
     bool m_alreadyUpdating;

@@ -5,7 +5,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMetaType>
 
-#include <api/media_server_statistics_data.h>
+#include <api/model/statistics_reply.h>
 
 #include "resource_widget.h"
 

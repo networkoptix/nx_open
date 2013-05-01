@@ -10,9 +10,9 @@
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
+#include <api/model/statistics_reply.h>
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
-#include <api/media_server_statistics_data.h>
 #include <api/media_server_connection.h>
 
 #include <recording/time_period.h>
@@ -78,7 +78,6 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnMessage>();
 
     qRegisterMetaType<QnCamerasFoundInfoList>();
-    qRegisterMetaType<QnStatisticsDataList>();
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<QnPtzSpaceMapper>();
@@ -105,6 +104,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
+    qRegisterMetaType<QnStatisticsReply>();
     
     qn_commonMetaTypes_initialized = true;
 }

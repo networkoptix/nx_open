@@ -2,7 +2,6 @@
 
 #include <QtCore/QTimer>
 
-#include <api/media_server_statistics_data.h>
 #include <api/media_server_statistics_storage.h>
 
 #include <core/resource/media_server_resource.h>
