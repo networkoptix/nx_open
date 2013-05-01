@@ -18,15 +18,23 @@ public:
     virtual ~QnMServerBusinessRuleProcessor();
 
     virtual QString getGuid() const override;
+    
+    /*
+    * How long to keep event log in usecs
+    */
+    void setEventLogPeriod(qint64 periodUsec);
 protected slots:
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res) override;
 private:
     bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
     bool executePanicAction(QnPanicBusinessActionPtr action);
     bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
-    void saveActionToDB(QnAbstractBusinessActionPtr action);
+    bool saveActionToDB(QnAbstractBusinessActionPtr action);
+    bool cleanupEvents();
 private:
     QSqlDatabase m_sdb;
+    qint64 m_lastCleanuptime;
+    qint64 m_eventKeepPeriod;
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

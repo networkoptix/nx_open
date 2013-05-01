@@ -6,32 +6,15 @@
 #include "serverutil.h"
 #include "api/app_server_connection.h"
 #include "core/resource_managment/resource_pool.h"
+#include "utils/common/synctime.h"
 
-void QnMServerBusinessRuleProcessor::saveActionToDB(QnAbstractBusinessActionPtr action)
-{
-    if (!m_sdb.isOpen())
-        return;
-
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count) "
-        "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count);");
-
-    qint64 timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
-
-    insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
-    insQuery.bindValue(":action_type", (int) action->actionType());
-    insQuery.bindValue(":action_params", serializeBusinessParams(action->getParams()));
-    insQuery.bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
-    insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
-    insQuery.bindValue(":toggle_state", (int) action->getToggleState());
-    insQuery.bindValue(":aggregation_count", action->getAggregationCount());
-
-    bool insOK = insQuery.exec();
-    insOK = insOK;
-}
+static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
+static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
-    QnBusinessRuleProcessor()
+    QnBusinessRuleProcessor(),
+    m_lastCleanuptime(0),
+    m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD)
 {
     m_sdb = QSqlDatabase::addDatabase("QSQLITE");
     m_sdb.setDatabaseName(closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")));
@@ -47,6 +30,52 @@ QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
 
 QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 {
+}
+
+void QnMServerBusinessRuleProcessor::setEventLogPeriod(qint64 periodUsec)
+{
+    m_eventKeepPeriod = periodUsec;
+}
+
+bool QnMServerBusinessRuleProcessor::cleanupEvents()
+{
+    bool rez = true;
+
+    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTime - m_lastCleanuptime > EVENTS_CLEANUP_INTERVAL)
+    {
+        m_lastCleanuptime = currentTime;
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp;");
+        delQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch((currentTime - m_eventKeepPeriod)/1000));
+        rez = delQuery.exec();
+    }
+    return rez;
+}
+
+bool QnMServerBusinessRuleProcessor::saveActionToDB(QnAbstractBusinessActionPtr action)
+{
+    if (!m_sdb.isOpen())
+        return false;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count) "
+        "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count);");
+
+    qint64 timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
+
+    insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
+    insQuery.bindValue(":action_type", (int) action->actionType());
+    insQuery.bindValue(":action_params", serializeBusinessParams(action->getParams()));
+    insQuery.bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
+    insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
+    insQuery.bindValue(":toggle_state", (int) action->getToggleState());
+    insQuery.bindValue(":aggregation_count", action->getAggregationCount());
+
+    bool rez = insQuery.exec();
+    if (rez)
+        cleanupEvents();
+    return rez;
 }
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
