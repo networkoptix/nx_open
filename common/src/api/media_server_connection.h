@@ -97,10 +97,12 @@ private:
         T reply;
         if(status == 0) {
             QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
+            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply)) {
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
                 status = 1;
+            }
         } else {
-            qnWarning("Error while processing request: %1.", response.errorString);
+            qnWarning("Error processing request: %1.", response.errorString);
         }
 
         emitFinished(status, reply, handle);
