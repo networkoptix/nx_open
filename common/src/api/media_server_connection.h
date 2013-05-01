@@ -10,11 +10,13 @@
 #include <QtGui/QRegion>
 
 #include <utils/common/request_param.h>
+#include <utils/common/warnings.h>
 #include <utils/common/util.h>
 
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
+#include <api/model/time_reply.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -64,6 +66,7 @@ signals:
     void finished(int status, const QVector3D &reply, int handle);
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
+    void finished(int status, const QnTimeReply &reply, int handle);
 
 private:
     template<class T>
@@ -85,6 +88,22 @@ private:
 
         emit finished(status, handle);
         emit finished(status, m_reply, handle);
+    }
+
+    template<class T>
+    void processJsonReply(const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+
+        T reply;
+        if(status == 0) {
+            QVariantMap map;
+            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
+                status = 1;
+        } else {
+            qnWarning("Error while processing request: %1.", response.errorString);
+        }
+
+        emitFinished(status, reply, handle);
     }
 
 private:
@@ -136,19 +155,6 @@ namespace detail {
         void finishedSearch(const QnCamerasFoundInfoList &);
         void searchError(int, const QString &);
         void finishedAdd(int);
-    };
-
-    class QnMediaServerGetTimeReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-        QnMediaServerGetTimeReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
-    public slots:
-        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
-
-    signals:
-        void finished(int status, const QDateTime &dateTime, int utcOffset, int handle);
     };
 
 } // namespace detail

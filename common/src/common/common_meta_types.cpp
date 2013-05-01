@@ -105,6 +105,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
+    qRegisterMetaType<QnTimeReply>();
     
     qn_commonMetaTypes_initialized = true;
 }

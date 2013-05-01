@@ -32,6 +32,7 @@ namespace {
         ((PtzMoveObject,            "ptz/move"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
+        ((TimeObject,               "gettime"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -181,36 +182,12 @@ QnMediaServerReplyProcessor::~QnMediaServerReplyProcessor() {
 
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
     switch(m_object) {
-    case StorageStatusObject: {
-        int status = response.status;
-
-        QnStorageStatusReply reply;
-        if(status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
-                status = 1;
-        } else {
-            qnWarning("Could not get storage spaces.", response.errorString);
-        }
-
-        emitFinished(status, reply, handle);
+    case StorageStatusObject:
+        processJsonReply<QnStorageStatusReply>(response, handle);
         break;
-    }
-    case StorageSpaceObject: {
-        int status = response.status;
-
-        QnStorageSpaceReply reply;
-        if(response.status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
-                status = 1;
-        } else {
-            qnWarning("Could not get storage spaces: %1.", response.errorString);
-        }
-
-        emitFinished(status, reply, handle);
+    case StorageSpaceObject:
+        processJsonReply<QnStorageSpaceReply>(response, handle);
         break;
-    }
     case TimePeriodsObject: {
         int status = response.status;
 
@@ -230,7 +207,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case StatisticsObject: {
         const QByteArray &data = response.data;
         int status = response.status;
-        int updatePeriod = -1;
         QnStatisticsReply reply;
 
         if(status == 0) {
@@ -289,21 +265,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(status, reply, handle);
         break;
     }
-    case PtzSpaceMapperObject: {
-        int status = response.status;
-
-        QnPtzSpaceMapper reply;
-        if(status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply))
-                status = 1;
-        } else {
-            qnWarning("Could not get ptz space mapper for camera: %1.", response.errorString);
-        }
-
-        emitFinished(status, reply, handle);
+    case PtzSpaceMapperObject:
+        processJsonReply<QnPtzSpaceMapper>(response, handle);
         break;
-    }
     case PtzPositionObject: {
         const QByteArray& data = response.data;
         QVector3D reply;
@@ -357,6 +321,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(response.status, reply, handle);
         break;
     }
+    case TimeObject:
+        processJsonReply<QnTimeReply>(response, handle);
+        break;
     case PtzSetPositionObject:
     case PtzStopObject:
     case PtzMoveObject: {
@@ -558,27 +525,7 @@ int QnMediaServerConnection::ptzGetPosAsync(const QnNetworkResourcePtr &camera, 
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
-    detail::QnMediaServerGetTimeReplyProcessor *processor = new detail::QnMediaServerGetTimeReplyProcessor();
-    connect(processor, SIGNAL(finished(int, const QDateTime &, int, int)), target, slot, Qt::QueuedConnection);
-
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("gettime"), QnRequestHeaderList(), QnRequestParamList(), processor, SLOT(at_replyReceived(QnHTTPRawResponse, int)));
-}
-
-void detail::QnMediaServerGetTimeReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle) {
-    const QByteArray& reply = response.data;
-
-    QDateTime dateTime;
-    int utcOffset = 0;
-
-    if (response.status == 0) {
-        dateTime = QDateTime::fromString(QString::fromLatin1(extractXmlBody(reply, "clock")), Qt::ISODate);
-        utcOffset = QString::fromLatin1(extractXmlBody(reply, "utcOffset")).toInt();
-    } else {
-        qnWarning("Could not get time from media server: %1.", response.errorString);
-    }
-
-    emit finished(response.status, dateTime, utcOffset, handle);
-    deleteLater();
+    return sendAsyncRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {
