@@ -114,7 +114,7 @@ public:
      * @param slot                          SLOT(int status, const QByteArray& data, int handle)
      * @return                              Handle of the request
      */
-    int requestStoredFileAsync(const QString& filename, QObject *target, const char *slot);
+    int requestStoredFileAsync(const QString &filename, QObject *target, const char *slot);
 
     /**
      * @brief addStoredFileAsync            Put new file to EC
@@ -124,66 +124,65 @@ public:
      * @param slot                          SLOT(int status, int handle)
      * @return                              Handle of the request
      */
-    int addStoredFileAsync(const QString& filename, const QByteArray &data, QObject *target, const char *slot);
+    int addStoredFileAsync(const QString &filename, const QByteArray &data, QObject *target, const char *slot);
 
     // Asynchronous API
-    int testConnectionAsync(QObject* target, const char* slot);
-    int connectAsync(QObject* target, const char *slot);
+    int testConnectionAsync(QObject *target, const char *slot);
+    int connectAsync(QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int getBusinessRulesAsync(QObject *target, const char *slot);
-    int getKvPairsAsync(QObject* target, const char* slot);
+    int getKvPairsAsync(QObject *target, const char *slot);
     int getSettingsAsync(QObject *target, const char *slot);
 
-    int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
+    int setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot);
     int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
+    int setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
     int dumpDatabase(QObject *target, const char *slot);
-    int restoreDatabase(const QByteArray& data, QObject *target, const char *slot);
+    int restoreDatabase(const QByteArray &data, QObject *target, const char *slot);
 
-    // Returns request id
-    int saveAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
-    int saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot);
+    int saveAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    int saveAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
+    int saveAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
+    int saveAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
+    int saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot);
 
-    int saveAsync(const QnLayoutResourceList&, QObject*, const char*);
-    int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
+    int saveAsync(const QnLayoutResourceList &resources, QObject *target, const char *slot);
+    int saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot);
 
-    int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
-    int addLicensesAsync(const QList<QnLicensePtr>& licenses, QObject* target, const char* slot);
+    int saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
+    int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
 
-    int saveAsync(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QObject* target, const char* slot);
-    int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/);
+    int saveAsync(const QnResourcePtr &resource, const QnKvPairList &kvPairs, QObject *target, const char *slot);
+    int saveSettingsAsync(const QnKvPairList& kvPairs/*, QObject* target, const char* slot*/); // TODO: #GDM? why object-slot are commented out?
 
-    int deleteAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
-    int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
-    int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
-    int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    int deleteAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
+    int deleteAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
+    int deleteAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
 
-    int deleteRuleAsync(int ruleId, QObject* target, const char* slot);
+    int deleteRuleAsync(int ruleId, QObject *target, const char *slot);
 
-    int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
+    int deleteAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
 
-    int broadcastBusinessAction(const QnAbstractBusinessActionPtr& businessAction, QObject *target, const char *slot);
+    int broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot);
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory &resourceFactory, QnApiSerializer &serializer, const QString &guid, const QString &authKey);
 
-    int connectAsync_i(const QnRequestHeaderList& headers, const QnRequestParamList& params, QObject* target, const char *slot);
+    int connectAsync_i(const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot);
 
-    int getResourcesAsync(const QString& args, int object, QObject *target, const char *slot);
+    int getResourcesAsync(const QString &args, int object, QObject *target, const char *slot);
 
-    int getObjectsAsync(int object, const QString& args, QObject* target, const char* slot);
-    int getObjects(int object, const QString& args, QnHTTPRawResponse& response);
+    int getObjectsAsync(int object, const QString &args, QObject *target, const char *slot);
+    int getObjects(int object, const QString &args, QnHTTPRawResponse &response);
 
-    int addObjectAsync(int object, const QByteArray& data, QObject* target, const char* slot);
-    int addObject(int object, const QByteArray& body, QnHTTPRawResponse &response);
+    int addObjectAsync(int object, const QByteArray &data, QObject *target, const char *slot);
+    int addObject(int object, const QByteArray &body, QnHTTPRawResponse &response);
 
-    int deleteObjectAsync(int object, int id, QObject* target, const char* slot);
+    int deleteObjectAsync(int object, int id, QObject *target, const char *slot);
 
 private:
     // By now this is used only by synchronous api.
@@ -204,6 +203,7 @@ private:
     friend class QnAppServerConnectionFactory;
 };
 
+
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
@@ -217,12 +217,12 @@ public:
     static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
-    static void setDefaultFactory(QnResourceFactory*);
+    static void setDefaultFactory(QnResourceFactory *);
     static void setDefaultMediaProxyPort(int port);
-    static void setCurrentVersion(const QString& version);
+    static void setCurrentVersion(const QString &version);
 
     static QnAppServerConnectionPtr createConnection();
-    static QnAppServerConnectionPtr createConnection(const QUrl& url);
+    static QnAppServerConnectionPtr createConnection(const QUrl &url);
 
 private:
     QMutex m_mutex;

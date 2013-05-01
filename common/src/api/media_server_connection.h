@@ -162,6 +162,7 @@ public:
     void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
+    QString getUrl() const { return m_url.toString(); }
 
     int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
@@ -216,8 +217,6 @@ public:
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
     int getTimeAsync(QObject *target, const char *slot);
-
-    QString getUrl() const { return m_url.toString(); }
 
     using base_type::connect;
     static bool connect(QnMediaServerReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
