@@ -59,6 +59,20 @@ namespace BusinessActionType {
     }
 }
 
+namespace QnBusinessActionRuntime {
+
+    static QLatin1String resourceIdStr("actionResourceId");
+
+    int getActionResourceId(const QnBusinessParams &params) {
+        return params.value(resourceIdStr).toInt();
+    }
+
+    void setActionResourceId(QnBusinessParams* params, int value) {
+        (*params)[resourceIdStr] = value;
+    }
+
+}
+
 QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessParams& runtimeParams):
     m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 

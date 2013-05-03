@@ -29,3 +29,7 @@ message BusinessAction {
     optional ToggleStateType toggleState   = 6;
     optional int32 aggregationCount        = 7;
 }
+
+message BusinessActionList {
+    repeated BusinessAction businessAction = 1;
+}

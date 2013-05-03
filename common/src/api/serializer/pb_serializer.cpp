@@ -41,6 +41,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
+void parseBusinessActionList(QList<QnAbstractBusinessActionPtr>& businessActionList, const pb::BusinessActionList& pb_businessActionList);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
@@ -818,6 +819,18 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
     parseBusinessAction(businessAction, pb_businessAction);
 }
 
+void QnApiPbSerializer::deserializeBusinessActionList(QList<QnAbstractBusinessActionPtr>& businessActionList, const QByteArray& data)
+{
+    pb::BusinessActionList pb_businessActionList;
+    if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
+    {
+        QByteArray errorString;
+        errorString = "QnAbstractBusinessAction::fromByteArray(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+    parseBusinessActionList(businessActionList, pb_businessActionList);
+}
+
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)
 {
     pb::Resources pb_cameras;
@@ -1019,6 +1032,31 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
     data = QByteArray(str.data(), (int) str.length());
 }
 
+void QnApiPbSerializer::serializeBusinessActionList(const QList<QnAbstractBusinessActionPtr> &actions, QByteArray &data)
+{
+    pb::BusinessActionList pb_businessActionList;
+
+    for (int i = 0; i < actions.size(); ++i)
+    {
+        pb::BusinessAction* ba = pb_businessActionList.add_businessaction();
+        ba->set_actiontype((pb::BusinessActionType) serializeBusinessActionType(actions[i]->actionType()));
+        foreach(QnResourcePtr res, actions[i]->getResources()) {
+            if (res)
+                ba->add_actionresource(res->getId());
+        }
+        ba->set_actionparams(serializeBusinessParams(actions[i]->getParams()));
+        ba->set_runtimeparams(serializeBusinessParams(actions[i]->getRuntimeParams()));
+        ba->set_businessruleid(actions[i]->getBusinessRuleId().toInt());
+        ba->set_togglestate((pb::ToggleStateType) actions[i]->getToggleState());
+        ba->set_aggregationcount(actions[i]->getAggregationCount());
+
+    }
+
+    std::string str;
+    pb_businessActionList.SerializeToString(&str);
+    data = QByteArray(str.data(), (int) str.length());
+}
+
 void QnApiPbSerializer::serializeKvPair(const QnKvPair& kvPair, QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
@@ -1188,6 +1226,33 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
     businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
     businessAction->setAggregationCount(pb_businessAction.aggregationcount());
+}
+
+void parseBusinessActionList(QList<QnAbstractBusinessActionPtr>& businessActionList, const pb::BusinessActionList& pb_businessActionList)
+{
+    for (int i = 0; i < pb_businessActionList.businessaction_size(); ++i)
+    {
+        const pb::BusinessAction& pb_businessAction = pb_businessActionList.businessaction(i);
+
+        QnBusinessParams runtimeParams;
+        if (pb_businessAction.has_runtimeparams())
+            runtimeParams = deserializeBusinessParams(pb_businessAction.runtimeparams().c_str());
+        QnAbstractBusinessActionPtr businessAction = QnBusinessActionFactory::createAction(
+            parsePbBusinessActionType(pb_businessAction.actiontype()),
+            runtimeParams);
+
+        QnResourceList resources;
+        for (int i = 0; i < pb_businessAction.actionresource_size(); i++) //destination resource can belong to another server
+            resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
+        businessAction->setResources(resources);
+
+        businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
+        businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
+        businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
+        businessAction->setAggregationCount(pb_businessAction.aggregationcount());
+
+        businessActionList << businessAction;
+    }
 }
 
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)

@@ -57,6 +57,12 @@ namespace BusinessActionType
 class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 
+
+namespace QnBusinessActionRuntime {
+    int getActionResourceId(const QnBusinessParams &params);
+    void setActionResourceId(QnBusinessParams* params, int value);
+}
+
 /*
 * Base class for business actions
 */
