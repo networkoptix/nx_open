@@ -1,5 +1,9 @@
 
-set TARGET_DIR=nx_sdk
+set SDK_NAME=nx_sdk
+set TARGET_DIR=%SDK_NAME%
+
+rmdir /S /Q %TARGET_DIR%
+
 mkdir %TARGET_DIR%
 mkdir %TARGET_DIR%\include\
 mkdir %TARGET_DIR%\include\plugins\
@@ -28,3 +32,4 @@ set CUR_DIR_BAK=%~dp0
 cd %TARGET_DIR%\sample\axiscamplugin\
 doxygen
 cd %CUR_DIR_BAK%
+del /F /Q %TARGET_DIR%\sample\axiscamplugin\Doxyfile
