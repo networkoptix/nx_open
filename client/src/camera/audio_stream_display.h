@@ -10,7 +10,7 @@ class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
 
 /*!
-    \note On source data end \a flush method MUST be called to avoid media data loss
+    \note On source data end \a playCurrentBuffer method MUST be called to avoid media data loss
 */
 class QnAudioStreamDisplay : public QObject
 {
@@ -45,12 +45,10 @@ public:
 
     bool isDownmixForced() const { return m_forceDownmix; }
 
+    //!Plays current buffer to the end
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
-
-    //!Plays current buffer to the end
-    void flush();
 
 private:
     int msInQueue() const;
