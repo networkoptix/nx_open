@@ -197,3 +197,6 @@ appserver/hostedfiles/*
 
 genericrtspplugin/x86
 genericrtspplugin/x64
+
+
+nx_sdk/nx_sdk 
