@@ -223,6 +223,9 @@ namespace {
     const int legendImgSize = 20;
     const int legendFontSize = 20;
     const int itemSpacing = 2;
+
+    const char *buttonBarPropertyName = "_qn_buttonBarPropertyName";
+
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
@@ -381,10 +384,12 @@ protected:
         QMap<QString, qreal> displayValues;
         qreal maxNetworkValue = 0.0;
         foreach(QString key, m_widget->m_sortedKeys) {
-            if (!m_widget->m_checkedFlagByKey.value(key, true))
+            QnStatisticsData &stats = m_widget->m_history[key];
+
+            LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+            if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                 continue;
 
-            QnStatisticsData &stats = m_widget->m_history[key];
             if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
                 maxNetworkValue = qMax(maxNetworkValue, maxValue(stats.values));
         }
@@ -408,10 +413,12 @@ protected:
             graphPen.setCapStyle(Qt::FlatCap);
 
             foreach(QString key, m_widget->m_sortedKeys) {
-                if (!m_widget->m_checkedFlagByKey.value(key, true))
+                QnStatisticsData &stats = m_widget->m_history[key];
+                LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+
+                if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                     continue;
 
-                QnStatisticsData &stats = m_widget->m_history[key];
                 QLinkedList<qreal> values = stats.values;
                 if (stats.deviceType == NETWORK_IN || stats.deviceType == NETWORK_OUT)
                     values = scaledNetworkValues(values, networkUpperBound);
@@ -424,7 +431,7 @@ protected:
             }
         }
 
-        /* Draw frame and legend */
+        /* Draw frame and numeric values */
         {
             QnScopedPainterPenRollback penRollback(painter);
             Q_UNUSED(penRollback)
@@ -445,7 +452,10 @@ protected:
                 qreal xRight = offsetX + ow + itemSpacing*2;
                 qreal xLeft  = itemSpacing;
                 foreach(QString key, m_widget->m_sortedKeys) {
-                    if (!m_widget->m_checkedFlagByKey.value(key, true))
+                    QnStatisticsData &stats = m_widget->m_history[key];
+                    LegendButtonBar bar = m_widget->buttonBarByDeviceType(stats.deviceType);
+
+                    if (!m_widget->m_checkedFlagByKey[bar].value(key, true))
                         continue;
 
                     qreal interValue = displayValues[key];
@@ -453,7 +463,7 @@ protected:
                         continue;
                     qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
 
-                    QnStatisticsData &stats = m_widget->m_history[key];
+
                     main_pen.setColor(getDeviceColor(stats.deviceType, key));
                     painter->setPen(main_pen);
 
@@ -489,9 +499,11 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
-    m_maxMaskUsed(1),
     m_infoOpacity(0.0)
 {
+    for (int i = 0; i < ButtonBarCount; i++)
+        m_maxMaskUsed[i] = 1;
+
     m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
@@ -578,15 +590,8 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 }
 
 void QnServerResourceWidget::addOverlays() {
-    m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Horizontal);
-    connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
 
-    QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    legendOverlayHLayout->addStretch();
-    legendOverlayHLayout->addItem(m_legendButtonBar);
-    m_legendButtonBar->setOpacity(m_infoOpacity);
-    legendOverlayHLayout->addStretch();
+
 
     StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
     statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
@@ -595,7 +600,20 @@ void QnServerResourceWidget::addOverlays() {
     mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
     mainOverlayLayout->setSpacing(0.5);
     mainOverlayLayout->addItem(statisticsOverlayWidget);
-    mainOverlayLayout->addItem(legendOverlayHLayout);
+
+    for (int i = 0; i < ButtonBarCount; i++) {
+        m_legendButtonBar[i] = new QnImageButtonBar(this, 0, Qt::Horizontal);
+        connect(m_legendButtonBar[i], SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
+        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+        m_legendButtonBar[i]->setProperty(buttonBarPropertyName, i);
+
+        QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+        legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+        legendOverlayHLayout->addStretch();
+        legendOverlayHLayout->addItem(m_legendButtonBar[i]);
+        legendOverlayHLayout->addStretch();
+        mainOverlayLayout->addItem(legendOverlayHLayout);
+    }
 
     QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
     mainOverlayWidget->setLayout(mainOverlayLayout);
@@ -604,32 +622,54 @@ void QnServerResourceWidget::addOverlays() {
     addOverlayWidget(mainOverlayWidget, UserVisible, true);
 }
 
+LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const {
+    switch(deviceType) {
+    case NETWORK_IN:
+        return NetworkInButtonBar;
+    case NETWORK_OUT:
+        return NetworkOutButtonBar;
+    default:
+        break;
+    }
+    return CommonButtonBar;
+}
+
 void QnServerResourceWidget::updateLegend() {
-    int visibleMask = 0;
-    int checkedMask = 0;
+    int visibleMask[ButtonBarCount];
+    int checkedMask[ButtonBarCount];
+    for (int i = 0; i < ButtonBarCount; i++) {
+        visibleMask[i] = 0;
+        checkedMask[i] = 0;
+    }
 
     foreach (QString key, m_sortedKeys) {
+        QnStatisticsData &stats = m_history[key];
+
+        LegendButtonBar bar = buttonBarByDeviceType(stats.deviceType);
         int mask;
-        if (!m_buttonMaskByKey.contains(key)) {
-            mask = m_maxMaskUsed;
-            m_maxMaskUsed *= 2;
-            m_buttonMaskByKey[key] = mask;
+        if (!m_buttonMaskByKey[bar].contains(key)) {
+            mask = m_maxMaskUsed[bar];
+            m_maxMaskUsed[bar] *= 2;
+            m_buttonMaskByKey[bar][key] = mask;
         } else {
-            mask = m_buttonMaskByKey[key];
+            mask = m_buttonMaskByKey[bar][key];
         }
-        visibleMask |= mask;
+        visibleMask[bar] |= mask;
 
-        if (!m_legendButtonBar->button(mask)) {
-            QnStatisticsData &stats = m_history[key];
-            m_legendButtonBar->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
+        if (!m_legendButtonBar[bar]->button(mask)) {
+            m_legendButtonBar[bar]->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
         }
 
-        bool checked =  m_checkedFlagByKey.value(key, true);
+        bool checked =  m_checkedFlagByKey[bar].value(key, true);
         if (checked)
-            checkedMask |= mask;
+            checkedMask[bar] |= mask;
     }
-    m_legendButtonBar->setCheckedButtons(checkedMask);
-    m_legendButtonBar->setVisibleButtons(visibleMask);
+
+    for (int i = 0; i < ButtonBarCount; i++) {
+        m_legendButtonBar[i]->setCheckedButtons(checkedMask[i]);
+        m_legendButtonBar[i]->setVisibleButtons(visibleMask[i]);
+    }
+
 }
 
 
@@ -694,16 +734,19 @@ void QnServerResourceWidget::at_statistics_received() {
 }
 
 void QnServerResourceWidget::at_legend_checkedButtonsChanged() {
-    int checkedMask = m_legendButtonBar->checkedButtons();
+    LegendButtonBar bar = (LegendButtonBar)sender()->property(buttonBarPropertyName).toInt();
+
+    int checkedMask = m_legendButtonBar[bar]->checkedButtons();
     foreach (QString key, m_sortedKeys) {
-        if (!m_buttonMaskByKey.contains(key))
+        if (!m_buttonMaskByKey[bar].contains(key))
             continue;
-        int mask = m_buttonMaskByKey[key];
-        m_checkedFlagByKey[key] = ((checkedMask & mask) > 0);
+        int mask = m_buttonMaskByKey[bar][key];
+        m_checkedFlagByKey[bar][key] = ((checkedMask & mask) > 0);
     }
 }
 
 void QnServerResourceWidget::at_headerOverlayWidget_opacityChanged(const QVariant &value) {
     m_infoOpacity = value.toDouble();
-    m_legendButtonBar->setOpacity(m_infoOpacity);
+    for (int i = 0; i < ButtonBarCount; i++)
+        m_legendButtonBar[i]->setOpacity(m_infoOpacity);
 }
