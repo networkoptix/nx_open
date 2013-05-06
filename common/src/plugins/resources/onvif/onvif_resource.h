@@ -268,6 +268,8 @@ protected:
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
 
+    qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
+    int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
 private slots:
     void onRenewSubscriptionTimer();
 
