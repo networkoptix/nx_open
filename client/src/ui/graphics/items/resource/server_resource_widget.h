@@ -13,6 +13,14 @@ class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
 
+enum LegendButtonBar {
+    CommonButtonBar,
+    NetworkOutButtonBar,
+    NetworkInButtonBar,
+
+    ButtonBarCount
+};
+
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT
 
@@ -56,6 +64,8 @@ private:
 
     void addOverlays();
 
+    LegendButtonBar buttonBarByDeviceType(const QnStatisticsDeviceType deviceType) const;
+
     void updateLegend();
 
 private:
@@ -89,6 +99,9 @@ private:
     /** Number of data points displayed simultaneously. */
     int m_pointsLimit;
 
+    /** Period of updating data from the server in milliseconds. */
+    qreal m_updatePeriod;
+
     /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
 
@@ -98,15 +111,19 @@ private:
     /** Helper for the background painting. */
     QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
 
-    QnImageButtonBar *m_legendButtonBar;
+    /** Button bars with corresponding buttons */
+    QnImageButtonBar* m_legendButtonBar[ButtonBarCount];
 
-    QHash<QString, bool> m_checkedFlagByKey;
-    QHash<QString, int> m_buttonMaskByKey;
-    int m_maxMaskUsed;
+    /** Which buttons are checked on each button bar */
+    QHash<QString, bool> m_checkedFlagByKey[ButtonBarCount];
+
+    /** Masks to get corresponding button from button bar */
+    QHash<QString, int> m_buttonMaskByKey[ButtonBarCount];
+
+    /** Mask generate variables */
+    int m_maxMaskUsed[ButtonBarCount];
+
     qreal m_infoOpacity;
-
-    /** Period of updating data from the server in milliseconds. */
-    qreal m_updatePeriod;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)
