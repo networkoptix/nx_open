@@ -23,7 +23,6 @@ public:
      */
     QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent);
 
-    // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
      *  Register the consumer object (usually widget).
      *
@@ -44,6 +43,7 @@ public:
 
     /** Data update period. Is taken from the server's response. */
     int updatePeriod() const;
+
 signals:
     /**
      * Signal emitted when new data is received.

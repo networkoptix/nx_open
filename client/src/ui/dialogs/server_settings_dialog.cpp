@@ -216,7 +216,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
-    m_tableBottomLabel(NULL),
     m_hasStorageChanges(false)
 {
     ui->setupUi(this);
@@ -278,7 +277,7 @@ void QnServerSettingsDialog::reject() {
 }
 
 void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
-    int row = ui->storagesTable->rowCount() - 1;
+    int row = dataRowCount();
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
@@ -318,21 +317,18 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 }
 
 void QnServerSettingsDialog::setTableItems(const QList<QnStorageSpaceData> &items) {
+    QString bottomLabelText = this->bottomLabelText();
+    
     ui->storagesTable->setRowCount(0);
-    ui->storagesTable->insertRow(0);
-    ui->storagesTable->setSpan(0, 0, 1, 4);
-    m_tableBottomLabel = new QLabel();
-    m_tableBottomLabel->setAlignment(Qt::AlignCenter);
-    connect(m_tableBottomLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_tableBottomLabel_linkActivated()));
-    ui->storagesTable->setCellWidget(0, 0, m_tableBottomLabel);
-
     foreach(const QnStorageSpaceData &item, items)
         addTableItem(item);
+
+    setBottomLabelText(bottomLabelText);
 }
 
 QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
     QnStorageSpaceData result;
-    if(row < 0 || row >= ui->storagesTable->rowCount() - 1)
+    if(row < 0 || row >= dataRowCount())
         return result;
 
     QTableWidgetItem *checkBoxItem = ui->storagesTable->item(row, CheckBoxColumn);
@@ -360,7 +356,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
 QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     QList<QnStorageSpaceData> result;
-    for(int row = 0; row < ui->storagesTable->rowCount() - 1; row++)
+    for(int row = 0; row < dataRowCount(); row++)
         result.push_back(tableItem(row));
     return result;
 }
@@ -368,7 +364,7 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 void QnServerSettingsDialog::updateFromResources() {
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     setTableItems(QList<QnStorageSpaceData>());
-    m_tableBottomLabel->setText(tr("Loading..."));
+    setBottomLabelText(tr("Loading..."));
 
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
@@ -414,6 +410,59 @@ void QnServerSettingsDialog::submitToResources() {
     }
 
     m_server->setName(ui->nameLineEdit->text());
+}
+
+void QnServerSettingsDialog::setBottomLabelText(const QString &text) {
+    bool hasLabel = dataRowCount() != ui->storagesTable->rowCount();
+
+    if(!text.isEmpty()) {
+        if(!hasLabel) {
+            QLabel *tableBottomLabel = new QLabel();
+            tableBottomLabel->setAlignment(Qt::AlignCenter);
+            connect(tableBottomLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(at_tableBottomLabel_linkActivated()));
+
+            int row = ui->storagesTable->rowCount();
+            ui->storagesTable->insertRow(row);
+            ui->storagesTable->setSpan(row, 0, 1, ColumnCount);
+            ui->storagesTable->setCellWidget(row, 0, tableBottomLabel);
+
+            m_tableBottomLabel = tableBottomLabel;
+        }
+
+        m_tableBottomLabel.data()->setText(text);
+    } else {
+        if(!hasLabel)
+            return;
+
+        ui->storagesTable->setRowCount(ui->storagesTable->rowCount() - 1);
+    }
+}
+
+QString QnServerSettingsDialog::bottomLabelText() const {
+    bool hasLabel = dataRowCount() != ui->storagesTable->rowCount();
+
+    if(hasLabel && m_tableBottomLabel) {
+        return m_tableBottomLabel.data()->text();
+    } else {
+        return QString();
+    }
+}
+
+int QnServerSettingsDialog::dataRowCount() const {
+    int rowCount = ui->storagesTable->rowCount();
+    if(rowCount == 0)
+        return rowCount;
+    
+    if(!m_tableBottomLabel)
+        return rowCount;
+
+    /* Label could not yet be deleted even if the corresponding row is already removed,
+     * so we have to check that it's there. */
+    QWidget *cellWidget = ui->storagesTable->cellWidget(rowCount - 1, 0);
+    if(cellWidget)
+        return rowCount - 1;
+
+    return rowCount;
 }
 
 
@@ -462,7 +511,7 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
 
 void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceReply &reply, int) {
     if(status != 0) {
-        m_tableBottomLabel->setText(tr("Could not load storages from server."));
+        setBottomLabelText(tr("Could not load storages from server."));
         return;
     }
 
@@ -496,7 +545,11 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
     setTableItems(items);
 
     m_storageProtocols = reply.storageProtocols;
-    m_tableBottomLabel->setText(tr("<a href='1'>Add external Storage...</a>"));
+    if(m_storageProtocols.isEmpty()) {
+        setBottomLabelText(QString());
+    } else {
+        setBottomLabelText(tr("<a href='1'>Add external Storage...</a>"));
+    }
 
     m_hasStorageChanges = false;
 }
