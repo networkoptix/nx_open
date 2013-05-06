@@ -147,6 +147,7 @@ namespace {
 
     const qreal lineCommentTopMargin = -0.20;
     const qreal lineCommentBottomMargin = 0.05;
+    const qreal lineBarMinChunkSize = 0.5;
 
 
     /* Thumbnails bar. */
@@ -1134,14 +1135,14 @@ void QnTimeSlider::updateAggregationValue() {
 
     /* Aggregate to half-pixels. */
     qreal aggregationMSecs = m_msecsPerPixel / 2.0;
-    // calculate only once presuming current value is the same on all lines
+    
+    /* Calculate only once presuming current value is the same on all lines. */
     qreal oldAggregationMSecs = m_lineData[0].timeStorage.aggregationMSecs();
     if(oldAggregationMSecs / 2.0 < aggregationMSecs && aggregationMSecs < oldAggregationMSecs * 2.0)
         return;
 
-    for(int line = 0; line < m_lineCount; line++){
+    for(int line = 0; line < m_lineCount; line++)
         m_lineData[line].timeStorage.setAggregationMSecs(aggregationMSecs);
-    }
 }
 
 void QnTimeSlider::updateTotalLineStretch() {
@@ -1478,15 +1479,21 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
             bestIndex = Qn::TimePeriodContentCount;
         }
 
+        // TODO: draw fixed minwidth with opacity, store current adjusted left/right pos?
+
         qreal leftPos = quickPositionFromValue(value);
         qreal rightPos = quickPositionFromValue(bestValue);
-        if(rightPos <= centralPos) {
-            painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), pastColor[bestIndex]);
-        } else if(leftPos >= centralPos) {
-            painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), futureColor[bestIndex]);
-        } else {
-            painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastColor[bestIndex]);
-            painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureColor[bestIndex]);
+        if(bestIndex != Qn::MotionContent || rightPos - leftPos > lineBarMinChunkSize || bestValue == maximumValue) {
+            if(rightPos <= centralPos) {
+                painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), pastColor[bestIndex]);
+            } else if(leftPos >= centralPos) {
+                painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), futureColor[bestIndex]);
+            } else {
+                painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastColor[bestIndex]);
+                painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureColor[bestIndex]);
+            }
+
+            value = bestValue;
         }
         
         for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
@@ -1497,8 +1504,6 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 pos[i]++;
             inside[i] = !inside[i];
         }
-
-        value = bestValue;
     }
 }
 
@@ -1711,9 +1716,6 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
     QRectF rect;
     drawCroppedImage(painter, targetRect, boundingRect, image, image.rect(), &rect);
 
-    //QPixmap pixmap = QPixmap::fromImage(image);
-    //drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect(), &rect);
-
     if(!rect.isEmpty()) {
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
@@ -1733,6 +1735,7 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
     }
     painter->setOpacity(opacity);
 }
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

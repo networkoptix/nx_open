@@ -15,8 +15,10 @@ public:
     void setPeriods( Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods );
     void setAggregationMSecs(int value);
     int aggregationMSecs() const;
+
 protected:
-    void updateAggregated(Qn::TimePeriodContent type);    
+    void updateAggregated(Qn::TimePeriodContent type);
+
 private:
     QnTimePeriodList m_normalPeriods[Qn::TimePeriodContentCount];
     QnTimePeriodList m_aggregatedPeriods[Qn::TimePeriodContentCount];
