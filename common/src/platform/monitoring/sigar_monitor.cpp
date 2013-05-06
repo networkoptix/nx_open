@@ -262,8 +262,15 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     if(INVOKE(sigar_net_interface_list_get(d->sigar, &networkInterfaces)) != SIGAR_OK)
         return result;
 
+    QStringList interfacesNames;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
+        
+        // remove duplicating entries
+        if (interfacesNames.contains(interfaceName))
+            continue;
+        interfacesNames.append(interfaceName);
+
         result.push_back(d->networkLoad(interfaceName));
     }
 
