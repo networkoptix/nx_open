@@ -160,7 +160,7 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
-        return true;
+        return false;
     else if (s1.isH264 && !s2.isH264)
         return true;
 
@@ -1344,6 +1344,45 @@ bool QnPlOnvifResource::isH264Allowed() const
     //return !blockH264;
 }
 
+qreal QnPlOnvifResource::getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const
+{
+    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    QSize secondaryRes = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, aspectRatio, maxSquare, resList);
+    if (secondaryRes == EMPTY_RESOLUTION_PAIR)
+        secondaryRes = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSquare, resList);
+
+    qreal secResSquare = SECONDARY_STREAM_DEFAULT_RESOLUTION.width() * SECONDARY_STREAM_DEFAULT_RESOLUTION.height();
+    qreal findResSquare = secondaryRes.width() * secondaryRes.height();
+    if (findResSquare > secResSquare)
+        return findResSquare / secResSquare;
+    else
+        return secResSquare / findResSquare;
+}
+
+int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const
+{
+    if (optList.size() < 2 || optList[0].resolutions.isEmpty())
+        return 1; // default value
+
+    qreal bestResCoeff = INT_MAX;
+    int bestResIndex = 1;
+    bool bestIsH264 = false;
+
+    qreal aspectRation = (qreal) optList[0].resolutions[0].width() / (qreal) optList[0].resolutions[0].height();
+
+    for (int i = 1; i < optList.size(); ++i)
+    {
+        qreal resCoeff = getBestSecondaryCoeff(optList[i].resolutions, aspectRation);
+        if (resCoeff < bestResCoeff || resCoeff == bestResCoeff && optList[i].isH264) {
+            bestResCoeff = resCoeff;
+            bestResIndex = i;
+            bestIsH264 = optList[i].isH264;
+        }
+    }
+
+    return bestResIndex;
+}
+
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
@@ -1450,7 +1489,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     bool dualStreamingAllowed = optionsList.size() >= 2;
     if (dualStreamingAllowed)
     {
-        int secondaryIndex = 1;
+        int secondaryIndex = getSecondaryIndex(optionsList);
         QMutexLocker lock(&m_mutex);
 
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;

@@ -134,8 +134,8 @@ BUGS FIXED:
  - Fixed a bug with incorrect selection on Time Line if select a range for several items simultaneously 
  - If more than 64 cameras are being recorded and in the same time opened for viewing, Linux Media Server could crash. Fixed
  - Arecont Vision panoramic cameras now work at full resolutuion. It used to work in quarter resolution if medium or low quality was pulled
- - Areconnt Vision Spartan 6 integration is improved
- - Areconnt FPS jumping issue is fixed
+ - Resolved all issues with Arecont Spartan-6
+ - Arecont FPS jumping issue is fixed
  - If an error is returned from EC, the client displayed EC password in the error message. Fixed
  
 ----------------------------------------------- 1.4 Patch -----------------------------------------------
