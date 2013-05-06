@@ -64,6 +64,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
     data.zoomRect = zoomRect();
+    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.dataByRole = m_dataByRole;
 
     return data;
@@ -107,6 +108,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.flags = flags();
     data.rotation = rotation();
     data.zoomRect = zoomRect();
+    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
     data.combinedGeometry = combinedGeometry();
     data.dataByRole = m_dataByRole;
 }

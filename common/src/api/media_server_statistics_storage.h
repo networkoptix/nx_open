@@ -6,7 +6,7 @@
 
 #include <api/media_server_connection.h>
 #include <core/resource/resource_fwd.h>
-#include <api/media_server_statistics_data.h>
+#include <api/model/statistics_reply.h>
 #include <api/media_server_statistics_storage.h>
 
 /**
@@ -23,7 +23,6 @@ public:
      */
     QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent);
 
-    // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
      *  Register the consumer object (usually widget).
      *
@@ -44,6 +43,7 @@ public:
 
     /** Data update period. Is taken from the server's response. */
     int updatePeriod() const;
+
 signals:
     /**
      * Signal emitted when new data is received.
@@ -59,7 +59,7 @@ private slots:
     /**
      * Private slot for the handling data received from the server.
      */
-    void at_statisticsReceived(int status, const QnStatisticsDataList &data, int updatePeriod, int handle);
+    void at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle);
 
 private:
     bool m_alreadyUpdating;

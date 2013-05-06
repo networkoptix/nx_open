@@ -12,7 +12,6 @@
 
 #include <api/media_server_connection.h>
 #include <api/media_server_statistics_manager.h>
-#include <api/media_server_statistics_data.h>
 
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>

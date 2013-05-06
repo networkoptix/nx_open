@@ -2,7 +2,6 @@
 
 #include <QtCore/QTimer>
 
-#include <api/media_server_statistics_data.h>
 #include <core/resource/media_server_resource.h>
 
 #include <utils/common/synctime.h>
@@ -66,11 +65,11 @@ void QnMediaServerStatisticsStorage::update() {
             return;
     }
 
-    m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(int, const QnStatisticsDataList &, int, int)));
+    m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
     m_alreadyUpdating = true;
 }
 
-void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsDataList &data, int updatePeriod, int handle) {
+void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle) {
     Q_UNUSED(handle)
     if(status != 0)
         return;
@@ -78,8 +77,8 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
-    if (updatePeriod > 0 && m_updatePeriod != updatePeriod) {
-        m_updatePeriod = updatePeriod;
+    if (reply.updatePeriod > 0 && m_updatePeriod != reply.updatePeriod) {
+        m_updatePeriod = reply.updatePeriod;
         m_timer->stop();
         m_timer->start(m_updatePeriod);
     }
@@ -88,7 +87,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
     foreach(QString key, m_history.keys())
         notUpdated << key;
 
-    foreach(const QnStatisticsDataItem &nextData, data) {
+    foreach(const QnStatisticsDataItem &nextData, reply.statistics) {
         QString id = nextData.description;
         QnStatisticsData &stats = m_history[id];
         stats.deviceType = nextData.deviceType;

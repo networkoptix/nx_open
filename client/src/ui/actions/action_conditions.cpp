@@ -427,3 +427,21 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     }
     return Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        if(resource->hasFlags(QnResource::media) || resource->hasFlags(QnResource::server))
+            return Qn::EnabledAction;
+
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    foreach(const QnLayoutItemIndex &index, layoutItems) {
+        QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
+        if(qFuzzyCompare(itemData.zoomRect, QRectF(0.0, 0.0, 1.0, 1.0)))
+            return QnActionCondition::check(layoutItems);
+    }
+
+    return Qn::InvisibleAction;
+}

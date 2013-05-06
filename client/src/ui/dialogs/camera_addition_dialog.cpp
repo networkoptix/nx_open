@@ -263,6 +263,7 @@ bool QnCameraAdditionDialog::ensureServerOnline() {
     return false;
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -416,7 +417,6 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
 
     clearTable();
     ui->scanButton->setEnabled(false);
-
     ui->startIPLineEdit->setEnabled(false);
     ui->cameraIpLineEdit->setEnabled(false);
     ui->endIPLineEdit->setEnabled(false);
@@ -426,23 +426,20 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->loginLineEdit->setEnabled(false);
     ui->passwordLineEdit->setEnabled(false);
 
-
     ui->validateLabelSearch->setVisible(false);
     ui->scanProgressBar->setVisible(true);
     ui->stopScanButton->setVisible(true);
     ui->stopScanButton->setFocus();
 
-    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
-    connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
+    QnMediaServerRequestResult result;
+    m_server->apiConnection()->searchCameraAsync(startAddrStr, endAddrStr, username, password, port, &result, SLOT(processReply(int, const QVariant &, int)));
 
-    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncManualCameraSearch(startAddrStr, endAddrStr, username, password, port,
-                                                 processor.data(),
-                                                 SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
-                                                 SLOT(processSearchError(int, const QString &)));
-    processor->start();
+    QEventLoop loop;
+    connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
+    connect(ui->stopScanButton, SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
+    loop.exec();
 
     ui->scanButton->setEnabled(m_server);
     ui->startIPLineEdit->setEnabled(true);
@@ -457,40 +454,29 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->stopScanButton->setVisible(false);
     ui->scanProgressBar->setVisible(false);
 
-    switch (processor->state()) {
-    case detail::Init:
-    case detail::Progress:
-        qWarning() << "Incorrect reply processor state";
-        //fall-through
-    case detail::Cancelled:
-        break;
-    case detail::Success:
-        {
-            if (processor->camerasFound().count() > 0) {
-                fillTable(processor->camerasFound());
+    if(result.isFinished()) {
+        if(result.status() == 0) {
+            QnCamerasFoundInfoList cameras = result.reply().value<QnCamerasFoundInfoList>();
+
+            if (cameras.size() > 0) {
+                fillTable(cameras);
                 ui->addButton->setFocus();
-            } else
+            } else {
                 QMessageBox::information(this, tr("Finished"), tr("No cameras found"));
-        }
-        break;
-    case detail::Error:
-        {
+            }
+        } else {
             if (!ensureServerOnline())
                 return;
 
             QString error;
-            QString processorError = processor->getLastError();
-            if (processorError.length() == 0){
-                error = tr("Could not connect to server.\n"\
-                           "Make sure server is available and try again.");
+            if (0) { // TODO: #Elric
+                error = tr("Could not connect to server.\nMake sure the server is available and try again.");
             } else {
-                error = tr("Server returned an error:\n%1").arg(processorError);
+                error = tr("Server returned an error."); 
             }
+            
             QMessageBox::critical(this, tr("Error"), error);
         }
-        break;
-    default:
-        break;
     }
 
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
@@ -525,46 +511,33 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     ui->scanButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
 
-    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
+    QnMediaServerRequestResult result;
+    m_server->apiConnection()->addCameraAsync(urls, manufacturers, username, password, &result, SLOT(processReply(int, const QVariant &, int)));
 
-    connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
-    connect(this, SIGNAL(serverChanged()), processor.data(), SLOT(cancel()));
-
-    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncManualCameraAdd(urls, manufacturers, username, password,
-                                              processor.data(), SLOT(processAddReply(int)));
-    processor->start();
+    QEventLoop loop;
+    connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
+    connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
+    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
+    loop.exec();
 
     ui->addButton->setEnabled(true);
     ui->scanButton->setEnabled(m_server);
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 
-    switch (processor->state()) {
-    case detail::Init:
-    case detail::Progress:
-        qWarning() << "Incorrect reply processor state";
-        //fall-through
-    case detail::Cancelled:
-        break;
-    case detail::Success:
-        {
+    if(result.isFinished()) {
+        if(result.status() == 0) {
             removeAddedCameras();
-            QMessageBox::information(this,
-                                     tr("Success"),
-                                     tr("%n camera(s) added successfully.\n"\
-                                        "It might take a few moments to populate them in the tree.", "", urls.size()),
-                                     QMessageBox::Ok);
-        }
-        break;
-    case detail::Error:
-        {
+            QMessageBox::information(
+                this,
+                tr("Success"),
+                tr("%n camera(s) added successfully.\nIt might take a few moments to populate them in the tree.", "", urls.size()),
+                QMessageBox::Ok
+            );
+        } else {
             if (!ensureServerOnline())
                 return;
             QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)", "", urls.size()));
         }
-        break;
-    default:
-        break;
     }
 }
 

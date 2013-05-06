@@ -100,7 +100,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     at_onDecoderPluginsListChanged();
 
     connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
-    connect( PluginManager::instance(), SIGNAL(pluginUnloaded()), this, SLOT(at_onDecoderPluginsListChanged()) );
+    connect( PluginManager::instance(), SIGNAL(pluginUnloaded()), this, SLOT(at_onDecoderPluginsListChanged()) ); // TODO: #AK no such signal
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));

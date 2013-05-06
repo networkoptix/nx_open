@@ -27,6 +27,7 @@ namespace {
     const qreal zoomFrameWidth = qnGlobals->workbenchUnitSize() * 0.005; // TODO: #Elric move to settings;
 
     const qreal zoomWindowMinSize = 0.1;
+    const qreal zoomWindowMaxSize = 0.9;
 
 } // anonymous namespace
 
@@ -216,7 +217,7 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner 
     /* Size constraints go first. */
     QSizeF maxSize = geometry.size();
     if(overlayWidget)
-        maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size()), overlayWidget->size() * zoomWindowMinSize);
+        maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size() * zoomWindowMaxSize), overlayWidget->size() * zoomWindowMinSize);
     result = ConstrainedResizable::constrainedGeometry(geometry, pinCorner, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
     /* Position constraints go next. */
@@ -289,7 +290,7 @@ ZoomOverlayWidget *ZoomWindowInstrument::ensureOverlayWidget(QnMediaResourceWidg
     overlayWidget->setTarget(widget);
     data.overlayWidget = overlayWidget;
 
-    widget->addOverlayWidget(overlayWidget, QnResourceWidget::AutoVisible, false, false);
+    widget->addOverlayWidget(overlayWidget, QnResourceWidget::AutoVisible, false, false, false);
     return overlayWidget;
 }
 
@@ -361,7 +362,7 @@ void ZoomWindowInstrument::updateOverlayVisibility(QnMediaResourceWidget *widget
     } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity | QnResourceWidget::DisplayCrosshair)) {
         visibility = QnResourceWidget::Invisible;
     } else {
-        visibility = QnResourceWidget::AutoVisible;
+        visibility = QnResourceWidget::Visible;
     }
     widget->setOverlayWidgetVisibility(overlayWidget, visibility);
 }
@@ -507,6 +508,8 @@ void ZoomWindowInstrument::finishDrag(DragInfo *) {
                 QRectF(0.0, 0.0, 1.0, 1.0)
             );
         }
+        if(zoomRect.width() >= zoomWindowMaxSize || zoomRect.height() >= zoomWindowMaxSize)
+            zoomRect = expanded(aspectRatio(zoomRect), QSizeF(zoomWindowMaxSize, zoomWindowMaxSize), zoomRect.center(), Qt::KeepAspectRatio);
         
         emit zoomRectCreated(target(), zoomRect);
     }

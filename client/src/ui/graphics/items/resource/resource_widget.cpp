@@ -240,7 +240,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true);
+    addOverlayWidget(m_headerOverlayWidget, AutoVisible, true, true, true);
 
 
     /* Footer overlay. */
@@ -276,7 +276,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_footerOverlayWidget->setLayout(footerOverlayLayout);
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
-    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true);
+    addOverlayWidget(m_footerOverlayWidget, AutoVisible, true, true, true);
 
 
     /* Initialize resource. */
@@ -650,7 +650,14 @@ int QnResourceWidget::channelCount() const {
     return m_channelsLayout->channelCount();
 }
 
-void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport) {
+int QnResourceWidget::overlayWidgetIndex(QGraphicsWidget *widget) const {
+    for(int i = 0; i < m_overlayWidgets.size(); i++)
+        if(m_overlayWidgets[i].widget == widget)
+            return i;
+    return -1;
+}
+
+void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport, bool placeOverControls) {
     if(!widget) {
         qnNullWarning(widget);
         return;
@@ -666,7 +673,8 @@ void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibili
         boundWidget->setLayout(boundLayout);
         boundWidget->setAcceptedMouseButtons(0);
     }
-    (boundWidget ? boundWidget : widget)->setParentItem(this);
+    QGraphicsWidget *childWidget = boundWidget ? boundWidget : widget;
+    childWidget->setParentItem(this);
 
     QnFixedRotationTransform *rotationTransform = NULL;
     if(autoRotate) {
@@ -678,44 +686,53 @@ void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibili
     OverlayWidget overlay;
     overlay.visibility = visibility;
     overlay.widget = widget;
+    overlay.childWidget = childWidget;
     overlay.boundWidget = boundWidget;
     overlay.rotationTransform = rotationTransform;
 
-    m_overlayWidgets.push_back(overlay);
+    if(placeOverControls) {
+        m_overlayWidgets.push_back(overlay);
+    } else {
+        int index = overlayWidgetIndex(m_headerOverlayWidget);
+        if(index == -1) {
+            m_overlayWidgets.push_back(overlay);
+        } else {
+            m_overlayWidgets.insert(index, overlay);
+            overlay.childWidget->stackBefore(m_overlayWidgets[index + 1].childWidget);
+        }
+    }
 
     updateOverlayWidgetsGeometry();
 }
 
 void QnResourceWidget::removeOverlayWidget(QGraphicsWidget *widget) {
+    int index = overlayWidgetIndex(widget);
+    if(index == -1)
+        return;
 
-    for(int i = 0; i < m_overlayWidgets.size(); i++) {
-        const OverlayWidget &overlay = m_overlayWidgets[i];
-        if(overlay.widget == widget) {
-            overlay.widget->setParentItem(NULL);
-            if(overlay.boundWidget && overlay.boundWidget != overlay.widget)
-                delete overlay.boundWidget;
+    const OverlayWidget &overlay = m_overlayWidgets[index];
+    overlay.widget->setParentItem(NULL);
+    if(overlay.boundWidget && overlay.boundWidget != overlay.widget)
+        delete overlay.boundWidget;
 
-            m_overlayWidgets.removeAt(i);
-            return;
-        }
-    }
+    m_overlayWidgets.removeAt(index);
 }
 
 QnResourceWidget::OverlayVisibility QnResourceWidget::overlayWidgetVisibility(QGraphicsWidget *widget) const {
-    for(int i = 0; i < m_overlayWidgets.size(); i++)
-        if(m_overlayWidgets[i].widget == widget)
-            return m_overlayWidgets[i].visibility;
-    return Invisible;
+    int index = overlayWidgetIndex(widget);
+    return index == -1 ? Invisible : m_overlayWidgets[index].visibility;
 }
 
 void QnResourceWidget::setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility) {
-    for(int i = 0; i < m_overlayWidgets.size(); i++) {
-        if(m_overlayWidgets[i].widget == widget) {
-            m_overlayWidgets[i].visibility = visibility;
-            updateOverlayWidgetsVisibility();
-            return;
-        }
-    }
+    int index = overlayWidgetIndex(widget);
+    if(index == -1)
+        return;
+
+    if(m_overlayWidgets[index].visibility == visibility)
+        return;
+
+    m_overlayWidgets[index].visibility = visibility;
+    updateOverlayWidgetsVisibility();
 }
 
 bool QnResourceWidget::isOverlayVisible() const {
@@ -752,7 +769,15 @@ void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
         if(overlay.visibility == UserVisible)
             break;
 
-        qreal opacity = overlay.visibility == Invisible ? 0.0 : (m_overlayVisible ? 1.0 : 0.0);
+        qreal opacity;
+        if(overlay.visibility == Invisible) {
+            opacity = 0.0;
+        } else if(overlay.visibility == Visible) {
+            opacity = 1.0;
+        } else {
+            opacity = m_overlayVisible ? 1.0 : 0.0;
+        }
+
         if(animate) {
             opacityAnimator(overlay.widget, 1.0)->animateTo(opacity);
         } else {
