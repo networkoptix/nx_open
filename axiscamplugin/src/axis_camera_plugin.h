@@ -24,17 +24,17 @@
     It is Qt 4.7 project. Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
     To build You MUST have Qt 4.7.4+ installed.\n
     On MS Win following commands should be run from Visual Studio Command prompt:
-    \code {.bat}
+    \code
     CD %SDK_DIR%/sample/axiscamplugin
     qmake
-    nmake (on ms windows)
-    make (on linux)
+    nmake release (on ms windows)
+    make release (on linux)
     \endcode
-    On successful build You will find library axiscamplugin1.{dll|so} in %SDK_DIR%/sample/axiscamplugin/release directory
+    On successful build You will find libaxiscamplugin.so (linux) or axiscamplugin.dll (mswin) in %SDK_DIR%/sample/axiscamplugin/release directory
 
     \par Usage
     You MUST have HD Witness mediaserver installed to use this plugin.\n
-    To use plugin simply put built library axiscamplugin1 to mediaserver directory (by default, "C:\Program Files\Network Optix\HD Witness\Mediaserver" on ms windows and
+    To use plugin simply put built library to mediaserver directory (by default, "C:\Program Files\Network Optix\HD Witness\Mediaserver" on ms windows and
     /opt/networkoptix/mediaserver/bin/ on linux) and restart server
 
     \par Implements following camera integration interfaces:
