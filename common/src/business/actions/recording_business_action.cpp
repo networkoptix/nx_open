@@ -1,57 +1,9 @@
 #include "recording_business_action.h"
 
+#include <business/business_action_parameters.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-
-namespace BusinessActionParameters {
-
-    static QLatin1String fps("fps");
-    static QLatin1String quality("quality");
-    static QLatin1String duration("duration");
-    static QLatin1String before("before");
-    static QLatin1String after("after");
-
-    int getFps(const QnBusinessParams &params) {
-        return params.value(fps, 10).toInt();
-    }
-
-    void setFps(QnBusinessParams* params, int value) {
-        (*params)[fps] = value;
-    }
-
-    QnStreamQuality getStreamQuality(const QnBusinessParams &params) {
-        return (QnStreamQuality)params.value(quality, (int)QnQualityHighest).toInt();
-    }
-
-    void setStreamQuality(QnBusinessParams* params, QnStreamQuality value) {
-        (*params)[quality] = (int)value;
-    }
-
-    int getRecordDuration(const QnBusinessParams &params) {
-        return params.value(duration, 0).toInt();
-    }
-
-    void setRecordDuration(QnBusinessParams* params, int value) {
-        (*params)[duration] = value;
-    }
-
-    int getRecordBefore(const QnBusinessParams &params) {
-        return params.value(before, 0).toInt();
-    }
-
-    void setRecordBefore(QnBusinessParams* params, int value) {
-        (*params)[before] = value;
-    }
-
-    int getRecordAfter(const QnBusinessParams &params) {
-        return params.value(after, 0).toInt();
-    }
-
-    void setRecordAfter(QnBusinessParams* params, int value)  {
-        (*params)[after] = value;
-    }
-
-}
 
 QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessParams &runtimeParams):
     base_type(BusinessActionType::CameraRecording, runtimeParams)
@@ -59,23 +11,23 @@ QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessParams &run
 }
 
 int QnRecordingBusinessAction::getFps() const {
-    return BusinessActionParameters::getFps(getParams());
+    return QnBusinessActionParameters::getFps(getParams());
 }
 
 QnStreamQuality QnRecordingBusinessAction::getStreamQuality() const {
-    return BusinessActionParameters::getStreamQuality(getParams());
+    return QnBusinessActionParameters::getStreamQuality(getParams());
 }
 
 int QnRecordingBusinessAction::getRecordDuration() const {
-    return BusinessActionParameters::getRecordDuration(getParams());
+    return QnBusinessActionParameters::getRecordDuration(getParams());
 }
 
 int QnRecordingBusinessAction::getRecordBefore() const {
-    return BusinessActionParameters::getRecordBefore(getParams());
+    return QnBusinessActionParameters::getRecordBefore(getParams());
 }
 
 int QnRecordingBusinessAction::getRecordAfter() const {
-    return BusinessActionParameters::getRecordAfter(getParams());
+    return QnBusinessActionParameters::getRecordAfter(getParams());
 }
 
 bool QnRecordingBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {

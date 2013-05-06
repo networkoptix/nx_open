@@ -12,6 +12,7 @@
 
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/style/globals.h>
 
 #include <utils/threaded_image_loader.h>
 
@@ -80,8 +81,8 @@ private:
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
-    m_cache(new QnAppServerFileCache(this)),
-    m_cellAspectRatio((qreal)16/9),
+    m_cache(new QnAppServerImageCache(this)),
+    m_cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
     m_estimatePending(false),
     m_cropImage(false)
 {
@@ -109,8 +110,8 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     connect(ui->buttonBox,      SIGNAL(accepted()),this, SLOT(at_accepted()));
     connect(ui->opacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(at_opacitySpinBox_valueChanged(int)));
 
-    connect(m_cache, SIGNAL(imageLoaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
-    connect(m_cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
+    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(fileUploaded(QString, bool)), this, SLOT(at_imageStored(QString, bool)));
 
     updateControls();
 }
@@ -144,7 +145,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     m_cachedFilename = layout->backgroundImageFilename();
     if (!m_cachedFilename.isEmpty()) {
         m_newFilePath = m_cache->getFullPath(m_cachedFilename);
-        m_cache->loadImage(m_cachedFilename);
+        m_cache->downloadFile(m_cachedFilename);
         ui->widthSpinBox->setValue(layout->backgroundSize().width());
         ui->heightSpinBox->setValue(layout->backgroundSize().height());
         ui->opacitySpinBox->setValue(layout->backgroundOpacity() * 100);

@@ -9,6 +9,9 @@
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
 
+/*!
+    \note On source data end \a playCurrentBuffer method MUST be called to avoid media data loss
+*/
 class QnAudioStreamDisplay : public QObject
 {
     Q_OBJECT
@@ -42,9 +45,11 @@ public:
 
     bool isDownmixForced() const { return m_forceDownmix; }
 
+    //!Plays current buffer to the end
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
+
 private:
     int msInQueue() const;
 

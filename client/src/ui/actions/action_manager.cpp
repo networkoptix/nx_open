@@ -961,7 +961,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission).
         text(tr("Set as Layout Background")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::url | QnResource::local | QnResource::still_image));
+        condition(new QnSetAsBackgroundActionCondition(this));
 
     factory(Qn::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

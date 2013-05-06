@@ -16,8 +16,34 @@
 #include <plugins/plugin_api.h>
 
 
-/*! \main
-    Object life-time management:\n
+/*! \mainpage
+    \par
+    This project demonstrates usage of Network Optix camera integration plugin API to add AXIS camera support to HD Witness. Overrides built-in AXIS camera driver.\n
+
+    \par Build how-to
+    It is Qt 4.7 project. Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
+    To build You MUST have Qt 4.7.4+ installed.\n
+    On MS Win following commands should be run from Visual Studio Command prompt:
+    \code
+    CD %SDK_DIR%/sample/axiscamplugin
+    qmake
+    nmake release (on ms windows)
+    make release (on linux)
+    \endcode
+    On successful build You will find libaxiscamplugin.so (linux) or axiscamplugin.dll (mswin) in %SDK_DIR%/sample/axiscamplugin/release directory
+
+    \par Usage
+    You MUST have HD Witness mediaserver installed to use this plugin.\n
+    To use plugin simply put built library to mediaserver directory (by default, "C:\Program Files\Network Optix\HD Witness\Mediaserver" on ms windows and
+    /opt/networkoptix/mediaserver/bin/ on linux) and restart server
+
+    \par Implements following camera integration interfaces:
+    - \a nxcip::CameraDiscoveryManager to enable AXIS camera discovery by MDNS
+    - \a nxcip::BaseCameraManager to retrieve camera properties and access other managers
+    - \a nxcip::CameraMediaEncoder to receive media stream from camera
+    - \a nxcip::CameraRelayIOManager to receive relay input port change state events and change relay output port state
+
+    \par Object life-time management:
     - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
         to factory class instance (e.g., \a AxisCameraManager is a factory for \a AxisRelayIOManager, \a AxisMediaEncoder, etc.)
     - all factory classes (except for \a AxisCameraDiscoveryManager) hold pointer to child class object (e.g., \a AxisRelayIOManager is a child for \a AxisCameraManager)

@@ -463,15 +463,16 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 
 int serializeBusinessActionType(BusinessActionType::Value value) {
     switch(value) {
-        case BusinessActionType::NotDefined:         return pb::NotDefinedAction;
-        case BusinessActionType::CameraOutput:       return pb::CameraOutput;
-        case BusinessActionType::CameraOutputInstant:return pb::CameraOutputInstant;
-        case BusinessActionType::Bookmark:           return pb::Bookmark;
-        case BusinessActionType::CameraRecording:    return pb::CameraRecording;
-        case BusinessActionType::PanicRecording:     return pb::PanicRecording;
-        case BusinessActionType::SendMail:           return pb::SendMail;
-        case BusinessActionType::Alert:              return pb::Alert;
-        case BusinessActionType::ShowPopup:          return pb::ShowPopup;
+    case BusinessActionType::NotDefined:            return pb::NotDefinedAction;
+    case BusinessActionType::CameraOutput:          return pb::CameraOutput;
+    case BusinessActionType::CameraOutputInstant:   return pb::CameraOutputInstant;
+    case BusinessActionType::Bookmark:              return pb::Bookmark;
+    case BusinessActionType::CameraRecording:       return pb::CameraRecording;
+    case BusinessActionType::PanicRecording:        return pb::PanicRecording;
+    case BusinessActionType::SendMail:              return pb::SendMail;
+    case BusinessActionType::Alert:                 return pb::Alert;
+    case BusinessActionType::ShowPopup:             return pb::ShowPopup;
+    case BusinessActionType::PlaySound:             return pb::PlaySound;
     }
     return pb::NotDefinedAction;
 }
@@ -626,6 +627,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::SendMail:              return BusinessActionType::SendMail;
     case pb::Alert:                 return BusinessActionType::Alert;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
+    case pb::PlaySound:             return BusinessActionType::PlaySound;
     }
     return BusinessActionType::NotDefined;
 }

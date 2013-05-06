@@ -20,8 +20,6 @@
 #include "core/resource/interface/abstract_ptz_controller.h"
 #include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
-#include "utils/common/systemtimer.h"
-
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -275,6 +273,8 @@ protected:
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
 
+    qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
+    int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
 private slots:
     void onRenewSubscriptionTimer();
 

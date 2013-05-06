@@ -263,7 +263,7 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, const
         emitChanged(camera, positionChanged, false);
     } else {
         if(data.attemptCount[GetPositionRequest] > maxAttempts) {
-            qnWarning("Could not get PTZ position from '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
+//            qnWarning("Could not get PTZ position from '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
             sendGetPosition(camera);
         }
@@ -293,7 +293,7 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
         emitChanged(camera, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetPositionRequest] > maxAttempts) {
-            qnWarning("Could not set PTZ position for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
+//            qnWarning("Could not set PTZ position for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
             sendSetPosition(camera, position);
         }
@@ -327,7 +327,7 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
         emitChanged(camera, positionChanged, movementChanged);
     } else {
         if(data.attemptCount[SetMovementRequest] > maxAttempts) {
-            qnWarning("Could not set PTZ movement for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
+//            qnWarning("Could not set PTZ movement for '%1' after %2 attempts, giving up.", camera->getName(), maxAttempts);
         } else {
             sendSetMovement(camera, movement);
         }

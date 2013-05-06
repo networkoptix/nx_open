@@ -332,7 +332,7 @@ namespace nxcip_qt
         unsigned int autoResetTimeoutMS )
     {
         const QByteArray& outputIDUtf8 = outputID.toUtf8();
-        return m_intf->setRelayOutputState( outputIDUtf8.data(), activate, autoResetTimeoutMS );
+        return m_intf->setRelayOutputState( outputIDUtf8.data(), activate ? 1 : 0, autoResetTimeoutMS );
     }
 
     //!See nxcip::CameraRelayIOManager::startInputPortMonitoring

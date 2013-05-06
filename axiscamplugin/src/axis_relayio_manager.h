@@ -23,9 +23,10 @@
 
 class AxisCameraManager;
 
+//!Provides access to camera's relay input/output port (implements \a nxcip::CameraRelayIOManager)
 /*!
     \note Holds reference to \a AxisCameraManager
-    \note Delegates reference counting to \a AxisCameraManager instance
+    \note Delegates reference counting to \a AxisCameraManager instance (i.e., increments \a AxisCameraManager reference counter on initialiation and decrements on destruction)
 */
 class AxisRelayIOManager
 :
@@ -36,7 +37,7 @@ class AxisRelayIOManager
 
 public:
     /*!
-        Increments \a cameraManager reference counter
+        \note Works in \a AxisCameraPlugin::instance()->networkAccessManager() thread
     */
     AxisRelayIOManager(
         AxisCameraManager* cameraManager,
@@ -58,7 +59,7 @@ public:
     //!Implementation of nxcip::CameraRelayIOManager::getRelayOutputList
     virtual int setRelayOutputState(
         const char* outputID,
-        bool activate,
+        int activate,
         unsigned int autoResetTimeoutMS ) override;
     //!Implementation of nxcip::CameraRelayIOManager::getRelayOutputList
     virtual int startInputPortMonitoring() override;

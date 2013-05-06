@@ -245,7 +245,7 @@ void QnBusinessRuleWidget::initActionParameters() {
     if (m_actionWidgetsByType.contains(m_model->actionType())) {
         m_actionParameters = m_actionWidgetsByType.find(m_model->actionType()).value();
     } else {
-        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this, context());
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(m_model->actionType(), this);
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 

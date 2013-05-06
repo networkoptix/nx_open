@@ -33,7 +33,7 @@ class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContex
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnBusinessRulesDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRulesDialog(QWidget *parent = 0);
     virtual ~QnBusinessRulesDialog();
 
 protected:
