@@ -298,8 +298,3 @@ int QnAudioStreamDisplay::getAudioBufferSize() const
 {
     return m_bufferMs;
 }
-
-void QnAudioStreamDisplay::flush()
-{
-    playCurrentBuffer();
-}
