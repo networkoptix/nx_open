@@ -157,7 +157,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.info.presentationUrl = devUrl;
         devInfo.info.friendlyName = QString::fromUtf8(report.value("company name"));
         devInfo.info.manufacturer = manufacture();
-        QByteArray model = report.value("upnp_friendly_name").split('-')[0];
+        QByteArray model = report.value("production id").split('-')[0];
         devInfo.info.modelName = QString::fromUtf8(actiRes->unquoteStr(model));
         devInfo.info.serialNumber = QString::fromUtf8(report.value("mac address"));
         devInfo.timer.restart();
