@@ -12,6 +12,7 @@
 
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/style/globals.h>
 
 #include <utils/threaded_image_loader.h>
 
@@ -81,7 +82,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnLayoutSettingsDialog),
     m_cache(new QnAppServerImageCache(this)),
-    m_cellAspectRatio((qreal)16/9),
+    m_cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
     m_estimatePending(false),
     m_cropImage(false)
 {

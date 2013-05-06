@@ -125,6 +125,11 @@
 #include "launcher_win/nov_launcher.h"
 #endif
 
+namespace {
+    const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
+}
+
+
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
 // -------------------------------------------------------------------------- //
@@ -3527,6 +3532,9 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
         return;
 
+    if (workbench()->currentLayout()->resource()->locked())
+        return;
+
     QnProgressDialog *progressDialog = new QnProgressDialog(this->widget());
     progressDialog->setWindowTitle(tr("Updating background"));
     progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
@@ -3535,6 +3543,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     connect(progressDialog,   SIGNAL(canceled()),                   progressDialog,     SLOT(deleteLater()));
 
     QnAppServerImageCache *cache = new QnAppServerImageCache(this);
+    cache->setProperty(uploadingImageARPropertyName, menu()->currentParameters(sender()).widget()->aspectRatio());
     connect(cache,            SIGNAL(fileUploaded(QString, bool)),  this,               SLOT(at_backgroundImageStored(QString, bool)));
     connect(cache,            SIGNAL(fileUploaded(QString,bool)),   progressDialog,     SLOT(deleteLater()));
     connect(cache,            SIGNAL(fileUploaded(QString, bool)),  cache,              SLOT(deleteLater()));
@@ -3550,15 +3559,47 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
         return;
 
+    if (workbench()->currentLayout()->resource()->locked())
+        return;
+
     if (!success) {
         QMessageBox::warning(widget(), tr("Error"), tr("Image cannot be uploaded"));
         return;
     }
 
+    // if no background is set then size should be auto-calculated
+    bool shouldUpdateSize = workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty();
+
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
     layout->setBackgroundImageFilename(filename);
     if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
         layout->setBackgroundOpacity(0.7);
+
+    if (shouldUpdateSize) {
+        int widthLimit = 64; //TODO: #GDM common source in globals?
+        int heightLimit = 64;   //TODO: #GDM use real placed items
+
+        qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+        if (layout->cellAspectRatio() > 0) {
+            qreal cellWidth = 1.0 + layout->cellSpacing().width();
+            qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
+            cellAspectRatio = cellWidth / cellHeight;
+        }
+
+        qreal aspectRatio = sender()->property(uploadingImageARPropertyName).toReal();
+
+        int w, h;
+        qreal targetAspectRatio = aspectRatio / cellAspectRatio;
+        if (targetAspectRatio >= 1.0) { // width is greater than height
+            w = widthLimit;
+            h = qRound((qreal)w / targetAspectRatio);
+        } else {
+            h = heightLimit;
+            w = qRound((qreal)h * targetAspectRatio);
+        }
+        layout->setBackgroundSize(QSize(w, h));
+    }
+
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
