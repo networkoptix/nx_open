@@ -145,7 +145,7 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
-        return true;
+        return false;
     else if (s1.isH264 && !s2.isH264)
         return true;
 
