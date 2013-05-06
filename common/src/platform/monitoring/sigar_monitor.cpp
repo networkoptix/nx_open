@@ -100,7 +100,6 @@ public:
         if (INVOKE(sigar_net_interface_stat_get(sigar, interfaceName.toLatin1().constData(), &current) != SIGAR_OK))
             return result;
 
-
         if(!lastNetworkStatByInterfaceName.contains(interfaceName)) { /* Is this the first call? */
             NetworkStat stat;
             stat.stat = current;
@@ -270,6 +269,13 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         if (interfacesNames.contains(interfaceName))
             continue;
         interfacesNames.append(interfaceName);
+
+        sigar_net_interface_config_t config;
+        if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
+            continue;
+        qDebug() << config.name << config.flags;
+        if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) == 0)
+            continue;
 
         result.push_back(d->networkLoad(interfaceName));
     }
