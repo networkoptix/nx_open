@@ -37,7 +37,8 @@ CUR_DIR_BAK=`pwd`
 cd $TARGET_DIR/sample/axiscamplugin/
 doxygen
 cd $CUR_DIR_BAK
+rm -rf $TARGET_DIR/sample/axiscamplugin/Doxyfile
 
 #packing sdk
 tar czf $SDK_NAME-$VERSION.tar.gz $TARGET_DIR
-#rm -rf $TARGET_DIR
+rm -rf $TARGET_DIR
