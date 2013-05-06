@@ -5,6 +5,7 @@
 
 #include "axis_discovery_manager.h"
 
+#include <cstdlib>
 #include <cstddef>
 #include <cstring>
 

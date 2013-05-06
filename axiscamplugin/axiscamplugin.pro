@@ -1,11 +1,22 @@
+CONFIG += debug_and_release
 TEMPLATE = lib
 TARGET = axiscamplugin
 QT += core network
 
 INCLUDEPATH += ../../include/
 
+CONFIG(debug, debug|release) {
+  DESTDIR = debug
+} else {
+  DESTDIR = release
+}
+OBJECTS_DIR = $$DESTDIR
+MOC_DIR = $$DESTDIR
+
 win32 {
   QMAKE_CXXFLAGS += /wd4250
+} else {
+  DEFINES += override=
 }
 
 # Input
