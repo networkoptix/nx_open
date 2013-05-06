@@ -50,7 +50,7 @@
 #   define override override
 #elif defined(__GNUC__)
 #   if (GCC_VERSION >= 40700)
-#       define override override
+//#   define override override
 #   else
 #       define override
 #   endif
