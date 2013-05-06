@@ -17,6 +17,7 @@
 
 #include <api/serializer/serializer.h>
 #include <api/media_server_statistics_data.h>
+#include "serializer/pb_serializer.h"
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
@@ -324,6 +325,29 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 namespace detail
 {
     ////////////////////////////////////////////////////////////////
+    // QnMediaServerEventLogReplyProcessor
+    ////////////////////////////////////////////////////////////////
+    const QList<QnAbstractBusinessActionPtr>& QnMediaServerEventLogReplyProcessor::events() const
+    {
+        return m_events;
+    }
+
+    //!Parses response mesasge body and fills \a m_events
+    void QnMediaServerEventLogReplyProcessor::parseResponse( const QByteArray& responseMessageBody )
+    {
+        m_events.clear();
+        QnApiPbSerializer serializer;
+        serializer.deserializeBusinessActionList(m_events, responseMessageBody);;
+    }
+
+    void QnMediaServerEventLogReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/ )
+    {
+        parseResponse(response.data);
+        emit finished(response.status, m_events);
+        deleteLater();
+    }
+
+    ////////////////////////////////////////////////////////////////
     // QnMediaServerGetParamReplyProcessor
     ////////////////////////////////////////////////////////////////
     const QList< QPair< QString, QVariant> >& QnMediaServerGetParamReplyProcessor::receivedParams() const
@@ -340,7 +364,7 @@ namespace detail
         for( QList<QByteArray>::const_iterator
             it = paramPairs.begin();
             it != paramPairs.end();
-            ++it )
+        ++it )
         {
             int sepPos = it->indexOf( '=' );
             if( sepPos == -1 )   //no param value
@@ -443,6 +467,34 @@ QnTimePeriodList QnMediaServerConnection::recordedTimePeriods(const QnNetworkRes
     }
 
     return result;
+}
+
+int QnMediaServerConnection::asyncEventLog(QnNetworkResourcePtr camRes, qint64 dateFrom, qint64 dateTo, QnId businessRuleId, QObject *target, const char *slot)
+{
+    detail::QnMediaServerEventLogReplyProcessor* processor = new detail::QnMediaServerEventLogReplyProcessor();
+    connect(
+        processor,
+        SIGNAL(finished( int, const QList< QnAbstractBusinessAction >& )),
+        target,
+        slot,
+        Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    if (camRes)
+        requestParams << QnRequestParam( "res_id", camRes->getPhysicalId() );
+    if (businessRuleId.isValid())
+        requestParams << QnRequestParam( "brule_id", businessRuleId.toInt() );
+    requestParams << QnRequestParam( "from", dateFrom);
+    if (dateTo != DATETIME_NOW)
+        requestParams << QnRequestParam( "to", dateTo);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(
+        m_url,
+        QLatin1String("events"),
+        QnRequestHeaderList(),
+        requestParams,
+        processor,
+        SLOT(at_replyReceived(QnHTTPRawResponse, int)));
 }
 
 int QnMediaServerConnection::asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QObject *target, const char *slot)

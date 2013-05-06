@@ -20,6 +20,7 @@
 #include "api_fwd.h"
 #include "media_server_statistics_data.h"
 #include "media_server_cameras_data.h"
+#include "business/actions/abstract_business_action.h"
 
 
 class QnPtzSpaceMapper;
@@ -155,6 +156,30 @@ namespace detail {
         QList< QPair< QString, QVariant> > m_receivedParams;
     };
 
+    class QnMediaServerEventLogReplyProcessor: public QObject
+    {
+        Q_OBJECT
+
+    public:
+        //!Return value is actual only after response has been handled
+        const QList<QnAbstractBusinessActionPtr> &events() const;
+
+        //!Parses response mesasge body and fills \a m_receivedParams
+        void parseResponse(const QByteArray& responseMssageBody);
+
+    public slots:
+        /*!
+            \note calls \a deleteLater after parsing response response
+        */
+        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
+
+    signals:
+        void finished(int status, const QList<QnAbstractBusinessActionPtr> &events);
+
+    private:
+        QList<QnAbstractBusinessActionPtr> m_events;
+    };
+
     //!Handles response on SetParam request
     class QnMediaServerSetParamReplyProcessor: public QObject
     {
@@ -205,6 +230,23 @@ public:
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
 
     int asyncRecordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
+
+
+	/** 
+     * Get \a event log. 
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant> > &params)</tt>.
+     * \a status is 0 in case of success, in other cases it holds error code 
+     * 
+     * \param camRes filter events by camera. Optional.
+     * \param dateFrom  start timestamp in msec
+     * \param dateTo end timestamp in msec. Can be DATETIME_NOW
+     * \param businessRuleId filter events by specified business rule. Optional.
+     * 
+     * \returns                         Request handle.
+	 */
+    int asyncEventLog(QnNetworkResourcePtr camRes, qint64 dateFrom, qint64 dateTo, QnId businessRuleId, QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
