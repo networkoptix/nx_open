@@ -71,7 +71,7 @@ namespace {
 
         QLinkedList<qreal> result;
         for(QLinkedList<qreal>::const_iterator pos = values.begin(); pos != values.end(); pos++) {
-            if (qFuzzyCompare(*pos, -1))
+            if (*pos < 0)
                 result << *pos;
             else
                 result << *pos/upperBound;

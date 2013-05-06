@@ -62,16 +62,18 @@ void QnMediaServerStatisticsStorage::update() {
             if (stats.values.size() > m_pointsLimit)
                 stats.values.removeFirst();
         }
-        if (!m_alreadyUpdating)
-            return;
     }
 
+    if (m_alreadyUpdating)
+        return;
     m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(int, const QnStatisticsDataList &, int, int)));
     m_alreadyUpdating = true;
 }
 
 void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsDataList &data, int updatePeriod, int handle) {
     Q_UNUSED(handle)
+
+    m_alreadyUpdating = false;
     if(status != 0)
         return;
 
@@ -110,7 +112,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
             m_history.remove(id);
     }
 
-    m_alreadyUpdating = false;
+
     emit statisticsChanged();
 }
 
