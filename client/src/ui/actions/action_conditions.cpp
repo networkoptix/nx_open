@@ -445,3 +445,16 @@ Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnLayoutItemI
 
     return Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+    QnResourcePtr resource = resources[0];
+    if (!resource->hasFlags(QnResource::url | QnResource::local | QnResource::still_image))
+        return Qn::InvisibleAction;
+
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (layout->locked())
+        return Qn::DisabledAction;
+    return Qn::EnabledAction;
+}

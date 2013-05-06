@@ -161,7 +161,7 @@ void AudioPlayer::run()
         QnAbstractMediaDataPtr dataPacket = m_mediaFileReader->getNextData();
         if( !dataPacket )
         {
-            m_renderer->flush();
+            m_renderer->playCurrentBuffer();
 
             //end of file reached
             emit done();
