@@ -5,7 +5,6 @@
 #include "serverutil.h"
 #include "business/actions/abstract_business_action.h"
 #include "events/events_db.h"
-#include "events/mserver_business_rule_processor.h"
 
 QnRestEventsHandler::QnRestEventsHandler()
 {
@@ -41,8 +40,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
             period.durationMs = params[i].second.toLongLong() - period.startTimeMs;
     }
 
-    const QnEventsDB& db = static_cast<QnMServerBusinessRuleProcessor*> (QnBusinessRuleProcessor::instance())->getDB();
-    QList<QnAbstractBusinessActionPtr> actions = db.getActions(period);
+    QList<QnAbstractBusinessActionPtr> actions = qnEventsDB->getActions(period);
 
     result.append(QString("<pong>%1</pong>\n").arg(serverGuid()).toUtf8());
     return CODE_OK;

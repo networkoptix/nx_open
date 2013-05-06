@@ -23,16 +23,12 @@ public:
     */
     void setEventLogPeriod(qint64 periodUsec);
 
-    const QnEventsDB& getDB();
-
 protected slots:
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res) override;
 private:
     bool executeRecordingAction(QnRecordingBusinessActionPtr action, QnResourcePtr res);
     bool executePanicAction(QnPanicBusinessActionPtr action);
     bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource );
-private:
-    QnEventsDB m_db;
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

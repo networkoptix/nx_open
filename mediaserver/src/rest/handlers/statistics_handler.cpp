@@ -71,7 +71,7 @@ int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamLi
     return executeGet(path, params, result, contentType);
 }
 
-QString QnStatisticsHandler::description(TCPSocket *) const
+QString QnStatisticsHandler::description() const
 {
     return "Returns server info: CPU usage, HDD usage e.t.c \n";
 }

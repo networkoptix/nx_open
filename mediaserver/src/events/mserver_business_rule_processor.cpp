@@ -39,7 +39,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     }
 
     if (rez)
-        m_db.saveActionToDB(action, res);
+        qnEventsDB->saveActionToDB(action, res);
 
     return rez;
 }
@@ -110,9 +110,4 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
         relayOutputId,
         action->getToggleState() == ToggleState::On,
         autoResetTimeout );
-}
-
-const QnEventsDB& QnMServerBusinessRuleProcessor::getDB()
-{
-    return m_db;
 }

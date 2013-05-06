@@ -7,6 +7,7 @@
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
+QnEventsDB* QnEventsDB::m_instance = 0;
 
 QnEventsDB::QnEventsDB():
     m_lastCleanuptime(0),
@@ -121,4 +122,24 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(QnTimePeriod period) c
     }
 
     return result;
+}
+
+void QnEventsDB::init()
+{
+    // this call is not thread safe! You should init from main thread e.t.c
+    Q_ASSERT_X(!m_instance, Q_FUNC_INFO, "QnEventsDB::init must be called once!");
+    m_instance = new QnEventsDB();
+}
+
+void QnEventsDB::fini()
+{
+    delete m_instance;
+    m_instance = NULL;
+}
+
+QnEventsDB* QnEventsDB::instance()
+{
+    // this call is not thread safe! You should init from main thread e.t.c
+    Q_ASSERT_X(m_instance, Q_FUNC_INFO, "QnEventsDB::init must be called first!");
+    return m_instance;
 }

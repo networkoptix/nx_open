@@ -854,6 +854,7 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+    QnEventsDB::init();
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -1120,6 +1121,7 @@ void QnMain::run()
     QnBusinessEventConnector::initStaticInstance( NULL );
 
     QnBusinessRuleProcessor::fini();
+    QnEventsDB::fini();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
