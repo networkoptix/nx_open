@@ -50,9 +50,8 @@ namespace {
         case NETWORK_OUT:
             return colors.networkOutByKey(key);
         default:
-            break;
+            return QColor(Qt::white);
         }
-        return QColor(Qt::white);
     }
 
     qreal maxValue(const QLinkedList<qreal> &values) {
@@ -220,10 +219,12 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
-    const int legendImgSize = 20;
+    const int legendImageSize = 20;
     const int legendFontSize = 20;
     const int itemSpacing = 2;
+
 } // anonymous namespace
+
 
 // -------------------------------------------------------------------------- //
 // LegendButtonWidget
@@ -243,27 +244,22 @@ public:
         setIcon(qnSkin->icon("item/check.png"));
     }
 
-    ~LegendButtonWidget() {
-
-    }
-
+    virtual ~LegendButtonWidget() {}
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         switch (which) {
         case Qt::MinimumSize:
-            return QSizeF(legendImgSize, legendImgSize + itemSpacing);
-        case Qt::PreferredSize:
-            {
-                QFont font;
-                font.setPixelSize(legendFontSize);
-                return QSizeF(legendImgSize + QFontMetrics(font).width(m_key) + itemSpacing*2, legendImgSize + itemSpacing);
-            }
-        case Qt::MaximumSize:
-            {
-                QSizeF hint = base_type::sizeHint(which, constraint);
-                return QSizeF(hint.width(), legendImgSize + itemSpacing);
-            }
+            return QSizeF(legendImageSize, legendImageSize + itemSpacing);
+        case Qt::PreferredSize: {
+            QFont font;
+            font.setPixelSize(legendFontSize);
+            return QSizeF(legendImageSize + QFontMetrics(font).width(m_key) + itemSpacing*2, legendImageSize + itemSpacing);
+        }
+        case Qt::MaximumSize: {
+            QSizeF hint = base_type::sizeHint(which, constraint);
+            return QSizeF(hint.width(), legendImageSize + itemSpacing);
+        }
         default:
             break;
         }
@@ -278,11 +274,11 @@ protected:
         qreal opacity = painter->opacity();
         painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
 
-        QRectF imgRect = QRectF(0, 0, legendImgSize, legendImgSize);
-        int textOffset = legendImgSize + itemSpacing;
+        QRectF imgRect = QRectF(0, 0, legendImageSize, legendImageSize);
+        int textOffset = legendImageSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
-            //TODO: #GDM Text drawing is very slow. #Elric sais it is fast in Qt5
+            //TODO: #GDM Text drawing is very slow. #Elric says it is fast in Qt5
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
@@ -299,6 +295,7 @@ protected:
         base_type::paint(painter, startState, endState, progress, widget, imgRect);
         painter->setOpacity(opacity);
     }
+
 private:
     QnStatisticsDeviceType m_deviceType;
     QString m_key;
@@ -317,8 +314,7 @@ public:
     {
     }
 
-    ~StatisticsOverlayWidget() {
-    }
+    virtual ~StatisticsOverlayWidget() {}
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
