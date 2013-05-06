@@ -5,6 +5,7 @@
 #include "serverutil.h"
 #include "business/actions/abstract_business_action.h"
 #include "events/events_db.h"
+#include "api/serializer/pb_serializer.h"
 
 QnRestEventsHandler::QnRestEventsHandler()
 {
@@ -17,8 +18,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
     Q_UNUSED(params)
     Q_UNUSED(contentType)
 
-    QnTimePeriod period;
-    period.durationMs = -1;
+    QnTimePeriod period(-1,-1);
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -26,7 +26,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
             period.startTimeMs = params[i].second.toLongLong();
     }
 
-    if (period.startTimeMs == 0)
+    if (period.startTimeMs == -1)
     {
         result.append("<root>\n");
         result.append("Parameter 'from' MUST be specified");
@@ -41,8 +41,9 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
     }
 
     QList<QnAbstractBusinessActionPtr> actions = qnEventsDB->getActions(period);
-
-    result.append(QString("<pong>%1</pong>\n").arg(serverGuid()).toUtf8());
+    QnApiPbSerializer serializer;
+    serializer.serializeBusinessActionList(actions, result);
+    contentType = "application/octet-stream";
     return CODE_OK;
 }
 
