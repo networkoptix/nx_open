@@ -9,6 +9,16 @@
 namespace {
     const int noDataValue = -1;
     const int defaultUpdatePeriod = 500;
+
+    /**
+     * Set size of values to pointsLimit. Fill by noDataValue or cut from the beginning if needed.
+     */
+    void normalizeValuesList(QLinkedList<qreal> &values, int pointsLimit) {
+        while (values.size() < pointsLimit)
+            values.prepend(noDataValue);
+        while (values.size() > pointsLimit)
+            values.removeFirst();
+    }
 }
 
 QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent):
@@ -58,10 +68,11 @@ void QnMediaServerStatisticsStorage::update() {
         for (QnStatisticsHistory::iterator iter = m_history.begin(); iter != m_history.end(); iter++) {
             QnStatisticsData &stats = iter.value();
             stats.values.append(noDataValue);
-            if (stats.values.size() > m_pointsLimit)
-                stats.values.removeFirst();
+            normalizeValuesList(stats.values, m_pointsLimit);
         }
     }
+
+    emit statisticsChanged();
 
     if (m_alreadyUpdating)
         return;
@@ -93,28 +104,25 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
 
     foreach(const QnStatisticsDataItem &nextData, reply.statistics) {
         QString id = nextData.description;
+        notUpdated.remove(id);
+
         QnStatisticsData &stats = m_history[id];
         stats.deviceType = nextData.deviceType;
         stats.description = nextData.description;
-        while (stats.values.count() < m_pointsLimit)
-            stats.values.append(noDataValue);
         stats.values.append(nextData.value);
-        if (stats.values.size() > m_pointsLimit)
-            stats.values.removeFirst();
-        notUpdated.remove(id);
+        normalizeValuesList(stats.values, m_pointsLimit);
     }
 
     foreach(QString id, notUpdated) {
         QnStatisticsData &stats = m_history[id];
         stats.values.append(noDataValue);
-        if (stats.values.size() > m_pointsLimit)
-            stats.values.removeFirst();
-        if (stats.values.count(noDataValue) == stats.values.count())
+        normalizeValuesList(stats.values, m_pointsLimit);
+        if (stats.values.count(noDataValue) == stats.values.size())
             m_history.remove(id);
     }
 
 
-    emit statisticsChanged();
+//    emit statisticsChanged();
 }
 
 
