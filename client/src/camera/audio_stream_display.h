@@ -9,6 +9,9 @@
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
 
+/*!
+    \note On source data end \a flush method MUST be called to avoid media data loss
+*/
 class QnAudioStreamDisplay : public QObject
 {
     Q_OBJECT
@@ -45,6 +48,10 @@ public:
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
+
+    //!Plays current buffer to the end
+    void flush();
+
 private:
     int msInQueue() const;
 

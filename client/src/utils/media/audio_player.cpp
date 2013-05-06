@@ -32,7 +32,6 @@ AudioPlayer::AudioPlayer( const QString& filePath )
     m_renderer( NULL ),
     m_rtStartTime( AV_NOPTS_VALUE ),
     m_lastRtTime( 0 ),
-    m_mutex( QMutex::Recursive ),
     m_state( sInit )
 {
     if( !filePath.isEmpty() )
@@ -55,8 +54,7 @@ AudioPlayer::~AudioPlayer()
 bool AudioPlayer::isOpened() const
 {
     QMutexLocker lk( &m_mutex );
-
-    return m_mediaFileReader != NULL;
+    return isOpenedNonSafe();
 }
 
 QString AudioPlayer::getTagValue( const QString& name ) const
@@ -98,8 +96,8 @@ bool AudioPlayer::open( const QString& filePath )
 {
     QMutexLocker lk( &m_mutex );
 
-    if( isOpened() )
-        close();
+    if( isOpenedNonSafe() )
+        closeNonSafe();
 
     std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
 
@@ -125,7 +123,7 @@ bool AudioPlayer::playAsync()
 {
     QMutexLocker lk( &m_mutex );
 
-    if( !isOpened() )
+    if( !isOpenedNonSafe() )
         return false;
 
     if( !isRunning() )
@@ -143,21 +141,7 @@ bool AudioPlayer::playAsync()
 void AudioPlayer::close()
 {
     QMutexLocker lk( &m_mutex );
-
-    if( m_mediaFileReader )
-    {
-        delete m_mediaFileReader;
-        m_mediaFileReader = NULL;
-    }
-
-    if( m_renderer )
-    {
-        delete m_renderer;
-        m_renderer = NULL;
-    }
-
-    m_filePath.clear();
-    m_state = sInit;
+    closeNonSafe();
 }
 
 void AudioPlayer::run()
@@ -177,6 +161,8 @@ void AudioPlayer::run()
         QnAbstractMediaDataPtr dataPacket = m_mediaFileReader->getNextData();
         if( !dataPacket )
         {
+            m_renderer->flush();
+
             //end of file reached
             emit done();
             m_state = sReady;
@@ -193,6 +179,29 @@ void AudioPlayer::run()
             //playing it
         m_renderer->putData( audioData );
     }
+}
+
+void AudioPlayer::closeNonSafe()
+{
+    if( m_mediaFileReader )
+    {
+        delete m_mediaFileReader;
+        m_mediaFileReader = NULL;
+    }
+
+    if( m_renderer )
+    {
+        delete m_renderer;
+        m_renderer = NULL;
+    }
+
+    m_filePath.clear();
+    m_state = sInit;
+}
+
+bool AudioPlayer::isOpenedNonSafe() const
+{
+    return m_mediaFileReader != NULL;
 }
 
 void AudioPlayer::doRealtimeDelay( const QnAbstractDataPacketPtr& media )

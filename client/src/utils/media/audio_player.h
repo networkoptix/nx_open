@@ -98,6 +98,8 @@ private:
     QWaitCondition m_cond;
     State m_state;
 
+    bool isOpenedNonSafe() const;
+    void closeNonSafe();
     void doRealtimeDelay( const QnAbstractDataPacketPtr& media );
 };
 
