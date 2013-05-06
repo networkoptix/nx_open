@@ -11,7 +11,7 @@
 #include "common_ref_manager.h"
 
 
-//
+//!Discovers AXIS cameras with MDNS search method (implements \a nxcip::CameraDiscoveryManager)
 /*!
     Implements only MDNS search method (\a nxcip::CameraDiscoveryManager::fromMDNSData method)
 

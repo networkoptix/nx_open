@@ -102,7 +102,7 @@ int AxisRelayIOManager::getInputPortList( char** idList, int* idNum ) const
 
 int AxisRelayIOManager::setRelayOutputState(
     const char* outputID,
-    bool activate,
+    int activate,
     unsigned int autoResetTimeoutMS )
 {
     std::map<QString, unsigned int>::const_iterator it = m_outputPortNameToIndex.find( QString::fromUtf8(outputID) );
@@ -369,7 +369,7 @@ void AxisRelayIOManager::readAxisRelayPortNotification( const QByteArray& notifi
                 (*it)->inputPortStateChanged(
                     this,
                     portName.constData(),
-                    eventType == '/' ? true : false,
+                    eventType == '/' ? 1 : 0,
                     QDateTime::currentMSecsSinceEpoch() );
             }
             break;

@@ -4,19 +4,28 @@
 #include "plugin_api.h"
 
 
-//!Network Optix Camera Integration Plugin API
+//!Network Optix Camera Integration Plugin API (c++)
 /*!
-    - all text values are NULL-terminated utf-8
+    Contains structures and abstract classes to be implemented in real plugin.
+    
+    \par Following interfaces can be implemented by plugin:
+    - \a nxcip::CameraDiscoveryManager. Mandatory. Used to discover camera and instanciate \a nxcip::BaseCameraManager
+    - \a nxcip::BaseCameraManager. Mandatory. Used to get camera properties and get pointers to other interfaces
+    - \a nxcip::CameraMediaEncoder. Optional. Used to get media stream from camera
+    - \a nxcip::CameraRelayIOManager. Optional. Used to receive relay input port change state events and change relay output port state
+    - \a nxcip::CameraPTZManager. Optional. Used for pan-tilt-zoom control
 
+    \note all text values are NULL-terminated utf-8
     \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
         - single interface pointer is never used concurrently by multiple threads, but different pointers to same interface 
-            (e.g., \a BaseCameraManager) can be used by different threads concurrently
+            (e.g., \a nxcip::BaseCameraManager) can be used by different threads concurrently
 */
 namespace nxcip
 {
     static const int MAX_TEXT_LEN = 1024;
 
-    //!Error codes. Interface implementation MUST use these error codes when appropriate
+    //Error codes. Interface implementation MUST use these error codes when appropriate
+
     static const int NX_NO_ERROR = 0;
     static const int NX_NOT_AUTHORIZED = -1;
     static const int NX_INVALID_ENCODER_NUMBER = -2;
@@ -34,23 +43,25 @@ namespace nxcip
     // {0D06134F-16D0-41c8-9752-A33E81FE9C75}
     static const nxpl::NX_GUID IID_CameraDiscoveryManager = { { 0x0d, 0x06, 0x13, 0x4f, 0x16, 0xd0, 0x41, 0xc8, 0x97, 0x52, 0xa3, 0x3e, 0x81, 0xfe, 0x9c, 0x75 } };
 
+    //!Contains base camera information
     struct CameraInfo
     {
-        //!required
+        //!Camera model name in any human readable format. MUST NOT be empty
         char modelName[256];
-        //!Can be empty
+        //!Firmware version in any human readable format. Optional
         char firmware[256];
         //!Camera's unique identifier. MAC address can be used
         char uid[256];
         //!Camera management url
         char url[MAX_TEXT_LEN];
-        //!Any data in implementation defined format
+        //!Any data in implementation defined format (for internal plugin usage)
         char auxiliaryData[256];
-        //!Plugin can specify default redentials to use with camera
+        //!Plugin can specify default credentials to use with camera
         char defaultLogin[256];
-        //!Plugin can specify default redentials to use with camera
+        //!Plugin can specify default credentials to use with camera
         char defaultPassword[256];
 
+        //!Initializes all values with zeros/empty strings
         CameraInfo()
         {
             modelName[0] = 0;
@@ -65,13 +76,17 @@ namespace nxcip
 
     //!This interface is used to find cameras and create \a BaseCameraManager instance
     /*!
-        Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a fromUpnpData or \a fromMDNSData method.
-        If camera do support neither UPNP nor MDNS, plugin can provide its own search method by implementing \a findCameras
+        Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a nxcip::CameraDiscoveryManager::fromUpnpData or 
+        \a nxcip::CameraDiscoveryManager::fromMDNSData method.
+        If camera do support neither UPNP nor MDNS, plugin can provide its own search method by implementing \a nxcip::CameraDiscoveryManager::findCameras
 
-        In case camera is supported by multiple drivers, driver to use is selected under following rules:\n
-        - each received MDNS and UPNP response packet is first processed by plugins, then by built-in drivers. Plugins are iterated in vendor name ascending order
+        In case camera is supported by multiple plugins, plugin to use is selected under following rules:\n
+        - each received MDNS and UPNP response packet is first processed by plugins, then by built-in drivers. 
+            Plugins are iterated in vendor name (\a nxcip::CameraDiscoveryManager::getVendorName) ascending order
         - it is undefined when \a CameraDiscoveryManager::findCameras is called (with regard to mdns and upnp search)
-        - plugin can reserve model name(s) so that built-in drivers do not process cameras with that name TODO api
+        - plugin can reserve model name(s) by implementing nxcip::CameraDiscoveryManager::getReservedModelList so that built-in drivers do not process cameras with that name
+
+        \note Camera search methods MUST NOT take in account result of previously done searches
     */
     class CameraDiscoveryManager
     :
@@ -82,7 +97,7 @@ namespace nxcip
 
         //!Returns utf-8 camera vendor name
         /*!
-            \param buf Buffer of \a MAX_TEXT_LEN size
+            \param[out] buf Buffer of \a MAX_TEXT_LEN size
         */
         virtual void getVendorName( char* buf ) const = 0;
 
@@ -91,31 +106,33 @@ namespace nxcip
         /*!
             It is recommended that this method works in asynchronous mode (only returning list of already found cameras).
             This method is called periodically.
-            \param cameras Array of size \a CAMERA_INFO_ARRAY_SIZE
-            \param localInterfaceIPAddr String representation of local interface ip (ipv4 or ipv6). 
+            \param[out] cameras Array of size \a CAMERA_INFO_ARRAY_SIZE. Implementation filles this array with found camera(s) information
+            \param[in] localInterfaceIPAddr String representation of local interface ip (ipv4 or ipv6). 
                 If not NULL, camera search should be done on that interface only
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
         virtual int findCameras( CameraInfo* cameras, const char* localInterfaceIPAddr ) = 0;
         //!Check host for camera presence
         /*!
+            Plugin should investigate \a address for supported camera presence and fill \a cameras array with found camera(s) information
             This method is used to add camera with known ip (e.g., if multicast is disabled in network)
-            \param cameras Array of size \a CAMERA_INFO_ARRAY_SIZE
-            \param address String "host:port", port is optional
-            \param login If NULL, default login is used
-            \param password If NULL, default password is used
+            \param[out] cameras Array of size \a CAMERA_INFO_ARRAY_SIZE
+            \param[in] address String "host:port", port is optional
+            \param[in] login Login to access \a address. If NULL, default login should be used
+            \param[in] password Password to access \a address. If NULL, default password should be used
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
         virtual int checkHostAddress( CameraInfo* cameras, const char* address, const char* login, const char* password ) = 0;
         //!MDNS camera search method
         /*!
-            Mediaserver calls this method when it finds unknown MDNS host.
+            Mediaserver calls this method when it has found unknown MDNS host.
 
-            If non-zero value is returned, \a cameraInfo MUST be filled by this method (it will be used later in call to \a createCameraManager).
-            \param discoveryAddress Source address of \a mdnsResponsePacket (for ipv4 it is ip-address)
-            \param mdnsResponsePacket Received MDNS packet
-            \param mdnsResponsePacketSize Size of \a mdnsResponsePacket in bytes
-            \return non zero, if upnp data is recognized, 0 otherwise
+            If non-zero value is returned, \a cameraInfo MUST be filled by this method (it will be used later in call to \a nxcip::CameraDiscoveryManager::createCameraManager).
+            \param[in] discoveryAddress Source address of \a mdnsResponsePacket (for ipv4 it is ip-address)
+            \param[in] mdnsResponsePacket Received MDNS packet
+            \param[in] mdnsResponsePacketSize Size of \a mdnsResponsePacket in bytes
+            \param[out] cameraInfo If MDNS host is recognized, this structure is filled with camera parameters
+            \return non zero, if MDNS data is recognized, 0 otherwise
         */
         virtual int fromMDNSData(
             const char* discoveryAddress,
@@ -124,22 +141,23 @@ namespace nxcip
             CameraInfo* cameraInfo ) = 0;
         //!UPNP camera search method
         /*!
-            Mediaserver calls this method when it finds unknown UPNP device.
+            Mediaserver calls this method when it has found unknown UPNP device.
 
-            If non-zero value is returned, \a cameraInfo MUST be filled by this method (it will be used later in call to \a createCameraManager).
-            \param upnpXMLData Contains upnp data as specified in [UPnP Device Architecture 1.1, section 2.3]
-            \param upnpXMLDataSize Size of \a upnpXMLData in bytes
-            \return non zero, if upnp data is recognized, 0 otherwise
+            If non-zero value is returned, \a cameraInfo MUST be filled by this method (it will be used later in call to \a nxcip::CameraDiscoveryManager::createCameraManager).
+            \param[in] upnpXMLData Contains upnp data as specified in [UPnP Device Architecture 1.1, section 2.3]
+            \param[in] upnpXMLDataSize Size of \a upnpXMLData in bytes
+            \param[out] cameraInfo If upnp host is recognized, this structure is filled with camera data
+            \return non zero, if upnp data is recognized and \a cameraInfo is filled with data, 0 otherwise
         */
         virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, CameraInfo* cameraInfo ) = 0;
 
-        //!Creates camera manager instance based on \a info
+        //!Instanciates camera manager instance based on \a info
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
         static const int MAX_MODEL_NAME_SIZE = 256;
         //!Get model model names, reserved by the plugin
         /*!
-             \param[out] modelList        Array of char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
+             \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
              \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
                                           When the function returns, this variable contains the number of model names copied to \a modelList.
                                           If the buffer specified by \a modelList parameter is not large enough to hold the data, 
@@ -151,9 +169,12 @@ namespace nxcip
     };
 
 
+    //!Resolution of video stream picture
     struct Resolution
     {
+        //!Width in pixels
         int width;
+        //!Hidth in pixels
         int height;
 
         Resolution( int _width = 0, int _height = 0 )
@@ -163,10 +184,14 @@ namespace nxcip
         {
         }
     };
+
+    //!Contains resolution and maximum fps, supported by camera for this resolution
     struct ResolutionInfo
     {
+        //!Guess what
         Resolution resolution;
-        float maxFps;   //!Maximum fps, allowed for \a resolution
+        //!Maximum fps, allowed for \a resolution
+        float maxFps;
 
         ResolutionInfo()
         :
@@ -192,8 +217,7 @@ namespace nxcip
             Supported protocols:\n
                 - rtsp. RTP with h.264 and motion jpeg supported
                 - http. Motion jpeg only supported
-            \param encoderNumber Encoder number starts with 0
-            \param urlBuf Buffer of size \a MAX_TEXT_LEN. MUST be NULL-terminated after return
+            \param[out] urlBuf Buffer of size \a MAX_TEXT_LEN. MUST be NULL-terminated after return
             \return 0 on success, otherwise - error code
         */
         virtual int getMediaUrl( char* urlBuf ) const = 0;
@@ -202,8 +226,8 @@ namespace nxcip
 
         //!Returns supported resolution list
         /*!
-            \param infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
-            \param infoListCount Returned number of supported resolutions
+            \param[out] infoList Array of size \a MAX_RESOLUTION_LIST_SIZE
+            \param[out] infoListCount Returned number of supported resolutions
             \return 0 on success, otherwise - error code
             \note Plugin is can return empty resolution list
         */
@@ -211,29 +235,30 @@ namespace nxcip
 
         //!Returns maximem bitrate in Kbps. 0 is interpreted as unlimited bitrate value
         /*!
-            \param maxBitrate Returned value of max bitrate
+            \param[out] maxBitrate Returned value of max bitrate
             \return 0 on success, otherwise - error code
         */
         virtual int getMaxBitrate( int* maxBitrate ) const = 0;
 
         //!Change resolution on specified encoder
         /*!
+            \param[in] resolution
             \return 0 on success, otherwise - error code
         */
         virtual int setResolution( const Resolution& resolution ) = 0;
 
         /*!
             Camera is allowed to select fps different from requested, but it should try to choose fps nearest to requested
-            \param fps Requested fps
-            \param selectedFps *selectedFps MUST be set to actual fps implied
+            \param[in] fps Requested fps
+            \param[out] selectedFps *selectedFps MUST be set to actual fps implied
             \return 0 on success, otherwise - error code
         */
-        virtual int setFps( const float& fps, float* selectedFps ) = 0; // TODO: #AK passing float by const reference looks strange to me
+        virtual int setFps( const float& fps, float* selectedFps ) = 0;
 
         /*!
             Camera is allowed to select bitrate different from requested, but it should try to choose bitrate nearest to requested
-            \param bitrateKbps Requested bitrate in kbps
-            \param selectedBitrateKbps *selectedBitrateKbps MUST be set to actual bitrate implied
+            \param[in] bitrateKbps Requested bitrate in kbps
+            \param[out] selectedBitrateKbps *selectedBitrateKbps MUST be set to actual bitrate implied
             \return 0 on success, otherwise - error code
         */
         virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) = 0;
@@ -270,7 +295,7 @@ namespace nxcip
             - encoder number starts with 0
             - encoders MUST be numbered in quality decrease order (0 - encoder with best quality, 1 - low-quality)
 
-            \param encoderCount Contains encoder count on return
+            \param[out] encoderCount Contains encoder count on return
             \return 0 on success, otherwise - error code
         */
         virtual int getEncoderCount( int* encoderCount ) const = 0;
@@ -279,6 +304,8 @@ namespace nxcip
         /*!
             Most likely will return same pointer on multiple requests with same \a encoderIndex
 
+            \param[in] encoderIndex
+            \param[out] encoderPtr
             \return \a NX_NO_ERROR on success, otherwise - error code:\n
                 - \a NX_INVALID_ENCODER_NUMBER wrong \a encoderIndex value
             \note BaseCameraManager holds reference to \a CameraMediaEncoder
@@ -287,11 +314,13 @@ namespace nxcip
 
         //!Fills \a info struct with camera data
         /*!
+            \param[out] info
             \return 0 on success, otherwise - error code
             \note This method can set some parameters that were navailable during discovery
         */
         virtual int getCameraInfo( CameraInfo* info ) const = 0;
 
+        //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability
         { 
             hardwareMotionCapability    = 0x01, //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a CameraMotionDataProvider interface
@@ -304,7 +333,7 @@ namespace nxcip
         };
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
-            \param capabilitiesMask
+            \param[out] capabilitiesMask
             \return 0 on success, otherwise - error code
         */
         virtual int getCameraCapabilities( unsigned int* capabilitiesMask ) const = 0;
@@ -314,7 +343,7 @@ namespace nxcip
 
         //!Turn on/off audio on ALL encoders
         /*!
-            \param audioEnabled If non-zero, audio should be enabled on ALL encoders, else - disabled
+            \param[in] audioEnabled If non-zero, audio should be enabled on ALL encoders, else - disabled
             \return 0 on success, otherwise - error code
         */
         virtual int setAudioEnabled( int audioEnabled ) = 0;
@@ -340,7 +369,7 @@ namespace nxcip
 
         //!Returns text description of the last error
         /*!
-            \param errorString Buffer of size \a MAX_TEXT_LEN
+            \param[out] errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
     };
@@ -349,7 +378,7 @@ namespace nxcip
     // {8BAB5BC7-BEFC-4629-921F-8390A29D8A16}
     static const nxpl::NX_GUID IID_CameraPTZManager = { { 0x8b, 0xab, 0x5b, 0xc7, 0xbe, 0xfc, 0x46, 0x29, 0x92, 0x1f, 0x83, 0x90, 0xa2, 0x9d, 0x8a, 0x16 } };
 
-    //!Pan–tilt–zoom management
+    //!Pan-tilt-zoom management
     /*!
         VMS client has several PTZ support levels, and the more features are supported
         by the camera's PTZ manager, the smoother will be the client's experience.
@@ -373,7 +402,6 @@ namespace nxcip
     public:
         virtual ~CameraPTZManager() {}
 
-        // TODO: #Elric docz!
         enum Capability
         {
             ContinuousPanCapability             = 0x001,    //!< Camera supports continuous pan.
@@ -466,7 +494,7 @@ namespace nxcip
 
         //!Returns text description of the last error
         /*!
-            \param errorString Buffer of size \a MAX_TEXT_LEN
+            \param[out] errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
     };
@@ -495,7 +523,7 @@ namespace nxcip
 
     //!Relay input/output management
     /*!
-        It is implementation defined within which thread event (\a CameraInputEventHandler::inputPortStateChanged) will be delivered to
+        It is implementation defined within which thread event (\a nxcip::CameraInputEventHandler::inputPortStateChanged) will be delivered to
     */
     class CameraRelayIOManager
     :
@@ -504,30 +532,30 @@ namespace nxcip
     public:
         //!Returns list of IDs of available relay output ports
         /*!
-            \param idList Array of size \a MAX_RELAY_PORT_COUNT of \a MAX_ID_LEN - length strings. All strings MUST be NULL-terminated
-            \param idNum Size of returned id list
+            \param[out] idList Array of size \a MAX_RELAY_PORT_COUNT of \a MAX_ID_LEN - length strings. All strings MUST be NULL-terminated
+            \param[out] idNum Size of returned id list
             \return 0 on success, otherwise - error code
         */
         virtual int getRelayOutputList( char** idList, int* idNum ) const = 0;
 
         //!Returns list of IDs of available relay input ports
         /*!
-            \param idList Array of size \a MAX_RELAY_PORT_COUNT of \a MAX_ID_LEN - length strings. All strings MUST be NULL-terminated
-            \param idNum Size of returned id list
+            \param[out] idList Array of size \a MAX_RELAY_PORT_COUNT of \a MAX_ID_LEN - length strings. All strings MUST be NULL-terminated
+            \param[out] idNum Size of returned id list
             \return 0 on success, otherwise - error code
         */
         virtual int getInputPortList( char** idList, int* idNum ) const = 0;
 
         //!Change state of relay output port
         /*!
-            \param ouputID NULL-terminated ID of output port
-            \param activate If true, port should be activated (closed circuit), otherwise - deactivated (opened)
-            \param autoResetTimeoutMS If non-zero, port MUST return to deactivated state in \a autoResetTimeoutMS millis
+            \param[in] outputID NULL-terminated ID of output port
+            \param[in] activate If non-zero, port should be activated (closed circuit), otherwise - deactivated (opened circuit)
+            \param[in] autoResetTimeoutMS If non-zero, port MUST return to deactivated state in \a autoResetTimeoutMS millis
             \return 0 on success, otherwise - error code
         */
         virtual int setRelayOutputState(
             const char* outputID,
-            bool activate,
+            int activate,
             unsigned int autoResetTimeoutMS ) = 0;
 
         //!Starts relay input monitoring or increments internal counter, if already started
@@ -569,8 +597,7 @@ namespace nxcip
 
         //!Returns text description of last error
         /*!
-            \param errorCode Result code returned by any setter method
-            \param errorString Buffer of size \a MAX_TEXT_LEN
+            \param[out] errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
     };
@@ -590,15 +617,15 @@ namespace nxcip
         //!Called by \a CameraRelayIOManager on input port event
         /*!
             This method MUST not block
-            \param source
-            \param inputPortID NULL-terminated port ID
-            \param newState true - port activated (closed), false - deactivated (opened)
-            \param timestamp \a timestamp of event in millis since epoch (1970-01-01 00:00), UTC
+            \param[in] source
+            \param[in] inputPortID NULL-terminated port ID
+            \param[in] newState non-zero - port activated (closed), zero - deactivated (opened)
+            \param[in] timestamp \a timestamp of event in millis since epoch (1970-01-01 00:00), UTC
         */
         virtual void inputPortStateChanged(
             CameraRelayIOManager* source,
             const char* inputPortID,
-            bool newState,
+            int newState,
             unsigned long int timestamp ) = 0;
     };
 }

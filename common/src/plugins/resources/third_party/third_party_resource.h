@@ -59,7 +59,7 @@ public:
     virtual void inputPortStateChanged(
         nxcip::CameraRelayIOManager* source,
         const char* inputPortID,
-        bool newState,
+        int newState,
         unsigned long int timestamp ) override;
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;

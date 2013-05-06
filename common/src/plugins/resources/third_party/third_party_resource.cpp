@@ -155,13 +155,13 @@ unsigned int QnThirdPartyResource::releaseRef()
 void QnThirdPartyResource::inputPortStateChanged(
     nxcip::CameraRelayIOManager* /*source*/,
     const char* inputPortID,
-    bool newState,
+    int newState,
     unsigned long int /*timestamp*/ )
 {
     emit cameraInput(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
-        newState,
+        newState != 0,
         QDateTime::currentMSecsSinceEpoch() );
 }
 

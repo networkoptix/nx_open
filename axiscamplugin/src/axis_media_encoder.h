@@ -15,14 +15,19 @@
 
 class AxisCameraManager;
 
+//!Implementation of \a nxcip::CameraMediaEncoder
 /*!
-    \note Delegates reference counting to \a AxisCameraManager instance
+    \note Delegates reference counting to \a AxisCameraManager instance (i.e., increments \a AxisCameraManager reference counter on initialiation and decrements on destruction)
 */
 class AxisMediaEncoder
 :
     public nxcip::CameraMediaEncoder
 {
 public:
+    //!Initialization
+    /*!
+        \param cameraManager Reference counting is delegated to this object
+    */
     AxisMediaEncoder( AxisCameraManager* const cameraManager );
     virtual ~AxisMediaEncoder();
 
@@ -45,8 +50,6 @@ public:
     virtual int setFps( const float& fps, float* selectedFps ) override;
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
-    //!Implementation of nxcip::CameraMediaEncoder::getBaseCameraManager
-    //virtual nxcip::BaseCameraManager* getBaseCameraManager();
 
 private:
     CommonRefManager m_refManager;

@@ -19,7 +19,7 @@
 class CommonRefManager
 {
 public:
-    //!Use this constructor delete \a objToWatch when reference counter drops to zero
+    //!Use this constructor to delete \a objToWatch when reference counter drops to zero
     CommonRefManager( nxpl::PluginInterface* objToWatch );
     //!Use this constructor to delegate reference counting to another object
     CommonRefManager( CommonRefManager* refCountingDelegate );

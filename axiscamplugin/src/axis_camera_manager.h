@@ -22,6 +22,7 @@ class AxisMediaEncoder;
 class AxisRelayIOManager;
 class SyncHttpClient;
 
+//!Provides access to camera's properties and instanciates other managers (implements \a nxcip::BaseCameraManager)
 class AxisCameraManager
 :
     public nxcip::BaseCameraManager

@@ -2,21 +2,22 @@
 #define PLUGIN_API_H
 
 
-//!Network Optix dynamic plugin API
+//!Network Optix dynamic plugin API (c++)
 /*!
     - inspired by COM
-    - each plugin MUST export function of type \a nxpl::createNXPluginInstanceProc with name \a createNXPluginInstance with "C" linkage
+    - each plugin MUST export function of type \a nxpl::CreateNXPluginInstanceProc with name \a createNXPluginInstance with "C" linkage
     - each interface MUST inherit \a nxpl::PluginInterface
-    - each interface has GUID (\a IID_{interface_name} const non-member)
+    - each interface has GUID (\a IID_{interface_name} const non-member of type \a nxpl::NX_GUID)
 
     \note Use in multithreaded environment:\n
         - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef
 */
 namespace nxpl
 {
-    // TODO: #Elric rename to Guid?
+    //!GUID of plugin interface
     struct NX_GUID
     {
+        //!GUID bytes
         unsigned char bytes[16];
     };
 
@@ -58,6 +59,7 @@ namespace nxpl
         virtual unsigned int releaseRef() = 0;
     };
 
+    //!Automatic scoped pointer class which uses \a PluginInterface reference counting interface (\a PluginInterface::addRef and \a PluginInterface::releaseRef) instead of new/delete
     /*!
         Increments object's reference counter (\a PluginInterface::addRef) at construction, decrements at destruction (\a PluginInterface::releaseRef)
         \param T MUST inherit \a PluginInterface
@@ -67,6 +69,7 @@ namespace nxpl
     class ScopedRef
     {
     public:
+        //!Calls \a ptr->addRef() if \a ptr is not 0
         ScopedRef( T* ptr = 0 )
         :
             m_ptr( 0 )
@@ -79,6 +82,7 @@ namespace nxpl
             release();
         }
 
+        //!Returns protected pointer without releasing it
         T* get()
         {
             return m_ptr;
@@ -94,20 +98,23 @@ namespace nxpl
             return m_ptr;
         }
 
+        //!Releases protected pointer without calling \a nxpl::PluginInterface::releaseRef
         T* release()
         {
-            if( !m_ptr )
-                return 0;
-
             T* ptrBak = m_ptr;
-            m_ptr->releaseRef();
             m_ptr = 0;
             return ptrBak;
         }
 
+        //!Calls \a nxpl::PluginInterface::releaseRef on protected pointer (if any) and takes new pointer \a ptr (calling \a nxpl::PluginInterface::addRef)
         void reset( T* ptr = 0 )
         {
-            release();
+            if( m_ptr )
+            {
+                m_ptr->releaseRef();
+                m_ptr = 0;
+            }
+
             take( ptr );
         }
 

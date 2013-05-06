@@ -14,6 +14,9 @@
 
 
 //!Helper class, used by SyncHttpClient
+/*!
+    This class instance works in \a QNetworkAccessManager thread. This is needed to allow \a SyncHttpClient to belong to any thread
+*/
 class SyncHttpClientDelegate
 :
     public QObject
