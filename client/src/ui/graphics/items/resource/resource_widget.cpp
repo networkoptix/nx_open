@@ -767,7 +767,7 @@ void QnResourceWidget::updateOverlayWidgetsGeometry() {
 void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
     foreach(const OverlayWidget &overlay, m_overlayWidgets) {
         if(overlay.visibility == UserVisible)
-            break;
+            continue;
 
         qreal opacity;
         if(overlay.visibility == Invisible) {
