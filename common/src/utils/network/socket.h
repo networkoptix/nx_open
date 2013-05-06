@@ -65,7 +65,7 @@ public:
     /**
      *   Close and deallocate this socket
      */
-    ~Socket();
+    virtual ~Socket();
 
     QString lastError() const;
 

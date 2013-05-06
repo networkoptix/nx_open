@@ -21,13 +21,13 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_imageSize(1, 1),
     m_imageOpacity(0.7),
-    m_cache(new QnAppServerFileCache(this)),
+    m_cache(new QnAppServerImageCache(this)),
     m_imgUploaded(false),
     m_imageStatus(None)
 {
     setAcceptedMouseButtons(0);
 
-    connect(m_cache, SIGNAL(imageLoaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
+    connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
 }
@@ -53,7 +53,7 @@ void QnGridBackgroundItem::updateDisplay() {
     if (m_imageStatus != None)
         return;
     m_imageStatus = Loading;
-    m_cache->loadImage(m_imageFilename);
+    m_cache->downloadFile(m_imageFilename);
 }
 
 const QRectF& QnGridBackgroundItem::viewportRect() const {

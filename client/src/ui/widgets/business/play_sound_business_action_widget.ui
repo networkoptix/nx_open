@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QnPlaySoundBusinessActionWidget</class>
+ <widget class="QWidget" name="QnPlaySoundBusinessActionWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>35</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QComboBox" name="pathComboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="playButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../../x86/build/client-custom.qrc">
+       <normaloff>:/skin/slider/navigation/play.png</normaloff>:/skin/slider/navigation/play.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="manageButton">
+     <property name="text">
+      <string>Manage...</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../../x86/build/client-custom.qrc"/>
+ </resources>
+ <connections/>
+</ui>

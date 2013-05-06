@@ -10,11 +10,6 @@
 #include <business/events/abstract_business_event.h>
 #include <business/business_aggregation_info.h>
 
-namespace BusinessActionParameters {
-    QString getEmailAddress(const QnBusinessParams &params);
-    void setEmailAddress(QnBusinessParams* params, const QString &value);
-}
-
 class QnBusinessAggregationInfo;
 
 class QnSendMailBusinessAction: public QnAbstractBusinessAction

@@ -281,7 +281,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
             reply.setY(extractXmlBody(data, "yPos").toDouble());
             reply.setZ(extractXmlBody(data, "zoomPos").toDouble());
         } else {
-            qnWarning("Could not get ptz position from camera: %1.", response.errorString);
+//            qnWarning("Could not get ptz position from camera: %1.", response.errorString);
         }
 
         emitFinished(response.status, reply, handle);

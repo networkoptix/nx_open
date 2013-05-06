@@ -4,15 +4,6 @@
 #include "abstract_business_action.h"
 #include <core/resource/resource_fwd.h>
 
-namespace BusinessActionParameters {
-
-    QString getRelayOutputId(const QnBusinessParams &params);
-    void setRelayOutputId(QnBusinessParams* params, const QString &value);
-
-    int getRelayAutoResetTimeout(const QnBusinessParams &params);
-    void setRelayAutoResetTimeout(QnBusinessParams* params, int value);
-}
-
 class QnCameraOutputBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;

@@ -16,36 +16,32 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QImageWriter>
 
-#include <utils/common/environment.h>
-#include <utils/common/delete_later.h>
-#include <utils/common/mime_data.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/string.h>
-#include <utils/common/time.h>
-#include <utils/common/email.h>
-
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
-
 #include <api/session_manager.h>
 
-#include <business/actions/popup_business_action.h>
-
-#include <device_plugins/server_camera/appserver.h>
-
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <business/business_action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>
+#include <camera/caching_time_period_loader.h>
 
 #include <client/client_connection_data.h>
 
-#include <recording/time_period_list.h>
-#include <redass/redass_controller.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/resource_directory_browser.h>
 
-#include <ui/style/globals.h>
-#include <ui/style/skin.h>
+#include <device_plugins/server_camera/appserver.h>
+
+#include <ui/dialogs/notification_sound_manager_dialog.h>
+
+#include <plugins/resources/archive/archive_stream_reader.h>
+#include <plugins/resources/archive/avi_files/avi_resource.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <recording/time_period_list.h>
+
+#include <redass/redass_controller.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -70,7 +66,7 @@
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 
-#include <youtube/youtubeuploaddialog.h>
+//#include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -80,6 +76,9 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <ui/style/globals.h>
+#include <ui/style/skin.h>
 
 #include <ui/widgets/popups/popup_collection_widget.h>
 
@@ -103,7 +102,17 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/license_usage_helper.h>
-#include <utils/app_server_file_cache.h>
+#include <utils/app_server_image_cache.h>
+#include <utils/app_server_notification_cache.h>
+#include <utils/media/audio_player.h>
+#include <utils/common/environment.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/mime_data.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/string.h>
+#include <utils/common/time.h>
+#include <utils/common/email.h>
+#include <utils/common/synctime.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -111,16 +120,10 @@
 
 // TODO: #Elric remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
-#include "utils/common/synctime.h"
-#include "camera/caching_time_period_loader.h"
 
 #ifdef Q_OS_WIN
 #include "launcher_win/nov_launcher.h"
 #endif
-
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resource/resource_directory_browser.h"
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -939,11 +942,33 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::ShowPopup)
-        return;
+    switch (businessAction->actionType()) {
+    case BusinessActionType::ShowPopup: {
+            ensurePopupCollectionWidget();
+            popupCollectionWidget()->addBusinessAction(businessAction);
+            break;
+        }
+    case BusinessActionType::PlaySound: {
+            QString filename = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
+            qDebug() << "play sound action received" << filename;
 
-    ensurePopupCollectionWidget();
-    popupCollectionWidget()->addBusinessAction(businessAction);
+            QnAppServerNotificationCache *cache = new QnAppServerNotificationCache(this);
+            connect(cache,  SIGNAL(fileDownloaded(QString,bool)),  this,  SLOT(at_notificationSoundDownloaded(QString, bool)));
+            connect(cache,  SIGNAL(fileDownloaded(QString,bool)),  cache, SLOT(deleteLater()));
+            cache->downloadFile(filename);
+            break;
+        }
+    default:
+        break;
+    }
+}
+
+void QnWorkbenchActionHandler::at_notificationSoundDownloaded(const QString &filename, bool ok) {
+    if (!ok)
+        return;
+    qDebug() << "ready to play" << filename;
+    AudioPlayer::playFileAsync(filename);
+    //TODO: #GDM play sound
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -964,10 +989,21 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+
+//    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/chimes.wav");
+    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/blind_willie.mp3");
+//    QString soundPath = QLatin1String("/home/gdm1/Videos/300.avi");
+    qDebug() << "play sound action received" << soundPath << QFileInfo(soundPath).exists();
+    AudioPlayer::playFileAsync(soundPath);
+
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
+
+    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog());
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
@@ -1587,7 +1623,7 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     bool newlyCreated = false;
     if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(widget(), context());
+        m_businessRulesDialog = new QnBusinessRulesDialog(widget());
         newlyCreated = true;
     }
     QRect oldGeometry = businessRulesDialog()->geometry();
@@ -3491,19 +3527,19 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     if(!accessController()->hasPermissions(workbench()->currentLayout()->resource(), Qn::EditLayoutSettingsPermission))
         return;
 
-    QnAppServerFileCache *cache = new QnAppServerFileCache(this);
-    connect(cache, SIGNAL(imageStored(QString, bool)), this, SLOT(at_backgroundImageStored(QString, bool)));
-    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
-
     QnProgressDialog *progressDialog = new QnProgressDialog(this->widget());
     progressDialog->setWindowTitle(tr("Updating background"));
     progressDialog->setLabelText(tr("Image processing can take a lot of time. Please be patient."));
     progressDialog->setRange(0, 0);
     progressDialog->setCancelButton(NULL);
-
     connect(progressDialog,   SIGNAL(canceled()),                   progressDialog,     SLOT(deleteLater()));
-    connect(cache,            SIGNAL(imageStored(QString, bool)),   progressDialog,     SLOT(deleteLater()));
-    connect(cache,            SIGNAL(imageStored(QString, bool)),   cache,              SLOT(deleteLater()));
+
+    QnAppServerImageCache *cache = new QnAppServerImageCache(this);
+    connect(cache,            SIGNAL(fileUploaded(QString, bool)),  this,               SLOT(at_backgroundImageStored(QString, bool)));
+    connect(cache,            SIGNAL(fileUploaded(QString,bool)),   progressDialog,     SLOT(deleteLater()));
+    connect(cache,            SIGNAL(fileUploaded(QString, bool)),  cache,              SLOT(deleteLater()));
+
+    cache->storeImage(menu()->currentParameters(sender()).resource()->getUrl());
     progressDialog->exec();
 }
 

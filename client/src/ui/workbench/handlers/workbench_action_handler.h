@@ -362,6 +362,7 @@ protected slots:
 
     void at_serverSettings_received(int status, const QByteArray& errorString, const QnKvPairList& settings, int handle);
 
+    void at_notificationSoundDownloaded(const QString& filename, bool ok);
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 

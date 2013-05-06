@@ -15,8 +15,6 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/camera_output_business_action.h>
-#include <business/actions/popup_business_action.h>
-
 
 class QnProcessorAggregationInfo {
 public:
@@ -101,7 +99,7 @@ public:
 
     virtual QString getGuid() const { return QString(); }
 
-    bool showPopup(QnPopupBusinessActionPtr action);
+    bool broadcastBusinessAction(QnAbstractBusinessActionPtr action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
@@ -127,7 +125,7 @@ protected slots:
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
-    void at_sendPopupFinished(QnHTTPRawResponse response, int handle);
+    void at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle);
     void at_sendEmailFinished(int status, const QByteArray& errorString, bool result, int handle);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
