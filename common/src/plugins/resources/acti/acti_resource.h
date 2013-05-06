@@ -48,6 +48,7 @@ public:
     virtual QnAbstractPtzController* getPtzController() override;
 
     static QByteArray unquoteStr(const QByteArray& value);
+    QMap<QByteArray, QByteArray> parseReport(const QByteArray& report) const;
 signals:
     //!Emitted on camera input port state has been changed
     /*!
@@ -71,7 +72,6 @@ protected:
 private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
-    QMap<QByteArray, QByteArray> parseReport(const QByteArray& report) const;
     QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     void initializePtz();
 private:

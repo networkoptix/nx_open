@@ -38,7 +38,15 @@ private:
         QByteArray xml;
     };
 
+    struct CashedDevInfo
+    {
+        QElapsedTimer timer;
+        UpnpDeviceInfo info;
+    };
+
     QMap<QString, CasheInfo> m_cachedXml;
+    QMap<QString, CashedDevInfo> m_cashedDevInfo;
+
     QSet<QString >m_httpInProgress;
     QNetworkAccessManager *m_manager;
     QMutex m_mutex;
