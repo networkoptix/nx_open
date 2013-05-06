@@ -6,7 +6,7 @@
 
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <api/media_server_statistics_data.h>
+#include <api/model/statistics_reply.h>
 #include <api/media_server_statistics_storage.h>
 
 /**

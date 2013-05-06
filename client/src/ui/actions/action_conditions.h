@@ -351,6 +351,7 @@ public:
     QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent = NULL): QnActionCondition(parent), m_nodeType(nodeType) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
 private:
     Qn::NodeType m_nodeType;
 };
@@ -362,5 +363,13 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+class QnOpenInNewEntityActionCondition: public QnActionCondition {
+public: 
+    QnOpenInNewEntityActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
 
 #endif // QN_ACTION_CONDITIONS_H

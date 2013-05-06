@@ -1,12 +1,12 @@
-#ifndef QN_STATISTICS_DATA
-#define QN_STATISTICS_DATA
+#ifndef QN_STATISTICS_REPLY_H
+#define QN_STATISTICS_REPLY_H
 
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QHash>
 #include <QtCore/QLinkedList>
 
-enum  QnStatisticsDeviceType {
+enum QnStatisticsDeviceType {
     CPU,
     RAM,
     HDD,
@@ -15,7 +15,6 @@ enum  QnStatisticsDeviceType {
 };
 
 struct QnStatisticsDataItem {
-
     QnStatisticsDataItem() {}
     QnStatisticsDataItem(const QString &description, qreal value, QnStatisticsDeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
 
@@ -26,7 +25,15 @@ struct QnStatisticsDataItem {
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
-struct QnStatisticsData{
+struct QnStatisticsReply {
+    QnStatisticsDataList statistics;
+    qint64 updatePeriod;
+};
+
+
+// TODO: #Elric move out
+
+struct QnStatisticsData {
     QString description;
     QnStatisticsDeviceType deviceType;
     QLinkedList<qreal> values;
@@ -34,7 +41,7 @@ struct QnStatisticsData{
 
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
 
-Q_DECLARE_METATYPE(QnStatisticsDataList)
+Q_DECLARE_METATYPE(QnStatisticsReply)
 Q_DECLARE_METATYPE(QnStatisticsData)
 
-#endif // QN_STATISTICS_DATA
+#endif // QN_STATISTICS_REPLY_H

@@ -216,7 +216,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         }
 #endif
 
-        serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
+        serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
     }
 }
 
