@@ -304,10 +304,10 @@ private:
     QString m_key;
 };
 
+
 // -------------------------------------------------------------------------- //
 // StatisticsOverlayWidget
 // -------------------------------------------------------------------------- //
-
 class StatisticsOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 public:
@@ -325,15 +325,12 @@ protected:
         return base_type::sizeHint(which == Qt::MinimumSize ? which : Qt::MaximumSize, constraint);
     }
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override {
-        Q_UNUSED(widget)
-
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) override {
         QnScopedPainterFontRollback fontRollback(painter);
         Q_UNUSED(fontRollback)
         QFont font(this->font());
         font.setPixelSize(legendFontSize);
         painter->setFont(font);
-
 
         QRectF rect = option->rect;
 
@@ -363,7 +360,7 @@ protected:
         const qreal x_step = (qreal)ow*1.0/(m_widget->m_pointsLimit - 2); // one point is cut from the beginning and one from the end
         const qreal y_step = oh * 0.025;
 
-        /** Draw grid */
+        /* Draw grid */
         {
             QPen grid;
             grid.setColor(qnGlobals->statisticsColors().grid);
@@ -395,7 +392,7 @@ protected:
         while (maxNetworkValue > networkUpperBound)
             networkUpperBound *= 2;
 
-        /** Draw graph lines */
+        /* Draw graph lines */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
@@ -427,7 +424,7 @@ protected:
             }
         }
 
-        /** Draw frame and legend */
+        /* Draw frame and legend */
         {
             QnScopedPainterPenRollback penRollback(painter);
             Q_UNUSED(penRollback)
@@ -477,14 +474,15 @@ protected:
             }
         }
     }
+
 private:
     QnServerResourceWidget* m_widget;
 };
 
+
 // -------------------------------------------------------------------------- //
 // QnServerResourceWidget
 // -------------------------------------------------------------------------- //
-
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
     m_manager(context->instance<QnMediaServerStatisticsManager>()),
@@ -537,6 +535,7 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
     return m_renderStatus;
 }
 
+// TODO: #GDM this method draws background only, why 'drawStatistics'?
 void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painter) {
     qreal width = rect.width();
     qreal height = rect.height();
@@ -552,7 +551,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
     QRectF inner(offset, offset, ow, oh);
 
-    /** Draw background */
+    /* Draw background */
     if(!m_backgroundGradientPainter)
         m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
 
@@ -577,6 +576,62 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     }
     painter->endNativePainting();
 }
+
+void QnServerResourceWidget::addOverlays() {
+    m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Horizontal);
+    connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
+
+    QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    legendOverlayHLayout->addStretch();
+    legendOverlayHLayout->addItem(m_legendButtonBar);
+    m_legendButtonBar->setOpacity(m_infoOpacity);
+    legendOverlayHLayout->addStretch();
+
+    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
+    statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+
+    QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    mainOverlayLayout->setSpacing(0.5);
+    mainOverlayLayout->addItem(statisticsOverlayWidget);
+    mainOverlayLayout->addItem(legendOverlayHLayout);
+
+    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
+    mainOverlayWidget->setLayout(mainOverlayLayout);
+    mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+    mainOverlayWidget->setOpacity(1.0);
+    addOverlayWidget(mainOverlayWidget, UserVisible, true);
+}
+
+void QnServerResourceWidget::updateLegend() {
+    int visibleMask = 0;
+    int checkedMask = 0;
+
+    foreach (QString key, m_sortedKeys) {
+        int mask;
+        if (!m_buttonMaskByKey.contains(key)) {
+            mask = m_maxMaskUsed;
+            m_maxMaskUsed *= 2;
+            m_buttonMaskByKey[key] = mask;
+        } else {
+            mask = m_buttonMaskByKey[key];
+        }
+        visibleMask |= mask;
+
+        if (!m_legendButtonBar->button(mask)) {
+            QnStatisticsData &stats = m_history[key];
+            m_legendButtonBar->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
+        }
+
+        bool checked =  m_checkedFlagByKey.value(key, true);
+        if (checked)
+            checkedMask |= mask;
+    }
+    m_legendButtonBar->setCheckedButtons(checkedMask);
+    m_legendButtonBar->setVisibleButtons(visibleMask);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -636,62 +691,6 @@ void QnServerResourceWidget::at_statistics_received() {
 
     m_elapsedTimer.restart();
     m_counter++;
-}
-
-void QnServerResourceWidget::addOverlays() {
-    m_legendButtonBar = new QnImageButtonBar(this, 0, Qt::Horizontal);
-    connect(m_legendButtonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_legend_checkedButtonsChanged()));
-
-    QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    legendOverlayHLayout->addStretch();
-    legendOverlayHLayout->addItem(m_legendButtonBar);
-    m_legendButtonBar->setOpacity(m_infoOpacity);
-    legendOverlayHLayout->addStretch();
-
-    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this, this);
-    statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-
-    QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    mainOverlayLayout->setSpacing(0.5);
-    mainOverlayLayout->addItem(statisticsOverlayWidget);
-    mainOverlayLayout->addItem(legendOverlayHLayout);
-
-    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
-    mainOverlayWidget->setLayout(mainOverlayLayout);
-    mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-    mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(mainOverlayWidget, UserVisible, true);
-}
-
-void QnServerResourceWidget::updateLegend() {
-
-    int visibleMask = 0;
-    int checkedMask = 0;
-
-    foreach (QString key, m_sortedKeys) {
-        int mask;
-        if (!m_buttonMaskByKey.contains(key)) {
-            mask = m_maxMaskUsed;
-            m_maxMaskUsed *= 2;
-            m_buttonMaskByKey[key] = mask;
-        } else {
-            mask = m_buttonMaskByKey[key];
-        }
-        visibleMask |= mask;
-
-        if (!m_legendButtonBar->button(mask)) {
-            QnStatisticsData &stats = m_history[key];
-            m_legendButtonBar->addButton(mask, new LegendButtonWidget(stats.deviceType, key));
-        }
-
-        bool checked =  m_checkedFlagByKey.value(key, true);
-        if (checked)
-            checkedMask |= mask;
-    }
-    m_legendButtonBar->setCheckedButtons(checkedMask);
-    m_legendButtonBar->setVisibleButtons(visibleMask);
 }
 
 void QnServerResourceWidget::at_legend_checkedButtonsChanged() {
