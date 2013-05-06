@@ -163,7 +163,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    processPacket(QHostAddress(), url.host(), devInfo.info, result);
+    processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
 
     return result;
 }
