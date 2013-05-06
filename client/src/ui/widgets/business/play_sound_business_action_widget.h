@@ -26,6 +26,7 @@ protected slots:
 
 private slots:
     void paramsChanged();
+    void at_playButton_clicked();
     void at_manageButton_clicked();
     void at_fileListReceived(const QStringList &filenames, bool ok);
 

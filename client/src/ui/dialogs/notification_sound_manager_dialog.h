@@ -21,6 +21,7 @@ private slots:
     void at_fileDownloaded(const QString &filename, bool ok);
     void at_fileUploaded(const QString &filename, bool ok);
 
+    void at_playButton_clicked();
     void at_addButton_clicked();
 private:
     void updateLoadingStatus();

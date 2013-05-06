@@ -89,7 +89,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="PlayButton">
+        <widget class="QPushButton" name="playButton">
          <property name="text">
           <string>&amp;Play</string>
          </property>
@@ -146,7 +146,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>PlayButton</tabstop>
+  <tabstop>playButton</tabstop>
   <tabstop>addButton</tabstop>
   <tabstop>removeButton</tabstop>
   <tabstop>buttonBox</tabstop>

@@ -15,7 +15,6 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QCheckBox>
 #include <QtGui/QImageWriter>
-#include <QtGui/QSound>
 
 #include <api/session_manager.h>
 
@@ -34,8 +33,6 @@
 
 #include <device_plugins/server_camera/appserver.h>
 
-#include <openal/qtvaudiodevice.h>
-#include <openal/qtvsound.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
@@ -107,6 +104,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/media/audio_player.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
@@ -969,6 +967,7 @@ void QnWorkbenchActionHandler::at_notificationSoundDownloaded(const QString &fil
     if (!ok)
         return;
     qDebug() << "ready to play" << filename;
+    AudioPlayer::playFileAsync(filename);
     //TODO: #GDM play sound
 }
 
@@ -992,18 +991,11 @@ void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
 
 
-    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/chimes.wav");
+//    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/chimes.wav");
+    QString soundPath = QLatin1String("/home/gdm1/tmp/snd/blind_willie.mp3");
+//    QString soundPath = QLatin1String("/home/gdm1/Videos/300.avi");
     qDebug() << "play sound action received" << soundPath << QFileInfo(soundPath).exists();
-
-    QnByteArray decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE);
-    QnAudioFormat format;
-
-    QtvSound* sound = QtvAudioDevice::instance()->addSound(format);
-    if (!sound) {
-        qDebug() << "false check";
-        return;
-    }
-    sound->play((const quint8*) decodedAudioBuffer.data(), decodedAudioBuffer.size());
+    AudioPlayer::playFileAsync(soundPath);
 
 }
 

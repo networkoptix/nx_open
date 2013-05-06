@@ -1,13 +1,17 @@
 #include "play_sound_business_action_widget.h"
 #include "ui_play_sound_business_action_widget.h"
 
+#include <QtCore/QFileInfo>
+
 #include <business/business_action_parameters.h>
 
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/media/audio_player.h>
+
 
 QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -19,6 +23,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
     ui->setupUi(this);
 
     connect(ui->pathComboBox, SIGNAL(editTextChanged(QString)), this, SLOT(paramsChanged()));
+    connect(ui->playButton, SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
     connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
 
     connect(m_cache, SIGNAL(fileListReceived(QStringList,bool)), this, SLOT(at_fileListReceived(QStringList,bool)));
@@ -33,7 +38,7 @@ void QnPlaySoundBusinessActionWidget::updateSoundUrl() {
     QnScopedValueRollback<bool> guard(&m_updating, true);
     Q_UNUSED(guard)
 
-    int idx = ui->pathComboBox->findText(m_soundUrl);
+    int idx = ui->pathComboBox->findData(m_soundUrl);
     if (idx > 0)
         ui->pathComboBox->setCurrentIndex(idx);
     else
@@ -46,8 +51,11 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
         m_soundUrl = QnBusinessActionParameters::getSoundUrl(model->actionParams());
-        if (m_loaded)
-            updateSoundUrl();
+        if (!m_loaded) {
+            ui->pathComboBox->clear();
+            ui->pathComboBox->addItem(m_soundUrl, m_soundUrl);
+        }
+        updateSoundUrl();
     }
 }
 
@@ -56,30 +64,39 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
         return;
 
     QnBusinessParams params;
-    QnBusinessActionParameters::setSoundUrl(&params, ui->pathComboBox->currentText());
+    QnBusinessActionParameters::setSoundUrl(&params, ui->pathComboBox->itemData(ui->pathComboBox->currentIndex()).toString());
     model()->setActionParams(params);
 }
 
+void QnPlaySoundBusinessActionWidget::at_playButton_clicked() {
+    if (m_soundUrl.isEmpty())
+        return;
 
+    QString filePath = m_cache->getFullPath(m_soundUrl);
+    if (!QFileInfo(filePath).exists())
+        return;
+
+    AudioPlayer::playFileAsync(filePath);
+}
 
 void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
     QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog());
-    dialog->exec();
+    if (dialog->exec() == QDialog::Rejected)
+        return;
+    m_loaded = false;
+    ui->pathComboBox->setEnabled(false);
+    m_cache->getFileList();
 }
 
 void QnPlaySoundBusinessActionWidget::at_fileListReceived(const QStringList &filenames, bool ok) {
-    ui->pathComboBox->clear();
-    if (!ok) {
-        ui->pathComboBox->addItem(tr("<Connection error>"));
-        ui->pathComboBox->setCurrentIndex(0);
+    if (!ok)
         return;
-    }
 
-    ui->pathComboBox->addItem(tr("<No sound>"));
+    ui->pathComboBox->clear();
     foreach(const QString &filename, filenames) {
-        ui->pathComboBox->addItem(filename); //TODO: #GDM metatada, filename in userData
+        ui->pathComboBox->addItem(filename, filename); //TODO: #GDM metatada, filename in userData
     }
     m_loaded = true;
+    ui->pathComboBox->setEnabled(true);
     updateSoundUrl();
-
 }
