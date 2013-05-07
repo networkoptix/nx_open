@@ -50,6 +50,7 @@ signals:
     void finishedSendEmail(int status, const QByteArray &errorString, bool result, int handle);
     void finishedGetFile(int status, const QByteArray& data, int handle);
     void finishedPutFile(int status, int handle);
+    void finishedDirectoryListing(int status, const QStringList &filenames, int handle);
 
 private:
     QnResourceFactory &m_resourceFactory;
@@ -125,6 +126,15 @@ public:
      * @return                              Handle of the request
      */
     int addStoredFileAsync(const QString &filename, const QByteArray &data, QObject *target, const char *slot);
+
+    /**
+     * @brief requestDirectoryListingAsync  Get filenames for all stored files on EC in the selected directory
+     * @param folderName                    Name of the directory
+     * @param target                        Receiver object
+     * @param slot                          SLOT(int status, const QStringList& filenames, int handle)
+     * @return                              Handle of the request
+     */
+    int requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot);
 
     // Asynchronous API
     int testConnectionAsync(QObject *target, const char *slot);

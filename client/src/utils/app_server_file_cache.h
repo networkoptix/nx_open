@@ -15,7 +15,7 @@ public:
         CategoryCount
     };
 
-    explicit QnAppServerFileCache(QObject *parent = 0);
+    explicit QnAppServerFileCache(QString folderName, QObject *parent = 0);
     ~QnAppServerFileCache();
 
     /** Get full path to cached file with fixed filename */
@@ -41,16 +41,15 @@ protected:
      * @param filename      Filename in the cache directory.
      */
     void uploadFile(const QString &filename);
-
 private slots:
-
-    void debugTimer();
-
     void at_fileLoaded(int status, const QByteArray& data, int handle);
     void at_fileUploaded(int status, int handle);
+    void at_fileListReceived(int status, const QStringList& filenames, int handle);
 private:
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;
+    int m_fileListHandle;
+    QString m_folderName;
 };
 
 #endif // APP_SERVER_FILE_CACHE_H

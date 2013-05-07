@@ -6,13 +6,14 @@
 #include <transcoding/file_transcoder.h>
 
 namespace {
+    const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
 
     const unsigned int durationMs = 10000;
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
-    base_type(parent)
+    base_type(folder, parent)
 {
 }
 
