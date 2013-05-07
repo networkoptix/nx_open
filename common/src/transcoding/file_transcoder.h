@@ -89,6 +89,8 @@ public:
     int resultCode() const;
 
 public slots:
+    //!Overrides QnLongRunnable::pleaseStop
+    virtual void pleaseStop() override;
     //!Start transcoding
     /*!
         This method returns immediately. On transcoding end \a done signal is emmitted

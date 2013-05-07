@@ -57,6 +57,8 @@ public:
     static QString getTagValue( const QString& filePath, const QString& tagName );
 
 public slots:
+    //!Overrides QnLongRunnable::pleaseStop
+    virtual void pleaseStop() override;
     //!Openes file for playback and initializes internal data
     /*!
         If there is opened file, it's being closed first

@@ -30,10 +30,6 @@ FileTranscoder::FileTranscoder()
 FileTranscoder::~FileTranscoder()
 {
     pleaseStop();
-    {
-        QMutexLocker lk( &m_mutex );
-        m_cond.wakeAll();
-    }
     stop();
 }
 
@@ -87,6 +83,14 @@ void FileTranscoder::setTranscodeDurationLimit( unsigned int lengthToReadMS )
 int FileTranscoder::resultCode() const
 {
     return m_resultCode;
+}
+
+void FileTranscoder::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+
+    QMutexLocker lk( &m_mutex );
+    m_cond.wakeAll();
 }
 
 bool FileTranscoder::startAsync()
