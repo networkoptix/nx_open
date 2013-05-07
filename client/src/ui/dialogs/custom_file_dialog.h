@@ -5,6 +5,7 @@
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QCheckBox>
+#include <QtGui/QSpinBox>
 
 class QnCheckboxControlAbstractDelegate: public QObject
 {
@@ -54,6 +55,8 @@ public:
     void addCheckbox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate = NULL);
 
 
+    void addSpinBox(const QString &text, int minValue, int maxValue, int *value);
+
     /**
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
@@ -63,6 +66,7 @@ private slots:
     void at_accepted();
 private:
     QMap<QCheckBox*, bool *> m_checkboxes;
+    QMap<QSpinBox*, int *> m_spinboxes;
 
 };
 

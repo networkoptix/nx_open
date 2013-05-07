@@ -4,6 +4,8 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
 
+#include <ui/dialogs/custom_file_dialog.h>
+
 #include <utils/app_server_notification_cache.h>
 #include <utils/media/audio_player.h>
 
@@ -97,19 +99,26 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 }
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file...")));
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
+    dialog->setNameFilter(supportedFormats);
 
-    QString filename = QFileDialog::getOpenFileName(
-                this,
-                //tr("Select file..."),
-                QString(),
-                QString(),
-                supportedFormats);
-    if (filename.isEmpty())
+    int cropSoundSecs = 5;
+
+    dialog->addSpinBox(tr("Cut to first secs"), 1, 10, &cropSoundSecs);
+    if(!dialog->exec())
         return;
-    m_cache->storeSound(filename);
+
+    QStringList files = dialog->selectedFiles();
+    if (files.size() < 0)
+        return;
+
+    QString filename = files[0];
+
+    m_cache->storeSound(filename, cropSoundSecs*1000);
     m_total = 1;
     m_loadingCounter = 1;
     updateLoadingStatus();

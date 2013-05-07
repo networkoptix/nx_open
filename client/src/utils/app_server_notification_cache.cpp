@@ -8,8 +8,6 @@
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-
-    const unsigned int durationMs = 10000;
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
@@ -21,7 +19,7 @@ QnAppServerNotificationCache::~QnAppServerNotificationCache() {
 
 }
 
-void QnAppServerNotificationCache::storeSound(const QString &filePath) {
+void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs) {
     QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
     QString title = QFileInfo(filePath).fileName();
@@ -32,8 +30,10 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath) {
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
     transcoder->setAudioCodec(CODEC_ID_MP3);
-    transcoder->setTranscodeDurationLimit(durationMs);
     transcoder->addTag(QLatin1String("Comment"), title);
+
+    if (maxLengthMSecs > 0)
+        transcoder->setTranscodeDurationLimit(maxLengthMSecs);
 
     connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
     connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
