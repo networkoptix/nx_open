@@ -41,7 +41,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
 void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::BusinessAction& pb_businessAction);
-void parseBusinessActionList(QList<QnAbstractBusinessActionPtr>& businessActionList, const pb::BusinessActionList& pb_businessActionList);
+void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, const pb::BusinessActionList& pb_businessActionList);
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
@@ -819,7 +819,7 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
     parseBusinessAction(businessAction, pb_businessAction);
 }
 
-void QnApiPbSerializer::deserializeBusinessActionList(QList<QnAbstractBusinessActionPtr>& businessActionList, const QByteArray& data)
+void QnApiPbSerializer::deserializeBusinessActionList(QnAbstractBusinessActionList& businessActionList, const QByteArray& data)
 {
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
@@ -1032,7 +1032,7 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeBusinessActionList(const QList<QnAbstractBusinessActionPtr> &actions, QByteArray &data)
+void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActionList &actions, QByteArray &data)
 {
     pb::BusinessActionList pb_businessActionList;
 
@@ -1228,7 +1228,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
     businessAction->setAggregationCount(pb_businessAction.aggregationcount());
 }
 
-void parseBusinessActionList(QList<QnAbstractBusinessActionPtr>& businessActionList, const pb::BusinessActionList& pb_businessActionList)
+void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, const pb::BusinessActionList& pb_businessActionList)
 {
     for (int i = 0; i < pb_businessActionList.businessaction_size(); ++i)
     {

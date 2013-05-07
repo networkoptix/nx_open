@@ -240,6 +240,11 @@ namespace Qn {
         SystemSettingsAction,
 
         /**
+         * Opens business events log dialog.
+         */
+        BusinessEventsLogAction,
+
+        /**
          * Opens business events editing dialog.
          */
         BusinessEventsAction,

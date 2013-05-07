@@ -24,6 +24,7 @@ private:
     QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;
     qint64 m_eventKeepPeriod;
+    mutable QMutex m_mutex;
     static QnEventsDB* m_instance;
 };
 

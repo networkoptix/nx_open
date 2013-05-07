@@ -98,6 +98,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
+    qRegisterMetaType<QnAbstractBusinessActionList>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();

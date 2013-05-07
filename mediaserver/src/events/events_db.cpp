@@ -48,6 +48,8 @@ bool QnEventsDB::cleanupEvents()
 
 bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
 {
+    QMutexLocker lock(&m_mutex);
+
     if (!m_sdb.isOpen())
         return false;
 
@@ -84,6 +86,8 @@ bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePt
 
 QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(QnTimePeriod period) const
 {
+    QMutexLocker lock(&m_mutex);
+
     QList<QnAbstractBusinessActionPtr> result;
 
     QSqlQuery query(m_sdb);

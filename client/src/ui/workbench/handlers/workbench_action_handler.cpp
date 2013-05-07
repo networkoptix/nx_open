@@ -238,6 +238,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
+    connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
@@ -371,6 +372,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (businessRulesDialog())
         delete businessRulesDialog();
+
+    if (businessEventsLogDialog())
+        delete businessEventsLogDialog();
 
     if (popupCollectionWidget())
         delete popupCollectionWidget();
@@ -1526,6 +1530,18 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     businessRulesDialog()->show();
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
+}
+
+void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
+    bool newlyCreated = false;
+    if(!businessEventsLogDialog()) {
+        m_businessEventsLogDialog = new QnEventLogDialog(widget(), context());
+        newlyCreated = true;
+    }
+    QRect oldGeometry = businessEventsLogDialog()->geometry();
+    businessEventsLogDialog()->show();
+    if(!newlyCreated)
+        businessEventsLogDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {

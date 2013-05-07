@@ -597,6 +597,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+E")).
         autoRepeat(false);
 
+    factory(Qn::BusinessEventsLogAction).
+        flags(Qn::Main).
+        requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalProtectedPermission).
+        text(tr("Alarm/Event Log...")).
+        shortcut(tr("Ctrl+L")).
+        autoRepeat(false);
+
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).

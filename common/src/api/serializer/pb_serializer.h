@@ -23,7 +23,7 @@ public:
     void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
     void deserializeBusinessRules(QnBusinessEventRules& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
-    void deserializeBusinessActionList(QList<QnAbstractBusinessActionPtr> &businessActionList, const QByteArray& data) override;
+    void deserializeBusinessActionList(QnAbstractBusinessActionList &businessActionList, const QByteArray& data) override;
     void deserializeKvPairs(QnKvPairList& kvPairs, const QByteArray& data);
     void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data);
 
@@ -37,7 +37,7 @@ public:
     void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
     void serializeEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, QByteArray& data) override;
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
-    void serializeBusinessActionList(const QList<QnAbstractBusinessActionPtr> &businessActions, QByteArray& data) override;
+    void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) override;
     void serializeKvPair(const QnKvPair& kvPair, QByteArray& data);
     void serializeKvPairs(const QnKvPairList& kvPairs, QByteArray& data);
     void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data);

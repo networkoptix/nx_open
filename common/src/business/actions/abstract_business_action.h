@@ -56,6 +56,7 @@ namespace BusinessActionType
 
 class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
+typedef QList<QnAbstractBusinessActionPtr> QnAbstractBusinessActionList;
 
 
 namespace QnBusinessActionRuntime {
@@ -123,6 +124,7 @@ protected:
 
 Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
+Q_DECLARE_METATYPE(QnAbstractBusinessActionList)
 
 
 #endif // __ABSTRACT_BUSINESS_ACTION_H_

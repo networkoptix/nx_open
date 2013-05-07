@@ -137,7 +137,7 @@ private slots:
 
 protected:
     bool containResource(QnResourceList resList, const QnId& resId) const;
-    QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
+    QnAbstractBusinessActionList matchActions(QnAbstractBusinessEventPtr bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*

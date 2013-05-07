@@ -162,7 +162,7 @@ namespace detail {
 
     public:
         //!Return value is actual only after response has been handled
-        const QList<QnAbstractBusinessActionPtr> &events() const;
+        const QnAbstractBusinessActionList &events() const;
 
         //!Parses response mesasge body and fills \a m_receivedParams
         void parseResponse(const QByteArray& responseMssageBody);
@@ -174,10 +174,10 @@ namespace detail {
         void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
 
     signals:
-        void finished(int status, const QList<QnAbstractBusinessActionPtr> &events);
+        void finished(int requestNum, int httpStatus, const QnAbstractBusinessActionList& events);
 
     private:
-        QList<QnAbstractBusinessActionPtr> m_events;
+        QnAbstractBusinessActionList m_events;
     };
 
     //!Handles response on SetParam request
@@ -236,7 +236,7 @@ public:
      * Get \a event log. 
      * 
      * Returns immediately. On request completion \a slot of object \a target 
-     * is called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant> > &params)</tt>.
+     * is called with signature <tt>(int handle, int httpStatusCode, const QList<QnAbstractBusinessAction> &events)</tt>.
      * \a status is 0 in case of success, in other cases it holds error code 
      * 
      * \param camRes filter events by camera. Optional.

@@ -327,7 +327,7 @@ namespace detail
     ////////////////////////////////////////////////////////////////
     // QnMediaServerEventLogReplyProcessor
     ////////////////////////////////////////////////////////////////
-    const QList<QnAbstractBusinessActionPtr>& QnMediaServerEventLogReplyProcessor::events() const
+    const QnAbstractBusinessActionList& QnMediaServerEventLogReplyProcessor::events() const
     {
         return m_events;
     }
@@ -337,13 +337,14 @@ namespace detail
     {
         m_events.clear();
         QnApiPbSerializer serializer;
-        serializer.deserializeBusinessActionList(m_events, responseMessageBody);;
+        serializer.deserializeBusinessActionList(m_events, responseMessageBody);
     }
 
-    void QnMediaServerEventLogReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/ )
+    void QnMediaServerEventLogReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int handle )
     {
-        parseResponse(response.data);
-        emit finished(response.status, m_events);
+        if (response.status == 0)
+            parseResponse(response.data);
+        emit finished(handle, response.status, m_events);
         deleteLater();
     }
 
@@ -377,7 +378,7 @@ namespace detail
         }
     }
 
-    void QnMediaServerGetParamReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/ )
+    void QnMediaServerGetParamReplyProcessor::at_replyReceived(const QnHTTPRawResponse& response, int /* handle */)
     {
         parseResponse(response.data);
         emit finished(response.status, m_receivedParams);
@@ -474,7 +475,7 @@ int QnMediaServerConnection::asyncEventLog(QnNetworkResourcePtr camRes, qint64 d
     detail::QnMediaServerEventLogReplyProcessor* processor = new detail::QnMediaServerEventLogReplyProcessor();
     connect(
         processor,
-        SIGNAL(finished( int, const QList< QnAbstractBusinessAction >& )),
+        SIGNAL(finished(int, int, const QnAbstractBusinessActionList&)),
         target,
         slot,
         Qt::QueuedConnection);

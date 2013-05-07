@@ -165,7 +165,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bE
 {
     QMutexLocker lock(&m_mutex);
 
-    QList<QnAbstractBusinessActionPtr> actions = matchActions(bEvent);
+    QnAbstractBusinessActionList actions = matchActions(bEvent);
     foreach(QnAbstractBusinessActionPtr action, actions)
     {
         executeAction(action);
@@ -318,9 +318,9 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     return true;
 }
 
-QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
+QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
-    QList<QnAbstractBusinessActionPtr> result;
+    QnAbstractBusinessActionList result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         if (rule->disabled() || rule->eventType() != bEvent->getEventType())

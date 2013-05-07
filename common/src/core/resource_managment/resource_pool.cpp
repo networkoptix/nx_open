@@ -306,6 +306,23 @@ QnResourceList QnResourcePool::getAllEnabledCameras() const
     return result;
 }
 
+QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName) const
+{
+    QnResourceList result;
+    
+    const QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(typeName);
+    if (!resType)
+        return result;
+
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        if (resource->getTypeId() == resType->getId())
+            result << resource;
+    }
+
+    return result;
+}
+
 QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
 {
     QnNetworkResourceList result;
