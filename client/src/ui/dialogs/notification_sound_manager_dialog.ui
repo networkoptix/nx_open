@@ -22,7 +22,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -54,7 +54,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QProgressBar" name="progressBar"/>
+          <widget class="QProgressBar" name="progressBar">
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_4">

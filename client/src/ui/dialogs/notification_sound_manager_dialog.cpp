@@ -33,6 +33,16 @@ QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
 {
 }
 
+void QnNotificationSoundManagerDialog::addItem(const QString &filename) {
+    QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), QLatin1String("Comment") );
+    if (title.isEmpty())
+        title = filename;
+
+    QListWidgetItem *item = new QListWidgetItem(title);
+    item->setData(Qt::UserRole, filename);
+    ui->listWidget->addItem(item);
+}
+
 
 void QnNotificationSoundManagerDialog::updateLoadingStatus() {
     int pageIndex = (m_loadingCounter == 0) ? 0 : 1;
@@ -40,7 +50,7 @@ void QnNotificationSoundManagerDialog::updateLoadingStatus() {
 
     if (m_loadingCounter > 0) {
         ui->statusLabel->setText(tr("Loading..."));
-        ui->progressBar->setValue( (m_total - m_loadingCounter)*ui->progressBar->maximum() / m_total);
+        ui->progressBar->setValue( (m_total - m_loadingCounter)*ui->progressBar->maximum() / (qMax(m_total, 1)));
     }
 }
 
@@ -65,19 +75,17 @@ void QnNotificationSoundManagerDialog::at_fileDownloaded(const QString &filename
     if (!ok)
         //TODO: #GDM show warning message
         return;
-
-    //TODO: #GDM extractMetadata
-    QString title = filename;
-    ui->listWidget->addItem(new QListWidgetItem(title));
+    addItem(filename);
 }
 
 void QnNotificationSoundManagerDialog::at_fileUploaded(const QString &filename, bool ok) {
-    if (!ok)
-        return;
+    m_loadingCounter = 0;
+    updateLoadingStatus();
 
-    //TODO: #GDM extractMetadata
-    QString title = filename;
-    ui->listWidget->addItem(new QListWidgetItem(title));
+    if (!ok)
+        //TODO: #GDM show warning message
+        return;
+    addItem(filename);
 }
 
 void QnNotificationSoundManagerDialog::at_playButton_clicked() {
@@ -106,5 +114,8 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     if (filename.isEmpty())
         return;
     m_cache->storeSound(filename);
+    m_total = 1;
+    m_loadingCounter = 1;
+    updateLoadingStatus();
 
 }

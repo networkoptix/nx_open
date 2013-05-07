@@ -20,7 +20,7 @@ QSize QnAppServerImageCache::getMaxImageSize() const {
 }
 
 void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageToMonitorAspectRatio) {
-    QString uuid =  QUuid::createUuid().toString();
+    QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".png");
 
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
@@ -29,6 +29,7 @@ void QnAppServerImageCache::storeImage(const QString &filePath, bool cropImageTo
     loader->setCropToMonitorAspectRatio(cropImageToMonitorAspectRatio);
     loader->setOutput(getFullPath(newFilename));
     connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
+    connect(loader, SIGNAL(finished(QString)), loader, SLOT(deleteLater()));
     loader->start();
 }
 

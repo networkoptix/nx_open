@@ -46,6 +46,7 @@ bool FileTranscoder::setSourceFile( const QString& filePath )
 
 bool FileTranscoder::setDestFile( const QString& filePath )
 {
+    m_dstFilePath = filePath;
     setDest( new QFile(filePath) );
     return true;
 }
@@ -146,7 +147,7 @@ void FileTranscoder::run()
             m_state = sReady;
             m_cond.wakeAll();
             closeFiles();
-            emit done();
+            emit done(m_dstFilePath);
             continue;
         }
 
@@ -163,7 +164,7 @@ void FileTranscoder::run()
             m_state = sReady;
             m_cond.wakeAll();
             closeFiles();
-            emit done();
+            emit done(m_dstFilePath);
             continue;
         }
 
@@ -178,7 +179,7 @@ void FileTranscoder::run()
                 m_state = sReady;
                 m_cond.wakeAll();
                 closeFiles();
-                emit done();
+                emit done(m_dstFilePath);
                 break;
             }
             curPos += bytesWritten;
@@ -191,7 +192,7 @@ void FileTranscoder::run()
                     m_state = sReady;
                     m_cond.wakeAll();
                     closeFiles();
-                    emit done();
+                    emit done(m_dstFilePath);
                     break;
                 }
             }

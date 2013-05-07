@@ -24,6 +24,7 @@ private slots:
     void at_playButton_clicked();
     void at_addButton_clicked();
 private:
+    void addItem(const QString &filename);
     void updateLoadingStatus();
 
     QScopedPointer<Ui::QnNotificationSoundManagerDialog> ui;

@@ -99,7 +99,7 @@ public slots:
 
 signals:
     //!Emitted on transcoding finish (successfully or failed). For result see \a resultCode method
-    void done();
+    void done(const QString &destFilePath);
 
 protected:
     virtual void run() override;
@@ -123,6 +123,7 @@ private:
     unsigned int m_transcodeDurationLimit;
     unsigned int m_transcodedDataDuration;
     QString m_srcFilePath;
+    QString m_dstFilePath;
 
     /*!
         Takes ownership of \a src

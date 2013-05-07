@@ -12,11 +12,9 @@ public:
     explicit QnAppServerNotificationCache(QObject *parent = 0);
     ~QnAppServerNotificationCache();
     
-
     void storeSound(const QString &filePath);
-signals:
-    
-public slots:
+private slots:
+    void at_soundConverted(const QString &filePath);
     
 };
 
