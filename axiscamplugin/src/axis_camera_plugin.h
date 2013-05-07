@@ -23,7 +23,9 @@
     \par Build how-to
     It is Qt 4.7 project. Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
     To build You MUST have Qt 4.7.4+ installed.\n
-    On MS Win following commands should be run from Visual Studio Command prompt:
+    \warning Qt is used here to simplify this sample only! It is not required to use Qt in real production plugin. Provided API uses c++ only (even STL is not required)
+
+    To build:
     \code
     CD %SDK_DIR%/sample/axiscamplugin
     qmake
