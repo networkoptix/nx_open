@@ -359,7 +359,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
-    m_tmpFrame->setUseExternalData(true);
+    m_tmpFrame->setUseExternalData(true);   //temp frame will take internal ffmpeg buffer for optimization
 
     if (data->compressionType == CODEC_ID_NONE)
     {
@@ -513,10 +513,25 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (useTmpFrame)
     {
-        if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
+        //checkig once again for need to scale, since previous check could be incorrect due to unknown pixel format (this actual for some images, e.g., jpeg)
+        const bool scalingStillNeeded =
+            (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
+    	    (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
+             !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
+             scaleFactor != QnFrameScaler::factor_1);
+
+        if( !scalingStillNeeded )
         {
-            if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+            CLVideoDecoderOutput::copy( m_tmpFrame.data(), outFrame.data() );
+        }
+        else if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
+        {
+            if (QnGLRenderer::isPixelFormatSupported(pixFmt) &&
+                CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && 
+                scaleFactor <= QnFrameScaler::factor_8 )
+            {
                 QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
+            }
             else {
                 if (!rescaleFrame(*m_tmpFrame, *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
                     return Status_Displayed;
