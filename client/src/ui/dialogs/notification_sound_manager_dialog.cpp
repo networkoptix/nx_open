@@ -69,23 +69,19 @@ void QnNotificationSoundManagerDialog::at_fileListReceived(const QStringList &fi
 }
 
 void QnNotificationSoundManagerDialog::at_fileDownloaded(const QString &filename, bool ok) {
+    if (ok)
+        addItem(filename);
+    //TODO: #GDM else show warning message
     m_loadingCounter--;
     updateLoadingStatus();
-
-    if (!ok)
-        //TODO: #GDM show warning message
-        return;
-    addItem(filename);
 }
 
 void QnNotificationSoundManagerDialog::at_fileUploaded(const QString &filename, bool ok) {
+    if (ok)
+        addItem(filename);
+    //TODO: #GDM else show warning message
     m_loadingCounter = 0;
     updateLoadingStatus();
-
-    if (!ok)
-        //TODO: #GDM show warning message
-        return;
-    addItem(filename);
 }
 
 void QnNotificationSoundManagerDialog::at_playButton_clicked() {
