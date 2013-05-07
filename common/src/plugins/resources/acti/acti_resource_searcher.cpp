@@ -160,10 +160,14 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         QByteArray model = report.value("production id").split('-')[0];
         devInfo.info.modelName = QString::fromUtf8(actiRes->unquoteStr(model));
         devInfo.info.serialNumber = QString::fromUtf8(report.value("mac address"));
+
+        if (devInfo.info.modelName.isEmpty() || devInfo.info.serialNumber.isEmpty())
+            return result;
+
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
+	processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
 
     return result;
 }

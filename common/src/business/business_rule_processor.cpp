@@ -156,11 +156,7 @@ void QnBusinessRuleProcessor::fini()
 
 void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
 {
-    QMutexLocker lock(&m_mutex);
-    m_rules << value;
-
-    if( !value->disabled() )
-        notifyResourcesAboutEventIfNeccessary( value, true );
+    at_businessRuleChanged(value);
 }
 
 void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bEvent)
