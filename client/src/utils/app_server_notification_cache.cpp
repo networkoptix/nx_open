@@ -8,6 +8,7 @@
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
+    const QLatin1String titleTagValue("Comment");
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
@@ -17,6 +18,10 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
 
 QnAppServerNotificationCache::~QnAppServerNotificationCache() {
 
+}
+
+QString QnAppServerNotificationCache::titleTag() {
+    return titleTagValue;
 }
 
 void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs) {
@@ -30,7 +35,7 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
     transcoder->setAudioCodec(CODEC_ID_MP3);
-    transcoder->addTag(QLatin1String("Comment"), title);
+    transcoder->addTag(titleTag(), title);
 
     if (maxLengthMSecs > 0)
         transcoder->setTranscodeDurationLimit(maxLengthMSecs);
@@ -42,4 +47,12 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
     uploadFile(QFileInfo(filePath).fileName());
+}
+
+void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, bool ok) {
+
+}
+
+void QnAppServerNotificationCache::at_fileDownloaded(const QString &filename, bool ok) {
+
 }

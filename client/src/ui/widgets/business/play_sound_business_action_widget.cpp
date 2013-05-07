@@ -52,7 +52,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
     if (fields & QnBusiness::ActionParamsField) {
         m_soundUrl = QnBusinessActionParameters::getSoundUrl(model->actionParams());
         if (!m_loaded) {
-            QString title = AudioPlayer::getTagValue(m_cache->getFullPath(m_soundUrl), QLatin1String("Comment") );
+            QString title = AudioPlayer::getTagValue(m_cache->getFullPath(m_soundUrl), m_cache->titleTag() );
             if (title.isEmpty())
                 title = m_soundUrl;
 
@@ -98,7 +98,7 @@ void QnPlaySoundBusinessActionWidget::at_fileListReceived(const QStringList &fil
 
     ui->pathComboBox->clear();
     foreach(const QString &filename, filenames) {
-        QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), QLatin1String("Comment") );
+        QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), m_cache->titleTag() );
         if (title.isEmpty())
             title = filename;
         ui->pathComboBox->addItem(title, filename); //TODO: #GDM metatada, filename in userData

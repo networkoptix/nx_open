@@ -1,16 +1,18 @@
 #include "business_rules_view_model.h"
 
+#include <QtCore/QFileInfo>
+
+#include <client/client_settings.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <business/business_action_parameters.h>
-
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
-
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
 
@@ -18,8 +20,9 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <client/client_settings.h>
+#include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
+#include <utils/media/audio_player.h>
 
 namespace {
 
@@ -164,6 +167,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                     return QnBusinessActionParameters::getEmailAddress(m_actionParams);
                 if (m_actionType == BusinessActionType::ShowPopup)
                     return (int)QnBusinessActionParameters::getUserGroup(m_actionParams);
+                if (m_actionType == BusinessActionType::PlaySound)
+                    return QnBusinessActionParameters::getSoundUrl(m_actionParams);
             }
             break;
 
@@ -234,7 +239,11 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 QnBusinessActionParameters::setUserGroup(&params, (QnBusinessActionParameters::UserGroup)value.toInt());
                 setActionParams(params);
             }
-            else
+            else if (m_actionType == BusinessActionType::PlaySound) {
+                QnBusinessParams params;
+                QnBusinessActionParameters::setSoundUrl(&params, value.toString());
+                setActionParams(params);
+            } else
                 setActionResources(value.value<QnResourceList>());
             return true;
         default:
@@ -633,6 +642,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                 } else {
                     return qnResIconCache->icon(QnResourceIconCache::Camera);
                 }
+                //TODO: #GDM special icon for sound action
             }
         default:
             break;
@@ -679,6 +689,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     return any;
                 } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
+                } else if (m_actionType == BusinessActionType::PlaySound) {
+                    return !QnBusinessActionParameters::getSoundUrl(m_actionParams).isEmpty();
                 }
 
                 QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
@@ -792,6 +804,15 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());
+    } else if (m_actionType == BusinessActionType::PlaySound) {
+        QString filename = QnBusinessActionParameters::getSoundUrl(m_actionParams);
+        if (filename.isEmpty())
+            return tr("Select a sound");
+        QString fullPath = QnAppServerNotificationCache().getFullPath(filename);
+        if (QFileInfo(fullPath).exists())
+            return AudioPlayer::getTagValue(fullPath, QnAppServerNotificationCache::titleTag());
+        return tr("Downloading sound...");
+        //TODO: #GDM download sound
     }
 
     QnResourceList resources = m_actionResources;

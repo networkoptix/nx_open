@@ -36,7 +36,7 @@ QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
 }
 
 void QnNotificationSoundManagerDialog::addItem(const QString &filename) {
-    QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), QLatin1String("Comment") );
+    QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), m_cache->titleTag());
     if (title.isEmpty())
         title = filename;
 

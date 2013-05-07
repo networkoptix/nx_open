@@ -39,6 +39,8 @@ private:
     Qn::NodeType m_nodeType;
 };
 
+class QnAppServerNotificationCache;
+
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate {
     Q_OBJECT
 
@@ -56,6 +58,8 @@ protected:
 private slots:
     void at_editor_commit();
 
+private:
+    QnAppServerNotificationCache* m_soundCache;
 };
 
 #endif // BUSINESS_RULE_ITEM_DELEGATE_H
