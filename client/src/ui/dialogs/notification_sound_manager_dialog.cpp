@@ -92,7 +92,7 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
     if (!ui->listWidget->currentItem())
         return;
 
-    QString soundUrl = ui->listWidget->currentItem()->text();
+    QString soundUrl = ui->listWidget->currentItem()->data(Qt::UserRole).toString();
     QString filePath = m_cache->getFullPath(soundUrl);
     if (!QFileInfo(filePath).exists())
         return;
