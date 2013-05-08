@@ -187,7 +187,9 @@ void QnActiResourceSearcher::processPacket(const QHostAddress& discoveryAddr, co
     resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);
-    resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(devInfo.serialNumber));
+    QString sn = devInfo.serialNumber;
+    sn = sn.replace(QLatin1String(":"), QLatin1String("_"));
+    resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(sn));
     QAuthenticator auth;
     
     auth.setUser(DEFAULT_LOGIN);
