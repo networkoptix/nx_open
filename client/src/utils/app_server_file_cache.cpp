@@ -10,8 +10,10 @@
 #include <api/app_server_connection.h>
 
 
-QnAppServerFileCache::QnAppServerFileCache(QObject *parent) :
-    QObject(parent)
+QnAppServerFileCache::QnAppServerFileCache(QString folderName, QObject *parent) :
+    QObject(parent),
+    m_fileListHandle(0),
+    m_folderName(folderName)
 {}
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
@@ -21,30 +23,34 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QUrl url = QnAppServerConnectionFactory::defaultUrl();
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4"))
+    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
                                     .arg(path)
                                     .arg(QLatin1String(url.encodedHost()))
                                     .arg(url.port())
+                                    .arg(m_folderName)
                                     .arg(filename)
                                     );
 }
 
 
-// -------------- Loading methods ----------------
+// -------------- File List loading methods -----
 
 void QnAppServerFileCache::getFileList() {
-    //TODO: #GDM replace with server code
-    QTimer::singleShot(1000, this, SLOT(debugTimer()));
+    m_fileListHandle = QnAppServerConnectionFactory::createConnection()->requestDirectoryListingAsync(
+                m_folderName,
+                this,
+                SLOT(at_fileListReceived(int, const QStringList &, int))
+                );
 }
 
-void QnAppServerFileCache::debugTimer() {
-    QDir myDir(getFullPath(QString()));
-    QStringList list = myDir.entryList(QStringList()
-                                       << QLatin1String("*.wav")
-                                       << QLatin1String("*.mp3")
-                                       << QLatin1String("*.ogg"));
-    emit fileListReceived(list, true);
+void QnAppServerFileCache::at_fileListReceived(int status, const QStringList &filenames, int handle) {
+    if (handle != m_fileListHandle)
+        return;
+
+    emit fileListReceived(filenames, status == 0);
 }
+
+// -------------- Download File methods ----------
 
 void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (filename.isEmpty()) {
@@ -62,7 +68,7 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
       return;
 
     int handle = QnAppServerConnectionFactory::createConnection()->requestStoredFileAsync(
-                filename,
+                m_folderName + QLatin1Char('/') + filename,
                 this,
                 SLOT(at_fileLoaded(int, const QByteArray&, int))
                 );
@@ -113,7 +119,7 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
         return;
 
     int handle = QnAppServerConnectionFactory::createConnection()->addStoredFileAsync(
-                filename,
+                m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
                 SLOT(at_fileUploaded(int, int))

@@ -4,6 +4,8 @@
 #include <QtCore/QFileInfo>
 #include <QtGui/QFileDialog>
 
+#include <ui/dialogs/custom_file_dialog.h>
+
 #include <utils/app_server_notification_cache.h>
 #include <utils/media/audio_player.h>
 
@@ -34,7 +36,7 @@ QnNotificationSoundManagerDialog::~QnNotificationSoundManagerDialog()
 }
 
 void QnNotificationSoundManagerDialog::addItem(const QString &filename) {
-    QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), QLatin1String("Comment") );
+    QString title = AudioPlayer::getTagValue(m_cache->getFullPath(filename), m_cache->titleTag());
     if (title.isEmpty())
         title = filename;
 
@@ -69,23 +71,19 @@ void QnNotificationSoundManagerDialog::at_fileListReceived(const QStringList &fi
 }
 
 void QnNotificationSoundManagerDialog::at_fileDownloaded(const QString &filename, bool ok) {
+    if (ok)
+        addItem(filename);
+    //TODO: #GDM else show warning message
     m_loadingCounter--;
     updateLoadingStatus();
-
-    if (!ok)
-        //TODO: #GDM show warning message
-        return;
-    addItem(filename);
 }
 
 void QnNotificationSoundManagerDialog::at_fileUploaded(const QString &filename, bool ok) {
+    if (ok)
+        addItem(filename);
+    //TODO: #GDM else show warning message
     m_loadingCounter = 0;
     updateLoadingStatus();
-
-    if (!ok)
-        //TODO: #GDM show warning message
-        return;
-    addItem(filename);
 }
 
 void QnNotificationSoundManagerDialog::at_playButton_clicked() {
@@ -101,19 +99,26 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 }
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file...")));
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
+    dialog->setNameFilter(supportedFormats);
 
-    QString filename = QFileDialog::getOpenFileName(
-                this,
-                //tr("Select file..."),
-                QString(),
-                QString(),
-                supportedFormats);
-    if (filename.isEmpty())
+    int cropSoundSecs = 5;
+
+    dialog->addSpinBox(tr("Cut to first secs"), 1, 10, &cropSoundSecs);
+    if(!dialog->exec())
         return;
-    m_cache->storeSound(filename);
+
+    QStringList files = dialog->selectedFiles();
+    if (files.size() < 0)
+        return;
+
+    QString filename = files[0];
+
+    m_cache->storeSound(filename, cropSoundSecs*1000);
     m_total = 1;
     m_loadingCounter = 1;
     updateLoadingStatus();

@@ -6,13 +6,18 @@
 
 #include <utils/threaded_image_loader.h>
 
+namespace {
+    const QLatin1String folder("wallpapers");
+}
+
 QnAppServerImageCache::QnAppServerImageCache(QObject *parent) :
-    base_type(parent)
+    base_type(folder, parent)
 {
 }
 
 QnAppServerImageCache::~QnAppServerImageCache() {
 }
+
 
 QSize QnAppServerImageCache::getMaxImageSize() const {
     int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);

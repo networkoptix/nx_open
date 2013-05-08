@@ -36,6 +36,7 @@ namespace {
         ((TestEmailSettingsObject,  "testEmailSettings"))
         ((GetFileObject,            "getfile"))
         ((PutFileObject,            "putfile"))
+        ((ListDirObject,            "listdir"))
     );
 
 } // anonymous namespace
@@ -227,6 +228,17 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         }
     case PutFileObject: {
             emit finishedPutFile(status, handle);
+            break;
+        }
+    case ListDirObject: {
+            QStringList filenames;
+            if (status == 0) {
+                if(!QJson::deserialize(result, &filenames)) {
+                    qnWarning("Error parsing JSON reply:\n%1\n\n", result);
+                    status = 1;
+                }
+            }
+            emit finishedDirectoryListing(status, filenames, handle);
             break;
         }
     default:
@@ -955,6 +967,18 @@ int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QBy
                                                               data,
                                                               processor,
                                                               SLOT(processReply(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot) {
+    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, ListDirObject);
+    QObject::connect(processor, SIGNAL(finishedDirectoryListing(int, const QStringList&, int)), target, slot);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url,
+                                                             m_objectNameMapper->name(ListDirObject) + QLatin1String("/") + folderName,
+                                                             m_requestHeaders,
+                                                             m_requestParams,
+                                                             processor,
+                                                             SLOT(processReply(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

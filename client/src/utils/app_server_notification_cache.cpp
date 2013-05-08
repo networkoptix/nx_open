@@ -6,13 +6,13 @@
 #include <transcoding/file_transcoder.h>
 
 namespace {
+    const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-
-    const unsigned int durationMs = 10000;
+    const QLatin1String titleTagValue("Comment");
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
-    base_type(parent)
+    base_type(folder, parent)
 {
 }
 
@@ -20,7 +20,11 @@ QnAppServerNotificationCache::~QnAppServerNotificationCache() {
 
 }
 
-void QnAppServerNotificationCache::storeSound(const QString &filePath) {
+QString QnAppServerNotificationCache::titleTag() {
+    return titleTagValue;
+}
+
+void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs) {
     QString uuid = QUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
     QString title = QFileInfo(filePath).fileName();
@@ -31,8 +35,10 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath) {
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
     transcoder->setAudioCodec(CODEC_ID_MP3);
-    transcoder->setTranscodeDurationLimit(durationMs);
-    transcoder->addTag(QLatin1String("Comment"), title);
+    transcoder->addTag(titleTag(), title);
+
+    if (maxLengthMSecs > 0)
+        transcoder->setTranscodeDurationLimit(maxLengthMSecs);
 
     connect(transcoder, SIGNAL(done(QString)), this, SLOT(at_soundConverted(QString)));
     connect(transcoder, SIGNAL(done(QString)), transcoder, SLOT(deleteLater()));
@@ -41,4 +47,12 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath) {
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
     uploadFile(QFileInfo(filePath).fileName());
+}
+
+void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, bool ok) {
+
+}
+
+void QnAppServerNotificationCache::at_fileDownloaded(const QString &filename, bool ok) {
+
 }

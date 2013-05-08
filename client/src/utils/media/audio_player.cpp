@@ -41,11 +41,6 @@ AudioPlayer::AudioPlayer( const QString& filePath )
 AudioPlayer::~AudioPlayer()
 {
     pleaseStop();
-    {
-        QMutexLocker lk( &m_mutex );
-        m_adaptiveSleep.breakSleep();
-        m_cond.wakeAll();
-    }
     stop();
 
     close();
@@ -93,6 +88,15 @@ QString AudioPlayer::getTagValue( const QString& filePath, const QString& tagNam
 }
 
 static const int AUDIO_BUF_SIZE = 4000;
+
+void AudioPlayer::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+
+    QMutexLocker lk( &m_mutex );
+    m_adaptiveSleep.breakSleep();
+    m_cond.wakeAll();
+}
 
 bool AudioPlayer::open( const QString& filePath )
 {
