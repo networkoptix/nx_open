@@ -26,7 +26,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->dateEditTo->setDate(dt);
 
     ui->gridEvents->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-    ui->gridEvents->horizontalHeader()->setMouseTracking(true);
 
     QStringList eventItems;
     eventItems << tr("All events");
