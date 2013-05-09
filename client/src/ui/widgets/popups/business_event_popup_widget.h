@@ -79,10 +79,10 @@ private:
     /**
      * @brief updateReasonTree      Used to build and update tree containing event resources
      *                              and event reason (for failure events).
-     * @param eventParams           Params of the last event.
+     * @param businessAction        last event.
      * @return                      Updated item or NULL if event resource does not exist.
      */
-    QStandardItem* updateReasonTree(const QnBusinessParams& eventParams);
+    QStandardItem* updateReasonTree(const QnAbstractBusinessActionPtr &businessAction);
 
     /**
      * @brief updateConflictTree    Used to build and update tree containing event resources

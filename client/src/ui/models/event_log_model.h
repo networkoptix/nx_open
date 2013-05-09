@@ -9,13 +9,16 @@ class QnEventLogModel: public QStandardItemModel {
     typedef QStandardItemModel base_type;
 
 public:
+    enum Roles {
+         ItemLinkRole = Qt::UserRole + 500
+    };
+
     enum Column {
         DateTimeColumn,
         EventColumn,
         EventCameraColumn,
         ActionColumn,
         ActionCameraColumn,
-        RepeatCountColumn,
         DescriptionColumn,
         ColumnCount
     };
@@ -31,16 +34,18 @@ public:
     void setColumns(const QList<Column> &columns);
 
     QnAbstractBusinessActionPtr getEvent(const QModelIndex &index) const;
-
-private:
     void rebuild();
+    void clear();
+private:
 
     static QString columnTitle(Column column);
-    static QStandardItem *createItem(Column column, const QnAbstractBusinessActionPtr &license);
+    QStandardItem *createItem(Column column, const QnAbstractBusinessActionPtr &license);
 
 private:
     QList<Column> m_columns;
     QnAbstractBusinessActionList m_events;
+    QBrush m_linkBrush;
+    QFont m_linkFont;
 };
 
 #endif // QN_EVENT_LOG_MODEL_H

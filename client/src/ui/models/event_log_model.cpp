@@ -7,10 +7,15 @@
 #include "core/resource/resource.h"
 #include "business/events/reasoned_business_event.h"
 #include "core/resource_managment/resource_pool.h"
+#include "ui/style/resource_icon_cache.h"
+#include "business/business_strings_helper.h"
+#include "client/client_globals.h"
 
 QnEventLogModel::QnEventLogModel(QObject *parent):
-    base_type(parent)
+    base_type(parent),
+    m_linkBrush(QPalette().link())
 {
+    m_linkFont.setUnderline(true);
     rebuild();
 }
 
@@ -33,7 +38,6 @@ void QnEventLogModel::setEvents(const QnAbstractBusinessActionList &events) {
 
 void QnEventLogModel::addEvents(const QnAbstractBusinessActionList &events) {
     m_events += events;
-    rebuild();
 }
 
 QList<QnEventLogModel::Column> QnEventLogModel::columns() const {
@@ -60,10 +64,9 @@ QString QnEventLogModel::columnTitle(Column column) {
     switch(column) {
     case DateTimeColumn:        return tr("Date/Time");
     case EventColumn:           return tr("Event");
-    case EventCameraColumn:     return tr("Event camera");
+    case EventCameraColumn:     return tr("Source");
     case ActionColumn:          return tr("Action");
-    case ActionCameraColumn:    return tr("Action camera");
-    case RepeatCountColumn:     return tr("Repeat count");
+    case ActionCameraColumn:    return tr("Target");
     case DescriptionColumn:     return tr("Description");
     default:
         assert(false);
@@ -81,11 +84,13 @@ QStandardItem *QnEventLogModel::createItem(Column column, const QnAbstractBusine
     QnId eventResId;
     QnId actionResId;
     BusinessActionType::Value actionType;
+    QDateTime dt;
 
     switch(column) {
     case DateTimeColumn:
         timestampUsec = QnBusinessEventRuntime::getEventTimestamp(action->getRuntimeParams());
-        item->setText(QDateTime::fromMSecsSinceEpoch(timestampUsec).toString());
+        dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
+        item->setText(dt.toString(Qt::SystemLocaleShortDate));
         break;
     case EventColumn:
         eventType = QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
@@ -94,8 +99,10 @@ QStandardItem *QnEventLogModel::createItem(Column column, const QnAbstractBusine
     case EventCameraColumn:
         eventResId = QnBusinessEventRuntime::getEventResourceId(action->getRuntimeParams());
         eventResource = qnResPool->getResourceById(eventResId);
-        if (eventResource)
+        if (eventResource) {
             item->setText(eventResource->getName());
+            item->setIcon(qnResIconCache->icon(eventResource->flags(), eventResource->getStatus()));
+        }
         break;
     case ActionColumn:
         item->setText(BusinessActionType::toString(action->actionType()));
@@ -103,14 +110,36 @@ QStandardItem *QnEventLogModel::createItem(Column column, const QnAbstractBusine
     case ActionCameraColumn:
         actionResId = QnBusinessActionRuntime::getActionResourceId(action->getRuntimeParams());
         actionResource = qnResPool->getResourceById(eventResId);
-        if (actionResource)
+        if (actionResource) {
             item->setText(actionResource->getName());
-        break;
-    case RepeatCountColumn:
-        item->setText(QString::number(action->getAggregationCount()));
+            item->setIcon(qnResIconCache->icon(actionResource->flags(), actionResource->getStatus()));
+        }
         break;
     case DescriptionColumn:
-        item->setText(lit("fill me"));
+            eventType = QnBusinessEventRuntime::getEventType(action->getRuntimeParams());
+            switch (eventType) {
+                case BusinessEventType::Camera_Disconnect:
+                case BusinessEventType::Camera_Input:
+                    break;
+                case BusinessEventType::Camera_Motion:
+                    item->setText(tr("Click me to see video"));
+                    item->setFont(m_linkFont);
+                    item->setForeground(m_linkBrush);
+                    item->setData(QnBusinessStringsHelper::motionUrl(action->getRuntimeParams()), ItemLinkRole);
+                    item->setData(Qt::PointingHandCursor, Qn::ItemMouseCursorRole);
+                    break;
+                case BusinessEventType::Storage_Failure:
+                case BusinessEventType::Network_Issue:
+                case BusinessEventType::MediaServer_Failure:
+                    item->setText(QnBusinessStringsHelper::eventReason(action.data()));
+                    break;
+                case BusinessEventType::Camera_Ip_Conflict:
+                case BusinessEventType::MediaServer_Conflict:
+                    item->setText(QnBusinessStringsHelper::conflictString(action->getRuntimeParams()));
+                    break;
+                default:
+                    return false;
+            }
         break;
     default:
         assert(false);
@@ -119,8 +148,14 @@ QStandardItem *QnEventLogModel::createItem(Column column, const QnAbstractBusine
     return item;
 }
 
+void QnEventLogModel::clear()
+{
+    m_events.clear();
+    QStandardItemModel::clear();
+}
+
 void QnEventLogModel::rebuild() {
-    clear();
+    QStandardItemModel::clear();
     if(m_columns.isEmpty())
         return;
 

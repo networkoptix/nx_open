@@ -470,7 +470,13 @@ QnTimePeriodList QnMediaServerConnection::recordedTimePeriods(const QnNetworkRes
     return result;
 }
 
-int QnMediaServerConnection::asyncEventLog(QnNetworkResourcePtr camRes, qint64 dateFrom, qint64 dateTo, QnId businessRuleId, QObject *target, const char *slot)
+int QnMediaServerConnection::asyncEventLog(
+    qint64 dateFrom, qint64 dateTo, 
+    QnNetworkResourcePtr camRes, 
+    BusinessEventType::Value eventType, 
+    BusinessActionType::Value actionType,
+    QnId businessRuleId, 
+    QObject *target, const char *slot)
 {
     detail::QnMediaServerEventLogReplyProcessor* processor = new detail::QnMediaServerEventLogReplyProcessor();
     connect(
@@ -481,13 +487,17 @@ int QnMediaServerConnection::asyncEventLog(QnNetworkResourcePtr camRes, qint64 d
         Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
+    requestParams << QnRequestParam( "from", dateFrom);
+    if (dateTo != DATETIME_NOW)
+        requestParams << QnRequestParam( "to", dateTo);
     if (camRes)
         requestParams << QnRequestParam( "res_id", camRes->getPhysicalId() );
     if (businessRuleId.isValid())
         requestParams << QnRequestParam( "brule_id", businessRuleId.toInt() );
-    requestParams << QnRequestParam( "from", dateFrom);
-    if (dateTo != DATETIME_NOW)
-        requestParams << QnRequestParam( "to", dateTo);
+    if (eventType != BusinessEventType::NotDefined)
+        requestParams << QnRequestParam( "event", (int) eventType);
+    if (actionType != BusinessActionType::NotDefined)
+        requestParams << QnRequestParam( "action", (int) actionType);
 
     return QnSessionManager::instance()->sendAsyncGetRequest(
         m_url,

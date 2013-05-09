@@ -6,6 +6,7 @@
 #include "business/actions/abstract_business_action.h"
 #include "events/events_db.h"
 #include "api/serializer/pb_serializer.h"
+#include "core/resource_managment/resource_pool.h"
 
 QnRestEventsHandler::QnRestEventsHandler()
 {
@@ -19,6 +20,11 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
     Q_UNUSED(contentType)
 
     QnTimePeriod period(-1,-1);
+    QnResourcePtr res;
+    QString errStr;
+    BusinessEventType::Value  eventType = BusinessEventType::NotDefined;
+    BusinessActionType::Value  actionType = BusinessActionType::NotDefined;
+    QnId businessRuleId;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -28,19 +34,48 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
 
     if (period.startTimeMs == -1)
     {
+        errStr = "Parameter 'from' MUST be specified";
+    }
+    else {
+        for (int i = 0; i < params.size(); ++i)
+        {
+            if (params[i].first == "to")
+                period.durationMs = params[i].second.toLongLong() - period.startTimeMs;
+            else if (params[i].first == "res_id") {
+                res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
+                if (!res)
+                    errStr = QString("Camera resource %1 not found").arg(params[i].second);
+            }
+            else if (params[i].first == "event") {
+                eventType = (BusinessEventType::Value) params[i].second.toInt();
+                if (eventType < 0 || eventType >= BusinessEventType::NotDefined)
+                    errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessEventType::NotDefined-1);
+            }
+            else if (params[i].first == "action") {
+                actionType = (BusinessActionType::Value) params[i].second.toInt();
+                if (actionType < 0 || actionType >= BusinessActionType::NotDefined)
+                    errStr = QString("Invalid action type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessActionType::NotDefined-1);
+            }
+            else if (params[i].first == "brule_id") {
+                businessRuleId = params[i].second.toInt();
+            }
+        }
+    }
+
+    if (!errStr.isEmpty())
+    {
         result.append("<root>\n");
-        result.append("Parameter 'from' MUST be specified");
+        result.append(errStr);
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
 
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "to")
-            period.durationMs = params[i].second.toLongLong() - period.startTimeMs;
-    }
-
-    QList<QnAbstractBusinessActionPtr> actions = qnEventsDB->getActions(period);
+    QList<QnAbstractBusinessActionPtr> actions = qnEventsDB->getActions(
+        period, 
+        res ? res->getId() : QnId(), 
+        eventType, 
+        actionType,
+        businessRuleId);
     QnApiPbSerializer serializer;
     serializer.serializeBusinessActionList(actions, result);
     contentType = "application/octet-stream";
@@ -59,5 +94,8 @@ QString QnRestEventsHandler::description() const
         "Returns events log"
         "<BR>Param <b>from</b> - start of time period at ms sicnec 1.1.1970 (UTC format)"
         "<BR>Param <b>to</b> - end of time period at ms sicnec 1.1.1970 (UTC format). Optional"
-        "<BR>Param <b>format</b> - allowed values: <b>text</b>, <b>protobuf</b>";
+        "<BR>Param <b>format</b> - allowed values: <b>text</b>, <b>protobuf. Optional</b>"
+        "<BR>Param <b>event</b> - event type. Optional</b>"
+        "<BR>Param <b>action</b> - action type. Optional</b>"
+        "<BR>Param <b>brule_id</b> - business rule id. Optional</b>";
 }

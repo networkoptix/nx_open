@@ -83,23 +83,41 @@ bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePt
     return rez;
 }
 
+QString QnEventsDB::toSQLDate(qint64 timeMs) const
+{
+    return QDateTime::fromMSecsSinceEpoch(timeMs).toString("yyyy-MM-dd hh:mm:ss");
+}
 
-QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(QnTimePeriod period) const
+QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
+    const QnTimePeriod& period,
+    const QnId& cameraId, 
+    const BusinessEventType::Value& eventType, 
+    const BusinessActionType::Value& actionType,
+    const QnId& businessRuleId) const
+
 {
     QMutexLocker lock(&m_mutex);
 
     QList<QnAbstractBusinessActionPtr> result;
 
-    QSqlQuery query(m_sdb);
+    QString request(lit("SELECT * FROM runtime_actions where"));
     if (period.durationMs != -1) {
-        query.prepare("SELECT * FROM runtime_actions where timestamp between :timefrom and :timeto;");
-        query.bindValue(":timefrom", QDateTime::fromMSecsSinceEpoch(period.startTimeMs));
-        query.bindValue(":timeto", QDateTime::fromMSecsSinceEpoch(period.endTimeMs()));
+        request += QString(lit(" timestamp between '%1' and '%2'")).arg(toSQLDate(period.startTimeMs)).arg(toSQLDate(period.endTimeMs()));
     }
     else {
-        query.prepare("SELECT * FROM runtime_actions where timestamp > :timefrom;");
-        query.bindValue(":timefrom", QDateTime::fromMSecsSinceEpoch(period.startTimeMs));
+        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs);
     }
+    if (cameraId.isValid())
+        request += QString(lit(" and event_resource_id = %1 ")).arg(cameraId.toInt());
+    if (eventType != BusinessEventType::NotDefined)
+        request += QString(lit( " and event_type = %1 ")).arg((int) eventType);
+    if (actionType != BusinessActionType::NotDefined)
+        request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
+    if (businessRuleId.isValid())
+        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
+
+    QSqlQuery query(request);
+    //query.prepare(request);
     if (!query.exec())
         return result;
 

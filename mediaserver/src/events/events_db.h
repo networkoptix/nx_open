@@ -3,6 +3,7 @@
 
 #include <QtSql>
 #include "business/actions/abstract_business_action.h"
+#include "business/events/abstract_business_event.h"
 #include "recording/time_period.h"
 
 class QnEventsDB
@@ -10,7 +11,13 @@ class QnEventsDB
 public:
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes);
-    QList<QnAbstractBusinessActionPtr> getActions(QnTimePeriod period) const;
+    
+    QList<QnAbstractBusinessActionPtr> getActions(
+        const QnTimePeriod& period,
+        const QnId& cameraId = QnId(), 
+        const BusinessEventType::Value& eventType = BusinessEventType::NotDefined, 
+        const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
+        const QnId& businessRuleId = QnId()) const;
 
     static QnEventsDB* instance();
     static void init();
@@ -20,6 +27,7 @@ protected:
     QnEventsDB();
 private:
     bool cleanupEvents();
+    QString toSQLDate(qint64 timeMs) const;
 private:
     QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;

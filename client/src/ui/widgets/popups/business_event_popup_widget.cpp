@@ -12,6 +12,7 @@
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/synctime.h>
+#include "business/business_strings_helper.h"
 
 namespace {
 
@@ -195,7 +196,7 @@ bool QnBusinessEventPopupWidget::updateTreeModel(const QnAbstractBusinessActionP
         case BusinessEventType::Storage_Failure:
         case BusinessEventType::Network_Issue:
         case BusinessEventType::MediaServer_Failure:
-            item = updateReasonTree(businessAction->getRuntimeParams());
+            item = updateReasonTree(businessAction);
             break;
         case BusinessEventType::Camera_Ip_Conflict:
         case BusinessEventType::MediaServer_Conflict:
@@ -267,59 +268,14 @@ QStandardItem* QnBusinessEventPopupWidget::updateSimpleTree(const QnBusinessPara
     return item;
 }
 
-QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnBusinessParams& eventParams) {
-    QStandardItem *item = findOrCreateItem(eventParams);
-    if (!item)
-        return NULL;
-
-    item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
-
-    QnBusiness::EventReason reasonCode = (QnBusiness::EventReason)item->data(EventReasonRole).toInt();
-    QString reasonText = item->data(EventReasonTextRole).toString();
-
-    switch (reasonCode) {
-        case QnBusiness::NetworkIssueNoFrame:
-            if (m_eventType == BusinessEventType::Network_Issue)
-                item->appendRow(new QStandardItem(tr("No video frame received\nduring last %1 seconds.")
-                                                  .arg(reasonText)));
-            break;
-        case QnBusiness::NetworkIssueConnectionClosed:
-            if (m_eventType == BusinessEventType::Network_Issue)
-                item->appendRow(new QStandardItem(tr("Connection to camera\nwas unexpectedly closed")));
-            break;
-        case QnBusiness::NetworkIssueRtpPacketLoss:
-            if (m_eventType == BusinessEventType::Network_Issue) {
-                QStringList seqs = reasonText.split(QLatin1Char(';'));
-                if (seqs.size() != 2)
-                    break;
-                QString text = tr("RTP packet loss detected.\nPrev seq.=%1 next seq.=%2")
-                        .arg(seqs[0])
-                        .arg(seqs[1]);
-                item->appendRow(new QStandardItem(text));
-            }
-            break;
-        case QnBusiness::MServerIssueTerminated:
-            if (m_eventType == BusinessEventType::MediaServer_Failure)
-                item->appendRow(new QStandardItem(tr("Server terminated.")));
-            break;
-        case QnBusiness::MServerIssueStarted:
-            if (m_eventType == BusinessEventType::MediaServer_Failure)
-                item->appendRow(new QStandardItem(tr("Server started after crash.")));
-            break;
-        case QnBusiness::StorageIssueIoError:
-            if (m_eventType == BusinessEventType::Storage_Failure)
-                item->appendRow(new QStandardItem(tr("I/O Error occured at\n%1")
-                                                  .arg(reasonText)));
-            break;
-        case QnBusiness::StorageIssueNotEnoughSpeed:
-            if (m_eventType == BusinessEventType::Storage_Failure)
-                item->appendRow(new QStandardItem(tr("Not enough HDD/SSD speed\nfor recording at\n%1.")
-                                                  .arg(reasonText)));
-            break;
-        default:
-            break;
+QStandardItem* QnBusinessEventPopupWidget::updateReasonTree(const QnAbstractBusinessActionPtr &businessAction) {
+    QStandardItem *item = findOrCreateItem(businessAction->getRuntimeParams());
+    if (item) {
+        item->removeRows(0, item->rowCount()); //TODO: #GDM fix removing rows
+        QString reason = QnBusinessStringsHelper::eventReason(businessAction.data());
+        if (!reason.isEmpty())
+            item->appendRow(new QStandardItem(reason));
     }
-
     return item;
 }
 

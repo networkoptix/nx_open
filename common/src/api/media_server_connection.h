@@ -21,7 +21,7 @@
 #include "media_server_statistics_data.h"
 #include "media_server_cameras_data.h"
 #include "business/actions/abstract_business_action.h"
-
+#include "business/events/abstract_business_event.h"
 
 class QnPtzSpaceMapper;
 class QnEnumNameMapper;
@@ -246,7 +246,13 @@ public:
      * 
      * \returns                         Request handle.
 	 */
-    int asyncEventLog(QnNetworkResourcePtr camRes, qint64 dateFrom, qint64 dateTo, QnId businessRuleId, QObject *target, const char *slot);
+    int asyncEventLog(
+        qint64 dateFrom, qint64 dateTo, 
+        QnNetworkResourcePtr camRes, 
+        BusinessEventType::Value eventType, 
+        BusinessActionType::Value actionType,
+        QnId businessRuleId, 
+        QObject *target, const char *slot);
 
 	/** 
      * Get \a camera params. 
