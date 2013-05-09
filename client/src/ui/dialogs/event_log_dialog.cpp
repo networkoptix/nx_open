@@ -120,6 +120,4 @@ void QnEventLogDialog::at_gotEvents(int requestNum, int httpStatus, const QnAbst
 
 void QnEventLogDialog::onItemClicked(QListWidgetItem * item)
 {
-    QString mylink = item->data(Qt::UserRole).toString();
-    QDesktopServices::openUrl(QUrl(mylink));
 }

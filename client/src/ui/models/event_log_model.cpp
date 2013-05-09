@@ -154,7 +154,11 @@ void QnEventLogModel::clear()
     QStandardItemModel::clear();
 }
 
-void QnEventLogModel::rebuild() {
+void QnEventLogModel::rebuild() 
+{
+    QTime t;
+    t.restart();
+
     QStandardItemModel::clear();
     if(m_columns.isEmpty())
         return;
@@ -169,10 +173,11 @@ void QnEventLogModel::rebuild() {
         QList<QStandardItem *> items;
         for(int c = 0; c < m_columns.size(); c++)
             items.push_back(createItem(m_columns[c], m_events[r]));
-        items[0]->setData(r, Qt::UserRole);
 
         appendRow(items);
     }
+
+    qDebug() << Q_FUNC_INFO << "time=" << t.elapsed();
 }
 
 QnAbstractBusinessActionPtr QnEventLogModel::getEvent(const QModelIndex &index) const {
