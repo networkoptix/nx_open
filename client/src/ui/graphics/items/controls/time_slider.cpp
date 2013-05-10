@@ -150,6 +150,7 @@ namespace {
     const qreal lineCommentTopMargin = -0.20;
     const qreal lineCommentBottomMargin = 0.05;
     const qreal lineBarMinChunkSize = 0.51;
+    const qreal lineBarMinMotionFraction = 0.5;
 
 
     /* Thumbnails bar. */
@@ -370,12 +371,20 @@ private:
     }
 
     QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
+        qreal rc = m_weights[Qn::RecordingContent];
+        qreal mc = m_weights[Qn::MotionContent];
+        qreal bc = m_weights[Qn::TimePeriodContentCount];
         qreal sum = m_pendingLength;
-        qreal rc = m_weights[Qn::RecordingContent] / sum;
-        qreal mc = m_weights[Qn::MotionContent] / sum;
-        qreal bc = m_weights[Qn::TimePeriodContentCount] / sum;
-        
-        return linearCombine(rc, colors[Qn::RecordingContent], 1.0, linearCombine(mc, colors[Qn::MotionContent], bc, colors[Qn::TimePeriodContentCount]));
+
+        if(m_weights[Qn::MotionContent] != 0) {
+            /* Make sure motion is noticable even if there isn't much of it. 
+             * Note that these adjustments don't change sum. */
+            rc = rc * (1.0 - lineBarMinMotionFraction);
+            mc = sum * lineBarMinMotionFraction + mc * (1.0 - lineBarMinMotionFraction);
+            bc = bc * (1.0 - lineBarMinMotionFraction);
+        }
+
+        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], bc / sum, colors[Qn::TimePeriodContentCount]));
     }
 
 private:
