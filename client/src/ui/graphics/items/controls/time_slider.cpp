@@ -290,6 +290,11 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnTimeSliderChunkPainter
 // -------------------------------------------------------------------------- //
+// TODO: #Elric
+// An even better solution that will remove all blinking 
+// (we still have it with recorded chunks trapped between two motion chunks)
+// would be to draw it pixel-by-pixel, counting the motion/recording percentage
+// in each pixel. This approach can be made to work just as fast as the current one.
 class QnTimeSliderChunkPainter {
 public:
     QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter): 
