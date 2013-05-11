@@ -5,6 +5,7 @@
 #include <QtGui/QFileDialog>
 
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
@@ -32,9 +33,10 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
     if (!ui->listView->currentIndex().isValid())
         return;
 
-    QString soundUrl = ui->listView->model()->data(
-                ui->listView->currentIndex(), Qt::UserRole + 1).toString();
-    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(soundUrl);
+    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QString filename = soundModel->filenameByRow(ui->listView->currentIndex().row());
+
+    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
     if (!QFileInfo(filePath).exists())
         return;
 

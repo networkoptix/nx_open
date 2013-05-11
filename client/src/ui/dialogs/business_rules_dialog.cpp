@@ -47,7 +47,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     createActions();
 
-    m_rulesViewModel = new QnBusinessRulesViewModel(this, this->context());
+    m_rulesViewModel = new QnBusinessRulesViewModel(this);
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);

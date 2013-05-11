@@ -61,7 +61,7 @@ namespace QnBusiness {
 }
 
 
-class QnBusinessRuleViewModel: public QObject {
+class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 
     typedef QObject base_type;
@@ -169,7 +169,7 @@ class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchCo
 
     typedef QAbstractItemModel base_type;
 public:
-    explicit QnBusinessRulesViewModel(QObject *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRulesViewModel(QObject *parent = 0);
     virtual ~QnBusinessRulesViewModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -194,6 +194,8 @@ public:
     QnBusinessRuleViewModel* getRuleModel(int row);
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
+    void at_soundModel_listChanged();
+    void at_soundModel_itemChanged(const QString &filename);
 
 private:
     QList<QnBusinessRuleViewModel *> m_rules;

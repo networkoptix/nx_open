@@ -11,6 +11,7 @@
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
+#include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
@@ -206,6 +207,15 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                     return;
                 }
 
+                if (actionType == BusinessActionType::PlaySound) {
+                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+                        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+                        comboBox->setCurrentIndex(soundModel->rowByFilename(index.data(Qt::EditRole).toString()));
+                    }
+                    return;
+                }
+
+
                 if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
                     btn->setResources(index.data(QnBusiness::ActionResourcesRole).value<QnResourceList>());
                     btn->setText(index.data(QnBusiness::ShortTextRole).toString());
@@ -245,9 +255,11 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             {
                 BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
 
-                if (actionType == BusinessActionType::ShowPopup) {
+                if (actionType == BusinessActionType::ShowPopup || actionType == BusinessActionType::PlaySound) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                        model->setData(index, comboBox->itemData(comboBox->currentIndex()));
+                        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+                        QString filename = soundModel->filenameByRow(comboBox->currentIndex());
+                        model->setData(index, filename);
                     }
                     return;
                 }

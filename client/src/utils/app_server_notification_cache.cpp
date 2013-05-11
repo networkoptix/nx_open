@@ -4,17 +4,20 @@
 #include <QtCore/QFileInfo>
 
 #include <transcoding/file_transcoder.h>
+
+#include <ui/models/notification_sound_model.h>
+
 #include <utils/media/audio_player.h>
 
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-    const QLatin1String titleTagValue("Comment");
+    const QLatin1String titleTag("Comment");
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     base_type(folder, parent),
-    m_model(new QStandardItemModel(this))
+    m_model(new QnNotificationSoundModel(this))
 {
     connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
@@ -27,12 +30,8 @@ QnAppServerNotificationCache::~QnAppServerNotificationCache() {
 
 }
 
-QStandardItemModel* QnAppServerNotificationCache::persistentGuiModel() const {
+QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() const {
     return m_model;
-}
-
-QString QnAppServerNotificationCache::titleTag() {
-    return titleTagValue;
 }
 
 void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs) {
@@ -46,7 +45,7 @@ void QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     transcoder->setDestFile(getFullPath(newFilename));
     transcoder->setContainer(targetContainter);
     transcoder->setAudioCodec(CODEC_ID_MP3);
-    transcoder->addTag(titleTag(), title);
+    transcoder->addTag(titleTag, title);
 
     if (maxLengthMSecs > 0)
         transcoder->setTranscodeDurationLimit(maxLengthMSecs);
@@ -64,7 +63,7 @@ void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filena
     if (!ok)
         return;
 
-    m_model->clear();
+    m_model->loadList(filenames);
     foreach (QString filename, filenames) {
         downloadFile(filename);
     }
@@ -74,12 +73,9 @@ void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok
     if (!ok)
         return;
 
-    QString title = AudioPlayer::getTagValue(getFullPath(filename), titleTagValue);
-    if (title.isEmpty())
-        title = filename;
-
-    QStandardItem* item = new QStandardItem(title);
-    item->setData(filename);
-    m_model->appendRow(item);
+    //TODO: #GDM think about getTagValueAsync
+    QString title = AudioPlayer::getTagValue(getFullPath(filename), titleTag);
+    if (!title.isEmpty())
+        m_model->updateTitle(filename, title);
 }
 
