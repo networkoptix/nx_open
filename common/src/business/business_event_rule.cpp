@@ -78,12 +78,12 @@ void QnBusinessEventRule::setActionResources(const QnResourceList &value) {
     m_actionResources = value;
 }
 
-QnBusinessParams QnBusinessEventRule::actionParams() const
+QnBusinessActionParameters QnBusinessEventRule::actionParams() const
 {
     return m_actionParams;
 }
 
-void QnBusinessEventRule::setActionParams(const QnBusinessParams &params)
+void QnBusinessEventRule::setActionParams(const QnBusinessActionParameters &params)
 {
     m_actionParams = params;
 }

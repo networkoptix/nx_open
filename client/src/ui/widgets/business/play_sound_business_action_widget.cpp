@@ -49,7 +49,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
         return;
 
     if (fields & QnBusiness::ActionParamsField) {
-        m_filename = QnBusinessActionParameters::getSoundUrl(model->actionParams());
+        m_filename = model->actionParams().getSoundUrl();
         updateSoundUrl();
     }
 }
@@ -60,8 +60,8 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
 
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
     QString filename = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
-    QnBusinessParams params;
-    QnBusinessActionParameters::setSoundUrl(&params, filename);
+    QnBusinessActionParameters params;
+    params.setSoundUrl(filename);
     model()->setActionParams(params);
 }
 

@@ -6,17 +6,39 @@
 //TODO: #GDM move QnStreamQuality OUT OF THERE!
 #include <core/resource/media_resource.h>
 
-namespace QnBusinessActionParameters {
+class QnBusinessActionParameters 
+{
+public:
+
+    enum Params 
+    {
+        soundUrlParam,
+        emailAddressParam,
+        userGroupParam,
+        fpsParam,
+        qualityParam,
+        durationParam,
+        beforeParam,
+        afterParam,
+        relayOutputIDParam,
+        relayAutoResetTimeoutParam,
+        inputPortIdParam,
+        keyParam,
+
+        CountParam
+    };
+
+    QnBusinessActionParameters();
 
     // Play Sound
 
-    QString getSoundUrl(const QnBusinessParams &params);
-    void setSoundUrl(QnBusinessParams* params, const QString &value);
+    QString getSoundUrl() const;
+    void setSoundUrl(const QString &value);
 
     // Email
 
-    QString getEmailAddress(const QnBusinessParams &params);
-    void setEmailAddress(QnBusinessParams* params, const QString &value);
+    QString getEmailAddress() const;
+    void setEmailAddress(const QString &value);
 
     // Popups and System Health
 
@@ -25,34 +47,57 @@ namespace QnBusinessActionParameters {
         AdminOnly
     };
 
-    UserGroup getUserGroup(const QnBusinessParams &params);
-    void setUserGroup(QnBusinessParams* params, const UserGroup value);
+    UserGroup getUserGroup() const;
+    void setUserGroup(const UserGroup value);
 
     // Recording
 
-    int getFps(const QnBusinessParams &params);
-    void setFps(QnBusinessParams* params, int value);
+    int getFps() const;
+    void setFps(int value);
 
-    QnStreamQuality getStreamQuality(const QnBusinessParams &params);
-    void setStreamQuality(QnBusinessParams* params, QnStreamQuality value);
+    QnStreamQuality getStreamQuality() const;
+    void setStreamQuality(QnStreamQuality value);
 
-    int getRecordDuration(const QnBusinessParams &params);
-    void setRecordDuration(QnBusinessParams* params, int value);
+    int getRecordDuration() const;
+    void setRecordDuration(int value);
 
-    int getRecordBefore(const QnBusinessParams &params);
-    void setRecordBefore(QnBusinessParams* params, int value);
+    int getRecordBefore() const;
+    void setRecordBefore(int value);
 
-    int getRecordAfter(const QnBusinessParams &params);
-    void setRecordAfter(QnBusinessParams* params, int value);
+    int getRecordAfter() const;
+    void setRecordAfter(int value);
 
     // Camera Output
 
-    QString getRelayOutputId(const QnBusinessParams &params);
-    void setRelayOutputId(QnBusinessParams* params, const QString &value);
+    QString getRelayOutputId() const;
+    void setRelayOutputId(const QString &value);
 
-    int getRelayAutoResetTimeout(const QnBusinessParams &params);
-    void setRelayAutoResetTimeout(QnBusinessParams* params, int value);
+    int getRelayAutoResetTimeout() const;
+    void setRelayAutoResetTimeout(int value);
 
-}
+    QString getParamsKey() const;
+    void setParamsKey(QString value);
+
+    QString getInputPortId() const;
+    void setInputPortId(const QString &value);
+
+    static QnBusinessActionParameters deserialize(const QByteArray& value);
+    QByteArray serialize() const;
+
+    QnBusinessParams toBusinessParams() const;
+    static QnBusinessActionParameters fromBusinessParams(const QnBusinessParams& bParams);
+
+    QVariant& operator[](int index);
+    const QVariant& operator[](int index) const;
+
+    /*
+    * Returns true if all parameters have default values
+    */
+    bool isDefault() const;
+private:
+    static int getParamIndex(const QString& key);
+private:
+    QVector<QVariant> m_params;
+};
 
 #endif // BUSINESS_ACTION_PARAMETERS_H

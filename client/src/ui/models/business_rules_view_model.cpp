@@ -167,11 +167,11 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return m_actionType;
             else if (column == QnBusiness::TargetColumn) {
                 if (m_actionType == BusinessActionType::SendMail)
-                    return QnBusinessActionParameters::getEmailAddress(m_actionParams);
+                    return m_actionParams.getEmailAddress();
                 if (m_actionType == BusinessActionType::ShowPopup)
-                    return (int)QnBusinessActionParameters::getUserGroup(m_actionParams);
+                    return (int)m_actionParams.getUserGroup();
                 if (m_actionType == BusinessActionType::PlaySound)
-                    return QnBusinessActionParameters::getSoundUrl(m_actionParams);
+                    return m_actionParams.getSoundUrl();
             }
             break;
 
@@ -238,13 +238,13 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             return true;
         case QnBusiness::TargetColumn:
             if (m_actionType == BusinessActionType::ShowPopup) {
-                QnBusinessParams params = m_actionParams;
-                QnBusinessActionParameters::setUserGroup(&params, (QnBusinessActionParameters::UserGroup)value.toInt());
+                QnBusinessActionParameters params = m_actionParams;
+                params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt());
                 setActionParams(params);
             }
             else if (m_actionType == BusinessActionType::PlaySound) {
-                QnBusinessParams params;
-                QnBusinessActionParameters::setSoundUrl(&params, value.toString());
+                QnBusinessActionParameters params;
+                params.setSoundUrl(value.toString());
                 setActionParams(params);
             } else
                 setActionResources(value.value<QnResourceList>());
@@ -275,8 +275,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_actionResources.clear();
     m_actionResources.append(businessRule->actionResources());
 
-    foreach (QString key, businessRule->actionParams().keys())
-        m_actionParams[key] = businessRule->actionParams()[key];
+    m_actionParams = businessRule->actionParams();
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
@@ -484,18 +483,18 @@ void QnBusinessRuleViewModel::setActionResources(const QnResourceList &value) {
     emit dataChanged(this, QnBusiness::ActionResourcesField | QnBusiness::ModifiedField);
 }
 
-QnBusinessParams QnBusinessRuleViewModel::actionParams() const
+QnBusinessActionParameters QnBusinessRuleViewModel::actionParams() const
 {
     return m_actionParams;
 }
 
-void QnBusinessRuleViewModel::setActionParams(const QnBusinessParams &params)
+void QnBusinessRuleViewModel::setActionParams(const QnBusinessActionParameters &params)
 {
     bool hasChanges = false;
-    foreach(const QString &key, params.keys()) {
-        if (m_actionParams.contains(key) && m_actionParams[key] == params[key])
+    for (int i = 0; i < (int) QnBusinessActionParameters::CountParam; ++i) {
+        if (m_actionParams[i] == params[i])
             continue;
-        m_actionParams[key] = params[key];
+        m_actionParams[i] = params[i];
         hasChanges = true;
     }
 
@@ -628,7 +627,7 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
                     return qnResIconCache->icon(QnResourceIconCache::Users);
 
                 } else if (m_actionType == BusinessActionType::ShowPopup) {
-                    if (QnBusinessActionParameters::getUserGroup(m_actionParams) == QnBusinessActionParameters::AdminOnly)
+                    if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
                         return qnResIconCache->icon(QnResourceIconCache::User);
                     else
                         return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -681,7 +680,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                         any = true;
                     }
 
-                    QStringList additional = QnBusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+                    QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
                     foreach(const QString &email, additional) {
                         if (email.trimmed().isEmpty())
                             continue;
@@ -693,7 +692,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                 } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
                 } else if (m_actionType == BusinessActionType::PlaySound) {
-                    return !QnBusinessActionParameters::getSoundUrl(m_actionParams).isEmpty();
+                    return !m_actionParams.getSoundUrl().isEmpty();
                 }
 
                 QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
@@ -769,7 +768,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
         }
 
-        QStringList additional = QnBusinessActionParameters::getEmailAddress(m_actionParams).split(QLatin1Char(';'), QString::SkipEmptyParts);
+        QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
         foreach(const QString &email, additional) {
             QString trimmed = email.trimmed();
             if (trimmed.isEmpty())
@@ -789,7 +788,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         return tr("%1 users").arg(users.size());
 
     } else if (m_actionType == BusinessActionType::ShowPopup) {
-        if (QnBusinessActionParameters::getUserGroup(m_actionParams) == QnBusinessActionParameters::AdminOnly)
+        if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
             return tr("Administrators only");
         else
             return tr("All users");
@@ -808,7 +807,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());
     } else if (m_actionType == BusinessActionType::PlaySound) {
-        QString filename = QnBusinessActionParameters::getSoundUrl(m_actionParams);
+        QString filename = m_actionParams.getSoundUrl();
         if (filename.isEmpty())
             return tr("Select a sound");
 
@@ -1058,7 +1057,7 @@ void QnBusinessRulesViewModel::at_soundModel_itemChanged(const QString &filename
     for (int i = 0; i < m_rules.size(); i++) {
         if (m_rules[i]->actionType() != BusinessActionType::PlaySound)
             continue;
-        if (QnBusinessActionParameters::getSoundUrl(m_rules[i]->actionParams()) != filename)
+        if (m_rules[i]->actionParams().getSoundUrl() != filename)
             continue;
         QModelIndex index = this->index(i, QnBusiness::TargetColumn, QModelIndex());
         emit dataChanged(index, index);

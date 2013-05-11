@@ -958,7 +958,7 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             break;
         }
     case BusinessActionType::PlaySound: {
-            QString filename = QnBusinessActionParameters::getSoundUrl(businessAction->getParams());
+            QString filename = businessAction->getParams().getSoundUrl();
             qDebug() << "play sound action received" << filename;
 
             QnAppServerNotificationCache *cache = new QnAppServerNotificationCache(this);

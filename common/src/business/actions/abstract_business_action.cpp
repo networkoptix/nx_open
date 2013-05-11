@@ -116,11 +116,11 @@ const QnResourceList& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 
-void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
+void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {
     m_params = params;
 }
 
-const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
+const QnBusinessActionParameters& QnAbstractBusinessAction::getParams() const {
     return m_params;
 }
 

@@ -369,7 +369,7 @@ bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& actio
             recipients << email;
     }
 
-    QStringList additional = QnBusinessActionParameters::getEmailAddress(action->getParams()).split(QLatin1Char(';'), QString::SkipEmptyParts);
+    QStringList additional = action->getParams().getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
     foreach(const QString &email, additional) {
         log << email;
         QString trimmed = email.trimmed();

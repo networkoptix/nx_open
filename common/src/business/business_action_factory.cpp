@@ -17,8 +17,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 
-    if (!rule->actionParams().isEmpty())
-        result->setParams(rule->actionParams());
+    result->setParams(rule->actionParams());
     result->setResources(rule->actionResources());
 
     if (BusinessEventType::hasToggleState(event->getEventType()) && BusinessActionType::hasToggleState(rule->actionType())) {

@@ -6,6 +6,7 @@
 #include <business/business_logic_common.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/qnid.h>
+#include "../business_action_parameters.h"
 
 namespace BusinessActionType
 {
@@ -96,8 +97,8 @@ public:
 
     const QnResourceList& getResources() const;
 
-    void setParams(const QnBusinessParams& params);
-    const QnBusinessParams& getParams() const;
+    void setParams(const QnBusinessActionParameters& params);
+    const QnBusinessActionParameters& getParams() const;
 
     void setRuntimeParams(const QnBusinessParams& params);
     const QnBusinessParams& getRuntimeParams() const;
@@ -126,7 +127,7 @@ protected:
     ToggleState::Value m_toggleState;
     bool m_receivedFromRemoteHost;
     QnResourceList m_resources;
-    QnBusinessParams m_params;
+    QnBusinessActionParameters m_params;
     QnBusinessParams m_runtimeParams;
     QnId m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;

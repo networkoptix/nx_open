@@ -53,7 +53,7 @@ bool QnPopupCollectionWidget::addBusinessAction(const QnAbstractBusinessActionPt
         return false;
 
     //TODO: #GDM check if camera is visible to us
-    QnBusinessActionParameters::UserGroup userGroup = QnBusinessActionParameters::getUserGroup(businessAction->getParams());
+    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         qDebug() << "popup for admins received, we are not admin";

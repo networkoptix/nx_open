@@ -15,8 +15,8 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
     QnBusinessEventRuntime::setEventResourceId(&runtimeParams, eventResourceId);
     setRuntimeParams(runtimeParams);
 
-    QnBusinessParams actionParams;
-    QnBusinessActionParameters::setUserGroup(&actionParams, QnBusinessActionParameters::AdminOnly);
+    QnBusinessActionParameters actionParams;
+    actionParams.setUserGroup(QnBusinessActionParameters::AdminOnly);
     setParams(actionParams);
 
 }

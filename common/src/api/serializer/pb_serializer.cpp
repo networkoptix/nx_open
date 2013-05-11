@@ -516,7 +516,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_actiontype((pb::BusinessActionType) serializeBusinessActionType(businessRulePtr->actionType()));
     foreach(QnResourcePtr res, businessRulePtr->actionResources())
         pb_businessRule.add_actionresource(res->getId().toInt());
-    pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams()));
+    pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->actionParams().toBusinessParams()));
 
     pb_businessRule.set_aggregationperiod(businessRulePtr->aggregationPeriod());
     pb_businessRule.set_disabled(businessRulePtr->disabled());
@@ -1025,7 +1025,7 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
         if (res)
             pb_businessAction.add_actionresource(res->getId());
     }
-    pb_businessAction.set_actionparams(serializeBusinessParams(action->getParams()));
+    pb_businessAction.set_actionparams(action->getParams().serialize());
     pb_businessAction.set_runtimeparams(serializeBusinessParams(action->getRuntimeParams()));
     pb_businessAction.set_businessruleid(action->getBusinessRuleId().toInt());
     pb_businessAction.set_togglestate((pb::ToggleStateType) action->getToggleState());
@@ -1048,7 +1048,7 @@ void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActi
             if (res)
                 ba->add_actionresource(res->getId());
         }
-        ba->set_actionparams(serializeBusinessParams(actions[i]->getParams()));
+        ba->set_actionparams(actions[i]->getParams().serialize());
         ba->set_runtimeparams(serializeBusinessParams(actions[i]->getRuntimeParams()));
         ba->set_businessruleid(actions[i]->getBusinessRuleId().toInt());
         ba->set_togglestate((pb::ToggleStateType) actions[i]->getToggleState());
@@ -1204,7 +1204,8 @@ void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessR
             qWarning() << "NULL action resource while reading rule" << pb_businessRule.id();
     }
     businessRule->setActionResources(actionResources);
-    businessRule->setActionParams(deserializeBusinessParams(pb_businessRule.actionparams().c_str()));
+    QnBusinessParams bParams = deserializeBusinessParams(pb_businessRule.actionparams().c_str());
+    businessRule->setActionParams(QnBusinessActionParameters::fromBusinessParams(bParams));
 
     businessRule->setAggregationPeriod(pb_businessRule.aggregationperiod());
     businessRule->setDisabled(pb_businessRule.disabled());
@@ -1226,7 +1227,7 @@ void parseBusinessAction(QnAbstractBusinessActionPtr& businessAction, const pb::
         resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
     businessAction->setResources(resources);
 
-    businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
+    businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
     businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
     businessAction->setAggregationCount(pb_businessAction.aggregationcount());
@@ -1250,7 +1251,7 @@ void parseBusinessActionList(QnAbstractBusinessActionList& businessActionList, c
             resources << qnResPool->getResourceById(pb_businessAction.actionresource(i), QnResourcePool::rfAllResources);
         businessAction->setResources(resources);
 
-        businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
+        businessAction->setParams(QnBusinessActionParameters::deserialize(pb_businessAction.actionparams().c_str()));
         businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
         businessAction->setToggleState((ToggleState::Value) pb_businessAction.togglestate());
         businessAction->setAggregationCount(pb_businessAction.aggregationcount());

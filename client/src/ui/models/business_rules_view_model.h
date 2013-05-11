@@ -105,8 +105,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
-    QnBusinessParams actionParams() const;
-    void setActionParams(const QnBusinessParams& params);
+    QnBusinessActionParameters actionParams() const;
+    void setActionParams(const QnBusinessActionParameters& params);
 
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
@@ -150,7 +150,7 @@ private:
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;
-    QnBusinessParams m_actionParams;
+    QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;
     bool m_disabled;

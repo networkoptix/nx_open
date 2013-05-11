@@ -60,7 +60,7 @@ void QnCameraInputBusinessEventWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessParams params;
-    QnBusinessEventRuntime::setInputPortId(&params, ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
+    QnBusinessActionParameters params;
+    params.setInputPortId(ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString());
     model()->setActionParams(params);
 }

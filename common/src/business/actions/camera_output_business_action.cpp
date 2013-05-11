@@ -13,11 +13,11 @@ QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const Q
 }
 
 QString QnCameraOutputBusinessAction::getRelayOutputId() const {
-    return QnBusinessActionParameters::getRelayOutputId(getParams());
+    return m_params.getRelayOutputId();
 }
 
 int QnCameraOutputBusinessAction::getRelayAutoResetTimeout() const {
-    return QnBusinessActionParameters::getRelayAutoResetTimeout(getParams());
+    return m_params.getRelayAutoResetTimeout();
 }
 
 QString QnCameraOutputBusinessAction::getExternalUniqKey() const

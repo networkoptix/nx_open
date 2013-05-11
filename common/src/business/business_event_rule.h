@@ -6,6 +6,7 @@
 #include <business/business_logic_common.h>
 
 #include <core/resource/resource_fwd.h>
+#include "business_action_parameters.h"
 
 /**
 * This class define relation between business event and action
@@ -41,8 +42,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
-    QnBusinessParams actionParams() const;
-    void setActionParams(const QnBusinessParams& params);
+    QnBusinessActionParameters actionParams() const;
+    void setActionParams(const QnBusinessActionParameters& params);
 
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
@@ -71,7 +72,7 @@ private:
 
     BusinessActionType::Value m_actionType;
     QnResourceList m_actionResources;
-    QnBusinessParams m_actionParams;
+    QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;
     bool m_disabled;

@@ -67,7 +67,7 @@ bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePt
 
     insQuery.bindValue(":timestamp", QDateTime::fromMSecsSinceEpoch(timestampUsec/1000));
     insQuery.bindValue(":action_type", (int) action->actionType());
-    insQuery.bindValue(":action_params", serializeBusinessParams(action->getParams()));
+    insQuery.bindValue(":action_params", action->getParams().serialize());
     insQuery.bindValue(":runtime_params", serializeBusinessParams(action->getRuntimeParams()));
     insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
@@ -96,6 +96,9 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     const QnId& businessRuleId) const
 
 {
+    QTime t;
+    t.restart();
+
     QMutexLocker lock(&m_mutex);
 
     QList<QnAbstractBusinessActionPtr> result;
@@ -117,7 +120,6 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
 
     QSqlQuery query(request);
-    //query.prepare(request);
     if (!query.exec())
         return result;
 
@@ -132,7 +134,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     while (query.next()) 
     {
         BusinessActionType::Value actionType = (BusinessActionType::Value) query.value(actionTypeIdx).toInt();
-        QnBusinessParams actionParams = deserializeBusinessParams(query.value(actionParamIdx).toByteArray());
+        QnBusinessActionParameters actionParams = QnBusinessActionParameters::deserialize(query.value(actionParamIdx).toByteArray());
         QnBusinessParams runtimeParams = deserializeBusinessParams(query.value(runtimeParamIdx).toByteArray());
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
@@ -143,14 +145,79 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         result << action;
     }
 
+    qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
+
     return result;
 }
+
+/*
+void QnEventsDB::migrate()
+{
+    QList<QnAbstractBusinessActionPtr> result;
+
+    QString request(lit("SELECT * FROM runtime_actions"));
+
+    QSqlQuery query(request);
+    //query.prepare(request);
+    if (!query.exec())
+        return;
+
+    QSqlRecord rec = query.record();
+    int idIdx = rec.indexOf("id");
+    int actionTypeIdx = rec.indexOf("action_type");
+    int actionParamIdx = rec.indexOf("action_params");
+    int runtimeParamIdx = rec.indexOf("runtime_params");
+    int businessRuleIdx = rec.indexOf("business_rule_id");
+    int toggleStateIdx = rec.indexOf("toggle_state");
+    int aggregationCntIdx = rec.indexOf("aggregation_count");
+
+    QList<int> idList;
+
+    while (query.next()) 
+    {
+        BusinessActionType::Value actionType = (BusinessActionType::Value) query.value(actionTypeIdx).toInt();
+        
+        QByteArray data = query.value(actionParamIdx).toByteArray();
+        if (data.size() > 4) {
+            int gg = 4;
+        }
+        QnBusinessParams bParams = deserializeBusinessParams(data);
+
+        QnBusinessActionParameters actionParams = QnBusinessActionParameters::fromBusinessParams(bParams);
+
+        QnBusinessParams runtimeParams = deserializeBusinessParams(query.value(runtimeParamIdx).toByteArray());
+        QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
+        action->setParams(actionParams);
+        action->setBusinessRuleId(query.value(businessRuleIdx).toInt());
+        action->setToggleState( (ToggleState::Value) query.value(toggleStateIdx).toInt());
+        action->setAggregationCount(query.value(aggregationCntIdx).toInt());
+
+        result << action;
+        idList << query.value(idIdx).toInt();
+    }
+
+    query.finish();
+
+    for (int i = 0; i < result.size(); ++i)
+    {
+        QSqlQuery query2;
+        query2.prepare("UPDATE runtime_actions set action_params=:action_params WHERE id =:id");
+        query2.bindValue(":action_params", result[i]->getParams().serialize());
+        query2.bindValue(":id", idList[i]);
+        query2.exec();
+    }
+
+}
+*/
+
 
 void QnEventsDB::init()
 {
     // this call is not thread safe! You should init from main thread e.t.c
     Q_ASSERT_X(!m_instance, Q_FUNC_INFO, "QnEventsDB::init must be called once!");
     m_instance = new QnEventsDB();
+
+    //migrate();
 }
 
 void QnEventsDB::fini()

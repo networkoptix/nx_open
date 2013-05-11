@@ -32,7 +32,7 @@ void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMode
     Q_UNUSED(guard)
 
     if (fields & QnBusiness::ActionParamsField) {
-        QString email = QnBusinessActionParameters::getEmailAddress(model->actionParams());
+        QString email = (model->actionParams().getEmailAddress());
         if (ui->emailLineEdit->text() != email)
             ui->emailLineEdit->setText(email);
     }
@@ -42,8 +42,8 @@ void QnSendmailBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnBusinessParams params;
-    QnBusinessActionParameters::setEmailAddress(&params, ui->emailLineEdit->text());
+    QnBusinessActionParameters params;
+    params.setEmailAddress(ui->emailLineEdit->text());
     model()->setActionParams(params);
 }
 
