@@ -41,7 +41,6 @@ public:
 private:
 
     static QString columnTitle(Column column);
-    QStandardItem *createItem(Column column, const QnAbstractBusinessActionPtr &action) const;
     
     QVariant textData(const Column& column,const QnAbstractBusinessActionPtr &action) const;
     QVariant iconData(const Column& column, const QnAbstractBusinessActionPtr &action) const;

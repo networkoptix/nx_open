@@ -139,10 +139,16 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
 QByteArray QnBusinessEventParameters::serialize() const
 {
     QByteArray result;
-    result = m_params[0].toString().toAscii();
+
+    static QnBusinessEventParameters m_defaultParams;
+
+    QByteArray tmp;
+    tmp = m_params[0].toString().toAscii();
     for (int i = 0; i < m_params.size(); ++i) {
-        result += DELIMITER;
-        result += m_params[i].toString().toAscii();
+        tmp += DELIMITER;
+        tmp += m_params[i].toString().toAscii();
+        if (m_params[i] != m_defaultParams[i])
+            result = tmp;
     }
     return result;
 }
